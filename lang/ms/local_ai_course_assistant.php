@@ -3130,3 +3130,15 @@ $string['outcomes:state_unavailable'] = 'Keputusan ini tidak tersedia buat masa 
 $string['cachedef_outcomesattainment'] = 'Pencapaian hasil program setiap pelajar dan kursus';
 
 $string['cachedef_vectors'] = 'Vektor embedding RAG untuk indeks dapatan semula';
+
+$string['voice:error_toolarge'] = 'Rakaman ini terlalu besar. Cuba klip yang lebih pendek, di bawah kira-kira 25 MB.';
+$string['voice:error_noaudio'] = 'Tiada rakaman diterima. Sila cuba rakam semula.';
+$string['voice:error_format'] = 'Format audio itu tidak disokong. Sila cuba rakam semula.';
+$string['voice:error_noprovider'] = 'Transkripsi suara tidak disediakan di laman ini. Sila hubungi pentadbir anda.';
+$string['voice:error_badresponse'] = 'Perkhidmatan transkripsi mengembalikan sesuatu yang tidak dijangka. Sila cuba lagi.';
+
+$string['settings:max_audio_mb'] = 'Saiz rakaman maksimum (MB)';
+$string['settings:max_audio_mb_desc'] = 'Rakaman suara terbesar yang boleh dimuat naik oleh pelajar, dalam megabait. Antara 1 dan 200; lalainya ialah 25.<br>Pada pelayan ini PHP membenarkan post_max_size = {$a->postmax} dan upload_max_filesize = {$a->uploadmax}, jadi saiz yang benar-benar dikuatkuasakan sekarang ialah {$a->effective} MB. Yang lebih kecil antara tetapan anda dan had PHP sendiri sentiasa berkuat kuasa.';
+$string['settings:max_audio_mb_capped'] = 'Hadnya pada pelayan ini ialah PHP, bukan tetapan ini. Naikkan post_max_size dan upload_max_filesize dalam php.ini kepada sekurang-kurangnya 26M jika anda mahu pelajar boleh menggunakan 25 MB penuh.';
+
+$string['voice:error_unavailable'] = 'Perkhidmatan transkripsi tidak tersedia sekarang. Sila cuba lagi sebentar lagi.';

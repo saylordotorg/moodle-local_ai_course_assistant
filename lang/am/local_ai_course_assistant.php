@@ -3114,3 +3114,15 @@ $string['outcomes:state_unavailable'] = 'ይህ ውጤት በአሁኑ ጊዜ �
 $string['cachedef_outcomesattainment'] = 'የፕሮግራም ውጤት ማሳካት ደረጃ በተማሪና በኮርስ';
 
 $string['cachedef_vectors'] = 'ለማምጣት ማውጫ የRAG ኤምቤዲንግ ቬክተሮች';
+
+$string['voice:error_toolarge'] = 'ይህ ቅጂ በጣም ትልቅ ነው። ከ25 ሜባ በታች የሆነ አጭር ቅጂ ይሞክሩ።';
+$string['voice:error_noaudio'] = 'ምንም ቅጂ አልደረሰም። እባክዎ እንደገና ለመቅዳት ይሞክሩ።';
+$string['voice:error_format'] = 'ይህ የድምፅ ቅርጸት አይደገፍም። እባክዎ እንደገና ለመቅዳት ይሞክሩ።';
+$string['voice:error_noprovider'] = 'በዚህ ጣቢያ ላይ የድምፅ ግልባጭ አልተዋቀረም። እባክዎ አስተዳዳሪዎን ያነጋግሩ።';
+$string['voice:error_badresponse'] = 'የግልባጭ አገልግሎቱ ያልተጠበቀ ነገር መልሷል። እባክዎ እንደገና ይሞክሩ።';
+
+$string['settings:max_audio_mb'] = 'ከፍተኛ የቅጂ መጠን (ሜባ)';
+$string['settings:max_audio_mb_desc'] = 'አንድ ተማሪ ሊጭን የሚችለው ትልቁ የድምፅ ቅጂ በሜጋባይት። ከ1 እስከ 200፤ ነባሪው 25 ነው።<br>በዚህ አገልጋይ ላይ PHP post_max_size = {$a->postmax} እና upload_max_filesize = {$a->uploadmax} ይፈቅዳል፤ ስለዚህ አሁን በተግባር የሚተገበረው መጠን {$a->effective} ሜባ ነው። ከእርስዎ ቅንብር እና ከPHP ገደቦች ትንሹ ሁልጊዜ ያሸንፋል።';
+$string['settings:max_audio_mb_capped'] = 'በዚህ አገልጋይ ላይ ገደቡ PHP ነው እንጂ ይህ ቅንብር አይደለም። ተማሪዎች ሙሉውን 25 ሜባ እንዲጠቀሙ ከፈለጉ በphp.ini ውስጥ post_max_size እና upload_max_filesize ቢያንስ ወደ 26M ከፍ ያድርጉ።';
+
+$string['voice:error_unavailable'] = 'የግልባጭ አገልግሎቱ በአሁኑ ጊዜ አይገኝም። እባክዎ ከጥቂት ጊዜ በኋላ እንደገና ይሞክሩ።';

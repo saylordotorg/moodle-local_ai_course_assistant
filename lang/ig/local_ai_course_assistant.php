@@ -3101,3 +3101,15 @@ $string['outcomes:state_unavailable'] = 'A pụghị inweta nsonaazụ a ugbu a.
 $string['cachedef_outcomesattainment'] = 'Mmezu nsonaazụ mmemme kwa nwa akwụkwọ na nkuzi';
 
 $string['cachedef_vectors'] = 'Vector embedding RAG maka ndeksị nweghachi';
+
+$string['voice:error_toolarge'] = 'Ndekọ a buru ibu nke ukwuu. Nwaa ndekọ dị mkpụmkpụ, nke na-erughị ihe dịka MB 25.';
+$string['voice:error_noaudio'] = 'Enwetaghị ndekọ ọ bụla. Biko nwaa ịdekọ ọzọ.';
+$string['voice:error_format'] = 'A naghị akwado ụdị ụda ahụ. Biko nwaa ịdekọ ọzọ.';
+$string['voice:error_noprovider'] = 'Edeghị ederede olu na saịtị a. Biko kpọtụrụ onye nchịkwa gị.';
+$string['voice:error_badresponse'] = 'Ọrụ ederede weghachiri ihe a na-atụghị anya ya. Biko nwaa ọzọ.';
+
+$string['settings:max_audio_mb'] = 'Nha ndekọ kachasị (MB)';
+$string['settings:max_audio_mb_desc'] = 'Ndekọ olu kachasị ukwuu onye mmụta nwere ike ibudata, na megabyte. N\'etiti 1 na 200; ndabara bụ 25.<br>Na sava a PHP na-enye ohere post_max_size = {$a->postmax} na upload_max_filesize = {$a->uploadmax}, ya mere nha a na-emanye ugbu a bụ {$a->effective} MB. Nke dị ntakịrị n\'etiti ntọala gị na oke PHP nwere na-emeri mgbe niile.';
+$string['settings:max_audio_mb_capped'] = 'Oke dị na sava a bụ PHP, ọ bụghị ntọala a. Welie post_max_size na upload_max_filesize na php.ini ruo opekempe 26M ma ọ bụrụ na ịchọrọ ka ndị mmụta nwee ike iji MB 25 zuru ezu.';
+
+$string['voice:error_unavailable'] = 'Ọrụ ederede adịghị ugbu a. Biko nwaa ọzọ n\'oge na-adịghị anya.';

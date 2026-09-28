@@ -3086,3 +3086,15 @@ $string['outcomes:state_unavailable'] = 'ขณะนี้ยังไม่ส
 $string['cachedef_outcomesattainment'] = 'ผลสัมฤทธิ์ตามผลลัพธ์หลักสูตรต่อผู้เรียนและรายวิชา';
 
 $string['cachedef_vectors'] = 'เวกเตอร์ embedding RAG สำหรับดัชนีการค้นคืน';
+
+$string['voice:error_toolarge'] = 'การบันทึกนี้มีขนาดใหญ่เกินไป ลองใช้คลิปที่สั้นลง ต่ำกว่าประมาณ 25 MB';
+$string['voice:error_noaudio'] = 'ไม่ได้รับการบันทึกใด ๆ โปรดลองบันทึกอีกครั้ง';
+$string['voice:error_format'] = 'ไม่รองรับรูปแบบเสียงนี้ โปรดลองบันทึกอีกครั้ง';
+$string['voice:error_noprovider'] = 'ยังไม่ได้ตั้งค่าการถอดเสียงบนเว็บไซต์นี้ โปรดติดต่อผู้ดูแลระบบของคุณ';
+$string['voice:error_badresponse'] = 'บริการถอดเสียงส่งคำตอบที่ไม่คาดคิดกลับมา โปรดลองอีกครั้ง';
+
+$string['settings:max_audio_mb'] = 'ขนาดการบันทึกสูงสุด (MB)';
+$string['settings:max_audio_mb_desc'] = 'ขนาดสูงสุดของการบันทึกเสียงที่ผู้เรียนอัปโหลดได้ หน่วยเป็นเมกะไบต์ อยู่ระหว่าง 1 ถึง 200 ค่าเริ่มต้นคือ 25<br>บนเซิร์ฟเวอร์นี้ PHP อนุญาต post_max_size = {$a->postmax} และ upload_max_filesize = {$a->uploadmax} ดังนั้นขนาดที่บังคับใช้จริงในขณะนี้คือ {$a->effective} MB ค่าที่น้อยกว่าระหว่างการตั้งค่าของคุณกับขีดจำกัดของ PHP จะมีผลเสมอ';
+$string['settings:max_audio_mb_capped'] = 'ขีดจำกัดบนเซิร์ฟเวอร์นี้คือ PHP ไม่ใช่การตั้งค่านี้ หากต้องการให้ผู้เรียนใช้ได้เต็ม 25 MB โปรดเพิ่ม post_max_size และ upload_max_filesize ใน php.ini เป็นอย่างน้อย 26M';
+
+$string['voice:error_unavailable'] = 'ขณะนี้บริการถอดเสียงไม่พร้อมใช้งาน โปรดลองอีกครั้งในอีกสักครู่';

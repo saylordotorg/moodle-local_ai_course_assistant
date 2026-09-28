@@ -3139,3 +3139,15 @@ $string['outcomes:state_unavailable'] = 'Hasil ini tidak tersedia saat ini. Nila
 $string['cachedef_outcomesattainment'] = 'Pencapaian capaian program per pelajar dan kursus';
 
 $string['cachedef_vectors'] = 'Vektor embedding RAG untuk indeks pengambilan';
+
+$string['voice:error_toolarge'] = 'Rekaman ini terlalu besar. Coba klip yang lebih pendek, di bawah sekitar 25 MB.';
+$string['voice:error_noaudio'] = 'Tidak ada rekaman yang diterima. Silakan coba merekam lagi.';
+$string['voice:error_format'] = 'Format audio itu tidak didukung. Silakan coba merekam lagi.';
+$string['voice:error_noprovider'] = 'Transkripsi suara belum disiapkan di situs ini. Silakan hubungi administrator Anda.';
+$string['voice:error_badresponse'] = 'Layanan transkripsi mengembalikan sesuatu yang tidak terduga. Silakan coba lagi.';
+
+$string['settings:max_audio_mb'] = 'Ukuran rekaman maksimum (MB)';
+$string['settings:max_audio_mb_desc'] = 'Rekaman suara terbesar yang boleh diunggah pelajar, dalam megabita. Antara 1 dan 200; defaultnya 25.<br>Di server ini PHP mengizinkan post_max_size = {$a->postmax} dan upload_max_filesize = {$a->uploadmax}, sehingga ukuran yang benar-benar diberlakukan saat ini adalah {$a->effective} MB. Yang lebih kecil antara pengaturan Anda dan batas PHP selalu yang berlaku.';
+$string['settings:max_audio_mb_capped'] = 'Batasnya di server ini adalah PHP, bukan pengaturan ini. Naikkan post_max_size dan upload_max_filesize di php.ini menjadi setidaknya 26M jika Anda ingin pelajar dapat menggunakan 25 MB penuh.';
+
+$string['voice:error_unavailable'] = 'Layanan transkripsi sedang tidak tersedia. Silakan coba lagi sebentar lagi.';

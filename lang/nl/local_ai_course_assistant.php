@@ -3110,3 +3110,15 @@ $string['outcomes:state_unavailable'] = 'Dit resultaat is op dit moment niet bes
 $string['cachedef_outcomesattainment'] = 'Behaald niveau op programmaleerresultaten per student en cursus';
 
 $string['cachedef_vectors'] = 'RAG-embeddingvectoren voor de zoekindex';
+
+$string['voice:error_toolarge'] = 'Deze opname is te groot. Probeer een kortere clip van minder dan ongeveer 25 MB.';
+$string['voice:error_noaudio'] = 'Er is geen opname ontvangen. Probeer opnieuw op te nemen.';
+$string['voice:error_format'] = 'Dit audioformaat wordt niet ondersteund. Probeer opnieuw op te nemen.';
+$string['voice:error_noprovider'] = 'Spraaktranscriptie is niet ingesteld op deze site. Neem contact op met uw beheerder.';
+$string['voice:error_badresponse'] = 'De transcriptiedienst gaf een onverwacht antwoord. Probeer het opnieuw.';
+
+$string['settings:max_audio_mb'] = 'Maximale opnamegrootte (MB)';
+$string['settings:max_audio_mb_desc'] = 'De grootste spraakopname die een cursist mag uploaden, in megabytes. Tussen 1 en 200; de standaard is 25.<br>Op deze server staat PHP post_max_size = {$a->postmax} en upload_max_filesize = {$a->uploadmax} toe, dus de grootte die op dit moment daadwerkelijk wordt afgedwongen is {$a->effective} MB. De kleinste van uw instelling en PHP\'s eigen limieten geldt altijd.';
+$string['settings:max_audio_mb_capped'] = 'De limiet op deze server is PHP, niet deze instelling. Verhoog post_max_size en upload_max_filesize in php.ini naar minstens 26M als u wilt dat cursisten de volledige 25 MB kunnen gebruiken.';
+
+$string['voice:error_unavailable'] = 'De transcriptiedienst is op dit moment niet beschikbaar. Probeer het zo meteen opnieuw.';

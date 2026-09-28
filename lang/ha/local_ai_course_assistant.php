@@ -3114,3 +3114,15 @@ $string['outcomes:state_unavailable'] = 'Wannan sakamakon ba ya samuwa a yanzu. 
 $string['cachedef_outcomesattainment'] = 'Matakin cimma sakamakon shiri na kowane xalibi da kowane kwas';
 
 $string['cachedef_vectors'] = 'Vektocin embedding na RAG don ƙididdigar dawowa';
+
+$string['voice:error_toolarge'] = 'Wannan rikodin ya yi girma sosai. Gwada gajeren rikodi, kasa da kusan MB 25.';
+$string['voice:error_noaudio'] = 'Ba a karɓi wani rikodi ba. Da fatan za a sake gwada yin rikodi.';
+$string['voice:error_format'] = 'Ba a goyan bayan wannan tsarin sauti ba. Da fatan za a sake gwada yin rikodi.';
+$string['voice:error_noprovider'] = 'Ba a saita rubuta murya a wannan shafin ba. Da fatan za a tuntuɓi mai gudanarwa.';
+$string['voice:error_badresponse'] = 'Sabis ɗin rubutawa ya mayar da wani abu da ba a tsammani ba. Da fatan za a sake gwadawa.';
+
+$string['settings:max_audio_mb'] = 'Matsakaicin girman rikodi (MB)';
+$string['settings:max_audio_mb_desc'] = 'Mafi girman rikodin murya da ɗalibi zai iya ɗorawa, a megabyte. Tsakanin 1 zuwa 200; tsoho shine 25.<br>A wannan sabar PHP yana ba da izinin post_max_size = {$a->postmax} da upload_max_filesize = {$a->uploadmax}, don haka girman da ake aiwatarwa a yanzu shine {$a->effective} MB. Ƙaramin tsakanin saitinka da iyakokin PHP koyaushe shine ke aiki.';
+$string['settings:max_audio_mb_capped'] = 'Iyaka a wannan sabar PHP ne, ba wannan saitin ba. Ka ɗaga post_max_size da upload_max_filesize a php.ini zuwa aƙalla 26M idan kana son ɗalibai su iya amfani da cikakken MB 25.';
+
+$string['voice:error_unavailable'] = 'Sabis ɗin rubutawa ba ya samuwa a yanzu. Da fatan za a sake gwadawa nan da ɗan lokaci.';

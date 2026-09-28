@@ -3087,3 +3087,15 @@ $string['outcomes:state_unavailable'] = 'Tento výsledek teď není k dispozici.
 $string['cachedef_outcomesattainment'] = 'Dosažení výstupů studijního programu na studenta a kurz';
 
 $string['cachedef_vectors'] = 'Vektory embeddingů RAG pro vyhledávací index';
+
+$string['voice:error_toolarge'] = 'Tato nahrávka je příliš velká. Zkuste kratší záznam, zhruba pod 25 MB.';
+$string['voice:error_noaudio'] = 'Nedorazila žádná nahrávka. Zkuste nahrát znovu.';
+$string['voice:error_format'] = 'Tento zvukový formát není podporován. Zkuste nahrát znovu.';
+$string['voice:error_noprovider'] = 'Hlasový přepis není na tomto webu nastaven. Obraťte se prosím na správce.';
+$string['voice:error_badresponse'] = 'Služba přepisu vrátila něco neočekávaného. Zkuste to prosím znovu.';
+
+$string['settings:max_audio_mb'] = 'Maximální velikost nahrávky (MB)';
+$string['settings:max_audio_mb_desc'] = 'Největší hlasová nahrávka, kterou může student nahrát, v megabajtech. Mezi 1 a 200; výchozí je 25.<br>Na tomto serveru PHP povoluje post_max_size = {$a->postmax} a upload_max_filesize = {$a->uploadmax}, takže skutečně vynucovaná velikost je nyní {$a->effective} MB. Vždy platí menší z vašeho nastavení a limitů PHP.';
+$string['settings:max_audio_mb_capped'] = 'Limitem na tomto serveru je PHP, nikoli toto nastavení. Zvyšte post_max_size a upload_max_filesize v php.ini alespoň na 26M, pokud chcete, aby studenti mohli využít celých 25 MB.';
+
+$string['voice:error_unavailable'] = 'Služba přepisu není právě teď dostupná. Zkuste to prosím za chvíli znovu.';

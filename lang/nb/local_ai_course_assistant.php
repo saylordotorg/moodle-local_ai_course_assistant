@@ -3085,3 +3085,15 @@ $string['outcomes:state_unavailable'] = 'Dette resultatet er ikke tilgjengelig a
 $string['cachedef_outcomesattainment'] = 'Oppnåelse av læringsutbytte i studieprogrammet per student og emne';
 
 $string['cachedef_vectors'] = 'RAG-embeddingvektorer for innhentingsindeksen';
+
+$string['voice:error_toolarge'] = 'Dette opptaket er for stort. Prøv et kortere klipp på under cirka 25 MB.';
+$string['voice:error_noaudio'] = 'Det kom ikke inn noe opptak. Prøv å ta opp på nytt.';
+$string['voice:error_format'] = 'Dette lydformatet støttes ikke. Prøv å ta opp på nytt.';
+$string['voice:error_noprovider'] = 'Taletranskripsjon er ikke satt opp på dette nettstedet. Ta kontakt med administratoren.';
+$string['voice:error_badresponse'] = 'Transkripsjonstjenesten returnerte noe uventet. Prøv igjen.';
+
+$string['settings:max_audio_mb'] = 'Maksimal opptaksstørrelse (MB)';
+$string['settings:max_audio_mb_desc'] = 'Det største lydopptaket en student kan laste opp, i megabyte. Mellom 1 og 200; standarden er 25.<br>På denne serveren tillater PHP post_max_size = {$a->postmax} og upload_max_filesize = {$a->uploadmax}, så størrelsen som faktisk håndheves nå, er {$a->effective} MB. Den minste av innstillingen din og PHPs egne grenser gjelder alltid.';
+$string['settings:max_audio_mb_capped'] = 'Grensen på denne serveren settes av PHP, ikke av denne innstillingen. Øk post_max_size og upload_max_filesize i php.ini til minst 26M hvis du vil at studentene skal kunne bruke hele 25 MB.';
+
+$string['voice:error_unavailable'] = 'Transkripsjonstjenesten er ikke tilgjengelig akkurat nå. Prøv igjen om litt.';

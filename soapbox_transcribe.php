@@ -33,6 +33,20 @@ define('AJAX_SCRIPT', true);
 require_once('../../config.php');
 
 require_login();
+
+// PHP throws the whole body away when it exceeds post_max_size, and its default
+// (8 MB) is well under MAX_AUDIO_BYTES (25 MB). Detect that here, before
+// require_sesskey(), because the sesskey was discarded with everything else:
+// without this the learner's long recording comes back as an invalid-sesskey
+// exception at HTTP 200 and the server log records a CSRF failure that did not
+// happen. See security::oversized_post_was_discarded().
+if (\local_ai_course_assistant\security::oversized_post_was_discarded($_SERVER, $_POST, $_FILES)) {
+    http_response_code(413);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => get_string('soapbox:audio_too_large', 'local_ai_course_assistant')]);
+    exit;
+}
+
 require_sesskey();
 
 \local_ai_course_assistant\security::send_security_headers();
@@ -58,19 +72,30 @@ if (\local_ai_course_assistant\rate_limiter::is_rate_limited($USER->id, 'soapbox
     exit;
 }
 
-// Require the uploaded audio file.
+// Require the uploaded audio file. A size-class upload error means the file WAS
+// provided and was too big for upload_max_filesize (PHP default 2 MB) or for a
+// form MAX_FILE_SIZE; it leaves tmp_name empty exactly as an absent file does,
+// so it has to be separated out or an oversized clip is reported as a missing one.
+$uploaderror = (int) ($_FILES['audio']['error'] ?? UPLOAD_ERR_NO_FILE);
+if (\local_ai_course_assistant\security::upload_error_is_size($uploaderror)) {
+    http_response_code(413);
+    echo json_encode(['error' => get_string('soapbox:audio_too_large', 'local_ai_course_assistant')]);
+    exit;
+}
 if (empty($_FILES['audio']['tmp_name']) || !is_uploaded_file($_FILES['audio']['tmp_name'])) {
     http_response_code(400);
-    echo json_encode(['error' => 'No audio file provided.']);
+    echo json_encode(['error' => get_string('voice:error_noaudio', 'local_ai_course_assistant')]);
     exit;
 }
 
-// Enforce a 25 MB max size and an audio MIME allowlist before the file ever
+// Enforce the configured max size (max_audio_mb, default 25 MB, capped by
+// PHP's own post_max_size and upload_max_filesize) and an audio MIME
+// allowlist before the file ever
 // reaches the transcription API. Uses finfo so a spoofed Content-Type header
 // cannot smuggle a non-audio payload through. 25 MB bounds duration (and cost).
 $tmp = $_FILES['audio']['tmp_name'];
 $size = filesize($tmp) ?: 0;
-if ($size <= 0 || $size > \local_ai_course_assistant\security::MAX_AUDIO_BYTES) {
+if ($size <= 0 || $size > \local_ai_course_assistant\security::max_audio_bytes()) {
     http_response_code(413);
     echo json_encode(['error' => get_string('soapbox:audio_too_large', 'local_ai_course_assistant')]);
     exit;
@@ -83,7 +108,7 @@ if ($finfo) {
 $declaredtype = !empty($_FILES['audio']['type']) ? (string) $_FILES['audio']['type'] : '';
 if (!\local_ai_course_assistant\security::is_allowed_audio_upload((string) $sniffed, $declaredtype)) {
     http_response_code(415);
-    echo json_encode(['error' => 'Unsupported audio format.']);
+    echo json_encode(['error' => get_string('voice:error_format', 'local_ai_course_assistant')]);
     exit;
 }
 
@@ -131,8 +156,19 @@ if ($cfg['provider'] === 'xai') {
 }
 
 if (!\local_ai_course_assistant\security::is_safe_provider_url($cfg['endpoint'])) {
+    // The endpoint failed SSRF validation, which is an administrator's
+    // misconfiguration, not anything the learner did or can retry past. The
+    // diagnostic, including the URL that was rejected, goes to the server log:
+    // it names an internal host an administrator chose, and echoing it back
+    // tells whoever is on the other end of this request what is reachable from
+    // inside the network. The learner gets the actionable half, which is that
+    // transcription is not set up and an administrator needs to look at it.
+    debugging(
+        'SOLA STT endpoint failed SSRF validation: ' . $cfg['endpoint'],
+        DEBUG_DEVELOPER
+    );
     http_response_code(502);
-    echo json_encode(['error' => 'STT endpoint failed SSRF validation']);
+    echo json_encode(['error' => get_string('voice:error_noprovider', 'local_ai_course_assistant')]);
     exit;
 }
 $headers = [];
@@ -152,15 +188,25 @@ $response = $curl->post($cfg['endpoint'], $post);
 $httpcode = (int) ($curl->get_info()['http_code'] ?? 0);
 
 if ($httpcode !== 200) {
+    // The upstream status is a diagnostic. A learner reading "Transcription API
+    // error 401" learns only that something is broken, and it discloses which
+    // upstream failure mode a caller triggered. Log it with the host so an
+    // administrator can tell a bad key from a rate limit from an outage, and
+    // tell the learner the thing they can act on: try again shortly.
+    debugging(
+        'SOLA STT provider returned HTTP ' . $httpcode . ' from '
+            . (parse_url($cfg['endpoint'], PHP_URL_HOST) ?: 'unknown host'),
+        DEBUG_DEVELOPER
+    );
     http_response_code(502);
-    echo json_encode(['error' => 'Transcription API error ' . $httpcode]);
+    echo json_encode(['error' => get_string('voice:error_unavailable', 'local_ai_course_assistant')]);
     exit;
 }
 
 $data = json_decode($response, true);
 if (!isset($data['text'])) {
     http_response_code(502);
-    echo json_encode(['error' => 'Invalid transcription response.']);
+    echo json_encode(['error' => get_string('voice:error_badresponse', 'local_ai_course_assistant')]);
     exit;
 }
 

@@ -3126,3 +3126,15 @@ $string['outcomes:state_unavailable'] = 'Ez az eredmény most nem érhető el. S
 $string['cachedef_outcomesattainment'] = 'Képzési tanulási eredmények teljesítése tanulónként és kurzusonként';
 
 $string['cachedef_vectors'] = 'RAG beágyazási vektorok a visszakeresési indexhez';
+
+$string['voice:error_toolarge'] = 'Ez a felvétel túl nagy. Próbáljon rövidebb, körülbelül 25 MB alatti felvételt.';
+$string['voice:error_noaudio'] = 'Nem érkezett felvétel. Kérjük, próbálja meg újra rögzíteni.';
+$string['voice:error_format'] = 'Ez a hangformátum nem támogatott. Kérjük, próbálja meg újra rögzíteni.';
+$string['voice:error_noprovider'] = 'A hangátírás nincs beállítva ezen az oldalon. Kérjük, forduljon a rendszergazdához.';
+$string['voice:error_badresponse'] = 'Az átírási szolgáltatás váratlan választ adott. Kérjük, próbálja újra.';
+
+$string['settings:max_audio_mb'] = 'Maximális felvételméret (MB)';
+$string['settings:max_audio_mb_desc'] = 'A legnagyobb hangfelvétel, amelyet egy tanuló feltölthet, megabájtban. 1 és 200 között; az alapértelmezés 25.<br>Ezen a kiszolgálón a PHP a post_max_size = {$a->postmax} és az upload_max_filesize = {$a->uploadmax} értéket engedi, így a ténylegesen érvényesített méret most {$a->effective} MB. Mindig a beállítása és a PHP saját korlátai közül a kisebb érvényesül.';
+$string['settings:max_audio_mb_capped'] = 'Ezen a kiszolgálón a PHP szabja meg a korlátot, nem ez a beállítás. Emelje a post_max_size és az upload_max_filesize értékét a php.ini fájlban legalább 26M-re, ha azt szeretné, hogy a tanulók a teljes 25 MB-ot használhassák.';
+
+$string['voice:error_unavailable'] = 'Az átírási szolgáltatás jelenleg nem érhető el. Kérjük, próbálja újra egy kis idő múlva.';

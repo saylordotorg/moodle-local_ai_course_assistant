@@ -3131,3 +3131,15 @@ $string['outcomes:state_unavailable'] = 'Hindi available ang resultang ito sa ng
 $string['cachedef_outcomesattainment'] = 'Pagkamit ng outcome ng programa bawat mag-aaral at kurso';
 
 $string['cachedef_vectors'] = 'Mga embedding vector ng RAG para sa index ng pagkuha';
+
+$string['voice:error_toolarge'] = 'Masyadong malaki ang recording na ito. Subukan ang mas maikling clip, mas mababa sa mga 25 MB.';
+$string['voice:error_noaudio'] = 'Walang natanggap na recording. Pakisubukang mag-record ulit.';
+$string['voice:error_format'] = 'Hindi suportado ang audio format na iyon. Pakisubukang mag-record ulit.';
+$string['voice:error_noprovider'] = 'Hindi naka-set up ang voice transcription sa site na ito. Makipag-ugnayan sa iyong administrator.';
+$string['voice:error_badresponse'] = 'Nagbalik ng hindi inaasahang tugon ang transcription service. Pakisubukan ulit.';
+
+$string['settings:max_audio_mb'] = 'Pinakamalaking laki ng recording (MB)';
+$string['settings:max_audio_mb_desc'] = 'Ang pinakamalaking voice recording na maaaring i-upload ng isang mag-aaral, sa megabytes. Sa pagitan ng 1 at 200; ang default ay 25.<br>Sa server na ito, pinapayagan ng PHP ang post_max_size = {$a->postmax} at upload_max_filesize = {$a->uploadmax}, kaya ang laking talagang ipinapatupad ngayon ay {$a->effective} MB. Ang mas maliit sa pagitan ng iyong setting at ng sariling limitasyon ng PHP ang laging masusunod.';
+$string['settings:max_audio_mb_capped'] = 'Ang PHP ang naglilimita sa server na ito, hindi ang setting na ito. Itaas ang post_max_size at upload_max_filesize sa php.ini sa hindi bababa sa 26M kung nais mong magamit ng mga mag-aaral ang buong 25 MB.';
+
+$string['voice:error_unavailable'] = 'Hindi available ngayon ang transcription service. Pakisubukan ulit maya-maya.';

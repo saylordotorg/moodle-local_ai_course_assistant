@@ -3085,3 +3085,15 @@ $string['outcomes:state_unavailable'] = 'この結果は現在表示できませ
 $string['cachedef_outcomesattainment'] = '学習者・コースごとのプログラムアウトカムの達成状況';
 
 $string['cachedef_vectors'] = 'RAG取得インデックス用の埋め込みベクトル';
+
+$string['voice:error_toolarge'] = 'この録音はサイズが大きすぎます。約25MB未満の短いクリップをお試しください。';
+$string['voice:error_noaudio'] = '録音を受信できませんでした。もう一度録音してください。';
+$string['voice:error_format'] = 'この音声形式はサポートされていません。もう一度録音してください。';
+$string['voice:error_noprovider'] = 'このサイトでは音声文字起こしが設定されていません。管理者にお問い合わせください。';
+$string['voice:error_badresponse'] = '文字起こしサービスから予期しない応答が返されました。もう一度お試しください。';
+
+$string['settings:max_audio_mb'] = '録音の最大サイズ (MB)';
+$string['settings:max_audio_mb_desc'] = '学習者がアップロードできる音声録音の最大サイズ (メガバイト)。1 から 200 の範囲で、既定値は 25 です。<br>このサーバーでは PHP が post_max_size = {$a->postmax}、upload_max_filesize = {$a->uploadmax} を許可しているため、現在実際に適用されるサイズは {$a->effective} MB です。この設定と PHP 自身の制限のうち、必ず小さいほうが適用されます。';
+$string['settings:max_audio_mb_capped'] = 'このサーバーでは PHP が上限であり、この設定ではありません。学習者に 25 MB をすべて使わせたい場合は、php.ini の post_max_size と upload_max_filesize を少なくとも 26M に引き上げてください。';
+
+$string['voice:error_unavailable'] = '文字起こしサービスは現在利用できません。しばらくしてからもう一度お試しください。';

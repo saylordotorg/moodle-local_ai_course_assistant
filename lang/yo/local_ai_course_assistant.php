@@ -3107,3 +3107,15 @@ $string['outcomes:state_unavailable'] = 'Àbájáde yìí kò sí ní àkókò y
 $string['cachedef_outcomesattainment'] = 'Ìmúṣẹ àbájáde ìtòlẹ́sẹẹsẹ fún akẹ́kọ̀ọ́ àti ẹ̀kọ́ kọ̀ọ̀kan';
 
 $string['cachedef_vectors'] = 'Àwọn vẹ́ktọ̀ embedding RAG fún àtọ́ka ìgbàpadà';
+
+$string['voice:error_toolarge'] = 'Gbigbasilẹ yii tobi ju. Gbiyanju agekuru kukuru, labẹ bii MB 25.';
+$string['voice:error_noaudio'] = 'A ko gba gbigbasilẹ kankan. Jọwọ gbiyanju lati gbasilẹ lẹẹkansi.';
+$string['voice:error_format'] = 'A ko ṣe atilẹyin fun ọna ohun yẹn. Jọwọ gbiyanju lati gbasilẹ lẹẹkansi.';
+$string['voice:error_noprovider'] = 'A ko ṣeto kikọ ohun sori ayelujara yii. Jọwọ kan si alabojuto rẹ.';
+$string['voice:error_badresponse'] = 'Iṣẹ kikọ naa da nkan airotẹlẹ pada. Jọwọ gbiyanju lẹẹkansi.';
+
+$string['settings:max_audio_mb'] = 'Iwọn gbigbasilẹ ti o pọ julọ (MB)';
+$string['settings:max_audio_mb_desc'] = 'Gbigbasilẹ ohun ti o tobi julọ ti akẹkọ le gbe sori ẹrọ, ni megabyte. Laarin 1 ati 200; aiyipada ni 25.<br>Lori olupin yii PHP gba post_max_size = {$a->postmax} ati upload_max_filesize = {$a->uploadmax} laaye, nitorinaa iwọn ti a fi lelẹ gangan ni bayi ni {$a->effective} MB. Eyi ti o kere laarin eto rẹ ati awọn opin PHP ni yoo maa ṣiṣẹ nigbagbogbo.';
+$string['settings:max_audio_mb_capped'] = 'PHP ni o ṣeto opin lori olupin yii, kii ṣe eto yii. Gbe post_max_size ati upload_max_filesize soke ninu php.ini si o kere ju 26M ti o ba fẹ ki awọn akẹkọ le lo gbogbo 25 MB.';
+
+$string['voice:error_unavailable'] = 'Iṣẹ kikọ ko si ni bayi. Jọwọ gbiyanju lẹẹkansi laipẹ.';

@@ -1764,6 +1764,34 @@ if ($hassiteconfig) {
         $sttchoices
     ));
 
+    // Maximum audio upload size (v7.5.5). The description below reports what PHP
+    // on THIS server will actually accept, because the setting alone is a number
+    // an admin can type and be wrong about: PHP's post_max_size (default 8 MB)
+    // and upload_max_filesize (default 2 MB) are both under the 25 MB default,
+    // and the smaller of the two wins no matter what is set here. Rendering the
+    // detected values turns "why did a long recording fail" into something the
+    // admin can see before a learner reports it.
+    $phplimit = \local_ai_course_assistant\security::php_upload_limit_bytes();
+    $effective = \local_ai_course_assistant\security::max_audio_bytes();
+    $maxaudiodesc = get_string('settings:max_audio_mb_desc', 'local_ai_course_assistant', (object) [
+        'postmax'   => (string) ini_get('post_max_size'),
+        'uploadmax' => (string) ini_get('upload_max_filesize'),
+        'effective' => (string) round($effective / (1024 * 1024), 1),
+    ]);
+    if ($phplimit > 0 && $phplimit < \local_ai_course_assistant\security::MAX_AUDIO_BYTES) {
+        $maxaudiodesc .= '<br><strong class="text-danger">'
+            . get_string('settings:max_audio_mb_capped', 'local_ai_course_assistant')
+            . '</strong>';
+    }
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/max_audio_mb',
+        get_string('settings:max_audio_mb', 'local_ai_course_assistant'),
+        $maxaudiodesc,
+        (string) (\local_ai_course_assistant\security::MAX_AUDIO_BYTES / (1024 * 1024)),
+        PARAM_INT,
+        6
+    ));
+
     // Selfhosted Whisper STT server (v6.2.0). Any OpenAI compatible
     // transcription server works: whisper-server Docker, speaches
     // (faster-whisper), or whisper.cpp server.

@@ -676,13 +676,18 @@ final class voice_learner_journey_test extends \advanced_testcase {
     /**
      * An empty or oversized recording is refused before it reaches a provider.
      *
-     * MAX_AUDIO_BYTES has zero test references anywhere in the tree. The
-     * `$size <= 0` half is the absent-value case that matters: filesize()
+     * The `$size <= 0` half is the absent-value case that matters: filesize()
      * returns 0 or false for an unreadable or empty temp file, and a zero must
      * be refused rather than treated as a valid very small clip. If this
      * breaks, a learner whose recording failed silently uploads nothing, waits
      * for a 30-second provider round trip, and gets an empty transcript -- and
      * a 25 MB clip is paid for in full before anyone looks at it.
+     *
+     * Since 7.5.5 the ceiling is max_audio_bytes(), not the MAX_AUDIO_BYTES
+     * constant: an admin can move it, and PHP's own limits cap whatever they
+     * choose. The constant is still what an unconfigured site gets, so it is
+     * still worth pinning, but the endpoint must read the function or the
+     * setting does nothing.
      *
      * @return void
      */
@@ -690,15 +695,16 @@ final class voice_learner_journey_test extends \advanced_testcase {
         $this->assertSame(
             25 * 1024 * 1024,
             security::MAX_AUDIO_BYTES,
-            'The audio upload cap moved; 25 MB is what the endpoint documents and bills against.'
+            'The default audio upload cap moved; 25 MB is what an unconfigured site gets.'
         );
 
         $this->assert_appears_in_order(
             $this->endpoint_source('transcribe.php'),
             [
-                "if (\$size <= 0 || \$size > \\local_ai_course_assistant\\security::MAX_AUDIO_BYTES) {\n"
+                "if (\$size <= 0 || \$size > \\local_ai_course_assistant\\security::max_audio_bytes()) {\n"
                     . "    http_response_code(413);\n"
-                    . "    echo json_encode(['error' => 'Audio file too large.']);\n"
+                    . "    echo json_encode(['error' => get_string('voice:error_toolarge',"
+                    . " 'local_ai_course_assistant')]);\n"
                     . "    exit;\n"
                     . '}',
                 'new \curl()',

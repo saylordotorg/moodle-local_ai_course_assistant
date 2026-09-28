@@ -91,6 +91,103 @@ Feature: SOLA drawer interactions beyond send-receive
     And I should see "Second message" in the ".local-ai-course-assistant__messages" "css_element"
 
   @javascript
+  Scenario: Opening the assistant puts the keyboard in it
+    # The drawer has had role="dialog", an aria-label and a Tab trap since
+    # v6.x, and until v7.5.5 it never took focus when it opened. Every
+    # assertion about the markup passed the whole time, because the markup was
+    # right; what was missing was one call, and its absence is only observable
+    # as document.activeElement, which only a browser has.
+    #
+    # The consequence for a keyboard user was a dialog opening in front of them
+    # with the keyboard still behind it, and a Tab trap that could not engage
+    # because it acts only once focus is already inside.
+    Given I log in as "student1"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    And focus should be inside "#local-ai-course-assistant-drawer"
+    And focus should be on ".local-ai-course-assistant__input"
+
+  @javascript
+  Scenario: On a phone the assistant takes focus without opening the keyboard
+    # The mobile half of the same fix, and the reason it is not simply "focus
+    # the message box". Focusing a textarea on a phone opens the on-screen
+    # keyboard, which would cover the drawer the learner just opened with a
+    # keyboard they did not ask for. So under 600px focus goes to the dialog
+    # container instead: still inside, still announced by its aria-label, the
+    # Tab trap still engages on the first Tab, and nothing is typed into until
+    # the learner picks the message box themselves.
+    #
+    # 600px is the breakpoint updatePagePush already uses to decide the drawer
+    # overlays rather than pushes the page.
+    Given I log in as "student1"
+    And I am on "Test Course" course homepage
+    And I change window size to "mobile"
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    And focus should be inside "#local-ai-course-assistant-drawer"
+    And focus should be on "#local-ai-course-assistant-drawer"
+
+  @javascript
+  Scenario: Every panel a learner can open is free of template artefacts
+    # The bottom-nav panels, Progress and History, are reachable by any learner
+    # and were reached by no scenario until v7.5.4. The help panel was in the
+    # same position: it HAD a scenario, which asserted only that it was visible,
+    # and it stayed green through seven weeks of showing internal notes.
+    #
+    # This walks the learner-reachable surfaces and asserts the thing that is
+    # cheap to check and expensive to miss: no Mustache tag, no unresolved
+    # branding token, no unsubstituted placeholder, no raw string key.
+    #
+    # The Progress control does not exist unless mastery AND the mastery
+    # dashboard are on for THIS course. The first version of this scenario
+    # clicked it without turning either on and failed with "not found", which was
+    # the truthful answer: there was no control. The second gate's config key
+    # contains the course id, so it cannot be written in a Background table
+    # before the generator has assigned one; hence a step, not a row.
+    Given the mastery progress tab is enabled for course "DI1"
+    And I log in as "student1"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" should not leak template syntax
+    And I click on "[data-mode=\"progress\"]" "css_element"
+    And ".local-ai-course-assistant__progress-panel" should not leak template syntax
+    And I click on "[data-mode=\"history\"]" "css_element"
+    And ".local-ai-course-assistant__history-panel" should not leak template syntax
+    And I click on "[data-mode=\"chat\"]" "css_element"
+    And ".local-ai-course-assistant__starters" should not leak template syntax
+
+  @javascript
+  Scenario: An oversized recording is refused before it reaches the provider
+    # The guard this pins is at transcribe.php, and until now nothing proved it
+    # FIRES. PHPUnit cannot enter that file: it declares AJAX_SCRIPT and gates on
+    # is_uploaded_file(), so the unit tests can only read the source and assert the
+    # guard is present and correctly ordered. Deleting just the `exit;` from the
+    # guard body leaves every one of those assertions green while an oversized clip
+    # goes to the provider and is billed, and the provider's JSON refusal reaches
+    # the learner base64-encoded as audio that decodes to silence.
+    #
+    # A real browser POST carries the session cookie and the page's sesskey, so it
+    # satisfies require_login, require_sesskey and require_capability and arrives at
+    # the guard the way a learner's own recording does.
+    #
+    # The first version of this scenario got HTTP 200 and I could not say why,
+    # because the step captured only the status. The answer, once the body was
+    # captured: PHP discards a body over post_max_size (default 8 MB) in its
+    # entirety, so $_POST and $_FILES both arrive empty, require_sesskey throws on
+    # a sesskey that went in the bin with the audio, and Moodle's AJAX handler
+    # answers that at HTTP 200. MAX_AUDIO_BYTES is 25 MB, so on a stock PHP the
+    # 25 MB guard was never the guard that ran. transcribe.php now detects the
+    # discarded body before require_sesskey and answers 413 itself, so this
+    # scenario gets the same answer whatever post_max_size is set to.
+    #
+    # 26214401 bytes is one over security::MAX_AUDIO_BYTES (25 * 1024 * 1024).
+    Given I log in as "student1"
+    And I am on "Test Course" course homepage
+    When I post a 26214401 byte audio clip to the transcription endpoint
+    Then the transcription endpoint should have refused with 413
+
+  @javascript
   Scenario: An empty recording is refused before it reaches the provider
     # The same guard, the cheap half of it: the condition is `$size <= 0 || $size >
     # MAX`, so a zero-byte clip exercises the identical refusal without pushing 26MB

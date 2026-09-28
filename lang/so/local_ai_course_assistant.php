@@ -3131,3 +3131,15 @@ $string['outcomes:state_unavailable'] = 'Natiijadan hadda lama heli karo. Cidna 
 $string['cachedef_outcomesattainment'] = 'Gaadhista natiijooyinka barnaamijka ee arday kasta iyo koorso kasta';
 
 $string['cachedef_vectors'] = 'Vectors-ka embedding-ka RAG ee indekska soo-helitaanka';
+
+$string['voice:error_toolarge'] = 'Duubistan aad bay u weyn tahay. Isku day duubis gaaban, ka yar ilaa 25 MB.';
+$string['voice:error_noaudio'] = 'Wax duubis ah lama helin. Fadlan mar kale isku day inaad duubto.';
+$string['voice:error_format'] = 'Qaabkaas codka lama taageero. Fadlan mar kale isku day inaad duubto.';
+$string['voice:error_noprovider'] = 'Qorista codka laguma dejin goobtan. Fadlan la xiriir maamulahaaga.';
+$string['voice:error_badresponse'] = 'Adeegga qoraalku wuxuu soo celiyay jawaab aan la filayn. Fadlan mar kale isku day.';
+
+$string['settings:max_audio_mb'] = 'Cabbirka ugu badan ee duubista (MB)';
+$string['settings:max_audio_mb_desc'] = 'Duubista codka ugu weyn ee ardaygu soo geli karo, oo megabyte lagu qiyaaso. Inta u dhaxaysa 1 iyo 200; caadiga waa 25.<br>Serverkan PHP wuxuu ogolaanayaa post_max_size = {$a->postmax} iyo upload_max_filesize = {$a->uploadmax}, sidaas darteed cabbirka dhab ahaan hadda la fulinayo waa {$a->effective} MB. Midka ka yar ee u dhexeeya dejintaada iyo xadka PHP ayaa had iyo jeer shaqeeya.';
+$string['settings:max_audio_mb_capped'] = 'Xadka serverkan waa PHP, ma ahan dejintan. Kor u qaad post_max_size iyo upload_max_filesize ee php.ini ugu yaraan 26M haddii aad rabto in ardaydu isticmaali karaan 25 MB oo dhan.';
+
+$string['voice:error_unavailable'] = 'Adeegga qoraalku hadda ma diyaar aha. Fadlan mar kale isku day daqiiqado kadib.';

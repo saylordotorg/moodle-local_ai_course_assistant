@@ -52,8 +52,22 @@ class security {
         'application/ogg',
     ];
 
-    /** @var int Maximum audio upload size in bytes (25 MB). */
+    /**
+     * Default maximum audio upload size in bytes (25 MB).
+     *
+     * This is the DEFAULT, not the effective limit. Call max_audio_bytes() for
+     * that: an admin can raise or lower it with the max_audio_mb setting, and
+     * PHP's own limits cap whatever they choose.
+     *
+     * @var int
+     */
     public const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
+
+    /** @var int Lowest value the max_audio_mb setting is allowed to take, in MB. */
+    public const MIN_AUDIO_MB = 1;
+
+    /** @var int Highest value the max_audio_mb setting is allowed to take, in MB. */
+    public const MAX_AUDIO_MB = 200;
 
     /**
      * Return true only if the URL is a safe https endpoint not pointing at a
@@ -306,6 +320,163 @@ class security {
             return true;
         }
         return false;
+    }
+
+    /**
+     * True when PHP threw the whole request body away because it exceeded
+     * post_max_size, so the endpoint is looking at an empty $_POST and $_FILES
+     * for a request that plainly carried a payload.
+     *
+     * This is not a hypothetical. MAX_AUDIO_BYTES is 25 MB and PHP's compiled
+     * default post_max_size is 8 MB, so on a stock configuration the 25 MB guard
+     * is unreachable: PHP discards the body first, both superglobals come back
+     * empty, and the endpoint's own require_sesskey() is the code that fails,
+     * because the sesskey went into the bin with everything else. Moodle's AJAX
+     * exception handler answers that with HTTP 200 and an exception payload, so
+     * a learner who records a long clip gets "invalid sesskey" and is invited to
+     * log in again, and the log records a CSRF failure that never happened.
+     *
+     * The caller must run this BEFORE require_sesskey(), which is safe: the
+     * branch reads nothing, writes nothing, and answers with a size refusal that
+     * an attacker could equally well obtain by reading the source.
+     *
+     * Detection is CONTENT_LENGTH against an empty pair of superglobals. A
+     * genuine POST with no fields is indistinguishable from this at the PHP
+     * level, which is why CONTENT_LENGTH must be positive: a body was sent and
+     * nothing arrived.
+     *
+     * CALL THIS ONLY FROM AN ENDPOINT THAT READS A FORM-ENCODED OR MULTIPART
+     * BODY. PHP never populates $_POST from a JSON body whatever its size, so on
+     * an endpoint that reads php://input this returns true for every well-formed
+     * request. Both current callers, transcribe.php and soapbox_transcribe.php,
+     * take multipart uploads.
+     *
+     * @param array $server $_SERVER.
+     * @param array $post   $_POST.
+     * @param array $files  $_FILES.
+     * @return bool
+     */
+    public static function oversized_post_was_discarded(array $server, array $post, array $files): bool {
+        if (strtoupper((string) ($server['REQUEST_METHOD'] ?? '')) !== 'POST') {
+            return false;
+        }
+        if (!empty($post) || !empty($files)) {
+            return false;
+        }
+        return ((int) ($server['CONTENT_LENGTH'] ?? 0)) > 0;
+    }
+
+    /**
+     * True when a per-file upload error means "too big", as opposed to "absent"
+     * or "broken".
+     *
+     * UPLOAD_ERR_INI_SIZE is upload_max_filesize, whose PHP default is 2 MB, and
+     * UPLOAD_ERR_FORM_SIZE is a MAX_FILE_SIZE field in the form. Both leave
+     * tmp_name empty, so without this the endpoint reports "No audio file
+     * provided" with HTTP 400 for a file that was provided and was too large.
+     *
+     * @param int $error The $_FILES[...]['error'] value.
+     * @return bool
+     */
+    public static function upload_error_is_size(int $error): bool {
+        return $error === UPLOAD_ERR_INI_SIZE || $error === UPLOAD_ERR_FORM_SIZE;
+    }
+
+    /**
+     * Parse a PHP ini size value ("8M", "1G", "512K", "-1", "") into bytes.
+     *
+     * Returns 0 for the two values that mean "no limit": an empty string, and
+     * -1, which is what post_max_size uses to disable the check entirely. A
+     * caller treats 0 as "PHP imposes no ceiling here", NOT as "zero bytes
+     * allowed", which is the trap in this function and the reason it is its own
+     * method with its own test.
+     *
+     * @param string|false $value Raw ini value, e.g. from ini_get().
+     * @return int Bytes, or 0 for unlimited/unset.
+     */
+    public static function parse_ini_bytes($value): int {
+        $raw = trim((string) $value);
+        if ($raw === '') {
+            return 0;
+        }
+        $number = (int) $raw;
+        if ($number < 0) {
+            return 0;
+        }
+        $suffix = strtolower(substr($raw, -1));
+        if ($suffix === 'g') {
+            return $number * 1024 * 1024 * 1024;
+        }
+        if ($suffix === 'm') {
+            return $number * 1024 * 1024;
+        }
+        if ($suffix === 'k') {
+            return $number * 1024;
+        }
+        return $number;
+    }
+
+    /**
+     * The largest audio upload PHP will actually let through, in bytes, or 0 if
+     * PHP imposes no ceiling.
+     *
+     * Two settings both apply and the smaller wins. post_max_size (default 8 MB)
+     * bounds the whole request body; exceed it and PHP discards the body in full,
+     * which is the failure oversized_post_was_discarded() exists to catch.
+     * upload_max_filesize (default 2 MB) bounds the single file; exceed it and
+     * the file arrives with UPLOAD_ERR_INI_SIZE and an empty tmp_name.
+     *
+     * Both PHP defaults are below MAX_AUDIO_BYTES, so on a stock configuration
+     * SOLA's own cap is not the one that fires. That is why this exists: an
+     * admin who sets max_audio_mb to 50 on a server with post_max_size 8M has
+     * configured a number that cannot happen, and should be told so rather than
+     * discover it from a learner.
+     *
+     * @return int Bytes, or 0 if neither ini setting imposes a limit.
+     */
+    public static function php_upload_limit_bytes(): int {
+        $post = self::parse_ini_bytes(ini_get('post_max_size'));
+        $file = self::parse_ini_bytes(ini_get('upload_max_filesize'));
+
+        $limits = array_filter([$post, $file], static function (int $bytes): bool {
+            return $bytes > 0;
+        });
+
+        return $limits ? (int) min($limits) : 0;
+    }
+
+    /**
+     * The effective maximum audio upload size in bytes.
+     *
+     * The admin setting, clamped to [MIN_AUDIO_MB, MAX_AUDIO_MB], and then
+     * capped by whatever PHP will accept. The PHP cap is applied last and
+     * silently, because it is not a preference: a larger configured value is
+     * simply unreachable, and enforcing the configured number would mean
+     * refusing at a size PHP already refused at differently.
+     *
+     * get_config() returns false before the setting has ever been saved, which
+     * is every existing installation on upgrade, so the default has to be
+     * MAX_AUDIO_BYTES rather than zero.
+     *
+     * @return int Bytes.
+     */
+    public static function max_audio_bytes(): int {
+        $configured = get_config('local_ai_course_assistant', 'max_audio_mb');
+
+        if ($configured === false || $configured === null || trim((string) $configured) === '') {
+            $bytes = self::MAX_AUDIO_BYTES;
+        } else {
+            $mb = (int) $configured;
+            $mb = max(self::MIN_AUDIO_MB, min(self::MAX_AUDIO_MB, $mb));
+            $bytes = $mb * 1024 * 1024;
+        }
+
+        $phplimit = self::php_upload_limit_bytes();
+        if ($phplimit > 0 && $phplimit < $bytes) {
+            return $phplimit;
+        }
+
+        return $bytes;
     }
 
     /**

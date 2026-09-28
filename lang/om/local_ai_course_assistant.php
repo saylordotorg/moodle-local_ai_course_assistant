@@ -3118,3 +3118,15 @@ $string['outcomes:state_unavailable'] = 'Bu\'aan kun yeroo ammaatti hin argamu. 
 $string['cachedef_outcomesattainment'] = 'Gahumsa bu\'aa sagantaa tokkoo tokkoon barataa fi koorsii';
 
 $string['cachedef_vectors'] = 'Vektaroota embedding RAG indeeksii argannootiif';
+
+$string['voice:error_toolarge'] = 'Waraabbiin kun baay\'ee guddaa dha. Waraabbii gabaabaa, MB 25 gadi ta\'e yaali.';
+$string['voice:error_noaudio'] = 'Waraabbiin tokkollee hin dhufne. Maaloo irra deebi\'ii waraabuu yaali.';
+$string['voice:error_format'] = 'Bifti sagalee kun hin deeggaramu. Maaloo irra deebi\'ii waraabuu yaali.';
+$string['voice:error_noprovider'] = 'Barreeffamni sagalee marsariitii kana irratti hin qophoofne. Maaloo bulchaa kee quunnami.';
+$string['voice:error_badresponse'] = 'Tajaajilli barreeffamaa deebii hin eegamne deebise. Maaloo irra deebi\'ii yaali.';
+
+$string['settings:max_audio_mb'] = 'Guddina waraabbii ol\'aanaa (MB)';
+$string['settings:max_audio_mb_desc'] = 'Waraabbii sagalee guddaan barataan olkaa\'uu danda\'u, megabaayitiidhaan. 1 fi 200 gidduu; durtiin 25 dha.<br>Sarvara kana irratti PHP post_max_size = {$a->postmax} fi upload_max_filesize = {$a->uploadmax} hayyama, kanaafuu guddinni amma dhugumaan hojiirra oolu {$a->effective} MB dha. Qindaa\'ina kee fi daangaa PHP gidduudhaa inni xiqqaan yeroo hunda kan hojiirra oolu dha.';
+$string['settings:max_audio_mb_capped'] = 'Sarvara kana irratti daangaan PHP dha malee qindaa\'ina kana miti. Barattoonni MB 25 guutuu akka fayyadaman yoo barbaadde php.ini keessatti post_max_size fi upload_max_filesize yoo xiqqaate gara 26M tti ol kaasi.';
+
+$string['voice:error_unavailable'] = 'Tajaajilli barreeffamaa yeroo ammaa hin argamu. Maaloo yeroo muraasa booda irra deebi\'ii yaali.';

@@ -3088,3 +3088,15 @@ $string['outcomes:state_unavailable'] = 'Ce résultat n\'est pas disponible pour
 $string['cachedef_outcomesattainment'] = 'Atteinte des acquis du programme par apprenant et par cours';
 
 $string['cachedef_vectors'] = 'Vecteurs d\'embedding RAG pour l\'index de récupération';
+
+$string['voice:error_toolarge'] = 'Cet enregistrement est trop volumineux. Essayez un extrait plus court, de moins de 25 Mo environ.';
+$string['voice:error_noaudio'] = 'Aucun enregistrement n\'a été reçu. Veuillez réessayer d\'enregistrer.';
+$string['voice:error_format'] = 'Ce format audio n\'est pas pris en charge. Veuillez réessayer d\'enregistrer.';
+$string['voice:error_noprovider'] = 'La transcription vocale n\'est pas configurée sur ce site. Veuillez contacter votre administrateur.';
+$string['voice:error_badresponse'] = 'Le service de transcription a renvoyé une réponse inattendue. Veuillez réessayer.';
+
+$string['settings:max_audio_mb'] = 'Taille maximale d\'enregistrement (Mo)';
+$string['settings:max_audio_mb_desc'] = 'Le plus gros enregistrement vocal qu\'un apprenant peut téléverser, en mégaoctets. Entre 1 et 200 ; la valeur par défaut est 25.<br>Sur ce serveur, PHP autorise post_max_size = {$a->postmax} et upload_max_filesize = {$a->uploadmax}, donc la taille réellement appliquée en ce moment est de {$a->effective} Mo. C\'est toujours la plus petite valeur entre votre réglage et les limites propres à PHP qui s\'applique.';
+$string['settings:max_audio_mb_capped'] = 'Sur ce serveur, c\'est PHP qui fixe la limite, pas ce réglage. Augmentez post_max_size et upload_max_filesize dans php.ini à au moins 26M si vous voulez que les apprenants puissent utiliser les 25 Mo complets.';
+
+$string['voice:error_unavailable'] = 'Le service de transcription n\'est pas disponible pour le moment. Veuillez réessayer dans un instant.';

@@ -3126,3 +3126,15 @@ $string['outcomes:state_unavailable'] = 'התוצאה הזו אינה זמינה
 $string['cachedef_outcomesattainment'] = 'השגת תוצרי הלמידה של התוכנית לכל לומד וקורס';
 
 $string['cachedef_vectors'] = 'וקטורי embedding של RAG לאינדקס האחזור';
+
+$string['voice:error_toolarge'] = 'ההקלטה הזו גדולה מדי. נסו קטע קצר יותר, מתחת ל-25 מ"ב בקירוב.';
+$string['voice:error_noaudio'] = 'לא התקבלה הקלטה. נסו להקליט שוב.';
+$string['voice:error_format'] = 'פורמט האודיו הזה אינו נתמך. נסו להקליט שוב.';
+$string['voice:error_noprovider'] = 'תמלול קולי אינו מוגדר באתר הזה. פנו למנהל המערכת.';
+$string['voice:error_badresponse'] = 'שירות התמלול החזיר תשובה לא צפויה. נסו שוב.';
+
+$string['settings:max_audio_mb'] = 'גודל הקלטה מרבי (מ"ב)';
+$string['settings:max_audio_mb_desc'] = 'ההקלטה הקולית הגדולה ביותר שלומד יכול להעלות, במגה-בייט. בין 1 ל-200; ברירת המחדל היא 25.<br>בשרת הזה PHP מתיר post_max_size = {$a->postmax} ו-upload_max_filesize = {$a->uploadmax}, ולכן הגודל שנאכף בפועל כרגע הוא {$a->effective} מ"ב. הקטן מבין ההגדרה שלכם לבין מגבלות PHP הוא זה שתמיד קובע.';
+$string['settings:max_audio_mb_capped'] = 'המגבלה בשרת הזה היא PHP, לא ההגדרה הזו. העלו את post_max_size ואת upload_max_filesize בקובץ php.ini ל-26M לפחות אם ברצונכם שהלומדים יוכלו להשתמש בכל 25 המ"ב.';
+
+$string['voice:error_unavailable'] = 'שירות התמלול אינו זמין כרגע. נסו שוב בעוד רגע.';

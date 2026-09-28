@@ -3086,3 +3086,15 @@ $string['outcomes:state_unavailable'] = 'Acest rezultat nu este disponibil momen
 $string['cachedef_outcomesattainment'] = 'Gradul de atingere a rezultatelor programului per cursant și curs';
 
 $string['cachedef_vectors'] = 'Vectori de încorporare RAG pentru indexul de regăsire';
+
+$string['voice:error_toolarge'] = 'Această înregistrare este prea mare. Încercați un fragment mai scurt, sub aproximativ 25 MB.';
+$string['voice:error_noaudio'] = 'Nu a fost primită nicio înregistrare. Încercați să înregistrați din nou.';
+$string['voice:error_format'] = 'Acest format audio nu este acceptat. Încercați să înregistrați din nou.';
+$string['voice:error_noprovider'] = 'Transcrierea vocală nu este configurată pe acest site. Contactați administratorul.';
+$string['voice:error_badresponse'] = 'Serviciul de transcriere a returnat un răspuns neașteptat. Încercați din nou.';
+
+$string['settings:max_audio_mb'] = 'Dimensiunea maximă a înregistrării (MB)';
+$string['settings:max_audio_mb_desc'] = 'Cea mai mare înregistrare vocală pe care o poate încărca un cursant, în megaocteți. Între 1 și 200; valoarea implicită este 25.<br>Pe acest server PHP permite post_max_size = {$a->postmax} și upload_max_filesize = {$a->uploadmax}, așa că dimensiunea aplicată efectiv acum este {$a->effective} MB. Se aplică întotdeauna valoarea mai mică dintre setarea dumneavoastră și limitele PHP.';
+$string['settings:max_audio_mb_capped'] = 'Limita pe acest server este dată de PHP, nu de această setare. Creșteți post_max_size și upload_max_filesize în php.ini la cel puțin 26M dacă doriți ca cursanții să poată folosi cei 25 MB întregi.';
+
+$string['voice:error_unavailable'] = 'Serviciul de transcriere nu este disponibil în acest moment. Încercați din nou peste puțin timp.';

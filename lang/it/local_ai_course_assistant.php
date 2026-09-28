@@ -3125,3 +3125,15 @@ $string['outcomes:state_unavailable'] = 'Questo esito non è disponibile in ques
 $string['cachedef_outcomesattainment'] = 'Conseguimento dei risultati di apprendimento del programma per studente e corso';
 
 $string['cachedef_vectors'] = 'Vettori di embedding RAG per l\'indice di recupero';
+
+$string['voice:error_toolarge'] = 'Questa registrazione è troppo grande. Prova con una clip più breve, sotto i 25 MB circa.';
+$string['voice:error_noaudio'] = 'Nessuna registrazione ricevuta. Prova a registrare di nuovo.';
+$string['voice:error_format'] = 'Questo formato audio non è supportato. Prova a registrare di nuovo.';
+$string['voice:error_noprovider'] = 'La trascrizione vocale non è configurata su questo sito. Contatta l\'amministratore.';
+$string['voice:error_badresponse'] = 'Il servizio di trascrizione ha restituito una risposta imprevista. Riprova.';
+
+$string['settings:max_audio_mb'] = 'Dimensione massima della registrazione (MB)';
+$string['settings:max_audio_mb_desc'] = 'La registrazione vocale più grande che uno studente può caricare, in megabyte. Tra 1 e 200; il valore predefinito è 25.<br>Su questo server PHP consente post_max_size = {$a->postmax} e upload_max_filesize = {$a->uploadmax}, quindi la dimensione effettivamente applicata in questo momento è {$a->effective} MB. Vince sempre il valore più piccolo tra la tua impostazione e i limiti di PHP.';
+$string['settings:max_audio_mb_capped'] = 'Il limite su questo server lo impone PHP, non questa impostazione. Aumenta post_max_size e upload_max_filesize nel php.ini ad almeno 26M se vuoi che gli studenti possano usare tutti i 25 MB.';
+
+$string['voice:error_unavailable'] = 'Il servizio di trascrizione non è disponibile in questo momento. Riprova tra poco.';

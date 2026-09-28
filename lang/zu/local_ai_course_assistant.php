@@ -3131,3 +3131,15 @@ $string['outcomes:state_unavailable'] = 'Lo mphumela awutholakali okwamanje. Ake
 $string['cachedef_outcomesattainment'] = 'Ukufezeka kwemiphumela yohlelo ngomfundi ngamunye nangesifundo ngasinye';
 
 $string['cachedef_vectors'] = 'Amavektha e-embedding ye-RAG enkombeni yokulanda';
+
+$string['voice:error_toolarge'] = 'Lokhu kuqoshwa kukhulu kakhulu. Zama isiqeshana esifushane, ngaphansi kwamaMB angu-25.';
+$string['voice:error_noaudio'] = 'Akukho kuqoshwa okutholakele. Sicela uzame ukuqopha futhi.';
+$string['voice:error_format'] = 'Lelo fomethi yomsindo ayisekelwe. Sicela uzame ukuqopha futhi.';
+$string['voice:error_noprovider'] = 'Ukubhalwa kwezwi akuselwe kule sayithi. Sicela uxhumane nomlawuli wakho.';
+$string['voice:error_badresponse'] = 'Isevisi yokubhala ibuyise okuthile okungalindelekile. Sicela uzame futhi.';
+
+$string['settings:max_audio_mb'] = 'Usayizi omkhulu wokuqoshwa (MB)';
+$string['settings:max_audio_mb_desc'] = 'Ukuqoshwa kwezwi okukhulu kunakho konke umfundi angakulayisha, ngamamegabyte. Phakathi kuka-1 no-200; okuzenzakalelayo ngu-25.<br>Kule seva i-PHP ivumela i-post_max_size = {$a->postmax} ne-upload_max_filesize = {$a->uploadmax}, ngakho usayizi osebenza ngempela manje ngu-{$a->effective} MB. Omncane phakathi kwesilungiselelo sakho nemikhawulo ye-PHP uhlala esebenza.';
+$string['settings:max_audio_mb_capped'] = 'Umkhawulo kule seva yi-PHP, hhayi lesi silungiselelo. Khuphula i-post_max_size ne-upload_max_filesize ku-php.ini okungenani kube ngu-26M uma ufuna abafundi bakwazi ukusebenzisa wonke ama-MB angu-25.';
+
+$string['voice:error_unavailable'] = 'Isevisi yokubhala ayitholakali okwamanje. Sicela uzame futhi emizuzwaneni embalwa.';

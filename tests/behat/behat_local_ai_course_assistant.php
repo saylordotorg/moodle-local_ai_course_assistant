@@ -141,6 +141,7 @@ class behat_local_ai_course_assistant extends behat_base {
     public function i_post_an_audio_clip_of_size(int $bytes): void {
         $script = <<<JS
             window.__solaProbeStatus = null;
+            window.__solaProbeBody = null;
             (function () {
                 var body = new Blob([new Uint8Array($bytes)], {type: 'audio/webm'});
                 var form = new FormData();
@@ -151,8 +152,12 @@ class behat_local_ai_course_assistant extends behat_base {
                 fetch(M.cfg.wwwroot + '/local/ai_course_assistant/transcribe.php', {
                     method: 'POST', body: form, credentials: 'same-origin'
                 }).then(function (r) {
-                    window.__solaProbeStatus = r.status;
-                }).catch(function () {
+                    return r.text().then(function (body) {
+                        window.__solaProbeBody = (body || '').substring(0, 400);
+                        window.__solaProbeStatus = r.status;
+                    });
+                }).catch(function (e) {
+                    window.__solaProbeBody = 'fetch failed: ' + e;
                     window.__solaProbeStatus = -1;
                 });
             })();
@@ -197,9 +202,134 @@ JS;
                 . 'reached the transcription provider and was billed.'
             : 'Expected ' . $code . ' from the size guard.';
 
+        $body = (string) $this->getSession()->evaluateScript('return window.__solaProbeBody;');
+
+        // The body is what names the answer. Moodle's AJAX exception handler emits
+        // HTTP 200 for ANY uncaught exception in an AJAX_SCRIPT, so a 200 here does
+        // not mean the upload succeeded; it usually means the request never reached
+        // the guard at all. Without the body that is indistinguishable from the
+        // guard failing to fire, which is the difference this step exists to report.
         throw new ExpectationException(
-            $meaning . ' Got HTTP ' . $status . '.',
+            $meaning . ' Got HTTP ' . $status . '. Body: ' . $body,
             $this->getSession()
         );
+    }
+
+    /**
+     * Turn on both gates the Progress tab needs, for one course, at run time.
+     *
+     * The Progress button and panel are wrapped in {{#masterydashboardenabled}},
+     * which objective_manager::is_dashboard_enabled_for_course() grants only when
+     * mastery is enabled for the course AND mastery_dashboard_enabled_course_<id>
+     * is set. The second key has no site-wide fallback, so it cannot be expressed
+     * in a Background config table: the key contains the course id, which does not
+     * exist until the generator has run.
+     *
+     * A scenario that clicks Progress without this gets "not found", which is the
+     * truthful answer. The control is absent, not hidden.
+     *
+     * @Given /^the mastery progress tab is enabled for course "(?P<shortname>[^"]*)"$/
+     * @param string $shortname Course shortname.
+     */
+    public function the_mastery_progress_tab_is_enabled_for_course(string $shortname): void {
+        global $DB;
+
+        $courseid = (int) $DB->get_field('course', 'id', ['shortname' => $shortname]);
+        if ($courseid <= 0) {
+            // MUST_EXIST's own message is "Can't find data record in database table
+            // course", which does not say which course, and the shortname is the one
+            // thing likely to be wrong here: it comes from the feature's Background,
+            // not from anything this step can see.
+            throw new ExpectationException(
+                'No course with shortname "' . $shortname . '". Check it against the'
+                    . ' Background of this feature.',
+                $this->getSession()
+            );
+        }
+        \local_ai_course_assistant\objective_manager::set_enabled_for_course($courseid, true);
+        \local_ai_course_assistant\objective_manager::set_dashboard_enabled_for_course($courseid, true);
+    }
+
+    /**
+     * Assert that keyboard focus is inside the given element.
+     *
+     * A dialog that opens without taking focus is the defect this pins. It is
+     * invisible to every assertion about markup: the drawer is present, it has
+     * role="dialog", it has an aria-label, and a focus trap is bound to it. All
+     * of that was true while a keyboard user pressing Tab walked the page behind
+     * the open dialog, because the trap only acts once activeElement is already
+     * the first or last control inside the drawer, and nothing had put it there.
+     *
+     * document.activeElement is the only thing that distinguishes the two, and
+     * only a real browser has one.
+     *
+     * @Then /^focus should be inside "(?P<selector>[^"]*)"$/
+     * @param string $selector CSS selector for the container.
+     * @throws ExpectationException
+     */
+    public function focus_should_be_inside(string $selector): void {
+        $escaped = json_encode($selector);
+        $script = <<<JS
+            (function () {
+                var box = document.querySelector({$escaped});
+                var active = document.activeElement;
+                if (!box) { return 'NO CONTAINER'; }
+                if (!active) { return 'NO ACTIVE ELEMENT'; }
+                if (!box.contains(active)) {
+                    return 'OUTSIDE: ' + active.tagName.toLowerCase()
+                        + (active.className ? '.' + String(active.className).split(' ').join('.') : '');
+                }
+                return 'INSIDE';
+            })();
+JS;
+        $result = (string) $this->getSession()->evaluateScript('return ' . trim($script));
+
+        if ($result !== 'INSIDE') {
+            throw new ExpectationException(
+                'Focus is not inside "' . $selector . '": ' . $result
+                    . '. A dialog that opens without taking focus leaves a keyboard user'
+                    . ' tabbing through the page behind it, and its focus trap never engages.',
+                $this->getSession()
+            );
+        }
+    }
+
+    /**
+     * Assert that keyboard focus is on exactly the given element.
+     *
+     * Stricter than focus_should_be_inside(), and needed because the drawer has
+     * two correct answers depending on viewport. On a desktop width focus goes to
+     * the message box, which is what someone opening an assistant wants. Under
+     * 600px it goes to the dialog container instead: focusing a textarea on a
+     * phone opens the on-screen keyboard, which would cover the drawer the
+     * learner just opened. Both put focus inside the dialog; only this step can
+     * tell which one actually happened.
+     *
+     * @Then /^focus should be on "(?P<selector>[^"]*)"$/
+     * @param string $selector CSS selector for the element expected to have focus.
+     * @throws ExpectationException
+     */
+    public function focus_should_be_on(string $selector): void {
+        $escaped = json_encode($selector);
+        $script = <<<JS
+            (function () {
+                var want = document.querySelector({$escaped});
+                var active = document.activeElement;
+                if (!want) { return 'NO SUCH ELEMENT'; }
+                if (!active) { return 'NO ACTIVE ELEMENT'; }
+                if (want === active) { return 'MATCH'; }
+                return 'ON: ' + active.tagName.toLowerCase()
+                    + (active.id ? '#' + active.id : '')
+                    + (active.className ? '.' + String(active.className).trim().split(/\s+/).join('.') : '');
+            })();
+JS;
+        $result = (string) $this->getSession()->evaluateScript('return ' . trim($script));
+
+        if ($result !== 'MATCH') {
+            throw new ExpectationException(
+                'Focus is not on "' . $selector . '": ' . $result . '.',
+                $this->getSession()
+            );
+        }
     }
 }

@@ -3115,3 +3115,15 @@ $string['outcomes:state_unavailable'] = 'Nin ɲɛtaa in tɛ sɔrɔ sisan. Mɔgɔ
 $string['cachedef_outcomesattainment'] = 'Porogaramu ɲɛtaa sɔrɔ (kalanden ni kalansen kelen-kelen na)';
 
 $string['cachedef_vectors'] = 'RAG embedding vɛkitɛriw sɔrɔli index kama';
+
+$string['voice:error_toolarge'] = 'Nin kumakan ka bon kojugu. A lajɛ ni kumakan surun ye, min tɛ tɛmɛ 25 MB kan.';
+$string['voice:error_noaudio'] = 'Kumakan si ma se. Aw ye a lajɛ ka kumakan kɛ kokura.';
+$string['voice:error_format'] = 'Nin kumakan cogoya tɛ sɔrɔ. Aw ye a lajɛ ka kumakan kɛ kokura.';
+$string['voice:error_noprovider'] = 'Kumakan sɛbɛnni ma labɛn nin siti kan. Aw ye kuma a ɲɛmɔgɔ fɛ.';
+$string['voice:error_badresponse'] = 'Sɛbɛnni baara ye fɛn dɔ lasegin min ma lajɛ. Aw ye a lajɛ kokura.';
+
+$string['settings:max_audio_mb'] = 'Kumakan bonya belebele (MB)';
+$string['settings:max_audio_mb_desc'] = 'Kalanden bɛ se ka kumakan min bila, o bonya belebele, MB la. 1 ni 200 cɛ; a kɔnɔna ye 25 ye.<br>Nin sɛrɛwɛri kan, PHP bɛ sɔn post_max_size = {$a->postmax} ni upload_max_filesize = {$a->uploadmax} ma, o la sisan bonya min bɛ baara la ye {$a->effective} MB ye. I ka labɛnni ni PHP ka dan cɛ, min ka dɔgɔ o de bɛ se tuma bɛɛ.';
+$string['settings:max_audio_mb_capped'] = 'Nin sɛrɛwɛri kan, PHP de ye dan ye, nin labɛnni tɛ. Aw ye post_max_size ni upload_max_filesize yɛlɛma php.ini kɔnɔ ka se 26M ma ni aw b\'a fɛ kalandenw ka se ka MB 25 bɛɛ kɛ.';
+
+$string['voice:error_unavailable'] = 'Sɛbɛnni baara tɛ sɔrɔ sisan. Aw ye a lajɛ kokura dɔɔnin kɔfɛ.';

@@ -1870,6 +1870,55 @@ define([
             };
             drawer.addEventListener('keydown', drawer._aicaFocusTrap);
         }
+
+        // Move focus INTO the dialog. Without this the drawer opens and focus
+        // stays on the toggle button, which the open state then hides, so the
+        // browser drops focus to <body>.
+        //
+        // Three things break when that happens, and none of them is cosmetic.
+        // A keyboard user has to Tab from the top of the page to reach a dialog
+        // that is already open in front of them. The focus trap installed just
+        // above never engages, because it only acts when activeElement is
+        // already the first or last control inside the drawer. And a screen
+        // reader announces nothing on open, because nothing focusable moved.
+        //
+        // closeDrawer() has always restored focus with toggle.focus(); this is
+        // the missing other half of that pair.
+        //
+        // On desktop the message box is the target rather than the close button:
+        // it is what a learner opening an assistant wants, and it is the one
+        // control whose purpose is not "leave".
+        //
+        // On mobile it is the drawer itself, via tabindex="-1". Focusing a
+        // textarea on a phone opens the on-screen keyboard, which would cover
+        // the drawer the learner just opened with a keyboard they did not ask
+        // for. Focusing the dialog container satisfies the same requirement:
+        // focus is inside, a screen reader announces the dialog by its
+        // aria-label, the trap can engage on the first Tab, and nothing is
+        // typed into until the learner chooses to. 600px is the same breakpoint
+        // updatePagePush uses to decide the drawer overlays rather than pushes.
+        //
+        // preventScroll because on a long course page focusing a fixed-position
+        // element otherwise jumps the page. Safari before 14 ignores the options
+        // object, hence the fallback.
+        let focusinto;
+        if (window.innerWidth <= 600) {
+            drawer.setAttribute('tabindex', '-1');
+            focusinto = drawer;
+        } else {
+            focusinto = drawer.querySelector('.local-ai-course-assistant__input')
+                || drawer.querySelector('.local-ai-course-assistant__btn-close')
+                || drawer;
+            if (focusinto === drawer) {
+                drawer.setAttribute('tabindex', '-1');
+            }
+        }
+        try {
+            focusinto.focus({preventScroll: true});
+        } catch (e) {
+            focusinto.focus();
+        }
+
         // Push page content aside on desktop so drawer doesn't overlap.
         // Use requestAnimationFrame so the drawer has its final width before we read it.
         requestAnimationFrame(function() {

@@ -3085,3 +3085,15 @@ $string['outcomes:state_unavailable'] = 'هذه النتيجة غير متاحة
 $string['cachedef_outcomesattainment'] = 'مستوى تحقيق نتائج البرنامج الدراسي لكل متعلم ومقرر';
 
 $string['cachedef_vectors'] = 'متجهات تضمين RAG لفهرس الاسترجاع';
+
+$string['voice:error_toolarge'] = 'هذا التسجيل كبير جدًا. جرّب مقطعًا أقصر، أقل من 25 ميجابايت تقريبًا.';
+$string['voice:error_noaudio'] = 'لم يصل أي تسجيل. يرجى محاولة التسجيل مرة أخرى.';
+$string['voice:error_format'] = 'تنسيق الصوت هذا غير مدعوم. يرجى محاولة التسجيل مرة أخرى.';
+$string['voice:error_noprovider'] = 'لم يتم إعداد التفريغ الصوتي على هذا الموقع. يرجى التواصل مع المسؤول.';
+$string['voice:error_badresponse'] = 'أعادت خدمة التفريغ استجابة غير متوقعة. يرجى المحاولة مرة أخرى.';
+
+$string['settings:max_audio_mb'] = 'الحد الأقصى لحجم التسجيل (ميجابايت)';
+$string['settings:max_audio_mb_desc'] = 'أكبر تسجيل صوتي يمكن للمتعلم رفعه، بالميجابايت. بين 1 و200؛ القيمة الافتراضية 25.<br>على هذا الخادم يسمح PHP بـ post_max_size = {$a->postmax} و upload_max_filesize = {$a->uploadmax}، لذا فإن الحجم المطبَّق فعليًا الآن هو {$a->effective} ميجابايت. الأصغر بين إعدادك وحدود PHP هو الذي يسري دائمًا.';
+$string['settings:max_audio_mb_capped'] = 'الحد على هذا الخادم هو PHP وليس هذا الإعداد. ارفع post_max_size و upload_max_filesize في php.ini إلى 26M على الأقل إذا أردت أن يتمكن المتعلمون من استخدام كامل الـ 25 ميجابايت.';
+
+$string['voice:error_unavailable'] = 'خدمة التفريغ الصوتي غير متاحة حاليًا. يرجى المحاولة مرة أخرى بعد قليل.';

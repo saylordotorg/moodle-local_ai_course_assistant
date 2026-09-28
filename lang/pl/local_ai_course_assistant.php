@@ -3086,3 +3086,15 @@ $string['outcomes:state_unavailable'] = 'Ten wynik jest w tej chwili niedostępn
 $string['cachedef_outcomesattainment'] = 'Stopień osiągnięcia efektów kształcenia programu na uczącego się i kurs';
 
 $string['cachedef_vectors'] = 'Wektory embeddingów RAG dla indeksu wyszukiwania';
+
+$string['voice:error_toolarge'] = 'To nagranie jest za duże. Spróbuj krótszego fragmentu, poniżej około 25 MB.';
+$string['voice:error_noaudio'] = 'Nie otrzymano nagrania. Spróbuj nagrać ponownie.';
+$string['voice:error_format'] = 'Ten format audio nie jest obsługiwany. Spróbuj nagrać ponownie.';
+$string['voice:error_noprovider'] = 'Transkrypcja głosu nie jest skonfigurowana w tej witrynie. Skontaktuj się z administratorem.';
+$string['voice:error_badresponse'] = 'Usługa transkrypcji zwróciła nieoczekiwaną odpowiedź. Spróbuj ponownie.';
+
+$string['settings:max_audio_mb'] = 'Maksymalny rozmiar nagrania (MB)';
+$string['settings:max_audio_mb_desc'] = 'Największe nagranie głosowe, jakie może przesłać uczący się, w megabajtach. Od 1 do 200; domyślnie 25.<br>Na tym serwerze PHP zezwala na post_max_size = {$a->postmax} i upload_max_filesize = {$a->uploadmax}, więc rozmiar faktycznie egzekwowany w tej chwili to {$a->effective} MB. Zawsze obowiązuje mniejsza z wartości: Twoje ustawienie albo limity samego PHP.';
+$string['settings:max_audio_mb_capped'] = 'Limit na tym serwerze wyznacza PHP, a nie to ustawienie. Zwiększ post_max_size i upload_max_filesize w php.ini do co najmniej 26M, jeśli chcesz, aby uczący się mogli wykorzystać pełne 25 MB.';
+
+$string['voice:error_unavailable'] = 'Usługa transkrypcji jest w tej chwili niedostępna. Spróbuj ponownie za chwilę.';
