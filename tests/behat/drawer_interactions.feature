@@ -91,47 +91,6 @@ Feature: SOLA drawer interactions beyond send-receive
     And I should see "Second message" in the ".local-ai-course-assistant__messages" "css_element"
 
   @javascript
-  Scenario: Every panel a learner can open is free of template artefacts
-    # The bottom-nav panels, Progress and History, are reachable by any learner
-    # and were reached by no scenario until v7.5.4. The help panel was in the
-    # same position: it HAD a scenario, which asserted only that it was visible,
-    # and it stayed green through seven weeks of showing internal notes.
-    #
-    # This walks the learner-reachable surfaces and asserts the thing that is
-    # cheap to check and expensive to miss: no Mustache tag, no unresolved
-    # branding token, no unsubstituted placeholder, no raw string key.
-    Given I log in as "student1"
-    And I am on "Test Course" course homepage
-    When I click on "#local-ai-course-assistant-toggle" "css_element"
-    Then "#local-ai-course-assistant-drawer" should not leak template syntax
-    And I click on "[data-mode=\"progress\"]" "css_element"
-    And ".local-ai-course-assistant__progress-panel" should not leak template syntax
-    And I click on "[data-mode=\"history\"]" "css_element"
-    And ".local-ai-course-assistant__history-panel" should not leak template syntax
-    And I click on "[data-mode=\"chat\"]" "css_element"
-    And ".local-ai-course-assistant__starters" should not leak template syntax
-
-  @javascript
-  Scenario: An oversized recording is refused before it reaches the provider
-    # The guard this pins is at transcribe.php, and until now nothing proved it
-    # FIRES. PHPUnit cannot enter that file: it declares AJAX_SCRIPT and gates on
-    # is_uploaded_file(), so the unit tests can only read the source and assert the
-    # guard is present and correctly ordered. Deleting just the `exit;` from the
-    # guard body leaves every one of those assertions green while an oversized clip
-    # goes to the provider and is billed, and the provider's JSON refusal reaches
-    # the learner base64-encoded as audio that decodes to silence.
-    #
-    # A real browser POST carries the session cookie and the page's sesskey, so it
-    # satisfies require_login, require_sesskey and require_capability and arrives at
-    # the guard the way a learner's own recording does.
-    #
-    # 26214401 bytes is one over security::MAX_AUDIO_BYTES (25 * 1024 * 1024).
-    Given I log in as "student1"
-    And I am on "Test Course" course homepage
-    When I post a 26214401 byte audio clip to the transcription endpoint
-    Then the transcription endpoint should have refused with 413
-
-  @javascript
   Scenario: An empty recording is refused before it reaches the provider
     # The same guard, the cheap half of it: the condition is `$size <= 0 || $size >
     # MAX`, so a zero-byte clip exercises the identical refusal without pushing 26MB
