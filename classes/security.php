@@ -461,15 +461,7 @@ class security {
      * @return int Bytes.
      */
     public static function max_audio_bytes(): int {
-        $configured = get_config('local_ai_course_assistant', 'max_audio_mb');
-
-        if ($configured === false || $configured === null || trim((string) $configured) === '') {
-            $bytes = self::MAX_AUDIO_BYTES;
-        } else {
-            $mb = (int) $configured;
-            $mb = max(self::MIN_AUDIO_MB, min(self::MAX_AUDIO_MB, $mb));
-            $bytes = $mb * 1024 * 1024;
-        }
+        $bytes = self::configured_audio_mb() * 1024 * 1024;
 
         $phplimit = self::php_upload_limit_bytes();
         if ($phplimit > 0 && $phplimit < $bytes) {
@@ -477,6 +469,80 @@ class security {
         }
 
         return $bytes;
+    }
+
+    /**
+     * The max_audio_mb setting, resolved and clamped, in megabytes.
+     *
+     * The single place that decides what the stored value means, because review
+     * on PR 258 found two places deciding it differently. settings.php used
+     * `get_config(...) ?: 25` with no clamp, so a stored "0" read as falsy and
+     * became 25 while the endpoint enforced 1, and a stored "300" produced
+     * advice to raise php.ini to 301M for 100 MB that could never be used.
+     * PARAM_INT on the setting does not enforce a range either, so out-of-range
+     * values do get stored.
+     *
+     * get_config() returns false before the setting has ever been saved, which
+     * is every installation on upgrade day, so the unset case must land on the
+     * documented default rather than on zero.
+     *
+     * @return int Megabytes, within [MIN_AUDIO_MB, MAX_AUDIO_MB].
+     */
+    public static function configured_audio_mb(): int {
+        $configured = get_config('local_ai_course_assistant', 'max_audio_mb');
+
+        if ($configured === false || $configured === null || trim((string) $configured) === '') {
+            return (int) (self::MAX_AUDIO_BYTES / (1024 * 1024));
+        }
+
+        return max(self::MIN_AUDIO_MB, min(self::MAX_AUDIO_MB, (int) $configured));
+    }
+
+    /**
+     * The effective cap as a whole number of megabytes, for showing to a person.
+     *
+     * One function so the settings page and the learner's error message cannot
+     * state different numbers for the same limit. Review found the page using
+     * round(x, 1) and the errors using floor(x): at upload_max_filesize = 2500K
+     * the admin read 2.4 MB and the learner read 2 MB.
+     *
+     * Floors, so the number shown is always one the learner can actually send,
+     * but never below 1: a PHP limit under a megabyte would otherwise render as
+     * "under about 0 MB", which is not advice.
+     *
+     * @return int Megabytes, at least 1.
+     */
+    public static function max_audio_mb_display(): int {
+        return max(1, (int) floor(self::max_audio_bytes() / (1024 * 1024)));
+    }
+
+    /**
+     * A provider URL reduced to the part that is safe to write to a log.
+     *
+     * Scheme, host and port only. A self-hosted endpoint can legitimately carry
+     * credentials, as https://user:pass@host/v1/audio or as ?api_key=..., and
+     * error logs are routinely shipped to aggregators, ticket attachments and
+     * support threads that are less trusted than the server they came from.
+     * Logging the raw URL puts a working key in all of those places.
+     *
+     * Raised in review on PR 258: the SSRF branch logged $cfg['endpoint'] whole,
+     * while the HTTP-status branch immediately below it already logged only the
+     * host. The host is the part an administrator actually needs, because it
+     * tells them which endpoint their configuration is pointing at.
+     *
+     * @param string $url The configured endpoint.
+     * @return string Scheme, host and port, or '(unparseable)'.
+     */
+    public static function loggable_endpoint(string $url): string {
+        $parts = parse_url($url);
+        if ($parts === false || empty($parts['host'])) {
+            return '(unparseable)';
+        }
+        $out = (!empty($parts['scheme']) ? $parts['scheme'] . '://' : '') . $parts['host'];
+        if (!empty($parts['port'])) {
+            $out .= ':' . $parts['port'];
+        }
+        return $out;
     }
 
     /**
@@ -505,6 +571,13 @@ class security {
      * @return void
      */
     public static function log_operational_failure(string $message): void {
+        // phpcs:ignore moodle.PHP.ForbiddenFunctions.Found
+        // moodle-cs lists error_log alongside print_r as a development debugging
+        // function. Here it is the deliberate choice and the docblock says why:
+        // it is the only core-free channel that writes at every debug level, and
+        // debugging() writes nothing on a production site. A custom event plus a
+        // logstore row would add database writes on an error path that fires
+        // once per failed request during an outage.
         error_log('SOLA: ' . $message);
     }
 

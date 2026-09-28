@@ -109,6 +109,42 @@ Feature: SOLA drawer interactions beyond send-receive
     And focus should be on ".local-ai-course-assistant__input"
 
   @javascript
+  Scenario: With consent still pending, focus goes into the consent notice
+    # The case the first version of this fix missed, found in review.
+    #
+    # While consent is pending, consent_gate.js puts `inert` on every sibling of
+    # the banner, which is the whole rest of the drawer. focus() on an inert
+    # element is a silent no-op, so targeting the message box did nothing:
+    # focus stayed on <body> and a screen reader announced nothing, in the one
+    # case where a modal notice most needs to be found and read.
+    #
+    # The learner here has dismissed the intro but NOT given consent, which is
+    # the state that isolates this. A brand-new learner does not reach it: the
+    # welcome panel renders a moment later and focuses its own Continue button
+    # in a requestAnimationFrame, so it wins whatever this code does. That is
+    # also why the review's predicted symptom is not visible on a first-ever
+    # open, and why this scenario sets intro_dismissed.
+    #
+    # Every other scenario in this plugin sets aica_sola_consent_given in its
+    # Background, which is why none of them saw any of it.
+    Given the following "users" exist:
+      | username | firstname | lastname | email              |
+      | newbie   | New       | Learner  | newbie@example.com |
+    And the following "course enrolments" exist:
+      | user   | course | role    |
+      | newbie | DI1    | student |
+    And the following "user preferences" exist:
+      | user   | preference                                | value |
+      | newbie | local_ai_course_assistant_intro_dismissed | 1     |
+    And I log in as "newbie"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    And ".aica-consent-banner" "css_element" should be visible
+    And focus should be inside "#local-ai-course-assistant-drawer"
+    And focus should be on ".aica-consent-scroll"
+
+  @javascript
   Scenario: On a phone the assistant takes focus without opening the keyboard
     # The mobile half of the same fix, and the reason it is not simply "focus
     # the message box". Focusing a textarea on a phone opens the on-screen

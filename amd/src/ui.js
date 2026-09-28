@@ -1854,13 +1854,23 @@ define([
         if (!drawer._aicaFocusTrap) {
             drawer._aicaFocusTrap = function(e) {
                 if (e.key !== 'Tab') { return; }
-                var focusable = drawer.querySelectorAll(
+                var candidates = drawer.querySelectorAll(
                     'button:not([disabled]):not([aria-hidden="true"]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
                 );
+                // querySelectorAll does not skip inert subtrees, so while the
+                // consent banner is up the first and last "focusable" controls
+                // can be ones the browser will not focus, and the trap never
+                // engages. Filter them out.
+                var focusable = Array.prototype.filter.call(candidates, function(el) {
+                    return !el.closest || el.closest('[inert]') === null;
+                });
                 if (!focusable.length) { return; }
                 var first = focusable[0];
                 var last = focusable[focusable.length - 1];
-                if (e.shiftKey && document.activeElement === first) {
+                // Shift+Tab from the dialog container itself must also wrap:
+                // on mobile focus lands on the container, which is not `first`,
+                // so without this the very first Shift+Tab leaves the dialog.
+                if (e.shiftKey && (document.activeElement === first || document.activeElement === drawer)) {
                     e.preventDefault();
                     last.focus();
                 } else if (!e.shiftKey && document.activeElement === last) {
@@ -1901,17 +1911,36 @@ define([
         // preventScroll because on a long course page focusing a fixed-position
         // element otherwise jumps the page. Safari before 14 ignores the options
         // object, hence the fallback.
-        let focusinto;
-        if (window.innerWidth <= 600) {
+        // The consent banner outranks everything. While it is up,
+        // consent_gate.js puts `inert` on every sibling of the banner, which is
+        // the whole rest of the drawer, and focus() on an inert element is a
+        // silent no-op. The first version of this fix targeted the message box
+        // unconditionally, so on a learner's FIRST open it did nothing at all:
+        // focus stayed on <body> and a screen reader announced nothing, in the
+        // one case where a modal notice most needs to be found. Every Behat
+        // Background sets aica_sola_consent_given, so no scenario saw it.
+        var inert = function(el) {
+            return !el || (el.closest && el.closest('[inert]') !== null);
+        };
+
+        let focusinto = null;
+        var banner = drawer.querySelector('.aica-consent-banner');
+        if (banner && !inert(banner)) {
+            focusinto = banner.querySelector('.aica-consent-scroll') || banner;
+        }
+
+        if (!focusinto && window.innerWidth > 600) {
+            // Desktop: the message box, unless consent has sealed it.
+            var box = drawer.querySelector('.local-ai-course-assistant__input');
+            var close = drawer.querySelector('.local-ai-course-assistant__btn-close');
+            focusinto = (!inert(box) && box) || (!inert(close) && close) || null;
+        }
+
+        if (!focusinto) {
+            // Mobile, or every candidate inert. The dialog itself is always
+            // focusable with tabindex=-1 and is never the inert one.
             drawer.setAttribute('tabindex', '-1');
             focusinto = drawer;
-        } else {
-            focusinto = drawer.querySelector('.local-ai-course-assistant__input')
-                || drawer.querySelector('.local-ai-course-assistant__btn-close')
-                || drawer;
-            if (focusinto === drawer) {
-                drawer.setAttribute('tabindex', '-1');
-            }
         }
         try {
             focusinto.focus({preventScroll: true});

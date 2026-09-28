@@ -43,7 +43,7 @@ if (\local_ai_course_assistant\security::oversized_post_was_discarded($_SERVER, 
     echo json_encode(['error' => get_string(
         'voice:error_toolarge',
         'local_ai_course_assistant',
-        (int) floor(\local_ai_course_assistant\security::max_audio_bytes() / (1024 * 1024))
+        \local_ai_course_assistant\security::max_audio_mb_display()
     )]);
     exit;
 }
@@ -81,7 +81,7 @@ if (\local_ai_course_assistant\security::upload_error_is_size($uploaderror)) {
     echo json_encode(['error' => get_string(
         'voice:error_toolarge',
         'local_ai_course_assistant',
-        (int) floor(\local_ai_course_assistant\security::max_audio_bytes() / (1024 * 1024))
+        \local_ai_course_assistant\security::max_audio_mb_display()
     )]);
     exit;
 }
@@ -103,7 +103,7 @@ if ($size <= 0 || $size > \local_ai_course_assistant\security::max_audio_bytes()
     echo json_encode(['error' => get_string(
         'voice:error_toolarge',
         'local_ai_course_assistant',
-        (int) floor(\local_ai_course_assistant\security::max_audio_bytes() / (1024 * 1024))
+        \local_ai_course_assistant\security::max_audio_mb_display()
     )]);
     exit;
 }
@@ -203,7 +203,8 @@ if (!\local_ai_course_assistant\security::is_safe_provider_url($cfg['endpoint'])
     // unless $CFG->debug is DEVELOPER, so on a production site this line would
     // be discarded and the claim above would be false.
     \local_ai_course_assistant\security::log_operational_failure(
-        'STT endpoint failed SSRF validation: ' . $cfg['endpoint']
+        'STT endpoint failed SSRF validation: '
+            . \local_ai_course_assistant\security::loggable_endpoint($cfg['endpoint'])
     );
     http_response_code(502);
     echo json_encode(['error' => get_string('voice:error_noprovider', 'local_ai_course_assistant')]);
@@ -238,7 +239,7 @@ if ($httpcode !== 200) {
     // unless $CFG->debug is DEVELOPER, which no production site sets.
     \local_ai_course_assistant\security::log_operational_failure(
         'STT provider returned HTTP ' . $httpcode . ' from '
-            . (parse_url($cfg['endpoint'], PHP_URL_HOST) ?: 'unknown host')
+            . \local_ai_course_assistant\security::loggable_endpoint($cfg['endpoint'])
     );
     http_response_code(502);
     echo json_encode(['error' => get_string('voice:error_unavailable', 'local_ai_course_assistant')]);

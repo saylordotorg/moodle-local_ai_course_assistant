@@ -454,7 +454,7 @@ final class audio_size_guard_test extends \advanced_testcase {
             $offset = 0;
             while (($at = strpos($src, "'" . $key . "'", $offset)) !== false) {
                 $calls++;
-                if (strpos(substr($src, $at, 300), 'max_audio_bytes()') !== false) {
+                if (strpos(substr($src, $at, 300), 'max_audio_mb_display()') !== false) {
                     $withcap++;
                 }
                 $offset = $at + 1;
@@ -531,71 +531,132 @@ final class audio_size_guard_test extends \advanced_testcase {
     }
 
     /**
-     * No locale carries letters from a script it does not use.
+     * Every locale is written in the script it is supposed to be written in.
      *
-     * This exists because it happened. While writing the 45 translations of
+     * This exists because it happened. Writing the 45 translations of
      * settings:max_audio_mb_capped I pasted Cyrillic into the middle of a
-     * Romanian word, producing "Pentru ca участanții". The batch had a check on
-     * it already, for placeholder counts and hardcoded numbers, and that check
-     * passed: a wrong-script splice is invisible to anything looking at
-     * structure rather than at the letters.
+     * Romanian word, producing "Pentru ca участanții". The batch check passed
+     * it, because it looked at placeholder counts and hardcoded numbers, which
+     * is structure and not letters.
      *
      * It is also invisible in review. Nobody reads 45 blocks of a language they
-     * do not speak, and the diff for a translation batch is four hundred lines
-     * of text a reviewer has no way to check. A script census is the one thing
-     * that does check it, and it is cheap.
+     * do not speak, and a translation diff is hundreds of lines a reviewer has
+     * no way to check.
      *
-     * The ini directive names are stripped before the census: post_max_size and
-     * upload_max_filesize are Latin in every locale, correctly.
+     * The first version of this test only checked the 30 Latin locales, which
+     * review pointed out leaves the other 16 with no census at all: Hebrew
+     * pasted into Arabic, or Latin prose left in Thai, would have passed. Each
+     * locale now declares the scripts it may use, and anything outside that set
+     * fails. Latin is allowed everywhere because the ini directive names and
+     * "MB" are Latin in every locale.
      *
      * @return void
      */
-    public function test_no_locale_mixes_in_a_script_it_does_not_use(): void {
+    public function test_every_locale_is_written_in_its_own_script(): void {
         $root = realpath(__DIR__ . '/..');
 
-        // Locales whose strings should be Latin script throughout.
-        $latin = ['en', 'bm', 'cs', 'da', 'de', 'es', 'fi', 'fr', 'ha', 'hu', 'id', 'ig',
-                  'it', 'ms', 'nb', 'nl', 'om', 'pl', 'pt_br', 'ro', 'sk', 'so', 'sv',
-                  'sw', 'tl', 'tr', 'vi', 'wo', 'yo', 'zu'];
+        // Script ranges, named so a failure message can say what it found.
+        $ranges = [
+            'Cyrillic' => '\x{0400}-\x{052F}',
+            'Greek' => '\x{0370}-\x{03FF}',
+            'Arabic' => '\x{0600}-\x{06FF}',
+            'Hebrew' => '\x{0590}-\x{05FF}',
+            // U+0964 DANDA and U+0965 DOUBLE DANDA live in the Devanagari block
+            // but are shared Indic punctuation; Bengali and Gurmukhi end sentences
+            // with them. Excluded, or every correct Bengali string fails as
+            // "contains Devanagari", which is exactly what this test did on its
+            // first run. The test was right that something was there; it was wrong
+            // about what the something meant.
+            'Devanagari' => '\x{0900}-\x{0963}\x{0966}-\x{097F}',
+            'Bengali' => '\x{0980}-\x{09FF}',
+            'Gurmukhi' => '\x{0A00}-\x{0A7F}',
+            'Tamil' => '\x{0B80}-\x{0BFF}',
+            'Thai' => '\x{0E00}-\x{0E7F}',
+            'Ethiopic' => '\x{1200}-\x{137F}',
+            'Han' => '\x{3400}-\x{4DBF}\x{4E00}-\x{9FFF}',
+            'Kana' => '\x{3040}-\x{30FF}',
+            'Hangul' => '\x{AC00}-\x{D7AF}',
+            'CJKPunctuation' => '\x{3000}-\x{303F}\x{FF00}-\x{FFEF}',
+        ];
+
+        // What each locale is allowed beyond Latin. Everything unlisted is
+        // Latin-only. The CJK locales get CJKPunctuation because their existing
+        // strings use full-width brackets.
+        $allowed = [
+            'ru' => ['Cyrillic'], 'uk' => ['Cyrillic'], 'bg' => ['Cyrillic'],
+            'el' => ['Greek'],
+            'ar' => ['Arabic'], 'he' => ['Hebrew'],
+            'hi' => ['Devanagari'], 'ne' => ['Devanagari'],
+            'bn' => ['Bengali'], 'pa' => ['Gurmukhi'], 'ta' => ['Tamil'],
+            'th' => ['Thai'], 'am' => ['Ethiopic'],
+            'zh_cn' => ['Han', 'CJKPunctuation'],
+            'ja' => ['Han', 'Kana', 'CJKPunctuation'],
+            'ko' => ['Hangul', 'Han', 'CJKPunctuation'],
+        ];
+
         $keys = ['voice:error_toolarge', 'voice:error_noaudio', 'voice:error_format',
                  'voice:error_noprovider', 'voice:error_badresponse', 'voice:error_unavailable',
                  'soapbox:audio_too_large', 'settings:max_audio_mb',
                  'settings:max_audio_mb_desc', 'settings:max_audio_mb_capped'];
-        $noise = ['post_max_size', 'upload_max_filesize', 'php.ini', 'PHP'];
 
+        $locales = array_map('basename', array_map('dirname', glob($root . '/lang/*/local_ai_course_assistant.php')));
         $checked = 0;
-        foreach ($latin as $locale) {
-            $file = $root . '/lang/' . $locale . '/local_ai_course_assistant.php';
-            $this->assertFileExists($file, 'Locale ' . $locale . ' is missing.');
-            $src = (string) file_get_contents($file);
+        $values = [];
+
+        foreach ($locales as $locale) {
+            $src = (string) file_get_contents($root . '/lang/' . $locale . '/local_ai_course_assistant.php');
+            $permitted = $allowed[$locale] ?? [];
 
             foreach ($keys as $key) {
                 $pattern = "/\\\$string\\['" . preg_quote($key, '/') . "'\\]\s*=\s*'((?:[^'\\\\]|\\\\.)*)';/";
-                if (!preg_match($pattern, $src, $m)) {
-                    continue;
-                }
-                $value = str_replace($noise, '', $m[1]);
-                $checked++;
-
-                // Cyrillic, Greek, Arabic, Hebrew, Devanagari, Han, Kana, Hangul,
-                // Thai, Bengali, Tamil, Gurmukhi, Ethiopic: none belong here.
                 $this->assertSame(
-                    0,
-                    preg_match(
-                        '/[\x{0400}-\x{04FF}\x{0370}-\x{03FF}\x{0600}-\x{06FF}'
-                            . '\x{0590}-\x{05FF}\x{0900}-\x{097F}\x{4E00}-\x{9FFF}'
-                            . '\x{3040}-\x{30FF}\x{AC00}-\x{D7AF}\x{0E00}-\x{0E7F}'
-                            . '\x{0980}-\x{09FF}\x{0B80}-\x{0BFF}\x{0A00}-\x{0A7F}'
-                            . '\x{1200}-\x{137F}]/u',
-                        $value
-                    ),
-                    $locale . '/' . $key . ' contains letters from another script, which almost'
-                        . ' always means text was pasted in from a different locale block: '
-                        . $m[1]
+                    1,
+                    preg_match($pattern, $src, $m),
+                    $locale . ' is missing ' . $key . ', or declares it with double quotes,'
+                        . ' which this census cannot read. Neither is allowed to pass silently.'
                 );
+                $checked++;
+                $values[$key][$locale] = $m[1];
+
+                foreach ($ranges as $name => $range) {
+                    if (in_array($name, $permitted, true)) {
+                        continue;
+                    }
+                    $this->assertSame(
+                        0,
+                        preg_match('/[' . $range . ']/u', $m[1]),
+                        $locale . '/' . $key . ' contains ' . $name . ' characters, which that'
+                            . ' locale does not use. This almost always means text was pasted'
+                            . ' in from another locale block: ' . $m[1]
+                    );
+                }
             }
         }
 
-        $this->assertGreaterThan(250, $checked, 'The census covered too few strings to mean anything.');
+        // Every locale, every key: exact, so a missing string cannot be skipped.
+        $this->assertSame(
+            count($locales) * count($keys),
+            $checked,
+            'The census did not cover every locale and key.'
+        );
+
+        // Same-script splices are the likeliest mistake and no script check can
+        // see them: es/pt_br, cs/sk, da/nb, ms/id, ru/uk/bg, hi/ne. Two locales
+        // sharing a byte-identical translation is the signature.
+        foreach ($values as $key => $bylocale) {
+            $seen = [];
+            foreach ($bylocale as $locale => $value) {
+                if ($locale === 'en') {
+                    continue;
+                }
+                if (isset($seen[$value])) {
+                    $this->fail(
+                        $seen[$value] . ' and ' . $locale . ' have a byte-identical '
+                            . $key . ', which means one was pasted from the other: ' . $value
+                    );
+                }
+                $seen[$value] = $locale;
+            }
+        }
     }
 }

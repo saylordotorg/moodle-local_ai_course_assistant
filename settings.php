@@ -1772,18 +1772,24 @@ if ($hassiteconfig) {
     // detected values turns "why did a long recording fail" into something the
     // admin can see before a learner reports it.
     $phplimit = \local_ai_course_assistant\security::php_upload_limit_bytes();
-    $effective = \local_ai_course_assistant\security::max_audio_bytes();
     $maxaudiodesc = get_string('settings:max_audio_mb_desc', 'local_ai_course_assistant', (object) [
         'postmax'   => (string) ini_get('post_max_size'),
         'uploadmax' => (string) ini_get('upload_max_filesize'),
-        'effective' => (string) round($effective / (1024 * 1024), 1),
+        // The same helper the learner's error message uses. These printed
+        // different numbers for one limit until review caught it: the page
+        // rounded and the error floored, so at upload_max_filesize = 2500K the
+        // admin read 2.4 MB and the learner read 2 MB.
+        'effective' => (string) \local_ai_course_assistant\security::max_audio_mb_display(),
     ]);
     // The warning names the ini value that would actually unblock the setting the
     // admin has chosen, not a fixed 26M. An admin who set 50 here needs 51M, and
     // telling them 26M would be the same defect this release is about: a number
     // that was right for the default and wrong for them.
-    $configuredmb = (int) (get_config('local_ai_course_assistant', 'max_audio_mb')
-        ?: \local_ai_course_assistant\security::MAX_AUDIO_BYTES / (1024 * 1024));
+    // configured_audio_mb() rather than get_config(...) ?: 25. The ?: form read
+    // a stored "0" as falsy and reported 25 while the endpoint enforced 1, and
+    // took a stored "300" at face value to advise raising php.ini to 301M for
+    // 100 MB the endpoint would never allow. One helper, one answer.
+    $configuredmb = \local_ai_course_assistant\security::configured_audio_mb();
     $configuredbytes = $configuredmb * 1024 * 1024;
     if ($phplimit > 0 && $phplimit < $configuredbytes) {
         $maxaudiodesc .= '<br><strong class="text-danger">'
