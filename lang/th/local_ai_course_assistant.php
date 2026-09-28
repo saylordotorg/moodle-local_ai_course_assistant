@@ -1501,7 +1501,7 @@ $string['soapbox:no_browser_stt'] = 'เบราว์เซอร์นี้�
 $string['soapbox:browser_note'] = 'สุนทรพจน์นี้ถูกถอดความในเบราว์เซอร์ของคุณ ไม่มีการอัปโหลดสิ่งใด ทำงานได้ดีที่สุดใน Chrome และ Safari';
 $string['soapbox:server_note'] = 'การบันทึกของคุณถูกอัปโหลดเพื่อการถอดความเท่านั้นและไม่ถูกจัดเก็บ';
 $string['soapbox:error'] = 'ไม่สามารถให้คะแนนสุนทรพจน์นี้ได้ในขณะนี้ โปรดลองอีกครั้งในอีกสักครู่';
-$string['soapbox:audio_too_large'] = 'การบันทึกนั้นใหญ่เกินไป โปรดให้สุนทรพจน์มีขนาดไม่เกินประมาณ 25 MB (ราว 20 นาที)';
+$string['soapbox:audio_too_large'] = 'การบันทึกนี้มีขนาดใหญ่เกินไป โปรดให้สุนทรพจน์มีขนาดไม่เกินประมาณ {$a} MB';
 $string['soapbox:no_stt'] = 'ยังไม่ได้กำหนดค่าผู้ให้บริการถอดความ ขอให้ผู้ดูแลระบบของคุณตั้งค่า Whisper หรือเปิดใช้งานการถอดความในเบราว์เซอร์';
 $string['soapbox:result_heading'] = 'คะแนนตามเกณฑ์';
 $string['soapbox:overall_heading'] = 'โดยรวม';
@@ -3087,7 +3087,7 @@ $string['cachedef_outcomesattainment'] = 'ผลสัมฤทธิ์ตา�
 
 $string['cachedef_vectors'] = 'เวกเตอร์ embedding RAG สำหรับดัชนีการค้นคืน';
 
-$string['voice:error_toolarge'] = 'การบันทึกนี้มีขนาดใหญ่เกินไป ลองใช้คลิปที่สั้นลง ต่ำกว่าประมาณ 25 MB';
+$string['voice:error_toolarge'] = 'การบันทึกนี้มีขนาดใหญ่เกินไป ลองใช้คลิปที่สั้นลง ต่ำกว่าประมาณ {$a} MB';
 $string['voice:error_noaudio'] = 'ไม่ได้รับการบันทึกใด ๆ โปรดลองบันทึกอีกครั้ง';
 $string['voice:error_format'] = 'ไม่รองรับรูปแบบเสียงนี้ โปรดลองบันทึกอีกครั้ง';
 $string['voice:error_noprovider'] = 'ยังไม่ได้ตั้งค่าการถอดเสียงบนเว็บไซต์นี้ โปรดติดต่อผู้ดูแลระบบของคุณ';
@@ -3095,6 +3095,5 @@ $string['voice:error_badresponse'] = 'บริการถอดเสียง
 
 $string['settings:max_audio_mb'] = 'ขนาดการบันทึกสูงสุด (MB)';
 $string['settings:max_audio_mb_desc'] = 'ขนาดสูงสุดของการบันทึกเสียงที่ผู้เรียนอัปโหลดได้ หน่วยเป็นเมกะไบต์ อยู่ระหว่าง 1 ถึง 200 ค่าเริ่มต้นคือ 25<br>บนเซิร์ฟเวอร์นี้ PHP อนุญาต post_max_size = {$a->postmax} และ upload_max_filesize = {$a->uploadmax} ดังนั้นขนาดที่บังคับใช้จริงในขณะนี้คือ {$a->effective} MB ค่าที่น้อยกว่าระหว่างการตั้งค่าของคุณกับขีดจำกัดของ PHP จะมีผลเสมอ';
-$string['settings:max_audio_mb_capped'] = 'ขีดจำกัดบนเซิร์ฟเวอร์นี้คือ PHP ไม่ใช่การตั้งค่านี้ หากต้องการให้ผู้เรียนใช้ได้เต็ม 25 MB โปรดเพิ่ม post_max_size และ upload_max_filesize ใน php.ini เป็นอย่างน้อย 26M';
-
+$string['settings:max_audio_mb_capped'] = 'ขีดจำกัดบนเซิร์ฟเวอร์นี้คือ PHP ไม่ใช่การตั้งค่านี้ หากต้องการให้ผู้เรียนใช้ขนาดที่ตั้งไว้ที่นี่ได้เต็มที่ โปรดเพิ่ม post_max_size และ upload_max_filesize ใน php.ini เป็นอย่างน้อย {$a}';
 $string['voice:error_unavailable'] = 'ขณะนี้บริการถอดเสียงไม่พร้อมใช้งาน โปรดลองอีกครั้งในอีกสักครู่';

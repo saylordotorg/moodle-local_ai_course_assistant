@@ -1533,7 +1533,7 @@ $string['soapbox:no_browser_stt'] = 'Biraawzariin kun beekumsa haasawaa biraawza
 $string['soapbox:browser_note'] = 'Haasawaan kun biraawzara kee keessatti barreeffama ta\'a. Homaa ol hin baafamu. Chrome fi Safari keessatti baay\'ee hojjeta.';
 $string['soapbox:server_note'] = 'Waraabbiin kee barreeffamaaf qofa ol baafama, hin kuufamu.';
 $string['soapbox:error'] = 'Haasawaa kana amma madaaluu hin dandeenye. Yeroo muraasa booda irra deebi\'ii yaali.';
-$string['soapbox:audio_too_large'] = 'Waraabbiin sun baay\'ee guddaa dha. Haasawaa MB 25 gad eegi (gara daqiiqaa 20).';
+$string['soapbox:audio_too_large'] = 'Waraabbiin kun baay\'ee guddaa dha. Haasawaa MB {$a} gad eegi.';
 $string['soapbox:no_stt'] = 'Kennaan barreeffamaa tokko illee hin qindoofne. Bulchaa kee gaafadhu akka Whisper qindeessu yookaan barreeffama biraawzara banu.';
 $string['soapbox:result_heading'] = 'Qabxiiwwan ulaagaa';
 $string['soapbox:overall_heading'] = 'Waliigala';
@@ -3119,7 +3119,7 @@ $string['cachedef_outcomesattainment'] = 'Gahumsa bu\'aa sagantaa tokkoo tokkoon
 
 $string['cachedef_vectors'] = 'Vektaroota embedding RAG indeeksii argannootiif';
 
-$string['voice:error_toolarge'] = 'Waraabbiin kun baay\'ee guddaa dha. Waraabbii gabaabaa, MB 25 gadi ta\'e yaali.';
+$string['voice:error_toolarge'] = 'Waraabbiin kun baay\'ee guddaa dha. Waraabbii gabaabaa, MB {$a} gadi ta\'e yaali.';
 $string['voice:error_noaudio'] = 'Waraabbiin tokkollee hin dhufne. Maaloo irra deebi\'ii waraabuu yaali.';
 $string['voice:error_format'] = 'Bifti sagalee kun hin deeggaramu. Maaloo irra deebi\'ii waraabuu yaali.';
 $string['voice:error_noprovider'] = 'Barreeffamni sagalee marsariitii kana irratti hin qophoofne. Maaloo bulchaa kee quunnami.';
@@ -3127,6 +3127,5 @@ $string['voice:error_badresponse'] = 'Tajaajilli barreeffamaa deebii hin eegamne
 
 $string['settings:max_audio_mb'] = 'Guddina waraabbii ol\'aanaa (MB)';
 $string['settings:max_audio_mb_desc'] = 'Waraabbii sagalee guddaan barataan olkaa\'uu danda\'u, megabaayitiidhaan. 1 fi 200 gidduu; durtiin 25 dha.<br>Sarvara kana irratti PHP post_max_size = {$a->postmax} fi upload_max_filesize = {$a->uploadmax} hayyama, kanaafuu guddinni amma dhugumaan hojiirra oolu {$a->effective} MB dha. Qindaa\'ina kee fi daangaa PHP gidduudhaa inni xiqqaan yeroo hunda kan hojiirra oolu dha.';
-$string['settings:max_audio_mb_capped'] = 'Sarvara kana irratti daangaan PHP dha malee qindaa\'ina kana miti. Barattoonni MB 25 guutuu akka fayyadaman yoo barbaadde php.ini keessatti post_max_size fi upload_max_filesize yoo xiqqaate gara 26M tti ol kaasi.';
-
+$string['settings:max_audio_mb_capped'] = 'Sarvara kana irratti daangaan PHP dha malee qindaa\'ina kana miti. Barattoonni guddina asitti qindaa\'e guutuu akka fayyadamaniif php.ini keessatti post_max_size fi upload_max_filesize yoo xiqqaate gara {$a} tti ol kaasi.';
 $string['voice:error_unavailable'] = 'Tajaajilli barreeffamaa yeroo ammaa hin argamu. Maaloo yeroo muraasa booda irra deebi\'ii yaali.';

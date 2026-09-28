@@ -1522,7 +1522,7 @@ $string['soapbox:no_browser_stt'] = '此浏览器不支持浏览器内语音识�
 $string['soapbox:browser_note'] = '本次演讲在您的浏览器中转写。不会上传任何内容。在 Chrome 和 Safari 中效果最佳。';
 $string['soapbox:server_note'] = '您的录音仅为转写而上传，不会被存储。';
 $string['soapbox:error'] = '目前无法为本次演讲评分。请稍后再试。';
-$string['soapbox:audio_too_large'] = '该录音过大。请将演讲控制在约 25 MB 以内（大约 20 分钟）。';
+$string['soapbox:audio_too_large'] = '这段录音太大了。请将演讲控制在约 {$a} MB 以内。';
 $string['soapbox:no_stt'] = '未配置任何转写提供商。请请管理员设置 Whisper 或启用浏览器转写。';
 $string['soapbox:result_heading'] = '评分标准得分';
 $string['soapbox:overall_heading'] = '总体';
@@ -3124,7 +3124,7 @@ $string['cachedef_outcomesattainment'] = '按学习者和课程的学习项目�
 
 $string['cachedef_vectors'] = '供检索索引使用的 RAG 嵌入向量';
 
-$string['voice:error_toolarge'] = '这段录音太大了。请尝试较短的录音，控制在约 25 MB 以内。';
+$string['voice:error_toolarge'] = '这段录音太大了。请尝试较短的录音，控制在约 {$a} MB 以内。';
 $string['voice:error_noaudio'] = '未收到任何录音。请重新录制。';
 $string['voice:error_format'] = '不支持该音频格式。请重新录制。';
 $string['voice:error_noprovider'] = '本站点尚未设置语音转录。请联系管理员。';
@@ -3132,6 +3132,5 @@ $string['voice:error_badresponse'] = '转录服务返回了意外的结果。请
 
 $string['settings:max_audio_mb'] = '录音最大容量（MB）';
 $string['settings:max_audio_mb_desc'] = '学习者可上传的最大语音录音容量，单位为兆字节。取值 1 至 200，默认 25。<br>本服务器上 PHP 允许 post_max_size = {$a->postmax}、upload_max_filesize = {$a->uploadmax}，因此当前实际生效的容量为 {$a->effective} MB。此设置与 PHP 自身限制中较小的一个始终生效。';
-$string['settings:max_audio_mb_capped'] = '本服务器的限制来自 PHP，而非此设置。若希望学习者能使用完整的 25 MB，请将 php.ini 中的 post_max_size 和 upload_max_filesize 提高到至少 26M。';
-
+$string['settings:max_audio_mb_capped'] = '本服务器的限制来自 PHP，而非此设置。若希望学习者能使用此处设置的完整容量，请将 php.ini 中的 post_max_size 和 upload_max_filesize 提高到至少 {$a}。';
 $string['voice:error_unavailable'] = '转录服务当前不可用。请稍后重试。';

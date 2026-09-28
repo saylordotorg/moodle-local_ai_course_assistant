@@ -40,7 +40,11 @@ require_login();
 if (\local_ai_course_assistant\security::oversized_post_was_discarded($_SERVER, $_POST, $_FILES)) {
     http_response_code(413);
     header('Content-Type: application/json');
-    echo json_encode(['error' => get_string('voice:error_toolarge', 'local_ai_course_assistant')]);
+    echo json_encode(['error' => get_string(
+        'voice:error_toolarge',
+        'local_ai_course_assistant',
+        (int) floor(\local_ai_course_assistant\security::max_audio_bytes() / (1024 * 1024))
+    )]);
     exit;
 }
 
@@ -74,7 +78,11 @@ if (\local_ai_course_assistant\rate_limiter::is_rate_limited($USER->id, 'stt', 2
 $uploaderror = (int) ($_FILES['audio']['error'] ?? UPLOAD_ERR_NO_FILE);
 if (\local_ai_course_assistant\security::upload_error_is_size($uploaderror)) {
     http_response_code(413);
-    echo json_encode(['error' => get_string('voice:error_toolarge', 'local_ai_course_assistant')]);
+    echo json_encode(['error' => get_string(
+        'voice:error_toolarge',
+        'local_ai_course_assistant',
+        (int) floor(\local_ai_course_assistant\security::max_audio_bytes() / (1024 * 1024))
+    )]);
     exit;
 }
 if (empty($_FILES['audio']['tmp_name']) || !is_uploaded_file($_FILES['audio']['tmp_name'])) {
@@ -92,7 +100,11 @@ $tmp = $_FILES['audio']['tmp_name'];
 $size = filesize($tmp) ?: 0;
 if ($size <= 0 || $size > \local_ai_course_assistant\security::max_audio_bytes()) {
     http_response_code(413);
-    echo json_encode(['error' => get_string('voice:error_toolarge', 'local_ai_course_assistant')]);
+    echo json_encode(['error' => get_string(
+        'voice:error_toolarge',
+        'local_ai_course_assistant',
+        (int) floor(\local_ai_course_assistant\security::max_audio_bytes() / (1024 * 1024))
+    )]);
     exit;
 }
 $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -181,14 +193,17 @@ if ($cfg['provider'] === 'xai') {
 if (!\local_ai_course_assistant\security::is_safe_provider_url($cfg['endpoint'])) {
     // The endpoint failed SSRF validation, which is an administrator's
     // misconfiguration, not anything the learner did or can retry past. The
-    // diagnostic, including the URL that was rejected, goes to the server log:
-    // it names an internal host an administrator chose, and echoing it back
-    // tells whoever is on the other end of this request what is reachable from
-    // inside the network. The learner gets the actionable half, which is that
-    // transcription is not set up and an administrator needs to look at it.
-    debugging(
-        'SOLA STT endpoint failed SSRF validation: ' . $cfg['endpoint'],
-        DEBUG_DEVELOPER
+    // diagnostic, including the URL that was rejected, goes to the server error
+    // log rather than the response: it names an internal host an administrator
+    // chose, and echoing it back tells whoever is on the other end of this
+    // request what is reachable from inside the network. The learner gets the
+    // actionable half, which is that transcription is not set up.
+    //
+    // log_operational_failure(), not debugging(): debugging() writes nothing
+    // unless $CFG->debug is DEVELOPER, so on a production site this line would
+    // be discarded and the claim above would be false.
+    \local_ai_course_assistant\security::log_operational_failure(
+        'STT endpoint failed SSRF validation: ' . $cfg['endpoint']
     );
     http_response_code(502);
     echo json_encode(['error' => get_string('voice:error_noprovider', 'local_ai_course_assistant')]);
@@ -215,13 +230,15 @@ $httpcode = (int) ($curl->get_info()['http_code'] ?? 0);
 if ($httpcode !== 200) {
     // The upstream status is a diagnostic. A learner reading "Transcription API
     // error 401" learns only that something is broken, and it discloses which
-    // upstream failure mode a caller triggered. Log it with the host so an
-    // administrator can tell a bad key from a rate limit from an outage, and
-    // tell the learner the thing they can act on: try again shortly.
-    debugging(
-        'SOLA STT provider returned HTTP ' . $httpcode . ' from '
-            . (parse_url($cfg['endpoint'], PHP_URL_HOST) ?: 'unknown host'),
-        DEBUG_DEVELOPER
+    // upstream failure mode a caller triggered. It goes to the server error log
+    // with the host, so an administrator can tell a bad key from a rate limit
+    // from an outage, and the learner is told the thing they can act on.
+    //
+    // log_operational_failure(), not debugging(): debugging() writes nothing
+    // unless $CFG->debug is DEVELOPER, which no production site sets.
+    \local_ai_course_assistant\security::log_operational_failure(
+        'STT provider returned HTTP ' . $httpcode . ' from '
+            . (parse_url($cfg['endpoint'], PHP_URL_HOST) ?: 'unknown host')
     );
     http_response_code(502);
     echo json_encode(['error' => get_string('voice:error_unavailable', 'local_ai_course_assistant')]);

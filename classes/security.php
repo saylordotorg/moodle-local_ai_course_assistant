@@ -480,6 +480,35 @@ class security {
     }
 
     /**
+     * Record an operational failure where an administrator will actually find it.
+     *
+     * NOT debugging(). debugging($msg, DEBUG_DEVELOPER) returns at its first
+     * condition unless $CFG->debug is set to DEVELOPER, and production sites run
+     * at NONE or MINIMAL, so a diagnostic sent that way on a live site is not
+     * written anywhere at all. Code review caught exactly that in 7.5.5: two
+     * diagnostics had been moved out of the learner's response body and into
+     * debugging(), with comments claiming an administrator could read them. On
+     * every production site they had simply been deleted, which is worse than
+     * where they started, because before the change they at least reached the
+     * browser console.
+     *
+     * error_log() writes regardless of Moodle's debug level, to whatever the
+     * server's error_log directive points at. The SOLA prefix is what makes the
+     * line greppable next to everything else PHP puts there.
+     *
+     * Use this for a failure an administrator needs to diagnose later and a
+     * learner must not be shown: a rejected provider URL, an upstream status
+     * code, a credential problem. It is not for anything routine; it has no rate
+     * limit, and a provider outage will write one line per request.
+     *
+     * @param string $message What failed, with the detail needed to act on it.
+     * @return void
+     */
+    public static function log_operational_failure(string $message): void {
+        error_log('SOLA: ' . $message);
+    }
+
+    /**
      * Emit hardened response headers on SOLA endpoints. Moodle default
      * rendering already sets Content-Type; this adds:
      *  - Content-Security-Policy with an explicit AI provider allowlist.

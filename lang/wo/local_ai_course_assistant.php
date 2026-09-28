@@ -1522,7 +1522,7 @@ $string['soapbox:no_browser_stt'] = 'Naróbull bii nanguwul xam-baatu waxtaan ci
 $string['soapbox:browser_note'] = 'Waxtaan bii dañu koy bind ci sa naróbull. Dara du génn. Dafa gën a baax ci Chrome ak Safari.';
 $string['soapbox:server_note'] = 'Sa enregistrement dañu koy yónnee ngir bind-mbind rekk te du ñu ko denc.';
 $string['soapbox:error'] = 'Mënuñu jox points waxtaan bii léegi. Jéemaat ci kanam tuuti.';
-$string['soapbox:audio_too_large'] = 'Enregistrement boobu dafa réy lool. Bàyyil waxtaan yi ci suuf 25 MB (lu tollu ci 20 simili).';
+$string['soapbox:audio_too_large'] = 'Enrejistarmaan bii dafa rëy lool. Bàyyil waxtaan yi ci suuf {$a} MB.';
 $string['soapbox:no_stt'] = 'Amul nattukaayu bind-mbind bu ñu config. Laaj sa borom-yor ngir mu defar Whisper walla yóbb bind-mbind bu naróbull.';
 $string['soapbox:result_heading'] = 'Pointu rubrique';
 $string['soapbox:overall_heading'] = 'Mbooloo';
@@ -3108,7 +3108,7 @@ $string['cachedef_outcomesattainment'] = 'Àggu résultat yu prograam ci njàngk
 
 $string['cachedef_vectors'] = 'Vektoor embedding RAG yi ngir index bu retrieval bi';
 
-$string['voice:error_toolarge'] = 'Enrejistarmaan bii dafa rëy lool. Jéemal benn bu gëna gàtt, bu yées 25 MB.';
+$string['voice:error_toolarge'] = 'Enrejistarmaan bii dafa rëy lool. Jéemal benn bu gëna gàtt, bu yées {$a} MB.';
 $string['voice:error_noaudio'] = 'Amul enrejistarmaan bu ñu jot. Jéemaatal enrejistre.';
 $string['voice:error_format'] = 'Xeetu baat bii nekkul ci yu ñu nangu. Jéemaatal enrejistre.';
 $string['voice:error_noprovider'] = 'Bindug baat defaruñu ko ci sit bii. Jokkool ak sa jawriñ.';
@@ -3116,6 +3116,5 @@ $string['voice:error_badresponse'] = 'Sarwisu bind bi delloo na benn mbir bu ñu
 
 $string['settings:max_audio_mb'] = 'Yaatuwaayu enrejistarmaan bi gëna mag (MB)';
 $string['settings:max_audio_mb_desc'] = 'Enrejistarmaanu baat bi gëna mag bi jàngkat bi mana yeb, ci megaoctet. Ci diggante 1 ak 200; li ñu tànn ci njëkk mooy 25.<br>Ci sarwëer bii, PHP dafay may post_max_size = {$a->postmax} ak upload_max_filesize = {$a->uploadmax}, kon yaatuwaay bi ñuy jëfandikoo léegi mooy {$a->effective} MB. Li gëna tuuti ci sa tànneef ak dayoy PHP mooy jëf saa su nekk.';
-$string['settings:max_audio_mb_capped'] = 'Ci sarwëer bii, PHP moo doon dayo bi, du tànneef bii. Yokkal post_max_size ak upload_max_filesize ci php.ini ba 26M lu néew néew su la soobee jàngkat yi mana jëfandikoo 25 MB yépp.';
-
+$string['settings:max_audio_mb_capped'] = 'Ci sarwëer bii, PHP moo doon dayo bi, du tànneef bii. Ngir jàngkat yi mana jëfandikoo yaatuwaay bi ñu tànn fii bépp, yokkal post_max_size ak upload_max_filesize ci php.ini ba {$a} lu néew néew.';
 $string['voice:error_unavailable'] = 'Sarwisu bind bi amul léegi. Jéemaatal ci kanam tuuti.';

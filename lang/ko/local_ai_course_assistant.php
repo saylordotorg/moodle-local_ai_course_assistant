@@ -1500,7 +1500,7 @@ $string['soapbox:no_browser_stt'] = '이 브라우저는 브라우저 내 음성
 $string['soapbox:browser_note'] = '이 스피치는 브라우저에서 전사됩니다. 아무것도 업로드되지 않습니다. Chrome 및 Safari에서 가장 잘 작동합니다.';
 $string['soapbox:server_note'] = '녹음은 전사 목적으로만 업로드되며 저장되지 않습니다.';
 $string['soapbox:error'] = '지금은 이 스피치를 채점할 수 없습니다. 잠시 후 다시 시도하세요.';
-$string['soapbox:audio_too_large'] = '이 녹음은 너무 큽니다. 스피치를 약 25 MB(대략 20분) 미만으로 유지하세요.';
+$string['soapbox:audio_too_large'] = '이 녹음은 용량이 너무 큽니다. 스피치를 약 {$a}MB 미만으로 유지하세요.';
 $string['soapbox:no_stt'] = '구성된 전사 제공자가 없습니다. 관리자에게 Whisper를 설정하거나 브라우저 전사를 활성화하도록 요청하세요.';
 $string['soapbox:result_heading'] = '루브릭 점수';
 $string['soapbox:overall_heading'] = '종합';
@@ -3086,7 +3086,7 @@ $string['cachedef_outcomesattainment'] = '학습자·강좌별 프로그램 성�
 
 $string['cachedef_vectors'] = 'RAG 검색 색인용 임베딩 벡터';
 
-$string['voice:error_toolarge'] = '이 녹음은 용량이 너무 큽니다. 약 25MB 미만의 짧은 클립을 시도해 보세요.';
+$string['voice:error_toolarge'] = '이 녹음은 용량이 너무 큽니다. 약 {$a}MB 미만의 짧은 클립을 시도해 보세요.';
 $string['voice:error_noaudio'] = '녹음이 수신되지 않았습니다. 다시 녹음해 보세요.';
 $string['voice:error_format'] = '이 오디오 형식은 지원되지 않습니다. 다시 녹음해 보세요.';
 $string['voice:error_noprovider'] = '이 사이트에는 음성 전사가 설정되어 있지 않습니다. 관리자에게 문의하세요.';
@@ -3094,6 +3094,5 @@ $string['voice:error_badresponse'] = '전사 서비스가 예기치 않은 응�
 
 $string['settings:max_audio_mb'] = '최대 녹음 크기 (MB)';
 $string['settings:max_audio_mb_desc'] = '학습자가 업로드할 수 있는 음성 녹음의 최대 크기(메가바이트)입니다. 1에서 200 사이이며 기본값은 25입니다.<br>이 서버에서 PHP는 post_max_size = {$a->postmax}, upload_max_filesize = {$a->uploadmax}를 허용하므로 지금 실제로 적용되는 크기는 {$a->effective} MB입니다. 이 설정과 PHP 자체 제한 중 항상 더 작은 값이 적용됩니다.';
-$string['settings:max_audio_mb_capped'] = '이 서버에서는 이 설정이 아니라 PHP가 한도를 정합니다. 학습자가 25 MB를 모두 쓸 수 있게 하려면 php.ini의 post_max_size와 upload_max_filesize를 최소 26M으로 올리세요.';
-
+$string['settings:max_audio_mb_capped'] = '이 서버에서는 이 설정이 아니라 PHP가 한도를 정합니다. 학습자가 여기에서 설정한 크기를 모두 사용할 수 있게 하려면 php.ini의 post_max_size와 upload_max_filesize를 최소 {$a}로 올리세요.';
 $string['voice:error_unavailable'] = '전사 서비스를 지금은 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.';

@@ -698,15 +698,21 @@ final class voice_learner_journey_test extends \advanced_testcase {
             'The default audio upload cap moved; 25 MB is what an unconfigured site gets.'
         );
 
+        // Pinned as ordered fragments rather than as one block of source text.
+        // The block form broke the moment the get_string() call gained its size
+        // argument in 7.5.5 and had to be reformatted across four lines, and a
+        // test that fails on reformatting teaches you to edit the test rather
+        // than read it. What has to hold is the ORDER: the size is checked, the
+        // refusal is sent, execution stops, and all of that happens before any
+        // request goes to a provider that would bill for it.
         $this->assert_appears_in_order(
             $this->endpoint_source('transcribe.php'),
             [
-                "if (\$size <= 0 || \$size > \\local_ai_course_assistant\\security::max_audio_bytes()) {\n"
-                    . "    http_response_code(413);\n"
-                    . "    echo json_encode(['error' => get_string('voice:error_toolarge',"
-                    . " 'local_ai_course_assistant')]);\n"
-                    . "    exit;\n"
-                    . '}',
+                "if (\$size <= 0 || \$size > \\local_ai_course_assistant\\security::max_audio_bytes()) {",
+                'http_response_code(413);',
+                "get_string(",
+                "'voice:error_toolarge',",
+                'exit;',
                 'new \curl()',
             ],
             'transcribe.php'

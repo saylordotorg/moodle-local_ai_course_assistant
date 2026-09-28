@@ -1528,7 +1528,7 @@ $string['soapbox:no_browser_stt'] = 'Este navegador no admite el reconocimiento 
 $string['soapbox:browser_note'] = 'Este discurso se transcribe en su navegador. No se sube nada. Funciona mejor en Chrome y Safari.';
 $string['soapbox:server_note'] = 'Su grabación se sube únicamente para la transcripción y no se almacena.';
 $string['soapbox:error'] = 'No se pudo calificar este discurso en este momento. Inténtelo de nuevo en un momento.';
-$string['soapbox:audio_too_large'] = 'Esa grabación es demasiado grande. Mantenga los discursos por debajo de unos 25 MB (aproximadamente 20 minutos).';
+$string['soapbox:audio_too_large'] = 'Esa grabación es demasiado grande. Mantén los discursos por debajo de unos {$a} MB.';
 $string['soapbox:no_stt'] = 'No hay ningún proveedor de transcripción configurado. Pida a su administrador que configure Whisper o que habilite la transcripción en el navegador.';
 $string['soapbox:result_heading'] = 'Puntuaciones de la rúbrica';
 $string['soapbox:overall_heading'] = 'General';
@@ -3115,7 +3115,7 @@ $string['cachedef_outcomesattainment'] = 'Logro de resultados de aprendizaje del
 
 $string['cachedef_vectors'] = 'Vectores de embedding de RAG para el índice de recuperación';
 
-$string['voice:error_toolarge'] = 'Esa grabación es demasiado grande. Prueba con un fragmento más corto, de menos de unos 25 MB.';
+$string['voice:error_toolarge'] = 'Esa grabación es demasiado grande. Prueba con un fragmento más corto, de menos de unos {$a} MB.';
 $string['voice:error_noaudio'] = 'No se recibió ninguna grabación. Inténtalo de nuevo.';
 $string['voice:error_format'] = 'Ese formato de audio no es compatible. Inténtalo de nuevo.';
 $string['voice:error_noprovider'] = 'La transcripción de voz no está configurada en este sitio. Ponte en contacto con tu administrador.';
@@ -3123,6 +3123,5 @@ $string['voice:error_badresponse'] = 'El servicio de transcripción devolvió al
 
 $string['settings:max_audio_mb'] = 'Tamaño máximo de grabación (MB)';
 $string['settings:max_audio_mb_desc'] = 'La grabación de voz más grande que puede subir un estudiante, en megabytes. Entre 1 y 200; el valor predeterminado es 25.<br>En este servidor PHP permite post_max_size = {$a->postmax} y upload_max_filesize = {$a->uploadmax}, así que el tamaño que se aplica realmente ahora es {$a->effective} MB. Siempre prevalece el menor entre tu ajuste y los límites propios de PHP.';
-$string['settings:max_audio_mb_capped'] = 'El límite en este servidor lo pone PHP, no este ajuste. Sube post_max_size y upload_max_filesize en php.ini a 26M como mínimo si quieres que los estudiantes puedan usar los 25 MB completos.';
-
+$string['settings:max_audio_mb_capped'] = 'El límite en este servidor lo pone PHP, no este ajuste. Para que los estudiantes puedan usar todo el tamaño establecido aquí, sube post_max_size y upload_max_filesize en php.ini a {$a} como mínimo.';
 $string['voice:error_unavailable'] = 'El servicio de transcripción no está disponible en este momento. Inténtalo de nuevo en un momento.';

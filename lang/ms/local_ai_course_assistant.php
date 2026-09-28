@@ -1545,7 +1545,7 @@ $string['soapbox:no_browser_stt'] = 'Pelayar ini tidak menyokong pengecaman pert
 $string['soapbox:browser_note'] = 'Ucapan ini ditranskripsikan dalam pelayar anda. Tiada apa-apa dimuat naik. Berfungsi paling baik dalam Chrome dan Safari.';
 $string['soapbox:server_note'] = 'Rakaman anda dimuat naik untuk transkripsi sahaja dan tidak disimpan.';
 $string['soapbox:error'] = 'Tidak dapat memberi markah ucapan ini sekarang. Cuba lagi sebentar lagi.';
-$string['soapbox:audio_too_large'] = 'Rakaman itu terlalu besar. Pastikan ucapan di bawah kira-kira 25 MB (lebih kurang 20 minit).';
+$string['soapbox:audio_too_large'] = 'Rakaman ini terlalu besar. Pastikan ucapan di bawah kira-kira {$a} MB.';
 $string['soapbox:no_stt'] = 'Tiada penyedia transkripsi dikonfigurasi. Minta pentadbir anda menyediakan Whisper atau mengaktifkan transkripsi pelayar.';
 $string['soapbox:result_heading'] = 'Markah rubrik';
 $string['soapbox:overall_heading'] = 'Keseluruhan';
@@ -3131,7 +3131,7 @@ $string['cachedef_outcomesattainment'] = 'Pencapaian hasil program setiap pelaja
 
 $string['cachedef_vectors'] = 'Vektor embedding RAG untuk indeks dapatan semula';
 
-$string['voice:error_toolarge'] = 'Rakaman ini terlalu besar. Cuba klip yang lebih pendek, di bawah kira-kira 25 MB.';
+$string['voice:error_toolarge'] = 'Rakaman ini terlalu besar. Cuba klip yang lebih pendek, di bawah kira-kira {$a} MB.';
 $string['voice:error_noaudio'] = 'Tiada rakaman diterima. Sila cuba rakam semula.';
 $string['voice:error_format'] = 'Format audio itu tidak disokong. Sila cuba rakam semula.';
 $string['voice:error_noprovider'] = 'Transkripsi suara tidak disediakan di laman ini. Sila hubungi pentadbir anda.';
@@ -3139,6 +3139,5 @@ $string['voice:error_badresponse'] = 'Perkhidmatan transkripsi mengembalikan ses
 
 $string['settings:max_audio_mb'] = 'Saiz rakaman maksimum (MB)';
 $string['settings:max_audio_mb_desc'] = 'Rakaman suara terbesar yang boleh dimuat naik oleh pelajar, dalam megabait. Antara 1 dan 200; lalainya ialah 25.<br>Pada pelayan ini PHP membenarkan post_max_size = {$a->postmax} dan upload_max_filesize = {$a->uploadmax}, jadi saiz yang benar-benar dikuatkuasakan sekarang ialah {$a->effective} MB. Yang lebih kecil antara tetapan anda dan had PHP sendiri sentiasa berkuat kuasa.';
-$string['settings:max_audio_mb_capped'] = 'Hadnya pada pelayan ini ialah PHP, bukan tetapan ini. Naikkan post_max_size dan upload_max_filesize dalam php.ini kepada sekurang-kurangnya 26M jika anda mahu pelajar boleh menggunakan 25 MB penuh.';
-
+$string['settings:max_audio_mb_capped'] = 'Hadnya pada pelayan ini ialah PHP, bukan tetapan ini. Agar pelajar boleh menggunakan keseluruhan saiz yang ditetapkan di sini, naikkan post_max_size dan upload_max_filesize dalam php.ini kepada sekurang-kurangnya {$a}.';
 $string['voice:error_unavailable'] = 'Perkhidmatan transkripsi tidak tersedia sekarang. Sila cuba lagi sebentar lagi.';

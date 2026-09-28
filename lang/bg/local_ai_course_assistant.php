@@ -1501,7 +1501,7 @@ $string['soapbox:no_browser_stt'] = 'Този браузър не поддърж
 $string['soapbox:browser_note'] = 'Тази реч се транскрибира във вашия браузър. Нищо не се качва. Работи най-добре в Chrome и Safari.';
 $string['soapbox:server_note'] = 'Вашият запис се качва само за транскрипция и не се съхранява.';
 $string['soapbox:error'] = 'В момента тази реч не може да бъде оценена. Опитайте отново след малко.';
-$string['soapbox:audio_too_large'] = 'Този запис е твърде голям. Поддържайте речите под около 25 MB (приблизително 20 минути).';
+$string['soapbox:audio_too_large'] = 'Този запис е твърде голям. Поддържайте речите под около {$a} MB.';
 $string['soapbox:no_stt'] = 'Не е конфигуриран доставчик на транскрипция. Помолете администратора си да настрои Whisper или да активира транскрипция в браузъра.';
 $string['soapbox:result_heading'] = 'Оценки по критериите';
 $string['soapbox:overall_heading'] = 'Общо';
@@ -3088,7 +3088,7 @@ $string['cachedef_outcomesattainment'] = 'Постигане на резулта
 
 $string['cachedef_vectors'] = 'RAG вектори за вграждане за индекса за извличане';
 
-$string['voice:error_toolarge'] = 'Този запис е твърде голям. Опитайте с по-кратък запис, под около 25 MB.';
+$string['voice:error_toolarge'] = 'Този запис е твърде голям. Опитайте с по-кратък запис, под около {$a} MB.';
 $string['voice:error_noaudio'] = 'Не е получен запис. Моля, опитайте да запишете отново.';
 $string['voice:error_format'] = 'Този аудио формат не се поддържа. Моля, опитайте да запишете отново.';
 $string['voice:error_noprovider'] = 'Гласовото транскрибиране не е настроено на този сайт. Моля, свържете се с администратора.';
@@ -3096,6 +3096,5 @@ $string['voice:error_badresponse'] = 'Услугата за транскриби
 
 $string['settings:max_audio_mb'] = 'Максимален размер на записа (MB)';
 $string['settings:max_audio_mb_desc'] = 'Най-големият гласов запис, който обучаем може да качи, в мегабайти. Между 1 и 200; по подразбиране 25.<br>На този сървър PHP позволява post_max_size = {$a->postmax} и upload_max_filesize = {$a->uploadmax}, така че реално прилаганият в момента размер е {$a->effective} MB. Винаги важи по-малкото от вашата настройка и ограниченията на PHP.';
-$string['settings:max_audio_mb_capped'] = 'Ограничението на този сървър е PHP, а не тази настройка. Увеличете post_max_size и upload_max_filesize в php.ini до поне 26M, ако искате обучаемите да могат да използват пълните 25 MB.';
-
+$string['settings:max_audio_mb_capped'] = 'Ограничението на този сървър е PHP, а не тази настройка. За да могат обучаемите да използват пълния зададен тук размер, увеличете post_max_size и upload_max_filesize в php.ini до поне {$a}.';
 $string['voice:error_unavailable'] = 'Услугата за транскрибиране в момента не е достъпна. Моля, опитайте отново след малко.';

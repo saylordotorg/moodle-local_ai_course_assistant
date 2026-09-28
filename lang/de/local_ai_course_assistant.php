@@ -1501,7 +1501,7 @@ $string['soapbox:no_browser_stt'] = 'Dieser Browser unterstützt keine Spracherk
 $string['soapbox:browser_note'] = 'Diese Rede wird in Ihrem Browser transkribiert. Es wird nichts hochgeladen. Funktioniert am besten in Chrome und Safari.';
 $string['soapbox:server_note'] = 'Ihre Aufnahme wird nur zur Transkription hochgeladen und nicht gespeichert.';
 $string['soapbox:error'] = 'Diese Rede konnte gerade nicht bewertet werden. Versuchen Sie es in einem Moment erneut.';
-$string['soapbox:audio_too_large'] = 'Diese Aufnahme ist zu groß. Halten Sie Reden unter etwa 25 MB (ungefähr 20 Minuten).';
+$string['soapbox:audio_too_large'] = 'Diese Aufnahme ist zu groß. Halten Sie Reden unter etwa {$a} MB.';
 $string['soapbox:no_stt'] = 'Es ist kein Transkriptionsanbieter konfiguriert. Bitten Sie Ihre Administratorin oder Ihren Administrator, Whisper einzurichten oder die Transkription im Browser zu aktivieren.';
 $string['soapbox:result_heading'] = 'Bewertungsraster-Punktzahlen';
 $string['soapbox:overall_heading'] = 'Gesamt';
@@ -3088,7 +3088,7 @@ $string['cachedef_outcomesattainment'] = 'Erreichung der Studiengangs-Lernergebn
 
 $string['cachedef_vectors'] = 'RAG-Embedding-Vektoren für den Abrufindex';
 
-$string['voice:error_toolarge'] = 'Diese Aufnahme ist zu groß. Versuchen Sie einen kürzeren Clip unter etwa 25 MB.';
+$string['voice:error_toolarge'] = 'Diese Aufnahme ist zu groß. Versuchen Sie einen kürzeren Clip unter etwa {$a} MB.';
 $string['voice:error_noaudio'] = 'Es ist keine Aufnahme angekommen. Bitte nehmen Sie erneut auf.';
 $string['voice:error_format'] = 'Dieses Audioformat wird nicht unterstützt. Bitte nehmen Sie erneut auf.';
 $string['voice:error_noprovider'] = 'Die Sprachtranskription ist auf dieser Website nicht eingerichtet. Bitte wenden Sie sich an Ihre Administration.';
@@ -3096,6 +3096,5 @@ $string['voice:error_badresponse'] = 'Der Transkriptionsdienst hat etwas Unerwar
 
 $string['settings:max_audio_mb'] = 'Maximale Aufnahmegröße (MB)';
 $string['settings:max_audio_mb_desc'] = 'Die größte Sprachaufnahme, die Lernende hochladen dürfen, in Megabyte. Zwischen 1 und 200; Standard ist 25.<br>Auf diesem Server erlaubt PHP post_max_size = {$a->postmax} und upload_max_filesize = {$a->uploadmax}, die derzeit tatsächlich durchgesetzte Größe beträgt also {$a->effective} MB. Es gilt immer der kleinere Wert aus Ihrer Einstellung und den PHP-Grenzen.';
-$string['settings:max_audio_mb_capped'] = 'Die Grenze auf diesem Server setzt PHP, nicht diese Einstellung. Erhöhen Sie post_max_size und upload_max_filesize in der php.ini auf mindestens 26M, damit Lernende die vollen 25 MB nutzen können.';
-
+$string['settings:max_audio_mb_capped'] = 'Die Grenze auf diesem Server setzt PHP, nicht diese Einstellung. Damit Lernende die hier eingestellte Größe voll nutzen können, erhöhen Sie post_max_size und upload_max_filesize in der php.ini auf mindestens {$a}.';
 $string['voice:error_unavailable'] = 'Der Transkriptionsdienst ist derzeit nicht verfügbar. Bitte versuchen Sie es in Kürze erneut.';

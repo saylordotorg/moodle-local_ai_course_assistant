@@ -1522,7 +1522,7 @@ $string['soapbox:no_browser_stt'] = 'Trình duyệt này không hỗ trợ nhậ
 $string['soapbox:browser_note'] = 'Bài nói này được phiên âm trong trình duyệt của bạn. Không có gì được tải lên. Hoạt động tốt nhất trong Chrome và Safari.';
 $string['soapbox:server_note'] = 'Bản ghi của bạn chỉ được tải lên để phiên âm và không được lưu trữ.';
 $string['soapbox:error'] = 'Hiện không thể chấm điểm bài nói này. Hãy thử lại sau giây lát.';
-$string['soapbox:audio_too_large'] = 'Bản ghi đó quá lớn. Hãy giữ các bài nói dưới khoảng 25 MB (khoảng 20 phút).';
+$string['soapbox:audio_too_large'] = 'Bản ghi này quá lớn. Hãy giữ các bài nói dưới khoảng {$a} MB.';
 $string['soapbox:no_stt'] = 'Chưa cấu hình nhà cung cấp phiên âm nào. Hãy đề nghị quản trị viên của bạn thiết lập Whisper hoặc bật phiên âm trên trình duyệt.';
 $string['soapbox:result_heading'] = 'Điểm theo thang đánh giá';
 $string['soapbox:overall_heading'] = 'Tổng thể';
@@ -3108,7 +3108,7 @@ $string['cachedef_outcomesattainment'] = 'Mức độ đạt kết quả đầu 
 
 $string['cachedef_vectors'] = 'Vectơ embedding RAG cho chỉ mục truy xuất';
 
-$string['voice:error_toolarge'] = 'Bản ghi này quá lớn. Hãy thử một đoạn ngắn hơn, dưới khoảng 25 MB.';
+$string['voice:error_toolarge'] = 'Bản ghi này quá lớn. Hãy thử một đoạn ngắn hơn, dưới khoảng {$a} MB.';
 $string['voice:error_noaudio'] = 'Không nhận được bản ghi nào. Vui lòng thử ghi âm lại.';
 $string['voice:error_format'] = 'Định dạng âm thanh đó không được hỗ trợ. Vui lòng thử ghi âm lại.';
 $string['voice:error_noprovider'] = 'Chuyển giọng nói thành văn bản chưa được thiết lập trên trang này. Vui lòng liên hệ quản trị viên.';
@@ -3116,6 +3116,5 @@ $string['voice:error_badresponse'] = 'Dịch vụ chuyển giọng nói trả v�
 
 $string['settings:max_audio_mb'] = 'Kích thước bản ghi tối đa (MB)';
 $string['settings:max_audio_mb_desc'] = 'Bản ghi giọng nói lớn nhất mà người học có thể tải lên, tính bằng megabyte. Từ 1 đến 200; mặc định là 25.<br>Trên máy chủ này, PHP cho phép post_max_size = {$a->postmax} và upload_max_filesize = {$a->uploadmax}, nên kích thước thực sự được áp dụng lúc này là {$a->effective} MB. Giá trị nhỏ hơn giữa cài đặt của bạn và giới hạn của chính PHP luôn được áp dụng.';
-$string['settings:max_audio_mb_capped'] = 'Giới hạn trên máy chủ này là do PHP, không phải cài đặt này. Hãy tăng post_max_size và upload_max_filesize trong php.ini lên ít nhất 26M nếu bạn muốn người học dùng được trọn 25 MB.';
-
+$string['settings:max_audio_mb_capped'] = 'Giới hạn trên máy chủ này là do PHP, không phải cài đặt này. Để người học dùng được trọn kích thước đặt ở đây, hãy tăng post_max_size và upload_max_filesize trong php.ini lên ít nhất {$a}.';
 $string['voice:error_unavailable'] = 'Dịch vụ chuyển giọng nói hiện không khả dụng. Vui lòng thử lại sau giây lát.';

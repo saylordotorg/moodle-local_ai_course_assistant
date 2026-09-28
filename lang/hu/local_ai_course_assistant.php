@@ -1540,7 +1540,7 @@ $string['soapbox:no_browser_stt'] = 'Ez a böngésző nem támogatja a böngész
 $string['soapbox:browser_note'] = 'Ez a beszéd a böngészőjében kerül átírásra. Semmi sem kerül feltöltésre. Chrome és Safari böngészőben működik a legjobban.';
 $string['soapbox:server_note'] = 'A felvételét csak átírás céljából töltjük fel, és nem tároljuk.';
 $string['soapbox:error'] = 'Ezt a beszédet most nem lehetett pontozni. Próbálja újra egy pillanat múlva.';
-$string['soapbox:audio_too_large'] = 'Ez a felvétel túl nagy. A beszédeket tartsa körülbelül 25 MB alatt (nagyjából 20 perc).';
+$string['soapbox:audio_too_large'] = 'Ez a felvétel túl nagy. A beszédeket tartsa körülbelül {$a} MB alatt.';
 $string['soapbox:no_stt'] = 'Nincs beállítva átírási szolgáltató. Kérje meg a rendszergazdát, hogy állítsa be a Whispert, vagy engedélyezze a böngészős átírást.';
 $string['soapbox:result_heading'] = 'Szempontrendszer pontszámai';
 $string['soapbox:overall_heading'] = 'Összesített';
@@ -3127,7 +3127,7 @@ $string['cachedef_outcomesattainment'] = 'Képzési tanulási eredmények teljes
 
 $string['cachedef_vectors'] = 'RAG beágyazási vektorok a visszakeresési indexhez';
 
-$string['voice:error_toolarge'] = 'Ez a felvétel túl nagy. Próbáljon rövidebb, körülbelül 25 MB alatti felvételt.';
+$string['voice:error_toolarge'] = 'Ez a felvétel túl nagy. Próbáljon rövidebb, körülbelül {$a} MB alatti felvételt.';
 $string['voice:error_noaudio'] = 'Nem érkezett felvétel. Kérjük, próbálja meg újra rögzíteni.';
 $string['voice:error_format'] = 'Ez a hangformátum nem támogatott. Kérjük, próbálja meg újra rögzíteni.';
 $string['voice:error_noprovider'] = 'A hangátírás nincs beállítva ezen az oldalon. Kérjük, forduljon a rendszergazdához.';
@@ -3135,6 +3135,5 @@ $string['voice:error_badresponse'] = 'Az átírási szolgáltatás váratlan vá
 
 $string['settings:max_audio_mb'] = 'Maximális felvételméret (MB)';
 $string['settings:max_audio_mb_desc'] = 'A legnagyobb hangfelvétel, amelyet egy tanuló feltölthet, megabájtban. 1 és 200 között; az alapértelmezés 25.<br>Ezen a kiszolgálón a PHP a post_max_size = {$a->postmax} és az upload_max_filesize = {$a->uploadmax} értéket engedi, így a ténylegesen érvényesített méret most {$a->effective} MB. Mindig a beállítása és a PHP saját korlátai közül a kisebb érvényesül.';
-$string['settings:max_audio_mb_capped'] = 'Ezen a kiszolgálón a PHP szabja meg a korlátot, nem ez a beállítás. Emelje a post_max_size és az upload_max_filesize értékét a php.ini fájlban legalább 26M-re, ha azt szeretné, hogy a tanulók a teljes 25 MB-ot használhassák.';
-
+$string['settings:max_audio_mb_capped'] = 'Ezen a kiszolgálón a PHP szabja meg a korlátot, nem ez a beállítás. Ahhoz, hogy a tanulók az itt beállított méretet teljesen kihasználhassák, emelje a post_max_size és az upload_max_filesize értékét a php.ini fájlban legalább {$a} értékre.';
 $string['voice:error_unavailable'] = 'Az átírási szolgáltatás jelenleg nem érhető el. Kérjük, próbálja újra egy kis idő múlva.';

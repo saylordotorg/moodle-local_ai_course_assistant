@@ -1502,7 +1502,7 @@ $string['soapbox:no_browser_stt'] = 'Bu tarayıcı, tarayıcı içi konuşma tan
 $string['soapbox:browser_note'] = 'Bu konuşma tarayıcınızda yazıya dökülür. Hiçbir şey karşıya yüklenmez. En iyi Chrome ve Safari\'de çalışır.';
 $string['soapbox:server_note'] = 'Kaydınız yalnızca yazıya dökme için karşıya yüklenir ve saklanmaz.';
 $string['soapbox:error'] = 'Bu konuşma şu anda puanlanamadı. Birazdan tekrar deneyin.';
-$string['soapbox:audio_too_large'] = 'O kayıt çok büyük. Konuşmaları yaklaşık 25 MB altında tutun (kabaca 20 dakika).';
+$string['soapbox:audio_too_large'] = 'Bu kayıt çok büyük. Konuşmaları yaklaşık {$a} MB altında tutun.';
 $string['soapbox:no_stt'] = 'Yapılandırılmış bir yazıya dökme sağlayıcısı yok. Yöneticinizden Whisper kurmasını veya tarayıcı yazıya dökmeyi etkinleştirmesini isteyin.';
 $string['soapbox:result_heading'] = 'Değerlendirme ölçütü puanları';
 $string['soapbox:overall_heading'] = 'Genel';
@@ -3088,7 +3088,7 @@ $string['cachedef_outcomesattainment'] = 'Öğrenci ve ders başına program kaz
 
 $string['cachedef_vectors'] = 'Getirme dizini için RAG gömme vektörleri';
 
-$string['voice:error_toolarge'] = 'Bu kayıt çok büyük. Yaklaşık 25 MB\'ın altında daha kısa bir kayıt deneyin.';
+$string['voice:error_toolarge'] = 'Bu kayıt çok büyük. Yaklaşık {$a} MB\'ın altında daha kısa bir kayıt deneyin.';
 $string['voice:error_noaudio'] = 'Hiçbir kayıt alınmadı. Lütfen tekrar kayıt yapmayı deneyin.';
 $string['voice:error_format'] = 'Bu ses biçimi desteklenmiyor. Lütfen tekrar kayıt yapmayı deneyin.';
 $string['voice:error_noprovider'] = 'Bu sitede sesli yazıya dökme ayarlanmamış. Lütfen yöneticinizle iletişime geçin.';
@@ -3096,6 +3096,5 @@ $string['voice:error_badresponse'] = 'Yazıya dökme hizmeti beklenmeyen bir yan
 
 $string['settings:max_audio_mb'] = 'En büyük kayıt boyutu (MB)';
 $string['settings:max_audio_mb_desc'] = 'Bir öğrencinin yükleyebileceği en büyük ses kaydı, megabayt cinsinden. 1 ile 200 arasında; varsayılan 25.<br>Bu sunucuda PHP post_max_size = {$a->postmax} ve upload_max_filesize = {$a->uploadmax} değerlerine izin veriyor, dolayısıyla şu anda gerçekten uygulanan boyut {$a->effective} MB. Ayarınız ile PHP\'nin kendi sınırlarından küçük olan her zaman geçerlidir.';
-$string['settings:max_audio_mb_capped'] = 'Bu sunucudaki sınırı bu ayar değil PHP belirliyor. Öğrencilerin 25 MB\'ın tamamını kullanabilmesini istiyorsanız php.ini içindeki post_max_size ve upload_max_filesize değerlerini en az 26M\'ye yükseltin.';
-
+$string['settings:max_audio_mb_capped'] = 'Bu sunucudaki sınırı bu ayar değil PHP belirliyor. Öğrencilerin burada ayarlanan boyutun tamamını kullanabilmesi için php.ini içindeki post_max_size ve upload_max_filesize değerlerini en az {$a} değerine yükseltin.';
 $string['voice:error_unavailable'] = 'Yazıya dökme hizmeti şu anda kullanılamıyor. Lütfen birazdan tekrar deneyin.';

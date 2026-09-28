@@ -399,11 +399,203 @@ final class audio_size_guard_test extends \advanced_testcase {
             }
 
             $this->assertStringContainsString(
-                'DEBUG_DEVELOPER',
+                'log_operational_failure(',
                 $src,
                 $file . ' discards its diagnostics entirely. They belong in the server log,'
                     . ' where an administrator can tell a bad key from a rate limit.'
             );
+            $this->assertStringNotContainsString(
+                'debugging(\'',
+                $src,
+                $file . ' sends a diagnostic through debugging(), which writes nothing unless'
+                    . ' $CFG->debug is DEVELOPER. Production sites run at NONE or MINIMAL, so'
+                    . ' that is not "logged", it is deleted. Use log_operational_failure().'
+            );
         }
+    }
+
+    /**
+     * The too-large message must name the cap that actually applies.
+     *
+     * Caught in review on PR 258, and it is the release's own defect one layer
+     * further out. This release makes the limit max_audio_bytes(), the smaller
+     * of the setting and PHP's ceiling, and the message still said "under about
+     * 25 MB". On the machine this was written on the real cap is 2 MB, so a
+     * learner refused at 5 MB was told to try again under 25, would fail again
+     * at 10, and had no way to find the number that would work.
+     *
+     * @return void
+     */
+    public function test_the_too_large_message_names_the_cap_that_applies(): void {
+        $this->resetAfterTest();
+
+        foreach ([['transcribe.php', 'voice:error_toolarge'],
+                  ['soapbox_transcribe.php', 'soapbox:audio_too_large']] as [$file, $key]) {
+            $src = (string) file_get_contents(__DIR__ . '/../' . $file);
+
+            $english = get_string_manager()->get_string($key, 'local_ai_course_assistant', null, 'en');
+            $this->assertStringContainsString(
+                '{$a}',
+                $english,
+                $key . ' has no placeholder, so it can only ever state one fixed size. The cap'
+                    . ' is configurable and is additionally capped by PHP, so a fixed number in'
+                    . ' this string is wrong on any server that is not at the default.'
+            );
+
+            // Every call site passes the effective cap, not a constant and not
+            // nothing. Checked by looking at the text that follows each mention
+            // of the key rather than with one regex across the whole call. The
+            // argument is `(int) floor(... / (1024 * 1024))`, so a pattern that
+            // stops at the first closing bracket stops inside `(int)` and
+            // reports zero matches against code that is correct. That is how
+            // this assertion failed the first time it ran.
+            $calls = 0;
+            $withcap = 0;
+            $offset = 0;
+            while (($at = strpos($src, "'" . $key . "'", $offset)) !== false) {
+                $calls++;
+                if (strpos(substr($src, $at, 300), 'max_audio_bytes()') !== false) {
+                    $withcap++;
+                }
+                $offset = $at + 1;
+            }
+
+            $this->assertGreaterThan(0, $calls, $file . ' does not use ' . $key . '.');
+            $this->assertSame(
+                $calls,
+                $withcap,
+                $file . ' has ' . $calls . ' uses of ' . $key . ' but only ' . $withcap
+                    . ' pass the effective cap. A call site that passes nothing renders the'
+                    . ' placeholder as the literal text {$a}.'
+            );
+        }
+    }
+
+    /**
+     * Every locale's too-large string carries the placeholder, and none of them
+     * still carries a hardcoded 25.
+     *
+     * The English string is the one a reviewer reads. The other 45 are where a
+     * stale number survives unnoticed, and the literal appeared in at least six
+     * forms across those files (25 MB, MB 25, 25 Mo, 25 Mt, 25 MB in Cyrillic,
+     * and in Bengali, Nepali and Arabic numerals), so a substitution that missed
+     * one would leave a fixed size in a string whose entire purpose is that the
+     * size is not fixed.
+     *
+     * @return void
+     */
+    public function test_every_locale_states_the_cap_as_a_placeholder(): void {
+        $root = realpath(__DIR__ . '/..');
+
+        // Three strings state a size, and none of them may state a fixed one.
+        // The third, the capped warning, was missed on the first pass: it told
+        // an admin to raise php.ini "to at least 26M ... to use the full 25 MB",
+        // which is right only at the default. An admin who set 50 needs 51M. A
+        // mutation reverting it survived this test until it was listed here,
+        // which is the argument for listing every such key rather than the two
+        // that were on my mind.
+        $keys = ['voice:error_toolarge', 'soapbox:audio_too_large', 'settings:max_audio_mb_capped'];
+        $digits = ['25', '26M', "\u{0662}\u{0665}", "\u{09E8}\u{09EB}", "\u{0968}\u{096B}"];
+        $checked = 0;
+
+        foreach (glob($root . '/lang/*/local_ai_course_assistant.php') as $file) {
+            $locale = basename(dirname($file));
+            $src = (string) file_get_contents($file);
+
+            foreach ($keys as $key) {
+                $pattern = "/\\\$string\\['" . preg_quote($key, '/') . "'\\]\s*=\s*'((?:[^'\\\\]|\\\\.)*)';/";
+                $this->assertSame(
+                    1,
+                    preg_match($pattern, $src, $m),
+                    $locale . ' is missing ' . $key . '.'
+                );
+                $value = $m[1];
+                $checked++;
+
+                $this->assertSame(
+                    1,
+                    substr_count($value, '{$a}'),
+                    $locale . '/' . $key . ' must carry exactly one {$a}: ' . $value
+                );
+                foreach ($digits as $twentyfive) {
+                    $this->assertStringNotContainsString(
+                        $twentyfive,
+                        $value,
+                        $locale . '/' . $key . ' still states a fixed size: ' . $value
+                    );
+                }
+            }
+        }
+
+        $this->assertSame(138, $checked, 'Expected 46 locales x 3 keys.');
+    }
+
+    /**
+     * No locale carries letters from a script it does not use.
+     *
+     * This exists because it happened. While writing the 45 translations of
+     * settings:max_audio_mb_capped I pasted Cyrillic into the middle of a
+     * Romanian word, producing "Pentru ca участanții". The batch had a check on
+     * it already, for placeholder counts and hardcoded numbers, and that check
+     * passed: a wrong-script splice is invisible to anything looking at
+     * structure rather than at the letters.
+     *
+     * It is also invisible in review. Nobody reads 45 blocks of a language they
+     * do not speak, and the diff for a translation batch is four hundred lines
+     * of text a reviewer has no way to check. A script census is the one thing
+     * that does check it, and it is cheap.
+     *
+     * The ini directive names are stripped before the census: post_max_size and
+     * upload_max_filesize are Latin in every locale, correctly.
+     *
+     * @return void
+     */
+    public function test_no_locale_mixes_in_a_script_it_does_not_use(): void {
+        $root = realpath(__DIR__ . '/..');
+
+        // Locales whose strings should be Latin script throughout.
+        $latin = ['en', 'bm', 'cs', 'da', 'de', 'es', 'fi', 'fr', 'ha', 'hu', 'id', 'ig',
+                  'it', 'ms', 'nb', 'nl', 'om', 'pl', 'pt_br', 'ro', 'sk', 'so', 'sv',
+                  'sw', 'tl', 'tr', 'vi', 'wo', 'yo', 'zu'];
+        $keys = ['voice:error_toolarge', 'voice:error_noaudio', 'voice:error_format',
+                 'voice:error_noprovider', 'voice:error_badresponse', 'voice:error_unavailable',
+                 'soapbox:audio_too_large', 'settings:max_audio_mb',
+                 'settings:max_audio_mb_desc', 'settings:max_audio_mb_capped'];
+        $noise = ['post_max_size', 'upload_max_filesize', 'php.ini', 'PHP'];
+
+        $checked = 0;
+        foreach ($latin as $locale) {
+            $file = $root . '/lang/' . $locale . '/local_ai_course_assistant.php';
+            $this->assertFileExists($file, 'Locale ' . $locale . ' is missing.');
+            $src = (string) file_get_contents($file);
+
+            foreach ($keys as $key) {
+                $pattern = "/\\\$string\\['" . preg_quote($key, '/') . "'\\]\s*=\s*'((?:[^'\\\\]|\\\\.)*)';/";
+                if (!preg_match($pattern, $src, $m)) {
+                    continue;
+                }
+                $value = str_replace($noise, '', $m[1]);
+                $checked++;
+
+                // Cyrillic, Greek, Arabic, Hebrew, Devanagari, Han, Kana, Hangul,
+                // Thai, Bengali, Tamil, Gurmukhi, Ethiopic: none belong here.
+                $this->assertSame(
+                    0,
+                    preg_match(
+                        '/[\x{0400}-\x{04FF}\x{0370}-\x{03FF}\x{0600}-\x{06FF}'
+                            . '\x{0590}-\x{05FF}\x{0900}-\x{097F}\x{4E00}-\x{9FFF}'
+                            . '\x{3040}-\x{30FF}\x{AC00}-\x{D7AF}\x{0E00}-\x{0E7F}'
+                            . '\x{0980}-\x{09FF}\x{0B80}-\x{0BFF}\x{0A00}-\x{0A7F}'
+                            . '\x{1200}-\x{137F}]/u',
+                        $value
+                    ),
+                    $locale . '/' . $key . ' contains letters from another script, which almost'
+                        . ' always means text was pasted in from a different locale block: '
+                        . $m[1]
+                );
+            }
+        }
+
+        $this->assertGreaterThan(250, $checked, 'The census covered too few strings to mean anything.');
     }
 }

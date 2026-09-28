@@ -1778,9 +1778,20 @@ if ($hassiteconfig) {
         'uploadmax' => (string) ini_get('upload_max_filesize'),
         'effective' => (string) round($effective / (1024 * 1024), 1),
     ]);
-    if ($phplimit > 0 && $phplimit < \local_ai_course_assistant\security::MAX_AUDIO_BYTES) {
+    // The warning names the ini value that would actually unblock the setting the
+    // admin has chosen, not a fixed 26M. An admin who set 50 here needs 51M, and
+    // telling them 26M would be the same defect this release is about: a number
+    // that was right for the default and wrong for them.
+    $configuredmb = (int) (get_config('local_ai_course_assistant', 'max_audio_mb')
+        ?: \local_ai_course_assistant\security::MAX_AUDIO_BYTES / (1024 * 1024));
+    $configuredbytes = $configuredmb * 1024 * 1024;
+    if ($phplimit > 0 && $phplimit < $configuredbytes) {
         $maxaudiodesc .= '<br><strong class="text-danger">'
-            . get_string('settings:max_audio_mb_capped', 'local_ai_course_assistant')
+            . get_string(
+                'settings:max_audio_mb_capped',
+                'local_ai_course_assistant',
+                ($configuredmb + 1) . 'M'
+            )
             . '</strong>';
     }
     $settings->add(new admin_setting_configtext(

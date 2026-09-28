@@ -1499,7 +1499,7 @@ $string['soapbox:no_browser_stt'] = 'لا يدعم هذا المتصفح الت�
 $string['soapbox:browser_note'] = 'يتم تفريغ هذا الخطاب في متصفحك. لا يتم رفع أي شيء. يعمل على أفضل وجه في Chrome وSafari.';
 $string['soapbox:server_note'] = 'يتم رفع تسجيلك للتفريغ فقط ولا يتم حفظه.';
 $string['soapbox:error'] = 'تعذّر تقييم هذا الخطاب الآن. أعد المحاولة بعد لحظة.';
-$string['soapbox:audio_too_large'] = 'هذا التسجيل كبير جدًا. اجعل الخطابات أقل من نحو 25 MB (نحو 20 دقيقة).';
+$string['soapbox:audio_too_large'] = 'هذا التسجيل كبير جدًا. اجعل الخطابات أقل من نحو {$a} ميجابايت.';
 $string['soapbox:no_stt'] = 'لم يتم إعداد أي مزوّد تفريغ. اطلب من المسؤول إعداد Whisper أو تفعيل التفريغ عبر المتصفح.';
 $string['soapbox:result_heading'] = 'درجات المعيار';
 $string['soapbox:overall_heading'] = 'الإجمالي';
@@ -3086,7 +3086,7 @@ $string['cachedef_outcomesattainment'] = 'مستوى تحقيق نتائج ال�
 
 $string['cachedef_vectors'] = 'متجهات تضمين RAG لفهرس الاسترجاع';
 
-$string['voice:error_toolarge'] = 'هذا التسجيل كبير جدًا. جرّب مقطعًا أقصر، أقل من 25 ميجابايت تقريبًا.';
+$string['voice:error_toolarge'] = 'هذا التسجيل كبير جدًا. جرّب مقطعًا أقصر، أقل من {$a} ميجابايت تقريبًا.';
 $string['voice:error_noaudio'] = 'لم يصل أي تسجيل. يرجى محاولة التسجيل مرة أخرى.';
 $string['voice:error_format'] = 'تنسيق الصوت هذا غير مدعوم. يرجى محاولة التسجيل مرة أخرى.';
 $string['voice:error_noprovider'] = 'لم يتم إعداد التفريغ الصوتي على هذا الموقع. يرجى التواصل مع المسؤول.';
@@ -3094,6 +3094,5 @@ $string['voice:error_badresponse'] = 'أعادت خدمة التفريغ است�
 
 $string['settings:max_audio_mb'] = 'الحد الأقصى لحجم التسجيل (ميجابايت)';
 $string['settings:max_audio_mb_desc'] = 'أكبر تسجيل صوتي يمكن للمتعلم رفعه، بالميجابايت. بين 1 و200؛ القيمة الافتراضية 25.<br>على هذا الخادم يسمح PHP بـ post_max_size = {$a->postmax} و upload_max_filesize = {$a->uploadmax}، لذا فإن الحجم المطبَّق فعليًا الآن هو {$a->effective} ميجابايت. الأصغر بين إعدادك وحدود PHP هو الذي يسري دائمًا.';
-$string['settings:max_audio_mb_capped'] = 'الحد على هذا الخادم هو PHP وليس هذا الإعداد. ارفع post_max_size و upload_max_filesize في php.ini إلى 26M على الأقل إذا أردت أن يتمكن المتعلمون من استخدام كامل الـ 25 ميجابايت.';
-
+$string['settings:max_audio_mb_capped'] = 'الحد على هذا الخادم هو PHP وليس هذا الإعداد. لتمكين المتعلمين من استخدام الحجم الكامل المحدد هنا، ارفع post_max_size و upload_max_filesize في php.ini إلى {$a} على الأقل.';
 $string['voice:error_unavailable'] = 'خدمة التفريغ الصوتي غير متاحة حاليًا. يرجى المحاولة مرة أخرى بعد قليل.';

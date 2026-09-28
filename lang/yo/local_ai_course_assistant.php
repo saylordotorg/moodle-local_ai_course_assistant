@@ -1522,7 +1522,7 @@ $string['soapbox:no_browser_stt'] = 'Aṣawakiri yii ko ṣe atilẹyin idanim�
 $string['soapbox:browser_note'] = 'A kọ ọrọ yii silẹ ninu aṣawakiri rẹ. Ko si ohunkohun ti a gbe soke. O ṣiṣẹ daradara julọ ni Chrome ati Safari.';
 $string['soapbox:server_note'] = 'A gbe igbasilẹ rẹ soke fun iwe afọwọkọ nikan ati pe a ko fipamọ rẹ.';
 $string['soapbox:error'] = 'A ko le fun ọrọ yii ni ami ni bayi. Tun gbiyanju ni iṣẹju diẹ.';
-$string['soapbox:audio_too_large'] = 'Igbasilẹ yẹn tobi ju. Jẹ ki awọn ọrọ wa labẹ nipa 25 MB (nipa iṣẹju 20).';
+$string['soapbox:audio_too_large'] = 'Gbigbasilẹ yii tobi ju. Jẹ ki awọn ọrọ wa labẹ nipa MB {$a}.';
 $string['soapbox:no_stt'] = 'A ko ṣeto olupese iwe afọwọkọ kankan. Beere lọwọ alabojuto rẹ lati ṣeto Whisper tabi tan iwe afọwọkọ aṣawakiri.';
 $string['soapbox:result_heading'] = 'Awọn ami rubric';
 $string['soapbox:overall_heading'] = 'Lapapọ';
@@ -3108,7 +3108,7 @@ $string['cachedef_outcomesattainment'] = 'Ìmúṣẹ àbájáde ìtòlẹ́sẹ
 
 $string['cachedef_vectors'] = 'Àwọn vẹ́ktọ̀ embedding RAG fún àtọ́ka ìgbàpadà';
 
-$string['voice:error_toolarge'] = 'Gbigbasilẹ yii tobi ju. Gbiyanju agekuru kukuru, labẹ bii MB 25.';
+$string['voice:error_toolarge'] = 'Gbigbasilẹ yii tobi ju. Gbiyanju agekuru kukuru, labẹ bii MB {$a}.';
 $string['voice:error_noaudio'] = 'A ko gba gbigbasilẹ kankan. Jọwọ gbiyanju lati gbasilẹ lẹẹkansi.';
 $string['voice:error_format'] = 'A ko ṣe atilẹyin fun ọna ohun yẹn. Jọwọ gbiyanju lati gbasilẹ lẹẹkansi.';
 $string['voice:error_noprovider'] = 'A ko ṣeto kikọ ohun sori ayelujara yii. Jọwọ kan si alabojuto rẹ.';
@@ -3116,6 +3116,5 @@ $string['voice:error_badresponse'] = 'Iṣẹ kikọ naa da nkan airotẹlẹ pa
 
 $string['settings:max_audio_mb'] = 'Iwọn gbigbasilẹ ti o pọ julọ (MB)';
 $string['settings:max_audio_mb_desc'] = 'Gbigbasilẹ ohun ti o tobi julọ ti akẹkọ le gbe sori ẹrọ, ni megabyte. Laarin 1 ati 200; aiyipada ni 25.<br>Lori olupin yii PHP gba post_max_size = {$a->postmax} ati upload_max_filesize = {$a->uploadmax} laaye, nitorinaa iwọn ti a fi lelẹ gangan ni bayi ni {$a->effective} MB. Eyi ti o kere laarin eto rẹ ati awọn opin PHP ni yoo maa ṣiṣẹ nigbagbogbo.';
-$string['settings:max_audio_mb_capped'] = 'PHP ni o ṣeto opin lori olupin yii, kii ṣe eto yii. Gbe post_max_size ati upload_max_filesize soke ninu php.ini si o kere ju 26M ti o ba fẹ ki awọn akẹkọ le lo gbogbo 25 MB.';
-
+$string['settings:max_audio_mb_capped'] = 'PHP ni o ṣeto opin lori olupin yii, kii ṣe eto yii. Ki awọn akẹkọ le lo gbogbo iwọn ti a ṣeto nibi, gbe post_max_size ati upload_max_filesize soke ninu php.ini si o kere ju {$a}.';
 $string['voice:error_unavailable'] = 'Iṣẹ kikọ ko si ni bayi. Jọwọ gbiyanju lẹẹkansi laipẹ.';

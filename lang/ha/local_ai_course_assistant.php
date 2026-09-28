@@ -1529,7 +1529,7 @@ $string['soapbox:no_browser_stt'] = 'Wannan birawsa ba ta tallafawa gane magana 
 $string['soapbox:browser_note'] = 'Ana rubuta wannan jawabin cikin birawsa naka. Ba a ɗora komai ba. Yana aiki mafi kyau a Chrome da Safari.';
 $string['soapbox:server_note'] = 'Ana ɗora rikodinka don rubutawa kawai kuma ba a adana shi ba.';
 $string['soapbox:error'] = 'Ba a iya ba wannan jawabin maki yanzu ba. Ka sake gwadawa cikin ɗan lokaci.';
-$string['soapbox:audio_too_large'] = 'Wannan rikodin ya yi girma sosai. Ka kiyaye jawabai a ƙasa da kusan 25 MB (kusan minti 20).';
+$string['soapbox:audio_too_large'] = 'Wannan rikodin ya yi girma sosai. Ka kiyaye jawabai a ƙasa da kusan MB {$a}.';
 $string['soapbox:no_stt'] = 'Ba a saita mai bayar da rubutawa ba. Ka nemi mai gudanarwa ya saita Whisper ko ya kunna rubutawa ta birawsa.';
 $string['soapbox:result_heading'] = 'Makin ma\'auni';
 $string['soapbox:overall_heading'] = 'Gaba ɗaya';
@@ -3115,7 +3115,7 @@ $string['cachedef_outcomesattainment'] = 'Matakin cimma sakamakon shiri na kowan
 
 $string['cachedef_vectors'] = 'Vektocin embedding na RAG don ƙididdigar dawowa';
 
-$string['voice:error_toolarge'] = 'Wannan rikodin ya yi girma sosai. Gwada gajeren rikodi, kasa da kusan MB 25.';
+$string['voice:error_toolarge'] = 'Wannan rikodin ya yi girma sosai. Gwada gajeren rikodi, kasa da kusan MB {$a}.';
 $string['voice:error_noaudio'] = 'Ba a karɓi wani rikodi ba. Da fatan za a sake gwada yin rikodi.';
 $string['voice:error_format'] = 'Ba a goyan bayan wannan tsarin sauti ba. Da fatan za a sake gwada yin rikodi.';
 $string['voice:error_noprovider'] = 'Ba a saita rubuta murya a wannan shafin ba. Da fatan za a tuntuɓi mai gudanarwa.';
@@ -3123,6 +3123,5 @@ $string['voice:error_badresponse'] = 'Sabis ɗin rubutawa ya mayar da wani abu d
 
 $string['settings:max_audio_mb'] = 'Matsakaicin girman rikodi (MB)';
 $string['settings:max_audio_mb_desc'] = 'Mafi girman rikodin murya da ɗalibi zai iya ɗorawa, a megabyte. Tsakanin 1 zuwa 200; tsoho shine 25.<br>A wannan sabar PHP yana ba da izinin post_max_size = {$a->postmax} da upload_max_filesize = {$a->uploadmax}, don haka girman da ake aiwatarwa a yanzu shine {$a->effective} MB. Ƙaramin tsakanin saitinka da iyakokin PHP koyaushe shine ke aiki.';
-$string['settings:max_audio_mb_capped'] = 'Iyaka a wannan sabar PHP ne, ba wannan saitin ba. Ka ɗaga post_max_size da upload_max_filesize a php.ini zuwa aƙalla 26M idan kana son ɗalibai su iya amfani da cikakken MB 25.';
-
+$string['settings:max_audio_mb_capped'] = 'Iyaka a wannan sabar PHP ne, ba wannan saitin ba. Domin ɗalibai su iya amfani da cikakken girman da aka saita anan, ka ɗaga post_max_size da upload_max_filesize a php.ini zuwa aƙalla {$a}.';
 $string['voice:error_unavailable'] = 'Sabis ɗin rubutawa ba ya samuwa a yanzu. Da fatan za a sake gwadawa nan da ɗan lokaci.';

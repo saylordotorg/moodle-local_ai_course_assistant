@@ -1502,7 +1502,7 @@ $string['soapbox:no_browser_stt'] = 'Ce navigateur ne prend pas en charge la rec
 $string['soapbox:browser_note'] = 'Ce discours est transcrit dans votre navigateur. Rien n\'est téléversé. Fonctionne mieux dans Chrome et Safari.';
 $string['soapbox:server_note'] = 'Votre enregistrement est téléversé uniquement pour la transcription et n\'est pas conservé.';
 $string['soapbox:error'] = 'Impossible d\'évaluer ce discours pour le moment. Réessayez dans un instant.';
-$string['soapbox:audio_too_large'] = 'Cet enregistrement est trop volumineux. Limitez les discours à environ 25 MB (environ 20 minutes).';
+$string['soapbox:audio_too_large'] = 'Cet enregistrement est trop volumineux. Limitez les discours à environ {$a} Mo.';
 $string['soapbox:no_stt'] = 'Aucun fournisseur de transcription n\'est configuré. Demandez à votre administrateur de configurer Whisper ou d\'activer la transcription navigateur.';
 $string['soapbox:result_heading'] = 'Scores de la grille';
 $string['soapbox:overall_heading'] = 'Global';
@@ -3089,7 +3089,7 @@ $string['cachedef_outcomesattainment'] = 'Atteinte des acquis du programme par a
 
 $string['cachedef_vectors'] = 'Vecteurs d\'embedding RAG pour l\'index de récupération';
 
-$string['voice:error_toolarge'] = 'Cet enregistrement est trop volumineux. Essayez un extrait plus court, de moins de 25 Mo environ.';
+$string['voice:error_toolarge'] = 'Cet enregistrement est trop volumineux. Essayez un extrait plus court, de moins de {$a} Mo environ.';
 $string['voice:error_noaudio'] = 'Aucun enregistrement n\'a été reçu. Veuillez réessayer d\'enregistrer.';
 $string['voice:error_format'] = 'Ce format audio n\'est pas pris en charge. Veuillez réessayer d\'enregistrer.';
 $string['voice:error_noprovider'] = 'La transcription vocale n\'est pas configurée sur ce site. Veuillez contacter votre administrateur.';
@@ -3097,6 +3097,5 @@ $string['voice:error_badresponse'] = 'Le service de transcription a renvoyé une
 
 $string['settings:max_audio_mb'] = 'Taille maximale d\'enregistrement (Mo)';
 $string['settings:max_audio_mb_desc'] = 'Le plus gros enregistrement vocal qu\'un apprenant peut téléverser, en mégaoctets. Entre 1 et 200 ; la valeur par défaut est 25.<br>Sur ce serveur, PHP autorise post_max_size = {$a->postmax} et upload_max_filesize = {$a->uploadmax}, donc la taille réellement appliquée en ce moment est de {$a->effective} Mo. C\'est toujours la plus petite valeur entre votre réglage et les limites propres à PHP qui s\'applique.';
-$string['settings:max_audio_mb_capped'] = 'Sur ce serveur, c\'est PHP qui fixe la limite, pas ce réglage. Augmentez post_max_size et upload_max_filesize dans php.ini à au moins 26M si vous voulez que les apprenants puissent utiliser les 25 Mo complets.';
-
+$string['settings:max_audio_mb_capped'] = 'Sur ce serveur, c\'est PHP qui fixe la limite, pas ce réglage. Pour que les apprenants puissent utiliser toute la taille définie ici, augmentez post_max_size et upload_max_filesize dans php.ini à au moins {$a}.';
 $string['voice:error_unavailable'] = 'Le service de transcription n\'est pas disponible pour le moment. Veuillez réessayer dans un instant.';
