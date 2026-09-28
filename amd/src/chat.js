@@ -5474,14 +5474,6 @@ define([
     };
 
     /**
-     * Detect whether the user's message is requesting a practice quiz.
-     * Used to intercept natural-language quiz requests (e.g. from STT)
-     * and route them to the interactive quiz UI instead of plain chat.
-     *
-     * @param {string} text
-     * @returns {boolean}
-     */
-    /**
      * Whether the practice quiz is available on this surface.
      *
      * False in support mode. Suppressing the starter chip is not enough on its
@@ -5494,9 +5486,26 @@ define([
      * @returns {boolean}
      */
     const isQuizEnabled = function() {
-        return !!(root && root.dataset.quizEnabled === '1');
+        // Resolve the widget root here rather than closing over one. There is no
+        // module-level `root` in this file -- every sibling helper takes it as a
+        // parameter -- so a bare reference is a ReferenceError at call time, not
+        // a quiet undefined. The first version of this function had exactly that
+        // bug, and because the throw happened inside the send handler it killed
+        // the whole turn: three Behat chat scenarios failed with the assistant
+        // reply never rendering. Same resolution as getDefaultVoice().
+        const el = (UI.getElements && UI.getElements().root)
+            || document.getElementById('local-ai-course-assistant');
+        return !!(el && el.dataset.quizEnabled === '1');
     };
 
+    /**
+     * Detect whether the user's message is requesting a practice quiz.
+     * Used to intercept natural-language quiz requests (e.g. from STT)
+     * and route them to the interactive quiz UI instead of plain chat.
+     *
+     * @param {string} text
+     * @returns {boolean}
+     */
     const detectQuizIntent = function(text) {
         return /quiz\s+me|test\s+me|give\s+(?:me\s+)?a\s+quiz|practice\s+quiz|take\s+a\s+quiz|let'?s\s+(?:do\s+a\s+)?quiz|quiz\s+(?:me\s+)?on|quiz\s+(?:me\s+)?about|test\s+my\s+knowledge/i.test(text);
     };

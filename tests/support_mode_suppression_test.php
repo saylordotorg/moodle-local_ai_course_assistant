@@ -179,9 +179,21 @@ final class support_mode_suppression_test extends \advanced_testcase {
             'typing "quiz me on X" must not reach the quiz UI when quiz is disabled'
         );
         $this->assertStringContainsString(
-            "root.dataset.quizEnabled === '1'",
+            "dataset.quizEnabled === '1'",
             $chat,
             'the client must read the server-side quiz flag'
+        );
+        // The helper must resolve the widget root itself. There is no
+        // module-level `root` in chat.js -- every sibling helper takes it as a
+        // parameter -- so a bare reference is a ReferenceError at call time.
+        // The first version had that bug, and because the throw landed inside
+        // the send handler it killed the whole turn: three Behat chat scenarios
+        // failed with the assistant reply never rendering, while PHPUnit stayed
+        // green because none of it executes JavaScript.
+        $this->assertMatchesRegularExpression(
+            '/const isQuizEnabled = function\(\) \{.*?getElementById\(/s',
+            $chat,
+            'isQuizEnabled must resolve the widget root itself, not reference a bare root'
         );
         $this->assertSame(
             2,
@@ -202,6 +214,47 @@ final class support_mode_suppression_test extends \advanced_testcase {
             'quizEnabled',
             $built,
             'amd/build/chat.min.js is stale: rebuild it, Moodle does not serve amd/src'
+        );
+    }
+
+    /**
+     * Quiz stays ON for ordinary courses.
+     *
+     * The direction of this change that could hurt an existing site. quizenabled
+     * is set unconditionally true and only the support-mode pass turns it off, so
+     * a course render must still emit data-quiz-enabled="1". If someone ever
+     * defaults it off, every course on every site loses the practice quiz
+     * silently -- the chip disappears and typed quiz intent stops working, with
+     * no error anywhere.
+     */
+    public function test_quiz_stays_enabled_for_ordinary_courses(): void {
+        $src = file_get_contents(__DIR__ . '/../classes/hook_callbacks.php');
+        $this->assertNotFalse($src);
+
+        $this->assertStringContainsString(
+            "'quizenabled'        => true,",
+            $src,
+            'quizenabled must default to true; only the support-mode pass turns it off'
+        );
+
+        // The suppression pass must be reached only when support mode is active.
+        // Checked as a literal two-line sequence rather than a regex: an earlier
+        // attempt used one and PCRE rejected \l inside the namespace separator.
+        $this->assertStringContainsString(
+            "if (\$supportmode) {\n"
+                . "            \$templatedata = \\local_ai_course_assistant\\support_mode::suppress_course_features(",
+            $src,
+            'the suppression pass must be guarded on support mode, or every course '
+                . 'render would lose the quiz and every other listed feature'
+        );
+
+        // And the template must emit "1" for the truthy case.
+        $tpl = file_get_contents(__DIR__ . '/../templates/chat_widget.mustache');
+        $this->assertNotFalse($tpl);
+        $this->assertStringContainsString(
+            'data-quiz-enabled="{{#quizenabled}}1{{/quizenabled}}"',
+            $tpl,
+            'the attribute must render the literal 1 the client compares against'
         );
     }
 
