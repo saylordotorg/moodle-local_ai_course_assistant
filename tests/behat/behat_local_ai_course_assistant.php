@@ -374,4 +374,42 @@ JS;
 
         $this->execute('behat_general::i_click_on', ['.aica-consent-accept', 'css_element']);
     }
+
+    /**
+     * The welcome panel must not be reachable while the consent notice is up.
+     *
+     * Asserts the three things that together make it unreachable, because any
+     * one of them alone can be true while the learner still gets to the button:
+     * the panel carries `inert`, focus is not on its Continue button, and the
+     * button reports itself as not focusable. The middle one is what actually
+     * went wrong: the panel focused its own button a frame after the drawer had
+     * correctly focused the notice.
+     *
+     * @Then /^the welcome panel should be sealed while consent is pending$/
+     * @throws ExpectationException
+     */
+    public function the_welcome_panel_should_be_sealed_while_consent_is_pending(): void {
+        $result = (string) $this->getSession()->evaluateScript(
+            "return (function () {"
+            . " var panel = document.querySelector('.local-ai-course-assistant__welcome');"
+            . " if (!panel) { return 'NO PANEL'; }"
+            . " if (!panel.hasAttribute('inert')) { return 'PANEL NOT INERT'; }"
+            . " var cta = panel.querySelector('.local-ai-course-assistant__welcome-cta');"
+            . " if (cta && document.activeElement === cta) { return 'FOCUS ON CONTINUE'; }"
+            . " if (cta) {"
+            . "   cta.focus();"
+            . "   if (document.activeElement === cta) { return 'CONTINUE STILL FOCUSABLE'; }"
+            . " }"
+            . " return 'SEALED';"
+            . "})();"
+        );
+
+        if ($result !== 'SEALED') {
+            throw new ExpectationException(
+                'The welcome panel is reachable while the consent notice is pending: ' . $result
+                    . '. A learner could dismiss the intro without the notice ever being read.',
+                $this->getSession()
+            );
+        }
+    }
 }

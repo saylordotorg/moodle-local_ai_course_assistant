@@ -1911,50 +1911,66 @@ define([
         // preventScroll because on a long course page focusing a fixed-position
         // element otherwise jumps the page. Safari before 14 ignores the options
         // object, hence the fallback.
-        // The consent banner outranks everything. While it is up,
-        // consent_gate.js puts `inert` on every sibling of the banner, which is
-        // the whole rest of the drawer, and focus() on an inert element is a
-        // silent no-op. The first version of this fix targeted the message box
-        // unconditionally, so on a learner's FIRST open it did nothing at all:
-        // focus stayed on <body> and a screen reader announced nothing, in the
-        // one case where a modal notice most needs to be found. Every Behat
-        // Background sets aica_sola_consent_given, so no scenario saw it.
-        var inert = function(el) {
-            return !el || (el.closest && el.closest('[inert]') !== null);
-        };
+        // Move focus INTO the dialog, by TRYING each candidate and checking
+        // whether it actually took focus. Not by predicting which one can.
+        //
+        // Three review rounds on this one block each found another state where
+        // the prediction was wrong, and each fix only taught the predicate one
+        // more rule:
+        //
+        //   inert           consent banner seals every sibling of itself
+        //   display:none    the banner after Accept; the input in mode-history
+        //                   and mode-voice, because toggleDrawer runs before
+        //                   setBottomMode puts the drawer back in chat mode
+        //   disabled        the input after setInputEnabled(false), which stays
+        //                   off for the rest of the page under a quiz lock
+        //
+        // Each of those left focus on <body> with the dialog open, which is the
+        // WCAG 2.4.3 failure this code exists to prevent. A fourth state would
+        // do it again, and there is no reason to believe the list is complete:
+        // any mode added later that hides the input reintroduces it.
+        //
+        // document.activeElement after the call is the only thing that knows,
+        // and it is right about every reason focus can fail, including ones
+        // nobody has thought of. So: ordered by preference, try, verify, stop.
+        //
+        // preventScroll because on a long course page focusing a fixed-position
+        // element otherwise jumps the page. Safari before 14 ignores the options
+        // object, hence the fallback.
+        drawer.setAttribute('tabindex', '-1');
 
-        let focusinto = null;
+        var candidates = [];
         var banner = drawer.querySelector('.aica-consent-banner');
-        // Visible, not merely present. Accepting consent sets
-        // banner.style.display = 'none' and calls release(); it never removes
-        // the banner and never marks the banner itself inert, because inert
-        // only ever went on its siblings. So on every later open in the same
-        // page the selector still matches, and without this check focus went to
-        // a display:none scroll region, which focus() ignores, while the input
-        // and drawer fallbacks below were skipped because focusinto was already
-        // set. The learner accepted the notice, closed the drawer, reopened it,
-        // and was back to focus on <body>: the same defect, one interaction later.
-        if (banner && !inert(banner) && banner.getClientRects().length > 0) {
-            focusinto = banner.querySelector('.aica-consent-scroll') || banner;
+        if (banner) {
+            // The notice outranks everything while it is up: it is modal, and
+            // the learner cannot use the assistant until they have read it.
+            candidates.push(banner.querySelector('.aica-consent-scroll') || banner);
         }
+        if (window.innerWidth > 600) {
+            // Desktop: the message box, then the close button. On a phone both
+            // are skipped, because focusing a textarea opens the on-screen
+            // keyboard over the drawer the learner just opened.
+            candidates.push(drawer.querySelector('.local-ai-course-assistant__input'));
+            candidates.push(drawer.querySelector('.local-ai-course-assistant__btn-close'));
+        }
+        // The dialog itself always works: tabindex="-1", never inert, never
+        // hidden while open. Focus here is announced by the aria-label and the
+        // trap engages on the first Tab.
+        candidates.push(drawer);
 
-        if (!focusinto && window.innerWidth > 600) {
-            // Desktop: the message box, unless consent has sealed it.
-            var box = drawer.querySelector('.local-ai-course-assistant__input');
-            var close = drawer.querySelector('.local-ai-course-assistant__btn-close');
-            focusinto = (!inert(box) && box) || (!inert(close) && close) || null;
-        }
-
-        if (!focusinto) {
-            // Mobile, or every candidate inert. The dialog itself is always
-            // focusable with tabindex=-1 and is never the inert one.
-            drawer.setAttribute('tabindex', '-1');
-            focusinto = drawer;
-        }
-        try {
-            focusinto.focus({preventScroll: true});
-        } catch (e) {
-            focusinto.focus();
+        for (var ci = 0; ci < candidates.length; ci++) {
+            var candidate = candidates[ci];
+            if (!candidate) {
+                continue;
+            }
+            try {
+                candidate.focus({preventScroll: true});
+            } catch (e) {
+                candidate.focus();
+            }
+            if (document.activeElement === candidate) {
+                break;
+            }
         }
 
         // Push page content aside on desktop so drawer doesn't overlap.
@@ -3160,7 +3176,42 @@ define([
         // Single rAF for the fade-in (browser needs one frame to register the element).
         requestAnimationFrame(function() {
             panel.classList.add('local-ai-course-assistant__welcome--visible');
+
+            // Not while the consent notice is up. consent_gate.js seals the
+            // drawer's children with `inert` once, at init, and this panel is
+            // inserted afterwards, so it escapes that seal: without this it
+            // would sit behind a modal consent dialog with its Continue button
+            // focusable, tabbable and clickable, one frame after toggleDrawer
+            // had correctly put focus in the notice. A learner could dismiss
+            // the intro without the consent notice ever having been read.
+            //
+            // Marking the panel inert as well as skipping the focus means the
+            // seal covers it for pointer and assistive tech too, not just for
+            // this one focus() call.
             var cta = panel.querySelector('.local-ai-course-assistant__welcome-cta');
+
+            if (drawer && drawer.classList.contains('aica-consent-pending')) {
+                panel.setAttribute('inert', '');
+
+                // And release it when consent is. consent_gate.js restores only
+                // the children it sealed at init, and this panel was inserted
+                // after that snapshot, so nothing else will ever take the inert
+                // back off. Leaving it would replace one defect with a worse
+                // one: a Continue button the learner can see and never press.
+                var observer = new MutationObserver(function() {
+                    if (drawer.classList.contains('aica-consent-pending')) {
+                        return;
+                    }
+                    observer.disconnect();
+                    panel.removeAttribute('inert');
+                    if (cta) {
+                        cta.focus();
+                    }
+                });
+                observer.observe(drawer, {attributes: true, attributeFilter: ['class']});
+                return;
+            }
+
             if (cta) {
                 cta.focus();
             }

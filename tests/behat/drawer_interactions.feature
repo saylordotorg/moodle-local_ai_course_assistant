@@ -179,6 +179,63 @@ Feature: SOLA drawer interactions beyond send-receive
     And focus should be on ".local-ai-course-assistant__input"
 
   @javascript
+  Scenario: Reopening after the History tab still puts focus in the message box
+    # Found in the fourth review round, and the reason the focus code stopped
+    # predicting which element can take focus.
+    #
+    # The drawer keeps its --mode-history class between opens, and the CSS hides
+    # the input area with display:none in that mode. handleToggle called
+    # UI.toggleDrawer() before setBottomMode('chat'), so the focus code chose an
+    # input that was not being rendered, focus() did nothing, and the learner
+    # got no focus at all. Nothing was inert, so every inert-aware check passed
+    # it as a fine target.
+    #
+    # Two changes make this pass: setBottomMode now runs before the drawer
+    # opens, and the focus code verifies document.activeElement instead of
+    # trusting that its chosen element accepted focus.
+    Given I log in as "student1"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    And I click on "[data-mode=\"history\"]" "css_element"
+    And I press the escape key
+    Then "#local-ai-course-assistant-drawer" "css_element" should not be visible
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    And focus should be inside "#local-ai-course-assistant-drawer"
+    And focus should be on ".local-ai-course-assistant__input"
+
+  @javascript
+  Scenario: A brand-new learner cannot dismiss the intro past a pending consent notice
+    # Found in the fourth review round. The most common first run of all, and
+    # no scenario could see it: every consent scenario sets intro_dismissed,
+    # and every other scenario sets consent. This one sets neither.
+    #
+    # showIntroModal inserts the welcome panel as a NEW child of the drawer and
+    # focuses its Continue button a frame later. consent_gate.js sealed the
+    # drawer's children with `inert` once, at init, so a panel inserted after
+    # that snapshot escapes the seal entirely. The result was a Continue button
+    # focused, tabbable and clickable in front of a modal consent notice the
+    # learner had not read: the intro could be dismissed without the notice
+    # ever being acknowledged.
+    #
+    # The panel now marks itself inert while consent is pending and releases
+    # that when the notice does, via a MutationObserver on the pending class.
+    # Marking it inert without the release would have been worse than the bug:
+    # a Continue button the learner can see and never press.
+    Given the following "users" exist:
+      | username | firstname | lastname | email            |
+      | fresh    | Fresh     | Start    | fresh@example.com |
+    And the following "course enrolments" exist:
+      | user  | course | role    |
+      | fresh | DI1    | student |
+    And I log in as "fresh"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then ".aica-consent-banner" "css_element" should be visible
+    And focus should be inside "#local-ai-course-assistant-drawer"
+    And the welcome panel should be sealed while consent is pending
+
+  @javascript
   Scenario: On a phone the assistant takes focus without opening the keyboard
     # The mobile half of the same fix, and the reason it is not simply "focus
     # the message box". Focusing a textarea on a phone opens the on-screen

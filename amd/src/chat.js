@@ -5139,9 +5139,22 @@ define([
         if (isFirstVisit) {
             UI.preWelcome();
         }
+        // setBottomMode BEFORE toggleDrawer, not after. The drawer keeps its
+        // --mode-history or --mode-voice class between opens, and both hide
+        // .local-ai-course-assistant__input-area with display:none. Opening
+        // first meant toggleDrawer chose its focus target while the input was
+        // still hidden, so a learner who used History, closed the drawer and
+        // reopened it got the drawer container rather than the message box.
+        // Putting the drawer back in chat mode first makes the input real
+        // before anything looks for it.
+        //
+        // Gated on actually opening: toggleDrawer also closes, and resetting the
+        // mode on the way out would be a behaviour change nobody asked for.
+        if (!UI.isOpen()) {
+            setBottomMode('chat', {force: true});
+        }
         const opened = UI.toggleDrawer();
         if (opened) {
-            setBottomMode('chat', {force: true});
             syncVoicePanel();
             hydrateMasteryChip();
         }
