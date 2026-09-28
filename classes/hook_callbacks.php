@@ -662,6 +662,30 @@ class hook_callbacks {
             $hasactivity
         );
 
+        // v7.5.7: in support mode, keep only starters that a support turn can
+        // actually service. Everything that is not a plain prompt goes through an
+        // endpoint still gated on the per-course capability -- quiz through
+        // generate_quiz, voice and pronunciation through get_realtime_token and
+        // score_speech -- so offering them renders a chip that always errors.
+        // 'focus-next' and 'study-plan' are plain prompts but are about course
+        // progress, which does not exist here, so they go too.
+        //
+        // $hasstarterdata is computed from this filtered list further down, and
+        // that matters: the template renders a hardcoded fallback set INCLUDING
+        // the quiz chip when it is false, so filtering to empty would put the
+        // chip straight back.
+        if ($supportmode) {
+            $starters = array_values(array_filter(
+                $starters,
+                static function (array $starter): bool {
+                    if (($starter['type'] ?? 'prompt') !== 'prompt') {
+                        return false;
+                    }
+                    return !in_array($starter['key'] ?? '', ['focus-next', 'study-plan'], true);
+                }
+            ));
+        }
+
         // v5.7.0 / Feature C — personalize the focus-next starter chip with the
         // learner's weakest objective when the mastery-aware starter flag is on.
         // Only the display name changes; the chip's prompt and behavior are
@@ -757,7 +781,15 @@ class hook_callbacks {
         }
 
         // Whether admin-configured starters exist (controls fallback defaults in template).
-        $hasstarterdata = !empty($starters);
+        //
+        // v7.5.7: forced true in support mode. The template's {{^hasstarterdata}}
+        // branch renders a hardcoded default set that includes the practice-quiz
+        // chip, and the support filter above can legitimately empty $starters --
+        // most built-ins are either non-prompt types or conditional on an activity
+        // page, and support mode has neither. Leaving this to !empty() would put
+        // the quiz chip back through the fallback, which is the exact thing the
+        // filter exists to remove. No chips is the correct support-mode outcome.
+        $hasstarterdata = $supportmode ? true : !empty($starters);
 
         // v5.9.0 — Learning path map + next-course nudge. pathenabled gates the
         // header button and the lazy-loaded panel; the nudge fields drive the
