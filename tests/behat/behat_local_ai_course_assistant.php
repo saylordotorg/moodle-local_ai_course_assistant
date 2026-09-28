@@ -412,4 +412,81 @@ JS;
             );
         }
     }
+
+
+    /**
+     * The welcome panel is usable again once consent has been given.
+     *
+     * The other half of the seal. The seal alone is only half a fix: a panel
+     * marked inert and never released is a Continue button the learner can see
+     * and never press, and consent_gate.js will not release it, because it
+     * restores only the children it sealed at init and this panel is inserted
+     * after that snapshot. A MutationObserver does it, and until this step
+     * nothing checked that it fires.
+     *
+     * @Then /^the welcome panel should be released$/
+     * @throws ExpectationException
+     */
+    public function the_welcome_panel_should_be_released(): void {
+        $this->spin(
+            function () {
+                $result = (string) $this->getSession()->evaluateScript(
+                    "return (function () {"
+                    . " var panel = document.querySelector('.local-ai-course-assistant__welcome');"
+                    . " if (!panel) { return 'NO PANEL'; }"
+                    . " if (panel.hasAttribute('inert')) { return 'STILL INERT'; }"
+                    . " var cta = panel.querySelector('.local-ai-course-assistant__welcome-cta');"
+                    . " if (!cta) { return 'NO CONTINUE BUTTON'; }"
+                    . " cta.focus();"
+                    . " return document.activeElement === cta ? 'RELEASED' : 'CONTINUE NOT FOCUSABLE';"
+                    . "})();"
+                );
+
+                if ($result !== 'RELEASED') {
+                    throw new ExpectationException(
+                        'The welcome panel was not released after consent: ' . $result
+                            . '. A sealed panel that never opens is worse than one that was'
+                            . ' never sealed.',
+                        $this->getSession()
+                    );
+                }
+                return true;
+            },
+            false,
+            10
+        );
+    }
+
+    /**
+     * The quiz or attempt lock actually took effect.
+     *
+     * A scenario about what happens WHEN the lock fires is worthless if the
+     * lock does not fire, and it will pass just as happily either way. A
+     * mutation removing the refocus call survived the first version of the
+     * attempt-lock scenario for precisely that reason: no lock meant no
+     * setInputEnabled(false), so there was nothing for the fix to do and
+     * nothing for its removal to break.
+     *
+     * @Then /^the assistant input should be disabled by the lock$/
+     * @throws ExpectationException
+     */
+    public function the_assistant_input_should_be_disabled_by_the_lock(): void {
+        $state = (string) $this->getSession()->evaluateScript(
+            "return (function () {"
+            . " var root = document.getElementById('local-ai-course-assistant-root');"
+            . " var input = document.querySelector('.local-ai-course-assistant__input');"
+            . " if (!input) { return 'NO INPUT'; }"
+            . " var flag = root ? root.dataset.attemptLocked : '(no root)';"
+            . " return input.disabled ? 'DISABLED' : 'ENABLED (data-attempt-locked=' + flag + ')';"
+            . "})();"
+        );
+
+        if ($state !== 'DISABLED') {
+            throw new ExpectationException(
+                'The lock did not disable the message box, so this scenario is not testing'
+                    . ' what it claims: ' . $state,
+                $this->getSession()
+            );
+        }
+    }
 }

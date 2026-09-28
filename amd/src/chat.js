@@ -5148,8 +5148,10 @@ define([
         // Putting the drawer back in chat mode first makes the input real
         // before anything looks for it.
         //
-        // Gated on actually opening: toggleDrawer also closes, and resetting the
-        // mode on the way out would be a behaviour change nobody asked for.
+        // The guard is belt and braces rather than load-bearing: handleToggle
+        // has already returned through handleReset() above if the drawer was
+        // open, so this is only ever reached on the way in. Kept so the call
+        // cannot fire on a close if that early return is ever removed.
         if (!UI.isOpen()) {
             setBottomMode('chat', {force: true});
         }

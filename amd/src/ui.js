@@ -1821,6 +1821,82 @@ define([
     };
 
     /**
+     * Put keyboard focus somewhere useful inside the open drawer.
+     *
+     * By TRYING each candidate and checking whether it actually took focus, not
+     * by predicting which one can. Five review rounds on this found five states
+     * where a prediction was wrong:
+     *
+     *   inert           the consent banner seals every sibling of itself
+     *   display:none    the banner after Accept
+     *   display:none    the input in --mode-history and --mode-voice
+     *   disabled        the input under a quiz or attempt lock
+     *
+     * Review round five predicted a sixth: that a first open under a lock would
+     * focus the still-enabled input and then handleToggle would disable it,
+     * dropping focus to <body>. That does not happen. chat.js init() calls
+     * setInputEnabled(false) at line 1526 when attemptLocked, before any open,
+     * so the input is already disabled when this runs and the loop skips it and
+     * lands on the close button. The handleToggle call is the second one, not
+     * the first. Verified in a browser: under a real in-progress attempt, focus
+     * lands on .local-ai-course-assistant__btn-close.
+     *
+     * A guard in setInputEnabled to re-place focus was written for that
+     * prediction and removed again: nothing reachable exercised it, and a
+     * mutation deleting it could not be made to fail.
+     *
+     * document.activeElement is right about every reason focus can fail,
+     * including ones nobody has thought of.
+     *
+     * @return {boolean} True if focus ended up inside the drawer.
+     */
+    const focusIntoDrawer = function() {
+        if (!drawer) {
+            return false;
+        }
+
+        var inDrawer = function(el) {
+            return !!el && drawer.contains(el);
+        };
+
+        var candidates = [];
+        var banner = drawer.querySelector('.aica-consent-banner');
+        if (banner && banner.getClientRects().length > 0) {
+            // The notice outranks everything while it is showing: it is modal,
+            // and the learner cannot use the assistant until they have read it.
+            candidates.push(banner.querySelector('.aica-consent-scroll') || banner);
+        }
+        if (window.innerWidth > 600) {
+            // Desktop: the message box, then the close button. On a phone both
+            // are skipped, because focusing a textarea opens the on-screen
+            // keyboard over the drawer the learner just opened.
+            candidates.push(drawer.querySelector('.local-ai-course-assistant__input'));
+            candidates.push(drawer.querySelector('.local-ai-course-assistant__btn-close'));
+        }
+
+        for (var ci = 0; ci < candidates.length; ci++) {
+            var candidate = candidates[ci];
+            if (!candidate) {
+                continue;
+            }
+            // preventScroll because on a long course page focusing a
+            // fixed-position element otherwise jumps the page.
+            candidate.focus({preventScroll: true});
+            if (document.activeElement === candidate) {
+                return true;
+            }
+        }
+
+        // Nothing inside took it. The dialog itself always can, but tabindex is
+        // set only here rather than on every open: a drawer carrying
+        // tabindex="-1" all the time steals focus off the textarea when the
+        // learner clicks blank space in the message list.
+        drawer.setAttribute('tabindex', '-1');
+        drawer.focus({preventScroll: true});
+        return inDrawer(document.activeElement);
+    };
+
+    /**
      * Toggle the drawer open/closed.
      *
      * @returns {boolean} True if drawer is now open
@@ -1857,12 +1933,23 @@ define([
                 var candidates = drawer.querySelectorAll(
                     'button:not([disabled]):not([aria-hidden="true"]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
                 );
-                // querySelectorAll does not skip inert subtrees, so while the
-                // consent banner is up the first and last "focusable" controls
-                // can be ones the browser will not focus, and the trap never
-                // engages. Filter them out.
+                // querySelectorAll returns controls the browser will not focus:
+                // inert subtrees while the consent banner is up, and everything
+                // display:none behind a closed panel, which is most of this
+                // list most of the time. The help panel's close button, the
+                // history, voice and progress panels and the consent Accept
+                // button are all in the document at all times.
+                //
+                // Without this, `last` is routinely a control the learner cannot
+                // see, so a forward Tab from the last VISIBLE control does not
+                // wrap and simply leaves the dialog. Same predict-don't-check
+                // problem as the focus placement had; getClientRects() is the
+                // cheap half of the answer, and it is exact for display:none.
                 var focusable = Array.prototype.filter.call(candidates, function(el) {
-                    return !el.closest || el.closest('[inert]') === null;
+                    if (el.closest && el.closest('[inert]') !== null) {
+                        return false;
+                    }
+                    return el.getClientRects().length > 0;
                 });
                 if (!focusable.length) { return; }
                 var first = focusable[0];
@@ -1911,67 +1998,7 @@ define([
         // preventScroll because on a long course page focusing a fixed-position
         // element otherwise jumps the page. Safari before 14 ignores the options
         // object, hence the fallback.
-        // Move focus INTO the dialog, by TRYING each candidate and checking
-        // whether it actually took focus. Not by predicting which one can.
-        //
-        // Three review rounds on this one block each found another state where
-        // the prediction was wrong, and each fix only taught the predicate one
-        // more rule:
-        //
-        //   inert           consent banner seals every sibling of itself
-        //   display:none    the banner after Accept; the input in mode-history
-        //                   and mode-voice, because toggleDrawer runs before
-        //                   setBottomMode puts the drawer back in chat mode
-        //   disabled        the input after setInputEnabled(false), which stays
-        //                   off for the rest of the page under a quiz lock
-        //
-        // Each of those left focus on <body> with the dialog open, which is the
-        // WCAG 2.4.3 failure this code exists to prevent. A fourth state would
-        // do it again, and there is no reason to believe the list is complete:
-        // any mode added later that hides the input reintroduces it.
-        //
-        // document.activeElement after the call is the only thing that knows,
-        // and it is right about every reason focus can fail, including ones
-        // nobody has thought of. So: ordered by preference, try, verify, stop.
-        //
-        // preventScroll because on a long course page focusing a fixed-position
-        // element otherwise jumps the page. Safari before 14 ignores the options
-        // object, hence the fallback.
-        drawer.setAttribute('tabindex', '-1');
-
-        var candidates = [];
-        var banner = drawer.querySelector('.aica-consent-banner');
-        if (banner) {
-            // The notice outranks everything while it is up: it is modal, and
-            // the learner cannot use the assistant until they have read it.
-            candidates.push(banner.querySelector('.aica-consent-scroll') || banner);
-        }
-        if (window.innerWidth > 600) {
-            // Desktop: the message box, then the close button. On a phone both
-            // are skipped, because focusing a textarea opens the on-screen
-            // keyboard over the drawer the learner just opened.
-            candidates.push(drawer.querySelector('.local-ai-course-assistant__input'));
-            candidates.push(drawer.querySelector('.local-ai-course-assistant__btn-close'));
-        }
-        // The dialog itself always works: tabindex="-1", never inert, never
-        // hidden while open. Focus here is announced by the aria-label and the
-        // trap engages on the first Tab.
-        candidates.push(drawer);
-
-        for (var ci = 0; ci < candidates.length; ci++) {
-            var candidate = candidates[ci];
-            if (!candidate) {
-                continue;
-            }
-            try {
-                candidate.focus({preventScroll: true});
-            } catch (e) {
-                candidate.focus();
-            }
-            if (document.activeElement === candidate) {
-                break;
-            }
-        }
+        focusIntoDrawer();
 
         // Push page content aside on desktop so drawer doesn't overlap.
         // Use requestAnimationFrame so the drawer has its final width before we read it.
@@ -3087,6 +3114,13 @@ define([
         const hasPronunciation = !!(root.querySelector('[data-starter="ell-pronunciation"]'));
         const existing = drawer ? drawer.querySelector('.local-ai-course-assistant__welcome') : null;
         if (existing) {
+            // Disconnect the outgoing panel's consent observer before dropping
+            // it, or every reopen before the intro is dismissed leaves one more
+            // live observer watching a node nobody can see.
+            if (existing._aicaConsentObserver) {
+                existing._aicaConsentObserver.disconnect();
+                existing._aicaConsentObserver = null;
+            }
             existing.remove();
         }
 
@@ -3199,16 +3233,32 @@ define([
                 // back off. Leaving it would replace one defect with a worse
                 // one: a Continue button the learner can see and never press.
                 var observer = new MutationObserver(function() {
+                    // The panel is replaced on every reopen until the intro is
+                    // dismissed, and the old one's observer used to survive it:
+                    // one leaked observer per reopen, all of them firing on
+                    // Accept and calling focus() on detached nodes.
+                    if (!panel.isConnected) {
+                        observer.disconnect();
+                        return;
+                    }
                     if (drawer.classList.contains('aica-consent-pending')) {
                         return;
                     }
                     observer.disconnect();
                     panel.removeAttribute('inert');
-                    if (cta) {
+                    // Only if the drawer is still open. record_consent is
+                    // asynchronous and release() runs in its .always(), so a
+                    // learner who accepts and immediately presses Escape gets
+                    // this callback while the drawer is closing. visibility is
+                    // held for 0.25s, so the focus() would succeed, pull focus
+                    // into a dialog that is going away, and drop it to <body>.
+                    if (cta && isOpen()) {
                         cta.focus();
                     }
                 });
                 observer.observe(drawer, {attributes: true, attributeFilter: ['class']});
+                // Kept on the panel so the reopen path can disconnect it.
+                panel._aicaConsentObserver = observer;
                 return;
             }
 
