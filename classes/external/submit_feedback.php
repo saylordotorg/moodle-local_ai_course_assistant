@@ -89,7 +89,10 @@ class submit_feedback extends external_api {
 
         $context = \context_course::instance($params['courseid']);
         self::validate_context($context);
-        require_capability('local/ai_course_assistant:use', $context);
+        \local_ai_course_assistant\support_mode::require_use(
+            (int) $courseid,
+            $context
+        );
 
         // Clamp rating to 1-5.
         $rating = max(1, min(5, $params['rating']));

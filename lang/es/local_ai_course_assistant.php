@@ -3127,3 +3127,11 @@ $string['settings:max_audio_mb_capped'] = 'El límite en este servidor lo pone P
 $string['voice:error_unavailable'] = 'El servicio de transcripción no está disponible en este momento. Inténtalo de nuevo en un momento.';
 
 $string['settings:max_audio_mb_range'] = 'Introduce un número entre {$a->min} y {$a->max}. Los valores mayores no pueden respetarse: el endpoint limita a {$a->max}, así que el campo indicaría un límite que el código no aplica.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Usar el asistente fuera de un curso';
+$string['settings:support_enabled'] = 'Habilitar el modo de soporte fuera de los cursos';
+$string['settings:support_enabled_desc'] = 'Permite que los estudiantes abran [[tutorshort]] en páginas que no pertenecen a un curso, como el Área personal o su perfil, para preguntar sobre matriculación, certificados, problemas técnicos y otras cuestiones de soporte. Es necesario indicar abajo un curso de soporte. Además, los estudiantes necesitan la capacidad «Usar el asistente fuera de un curso», que los usuarios autenticados tienen de forma predeterminada.';
+$string['settings:support_courseid'] = 'Curso de soporte';
+$string['settings:support_courseid_desc'] = 'El ID numérico de un curso visible que contenga su material de introducción, bienvenida y orientación. Las conversaciones de soporte se responden a partir de ese curso y de las preguntas frecuentes de arriba, y quedan registradas en él. Deje el campo vacío para desactivar el modo de soporte. No se acepta la Página Principal del sitio (curso 1).';
+$string['support:promptrole'] = 'Estás respondiendo a una pregunta de soporte formulada fuera de cualquier curso. El estudiante no pregunta por el contenido del curso, así que no lo remitas a él. Responde a partir de las preguntas frecuentes y del material de soporte que se te ha facilitado. Si no puedes responder con exactitud, dilo con claridad y ofrécete a trasladar la pregunta al equipo de soporte.';

@@ -146,6 +146,14 @@ class hook_callbacks {
         if (!get_config('local_ai_course_assistant', 'enabled')) {
             return false;
         }
+        // v7.5.7: support mode renders on pages this method would otherwise
+        // reject. Asking support_mode the same question the injector asks keeps
+        // the CSP header and the widget on exactly the same set of pages; a page
+        // that rendered the widget without the CSP would lose the defence added
+        // after the injected-widget incident.
+        if (\local_ai_course_assistant\support_mode::renders_here($PAGE)) {
+            return true;
+        }
         $context = $PAGE->context ?? null;
         if (!$context) {
             return false;
@@ -269,9 +277,24 @@ class hook_callbacks {
             return;
         }
 
-        // Only inject on course or module context pages.
+        // v7.5.7: support mode. A page that is not a course -- the dashboard, a
+        // profile, the site home -- renders the widget against the administrator's
+        // designated support course, so every downstream consumer receives a real
+        // course id and needs no SITEID special case. support_mode::renders_here()
+        // is the shared predicate; the CSP hook asks the same question of the same
+        // method, so the two cannot drift.
+        $supportmode = \local_ai_course_assistant\support_mode::renders_here($PAGE);
+
+        // Only inject on course or module context pages. In support mode the page
+        // is neither, so the context we work from is the support course's, not the
+        // page's: everything below this point expects a course context and a real
+        // course id, and in support mode it gets both.
         $context = $PAGE->context;
-        if ($context->contextlevel !== CONTEXT_COURSE && $context->contextlevel !== CONTEXT_MODULE) {
+        if ($supportmode) {
+            $context = \context_course::instance(
+                \local_ai_course_assistant\support_mode::course_id()
+            );
+        } else if ($context->contextlevel !== CONTEXT_COURSE && $context->contextlevel !== CONTEXT_MODULE) {
             return;
         }
 
@@ -303,29 +326,44 @@ class hook_callbacks {
 
         // Don't show on site home (course id 1).
         $courseid = $coursecontext->instanceid;
-        if ($courseid == SITEID) {
+        if (!$supportmode && $courseid == SITEID) {
             return;
         }
 
         // Remember the last course visited for admins, so the global settings
         // page can offer a "back to last course" shortcut. Non-admins skip this
         // to avoid pointless user_preferences writes.
-        if (is_siteadmin() || has_capability('moodle/site:config', \context_system::instance())) {
+        //
+        // Skipped in support mode: the dashboard and the profile are the pages an
+        // admin passes through between courses, so recording the support course
+        // here would overwrite the shortcut's value with the one course it is not
+        // useful to go back to, on essentially every navigation.
+        if (!$supportmode
+                && (is_siteadmin() || has_capability('moodle/site:config', \context_system::instance()))) {
             $lastpref = (int) get_user_preferences('local_ai_course_assistant_last_courseid', 0);
             if ($lastpref !== (int) $courseid) {
                 set_user_preference('local_ai_course_assistant_last_courseid', (int) $courseid);
             }
         }
 
-        // Check capability.
-        if (!has_capability('local/ai_course_assistant:use', $coursecontext)) {
+        // Check capability. In support mode the access decision has already been
+        // made by support_mode::can_use(), which checks :usesupport at system
+        // context -- a learner reaching the assistant from their dashboard is by
+        // definition not enrolled in the support course and holds no role in it,
+        // so the per-course :use capability is the wrong question there.
+        if (!$supportmode && !has_capability('local/ai_course_assistant:use', $coursecontext)) {
             return;
         }
 
         // Per-course SOLA enable check. Honours the site-wide
         // default_course_mode setting: new installs default to 'per_course'
         // (opt-in), upgraded installs default to 'all' (legacy behaviour).
-        if (!course_config_manager::is_enabled_for_course($courseid)) {
+        //
+        // Support mode has its own explicit on/off switch and must not inherit
+        // this one: default_course_mode='all' on an upgraded site would otherwise
+        // turn support mode on for every such site without an administrator
+        // choosing it.
+        if (!$supportmode && !course_config_manager::is_enabled_for_course($courseid)) {
             return;
         }
 
@@ -552,9 +590,13 @@ class hook_callbacks {
         // flag exists to remove, preserved for the people who test dev.
         $attemptlocked = false;
         if (!empty($USER->id)) {
+            // v7.5.7: same site-wide fallback as the enforcing call sites, so the
+            // composer is greyed on the support surface for a learner who has a
+            // live attempt elsewhere. Without this the UI would invite a message
+            // that the server then refuses.
             $attemptlocked = \local_ai_course_assistant\quiz_lock::is_locked_for(
                 (int) $USER->id,
-                (int) $courseid
+                \local_ai_course_assistant\support_mode::integrity_scope((int) $courseid)
             );
         }
 

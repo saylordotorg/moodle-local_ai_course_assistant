@@ -3144,3 +3144,11 @@ $string['settings:max_audio_mb_capped'] = 'Umkhawulo kule seva yi-PHP, hhayi les
 $string['voice:error_unavailable'] = 'Isevisi yokubhala ayitholakali okwamanje. Sicela uzame futhi emizuzwaneni embalwa.';
 
 $string['settings:max_audio_mb_range'] = 'Faka inombolo ephakathi kuka-{$a->min} no-{$a->max}. Amanani amakhulu kunalawa awakwazi ukulandelwa: i-endpoint inciphisa ibe ngu-{$a->max}, ngakho lensimu ingasho umkhawulo ikhodi engawuphoqeleli.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Sebenzisa umsizi ngaphandle kwekhosi';
+$string['settings:support_enabled'] = 'Vula imodi yosizo ngaphandle kwamakhosi';
+$string['settings:support_enabled_desc'] = 'Ivumela abafundi ukuvula [[tutorshort]] emakhasini angewona ikhosi, njengedeshibhodi noma iphrofayela yabo, ukuze babuze ngokubhalisa, izitifiketi, izinkinga zobuchwepheshe neminye imibuzo yosizo. Kudinga ikhosi losizo elisethwe ngezansi. Abafundi basadinga ikhono elithi "Sebenzisa umsizi ngaphandle kwekhosi", elinikezwa ngokuzenzakalela abasebenzisi abaqinisekisiwe.';
+$string['settings:support_courseid'] = 'Ikhosi losizo';
+$string['settings:support_courseid_desc'] = 'I-ID yekhosi elibonakalayo eliqukethe izinto zakho zokuqalisa, zokwethula nezokuqondisa. Izingxoxo zosizo ziphendulwa kusukela kuleli khosi kanye nakuma-FAQ angenhla, futhi ziqoshwa kulo. Shiya kungenalutho ukuze uvale imodi yosizo. Ikhaya lesayithi (ikhosi 1) alamukelwa.';
+$string['support:promptrole'] = 'Uphendula umbuzo wosizo ovela ngaphandle kwanoma yiliphi ikhosi. Umfundi akabuzi ngokuqukethwe kwekhosi, ngakho ungamdluliseli kukho. Phendula usuka kuma-FAQ nakuzinto zosizo onikezwe zona. Uma ungakwazi ukuphendula ngokunembile, yisho lokho ngokusobala bese unikela ngokudlulisela umbuzo ethimbeni losizo.';

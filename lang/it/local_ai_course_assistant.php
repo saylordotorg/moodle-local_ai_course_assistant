@@ -3138,3 +3138,11 @@ $string['settings:max_audio_mb_capped'] = 'Il limite su questo server lo impone 
 $string['voice:error_unavailable'] = 'Il servizio di trascrizione non è disponibile in questo momento. Riprova tra poco.';
 
 $string['settings:max_audio_mb_range'] = 'Inserisci un numero tra {$a->min} e {$a->max}. Valori superiori non possono essere rispettati: l\'endpoint limita a {$a->max}, quindi il campo indicherebbe un limite che il codice non applica.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Utilizzare l\'assistente al di fuori di un corso';
+$string['settings:support_enabled'] = 'Attiva la modalità assistenza fuori dai corsi';
+$string['settings:support_enabled_desc'] = 'Consente agli studenti di aprire [[tutorshort]] anche in pagine che non appartengono a un corso, come la dashboard o il proprio profilo, per porre domande su iscrizioni, attestati, problemi tecnici e altri temi di assistenza. Richiede che sia indicato qui sotto un corso di assistenza. Agli studenti serve inoltre la funzionalità «Utilizzare l\'assistente al di fuori di un corso», di cui gli utenti autenticati dispongono per impostazione predefinita.';
+$string['settings:support_courseid'] = 'Corso di assistenza';
+$string['settings:support_courseid_desc'] = 'L\'ID numerico di un corso visibile che raccoglie i materiali di avvio, accoglienza e orientamento. Le conversazioni di assistenza ricevono risposta da questo corso e dalle FAQ indicate sopra, e vengono registrate su di esso. Lasciare vuoto per disattivare la modalità assistenza. La home del sito (corso 1) non è ammessa.';
+$string['support:promptrole'] = 'Stai rispondendo a una domanda di assistenza posta al di fuori di qualsiasi corso. Chi scrive non sta chiedendo del materiale del corso, quindi non rimandarlo a esso. Rispondi in base alle FAQ e al materiale di assistenza che ti è stato fornito. Se non riesci a rispondere con precisione, dillo chiaramente e offriti di inoltrare la domanda al team di assistenza.';

@@ -45,7 +45,10 @@ class clear_history extends external_api {
 
         $context = \context_course::instance($params['courseid']);
         self::validate_context($context);
-        require_capability('local/ai_course_assistant:use', $context);
+        \local_ai_course_assistant\support_mode::require_use(
+            (int) $courseid,
+            $context
+        );
 
         $userid = $USER->id;
         $conv = conversation_manager::get_or_create_conversation($userid, $params['courseid']);

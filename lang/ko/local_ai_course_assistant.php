@@ -3098,3 +3098,11 @@ $string['settings:max_audio_mb_capped'] = '이 서버에서는 이 설정이 아
 $string['voice:error_unavailable'] = '전사 서비스를 지금은 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.';
 
 $string['settings:max_audio_mb_range'] = '{$a->min}에서 {$a->max} 사이의 숫자를 입력하세요. 더 큰 값은 적용할 수 없습니다. 엔드포인트가 {$a->max}로 제한하므로 필드가 코드와 다른 한도를 표시하게 됩니다.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = '코스 밖에서 어시스턴트 사용';
+$string['settings:support_enabled'] = '코스 밖에서 지원 모드 활성화';
+$string['settings:support_enabled_desc'] = '대시보드나 프로필처럼 코스가 아닌 페이지에서도 학습자가 [[tutorshort]]를 열어 수강 등록, 수료증, 기술적 문제 등 지원 관련 질문을 할 수 있게 합니다. 아래에서 지원 코스를 지정해야 작동합니다. 또한 학습자에게 "코스 밖에서 어시스턴트 사용" 권한이 있어야 하며, 인증된 사용자에게는 기본으로 부여되어 있습니다.';
+$string['settings:support_courseid'] = '지원 코스';
+$string['settings:support_courseid_desc'] = '시작 안내, 온보딩, 오리엔테이션 자료가 들어 있는, 학습자에게 보이는 코스의 ID입니다. 지원 대화는 이 코스와 위의 FAQ를 바탕으로 답변되며 이 코스에 기록됩니다. 비워 두면 지원 모드가 꺼집니다. 사이트 홈(코스 1)은 사용할 수 없습니다.';
+$string['support:promptrole'] = '지금 코스 밖에서 들어온 지원 질문에 답하고 있다. 학습자는 코스 내용을 묻는 것이 아니므로 코스 자료로 유도하지 마라. 제공된 FAQ와 지원 자료를 근거로 답하라. 정확하게 답할 수 없으면 그 사실을 분명히 밝히고, 질문을 지원팀에 전달하겠다고 제안하라.';

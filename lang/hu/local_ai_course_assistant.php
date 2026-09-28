@@ -3139,3 +3139,11 @@ $string['settings:max_audio_mb_capped'] = 'Ezen a kiszolgálón a PHP szabja meg
 $string['voice:error_unavailable'] = 'Az átírási szolgáltatás jelenleg nem érhető el. Kérjük, próbálja újra egy kis idő múlva.';
 
 $string['settings:max_audio_mb_range'] = 'Adjon meg egy számot {$a->min} és {$a->max} között. Ennél nagyobb érték nem tartható be: a végpont {$a->max} értékre korlátoz, így a mező olyan határt közölne, amelyet a kód nem érvényesít.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Az asszisztens használata kurzuson kívül';
+$string['settings:support_enabled'] = 'Támogatási mód engedélyezése kurzusokon kívül';
+$string['settings:support_enabled_desc'] = 'Lehetővé teszi a tanulóknak, hogy a(z) [[tutorshort]] asszisztenst olyan oldalakon is megnyissák, amelyek nem egy kurzushoz tartoznak, például az irányítópulton vagy a saját profiljukon, és beiratkozással, oklevelekkel, technikai gondokkal és egyéb támogatási kérdésekkel forduljanak hozzá. Ehhez alább meg kell adni egy támogatási kurzust. A tanulóknak emellett szükségük van „Az asszisztens használata kurzuson kívül” képességre, amellyel a hitelesített felhasználók alapértelmezés szerint rendelkeznek.';
+$string['settings:support_courseid'] = 'Támogatási kurzus';
+$string['settings:support_courseid_desc'] = 'Egy látható kurzus azonosítója, amely a kezdő lépésekhez, a beilleszkedéshez és a tájékozódáshoz szükséges anyagokat tartalmazza. A támogatási beszélgetések ebből a kurzusból és a fenti gyakori kérdésekből kapnak választ, és ehhez a kurzushoz kerülnek rögzítésre. Hagyja üresen a támogatási mód kikapcsolásához. A webhely kezdőlapja (1-es kurzus) nem fogadható el.';
+$string['support:promptrole'] = 'Kurzuson kívülről érkező támogatási kérdésre válaszolsz. A tanuló nem a kurzus anyagáról kérdez, ezért ne irányítsd oda vissza. A gyakori kérdésekből és a rendelkezésedre bocsátott támogatási anyagból válaszolj. Ha nem tudsz pontos választ adni, mondd ki ezt egyenesen, és ajánld fel, hogy továbbítod a kérdést a támogatási csapatnak.';

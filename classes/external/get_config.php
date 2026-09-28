@@ -44,7 +44,10 @@ class get_config extends external_api {
 
         $context = \context_course::instance($params['courseid']);
         self::validate_context($context);
-        require_capability('local/ai_course_assistant:use', $context);
+        \local_ai_course_assistant\support_mode::require_use(
+            (int) $courseid,
+            $context
+        );
 
         $userrole = \local_ai_course_assistant\context_builder::detect_role($params['courseid'], $USER->id);
         $canviewanalytics = has_capability('local/ai_course_assistant:viewanalytics', $context, $USER->id);

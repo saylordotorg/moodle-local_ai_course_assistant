@@ -3101,3 +3101,11 @@ $string['settings:max_audio_mb_capped'] = 'Sur ce serveur, c\'est PHP qui fixe l
 $string['voice:error_unavailable'] = 'Le service de transcription n\'est pas disponible pour le moment. Veuillez réessayer dans un instant.';
 
 $string['settings:max_audio_mb_range'] = 'Saisissez un nombre entre {$a->min} et {$a->max}. Les valeurs supérieures ne peuvent pas être respectées : le point de terminaison plafonne à {$a->max}, le champ annoncerait donc une limite que le code n\'applique pas.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Utiliser l\'assistant en dehors d\'un cours';
+$string['settings:support_enabled'] = 'Activer le mode assistance en dehors des cours';
+$string['settings:support_enabled_desc'] = 'Permet aux apprenants d\'ouvrir [[tutorshort]] sur des pages qui ne relèvent pas d\'un cours, comme le tableau de bord ou leur profil, afin de poser des questions sur l\'inscription, les certificats, les problèmes techniques et d\'autres demandes d\'assistance. Un cours d\'assistance doit être défini ci-dessous. Les apprenants doivent en outre disposer de la capacité « Utiliser l\'assistant en dehors d\'un cours », accordée par défaut aux utilisateurs authentifiés.';
+$string['settings:support_courseid'] = 'Cours d\'assistance';
+$string['settings:support_courseid_desc'] = 'L\'identifiant numérique d\'un cours visible contenant vos ressources de prise en main, d\'accueil et d\'orientation. Les conversations d\'assistance s\'appuient sur ce cours ainsi que sur la FAQ ci-dessus, et y sont enregistrées. Laissez le champ vide pour désactiver le mode assistance. L\'accueil du site (cours 1) n\'est pas accepté.';
+$string['support:promptrole'] = 'Vous répondez à une question d\'assistance posée en dehors de tout cours. L\'apprenant ne s\'interroge pas sur le contenu du cours : ne l\'y renvoyez pas. Répondez à partir de la FAQ et des ressources d\'assistance qui vous ont été fournies. Si vous ne pouvez pas répondre avec exactitude, dites-le clairement et proposez de transmettre la question à l\'équipe d\'assistance.';

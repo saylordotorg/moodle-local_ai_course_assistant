@@ -3100,3 +3100,11 @@ $string['settings:max_audio_mb_capped'] = 'Bu sunucudaki sınırı bu ayar deği
 $string['voice:error_unavailable'] = 'Yazıya dökme hizmeti şu anda kullanılamıyor. Lütfen birazdan tekrar deneyin.';
 
 $string['settings:max_audio_mb_range'] = '{$a->min} ile {$a->max} arasında bir sayı girin. Daha büyük değerler uygulanamaz: uç nokta {$a->max} değerine sınırlar, bu yüzden alan kodun uygulamadığı bir sınırı belirtmiş olur.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Asistanı kurs dışında kullanma';
+$string['settings:support_enabled'] = 'Kurs dışında destek modunu etkinleştir';
+$string['settings:support_enabled_desc'] = 'Öğrencilerin kontrol paneli veya profil sayfaları gibi bir kursa ait olmayan sayfalarda [[tutorshort]] asistanını açıp kayıt, sertifika, teknik sorunlar ve diğer destek konularında soru sormasına olanak tanır. Aşağıda bir destek kursunun belirlenmiş olması gerekir. Öğrencilerin ayrıca, kimliği doğrulanmış kullanıcılarda varsayılan olarak bulunan "Asistanı kurs dışında kullanma" yeteneğine sahip olması gerekir.';
+$string['settings:support_courseid'] = 'Destek kursu';
+$string['settings:support_courseid_desc'] = 'Başlangıç, tanıtım ve oryantasyon materyallerinizi içeren görünür bir kursun sayısal kimliği. Destek konuşmaları bu kurs ve yukarıdaki SSS temel alınarak yanıtlanır ve bu kursa kaydedilir. Destek modunu kapatmak için boş bırakın. Sitenin ana sayfası (kurs 1) kabul edilmez.';
+$string['support:promptrole'] = 'Herhangi bir kursun dışından gelen bir destek sorusunu yanıtlıyorsunuz. Öğrenci kurs içeriğiyle ilgili bir şey sormuyor, bu nedenle onu kurs içeriğine yönlendirmeyin. Yanıtınızı SSS ve size verilen destek materyallerine dayandırın. Doğru bir yanıt veremiyorsanız bunu açıkça söyleyin ve soruyu destek ekibine iletmeyi önerin.';

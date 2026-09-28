@@ -61,6 +61,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:provider'] = 'The AI pr
 // Capabilities.
 $string['ai_course_assistant:use'] = 'Use AI tutor chat';
 $string['ai_course_assistant:viewanalytics'] = 'View AI tutor chat analytics';
+$string['ai_course_assistant:usesupport'] = 'Use the assistant outside a course';
 $string['ai_course_assistant:manage'] = 'Manage AI tutor chat settings (Administrator role)';
 
 // Settings.
@@ -256,6 +257,11 @@ $string['settings:supplemental_courses'] = 'Supplemental courses';
 $string['settings:supplemental_courses_desc'] = 'Course IDs whose content [[tutorshort]] may also draw on when answering, separated by commas. Use this for material that lives in another course and applies everywhere, such as a student orientation or resource centre: a learner asking about exam policy then gets the answer from that course instead of nothing.
 
 The courses must already be indexed for retrieval; nothing extra is embedded, so adding one here is immediate and costs nothing. Hidden courses are ignored. Activities inside a listed course, however, are indexed as the administrator who reindexed it saw them, so a hidden or restricted activity’s text can be quoted back to a learner even though no link to it is shown. Only list courses whose whole content is suitable for the audience. Maximum {$a} courses. A per-course setting, where present, replaces this list rather than adding to it.';
+$string['settings:support_enabled'] = 'Enable support mode outside courses';
+$string['settings:support_enabled_desc'] = 'Let learners open [[tutorshort]] on pages that are not a course, such as the dashboard or their profile, to ask about enrolment, certificates, technical problems and other support questions. Requires a support course to be set below. Learners still need the "Use the assistant outside a course" capability, which authenticated users hold by default.';
+$string['settings:support_courseid'] = 'Support course';
+$string['settings:support_courseid_desc'] = 'The ID of a visible course holding your getting started, onboarding and orientation material. Support conversations are answered from this course plus the FAQ above, and are recorded against it. Leave empty to turn support mode off. The site home (course 1) is not accepted.';
+$string['support:promptrole'] = 'You are answering a support question from outside any course. The learner is not asking about course material, so do not redirect them to it. Answer from the FAQ and the support material you have been given. If you cannot answer accurately, say so plainly and offer to pass the question to the support team.';
 $string['settings:faq_content'] = 'FAQ Content';
 $string['settings:faq_content_desc'] = 'Enter FAQ entries (one per line in the format: Q: question | A: answer). These will be provided to the AI to answer common support questions.';
 $string['settings:zendesk_enabled'] = 'Enable Zendesk Escalation';

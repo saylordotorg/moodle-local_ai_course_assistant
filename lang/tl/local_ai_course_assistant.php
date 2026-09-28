@@ -3144,3 +3144,11 @@ $string['settings:max_audio_mb_capped'] = 'Ang PHP ang naglilimita sa server na 
 $string['voice:error_unavailable'] = 'Hindi available ngayon ang transcription service. Pakisubukan ulit maya-maya.';
 
 $string['settings:max_audio_mb_range'] = 'Maglagay ng numero sa pagitan ng {$a->min} at {$a->max}. Hindi maigagalang ang mas malalaking halaga: nililimitahan ng endpoint sa {$a->max}, kaya magsasaad ang field ng limitasyong hindi ipinapatupad ng code.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Gamitin ang assistant sa labas ng kurso';
+$string['settings:support_enabled'] = 'I-enable ang support mode sa labas ng mga kurso';
+$string['settings:support_enabled_desc'] = 'Payagan ang mga mag-aaral na buksan ang [[tutorshort]] sa mga pahinang hindi kurso, gaya ng dashboard o ng kanilang profile, para magtanong tungkol sa enrolment, sertipiko, teknikal na problema at iba pang katanungan sa suporta. Kailangang may nakatakdang kurso para sa suporta sa ibaba. Kailangan pa rin ng mga mag-aaral ang kakayahang "Gamitin ang assistant sa labas ng kurso", na taglay ng mga authenticated user bilang default.';
+$string['settings:support_courseid'] = 'Kurso para sa suporta';
+$string['settings:support_courseid_desc'] = 'Ang ID ng isang nakikitang kurso na naglalaman ng iyong materyal sa pagsisimula, onboarding at orientation. Sinasagot ang mga usapang pansuporta mula sa kursong ito kasama ang FAQ sa itaas, at doon din itinatala. Iwanang blangko para i-off ang support mode. Hindi tinatanggap ang site home (kurso 1).';
+$string['support:promptrole'] = 'Sumasagot ka ng tanong na pansuporta mula sa labas ng anumang kurso. Hindi tungkol sa materyal ng kurso ang tinatanong ng mag-aaral, kaya huwag mo siyang ibalik doon. Sumagot mula sa FAQ at sa materyal pansuportang ibinigay sa iyo. Kung hindi ka makakasagot nang tumpak, sabihin mo ito nang malinaw at mag-alok na ipasa ang tanong sa support team.';

@@ -3114,3 +3114,11 @@ $string['settings:max_audio_mb_capped'] = 'Oke dị na sava a bụ PHP, ọ bụ
 $string['voice:error_unavailable'] = 'Ọrụ ederede adịghị ugbu a. Biko nwaa ọzọ n\'oge na-adịghị anya.';
 
 $string['settings:max_audio_mb_range'] = 'Tinye ọnụọgụ dị n\'etiti {$a->min} na {$a->max}. Enweghị ike ịnabata ụkpụrụ buru ibu karịa: njedebe na-amachi na {$a->max}, ya mere ubi ga-ekwu oke koodu na-adịghị amanye.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Jiri onye enyemaka ahụ na mpụga usoro ihe ọmụmụ';
+$string['settings:support_enabled'] = 'Gbanye ọnọdụ nkwado na mpụga usoro ihe ọmụmụ';
+$string['settings:support_enabled_desc'] = 'Na-enye ndị mmụta ohere imepe [[tutorshort]] na ibe ndị na-abụghị usoro ihe ọmụmụ, dị ka dashboard ma ọ bụ profaịlụ ha, ịjụ ajụjụ gbasara ndebanye aha, asambodo, nsogbu teknụzụ na ajụjụ nkwado ndị ọzọ. Ọ chọrọ ka a họpụta usoro ihe ọmụmụ nkwado n\'okpuru. Ndị mmụta ka chọrọ ikike "Jiri onye enyemaka ahụ na mpụga usoro ihe ọmụmụ", nke ndị ọrụ banyere n\'akaụntụ ha nwere na ndabara.';
+$string['settings:support_courseid'] = 'Usoro ihe ọmụmụ nkwado';
+$string['settings:support_courseid_desc'] = 'ID nke usoro ihe ọmụmụ a na-ahụ anya nke nwere ihe mmalite, nnabata na ntọala gị. A na-aza mkparịta ụka nkwado site na usoro ihe ọmụmụ a tinyere ajụjụ ndị a na-ajụkarị dị n\'elu, a na-edekwa ha n\'okpuru ya. Hapụ ya ka ọ tọgbọrọ chakoo iji gbanyụọ ọnọdụ nkwado. A naghị anabata ụlọ saịtị ahụ (usoro ihe ọmụmụ 1).';
+$string['support:promptrole'] = 'Ị na-aza ajụjụ nkwado sitere na mpụga usoro ihe ọmụmụ ọ bụla. Onye mmụta ahụ anaghị ajụ maka ihe ọmụmụ nke usoro ihe ọmụmụ, ya mere eduganyela ya na ya. Zaa site na ajụjụ ndị a na-ajụkarị na ihe nkwado e nyere gị. Ọ bụrụ na ị nweghị ike ịza nke ọma, kwuo ya n\'ụzọ doro anya ma nye aka ibuga ajụjụ ahụ na ndị otu nkwado.';

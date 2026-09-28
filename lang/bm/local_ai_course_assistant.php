@@ -3128,3 +3128,11 @@ $string['settings:max_audio_mb_capped'] = 'Nin sɛrɛwɛri kan, PHP de ye dan ye
 $string['voice:error_unavailable'] = 'Sɛbɛnni baara tɛ sɔrɔ sisan. Aw ye a lajɛ kokura dɔɔnin kɔfɛ.';
 
 $string['settings:max_audio_mb_range'] = 'Jate sɛbɛn {$a->min} ni {$a->max} cɛ. Jate belebele tɛ se ka kɛ: dan bɛ se {$a->max} ma, o la yɔrɔ bɛ dan fɔ min tɛ kɛ.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Dɛmɛbaga baara kɛ kalan kɔkan';
+$string['settings:support_enabled'] = 'Dɛmɛli cogoya daminɛ kalanw kɔkan';
+$string['settings:support_enabled_desc'] = 'Kalandenw bɛ se ka [[tutorshort]] dayɛlɛ ɲɛw kan minnu tɛ kalan ye, i n’a fɔ tableau de bord walima u ka profil kan, walasa ka ɲininkali kɛ tɔgɔsɛbɛnni, sɛbɛn sɔrɔli, tekiniki gɛlɛyaw ani dɛmɛli ɲininkali wɛrɛw kan. Dɛmɛli kalan ka kan ka sigi duguma fɔlɔ. Kalandenw mago bɛ se in na hali bi: "Dɛmɛbaga baara kɛ kalan kɔkan", o se bɛ don baarakɛla dansɛgɛninw bɛɛ bolo u yɛrɛma.';
+$string['settings:support_courseid'] = 'Dɛmɛli kalan';
+$string['settings:support_courseid_desc'] = 'Kalan yerelen dɔ ka ID min kɔnɔ i ka daminɛli, ladonni ani ɲɛminɛli fɛnw bɛ. Dɛmɛli barow bɛ jaabi ka bɔ o kalan ani FAQ min bɛ sanfɛ la, ani u bɛ sɛbɛn o kalan tɔgɔ la. A to lankolon walasa ka dɛmɛli cogoya faga. Site kunfɛla (kalan 1) tɛ minɛ.';
+$string['support:promptrole'] = 'I bɛ dɛmɛli ɲininkali dɔ jaabi min bɔra kalan si kɔkan. Kalanden tɛ ɲininkali kɛ kalan kɔnɔkow kan, o la kana a bila ka taa o fan fɛ. Jaabi ta FAQ ani dɛmɛli fɛnw na minnu dira i ma. Ni i tɛ se ka jaabi tilennen di, o fɔ ka jɛ, ani i ka a fɔ ko i bɛ se ka ɲininkali in lase dɛmɛli jɛkulu ma.';

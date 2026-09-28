@@ -3100,3 +3100,11 @@ $string['settings:max_audio_mb_capped'] = 'Die Grenze auf diesem Server setzt PH
 $string['voice:error_unavailable'] = 'Der Transkriptionsdienst ist derzeit nicht verfügbar. Bitte versuchen Sie es in Kürze erneut.';
 
 $string['settings:max_audio_mb_range'] = 'Geben Sie eine Zahl zwischen {$a->min} und {$a->max} ein. Größere Werte lassen sich nicht einhalten: der Endpunkt begrenzt auf {$a->max}, das Feld würde also ein Limit nennen, das der Code nicht durchsetzt.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Den Assistenten außerhalb eines Kurses verwenden';
+$string['settings:support_enabled'] = 'Supportmodus außerhalb von Kursen aktivieren';
+$string['settings:support_enabled_desc'] = 'Erlaubt Lernenden, [[tutorshort]] auch auf Seiten zu öffnen, die zu keinem Kurs gehören, etwa im Dashboard oder im eigenen Profil, um Fragen zu Einschreibung, Zertifikaten, technischen Problemen und anderen Supportthemen zu stellen. Dafür muss unten ein Supportkurs festgelegt sein. Zusätzlich benötigen Lernende weiterhin das Recht „Den Assistenten außerhalb eines Kurses verwenden“, über das authentifizierte Nutzer/innen standardmäßig verfügen.';
+$string['settings:support_courseid'] = 'Supportkurs';
+$string['settings:support_courseid_desc'] = 'Die ID eines sichtbaren Kurses mit Ihren Einstiegs-, Onboarding- und Orientierungsmaterialien. Supportgespräche werden aus diesem Kurs und den oben hinterlegten FAQ beantwortet und diesem Kurs zugeordnet gespeichert. Leer lassen, um den Supportmodus auszuschalten. Die Startseite der Website (Kurs 1) wird nicht akzeptiert.';
+$string['support:promptrole'] = 'Sie beantworten eine Supportfrage außerhalb jedes Kurses. Die lernende Person fragt nicht nach Kursinhalten, verweisen Sie sie also nicht darauf. Antworten Sie anhand der FAQ und der Ihnen bereitgestellten Supportmaterialien. Wenn Sie nicht zutreffend antworten können, sagen Sie das klar und bieten Sie an, die Frage an das Supportteam weiterzugeben.';

@@ -3131,3 +3131,11 @@ $string['settings:max_audio_mb_capped'] = 'Sarvara kana irratti daangaan PHP dha
 $string['voice:error_unavailable'] = 'Tajaajilli barreeffamaa yeroo ammaa hin argamu. Maaloo yeroo muraasa booda irra deebi\'ii yaali.';
 
 $string['settings:max_audio_mb_range'] = 'Lakkoofsa {$a->min} fi {$a->max} gidduu jiru galchi. Gatiin isaa caalu hojiirra ooluu hin danda\'u: dhumti {$a->max} irratti daangessa, kanaaf dirreen daangaa koodiin hin hojjenne ibsa.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Gargaaraa koorsii alatti fayyadami';
+$string['settings:support_enabled'] = 'Haala deeggarsaa koorsiiwwan alatti dandeessisi';
+$string['settings:support_enabled_desc'] = 'Barattoonni fuulawwan koorsii hin taane irratti, fakkeenyaaf daashboordii yookaan piroofaayilii isaanii irratti, [[tutorshort]] banuudhaan waaʼee galmee, waraqaa ragaa, rakkoo teeknikaa fi gaaffilee deeggarsaa biroo akka gaafatan heyyama. Kun koorsii deeggarsaa armaan gadii qindaaʼuu barbaada. Barattoonni ammas dandeettii "Gargaaraa koorsii alatti fayyadami" jedhamu qabaachuu qabu; fayyadamtoonni mirkanaaʼan durumaan isa qabu.';
+$string['settings:support_courseid'] = 'Koorsii deeggarsaa';
+$string['settings:support_courseid_desc'] = 'ID koorsii mulʼatu tokkoo kan meeshaalee jalqabbii, seensaa fi qajeelfama kee qabatee jiru. Haasawwan deeggarsaa koorsii kanaa fi FAQ armaan olii irraa deebii argatu, akkasumas koorsicha jalatti galmaaʼu. Haala deeggarsaa dhaamsuuf duwwaa dhiisi. Fuulli jalqabaa marsariitii (koorsii 1) hin fudhatamu.';
+$string['support:promptrole'] = 'Ati gaaffii deeggarsaa koorsii kamiyyuu alaa dhufe deebisaa jirta. Barataan waaʼee qabiyyee koorsii hin gaafanne, kanaaf gara isaatti hin deebisin. FAQ fi meeshaalee deeggarsaa siif kennaman irraa deebisi. Sirriitti deebisuu yoo hin dandeenye, ifatti himi, gaaffii sana gara garee deeggarsaatti dabarsuuf fedhii agarsiisi.';

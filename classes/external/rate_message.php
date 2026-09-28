@@ -71,7 +71,12 @@ class rate_message extends external_api {
         // Validate context — user must have access to the course.
         $coursecontext = \context_course::instance($message->courseid);
         self::validate_context($coursecontext);
-        require_capability('local/ai_course_assistant:use', $coursecontext);
+        // The course comes from the stored message, not from a parameter: this
+        // endpoint takes a message id and derives everything else from it.
+        \local_ai_course_assistant\support_mode::require_use(
+            (int) $message->courseid,
+            $coursecontext
+        );
 
         // Ownership: a learner may only rate messages in their OWN
         // conversation. Course capability alone would let any enrolled user

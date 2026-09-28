@@ -3098,3 +3098,11 @@ $string['settings:max_audio_mb_capped'] = 'Grensen på denne serveren settes av 
 $string['voice:error_unavailable'] = 'Transkripsjonstjenesten er ikke tilgjengelig akkurat nå. Prøv igjen om litt.';
 
 $string['settings:max_audio_mb_range'] = 'Skriv inn et tall mellom {$a->min} og {$a->max}. Større verdier kan ikke overholdes: endepunktet begrenser til {$a->max}, så feltet ville oppgi en grense koden ikke håndhever.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Bruke assistenten utenfor et kurs';
+$string['settings:support_enabled'] = 'Slå på støttemodus utenfor kurs';
+$string['settings:support_enabled_desc'] = 'La studentene åpne [[tutorshort]] på sider som ikke er et kurs, for eksempel kontrollpanelet eller profilen sin, slik at de kan spørre om påmelding, kursbevis, tekniske problemer og andre støttespørsmål. Det krever at det er valgt et støttekurs nedenfor. Studentene må dessuten ha rettigheten "Bruke assistenten utenfor et kurs", som innloggede brukere har som standard.';
+$string['settings:support_courseid'] = 'Støttekurs';
+$string['settings:support_courseid_desc'] = 'ID-en til et synlig kurs som inneholder materiellet deres for kom i gang, introduksjon og orientering. Støttesamtaler besvares ut fra dette kurset og FAQ-en ovenfor, og registreres på det. La feltet stå tomt for å slå av støttemodus. Forsiden på nettstedet (kurs 1) godtas ikke.';
+$string['support:promptrole'] = 'Du svarer på et støttespørsmål som er stilt utenfor alle kurs. Studenten spør ikke om kursinnhold, så ikke henvis tilbake til det. Svar ut fra FAQ-en og støttematerialet du har fått. Hvis du ikke kan svare presist, si det rett ut og tilby å sende spørsmålet videre til støtteteamet.';

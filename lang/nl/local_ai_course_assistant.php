@@ -3123,3 +3123,11 @@ $string['settings:max_audio_mb_capped'] = 'De limiet op deze server is PHP, niet
 $string['voice:error_unavailable'] = 'De transcriptiedienst is op dit moment niet beschikbaar. Probeer het zo meteen opnieuw.';
 
 $string['settings:max_audio_mb_range'] = 'Voer een getal tussen {$a->min} en {$a->max} in. Grotere waarden kunnen niet worden nageleefd: het eindpunt begrenst op {$a->max}, dus het veld zou een limiet noemen die de code niet afdwingt.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'De assistent buiten een cursus gebruiken';
+$string['settings:support_enabled'] = 'Ondersteuningsmodus buiten cursussen inschakelen';
+$string['settings:support_enabled_desc'] = 'Laat cursisten [[tutorshort]] openen op pagina\'s die geen cursus zijn, zoals het dashboard of hun profiel, om vragen te stellen over inschrijving, certificaten, technische problemen en andere ondersteuningsvragen. Hiervoor moet hieronder een ondersteuningscursus zijn ingesteld. Cursisten hebben daarnaast het toegangsrecht "De assistent buiten een cursus gebruiken" nodig, dat geauthenticeerde gebruikers standaard hebben.';
+$string['settings:support_courseid'] = 'Ondersteuningscursus';
+$string['settings:support_courseid_desc'] = 'Het ID van een zichtbare cursus met uw introductie-, onboarding- en oriëntatiemateriaal. Ondersteuningsgesprekken worden beantwoord op basis van deze cursus en de FAQ hierboven, en worden bij deze cursus vastgelegd. Laat leeg om de ondersteuningsmodus uit te schakelen. De startpagina van de site (cursus 1) wordt niet geaccepteerd.';
+$string['support:promptrole'] = 'Je beantwoordt een ondersteuningsvraag die buiten een cursus is gesteld. De cursist vraagt niet naar cursusinhoud, dus verwijs er niet naar terug. Beantwoord de vraag op basis van de FAQ en het ondersteuningsmateriaal dat je hebt gekregen. Als je niet nauwkeurig kunt antwoorden, zeg dat dan gewoon en bied aan de vraag door te geven aan het ondersteuningsteam.';

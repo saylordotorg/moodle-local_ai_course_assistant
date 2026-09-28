@@ -3152,3 +3152,11 @@ $string['settings:max_audio_mb_capped'] = 'Batasnya di server ini adalah PHP, bu
 $string['voice:error_unavailable'] = 'Layanan transkripsi sedang tidak tersedia. Silakan coba lagi sebentar lagi.';
 
 $string['settings:max_audio_mb_range'] = 'Masukkan angka antara {$a->min} dan {$a->max}. Nilai yang lebih besar tidak dapat dipenuhi: endpoint membatasi ke {$a->max}, sehingga kolom ini akan menyatakan batas yang tidak diberlakukan kode.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Gunakan asisten di luar kursus';
+$string['settings:support_enabled'] = 'Aktifkan mode dukungan di luar kursus';
+$string['settings:support_enabled_desc'] = 'Izinkan pelajar membuka [[tutorshort]] di halaman yang bukan kursus, seperti dasbor atau halaman profil mereka, untuk bertanya tentang pendaftaran, sertifikat, masalah teknis, dan pertanyaan dukungan lainnya. Kursus dukungan harus ditetapkan di bawah ini. Pelajar tetap memerlukan kemampuan "Gunakan asisten di luar kursus", yang secara bawaan dimiliki oleh pengguna terautentikasi.';
+$string['settings:support_courseid'] = 'Kursus dukungan';
+$string['settings:support_courseid_desc'] = 'ID sebuah kursus yang terlihat dan memuat materi panduan memulai, pengenalan, dan orientasi Anda. Percakapan dukungan dijawab berdasarkan kursus ini ditambah FAQ di atas, dan dicatat pada kursus tersebut. Kosongkan untuk menonaktifkan mode dukungan. Beranda situs (kursus 1) tidak diterima.';
+$string['support:promptrole'] = 'Anda sedang menjawab pertanyaan dukungan dari luar kursus mana pun. Pelajar tidak menanyakan materi kursus, jadi jangan arahkan mereka ke materi tersebut. Jawablah berdasarkan FAQ dan materi dukungan yang telah diberikan kepada Anda. Jika Anda tidak dapat menjawab secara akurat, katakan terus terang dan tawarkan untuk meneruskan pertanyaan itu kepada tim dukungan.';

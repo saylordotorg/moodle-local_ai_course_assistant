@@ -3099,3 +3099,11 @@ $string['settings:max_audio_mb_capped'] = 'Limita pe acest server este dată de 
 $string['voice:error_unavailable'] = 'Serviciul de transcriere nu este disponibil în acest moment. Încercați din nou peste puțin timp.';
 
 $string['settings:max_audio_mb_range'] = 'Introduceți un număr între {$a->min} și {$a->max}. Valorile mai mari nu pot fi respectate: punctul final limitează la {$a->max}, deci câmpul ar indica o limită pe care codul nu o aplică.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Utilizarea asistentului în afara unui curs';
+$string['settings:support_enabled'] = 'Activarea modului de asistență în afara cursurilor';
+$string['settings:support_enabled_desc'] = 'Permite cursanților să deschidă [[tutorshort]] și pe pagini care nu aparțin unui curs, precum tabloul de bord sau profilul propriu, pentru a pune întrebări despre înscriere, certificate, probleme tehnice și alte subiecte de asistență. Este necesar să fie setat mai jos un curs de asistență. În plus, cursanții au nevoie de capabilitatea „Utilizarea asistentului în afara unui curs”, pe care utilizatorii autentificați o dețin în mod implicit.';
+$string['settings:support_courseid'] = 'Curs de asistență';
+$string['settings:support_courseid_desc'] = 'ID-ul numeric al unui curs vizibil care conține materialele de început, de integrare și de orientare. Conversațiile de asistență primesc răspuns din acest curs și din întrebările frecvente de mai sus și sunt înregistrate în dreptul lui. Lăsați gol pentru a dezactiva modul de asistență. Prima pagină a site-ului (cursul 1) nu este acceptată.';
+$string['support:promptrole'] = 'Răspunzi la o întrebare de asistență pusă în afara oricărui curs. Cursantul nu întreabă despre materialul cursului, așa că nu îl redirecționa către acesta. Răspunde pe baza întrebărilor frecvente și a materialelor de asistență care ți-au fost puse la dispoziție. Dacă nu poți răspunde cu exactitate, spune acest lucru clar și oferă-te să transmiți întrebarea echipei de asistență.';

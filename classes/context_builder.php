@@ -648,7 +648,19 @@ class context_builder {
         // when an administrator has edited it since. In each of those a site
         // must keep getting its FAQ rather than silently losing it to a stale
         // background index.
-        $faq = faq_manager::is_retrievable($courseid) ? '' : faq_manager::get_faq_for_prompt();
+        //
+        // v7.5.7: on a support turn the FAQ is inlined unconditionally. Support
+        // mode has no course material to fall back on, so the FAQ is not one
+        // source among several, it is most of the payload. is_retrievable() has a
+        // documented double-miss (see faq_manager, v7.4.5): after an embedding
+        // model migration the FAQ is indexed under the old model, classify_row()
+        // refuses to score it, yet is_retrievable() can still report true -- and
+        // the inline copy is dropped on the strength of that. In a course that
+        // degrades an answer. Here it would empty the prompt.
+        $issupport = \local_ai_course_assistant\support_mode::is_support_turn($courseid);
+        $faq = (!$issupport && faq_manager::is_retrievable($courseid))
+            ? ''
+            : faq_manager::get_faq_for_prompt();
         // v7.2.9 (S12): the escalation marker is gated on escalation being
         // AVAILABLE, not on the FAQ happening to be inline.
         //
@@ -680,6 +692,27 @@ class context_builder {
             self::get_marker_instructions($ragmode, $offtopicon, $canescalate),
             0
         );
+
+        // v7.5.7: support framing. The shipped template tells the model it is
+        // coaching a student "enrolled in {{coursename}}" and to "redirect
+        // learners back to course materials when questions fall outside the
+        // course" -- both exactly wrong on a support turn, where being outside
+        // the course IS the question. This section overrides that in place.
+        //
+        // CAT_SAFETY so it is exempt from the drop loop and the truncation cap:
+        // if the budget squeezes it out, the model reverts to telling a learner
+        // with a login problem to consult their course materials. It is added as
+        // a NEW section rather than by editing get_security_instructions(), which
+        // is pinned by the jailbreak corpora.
+        if ($issupport) {
+            $sections[] = new section(
+                'support_role',
+                section::CAT_SAFETY,
+                97,
+                "\n\n## Support conversation\n" . get_string('support:promptrole', 'local_ai_course_assistant'),
+                0
+            );
+        }
 
         // Safety — security guidance always lands in full (never truncated).
         $sections[] = new section('security', section::CAT_SAFETY, 100, self::get_security_instructions(), 0);
