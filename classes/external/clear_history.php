@@ -43,8 +43,15 @@ class clear_history extends external_api {
             'courseid' => $courseid,
         ]);
 
+        // validate_context() ends in require_login(..., $preventredirect = true),
+        // which enforces ENROLMENT for a course context and throws before this
+        // function body runs. A support learner is not enrolled in the support
+        // course, so on a support turn the request is validated at system context
+        // instead; require_use() below still decides whether they may be here.
         $context = \context_course::instance($params['courseid']);
-        self::validate_context($context);
+        self::validate_context(
+            \local_ai_course_assistant\support_mode::validation_context((int) $courseid, $context)
+        );
         \local_ai_course_assistant\support_mode::require_use(
             (int) $courseid,
             $context

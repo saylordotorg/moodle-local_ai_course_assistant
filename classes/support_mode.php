@@ -279,6 +279,37 @@ class support_mode {
     }
 
     /**
+     * The context an external function should validate for this request.
+     *
+     * external_api::validate_context() does more than check the context is in
+     * scope: it ends with `require_login($course, false, $cm, false, true)`, and
+     * that last argument makes it THROW require_login_exception rather than
+     * redirect. For a course context that means enrolment is enforced there,
+     * before the function body runs and therefore before any capability check.
+     *
+     * A support learner is by definition not enrolled in the support course, so
+     * validating the course context would reject exactly the people the feature
+     * is for -- and it would do it during the drawer's boot calls (get_config,
+     * get_history), so the widget would render on the dashboard and then fail to
+     * open, with a login exception rather than a permission error to explain it.
+     *
+     * On a support turn the request is therefore validated at system context: the
+     * learner has to be logged in, and require_use() still decides whether they
+     * may be here. sse.php does not need this because it uses a bare
+     * require_login() with no course argument.
+     *
+     * @param int $courseid Course id the request carries.
+     * @param \context $coursecontext Context to validate on the ordinary path.
+     * @return \context
+     */
+    public static function validation_context(int $courseid, \context $coursecontext): \context {
+        if (self::is_support_turn($courseid) && self::can_use()) {
+            return \context_system::instance();
+        }
+        return $coursecontext;
+    }
+
+    /**
      * Enforce access for a request that may be a support turn.
      *
      * The per-course :use capability is the wrong question on a support turn: a
