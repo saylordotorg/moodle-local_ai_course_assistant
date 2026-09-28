@@ -675,15 +675,7 @@ class hook_callbacks {
         // the quiz chip when it is false, so filtering to empty would put the
         // chip straight back.
         if ($supportmode) {
-            $starters = array_values(array_filter(
-                $starters,
-                static function (array $starter): bool {
-                    if (($starter['type'] ?? 'prompt') !== 'prompt') {
-                        return false;
-                    }
-                    return !in_array($starter['key'] ?? '', ['focus-next', 'study-plan'], true);
-                }
-            ));
+            $starters = \local_ai_course_assistant\support_mode::filter_starters($starters);
         }
 
         // v5.7.0 / Feature C — personalize the focus-next starter chip with the
@@ -856,10 +848,6 @@ class hook_callbacks {
         //
         // Deliberately a suppression list rather than widening the capability:
         // these features are about course material, and there is none here.
-        if ($supportmode) {
-            $pathenabled = false;
-        }
-
         // Render template.
         $templatedata = [
             'avataranim'         => $avataranim,
@@ -959,6 +947,7 @@ class hook_callbacks {
             'surveytrigger'      => self::config_int_with_default('survey_trigger_messages', 10),
             'completionpct'      => $completionpct,
             'contextdebugvisible' => $cansiteconfig,
+            'quizenabled'        => true,
             'starters'           => $starters,
             'startersjson'       => json_encode($starters),
             'startericoncolor'   => $startericoncolor,
@@ -970,18 +959,17 @@ class hook_callbacks {
             'serverpageheading'  => $serverpageheading,
             'llmoptionsjson'     => json_encode($llmoptions),
             'hasstarterdata'     => $hasstarterdata,
-            'voicetabenabled'    => !$supportmode && self::is_voice_tab_enabled($courseid),
+            'voicetabenabled'    => self::is_voice_tab_enabled($courseid),
             'voiceenabled'       => \local_ai_course_assistant\voice_registry::any_voice_enabled(),
             // v6.9.7: active-learners indicator, off by default. Gating the
             // markup here means the 60-second poll never starts on a site that
             // has not opted in — chat.js only builds the poller if the element
             // is present.
-            'activelearnersenabled' => !$supportmode && (bool) get_config(
+            'activelearnersenabled' => (bool) get_config(
                 'local_ai_course_assistant', 'active_learners_enabled'),
             // Mastery feature: both flags gated on master switch so the chip
             // never renders when mastery tracking is off for the course.
-            'masteryenabled'     => !$supportmode
-                && \local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid),
+            'masteryenabled'     => \local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid),
             'masterychipenabled' => \local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid)
                 && \local_ai_course_assistant\objective_manager::is_chip_enabled_for_course($courseid),
             'masterydashboardenabled' => \local_ai_course_assistant\objective_manager::is_dashboard_enabled_for_course($courseid),
@@ -992,9 +980,8 @@ class hook_callbacks {
             // content to send). 'unset' means show the prompt; 'opted_in'
             // and 'declined' both mean hide it.
             'digestoptinstate'   => self::digest_optin_state($courseid),
-            'showdigestoptin'    => !$supportmode && self::digest_optin_state($courseid) === 'unset',
-            'flashcardsenabled'  => !$supportmode
-                && \local_ai_course_assistant\flashcard_manager::is_enabled_for_course($courseid),
+            'showdigestoptin'    => self::digest_optin_state($courseid) === 'unset',
+            'flashcardsenabled'  => \local_ai_course_assistant\flashcard_manager::is_enabled_for_course($courseid),
             'flashcardsurl'      => (new \moodle_url(
                 '/local/ai_course_assistant/flashcards.php',
                 ['courseid' => $courseid]
@@ -1043,6 +1030,18 @@ class hook_callbacks {
             // "</script>" cannot break out of the inline script tag in the
             // template ({{{i18n_json}}} is intentionally unescaped).
             $templatedata['i18n_json'] = json_encode(self::get_js_strings(), JSON_HEX_TAG);
+        }
+
+        // v7.5.7: one pass, immediately before rendering, that forces off every
+        // drawer feature whose endpoint is still gated on the per-course
+        // capability. Deliberately NOT written as `!$supportmode &&` at each
+        // flag's own line: that was the first implementation, and a review found
+        // seven flags that had been missed that way -- the reminder toggles, the
+        // mastery chip and dashboard, the survey, user testing and the talking
+        // avatar. A miss is invisible in review, because the flag simply keeps
+        // its course-mode value, so keeping the list in one place is the control.
+        if ($supportmode) {
+            $templatedata = \local_ai_course_assistant\support_mode::suppress_course_features($templatedata);
         }
 
         $html = $OUTPUT->render_from_template('local_ai_course_assistant/chat_widget', $templatedata);

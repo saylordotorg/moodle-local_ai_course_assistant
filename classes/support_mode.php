@@ -362,6 +362,104 @@ class support_mode {
     }
 
     /**
+     * Template flags forced off in support mode, and the value to force them to.
+     *
+     * ONE list, because the alternative was tried and failed five times. The
+     * suppressions started as `!$supportmode &&` written inline at each call
+     * site, and a review found seven more flags that had been missed -- the
+     * reminder toggles, the mastery chip and dashboard, the survey, the user
+     * testing prompt and the talking-avatar button. Each one renders a control
+     * whose endpoint is still gated on the per-course capability, so the learner
+     * clicks it and gets nothing. The reminder toggles were the worst of them:
+     * the write is swallowed client-side, so the learner sets a reminder, sees it
+     * accepted, and no reminder is ever sent.
+     *
+     * The value matters. Most of these are booleans the template tests for
+     * truthiness, but `surveyenabled` and `usertestingenabled` are '1'/'0'
+     * STRINGS -- and '0' is truthy in mustache, so forcing them to false is
+     * wrong and forcing them to '0' is right.
+     *
+     * Anything added to the drawer that calls an endpoint gated on :use belongs
+     * here. tests/support_mode_suppression_test.php asserts the list is applied.
+     */
+    public const SUPPRESSED_FLAGS = [
+        // Course progress and study tooling.
+        'pathenabled'             => false,
+        'masteryenabled'          => false,
+        'masterychipenabled'      => false,
+        'masterydashboardenabled' => false,
+        'flashcardsenabled'       => false,
+        'showdigestoptin'         => false,
+        // Reminders: the panel writes through an endpoint that refuses, and the
+        // client swallows the failure, so the learner is told it worked.
+        'emailreminders'          => false,
+        'whatsappreminders'       => false,
+        // Polls that fire on a timer or on every turn regardless of a click.
+        'activelearnersenabled'   => false,
+        'surveyenabled'           => '0',
+        'usertestingenabled'      => '0',
+        // Voice, avatar and quiz surfaces.
+        'voicetabenabled'         => false,
+        'talkingavatarenabled'    => false,
+        'quizenabled'             => false,
+    ];
+
+    /**
+     * Force every course-only drawer feature off for a support-mode render.
+     *
+     * Applied to the assembled template data as a single pass, immediately before
+     * rendering, rather than at each key's own line. A miss here is invisible in
+     * review -- the flag simply keeps its course-mode value -- so the list being
+     * in one place is the control.
+     *
+     * Keys absent from the data are ignored rather than added, so this cannot
+     * invent a flag the template does not use.
+     *
+     * @param array $data Assembled template data.
+     * @return array
+     */
+    public static function suppress_course_features(array $data): array {
+        foreach (self::SUPPRESSED_FLAGS as $key => $off) {
+            if (array_key_exists($key, $data)) {
+                $data[$key] = $off;
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * Starters a support turn can actually service.
+     *
+     * Extracted from the injector so it can be tested through the code that runs,
+     * rather than by a test re-implementing the same filter and asserting against
+     * its own copy -- which is what the first version of this test did, and it
+     * would have passed however the production filter behaved.
+     *
+     * Anything that is not a plain prompt goes through an endpoint still gated on
+     * the per-course capability: quiz through generate_quiz, voice and
+     * pronunciation through get_realtime_token and score_speech. 'focus-next' and
+     * 'study-plan' are plain prompts but are about course progress, which does not
+     * exist here.
+     *
+     * @param array $starters
+     * @return array
+     */
+    public static function filter_starters(array $starters): array {
+        return array_values(array_filter(
+            $starters,
+            static function ($starter): bool {
+                if (!is_array($starter)) {
+                    return false;
+                }
+                if (($starter['type'] ?? 'prompt') !== 'prompt') {
+                    return false;
+                }
+                return !in_array($starter['key'] ?? '', ['focus-next', 'study-plan'], true);
+            }
+        ));
+    }
+
+    /**
      * Clear the per-request memo. Tests only.
      *
      * @return void
