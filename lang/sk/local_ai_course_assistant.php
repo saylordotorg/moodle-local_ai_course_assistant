@@ -3099,3 +3099,11 @@ $string['settings:max_audio_mb_capped'] = 'Limit na tomto serveri určuje PHP, n
 $string['voice:error_unavailable'] = 'Služba prepisu momentálne nie je dostupná. Skúste to prosím o chvíľu znova.';
 
 $string['settings:max_audio_mb_range'] = 'Zadajte číslo medzi {$a->min} a {$a->max}. Vyššie hodnoty nemožno dodržať: koncový bod obmedzuje na {$a->max}, takže pole by uvádzalo limit, ktorý kód nevynucuje.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Používať asistenta mimo kurzu';
+$string['settings:support_enabled'] = 'Povoliť režim podpory mimo kurzov';
+$string['settings:support_enabled_desc'] = 'Umožní študujúcim otvoriť [[tutorshort]] aj na stránkach, ktoré nie sú kurzom, napríklad na nástenke alebo v profile, a pýtať sa na zápis, certifikáty, technické problémy a ďalšie otázky pre podporu. Vyžaduje nastavenie kurzu podpory nižšie. Študujúci navyše potrebujú oprávnenie „Používať asistenta mimo kurzu“, ktoré overení používatelia majú predvolene.';
+$string['settings:support_courseid'] = 'Kurz podpory';
+$string['settings:support_courseid_desc'] = 'ID viditeľného kurzu s vašimi úvodnými, uvítacími a orientačnými materiálmi. Odpovede v režime podpory vychádzajú z tohto kurzu a z často kladených otázok vyššie a zaznamenávajú sa k nemu. Ak chcete režim podpory vypnúť, nechajte pole prázdne. Titulnú stránku webu (kurz 1) nemožno použiť.';
+$string['support:promptrole'] = 'Odpovedáš na otázku pre podporu položenú mimo akéhokoľvek kurzu. Študujúci sa nepýta na obsah kurzu, preto ho naň neodkazuj. Odpovedaj z často kladených otázok a z materiálov podpory, ktoré máš k dispozícii. Ak nedokážeš odpovedať presne, povedz to otvorene a ponúkni, že otázku odovzdáš tímu podpory.';

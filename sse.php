@@ -129,7 +129,10 @@ $clientmodel     = trim(optional_param('model', '', PARAM_TEXT));
 if ($logonly) {
     header('Content-Type: application/json');
     $context = context_course::instance($courseid);
-    require_capability('local/ai_course_assistant:use', $context);
+    \local_ai_course_assistant\support_mode::require_use(
+        (int) $courseid,
+        $context
+    );
     $userid = $USER->id;
     $conv = conversation_manager::get_or_create_conversation($userid, $courseid);
     // Parse duration from message like "[Realtime Voice Session: 120s]".
@@ -169,7 +172,10 @@ if ($englishlock) {
 
 // Validate context and capability.
 $context = context_course::instance($courseid);
-require_capability('local/ai_course_assistant:use', $context);
+\local_ai_course_assistant\support_mode::require_use(
+    (int) $courseid,
+    $context
+);
 
 // v5.5.4: derive caller role for downstream branches (e.g., post-response
 // student-profile auto-update). Anyone without the manage capability is a
@@ -375,7 +381,10 @@ try {
     // v7.2.4, so exempting them here only replaces a clear explanation with a
     // generic provider error.
     $lockedattempt = (!CLI_SCRIPT && !empty($USER->id))
-        ? \local_ai_course_assistant\quiz_lock::active_attempt((int) $USER->id, (int) $courseid)
+        ? \local_ai_course_assistant\quiz_lock::active_attempt(
+            (int) $USER->id,
+            \local_ai_course_assistant\support_mode::integrity_scope((int) $courseid)
+        )
         : null;
     if ($lockedattempt !== null) {
         // v7.2.7: record the refusal. Without this the audit log cannot tell a

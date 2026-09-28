@@ -2800,6 +2800,30 @@ if ($hassiteconfig) {
         PARAM_RAW_TRIMMED
     ));
 
+    // v7.5.7: support mode. Sits with the FAQ and supplemental courses because it
+    // is the same idea carried outside the course boundary: the FAQ is the answer
+    // an administrator wrote down, a supplemental course is an answer that already
+    // exists as a course, and this is the surface that lets a learner reach either
+    // one when they are not in a course at all.
+    //
+    // Bound to a real course id rather than SITEID on purpose -- see the header of
+    // \local_ai_course_assistant\support_mode for the five things SITEID already
+    // means and the two of them that would produce wrong answers.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/support_enabled',
+        \local_ai_course_assistant\branding::str('settings:support_enabled'),
+        \local_ai_course_assistant\branding::str('settings:support_enabled_desc'),
+        0
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/support_courseid',
+        \local_ai_course_assistant\branding::str('settings:support_courseid'),
+        \local_ai_course_assistant\branding::str('settings:support_courseid_desc'),
+        '',
+        PARAM_INT
+    ));
+
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/zendesk_enabled',
         get_string('settings:zendesk_enabled', 'local_ai_course_assistant'),

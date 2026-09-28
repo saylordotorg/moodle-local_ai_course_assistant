@@ -3120,3 +3120,11 @@ $string['settings:max_audio_mb_capped'] = 'Ci sarwëer bii, PHP moo doon dayo bi
 $string['voice:error_unavailable'] = 'Sarwisu bind bi amul léegi. Jéemaatal ci kanam tuuti.';
 
 $string['settings:max_audio_mb_range'] = 'Bindal benn limu ci diggante {$a->min} ak {$a->max}. Limu gëna mag mënul ñu ko topp: dan bi mooy {$a->max}, kon barab bi dina wax dayo bu kod bi dul jëfandikoo.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Jëfandikoo ndimbalkat bi ci biti kurs';
+$string['settings:support_enabled'] = 'Ubbi mode ndimbal bi ci biti kurs yi';
+$string['settings:support_enabled_desc'] = 'Mayal ndongo yi ñu ubbi [[tutorshort]] ci xët yi dul kurs, ni tableau de bord bi walla seen profil, ngir laaj ci inskripsion, atestasion, jafe-jafe yu teknik ak yeneen laaj yu ndimbal. Fàww nga def benn kurs ndimbal ci suuf. Ndongo yi war nañu am it kàttan gi tudd "Jëfandikoo ndimbalkat bi ci biti kurs", te jëfandikukat yi ñu wóoraale ñoo ko am ci seen bopp.';
+$string['settings:support_courseid'] = 'Kurs ndimbal';
+$string['settings:support_courseid_desc'] = 'ID bu benn kurs bu ñuy gis, bu ëmb say jumtukaay yu tàmbali, yu jàppale ndongo yu bees ak yu jubbanti. Waxtaan yu ndimbal dañuy jóge ci kurs boobu ak FAQ bi ci kaw, te ñu koy bind ci kurs boobu. Bàyyil ko dara ngir fey mode ndimbal bi. Kër site bi (kurs 1) duñu ko nangu.';
+$string['support:promptrole'] = 'Yaa ngi tontu benn laaj ndimbal bu jóge ci biti kurs. Ndongo li laajul ci njël kurs bi, kon bu ko yóbbe fa. Tontul jóge ci FAQ bi ak ci njël ndimbal li ñu la jox. Su fekkee mënuloo tontu bu wóor, waxal ko ci lu leer te joxe yoon ngir yóbbu laaj bi ci ekibu ndimbal bi.';

@@ -108,7 +108,10 @@ class generate_quiz extends external_api {
         // which would leave this one button still refusing because of an attempt
         // in an unrelated course -- the exact P1 v7.2.5 exists to fix -- while
         // chat in the same drawer answered normally.
-        $lockedattempt = quiz_lock::active_attempt($userid, $courseid);
+        $lockedattempt = quiz_lock::active_attempt(
+            $userid,
+            \local_ai_course_assistant\support_mode::integrity_scope($courseid)
+        );
         if ($lockedattempt !== null) {
             quiz_lock::record_refusal($userid, $courseid, $lockedattempt, 'quiz');
             return self::quiz_locked_result();
@@ -246,7 +249,10 @@ class generate_quiz extends external_api {
             // another course makes this true even though base_provider allowed
             // the call, and the learner is told to submit a quiz they are not
             // sitting while the real, retryable error is discarded.
-            $racedattempt = quiz_lock::active_attempt($userid, $courseid);
+            $racedattempt = quiz_lock::active_attempt(
+                $userid,
+                \local_ai_course_assistant\support_mode::integrity_scope($courseid)
+            );
             if ($racedattempt !== null) {
                 quiz_lock::record_refusal($userid, $courseid, $racedattempt, 'quiz');
                 return self::quiz_locked_result();

@@ -3144,3 +3144,11 @@ $string['settings:max_audio_mb_capped'] = 'Xadka serverkan waa PHP, ma ahan deji
 $string['voice:error_unavailable'] = 'Adeegga qoraalku hadda ma diyaar aha. Fadlan mar kale isku day daqiiqado kadib.';
 
 $string['settings:max_audio_mb_range'] = 'Geli tiro u dhaxaysa {$a->min} iyo {$a->max}. Qiimayaasha ka weyn lama fulin karo: barta dhamaadka waxay ku xaddidaysaa {$a->max}, sidaas darteed goobtu waxay sheegi lahayd xad aan koodku fulin.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Isticmaal kaaliyaha meel koorsi ka baxsan';
+$string['settings:support_enabled'] = 'Daar habka taageerada ee koorsooyinka ka baxsan';
+$string['settings:support_enabled_desc'] = 'Waxay ardayda u oggolaanaysaa inay [[tutorshort]] ka furaan bogag aan koorsi ahayn, sida dashboard-ka ama astaantooda, si ay u weydiiyaan diiwaangelinta, shahaadooyinka, dhibaatooyinka farsamada iyo su\'aalo kale oo taageero ah. Waxaa lagama maarmaan ah in hoos laga doorto koorsi taageero. Weliba ardaydu waxay u baahan yihiin awoodda "Isticmaal kaaliyaha meel koorsi ka baxsan", taas oo isticmaalayaasha la xaqiijiyay ay si caadi ah u haystaan.';
+$string['settings:support_courseid'] = 'Koorsada taageerada';
+$string['settings:support_courseid_desc'] = 'Aqoonsiga (ID) koorsi muuqda oo ay ku jiraan agabkaaga bilowga, soo-dhoweynta iyo hordhaca. Wada-hadallada taageerada waxaa laga jawaabaa koorsadan iyo FAQ-ga kor ku xusan, waxaana lagu diiwaangeliyaa koorsadaas. Bannaan u dhaaf si aad u damiso habka taageerada. Bogga hore ee goobta (koorsada 1) lama aqbalo.';
+$string['support:promptrole'] = 'Waxaad ka jawaabaysaa su\'aal taageero oo ka timid meel koorsi ka baxsan. Ardaygu ma weydiinayo waxa koorsada ku jira, sidaas darteed ha u dirin agabka koorsada. Ka jawaab FAQ-ga iyo agabka taageerada ee lagu siiyay. Haddaadan si sax ah uga jawaabi karin, si cad u sheeg, kadibna u soo bandhig inaad su\'aasha u gudbiso kooxda taageerada.';

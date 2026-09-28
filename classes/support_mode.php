@@ -1,0 +1,470 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace local_ai_course_assistant;
+
+/**
+ * Site-level support mode: the assistant on pages that are not a course.
+ *
+ * The problem this solves: a learner who cannot find the syllabus, cannot submit
+ * an assignment, or cannot get logged in has no way to reach the assistant,
+ * because it only renders inside a course. That is the population with the most
+ * urgent questions and the least ability to self-serve.
+ *
+ * WHY THIS BINDS TO A REAL COURSE RATHER THAN SITEID
+ *
+ * The obvious implementation is to render on non-course pages and pass SITEID as
+ * the course id. That was measured against the code and rejected. SITEID is not
+ * a free slot; it already carries at least five distinct meanings:
+ *
+ *   1. The FAQ chunk namespace (faq_manager writes modtype='faq' rows at SITEID,
+ *      and content_indexer carves them out of three separate predicates so a
+ *      site-course reindex cannot delete them).
+ *   2. The "no course supplied" null object in conversation_manager, tts,
+ *      transcribe, soapbox_transcribe and voyage_reranker's spend log.
+ *   3. The booking code for background embedding, rerank and benchmark spend.
+ *   4. Moodle's own front-page course.
+ *   5. The exclusion floor in embedding_migration, which enumerates courses with
+ *      `courseid > SITEID` -- so any chunk written at SITEID is structurally
+ *      invisible to an embedding-model migration, silently and forever.
+ *
+ * Two of those are not merely untidy, they are wrong answers. conversation_manager
+ * has a UNIQUE index on (userid, courseid) and ALREADY creates a SITEID
+ * conversation: record_meta_query() (Learning Radar) writes user/assistant rows
+ * against it. get_messages() filters on role, not on interaction type, so a
+ * support turn at SITEID would load the learner's Learning Radar prose as its
+ * chat history -- into the prompt and into the drawer. And spend_guard::get_cap()
+ * is keyed on courseid, so every user's support traffic across the whole site
+ * would meter against the site course's single per-course cap.
+ *
+ * Binding to an administrator-designated REAL course avoids all of it by
+ * construction rather than by special-casing. The conversation gets its own row,
+ * spend meters against a course an administrator can configure, the prompt cache
+ * key stops collapsing every non-course surface onto one entry per user, the
+ * embedding migration can see the chunks, and -- the decisive practical point --
+ * every existing `require_capability(':use', context_course::instance($courseid))`
+ * site keeps working against a context that genuinely exists. There are about
+ * forty-five of those, including get_config and get_history, which the drawer
+ * calls before it can render anything at all.
+ *
+ * WHAT AN ADMINISTRATOR HAS TO DO
+ *
+ * Point `support_courseid` at a real, visible course holding the getting-started
+ * and onboarding material, and tick `support_enabled`. Retrieval then reaches
+ * that course's already-indexed content plus the site FAQ, with no new indexing
+ * pipeline, exactly as supplemental_sources does for course-to-course reach.
+ *
+ * @package    local_ai_course_assistant
+ * @copyright  2026 Tom Caswell / Saylor University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class support_mode {
+
+    /**
+     * Capability that lets an authenticated user open the assistant off-course.
+     *
+     * Deliberately a NEW capability at CONTEXT_SYSTEM rather than granting the
+     * existing :use capability to the 'user' archetype. Archetypes apply at every
+     * context, so adding 'user' => CAP_ALLOW to :use would switch the widget on
+     * in every course on the site by inheritance and defeat the per-course
+     * opt-out that default_course_mode exists to provide.
+     */
+    public const CAPABILITY = 'local/ai_course_assistant:usesupport';
+
+    /** @var int|null Per-request memo for the resolved course id. */
+    private static ?int $resolved = null;
+
+    /**
+     * The designated support course id, or 0 when support mode is unusable.
+     *
+     * Validated the same way supplemental_sources validates its list: the course
+     * must exist and be visible. A hidden course is hidden from learners, and
+     * surfacing its content through the assistant would route around that.
+     *
+     * Returns 0 rather than throwing when the setting names a course that has
+     * since been deleted or hidden, so a stale setting degrades to "support mode
+     * is off" instead of breaking every page render on the site.
+     *
+     * @return int
+     */
+    public static function course_id(): int {
+        global $DB;
+
+        if (self::$resolved !== null) {
+            return self::$resolved;
+        }
+
+        $raw = (int) get_config('local_ai_course_assistant', 'support_courseid');
+
+        // SITEID is refused explicitly. Accepting it would reintroduce every
+        // collision documented in this class's header through the back door of
+        // an administrator typing 1 into the box.
+        if ($raw <= 0 || $raw == SITEID) {
+            self::$resolved = 0;
+            return 0;
+        }
+
+        $exists = $DB->record_exists_select('course', 'id = :id AND visible = 1', ['id' => $raw]);
+        self::$resolved = $exists ? $raw : 0;
+        return self::$resolved;
+    }
+
+    /**
+     * Whether support mode is switched on and correctly configured.
+     *
+     * Both halves are required. The checkbox alone is not enough, because a
+     * course id that no longer resolves would otherwise put the widget on every
+     * page of the site pointed at nothing.
+     *
+     * @return bool
+     */
+    public static function is_enabled(): bool {
+        return (bool) get_config('local_ai_course_assistant', 'support_enabled')
+            && self::course_id() > 0;
+    }
+
+    /**
+     * Whether the current user may use the assistant outside a course.
+     *
+     * Guests are excluded here rather than left to the capability. Phase 1 is the
+     * logged-in case only: an unauthenticated streaming LLM endpoint needs
+     * per-IP rate limiting and an anonymous identity story, and neither exists
+     * yet. The capability is also deliberately not granted to the 'guest'
+     * archetype, so this is belt and braces on purpose.
+     *
+     * @return bool
+     */
+    public static function can_use(): bool {
+        if (!isloggedin() || isguestuser()) {
+            return false;
+        }
+        return has_capability(self::CAPABILITY, \context_system::instance());
+    }
+
+    /**
+     * Whether a request carrying this course id is a support turn.
+     *
+     * Note this is true when the learner is genuinely inside the designated
+     * support course as a course, too. That is correct: the same content, the
+     * same corpus and the same conservative integrity scoping should apply
+     * whether they arrived from the dashboard or from the course page.
+     *
+     * @param int $courseid
+     * @return bool
+     */
+    public static function is_support_turn(int $courseid): bool {
+        return $courseid > 0 && self::is_enabled() && $courseid === self::course_id();
+    }
+
+    /**
+     * Course id to scope an academic-integrity check to, for this request.
+     *
+     * quiz_lock::active_attempt() adds `AND cm.course = :courseid` under its
+     * default course scope. The designated support course holds no quizzes, so
+     * passing its id would scope the exam lock to a course with nothing to find
+     * and the lock would never fire -- a learner mid-exam could open the
+     * dashboard in a second tab and get an unlocked assistant. quiz_lock's own
+     * docblock says to pass 0 for a surface with no course context, which falls
+     * back to the site-wide test: the conservative direction for an integrity
+     * control.
+     *
+     * Callers pass their real course id; this returns 0 only on a support turn.
+     *
+     * @param int $courseid
+     * @return int
+     */
+    public static function integrity_scope(int $courseid): int {
+        return self::is_support_turn($courseid) ? 0 : $courseid;
+    }
+
+    /**
+     * Whether the off-course widget should render on the page being built.
+     *
+     * Single source of truth, called by both the footer injector that renders the
+     * widget and the before_http_headers hook that sends its Content-Security-
+     * Policy. Those two have drifted before -- the CSP mirror's docblock claims
+     * checks it does not make -- and a page that renders the widget without the
+     * CSP loses the defence added after the injected-widget incident.
+     *
+     * Read-only and side-effect-free, because the CSP hook runs early and must be
+     * able to ask the same question before the page has finished setting up.
+     *
+     * @param \moodle_page $page
+     * @return bool
+     */
+    public static function renders_here(\moodle_page $page): bool {
+        if (!get_config('local_ai_course_assistant', 'enabled')) {
+            return false;
+        }
+        if (!self::is_enabled() || !self::can_use()) {
+            return false;
+        }
+
+        $context = $page->context ?? null;
+        if (!$context) {
+            return false;
+        }
+
+        // Course contexts belong to the ordinary per-course path, which has its own
+        // gate. The one exception is the site course: it is a course context, but
+        // it is the front page, and the per-course path returns early on it.
+        // Anything above a course -- user (dashboard, profile) and system -- is
+        // ours.
+        //
+        // MODULE contexts are refused, including front-page activities. The
+        // else-if below already refuses them by omission; this states it, because
+        // the reason is not obvious and a later edit widening that branch would
+        // otherwise reopen a real gap.
+        //
+        // The gap: the injector swaps $context for the support course's context,
+        // which makes every later `contextlevel === CONTEXT_MODULE` test false. On
+        // a front-page activity that leaves $modname empty, so the per-quiz
+        // assistance level -- including 'hidden' and 'coach' -- is never read. A
+        // site relying on per-quiz 'hidden' rather than the global quiz lock would
+        // get a fully working assistant on a graded front-page quiz.
+        //
+        // Refusing them also preserves today's behaviour exactly: front-page
+        // activities have never rendered the widget, because the per-course gate
+        // returns early at SITEID.
+        if ($context->contextlevel === CONTEXT_MODULE) {
+            return false;
+        }
+        if ($context->contextlevel === CONTEXT_COURSE) {
+            if ((int) $context->instanceid !== (int) SITEID) {
+                return false;
+            }
+        } else if ($context->contextlevel !== CONTEXT_USER
+                && $context->contextlevel !== CONTEXT_SYSTEM) {
+            return false;
+        }
+
+        // Never on an administration page, and never on the plugin's own pages --
+        // the same two exclusions the per-course gate makes, for the same reasons.
+        if (($page->pagelayout ?? '') === 'admin') {
+            return false;
+        }
+
+        // Path comparisons are made against the wwwroot-relative path, not against
+        // moodle_url::get_path(). get_path() includes the subdirectory of a
+        // subdirectory install ("/moodle/local/..."), so an anchored prefix test
+        // on it silently matches nothing there -- which is how both of these
+        // exclusions first shipped broken, and is why the test harness (whose
+        // wwwroot has a subdirectory) is the environment that catches it.
+        $relative = '';
+        if ($page->url instanceof \moodle_url) {
+            try {
+                $relative = $page->url->out_as_local_url(false);
+            } catch (\moodle_exception $e) {
+                // Not a local URL. Nothing we render belongs on one, so refuse
+                // rather than guess; renders_here() must never throw, because it
+                // is called from a hook on every page of the site.
+                return false;
+            }
+        }
+
+        if ($relative !== '' && strpos($relative, '/local/ai_course_assistant/') === 0) {
+            return false;
+        }
+
+        // Not on the login or signup flow. before_footer_html_generation fires
+        // there too, and a chat drawer over a login form is both useless (the
+        // visitor is not authenticated yet, so can_use() has already refused) and
+        // an invitation to type a password into it.
+        if ($relative !== '' && strpos($relative, '/login/') === 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * The context an external function should validate for this request.
+     *
+     * external_api::validate_context() does more than check the context is in
+     * scope: it ends with `require_login($course, false, $cm, false, true)`, and
+     * that last argument makes it THROW require_login_exception rather than
+     * redirect. For a course context that means enrolment is enforced there,
+     * before the function body runs and therefore before any capability check.
+     *
+     * A support learner is by definition not enrolled in the support course, so
+     * validating the course context would reject exactly the people the feature
+     * is for -- and it would do it during the drawer's boot calls (get_config,
+     * get_history), so the widget would render on the dashboard and then fail to
+     * open, with a login exception rather than a permission error to explain it.
+     *
+     * On a support turn the request is therefore validated at system context: the
+     * learner has to be logged in, and require_use() still decides whether they
+     * may be here. sse.php does not need this because it uses a bare
+     * require_login() with no course argument.
+     *
+     * @param int $courseid Course id the request carries.
+     * @param \context $coursecontext Context to validate on the ordinary path.
+     * @return \context
+     */
+    public static function validation_context(int $courseid, \context $coursecontext): \context {
+        if (self::is_support_turn($courseid) && self::can_use()) {
+            return \context_system::instance();
+        }
+        return $coursecontext;
+    }
+
+    /**
+     * Enforce access for a request that may be a support turn.
+     *
+     * The per-course :use capability is the wrong question on a support turn: a
+     * learner who opened the assistant from their dashboard is by definition not
+     * enrolled in the support course and holds no role in it, so :use there is
+     * false for exactly the people the feature is for.
+     *
+     * Deliberately NOT applied to all ~45 sites that enforce :use. The ones wired
+     * to this are the ones a support conversation needs -- boot, history, the
+     * turn itself, and the feedback controls attached to it. Everything else
+     * (quiz generation, study plans, flashcards, voice, soapbox, analytics) stays
+     * course-only and refuses on a support turn, which is correct: those features
+     * are about course material, and there is none here.
+     *
+     * @param int $courseid Course id the request carries.
+     * @param \context $context Course context to fall back to.
+     * @return void
+     */
+    public static function require_use(int $courseid, \context $context): void {
+        if (self::is_support_turn($courseid) && self::can_use()) {
+            return;
+        }
+        require_capability('local/ai_course_assistant:use', $context);
+    }
+
+    /**
+     * Non-throwing form of {@see require_use()}, for callers that branch.
+     *
+     * @param int $courseid
+     * @param \context $context
+     * @return bool
+     */
+    public static function can_use_in(int $courseid, \context $context): bool {
+        if (self::is_support_turn($courseid) && self::can_use()) {
+            return true;
+        }
+        return has_capability('local/ai_course_assistant:use', $context);
+    }
+
+    /**
+     * Template flags forced off in support mode, and the value to force them to.
+     *
+     * ONE list, because the alternative was tried and failed five times. The
+     * suppressions started as `!$supportmode &&` written inline at each call
+     * site, and a review found seven more flags that had been missed -- the
+     * reminder toggles, the mastery chip and dashboard, the survey, the user
+     * testing prompt and the talking-avatar button. Each one renders a control
+     * whose endpoint is still gated on the per-course capability, so the learner
+     * clicks it and gets nothing. The reminder toggles were the worst of them:
+     * the write is swallowed client-side, so the learner sets a reminder, sees it
+     * accepted, and no reminder is ever sent.
+     *
+     * The value matters. Most of these are booleans the template tests for
+     * truthiness, but `surveyenabled` and `usertestingenabled` are '1'/'0'
+     * STRINGS -- and '0' is truthy in mustache, so forcing them to false is
+     * wrong and forcing them to '0' is right.
+     *
+     * Anything added to the drawer that calls an endpoint gated on :use belongs
+     * here. tests/support_mode_suppression_test.php asserts the list is applied.
+     */
+    public const SUPPRESSED_FLAGS = [
+        // Course progress and study tooling.
+        'pathenabled'             => false,
+        'masteryenabled'          => false,
+        'masterychipenabled'      => false,
+        'masterydashboardenabled' => false,
+        'flashcardsenabled'       => false,
+        'showdigestoptin'         => false,
+        // Reminders: the panel writes through an endpoint that refuses, and the
+        // client swallows the failure, so the learner is told it worked.
+        'emailreminders'          => false,
+        'whatsappreminders'       => false,
+        // Polls that fire on a timer or on every turn regardless of a click.
+        'activelearnersenabled'   => false,
+        'surveyenabled'           => '0',
+        'usertestingenabled'      => '0',
+        // Voice, avatar and quiz surfaces.
+        'voicetabenabled'         => false,
+        'talkingavatarenabled'    => false,
+        'quizenabled'             => false,
+    ];
+
+    /**
+     * Force every course-only drawer feature off for a support-mode render.
+     *
+     * Applied to the assembled template data as a single pass, immediately before
+     * rendering, rather than at each key's own line. A miss here is invisible in
+     * review -- the flag simply keeps its course-mode value -- so the list being
+     * in one place is the control.
+     *
+     * Keys absent from the data are ignored rather than added, so this cannot
+     * invent a flag the template does not use.
+     *
+     * @param array $data Assembled template data.
+     * @return array
+     */
+    public static function suppress_course_features(array $data): array {
+        foreach (self::SUPPRESSED_FLAGS as $key => $off) {
+            if (array_key_exists($key, $data)) {
+                $data[$key] = $off;
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * Starters a support turn can actually service.
+     *
+     * Extracted from the injector so it can be tested through the code that runs,
+     * rather than by a test re-implementing the same filter and asserting against
+     * its own copy -- which is what the first version of this test did, and it
+     * would have passed however the production filter behaved.
+     *
+     * Anything that is not a plain prompt goes through an endpoint still gated on
+     * the per-course capability: quiz through generate_quiz, voice and
+     * pronunciation through get_realtime_token and score_speech. 'focus-next' and
+     * 'study-plan' are plain prompts but are about course progress, which does not
+     * exist here.
+     *
+     * @param array $starters
+     * @return array
+     */
+    public static function filter_starters(array $starters): array {
+        return array_values(array_filter(
+            $starters,
+            static function ($starter): bool {
+                if (!is_array($starter)) {
+                    return false;
+                }
+                if (($starter['type'] ?? 'prompt') !== 'prompt') {
+                    return false;
+                }
+                return !in_array($starter['key'] ?? '', ['focus-next', 'study-plan'], true);
+            }
+        ));
+    }
+
+    /**
+     * Clear the per-request memo. Tests only.
+     *
+     * @return void
+     */
+    public static function reset_cache(): void {
+        self::$resolved = null;
+    }
+}

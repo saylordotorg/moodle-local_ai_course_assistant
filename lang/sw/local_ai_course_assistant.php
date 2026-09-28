@@ -3144,3 +3144,11 @@ $string['settings:max_audio_mb_capped'] = 'Kikomo kwenye seva hii ni PHP, si mpa
 $string['voice:error_unavailable'] = 'Huduma ya unukuzi haipatikani kwa sasa. Tafadhali jaribu tena baada ya muda mfupi.';
 
 $string['settings:max_audio_mb_range'] = 'Weka nambari kati ya {$a->min} na {$a->max}. Thamani kubwa zaidi haziwezi kuheshimiwa: kiunganishi hupunguza hadi {$a->max}, hivyo sehemu hii ingetaja kikomo ambacho msimbo hautekelezi.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Tumia msaidizi nje ya kozi';
+$string['settings:support_enabled'] = 'Washa hali ya msaada nje ya kozi';
+$string['settings:support_enabled_desc'] = 'Huwaruhusu wanafunzi kufungua [[tutorshort]] kwenye kurasa zisizo za kozi, kama dashibodi au wasifu wao, ili kuuliza kuhusu usajili, vyeti, matatizo ya kiufundi na maswali mengine ya msaada. Ni lazima uweke kozi ya msaada hapa chini. Zaidi ya hayo, wanafunzi wanahitaji uwezo wa "Tumia msaidizi nje ya kozi", ambao watumiaji waliothibitishwa wanao kwa chaguo-msingi.';
+$string['settings:support_courseid'] = 'Kozi ya msaada';
+$string['settings:support_courseid_desc'] = 'Kitambulisho (ID) cha kozi inayoonekana yenye nyenzo zako za kuanza, za kuwakaribisha wanafunzi wapya na za utangulizi. Mazungumzo ya msaada hujibiwa kwa kutumia kozi hii pamoja na Maswali Yanayoulizwa Mara kwa Mara hapo juu, na hurekodiwa chini yake. Acha wazi ili kuzima hali ya msaada. Ukurasa wa mwanzo wa tovuti (kozi 1) haukubaliki.';
+$string['support:promptrole'] = 'Unajibu swali la msaada lililoulizwa nje ya kozi yoyote. Mwanafunzi hauulizi kuhusu maudhui ya kozi, kwa hivyo usimuelekeze huko. Jibu kwa kutumia Maswali Yanayoulizwa Mara kwa Mara na nyenzo za msaada ulizopewa. Kama huwezi kujibu kwa usahihi, sema hivyo wazi kisha jitolee kupeleka swali kwa timu ya msaada.';

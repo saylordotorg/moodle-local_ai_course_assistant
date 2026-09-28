@@ -146,6 +146,14 @@ class hook_callbacks {
         if (!get_config('local_ai_course_assistant', 'enabled')) {
             return false;
         }
+        // v7.5.7: support mode renders on pages this method would otherwise
+        // reject. Asking support_mode the same question the injector asks keeps
+        // the CSP header and the widget on exactly the same set of pages; a page
+        // that rendered the widget without the CSP would lose the defence added
+        // after the injected-widget incident.
+        if (\local_ai_course_assistant\support_mode::renders_here($PAGE)) {
+            return true;
+        }
         $context = $PAGE->context ?? null;
         if (!$context) {
             return false;
@@ -269,9 +277,24 @@ class hook_callbacks {
             return;
         }
 
-        // Only inject on course or module context pages.
+        // v7.5.7: support mode. A page that is not a course -- the dashboard, a
+        // profile, the site home -- renders the widget against the administrator's
+        // designated support course, so every downstream consumer receives a real
+        // course id and needs no SITEID special case. support_mode::renders_here()
+        // is the shared predicate; the CSP hook asks the same question of the same
+        // method, so the two cannot drift.
+        $supportmode = \local_ai_course_assistant\support_mode::renders_here($PAGE);
+
+        // Only inject on course or module context pages. In support mode the page
+        // is neither, so the context we work from is the support course's, not the
+        // page's: everything below this point expects a course context and a real
+        // course id, and in support mode it gets both.
         $context = $PAGE->context;
-        if ($context->contextlevel !== CONTEXT_COURSE && $context->contextlevel !== CONTEXT_MODULE) {
+        if ($supportmode) {
+            $context = \context_course::instance(
+                \local_ai_course_assistant\support_mode::course_id()
+            );
+        } else if ($context->contextlevel !== CONTEXT_COURSE && $context->contextlevel !== CONTEXT_MODULE) {
             return;
         }
 
@@ -303,29 +326,44 @@ class hook_callbacks {
 
         // Don't show on site home (course id 1).
         $courseid = $coursecontext->instanceid;
-        if ($courseid == SITEID) {
+        if (!$supportmode && $courseid == SITEID) {
             return;
         }
 
         // Remember the last course visited for admins, so the global settings
         // page can offer a "back to last course" shortcut. Non-admins skip this
         // to avoid pointless user_preferences writes.
-        if (is_siteadmin() || has_capability('moodle/site:config', \context_system::instance())) {
+        //
+        // Skipped in support mode: the dashboard and the profile are the pages an
+        // admin passes through between courses, so recording the support course
+        // here would overwrite the shortcut's value with the one course it is not
+        // useful to go back to, on essentially every navigation.
+        if (!$supportmode
+                && (is_siteadmin() || has_capability('moodle/site:config', \context_system::instance()))) {
             $lastpref = (int) get_user_preferences('local_ai_course_assistant_last_courseid', 0);
             if ($lastpref !== (int) $courseid) {
                 set_user_preference('local_ai_course_assistant_last_courseid', (int) $courseid);
             }
         }
 
-        // Check capability.
-        if (!has_capability('local/ai_course_assistant:use', $coursecontext)) {
+        // Check capability. In support mode the access decision has already been
+        // made by support_mode::can_use(), which checks :usesupport at system
+        // context -- a learner reaching the assistant from their dashboard is by
+        // definition not enrolled in the support course and holds no role in it,
+        // so the per-course :use capability is the wrong question there.
+        if (!$supportmode && !has_capability('local/ai_course_assistant:use', $coursecontext)) {
             return;
         }
 
         // Per-course SOLA enable check. Honours the site-wide
         // default_course_mode setting: new installs default to 'per_course'
         // (opt-in), upgraded installs default to 'all' (legacy behaviour).
-        if (!course_config_manager::is_enabled_for_course($courseid)) {
+        //
+        // Support mode has its own explicit on/off switch and must not inherit
+        // this one: default_course_mode='all' on an upgraded site would otherwise
+        // turn support mode on for every such site without an administrator
+        // choosing it.
+        if (!$supportmode && !course_config_manager::is_enabled_for_course($courseid)) {
             return;
         }
 
@@ -552,9 +590,13 @@ class hook_callbacks {
         // flag exists to remove, preserved for the people who test dev.
         $attemptlocked = false;
         if (!empty($USER->id)) {
+            // v7.5.7: same site-wide fallback as the enforcing call sites, so the
+            // composer is greyed on the support surface for a learner who has a
+            // live attempt elsewhere. Without this the UI would invite a message
+            // that the server then refuses.
             $attemptlocked = \local_ai_course_assistant\quiz_lock::is_locked_for(
                 (int) $USER->id,
-                (int) $courseid
+                \local_ai_course_assistant\support_mode::integrity_scope((int) $courseid)
             );
         }
 
@@ -619,6 +661,22 @@ class hook_callbacks {
             $realtimeenabled,
             $hasactivity
         );
+
+        // v7.5.7: in support mode, keep only starters that a support turn can
+        // actually service. Everything that is not a plain prompt goes through an
+        // endpoint still gated on the per-course capability -- quiz through
+        // generate_quiz, voice and pronunciation through get_realtime_token and
+        // score_speech -- so offering them renders a chip that always errors.
+        // 'focus-next' and 'study-plan' are plain prompts but are about course
+        // progress, which does not exist here, so they go too.
+        //
+        // $hasstarterdata is computed from this filtered list further down, and
+        // that matters: the template renders a hardcoded fallback set INCLUDING
+        // the quiz chip when it is false, so filtering to empty would put the
+        // chip straight back.
+        if ($supportmode) {
+            $starters = \local_ai_course_assistant\support_mode::filter_starters($starters);
+        }
 
         // v5.7.0 / Feature C — personalize the focus-next starter chip with the
         // learner's weakest objective when the mastery-aware starter flag is on.
@@ -715,7 +773,15 @@ class hook_callbacks {
         }
 
         // Whether admin-configured starters exist (controls fallback defaults in template).
-        $hasstarterdata = !empty($starters);
+        //
+        // v7.5.7: forced true in support mode. The template's {{^hasstarterdata}}
+        // branch renders a hardcoded default set that includes the practice-quiz
+        // chip, and the support filter above can legitimately empty $starters --
+        // most built-ins are either non-prompt types or conditional on an activity
+        // page, and support mode has neither. Leaving this to !empty() would put
+        // the quiz chip back through the fallback, which is the exact thing the
+        // filter exists to remove. No chips is the correct support-mode outcome.
+        $hasstarterdata = $supportmode ? true : !empty($starters);
 
         // v5.9.0 — Learning path map + next-course nudge. pathenabled gates the
         // header button and the lazy-loaded panel; the nudge fields drive the
@@ -772,6 +838,16 @@ class hook_callbacks {
             ? 'Your feedback helps us improve the assistant and goes to your site administrators.'
             : trim((string) $introcfg);
 
+        // v7.5.7: in support mode, suppress every drawer feature whose endpoint
+        // still requires the per-course :use capability. The learner is not
+        // enrolled in the support course, so each of these is an affordance that
+        // renders and then fails when used. The active-learners indicator is the
+        // one that matters most: chat.js starts a 60-second poll whenever its
+        // element is present, so leaving it on would throw a login exception every
+        // minute for every open dashboard tab.
+        //
+        // Deliberately a suppression list rather than widening the capability:
+        // these features are about course material, and there is none here.
         // Render template.
         $templatedata = [
             'avataranim'         => $avataranim,
@@ -871,6 +947,7 @@ class hook_callbacks {
             'surveytrigger'      => self::config_int_with_default('survey_trigger_messages', 10),
             'completionpct'      => $completionpct,
             'contextdebugvisible' => $cansiteconfig,
+            'quizenabled'        => true,
             'starters'           => $starters,
             'startersjson'       => json_encode($starters),
             'startericoncolor'   => $startericoncolor,
@@ -953,6 +1030,18 @@ class hook_callbacks {
             // "</script>" cannot break out of the inline script tag in the
             // template ({{{i18n_json}}} is intentionally unescaped).
             $templatedata['i18n_json'] = json_encode(self::get_js_strings(), JSON_HEX_TAG);
+        }
+
+        // v7.5.7: one pass, immediately before rendering, that forces off every
+        // drawer feature whose endpoint is still gated on the per-course
+        // capability. Deliberately NOT written as `!$supportmode &&` at each
+        // flag's own line: that was the first implementation, and a review found
+        // seven flags that had been missed that way -- the reminder toggles, the
+        // mastery chip and dashboard, the survey, user testing and the talking
+        // avatar. A miss is invisible in review, because the flag simply keeps
+        // its course-mode value, so keeping the list in one place is the control.
+        if ($supportmode) {
+            $templatedata = \local_ai_course_assistant\support_mode::suppress_course_features($templatedata);
         }
 
         $html = $OUTPUT->render_from_template('local_ai_course_assistant/chat_widget', $templatedata);

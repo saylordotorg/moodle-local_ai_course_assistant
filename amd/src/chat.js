@@ -3730,7 +3730,9 @@ define([
                 // tab. Used only when the model does not emit a SOLA_NEXT
                 // block; otherwise the parsed chips win.
                 fallbackChips: ['Tell me more', 'Give me an example',
-                    'Quiz me on this', 'End conversation'],
+                    'Quiz me on this', 'End conversation'].filter(function(c) {
+                        return isQuizEnabled() || c !== 'Quiz me on this';
+                    }),
             });
             return;
         }
@@ -5472,6 +5474,31 @@ define([
     };
 
     /**
+     * Whether the practice quiz is available on this surface.
+     *
+     * False in support mode. Suppressing the starter chip is not enough on its
+     * own: quiz is also reachable by TYPING ("quiz me on the introduction"),
+     * which detectQuizIntent intercepts, and through the SOLA_NEXT fallback
+     * chips, which offer "Quiz me on this" independently of the starter list.
+     * generate_quiz is still gated on the per-course capability, so every one of
+     * those routes ends in an error for a support learner.
+     *
+     * @returns {boolean}
+     */
+    const isQuizEnabled = function() {
+        // Resolve the widget root here rather than closing over one. There is no
+        // module-level `root` in this file -- every sibling helper takes it as a
+        // parameter -- so a bare reference is a ReferenceError at call time, not
+        // a quiet undefined. The first version of this function had exactly that
+        // bug, and because the throw happened inside the send handler it killed
+        // the whole turn: three Behat chat scenarios failed with the assistant
+        // reply never rendering. Same resolution as getDefaultVoice().
+        const el = (UI.getElements && UI.getElements().root)
+            || document.getElementById('local-ai-course-assistant');
+        return !!(el && el.dataset.quizEnabled === '1');
+    };
+
+    /**
      * Detect whether the user's message is requesting a practice quiz.
      * Used to intercept natural-language quiz requests (e.g. from STT)
      * and route them to the interactive quiz UI instead of plain chat.
@@ -5586,7 +5613,7 @@ define([
 
         // Intercept quiz intent (e.g. from STT: "quiz me on the introduction")
         // and route to the interactive quiz UI instead of plain chat.
-        if (detectQuizIntent(text)) {
+        if (isQuizEnabled() && detectQuizIntent(text)) {
             UI.clearInput();
             UI.autoResizeInput();
             UI.updateSendButton();
@@ -5773,9 +5800,12 @@ define([
                     } else if (parsed.text.trim().length > 0) {
                         // Smart fallback chips: comprehension-focused for long responses.
                         const wordCount = parsed.text.trim().split(/\s+/).length;
-                        const chips = wordCount > 120
+                        const chips = (wordCount > 120
                             ? ['Quiz me on this', 'Summarize this', 'Give me an example']
-                            : ['Tell me more', 'Give me an example', 'Quiz me on this'];
+                            : ['Tell me more', 'Give me an example', 'Quiz me on this'])
+                            .filter(function(c) {
+                                return isQuizEnabled() || c !== 'Quiz me on this';
+                            });
                         UI.showSuggestions(chips, handleSuggestionClick);
                     }
                 }

@@ -3100,3 +3100,11 @@ $string['settings:max_audio_mb_capped'] = 'Grænsen på denne server er PHP, ikk
 $string['voice:error_unavailable'] = 'Transskriptionstjenesten er ikke tilgængelig lige nu. Prøv igen om lidt.';
 
 $string['settings:max_audio_mb_range'] = 'Indtast et tal mellem {$a->min} og {$a->max}. Større værdier kan ikke overholdes: endepunktet begrænser til {$a->max}, så feltet ville angive en grænse, koden ikke håndhæver.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Brug assistenten uden for et kursus';
+$string['settings:support_enabled'] = 'Aktivér supporttilstand uden for kurser';
+$string['settings:support_enabled_desc'] = 'Lad studerende åbne [[tutorshort]] på sider, der ikke er et kursus, for eksempel dashboardet eller deres profil, så de kan spørge om tilmelding, kursusbeviser, tekniske problemer og andre supportspørgsmål. Det kræver, at der er valgt et supportkursus nedenfor. Studerende skal desuden have rettigheden "Brug assistenten uden for et kursus", som godkendte brugere har som standard.';
+$string['settings:support_courseid'] = 'Supportkursus';
+$string['settings:support_courseid_desc'] = 'ID\'et på et synligt kursus, der indeholder jeres kom godt i gang-, onboarding- og introduktionsmateriale. Supportsamtaler besvares ud fra dette kursus og FAQ\'en ovenfor og registreres på kurset. Lad feltet stå tomt for at slå supporttilstand fra. Forsiden (kursus 1) accepteres ikke.';
+$string['support:promptrole'] = 'Du besvarer et supportspørgsmål, der er stillet uden for alle kurser. Den studerende spørger ikke til kursusindhold, så henvis ikke tilbage til det. Svar ud fra FAQ\'en og det supportmateriale, du har fået. Hvis du ikke kan svare præcist, så sig det ligeud og tilbyd at sende spørgsmålet videre til supportteamet.';

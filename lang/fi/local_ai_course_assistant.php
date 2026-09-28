@@ -3100,3 +3100,11 @@ $string['settings:max_audio_mb_capped'] = 'Rajan asettaa tällä palvelimella PH
 $string['voice:error_unavailable'] = 'Tekstityspalvelu ei ole juuri nyt käytettävissä. Yritä hetken kuluttua uudelleen.';
 
 $string['settings:max_audio_mb_range'] = 'Anna luku väliltä {$a->min} ja {$a->max}. Suurempia arvoja ei voi noudattaa: päätepiste rajaa arvoon {$a->max}, joten kenttä ilmoittaisi rajan, jota koodi ei valvo.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Käytä avustajaa kurssien ulkopuolella';
+$string['settings:support_enabled'] = 'Ota tukitila käyttöön kurssien ulkopuolella';
+$string['settings:support_enabled_desc'] = 'Anna opiskelijoiden avata [[tutorshort]] myös muilla kuin kurssisivuilla, kuten työpöydällä tai omassa profiilissaan, ja kysyä ilmoittautumisesta, todistuksista, teknisistä ongelmista ja muista tukiasioista. Edellyttää, että alle on valittu tukikurssi. Lisäksi opiskelijalla on oltava oikeus "Käytä avustajaa kurssien ulkopuolella", joka on kirjautuneilla käyttäjillä oletuksena.';
+$string['settings:support_courseid'] = 'Tukikurssi';
+$string['settings:support_courseid_desc'] = 'Sen näkyvissä olevan kurssin tunniste (ID), jolla ovat aloitus-, perehdytys- ja opastusmateriaalisi. Tukikeskusteluihin vastataan tämän kurssin ja yllä olevan UKK:n pohjalta, ja ne kirjataan tälle kurssille. Jätä tyhjäksi, jos haluat poistaa tukitilan käytöstä. Sivuston etusivua (kurssi 1) ei hyväksytä.';
+$string['support:promptrole'] = 'Vastaat tukikysymykseen, joka on esitetty kurssien ulkopuolella. Opiskelija ei kysy kurssimateriaalista, joten älä ohjaa häntä siihen. Vastaa UKK:n ja saamasi tukimateriaalin perusteella. Jos et pysty vastaamaan täsmällisesti, sano se suoraan ja tarjoudu välittämään kysymyksen tukitiimille.';

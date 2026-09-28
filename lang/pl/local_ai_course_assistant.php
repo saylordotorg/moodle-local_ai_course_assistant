@@ -3099,3 +3099,11 @@ $string['settings:max_audio_mb_capped'] = 'Limit na tym serwerze wyznacza PHP, a
 $string['voice:error_unavailable'] = 'Usługa transkrypcji jest w tej chwili niedostępna. Spróbuj ponownie za chwilę.';
 
 $string['settings:max_audio_mb_range'] = 'Wpisz liczbę od {$a->min} do {$a->max}. Większych wartości nie da się zachować: punkt końcowy ogranicza do {$a->max}, więc pole podawałoby limit, którego kod nie egzekwuje.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Korzystanie z asystenta poza kursem';
+$string['settings:support_enabled'] = 'Włącz tryb wsparcia poza kursami';
+$string['settings:support_enabled_desc'] = 'Pozwala studentom otwierać [[tutorshort]] na stronach niebędących kursem, na przykład na kokpicie lub w profilu, aby zadawać pytania o zapisy, certyfikaty, problemy techniczne i inne sprawy wymagające wsparcia. Wymaga wskazania kursu wsparcia poniżej. Studenci muszą też mieć uprawnienie „Korzystanie z asystenta poza kursem”, które domyślnie przysługuje uwierzytelnionym użytkownikom.';
+$string['settings:support_courseid'] = 'Kurs wsparcia';
+$string['settings:support_courseid_desc'] = 'Numer ID widocznego kursu zawierającego materiały wprowadzające, powitalne i orientacyjne. Odpowiedzi w trybie wsparcia są oparte na tym kursie oraz na powyższych najczęstszych pytaniach i są do niego zapisywane. Pozostaw pole puste, aby wyłączyć tryb wsparcia. Strona główna witryny (kurs 1) nie jest akceptowana.';
+$string['support:promptrole'] = 'Odpowiadasz na pytanie o wsparcie zadane poza jakimkolwiek kursem. Student nie pyta o materiał kursu, więc go do niego nie odsyłaj. Odpowiadaj na podstawie najczęstszych pytań i przekazanych Ci materiałów wsparcia. Jeśli nie możesz odpowiedzieć rzetelnie, powiedz to wprost i zaproponuj przekazanie pytania zespołowi wsparcia.';

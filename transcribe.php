@@ -63,7 +63,12 @@ if ($courseid > 0) {
 } else {
     $context = context_system::instance();
 }
-require_capability('local/ai_course_assistant:use', $context);
+// v7.5.7: voice in and out are part of an ordinary chat turn, not a course
+// feature, and both buttons are on screen in support mode -- so a support
+// learner, who is not enrolled in the support course and holds no role in it,
+// must pass here. require_use() falls back to the per-course capability for
+// every other request.
+\local_ai_course_assistant\support_mode::require_use((int) $courseid, $context);
 
 // Rate limit: 20 STT requests per 60 seconds per user. Whisper is a per-minute
 // spend vector; without this cap an authenticated learner can upload clips in a

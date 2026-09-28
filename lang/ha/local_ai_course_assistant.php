@@ -3127,3 +3127,11 @@ $string['settings:max_audio_mb_capped'] = 'Iyaka a wannan sabar PHP ne, ba wanna
 $string['voice:error_unavailable'] = 'Sabis ɗin rubutawa ba ya samuwa a yanzu. Da fatan za a sake gwadawa nan da ɗan lokaci.';
 
 $string['settings:max_audio_mb_range'] = 'Shigar da lamba tsakanin {$a->min} da {$a->max}. Ba za a iya girmama manyan kimomi ba: wurin ƙarshe yana iyakance zuwa {$a->max}, don haka filin zai bayyana iyakar da lambar ba ta aiwatarwa.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Yi amfani da mataimakin a wajen kwas';
+$string['settings:support_enabled'] = 'Kunna yanayin tallafi a wajen kwasa-kwasan';
+$string['settings:support_enabled_desc'] = 'Yana ba ɗalibai damar buɗe [[tutorshort]] a shafukan da ba na kwas ba, kamar dashboard ko bayanan martabarsu, don yin tambaya kan rajista, takaddun shaida, matsalolin fasaha da sauran tambayoyin tallafi. Dole ne a saita kwas ɗin tallafi a ƙasa. Har yanzu ɗalibai na buƙatar izinin "Yi amfani da mataimakin a wajen kwas", wanda masu amfani da suka shiga da asusu ke da shi ta asali.';
+$string['settings:support_courseid'] = 'Kwas ɗin tallafi';
+$string['settings:support_courseid_desc'] = 'Lambar ID ta wani kwas da ake gani wanda ke ɗauke da kayan farawa, gabatarwa da sanin muhalli. Ana amsa tattaunawar tallafi daga wannan kwas tare da tambayoyin da ake yawan yi da ke sama, kuma ana yin rikodinsu a kansa. Ka bar shi fanko don kashe yanayin tallafi. Ba a karɓar shafin gida na rukunin yanar gizo (kwas 1).';
+$string['support:promptrole'] = 'Kana amsa tambayar tallafi da aka yi daga wajen kowane kwas. Ɗalibin ba ya tambaya kan kayan kwas ba, don haka kada ka mai da shi ga kayan kwas. Ka amsa daga tambayoyin da ake yawan yi da kayan tallafin da aka ba ka. Idan ba za ka iya amsawa daidai ba, ka faɗi haka a sarari kuma ka ba da shawarar mika tambayar ga ƙungiyar tallafi.';

@@ -3120,3 +3120,11 @@ $string['settings:max_audio_mb_capped'] = 'Giới hạn trên máy chủ này l�
 $string['voice:error_unavailable'] = 'Dịch vụ chuyển giọng nói hiện không khả dụng. Vui lòng thử lại sau giây lát.';
 
 $string['settings:max_audio_mb_range'] = 'Nhập một số từ {$a->min} đến {$a->max}. Giá trị lớn hơn không thể được tôn trọng: điểm cuối giới hạn ở {$a->max}, nên trường này sẽ nêu một giới hạn mà mã không thực thi.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Sử dụng trợ lý bên ngoài khóa học';
+$string['settings:support_enabled'] = 'Bật chế độ hỗ trợ bên ngoài khóa học';
+$string['settings:support_enabled_desc'] = 'Cho phép học viên mở [[tutorshort]] trên những trang không thuộc khóa học, chẳng hạn như bảng điều khiển hoặc trang hồ sơ cá nhân, để hỏi về ghi danh, chứng chỉ, sự cố kỹ thuật và các câu hỏi hỗ trợ khác. Cần thiết lập một khóa học hỗ trợ ở bên dưới. Học viên vẫn phải có quyền "Sử dụng trợ lý bên ngoài khóa học", vốn được cấp mặc định cho người dùng đã xác thực.';
+$string['settings:support_courseid'] = 'Khóa học hỗ trợ';
+$string['settings:support_courseid_desc'] = 'ID của một khóa học đang hiển thị, chứa tài liệu hướng dẫn bắt đầu, làm quen và định hướng của bạn. Các cuộc trò chuyện hỗ trợ được trả lời dựa trên khóa học này cùng với FAQ ở trên, và được ghi nhận vào khóa học đó. Để trống để tắt chế độ hỗ trợ. Không chấp nhận trang chủ của trang web (khóa học 1).';
+$string['support:promptrole'] = 'Bạn đang trả lời một câu hỏi hỗ trợ từ bên ngoài mọi khóa học. Học viên không hỏi về nội dung khóa học, vì vậy đừng hướng họ trở lại đó. Hãy trả lời dựa trên FAQ và tài liệu hỗ trợ đã được cung cấp cho bạn. Nếu không thể trả lời chính xác, hãy nói rõ điều đó và đề nghị chuyển câu hỏi cho đội ngũ hỗ trợ.';

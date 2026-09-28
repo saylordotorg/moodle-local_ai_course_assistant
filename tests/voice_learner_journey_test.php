@@ -568,10 +568,16 @@ final class voice_learner_journey_test extends \advanced_testcase {
      * @return void
      */
     public function test_both_direct_voice_endpoints_gate_before_they_spend(): void {
+        // v7.5.7: the capability line is now support_mode::require_use(), which
+        // enforces the same :use capability for every ordinary request and
+        // additionally admits a support learner who holds :usesupport. Voice in
+        // and out are part of a chat turn, not a course feature, and both buttons
+        // are on screen in support mode. What this test pins is unchanged: an
+        // auth gate, then a rate-limit gate, then the paid call -- in that order.
         $guards = [
             'require_login();',
             'require_sesskey();',
-            'require_capability(\'local/ai_course_assistant:use\', $context);',
+            'support_mode::require_use(',
             'voice_registry::resolve(',
             'new \curl()',
         ];

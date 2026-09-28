@@ -3120,3 +3120,11 @@ $string['settings:max_audio_mb_capped'] = 'PHP ni o ṣeto opin lori olupin yii,
 $string['voice:error_unavailable'] = 'Iṣẹ kikọ ko si ni bayi. Jọwọ gbiyanju lẹẹkansi laipẹ.';
 
 $string['settings:max_audio_mb_range'] = 'Tẹ nọmba kan laarin {$a->min} ati {$a->max} sii. A ko le bọwọ fun awọn iye ti o tobi ju: opin naa dín si {$a->max}, nitorinaa aaye naa yoo sọ opin ti koodu ko fi lelẹ.';
+
+// v7.5.7: support mode outside courses.
+$string['ai_course_assistant:usesupport'] = 'Lo olùrànlọ́wọ́ náà níta ẹ̀kọ́ kan';
+$string['settings:support_enabled'] = 'Mú ipò ìrànlọ́wọ́ ṣiṣẹ́ níta àwọn ẹ̀kọ́';
+$string['settings:support_enabled_desc'] = 'Fàyè gba àwọn akẹ́kọ̀ọ́ láti ṣí [[tutorshort]] sórí àwọn ojú-ìwé tí kì í ṣe ẹ̀kọ́, bíi ojú-ìwé ìṣàkóso tàbí profáìlì wọn, láti béèrè nípa ìforúkọsílẹ̀, ìwé-ẹ̀rí, ìṣòro ìmọ̀-ẹ̀rọ àti àwọn ìbéèrè ìrànlọ́wọ́ mìíràn. Ó nílò ẹ̀kọ́ ìrànlọ́wọ́ tí a gbọ́dọ̀ yàn nísàlẹ̀. Àwọn akẹ́kọ̀ọ́ ṣì nílò agbára "Lo olùrànlọ́wọ́ náà níta ẹ̀kọ́ kan", tí àwọn olùlò tí a ti fọwọ́sí ti ní tẹ́lẹ̀.';
+$string['settings:support_courseid'] = 'Ẹ̀kọ́ ìrànlọ́wọ́';
+$string['settings:support_courseid_desc'] = 'ID ẹ̀kọ́ kan tí ó hàn, tí ó ní àwọn ohun èlò ìbẹ̀rẹ̀, ìfáàrà àti ìtọ́sọ́nà rẹ nínú. A ó dáhùn àwọn ìjíròrò ìrànlọ́wọ́ láti inú ẹ̀kọ́ yìí àti FAQ tí ó wà lókè, a ó sì kọ wọ́n sí ẹ̀kọ́ náà. Fi sílẹ̀ ní òfo láti pa ipò ìrànlọ́wọ́ mọ́. Ojú-ìwé ilé sáìtì (ẹ̀kọ́ 1) kò ṣe é gbà.';
+$string['support:promptrole'] = 'O ń dáhùn ìbéèrè ìrànlọ́wọ́ kan tí ó wá láti òde gbogbo ẹ̀kọ́. Akẹ́kọ̀ọ́ náà kò béèrè nípa àkóónú ẹ̀kọ́, nítorí náà má ṣe darí rẹ̀ padà síbẹ̀. Dáhùn láti inú FAQ àti àwọn ohun èlò ìrànlọ́wọ́ tí a fún ọ. Bí o kò bá lè dáhùn ní pípé, sọ bẹ́ẹ̀ ní kedere, kí o sì fi ọwọ́ sí i pé o lè fi ìbéèrè náà ránṣẹ́ sí ẹgbẹ́ ìrànlọ́wọ́.';
