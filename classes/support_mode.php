@@ -218,20 +218,32 @@ class support_mode {
             return false;
         }
 
-        // Course and module contexts belong to the ordinary per-course path, which
-        // has its own gate. The one exception is the site course: it is a course
-        // context, but it is the front page, and the per-course path returns early
-        // on it. Anything above a course -- user (dashboard, profile) and system --
-        // is ours.
-        $iscoursecontext = $context->contextlevel === CONTEXT_COURSE
-            || $context->contextlevel === CONTEXT_MODULE;
-        if ($iscoursecontext) {
-            $coursecontext = $context->contextlevel === CONTEXT_MODULE
-                ? $context->get_course_context(false)
-                : $context;
-            // get_course_context(false) returns false rather than throwing when
-            // there is no course ancestor; treat that as "not ours" either way.
-            if (!$coursecontext || (int) $coursecontext->instanceid !== (int) SITEID) {
+        // Course contexts belong to the ordinary per-course path, which has its own
+        // gate. The one exception is the site course: it is a course context, but
+        // it is the front page, and the per-course path returns early on it.
+        // Anything above a course -- user (dashboard, profile) and system -- is
+        // ours.
+        //
+        // MODULE contexts are refused, including front-page activities. The
+        // else-if below already refuses them by omission; this states it, because
+        // the reason is not obvious and a later edit widening that branch would
+        // otherwise reopen a real gap.
+        //
+        // The gap: the injector swaps $context for the support course's context,
+        // which makes every later `contextlevel === CONTEXT_MODULE` test false. On
+        // a front-page activity that leaves $modname empty, so the per-quiz
+        // assistance level -- including 'hidden' and 'coach' -- is never read. A
+        // site relying on per-quiz 'hidden' rather than the global quiz lock would
+        // get a fully working assistant on a graded front-page quiz.
+        //
+        // Refusing them also preserves today's behaviour exactly: front-page
+        // activities have never rendered the widget, because the per-course gate
+        // returns early at SITEID.
+        if ($context->contextlevel === CONTEXT_MODULE) {
+            return false;
+        }
+        if ($context->contextlevel === CONTEXT_COURSE) {
+            if ((int) $context->instanceid !== (int) SITEID) {
                 return false;
             }
         } else if ($context->contextlevel !== CONTEXT_USER

@@ -115,6 +115,36 @@ final class support_mode_gate_test extends \advanced_testcase {
     }
 
     /**
+     * A front-page ACTIVITY is refused, and that is an integrity decision.
+     *
+     * Module contexts under SITEID would otherwise be accepted, because their
+     * course context is the site course. The injector then swaps $context for the
+     * support course's, which makes every later `contextlevel === CONTEXT_MODULE`
+     * test false -- so $modname stays empty and the per-quiz assistance level,
+     * including 'hidden' and 'coach', is never read. A site that relies on
+     * per-quiz 'hidden' rather than the global quiz lock would have got a fully
+     * working assistant on a graded front-page quiz.
+     *
+     * Refusing module contexts also preserves today's behaviour exactly: the
+     * per-course gate returns early at SITEID, so front-page activities have
+     * never rendered the widget.
+     */
+    public function test_a_front_page_activity_is_refused(): void {
+        $cm = $this->getDataGenerator()->create_module('page', ['course' => SITEID]);
+        $page = $this->page(
+            \context_module::instance($cm->cmid),
+            '/mod/page/view.php',
+            'incourse'
+        );
+
+        $this->assertFalse(
+            support_mode::renders_here($page),
+            'a front-page activity must not render support mode: the per-quiz '
+                . 'assistance level cannot be read once the context is swapped'
+        );
+    }
+
+    /**
      * Administration pages are excluded, as they are on the per-course path.
      */
     public function test_admin_pages_are_excluded(): void {
@@ -248,21 +278,92 @@ final class support_mode_gate_test extends \advanced_testcase {
             $src = file_get_contents($root . $rel);
             $this->assertNotFalse($src, $rel . ' must be readable');
 
-            // Every active_attempt/is_locked_for call must have integrity_scope()
-            // within the same call expression. Both are multi-line, so match the
-            // call and the following two lines.
-            if (!preg_match_all('/(?:active_attempt|is_locked_for)\s*\((.{0,240}?)\)\s*;/s', $src, $m)) {
-                continue;
-            }
-            foreach ($m[1] as $args) {
+            $calls = self::extract_calls($src, ['active_attempt', 'is_locked_for']);
+
+            // Zero matches is a FAILURE, not a skip. Every file in this list is
+            // here because it has a call site, so finding none means the matcher
+            // broke -- which is exactly what happened to the first version of
+            // this test: it required the call to end in `);`, and the two chat
+            // paths (sse.php, send_message.php) use a ternary that closes with
+            // `)\n : null;`. It matched nothing, `continue` swallowed it, and
+            // reverting integrity_scope in sse.php passed cleanly.
+            $this->assertNotEmpty(
+                $calls,
+                $rel . ': found no quiz-lock call to check. The matcher is broken, '
+                    . 'or the call site moved -- either way this guard is not guarding.'
+            );
+
+            foreach ($calls as $args) {
                 $this->assertStringContainsString(
                     'integrity_scope',
                     $args,
                     $rel . ' passes a raw course id to the quiz lock. On the support '
                         . 'surface that scopes the exam lock to a course with no quizzes, '
-                        . 'so it never fires.'
+                        . 'so it never fires: a learner mid-exam opens the dashboard in a '
+                        . 'second tab and gets an unlocked assistant.'
                 );
             }
         }
+    }
+
+    /**
+     * Argument lists of every call to the named methods, by paren balance.
+     *
+     * Regex cannot do this: the calls are multi-line, nested, and end in a
+     * ternary rather than a statement terminator. Balancing parens is the only
+     * form that does not depend on how the call happens to be laid out.
+     *
+     * Skips the method declarations themselves and anything inside a line
+     * comment, so a docblock mentioning the method does not register as a call.
+     *
+     * @param string $src
+     * @param string[] $methods
+     * @return string[] One argument-list string per call found.
+     */
+    private static function extract_calls(string $src, array $methods): array {
+        $found = [];
+        // Strip line comments and block comments first: a docblock that names
+        // active_attempt() is not a call site.
+        $stripped = preg_replace('!/\*.*?\*/!s', '', $src);
+        $stripped = preg_replace('!//[^\n]*!', '', (string) $stripped);
+        $stripped = (string) $stripped;
+
+        foreach ($methods as $method) {
+            $offset = 0;
+            while (($pos = strpos($stripped, $method, $offset)) !== false) {
+                $offset = $pos + strlen($method);
+
+                // Skip the declaration.
+                $before = substr($stripped, max(0, $pos - 30), min(30, $pos));
+                if (strpos($before, 'function') !== false) {
+                    continue;
+                }
+
+                // Find the opening paren of this call.
+                $i = $pos + strlen($method);
+                while ($i < strlen($stripped) && ctype_space($stripped[$i])) {
+                    $i++;
+                }
+                if ($i >= strlen($stripped) || $stripped[$i] !== '(') {
+                    continue;
+                }
+
+                // Walk to the matching close paren.
+                $depth = 0;
+                $start = $i + 1;
+                for ($j = $i, $len = strlen($stripped); $j < $len; $j++) {
+                    if ($stripped[$j] === '(') {
+                        $depth++;
+                    } else if ($stripped[$j] === ')') {
+                        $depth--;
+                        if ($depth === 0) {
+                            $found[] = substr($stripped, $start, $j - $start);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return $found;
     }
 }

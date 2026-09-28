@@ -63,6 +63,14 @@ final class support_mode_external_test extends \advanced_testcase {
         $this->setUser($this->user);
     }
 
+    protected function tearDown(): void {
+        // The resolved-course memo is static. It survives resetAfterTest, and
+        // only is_enabled()'s short-circuit on support_enabled keeps it from
+        // leaking today. That is one refactor away from being wrong.
+        support_mode::reset_cache();
+        parent::tearDown();
+    }
+
     /**
      * The precondition that makes this whole file necessary.
      */
@@ -199,5 +207,50 @@ final class support_mode_external_test extends \advanced_testcase {
 
         $this->expectException(\require_login_exception::class);
         \local_ai_course_assistant\external\get_config::execute((int) $this->supportcourse->id);
+    }
+
+    /**
+     * submit_feedback: the thumbs control under a support reply.
+     */
+    public function test_submit_feedback_works_for_an_unenrolled_support_learner(): void {
+        $result = \local_ai_course_assistant\external\submit_feedback::execute(
+            (int) $this->supportcourse->id,
+            5,
+            'Support mode answered my question.',
+            'Firefox',
+            'macOS',
+            'desktop',
+            '1920x1080',
+            'phpunit',
+            '/my/'
+        );
+
+        $this->assertIsArray($result);
+    }
+
+    /**
+     * rate_message: worth pinning separately because it is the one endpoint that
+     * takes its course from the STORED MESSAGE rather than from a parameter, so
+     * it exercises a different path into validation_context().
+     */
+    public function test_rate_message_works_for_an_unenrolled_support_learner(): void {
+        global $DB;
+
+        $conv = conversation_manager::get_or_create_conversation(
+            (int) $this->user->id,
+            (int) $this->supportcourse->id
+        );
+        $messageid = $DB->insert_record('local_ai_course_assistant_msgs', (object) [
+            'conversationid' => $conv->id,
+            'userid'         => (int) $this->user->id,
+            'courseid'       => (int) $this->supportcourse->id,
+            'role'           => 'assistant',
+            'message'        => 'A support answer.',
+            'timecreated'    => time(),
+        ]);
+
+        $result = \local_ai_course_assistant\external\rate_message::execute((int) $messageid, 1);
+
+        $this->assertIsArray($result);
     }
 }

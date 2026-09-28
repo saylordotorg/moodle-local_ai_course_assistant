@@ -814,6 +814,20 @@ class hook_callbacks {
             ? 'Your feedback helps us improve the assistant and goes to your site administrators.'
             : trim((string) $introcfg);
 
+        // v7.5.7: in support mode, suppress every drawer feature whose endpoint
+        // still requires the per-course :use capability. The learner is not
+        // enrolled in the support course, so each of these is an affordance that
+        // renders and then fails when used. The active-learners indicator is the
+        // one that matters most: chat.js starts a 60-second poll whenever its
+        // element is present, so leaving it on would throw a login exception every
+        // minute for every open dashboard tab.
+        //
+        // Deliberately a suppression list rather than widening the capability:
+        // these features are about course material, and there is none here.
+        if ($supportmode) {
+            $pathenabled = false;
+        }
+
         // Render template.
         $templatedata = [
             'avataranim'         => $avataranim,
@@ -924,17 +938,18 @@ class hook_callbacks {
             'serverpageheading'  => $serverpageheading,
             'llmoptionsjson'     => json_encode($llmoptions),
             'hasstarterdata'     => $hasstarterdata,
-            'voicetabenabled'    => self::is_voice_tab_enabled($courseid),
+            'voicetabenabled'    => !$supportmode && self::is_voice_tab_enabled($courseid),
             'voiceenabled'       => \local_ai_course_assistant\voice_registry::any_voice_enabled(),
             // v6.9.7: active-learners indicator, off by default. Gating the
             // markup here means the 60-second poll never starts on a site that
             // has not opted in — chat.js only builds the poller if the element
             // is present.
-            'activelearnersenabled' => (bool) get_config(
+            'activelearnersenabled' => !$supportmode && (bool) get_config(
                 'local_ai_course_assistant', 'active_learners_enabled'),
             // Mastery feature: both flags gated on master switch so the chip
             // never renders when mastery tracking is off for the course.
-            'masteryenabled'     => \local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid),
+            'masteryenabled'     => !$supportmode
+                && \local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid),
             'masterychipenabled' => \local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid)
                 && \local_ai_course_assistant\objective_manager::is_chip_enabled_for_course($courseid),
             'masterydashboardenabled' => \local_ai_course_assistant\objective_manager::is_dashboard_enabled_for_course($courseid),
@@ -945,8 +960,9 @@ class hook_callbacks {
             // content to send). 'unset' means show the prompt; 'opted_in'
             // and 'declined' both mean hide it.
             'digestoptinstate'   => self::digest_optin_state($courseid),
-            'showdigestoptin'    => self::digest_optin_state($courseid) === 'unset',
-            'flashcardsenabled'  => \local_ai_course_assistant\flashcard_manager::is_enabled_for_course($courseid),
+            'showdigestoptin'    => !$supportmode && self::digest_optin_state($courseid) === 'unset',
+            'flashcardsenabled'  => !$supportmode
+                && \local_ai_course_assistant\flashcard_manager::is_enabled_for_course($courseid),
             'flashcardsurl'      => (new \moodle_url(
                 '/local/ai_course_assistant/flashcards.php',
                 ['courseid' => $courseid]
