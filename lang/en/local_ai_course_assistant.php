@@ -1811,8 +1811,27 @@ $string['soapbox:err_provider']     = 'The AI scoring service could not be reach
 $string['soapbox:err_parse']        = 'The AI returned an unexpected response. Please try again.';
 $string['soapbox:err_disabled']     = 'Speech practice is not enabled for this course.';
 $string['soapbox:err_transcribe']   = 'Your recording could not be transcribed. Please try again, and check that your microphone is working.';
-$string['soapbox:audio_too_large']  = 'That recording is too large. Keep speeches under about 25 MB (roughly 20 minutes).';
+$string['soapbox:audio_too_large']  = 'That recording is too large. Keep speeches under about {$a} MB.';
 $string['soapbox:no_stt']           = 'No transcription provider is configured. Ask your administrator to set up Whisper or enable browser transcription.';
+// Voice transcription errors. These reach a learner verbatim in the transcript
+// area, so they are translated like any other learner-facing text. Until 7.5.5
+// they were English literals in transcribe.php and soapbox_transcribe.php: a
+// learner reading the interface in Spanish was told "Unsupported audio format."
+// Maximum audio upload size. The _desc placeholders are filled from ini_get()
+// at render time, so an admin sees the real ceiling on their own server rather
+// than a number from the documentation.
+$string['settings:max_audio_mb'] = 'Maximum recording size (MB)';
+$string['settings:max_audio_mb_desc'] = 'The largest voice recording a learner may upload, in megabytes. Between {$a->min} and {$a->max}; the default is {$a->default}.<br>On this server PHP allows post_max_size = {$a->postmax} and upload_max_filesize = {$a->uploadmax}, so the size actually enforced right now is {$a->effective} MB. The smaller of your setting and PHP\'s own limits always wins.';
+$string['settings:max_audio_mb_range'] = 'Enter a number between {$a->min} and {$a->max}. Larger values cannot be honoured: the endpoint clamps to {$a->max}, so the field would state a limit the code would not enforce.';
+$string['settings:max_audio_mb_capped'] = 'PHP on this server is the limit, not this setting. To let learners use the full size set here, raise post_max_size and upload_max_filesize in php.ini to at least {$a}.';
+
+$string['voice:error_toolarge']     = 'That recording is too large. Try a shorter clip, under about {$a} MB.';
+$string['voice:error_noaudio']      = 'No recording was received. Please try recording again.';
+$string['voice:error_format']       = 'That audio format is not supported. Please try recording again.';
+$string['voice:error_noprovider']   = 'Voice transcription is not set up on this site. Please contact your administrator.';
+$string['voice:error_badresponse']  = 'The transcription service returned something unexpected. Please try again.';
+$string['voice:error_unavailable']  = 'The transcription service is not available right now. Please try again in a moment.';
+
 $string['soapbox:result_heading']   = 'Rubric scores';
 $string['soapbox:overall_heading']  = 'Overall';
 $string['soapbox:tips_heading']     = 'Tips for next time';

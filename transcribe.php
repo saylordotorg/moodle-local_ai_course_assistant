@@ -30,6 +30,28 @@ define('AJAX_SCRIPT', true);
 require_once('../../config.php');
 
 require_login();
+
+// PHP throws the whole body away when it exceeds post_max_size, and its default
+// (8 MB) is well under MAX_AUDIO_BYTES (25 MB). Detect that here, before
+// require_sesskey(), because the sesskey was discarded with everything else:
+// without this the learner's long recording comes back as an invalid-sesskey
+// exception at HTTP 200 and the server log records a CSRF failure that did not
+// happen. See security::oversized_post_was_discarded().
+if (\local_ai_course_assistant\security::oversized_post_was_discarded($_SERVER, $_POST, $_FILES)) {
+    // Same headers as every other response from this endpoint. This branch used
+    // to answer before send_security_headers() ran, making it the one reply
+    // without nosniff, CSP and X-Frame-Options.
+    \local_ai_course_assistant\security::send_security_headers();
+    http_response_code(413);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => get_string(
+        'voice:error_toolarge',
+        'local_ai_course_assistant',
+        \local_ai_course_assistant\security::max_audio_mb_display()
+    )]);
+    exit;
+}
+
 require_sesskey();
 
 \local_ai_course_assistant\security::send_security_headers();
@@ -53,21 +75,45 @@ if (\local_ai_course_assistant\rate_limiter::is_rate_limited($USER->id, 'stt', 2
     exit;
 }
 
-// Require the uploaded audio file.
+// Require the uploaded audio file. A size-class upload error means the file WAS
+// provided and was too big for upload_max_filesize (PHP default 2 MB) or for a
+// form MAX_FILE_SIZE; it leaves tmp_name empty exactly as an absent file does,
+// so it has to be separated out or an oversized clip is reported as a missing one.
+// is_array guard first: a field posted as audio[] makes ['error'] an
+// ARRAY, and (int) on a non-empty array is 1, which is exactly
+// UPLOAD_ERR_INI_SIZE. Without this, a malformed upload with no size
+// problem is answered "that recording is too large".
+$rawerror = $_FILES['audio']['error'] ?? UPLOAD_ERR_NO_FILE;
+$uploaderror = is_array($rawerror) ? UPLOAD_ERR_NO_FILE : (int) $rawerror;
+if (\local_ai_course_assistant\security::upload_error_is_size($uploaderror)) {
+    http_response_code(413);
+    echo json_encode(['error' => get_string(
+        'voice:error_toolarge',
+        'local_ai_course_assistant',
+        \local_ai_course_assistant\security::max_audio_mb_display()
+    )]);
+    exit;
+}
 if (empty($_FILES['audio']['tmp_name']) || !is_uploaded_file($_FILES['audio']['tmp_name'])) {
     http_response_code(400);
-    echo json_encode(['error' => 'No audio file provided.']);
+    echo json_encode(['error' => get_string('voice:error_noaudio', 'local_ai_course_assistant')]);
     exit;
 }
 
-// Enforce a 25 MB max size and an audio MIME allowlist before the file ever
+// Enforce the configured max size (max_audio_mb, default 25 MB, capped by
+// PHP's own post_max_size and upload_max_filesize) and an audio MIME
+// allowlist before the file ever
 // hits the upstream transcription API. Uses finfo so a spoofed Content-Type
 // header cannot smuggle a non-audio payload through.
 $tmp = $_FILES['audio']['tmp_name'];
 $size = filesize($tmp) ?: 0;
-if ($size <= 0 || $size > \local_ai_course_assistant\security::MAX_AUDIO_BYTES) {
+if ($size <= 0 || $size > \local_ai_course_assistant\security::max_audio_bytes()) {
     http_response_code(413);
-    echo json_encode(['error' => 'Audio file too large.']);
+    echo json_encode(['error' => get_string(
+        'voice:error_toolarge',
+        'local_ai_course_assistant',
+        \local_ai_course_assistant\security::max_audio_mb_display()
+    )]);
     exit;
 }
 $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -81,7 +127,7 @@ if ($finfo) {
 $declaredtype = !empty($_FILES['audio']['type']) ? (string) $_FILES['audio']['type'] : '';
 if (!\local_ai_course_assistant\security::is_allowed_audio_upload((string) $sniffed, $declaredtype)) {
     http_response_code(415);
-    echo json_encode(['error' => 'Unsupported audio format.']);
+    echo json_encode(['error' => get_string('voice:error_format', 'local_ai_course_assistant')]);
     exit;
 }
 
@@ -91,7 +137,7 @@ $cfg = \local_ai_course_assistant\voice_registry::resolve(
 );
 if ($cfg === null) {
     http_response_code(503);
-    echo json_encode(['error' => 'No voice provider configured for transcription.']);
+    echo json_encode(['error' => get_string('voice:error_noprovider', 'local_ai_course_assistant')]);
     exit;
 }
 
@@ -154,8 +200,23 @@ if ($cfg['provider'] === 'xai') {
 }
 
 if (!\local_ai_course_assistant\security::is_safe_provider_url($cfg['endpoint'])) {
+    // The endpoint failed SSRF validation, which is an administrator's
+    // misconfiguration, not anything the learner did or can retry past. The
+    // diagnostic, including the URL that was rejected, goes to the server error
+    // log rather than the response: it names an internal host an administrator
+    // chose, and echoing it back tells whoever is on the other end of this
+    // request what is reachable from inside the network. The learner gets the
+    // actionable half, which is that transcription is not set up.
+    //
+    // log_operational_failure(), not debugging(): debugging() writes nothing
+    // unless $CFG->debug is DEVELOPER, so on a production site this line would
+    // be discarded and the claim above would be false.
+    \local_ai_course_assistant\security::log_operational_failure(
+        'STT endpoint failed SSRF validation: '
+            . \local_ai_course_assistant\security::loggable_endpoint($cfg['endpoint'])
+    );
     http_response_code(502);
-    echo json_encode(['error' => 'STT endpoint failed SSRF validation']);
+    echo json_encode(['error' => get_string('voice:error_noprovider', 'local_ai_course_assistant')]);
     exit;
 }
 // Selfhosted servers are usually keyless behind a trusted network; only
@@ -177,15 +238,27 @@ $response = $curl->post($cfg['endpoint'], $post);
 $httpcode = (int) ($curl->get_info()['http_code'] ?? 0);
 
 if ($httpcode !== 200) {
+    // The upstream status is a diagnostic. A learner reading "Transcription API
+    // error 401" learns only that something is broken, and it discloses which
+    // upstream failure mode a caller triggered. It goes to the server error log
+    // with the host, so an administrator can tell a bad key from a rate limit
+    // from an outage, and the learner is told the thing they can act on.
+    //
+    // log_operational_failure(), not debugging(): debugging() writes nothing
+    // unless $CFG->debug is DEVELOPER, which no production site sets.
+    \local_ai_course_assistant\security::log_operational_failure(
+        'STT provider returned HTTP ' . $httpcode . ' from '
+            . \local_ai_course_assistant\security::loggable_endpoint($cfg['endpoint'])
+    );
     http_response_code(502);
-    echo json_encode(['error' => 'Transcription API error ' . $httpcode]);
+    echo json_encode(['error' => get_string('voice:error_unavailable', 'local_ai_course_assistant')]);
     exit;
 }
 
 $data = json_decode($response, true);
 if (!isset($data['text'])) {
     http_response_code(502);
-    echo json_encode(['error' => 'Invalid transcription response.']);
+    echo json_encode(['error' => get_string('voice:error_badresponse', 'local_ai_course_assistant')]);
     exit;
 }
 

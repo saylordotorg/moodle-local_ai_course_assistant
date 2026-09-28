@@ -1525,7 +1525,7 @@ $string['soapbox:no_browser_stt'] = 'Deze browser ondersteunt geen spraakherkenn
 $string['soapbox:browser_note'] = 'Deze toespraak wordt in je browser getranscribeerd. Er wordt niets geüpload. Werkt het best in Chrome en Safari.';
 $string['soapbox:server_note'] = 'Je opname wordt alleen geüpload voor transcriptie en wordt niet opgeslagen.';
 $string['soapbox:error'] = 'Kon deze toespraak nu niet beoordelen. Probeer het zo dadelijk opnieuw.';
-$string['soapbox:audio_too_large'] = 'Die opname is te groot. Houd toespraken onder ongeveer 25 MB (ongeveer 20 minuten).';
+$string['soapbox:audio_too_large'] = 'Deze opname is te groot. Houd toespraken onder ongeveer {$a} MB.';
 $string['soapbox:no_stt'] = 'Er is geen transcriptieprovider geconfigureerd. Vraag je beheerder om Whisper in te stellen of browsertranscriptie in te schakelen.';
 $string['soapbox:result_heading'] = 'Rubriekscores';
 $string['soapbox:overall_heading'] = 'Totaal';
@@ -3110,3 +3110,16 @@ $string['outcomes:state_unavailable'] = 'Dit resultaat is op dit moment niet bes
 $string['cachedef_outcomesattainment'] = 'Behaald niveau op programmaleerresultaten per student en cursus';
 
 $string['cachedef_vectors'] = 'RAG-embeddingvectoren voor de zoekindex';
+
+$string['voice:error_toolarge'] = 'Deze opname is te groot. Probeer een kortere clip van minder dan ongeveer {$a} MB.';
+$string['voice:error_noaudio'] = 'Er is geen opname ontvangen. Probeer opnieuw op te nemen.';
+$string['voice:error_format'] = 'Dit audioformaat wordt niet ondersteund. Probeer opnieuw op te nemen.';
+$string['voice:error_noprovider'] = 'Spraaktranscriptie is niet ingesteld op deze site. Neem contact op met je beheerder.';
+$string['voice:error_badresponse'] = 'De transcriptiedienst gaf een onverwacht antwoord. Probeer het opnieuw.';
+
+$string['settings:max_audio_mb'] = 'Maximale opnamegrootte (MB)';
+$string['settings:max_audio_mb_desc'] = 'De grootste spraakopname die een cursist mag uploaden, in megabytes. Tussen {$a->min} en {$a->max}; de standaard is {$a->default}.<br>Op deze server staat PHP post_max_size = {$a->postmax} en upload_max_filesize = {$a->uploadmax} toe, dus de grootte die op dit moment daadwerkelijk wordt afgedwongen is {$a->effective} MB. De kleinste van je instelling en PHP\'s eigen limieten geldt altijd.';
+$string['settings:max_audio_mb_capped'] = 'De limiet op deze server is PHP, niet deze instelling. Om cursisten de volledige hier ingestelde grootte te laten gebruiken, verhoog je post_max_size en upload_max_filesize in php.ini naar minstens {$a}.';
+$string['voice:error_unavailable'] = 'De transcriptiedienst is op dit moment niet beschikbaar. Probeer het zo meteen opnieuw.';
+
+$string['settings:max_audio_mb_range'] = 'Voer een getal tussen {$a->min} en {$a->max} in. Grotere waarden kunnen niet worden nageleefd: het eindpunt begrenst op {$a->max}, dus het veld zou een limiet noemen die de code niet afdwingt.';

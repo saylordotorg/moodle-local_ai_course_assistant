@@ -1515,7 +1515,7 @@ $string['soapbox:no_browser_stt'] = 'Ihe nchọgharị a anaghị akwado nghọt
 $string['soapbox:browser_note'] = 'A na-atụgharị okwu a n\'ime ihe nchọgharị gị. Ọ dịghị ihe a na-ebugo. Ọ na-arụ ọrụ nke ọma na Chrome na Safari.';
 $string['soapbox:server_note'] = 'A na-ebugo ndekọ gị maka ntụgharị okwu naanị, a naghịkwa echekwa ya.';
 $string['soapbox:error'] = 'Enweghị ike inye okwu a akara ugbu a. Nwaa ọzọ n\'oge na-adịghị anya.';
-$string['soapbox:audio_too_large'] = 'Ndekọ ahụ buru ibu nke ukwuu. Mee ka okwu dịrị n\'okpuru ihe dịka 25 MB (ihe dịka nkeji 20).';
+$string['soapbox:audio_too_large'] = 'Ndekọ a buru ibu nke ukwuu. Mee ka okwu dịrị n\'okpuru ihe dịka MB {$a}.';
 $string['soapbox:no_stt'] = 'A hazighị onye na-enye ntụgharị okwu ọ bụla. Rịọ onye nchịkwa gị ka ọ hazie Whisper ma ọ bụ kwe ka ntụgharị okwu ihe nchọgharị rụọ ọrụ.';
 $string['soapbox:result_heading'] = 'Akara usoro nyocha';
 $string['soapbox:overall_heading'] = 'N\'ozuzu';
@@ -3101,3 +3101,16 @@ $string['outcomes:state_unavailable'] = 'A pụghị inweta nsonaazụ a ugbu a.
 $string['cachedef_outcomesattainment'] = 'Mmezu nsonaazụ mmemme kwa nwa akwụkwọ na nkuzi';
 
 $string['cachedef_vectors'] = 'Vector embedding RAG maka ndeksị nweghachi';
+
+$string['voice:error_toolarge'] = 'Ndekọ a buru ibu nke ukwuu. Nwaa ndekọ dị mkpụmkpụ, nke na-erughị ihe dịka MB {$a}.';
+$string['voice:error_noaudio'] = 'Enwetaghị ndekọ ọ bụla. Biko nwaa ịdekọ ọzọ.';
+$string['voice:error_format'] = 'A naghị akwado ụdị ụda ahụ. Biko nwaa ịdekọ ọzọ.';
+$string['voice:error_noprovider'] = 'Edeghị ederede olu na saịtị a. Biko kpọtụrụ onye nchịkwa gị.';
+$string['voice:error_badresponse'] = 'Ọrụ ederede weghachiri ihe a na-atụghị anya ya. Biko nwaa ọzọ.';
+
+$string['settings:max_audio_mb'] = 'Nha ndekọ kachasị (MB)';
+$string['settings:max_audio_mb_desc'] = 'Ndekọ olu kachasị ukwuu onye mmụta nwere ike ibudata, na megabyte. N\'etiti {$a->min} na {$a->max}; ndabara bụ {$a->default}.<br>Na sava a PHP na-enye ohere post_max_size = {$a->postmax} na upload_max_filesize = {$a->uploadmax}, ya mere nha a na-emanye ugbu a bụ {$a->effective} MB. Nke dị ntakịrị n\'etiti ntọala gị na oke PHP nwere na-emeri mgbe niile.';
+$string['settings:max_audio_mb_capped'] = 'Oke dị na sava a bụ PHP, ọ bụghị ntọala a. Ka ndị mmụta wee nwee ike iji nha zuru ezu edobere ebe a, welie post_max_size na upload_max_filesize na php.ini ruo opekempe {$a}.';
+$string['voice:error_unavailable'] = 'Ọrụ ederede adịghị ugbu a. Biko nwaa ọzọ n\'oge na-adịghị anya.';
+
+$string['settings:max_audio_mb_range'] = 'Tinye ọnụọgụ dị n\'etiti {$a->min} na {$a->max}. Enweghị ike ịnabata ụkpụrụ buru ibu karịa: njedebe na-amachi na {$a->max}, ya mere ubi ga-ekwu oke koodu na-adịghị amanye.';

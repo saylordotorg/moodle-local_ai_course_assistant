@@ -1522,7 +1522,22 @@ define([
         initSpeech();
         syncVoicePanel();
         UI.setModeButtonsEnabled(!quizLocked && !attemptLocked);
-        if (attemptLocked) {
+        // Both locks, not just attemptLocked. quizLocked is the per-quiz
+        // assistance level `hidden`, and it is set on a quiz's VIEW page as well
+        // as its attempt page, so a learner can have quizLocked true and
+        // attemptLocked false: no attempt is in progress yet.
+        //
+        // Disabling here, before any open, is what stops the focus defect rather
+        // than any guard later. handleToggle disables the input AFTER the drawer
+        // opens, and disabling the element that currently has focus makes the
+        // browser drop focus to <body>. attemptLocked was already covered here;
+        // quizLocked was not, so on a hidden-level quiz view page the first open
+        // focused an enabled input and then lost it.
+        //
+        // handleSend refuses both flags anyway, so the input now matches what
+        // the server will do. The setInputEnabled(false) calls in handleToggle
+        // become no-ops, which is harmless.
+        if (attemptLocked || quizLocked) {
             UI.setInputEnabled(false);
             // The practice-quiz button is not a mode button, so setModeButtons
             // does not reach it. Left live it is the same self-contradicting
@@ -5139,9 +5154,24 @@ define([
         if (isFirstVisit) {
             UI.preWelcome();
         }
+        // setBottomMode BEFORE toggleDrawer, not after. The drawer keeps its
+        // --mode-history or --mode-voice class between opens, and both hide
+        // .local-ai-course-assistant__input-area with display:none. Opening
+        // first meant toggleDrawer chose its focus target while the input was
+        // still hidden, so a learner who used History, closed the drawer and
+        // reopened it got the drawer container rather than the message box.
+        // Putting the drawer back in chat mode first makes the input real
+        // before anything looks for it.
+        //
+        // The guard is belt and braces rather than load-bearing: handleToggle
+        // has already returned through handleReset() above if the drawer was
+        // open, so this is only ever reached on the way in. Kept so the call
+        // cannot fire on a close if that early return is ever removed.
+        if (!UI.isOpen()) {
+            setBottomMode('chat', {force: true});
+        }
         const opened = UI.toggleDrawer();
         if (opened) {
-            setBottomMode('chat', {force: true});
             syncVoicePanel();
             hydrateMasteryChip();
         }

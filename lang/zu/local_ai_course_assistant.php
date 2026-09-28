@@ -1546,7 +1546,7 @@ $string['soapbox:no_browser_stt'] = 'Lesi siphequluli asisekeli ukubona inkulumo
 $string['soapbox:browser_note'] = 'Le nkulumo ibhalwa phansi kusiphequluli sakho. Akukho okulayishwayo. Isebenza kahle kakhulu ku-Chrome ne-Safari.';
 $string['soapbox:server_note'] = 'Ukuqopha kwakho kulayishwa ukuze kubhalwe phansi kuphela futhi akugcinwa.';
 $string['soapbox:error'] = 'Ayikwazanga ukunika amaphuzu le nkulumo okwamanje. Zama futhi ngomzuzwana.';
-$string['soapbox:audio_too_large'] = 'Lokho kuqoshwa kukhulu kakhulu. Gcina izinkulumo zingaphansi kwacishe i-25 MB (cishe imizuzu engu-20).';
+$string['soapbox:audio_too_large'] = 'Lokhu kuqoshwa kukhulu kakhulu. Gcina izinkulumo zingaphansi kwamaMB angu-{$a}.';
 $string['soapbox:no_stt'] = 'Akukho mhlinzeki wokubhala phansi omisiwe. Cela umlawuli wakho ukuthi asethe i-Whisper noma avule ukubhala phansi kwesiphequluli.';
 $string['soapbox:result_heading'] = 'Amaphuzu esilinganiso';
 $string['soapbox:overall_heading'] = 'Sezizonke';
@@ -3131,3 +3131,16 @@ $string['outcomes:state_unavailable'] = 'Lo mphumela awutholakali okwamanje. Ake
 $string['cachedef_outcomesattainment'] = 'Ukufezeka kwemiphumela yohlelo ngomfundi ngamunye nangesifundo ngasinye';
 
 $string['cachedef_vectors'] = 'Amavektha e-embedding ye-RAG enkombeni yokulanda';
+
+$string['voice:error_toolarge'] = 'Lokhu kuqoshwa kukhulu kakhulu. Zama isiqeshana esifushane, ngaphansi kwamaMB angu-{$a}.';
+$string['voice:error_noaudio'] = 'Akukho kuqoshwa okutholakele. Sicela uzame ukuqopha futhi.';
+$string['voice:error_format'] = 'Lelo fomethi yomsindo ayisekelwe. Sicela uzame ukuqopha futhi.';
+$string['voice:error_noprovider'] = 'Ukubhalwa kwezwi akuselwe kule sayithi. Sicela uxhumane nomlawuli wakho.';
+$string['voice:error_badresponse'] = 'Isevisi yokubhala ibuyise okuthile okungalindelekile. Sicela uzame futhi.';
+
+$string['settings:max_audio_mb'] = 'Usayizi omkhulu wokuqoshwa (MB)';
+$string['settings:max_audio_mb_desc'] = 'Ukuqoshwa kwezwi okukhulu kunakho konke umfundi angakulayisha, ngamamegabyte. Phakathi kuka-{$a->min} no-{$a->max}; okuzenzakalelayo ngu-{$a->default}.<br>Kule seva i-PHP ivumela i-post_max_size = {$a->postmax} ne-upload_max_filesize = {$a->uploadmax}, ngakho usayizi osebenza ngempela manje ngu-{$a->effective} MB. Omncane phakathi kwesilungiselelo sakho nemikhawulo ye-PHP uhlala esebenza.';
+$string['settings:max_audio_mb_capped'] = 'Umkhawulo kule seva yi-PHP, hhayi lesi silungiselelo. Ukuze abafundi basebenzise usayizi ogcwele osethwe lapha, khuphula i-post_max_size ne-upload_max_filesize ku-php.ini okungenani kube ngu-{$a}.';
+$string['voice:error_unavailable'] = 'Isevisi yokubhala ayitholakali okwamanje. Sicela uzame futhi emizuzwaneni embalwa.';
+
+$string['settings:max_audio_mb_range'] = 'Faka inombolo ephakathi kuka-{$a->min} no-{$a->max}. Amanani amakhulu kunalawa awakwazi ukulandelwa: i-endpoint inciphisa ibe ngu-{$a->max}, ngakho lensimu ingasho umkhawulo ikhodi engawuphoqeleli.';

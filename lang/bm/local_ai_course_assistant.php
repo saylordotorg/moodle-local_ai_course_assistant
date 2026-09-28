@@ -1529,7 +1529,7 @@ $string['soapbox:no_browser_stt'] = 'Nin navigatɛri tɛ se ka kuma faamuyali k�
 $string['soapbox:browser_note'] = 'Nin kuma bɛ sɛbɛn i ka navigatɛri kɔnɔ. Foyi tɛ tila. A bɛ baara kɛ ka ɲɛ Chrome ni Safari kɔnɔ.';
 $string['soapbox:server_note'] = 'I ka sɛbɛnni bɛ tila sɛbɛnni dɔrɔn kama ani a tɛ mara.';
 $string['soapbox:error'] = 'Nin kuma sumani ma se ka kɛ sisan. A lajɛ tugun waati dɔɔni kɔ.';
-$string['soapbox:audio_too_large'] = 'O sɛbɛnni ka bon kojugu. Kumaw to 25 MB ɲɔgɔn duguma (a bɛ se miniti 20 ɲɔgɔn ma).';
+$string['soapbox:audio_too_large'] = 'Nin kumakan ka bon kojugu. Kumaw to {$a} MB ɲɔgɔn duguma.';
 $string['soapbox:no_stt'] = 'Sɛbɛnni dibaga si ma labɛn. A ɲini i ka mara ɲɛmɔgɔ fɛ ka Whisper labɛn walima ka navigatɛri sɛbɛnni dabɔ.';
 $string['soapbox:result_heading'] = 'Sariyasun hakɛw';
 $string['soapbox:overall_heading'] = 'A bɛɛ lajɛlen';
@@ -3115,3 +3115,16 @@ $string['outcomes:state_unavailable'] = 'Nin ɲɛtaa in tɛ sɔrɔ sisan. Mɔgɔ
 $string['cachedef_outcomesattainment'] = 'Porogaramu ɲɛtaa sɔrɔ (kalanden ni kalansen kelen-kelen na)';
 
 $string['cachedef_vectors'] = 'RAG embedding vɛkitɛriw sɔrɔli index kama';
+
+$string['voice:error_toolarge'] = 'Nin kumakan ka bon kojugu. A lajɛ ni kumakan surun ye, min tɛ tɛmɛ {$a} MB kan.';
+$string['voice:error_noaudio'] = 'Kumakan si ma se. Aw ye a lajɛ ka kumakan kɛ kokura.';
+$string['voice:error_format'] = 'Nin kumakan cogoya tɛ sɔrɔ. Aw ye a lajɛ ka kumakan kɛ kokura.';
+$string['voice:error_noprovider'] = 'Kumakan sɛbɛnni ma labɛn nin siti kan. Aw ye kuma a ɲɛmɔgɔ fɛ.';
+$string['voice:error_badresponse'] = 'Sɛbɛnni baara ye fɛn dɔ lasegin min ma lajɛ. Aw ye a lajɛ kokura.';
+
+$string['settings:max_audio_mb'] = 'Kumakan bonya belebele (MB)';
+$string['settings:max_audio_mb_desc'] = 'Kalanden bɛ se ka kumakan min bila, o bonya belebele, MB la. {$a->min} ni {$a->max} cɛ; a kɔnɔna ye {$a->default} ye.<br>Nin sɛrɛwɛri kan, PHP bɛ sɔn post_max_size = {$a->postmax} ni upload_max_filesize = {$a->uploadmax} ma, o la sisan bonya min bɛ baara la ye {$a->effective} MB ye. I ka labɛnni ni PHP ka dan cɛ, min ka dɔgɔ o de bɛ se tuma bɛɛ.';
+$string['settings:max_audio_mb_capped'] = 'Nin sɛrɛwɛri kan, PHP de ye dan ye, nin labɛnni tɛ. Walisa kalandenw ka se ka bonya bɛɛ kɛ min sigira yan, aw ye post_max_size ni upload_max_filesize yɛlɛma php.ini kɔnɔ ka se {$a} ma.';
+$string['voice:error_unavailable'] = 'Sɛbɛnni baara tɛ sɔrɔ sisan. Aw ye a lajɛ kokura dɔɔnin kɔfɛ.';
+
+$string['settings:max_audio_mb_range'] = 'Jate sɛbɛn {$a->min} ni {$a->max} cɛ. Jate belebele tɛ se ka kɛ: dan bɛ se {$a->max} ma, o la yɔrɔ bɛ dan fɔ min tɛ kɛ.';

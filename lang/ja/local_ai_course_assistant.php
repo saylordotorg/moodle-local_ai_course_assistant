@@ -1500,7 +1500,7 @@ $string['soapbox:no_browser_stt'] = 'このブラウザーはブラウザー内�
 $string['soapbox:browser_note'] = 'このスピーチはお使いのブラウザー内で文字起こしされます。アップロードされるものはありません。Chrome と Safari で最も適切に動作します。';
 $string['soapbox:server_note'] = 'あなたの録音は文字起こしのためだけにアップロードされ、保存されません。';
 $string['soapbox:error'] = '現在このスピーチを採点できませんでした。少し経ってからもう一度お試しください。';
-$string['soapbox:audio_too_large'] = 'その録音は大きすぎます。スピーチは約 25 MB（およそ 20 分）未満に収めてください。';
+$string['soapbox:audio_too_large'] = 'この録音はサイズが大きすぎます。スピーチは約 {$a} MB 未満に収めてください。';
 $string['soapbox:no_stt'] = '文字起こしプロバイダーが設定されていません。管理者に Whisper を設定するか、ブラウザー文字起こしを有効にするよう依頼してください。';
 $string['soapbox:result_heading'] = 'ルーブリックのスコア';
 $string['soapbox:overall_heading'] = '総合';
@@ -3085,3 +3085,16 @@ $string['outcomes:state_unavailable'] = 'この結果は現在表示できませ
 $string['cachedef_outcomesattainment'] = '学習者・コースごとのプログラムアウトカムの達成状況';
 
 $string['cachedef_vectors'] = 'RAG取得インデックス用の埋め込みベクトル';
+
+$string['voice:error_toolarge'] = 'この録音はサイズが大きすぎます。約{$a}MB未満の短いクリップをお試しください。';
+$string['voice:error_noaudio'] = '録音を受信できませんでした。もう一度録音してください。';
+$string['voice:error_format'] = 'この音声形式はサポートされていません。もう一度録音してください。';
+$string['voice:error_noprovider'] = 'このサイトでは音声文字起こしが設定されていません。管理者にお問い合わせください。';
+$string['voice:error_badresponse'] = '文字起こしサービスから予期しない応答が返されました。もう一度お試しください。';
+
+$string['settings:max_audio_mb'] = '録音の最大サイズ (MB)';
+$string['settings:max_audio_mb_desc'] = '学習者がアップロードできる音声録音の最大サイズ (メガバイト)。{$a->min} から {$a->max} の範囲で、既定値は {$a->default} です。<br>このサーバーでは PHP が post_max_size = {$a->postmax}、upload_max_filesize = {$a->uploadmax} を許可しているため、現在実際に適用されるサイズは {$a->effective} MB です。この設定と PHP 自身の制限のうち、必ず小さいほうが適用されます。';
+$string['settings:max_audio_mb_capped'] = 'このサーバーでは PHP が上限であり、この設定ではありません。ここで設定したサイズを学習者がすべて使えるようにするには、php.ini の post_max_size と upload_max_filesize を少なくとも {$a} に引き上げてください。';
+$string['voice:error_unavailable'] = '文字起こしサービスは現在利用できません。しばらくしてからもう一度お試しください。';
+
+$string['settings:max_audio_mb_range'] = '{$a->min} から {$a->max} までの数値を入力してください。これより大きい値は適用できません。エンドポイントは {$a->max} に制限するため、フィールドがコードの実際の制限と食い違うことになります。';

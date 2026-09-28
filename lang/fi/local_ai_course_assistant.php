@@ -1501,7 +1501,7 @@ $string['soapbox:no_browser_stt'] = 'Tämä selain ei tue selaimensisäistä puh
 $string['soapbox:browser_note'] = 'Tämä puhe litteroidaan selaimessasi. Mitään ei ladata palvelimelle. Toimii parhaiten Chromessa ja Safarissa.';
 $string['soapbox:server_note'] = 'Äänitteesi ladataan vain litterointia varten, eikä sitä tallenneta.';
 $string['soapbox:error'] = 'Tätä puhetta ei voitu pisteyttää juuri nyt. Yritä hetken kuluttua uudelleen.';
-$string['soapbox:audio_too_large'] = 'Äänite on liian suuri. Pidä puheet alle noin 25 MB:n kokoisina (noin 20 minuuttia).';
+$string['soapbox:audio_too_large'] = 'Tämä tallenne on liian suuri. Pidä puheet alle noin {$a} megatavun kokoisina.';
 $string['soapbox:no_stt'] = 'Litterointitarjoajaa ei ole määritetty. Pyydä järjestelmänvalvojaa määrittämään Whisper tai ottamaan selainlitterointi käyttöön.';
 $string['soapbox:result_heading'] = 'Rubriikkipisteet';
 $string['soapbox:overall_heading'] = 'Kokonaisuus';
@@ -3087,3 +3087,16 @@ $string['outcomes:state_unavailable'] = 'Tämä tulos ei ole juuri nyt saatavill
 $string['cachedef_outcomesattainment'] = 'Tutkinto-ohjelman oppimistulosten saavuttaminen (oppija- ja kurssikohtainen)';
 
 $string['cachedef_vectors'] = 'RAG-upotusvektorit hakuindeksiä varten';
+
+$string['voice:error_toolarge'] = 'Tämä tallenne on liian suuri. Kokeile lyhyempää pätkää, alle noin {$a} Mt.';
+$string['voice:error_noaudio'] = 'Tallennetta ei saatu. Yritä tallentaa uudelleen.';
+$string['voice:error_format'] = 'Tätä äänimuotoa ei tueta. Yritä tallentaa uudelleen.';
+$string['voice:error_noprovider'] = 'Puheen tekstitystä ei ole määritetty tällä sivustolla. Ota yhteyttä ylläpitäjään.';
+$string['voice:error_badresponse'] = 'Tekstityspalvelu palautti jotain odottamatonta. Yritä uudelleen.';
+
+$string['settings:max_audio_mb'] = 'Tallenteen enimmäiskoko (Mt)';
+$string['settings:max_audio_mb_desc'] = 'Suurin äänitallenne, jonka opiskelija saa ladata, megatavuina. Välillä {$a->min} ja {$a->max}; oletus on {$a->default}.<br>Tällä palvelimella PHP sallii post_max_size = {$a->postmax} ja upload_max_filesize = {$a->uploadmax}, joten juuri nyt tosiasiassa voimassa oleva koko on {$a->effective} Mt. Pienempi asetuksestasi ja PHP:n omista rajoista on aina voimassa.';
+$string['settings:max_audio_mb_capped'] = 'Rajan asettaa tällä palvelimella PHP, ei tämä asetus. Jotta opiskelijat voivat käyttää tässä asetetun koon kokonaan, nosta php.ini-tiedostossa post_max_size ja upload_max_filesize vähintään arvoon {$a}.';
+$string['voice:error_unavailable'] = 'Tekstityspalvelu ei ole juuri nyt käytettävissä. Yritä hetken kuluttua uudelleen.';
+
+$string['settings:max_audio_mb_range'] = 'Anna luku väliltä {$a->min} ja {$a->max}. Suurempia arvoja ei voi noudattaa: päätepiste rajaa arvoon {$a->max}, joten kenttä ilmoittaisi rajan, jota koodi ei valvo.';

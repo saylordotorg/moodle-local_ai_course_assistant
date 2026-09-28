@@ -1546,7 +1546,7 @@ $string['soapbox:no_browser_stt'] = 'Kivinjari hiki hakitumii utambuzi wa hotuba
 $string['soapbox:browser_note'] = 'Hotuba hii inanukuliwa katika kivinjari chako. Hakuna kinachopakiwa. Hufanya kazi vizuri zaidi katika Chrome na Safari.';
 $string['soapbox:server_note'] = 'Rekodi yako inapakiwa kwa ajili ya unukuzi pekee na haihifadhiwi.';
 $string['soapbox:error'] = 'Haikuwezekana kupima hotuba hii sasa hivi. Jaribu tena baada ya muda mfupi.';
-$string['soapbox:audio_too_large'] = 'Rekodi hiyo ni kubwa mno. Weka hotuba chini ya takriban 25 MB (takriban dakika 20).';
+$string['soapbox:audio_too_large'] = 'Rekodi hii ni kubwa mno. Weka hotuba chini ya takriban MB {$a}.';
 $string['soapbox:no_stt'] = 'Hakuna mtoa huduma wa unukuzi aliyesanidiwa. Mwombe msimamizi wako aweke Whisper au awashe unukuzi wa kivinjari.';
 $string['soapbox:result_heading'] = 'Alama za kigezo';
 $string['soapbox:overall_heading'] = 'Kwa ujumla';
@@ -3131,3 +3131,16 @@ $string['outcomes:state_unavailable'] = 'Tokeo hili halipatikani kwa sasa. Hakun
 $string['cachedef_outcomesattainment'] = 'Kiwango cha kufikia matokeo ya programu kwa kila mwanafunzi na kozi';
 
 $string['cachedef_vectors'] = 'Vekta za upachikaji wa RAG kwa faharasa ya urejeshaji';
+
+$string['voice:error_toolarge'] = 'Rekodi hii ni kubwa mno. Jaribu klipu fupi zaidi, chini ya takriban MB {$a}.';
+$string['voice:error_noaudio'] = 'Hakuna rekodi iliyopokelewa. Tafadhali jaribu kurekodi tena.';
+$string['voice:error_format'] = 'Muundo huo wa sauti hauungwi mkono. Tafadhali jaribu kurekodi tena.';
+$string['voice:error_noprovider'] = 'Unukuzi wa sauti haujawekwa kwenye tovuti hii. Tafadhali wasiliana na msimamizi wako.';
+$string['voice:error_badresponse'] = 'Huduma ya unukuzi ilirudisha jibu lisilotarajiwa. Tafadhali jaribu tena.';
+
+$string['settings:max_audio_mb'] = 'Ukubwa wa juu wa rekodi (MB)';
+$string['settings:max_audio_mb_desc'] = 'Rekodi kubwa zaidi ya sauti ambayo mwanafunzi anaweza kupakia, kwa megabaiti. Kati ya {$a->min} na {$a->max}; chaguo-msingi ni {$a->default}.<br>Kwenye seva hii PHP inaruhusu post_max_size = {$a->postmax} na upload_max_filesize = {$a->uploadmax}, hivyo ukubwa unaotekelezwa kwa kweli sasa ni {$a->effective} MB. Ndogo kati ya mpangilio wako na mipaka ya PHP yenyewe ndiyo hutumika kila wakati.';
+$string['settings:max_audio_mb_capped'] = 'Kikomo kwenye seva hii ni PHP, si mpangilio huu. Ili wanafunzi waweze kutumia ukubwa wote uliowekwa hapa, ongeza post_max_size na upload_max_filesize katika php.ini hadi angalau {$a}.';
+$string['voice:error_unavailable'] = 'Huduma ya unukuzi haipatikani kwa sasa. Tafadhali jaribu tena baada ya muda mfupi.';
+
+$string['settings:max_audio_mb_range'] = 'Weka nambari kati ya {$a->min} na {$a->max}. Thamani kubwa zaidi haziwezi kuheshimiwa: kiunganishi hupunguza hadi {$a->max}, hivyo sehemu hii ingetaja kikomo ambacho msimbo hautekelezi.';
