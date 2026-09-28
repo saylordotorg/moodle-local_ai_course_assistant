@@ -38,6 +38,10 @@ require_login();
 // exception at HTTP 200 and the server log records a CSRF failure that did not
 // happen. See security::oversized_post_was_discarded().
 if (\local_ai_course_assistant\security::oversized_post_was_discarded($_SERVER, $_POST, $_FILES)) {
+    // Same headers as every other response from this endpoint. This branch used
+    // to answer before send_security_headers() ran, making it the one reply
+    // without nosniff, CSP and X-Frame-Options.
+    \local_ai_course_assistant\security::send_security_headers();
     http_response_code(413);
     header('Content-Type: application/json');
     echo json_encode(['error' => get_string(
@@ -75,7 +79,12 @@ if (\local_ai_course_assistant\rate_limiter::is_rate_limited($USER->id, 'stt', 2
 // provided and was too big for upload_max_filesize (PHP default 2 MB) or for a
 // form MAX_FILE_SIZE; it leaves tmp_name empty exactly as an absent file does,
 // so it has to be separated out or an oversized clip is reported as a missing one.
-$uploaderror = (int) ($_FILES['audio']['error'] ?? UPLOAD_ERR_NO_FILE);
+// is_array guard first: a field posted as audio[] makes ['error'] an
+// ARRAY, and (int) on a non-empty array is 1, which is exactly
+// UPLOAD_ERR_INI_SIZE. Without this, a malformed upload with no size
+// problem is answered "that recording is too large".
+$rawerror = $_FILES['audio']['error'] ?? UPLOAD_ERR_NO_FILE;
+$uploaderror = is_array($rawerror) ? UPLOAD_ERR_NO_FILE : (int) $rawerror;
 if (\local_ai_course_assistant\security::upload_error_is_size($uploaderror)) {
     http_response_code(413);
     echo json_encode(['error' => get_string(

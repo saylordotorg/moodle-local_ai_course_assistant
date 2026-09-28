@@ -171,6 +171,12 @@ Feature: SOLA drawer interactions beyond send-receive
     And I am on "Test Course" course homepage
     When I click on "#local-ai-course-assistant-toggle" "css_element"
     And I read and accept the SOLA consent notice
+    # Focus must survive the Accept itself, not only a later reopen.
+    # consent_gate.js hides the banner while the Accept button holds focus, so
+    # without a release observer on the drawer focus falls to <body> with the
+    # dialog still open. The per-panel observer cannot cover it: a learner who
+    # has already dismissed the intro has no welcome panel at all.
+    Then focus should be inside "#local-ai-course-assistant-drawer"
     And I press the escape key
     Then "#local-ai-course-assistant-drawer" "css_element" should not be visible
     When I click on "#local-ai-course-assistant-toggle" "css_element"
@@ -282,6 +288,32 @@ Feature: SOLA drawer interactions beyond send-receive
     # Without this the scenario passes whether or not the lock fires, and a
     # mutation removing the refocus survived it for exactly that reason: no
     # lock, no setInputEnabled(false), nothing for the fix to do.
+    And the assistant input should be disabled by the lock
+    And focus should be inside "#local-ai-course-assistant-drawer"
+
+  @javascript
+  Scenario: A hidden-level quiz view page does not strand the keyboard
+    # Found in review round six, which corrected the round-five revert.
+    #
+    # I reverted a focus guard after checking that init() disables the input
+    # before any open. It does, but only for attemptLocked. quizLocked is a
+    # different flag: the per-quiz assistance level `hidden`, set on a quiz's
+    # VIEW page as well as its attempt page. So a learner on the view page of a
+    # hidden-level quiz, with no attempt started, had quizLocked true and
+    # attemptLocked false. The input was enabled when focusIntoDrawer ran, took
+    # focus, and was then disabled by handleToggle, which drops focus to <body>.
+    #
+    # My browser check staged a real attempt, which sets attemptLocked, so it
+    # exercised the branch init() already covered and the revert looked safe.
+    # init() now disables the input for both locks.
+    Given the following "activities" exist:
+      | activity | name        | course | idnumber |
+      | quiz     | Hidden Quiz | DI1    | quiz2    |
+    And the SOLA assistance level for quiz "Hidden Quiz" is "hidden"
+    And I log in as "student1"
+    When I am on the "Hidden Quiz" "quiz activity" page
+    And I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
     And the assistant input should be disabled by the lock
     And focus should be inside "#local-ai-course-assistant-drawer"
 

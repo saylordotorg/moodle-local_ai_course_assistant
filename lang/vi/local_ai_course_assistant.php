@@ -3115,6 +3115,8 @@ $string['voice:error_noprovider'] = 'Chuyển giọng nói thành văn bản ch�
 $string['voice:error_badresponse'] = 'Dịch vụ chuyển giọng nói trả về kết quả không mong đợi. Vui lòng thử lại.';
 
 $string['settings:max_audio_mb'] = 'Kích thước bản ghi tối đa (MB)';
-$string['settings:max_audio_mb_desc'] = 'Bản ghi giọng nói lớn nhất mà người học có thể tải lên, tính bằng megabyte. Từ 1 đến 200; mặc định là 25.<br>Trên máy chủ này, PHP cho phép post_max_size = {$a->postmax} và upload_max_filesize = {$a->uploadmax}, nên kích thước thực sự được áp dụng lúc này là {$a->effective} MB. Giá trị nhỏ hơn giữa cài đặt của bạn và giới hạn của chính PHP luôn được áp dụng.';
+$string['settings:max_audio_mb_desc'] = 'Bản ghi giọng nói lớn nhất mà người học có thể tải lên, tính bằng megabyte. Từ {$a->min} đến {$a->max}; mặc định là {$a->default}.<br>Trên máy chủ này, PHP cho phép post_max_size = {$a->postmax} và upload_max_filesize = {$a->uploadmax}, nên kích thước thực sự được áp dụng lúc này là {$a->effective} MB. Giá trị nhỏ hơn giữa cài đặt của bạn và giới hạn của chính PHP luôn được áp dụng.';
 $string['settings:max_audio_mb_capped'] = 'Giới hạn trên máy chủ này là do PHP, không phải cài đặt này. Để người học dùng được trọn kích thước đặt ở đây, hãy tăng post_max_size và upload_max_filesize trong php.ini lên ít nhất {$a}.';
 $string['voice:error_unavailable'] = 'Dịch vụ chuyển giọng nói hiện không khả dụng. Vui lòng thử lại sau giây lát.';
+
+$string['settings:max_audio_mb_range'] = 'Nhập một số từ {$a->min} đến {$a->max}. Giá trị lớn hơn không thể được tôn trọng: điểm cuối giới hạn ở {$a->max}, nên trường này sẽ nêu một giới hạn mà mã không thực thi.';

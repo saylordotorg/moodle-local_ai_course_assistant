@@ -3095,6 +3095,8 @@ $string['voice:error_noprovider'] = 'Bu sitede sesli yazıya dökme ayarlanmamı
 $string['voice:error_badresponse'] = 'Yazıya dökme hizmeti beklenmeyen bir yanıt döndürdü. Lütfen tekrar deneyin.';
 
 $string['settings:max_audio_mb'] = 'En büyük kayıt boyutu (MB)';
-$string['settings:max_audio_mb_desc'] = 'Bir öğrencinin yükleyebileceği en büyük ses kaydı, megabayt cinsinden. 1 ile 200 arasında; varsayılan 25.<br>Bu sunucuda PHP post_max_size = {$a->postmax} ve upload_max_filesize = {$a->uploadmax} değerlerine izin veriyor, dolayısıyla şu anda gerçekten uygulanan boyut {$a->effective} MB. Ayarınız ile PHP\'nin kendi sınırlarından küçük olan her zaman geçerlidir.';
+$string['settings:max_audio_mb_desc'] = 'Bir öğrencinin yükleyebileceği en büyük ses kaydı, megabayt cinsinden. {$a->min} ile {$a->max} arasında; varsayılan {$a->default}.<br>Bu sunucuda PHP post_max_size = {$a->postmax} ve upload_max_filesize = {$a->uploadmax} değerlerine izin veriyor, dolayısıyla şu anda gerçekten uygulanan boyut {$a->effective} MB. Ayarınız ile PHP\'nin kendi sınırlarından küçük olan her zaman geçerlidir.';
 $string['settings:max_audio_mb_capped'] = 'Bu sunucudaki sınırı bu ayar değil PHP belirliyor. Öğrencilerin burada ayarlanan boyutun tamamını kullanabilmesi için php.ini içindeki post_max_size ve upload_max_filesize değerlerini en az {$a} değerine yükseltin.';
 $string['voice:error_unavailable'] = 'Yazıya dökme hizmeti şu anda kullanılamıyor. Lütfen birazdan tekrar deneyin.';
+
+$string['settings:max_audio_mb_range'] = '{$a->min} ile {$a->max} arasında bir sayı girin. Daha büyük değerler uygulanamaz: uç nokta {$a->max} değerine sınırlar, bu yüzden alan kodun uygulamadığı bir sınırı belirtmiş olur.';

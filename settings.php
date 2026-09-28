@@ -1773,6 +1773,12 @@ if ($hassiteconfig) {
     // admin can see before a learner reports it.
     $phplimit = \local_ai_course_assistant\security::php_upload_limit_bytes();
     $maxaudiodesc = get_string('settings:max_audio_mb_desc', 'local_ai_course_assistant', (object) [
+        // Derived from the constants rather than written into 46 lang files.
+        // Change MIN_AUDIO_MB or MAX_AUDIO_MB with the bounds hardcoded in the
+        // string and every locale silently states the wrong range.
+        'min'       => \local_ai_course_assistant\security::MIN_AUDIO_MB,
+        'max'       => \local_ai_course_assistant\security::MAX_AUDIO_MB,
+        'default'   => (int) (\local_ai_course_assistant\security::MAX_AUDIO_BYTES / (1024 * 1024)),
         'postmax'   => (string) ini_get('post_max_size'),
         'uploadmax' => (string) ini_get('upload_max_filesize'),
         // The same helper the learner's error message uses. These printed
@@ -1800,7 +1806,11 @@ if ($hassiteconfig) {
             )
             . '</strong>';
     }
-    $settings->add(new admin_setting_configtext(
+    // A subclass rather than PARAM_INT alone: PARAM_INT accepts any integer, so
+    // an admin could save 500, see 500 in the box, and have the endpoint enforce
+    // 200. The field would then disagree with the code in the same way this
+    // release exists to stop the error message disagreeing with the cap.
+    $settings->add(new \local_ai_course_assistant\admin_setting_audio_mb(
         'local_ai_course_assistant/max_audio_mb',
         get_string('settings:max_audio_mb', 'local_ai_course_assistant'),
         $maxaudiodesc,

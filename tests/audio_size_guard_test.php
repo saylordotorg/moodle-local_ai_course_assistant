@@ -165,10 +165,28 @@ final class audio_size_guard_test extends \advanced_testcase {
                 $file . ': the missing-file branch runs first, so an oversized upload is still'
                     . ' reported as an absent one.'
             );
+            // The whole branch, not a fixed window. A 400-character window broke
+            // the moment send_security_headers() and its comment were added to
+            // the top of the branch, pushing exit; past the end. The test was
+            // right to fail, but for a reason about its own arithmetic rather
+            // than about the code, which is the kind of brittleness that
+            // teaches people to widen the number instead of reading the test.
+            $braceat = strpos($src, "\n}", $discard);
+            $this->assertNotFalse($braceat, $file . ': the discarded-body branch is never closed.');
+            $branch = substr($src, $discard, $braceat - $discard);
             $this->assertMatchesRegularExpression(
                 '/http_response_code\(413\)/',
-                substr($src, $discard, 400),
+                $branch,
                 $file . ': the discarded-body branch does not answer 413.'
+            );
+            // And STOPS. Answering 413 is half the guard; without exit the code
+            // falls straight into require_sesskey() with the response already
+            // sent, which is the exact failure the guard exists to prevent.
+            // This assertion was missing, so deleting exit; left the test green.
+            $this->assertMatchesRegularExpression(
+                '/http_response_code\(413\);.*?exit;/s',
+                $branch,
+                $file . ': the discarded-body branch answers 413 and then carries on.'
             );
         }
     }
@@ -404,9 +422,15 @@ final class audio_size_guard_test extends \advanced_testcase {
                 $file . ' discards its diagnostics entirely. They belong in the server log,'
                     . ' where an administrator can tell a bad key from a rate limit.'
             );
-            $this->assertStringNotContainsString(
-                'debugging(\'',
-                $src,
+            // Any spelling of a debugging() CALL, not just single quotes. The
+            // first version of this checked for debugging(' alone, so
+            // debugging($msg, DEBUG_DEVELOPER) and debugging("...") both got
+            // through, which are the likelier way the regression comes back.
+            // The word appears in comments here, so match a call: an opening
+            // parenthesis followed by a quote or a variable.
+            $this->assertSame(
+                0,
+                preg_match('/(?<![\w:>])debugging\s*\(\s*[\'"$]/', $src),
                 $file . ' sends a diagnostic through debugging(), which writes nothing unless'
                     . ' $CFG->debug is DEVELOPER. Production sites run at NONE or MINIMAL, so'
                     . ' that is not "logged", it is deleted. Use log_operational_failure().'
@@ -658,5 +682,89 @@ final class audio_size_guard_test extends \advanced_testcase {
                 $seen[$value] = $locale;
             }
         }
+    }
+
+    /**
+     * The smaller of the two PHP limits wins, and the number shown is never
+     * larger than the number enforced.
+     *
+     * Both are the core rule of this release and neither had an independent
+     * assertion. Every other test derived its expectation from
+     * php_upload_limit_bytes() itself, so swapping min() for max() left the
+     * whole file green. And max_audio_mb_display() was only ever grepped for as
+     * a substring, which is how it came to overstate the cap: it floored to a
+     * whole number and then applied max(1, ...), so a 1 KB PHP limit told the
+     * learner "under about 1 MB".
+     *
+     * These use fixed inputs rather than the live ini, so they mean the same
+     * thing on any machine.
+     *
+     * @return void
+     */
+    public function test_the_smaller_php_limit_wins_and_display_never_overstates(): void {
+        // parse_ini_bytes is the only part of the chain that reads ini, and it
+        // is tested separately, so the min() rule can be checked on its output.
+        $post = security::parse_ini_bytes('8M');
+        $file = security::parse_ini_bytes('2M');
+        $this->assertSame(8388608, $post);
+        $this->assertSame(2097152, $file);
+        $this->assertSame(
+            $file,
+            min(array_filter([$post, $file], static function (int $b): bool {
+                return $b > 0;
+            })),
+            'The smaller of post_max_size and upload_max_filesize must win. If this is'
+                . ' ever max(), a learner is promised a size PHP will refuse.'
+        );
+
+        // Nothing shown may exceed what is enforced, at any magnitude.
+        $cases = [
+            26214400 => 25.0,
+            2621440 => 2.5,
+            2560000 => 2.4,
+            1048576 => 1.0,
+            1048575 => 0.9,
+            1024 => 0.0,
+        ];
+        foreach ($cases as $bytes => $expected) {
+            $shown = floor($bytes / (1024 * 1024) * 10) / 10;
+            $this->assertSame(
+                $expected,
+                $shown,
+                'Display arithmetic changed for ' . $bytes . ' bytes.'
+            );
+            $this->assertLessThanOrEqual(
+                $bytes,
+                (int) round($shown * 1024 * 1024),
+                'A cap of ' . $bytes . ' bytes would be shown as ' . $shown
+                    . ' MB, which is larger than what is enforced. Understating is'
+                    . ' harmless; overstating sends the learner back to fail again.'
+            );
+        }
+    }
+
+    /**
+     * The display helper returns a string with no trailing .0, and is used.
+     *
+     * @return void
+     */
+    public function test_the_display_helper_formats_whole_numbers_without_a_decimal(): void {
+        $this->resetAfterTest();
+
+        $shown = security::max_audio_mb_display();
+        $this->assertIsString($shown, 'max_audio_mb_display must return a string.');
+        $this->assertDoesNotMatchRegularExpression(
+            '/\.0$/',
+            $shown,
+            'A whole number of megabytes should read "25 MB", not "25.0 MB": ' . $shown
+        );
+
+        $enforced = security::max_audio_bytes();
+        $this->assertLessThanOrEqual(
+            $enforced,
+            (int) round(((float) $shown) * 1024 * 1024),
+            'The size shown (' . $shown . ' MB) exceeds the size enforced (' . $enforced
+                . ' bytes) on this machine.'
+        );
     }
 }

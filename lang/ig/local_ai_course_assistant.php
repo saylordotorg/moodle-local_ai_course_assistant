@@ -3109,6 +3109,8 @@ $string['voice:error_noprovider'] = 'Edeghị ederede olu na saịtị a. Biko k
 $string['voice:error_badresponse'] = 'Ọrụ ederede weghachiri ihe a na-atụghị anya ya. Biko nwaa ọzọ.';
 
 $string['settings:max_audio_mb'] = 'Nha ndekọ kachasị (MB)';
-$string['settings:max_audio_mb_desc'] = 'Ndekọ olu kachasị ukwuu onye mmụta nwere ike ibudata, na megabyte. N\'etiti 1 na 200; ndabara bụ 25.<br>Na sava a PHP na-enye ohere post_max_size = {$a->postmax} na upload_max_filesize = {$a->uploadmax}, ya mere nha a na-emanye ugbu a bụ {$a->effective} MB. Nke dị ntakịrị n\'etiti ntọala gị na oke PHP nwere na-emeri mgbe niile.';
+$string['settings:max_audio_mb_desc'] = 'Ndekọ olu kachasị ukwuu onye mmụta nwere ike ibudata, na megabyte. N\'etiti {$a->min} na {$a->max}; ndabara bụ {$a->default}.<br>Na sava a PHP na-enye ohere post_max_size = {$a->postmax} na upload_max_filesize = {$a->uploadmax}, ya mere nha a na-emanye ugbu a bụ {$a->effective} MB. Nke dị ntakịrị n\'etiti ntọala gị na oke PHP nwere na-emeri mgbe niile.';
 $string['settings:max_audio_mb_capped'] = 'Oke dị na sava a bụ PHP, ọ bụghị ntọala a. Ka ndị mmụta wee nwee ike iji nha zuru ezu edobere ebe a, welie post_max_size na upload_max_filesize na php.ini ruo opekempe {$a}.';
 $string['voice:error_unavailable'] = 'Ọrụ ederede adịghị ugbu a. Biko nwaa ọzọ n\'oge na-adịghị anya.';
+
+$string['settings:max_audio_mb_range'] = 'Tinye ọnụọgụ dị n\'etiti {$a->min} na {$a->max}. Enweghị ike ịnabata ụkpụrụ buru ibu karịa: njedebe na-amachi na {$a->max}, ya mere ubi ga-ekwu oke koodu na-adịghị amanye.';

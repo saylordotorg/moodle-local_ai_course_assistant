@@ -1522,7 +1522,22 @@ define([
         initSpeech();
         syncVoicePanel();
         UI.setModeButtonsEnabled(!quizLocked && !attemptLocked);
-        if (attemptLocked) {
+        // Both locks, not just attemptLocked. quizLocked is the per-quiz
+        // assistance level `hidden`, and it is set on a quiz's VIEW page as well
+        // as its attempt page, so a learner can have quizLocked true and
+        // attemptLocked false: no attempt is in progress yet.
+        //
+        // Disabling here, before any open, is what stops the focus defect rather
+        // than any guard later. handleToggle disables the input AFTER the drawer
+        // opens, and disabling the element that currently has focus makes the
+        // browser drop focus to <body>. attemptLocked was already covered here;
+        // quizLocked was not, so on a hidden-level quiz view page the first open
+        // focused an enabled input and then lost it.
+        //
+        // handleSend refuses both flags anyway, so the input now matches what
+        // the server will do. The setInputEnabled(false) calls in handleToggle
+        // become no-ops, which is harmless.
+        if (attemptLocked || quizLocked) {
             UI.setInputEnabled(false);
             // The practice-quiz button is not a mode button, so setModeButtons
             // does not reach it. Left live it is the same self-contradicting

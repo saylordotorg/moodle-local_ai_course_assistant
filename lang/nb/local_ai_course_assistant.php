@@ -3093,6 +3093,8 @@ $string['voice:error_noprovider'] = 'Taletranskripsjon er ikke satt opp på dett
 $string['voice:error_badresponse'] = 'Transkripsjonstjenesten returnerte noe uventet. Prøv igjen.';
 
 $string['settings:max_audio_mb'] = 'Maksimal opptaksstørrelse (MB)';
-$string['settings:max_audio_mb_desc'] = 'Det største lydopptaket en student kan laste opp, i megabyte. Mellom 1 og 200; standarden er 25.<br>På denne serveren tillater PHP post_max_size = {$a->postmax} og upload_max_filesize = {$a->uploadmax}, så størrelsen som faktisk håndheves nå, er {$a->effective} MB. Den minste av innstillingen din og PHPs egne grenser gjelder alltid.';
+$string['settings:max_audio_mb_desc'] = 'Det største lydopptaket en student kan laste opp, i megabyte. Mellom {$a->min} og {$a->max}; standarden er {$a->default}.<br>På denne serveren tillater PHP post_max_size = {$a->postmax} og upload_max_filesize = {$a->uploadmax}, så størrelsen som faktisk håndheves nå, er {$a->effective} MB. Den minste av innstillingen din og PHPs egne grenser gjelder alltid.';
 $string['settings:max_audio_mb_capped'] = 'Grensen på denne serveren settes av PHP, ikke av denne innstillingen. For at studentene skal kunne bruke hele størrelsen som er satt her, øk post_max_size og upload_max_filesize i php.ini til minst {$a}.';
 $string['voice:error_unavailable'] = 'Transkripsjonstjenesten er ikke tilgjengelig akkurat nå. Prøv igjen om litt.';
+
+$string['settings:max_audio_mb_range'] = 'Skriv inn et tall mellom {$a->min} og {$a->max}. Større verdier kan ikke overholdes: endepunktet begrenser til {$a->max}, så feltet ville oppgi en grense koden ikke håndhever.';

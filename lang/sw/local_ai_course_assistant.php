@@ -3139,6 +3139,8 @@ $string['voice:error_noprovider'] = 'Unukuzi wa sauti haujawekwa kwenye tovuti h
 $string['voice:error_badresponse'] = 'Huduma ya unukuzi ilirudisha jibu lisilotarajiwa. Tafadhali jaribu tena.';
 
 $string['settings:max_audio_mb'] = 'Ukubwa wa juu wa rekodi (MB)';
-$string['settings:max_audio_mb_desc'] = 'Rekodi kubwa zaidi ya sauti ambayo mwanafunzi anaweza kupakia, kwa megabaiti. Kati ya 1 na 200; chaguo-msingi ni 25.<br>Kwenye seva hii PHP inaruhusu post_max_size = {$a->postmax} na upload_max_filesize = {$a->uploadmax}, hivyo ukubwa unaotekelezwa kwa kweli sasa ni {$a->effective} MB. Ndogo kati ya mpangilio wako na mipaka ya PHP yenyewe ndiyo hutumika kila wakati.';
+$string['settings:max_audio_mb_desc'] = 'Rekodi kubwa zaidi ya sauti ambayo mwanafunzi anaweza kupakia, kwa megabaiti. Kati ya {$a->min} na {$a->max}; chaguo-msingi ni {$a->default}.<br>Kwenye seva hii PHP inaruhusu post_max_size = {$a->postmax} na upload_max_filesize = {$a->uploadmax}, hivyo ukubwa unaotekelezwa kwa kweli sasa ni {$a->effective} MB. Ndogo kati ya mpangilio wako na mipaka ya PHP yenyewe ndiyo hutumika kila wakati.';
 $string['settings:max_audio_mb_capped'] = 'Kikomo kwenye seva hii ni PHP, si mpangilio huu. Ili wanafunzi waweze kutumia ukubwa wote uliowekwa hapa, ongeza post_max_size na upload_max_filesize katika php.ini hadi angalau {$a}.';
 $string['voice:error_unavailable'] = 'Huduma ya unukuzi haipatikani kwa sasa. Tafadhali jaribu tena baada ya muda mfupi.';
+
+$string['settings:max_audio_mb_range'] = 'Weka nambari kati ya {$a->min} na {$a->max}. Thamani kubwa zaidi haziwezi kuheshimiwa: kiunganishi hupunguza hadi {$a->max}, hivyo sehemu hii ingetaja kikomo ambacho msimbo hautekelezi.';

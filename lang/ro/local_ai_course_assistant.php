@@ -3094,6 +3094,8 @@ $string['voice:error_noprovider'] = 'Transcrierea vocală nu este configurată p
 $string['voice:error_badresponse'] = 'Serviciul de transcriere a returnat un răspuns neașteptat. Încercați din nou.';
 
 $string['settings:max_audio_mb'] = 'Dimensiunea maximă a înregistrării (MB)';
-$string['settings:max_audio_mb_desc'] = 'Cea mai mare înregistrare vocală pe care o poate încărca un cursant, în megaocteți. Între 1 și 200; valoarea implicită este 25.<br>Pe acest server PHP permite post_max_size = {$a->postmax} și upload_max_filesize = {$a->uploadmax}, așa că dimensiunea aplicată efectiv acum este {$a->effective} MB. Se aplică întotdeauna valoarea mai mică dintre setarea dumneavoastră și limitele PHP.';
+$string['settings:max_audio_mb_desc'] = 'Cea mai mare înregistrare vocală pe care o poate încărca un cursant, în megaocteți. Între {$a->min} și {$a->max}; valoarea implicită este {$a->default}.<br>Pe acest server PHP permite post_max_size = {$a->postmax} și upload_max_filesize = {$a->uploadmax}, așa că dimensiunea aplicată efectiv acum este {$a->effective} MB. Se aplică întotdeauna valoarea mai mică dintre setarea dumneavoastră și limitele PHP.';
 $string['settings:max_audio_mb_capped'] = 'Limita pe acest server este dată de PHP, nu de această setare. Pentru ca participanții să poată folosi întreaga dimensiune setată aici, creșteți post_max_size și upload_max_filesize în php.ini la cel puțin {$a}.';
 $string['voice:error_unavailable'] = 'Serviciul de transcriere nu este disponibil în acest moment. Încercați din nou peste puțin timp.';
+
+$string['settings:max_audio_mb_range'] = 'Introduceți un număr între {$a->min} și {$a->max}. Valorile mai mari nu pot fi respectate: punctul final limitează la {$a->max}, deci câmpul ar indica o limită pe care codul nu o aplică.';

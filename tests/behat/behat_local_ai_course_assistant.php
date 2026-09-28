@@ -70,6 +70,12 @@ class behat_local_ai_course_assistant extends behat_base {
      * @throws ExpectationException
      */
     public function region_should_not_leak_template_syntax(string $selector): void {
+        // A region that has not rendered returns '' from getText(), and ''
+        // contains no template syntax, so the check passes on nothing at all.
+        // The progress and history panels hydrate asynchronously, so without
+        // this the sweep was very likely inspecting empty panels.
+        $this->the_region_should_not_be_empty($selector);
+
         $node = $this->find('css', $selector);
         $text = $node->getText();
 
@@ -395,11 +401,13 @@ JS;
             . " if (!panel) { return 'NO PANEL'; }"
             . " if (!panel.hasAttribute('inert')) { return 'PANEL NOT INERT'; }"
             . " var cta = panel.querySelector('.local-ai-course-assistant__welcome-cta');"
-            . " if (cta && document.activeElement === cta) { return 'FOCUS ON CONTINUE'; }"
-            . " if (cta) {"
-            . "   cta.focus();"
-            . "   if (document.activeElement === cta) { return 'CONTINUE STILL FOCUSABLE'; }"
-            . " }"
+            // Missing button is a failure, not a pass. Returning SEALED here
+            // skipped both assertions this step advertises and reported success
+            // on the strength of the inert attribute alone.
+            . " if (!cta) { return 'NO CONTINUE BUTTON'; }"
+            . " if (document.activeElement === cta) { return 'FOCUS ON CONTINUE'; }"
+            . " cta.focus();"
+            . " if (document.activeElement === cta) { return 'CONTINUE STILL FOCUSABLE'; }"
             . " return 'SEALED';"
             . "})();"
         );
@@ -473,7 +481,7 @@ JS;
     public function the_assistant_input_should_be_disabled_by_the_lock(): void {
         $state = (string) $this->getSession()->evaluateScript(
             "return (function () {"
-            . " var root = document.getElementById('local-ai-course-assistant-root');"
+            . " var root = document.getElementById('local-ai-course-assistant');"
             . " var input = document.querySelector('.local-ai-course-assistant__input');"
             . " if (!input) { return 'NO INPUT'; }"
             . " var flag = root ? root.dataset.attemptLocked : '(no root)';"
@@ -488,5 +496,91 @@ JS;
                 $this->getSession()
             );
         }
+    }
+
+    /**
+     * Set a quiz's SOLA assistance level.
+     *
+     * Writes the row quiz_config_manager reads. There is no admin UI path worth
+     * driving for this in a focus test, and the level is what hook_callbacks
+     * turns into the data-quiz-locked attribute the JS reads.
+     *
+     * @Given /^the SOLA assistance level for quiz "(?P<quizname>[^"]*)" is "(?P<level>[^"]*)"$/
+     * @param string $quizname Quiz name.
+     * @param string $level One of the quiz_config_manager levels, e.g. hidden.
+     * @throws ExpectationException
+     */
+    public function the_sola_assistance_level_for_quiz_is(string $quizname, string $level): void {
+        global $DB;
+
+        $cm = $DB->get_record_sql(
+            "SELECT cm.id, cm.course
+               FROM {course_modules} cm
+               JOIN {modules} m ON m.id = cm.module AND m.name = 'quiz'
+               JOIN {quiz} q ON q.id = cm.instance
+              WHERE q.name = ?",
+            [$quizname]
+        );
+
+        if (!$cm) {
+            throw new ExpectationException(
+                'No quiz named "' . $quizname . '" to set an assistance level on.',
+                $this->getSession()
+            );
+        }
+
+        $table = \local_ai_course_assistant\quiz_config_manager::TABLE;
+        $existing = $DB->get_record($table, ['cmid' => $cm->id]);
+        if ($existing) {
+            $existing->assistance_level = $level;
+            $DB->update_record($table, $existing);
+            return;
+        }
+
+        $DB->insert_record($table, (object) [
+            'cmid' => $cm->id,
+            'courseid' => $cm->course,
+            'assistance_level' => $level,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+    }
+
+
+
+    /**
+     * A region has rendered something, before anything is asserted about it.
+     *
+     * Behat's getText() returns an empty string for a region that is hidden or
+     * has not been populated yet, and every content assertion passes trivially
+     * against an empty string. Spins, because the panels this guards hydrate
+     * from an AJAX call.
+     *
+     * @Then /^"(?P<selector>[^"]*)" should not be empty$/
+     * @param string $selector CSS selector.
+     * @throws ExpectationException
+     */
+    public function the_region_should_not_be_empty(string $selector): void {
+        $this->spin(
+            function () use ($selector) {
+                $node = $this->getSession()->getPage()->find('css', $selector);
+                if (!$node) {
+                    throw new ExpectationException(
+                        'No element matches "' . $selector . '".',
+                        $this->getSession()
+                    );
+                }
+                if (trim($node->getText()) === '') {
+                    throw new ExpectationException(
+                        '"' . $selector . '" is empty, so any assertion about its content'
+                            . ' would pass without inspecting anything.',
+                        $this->getSession()
+                    );
+                }
+                return true;
+            },
+            false,
+            10
+        );
     }
 }

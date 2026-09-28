@@ -3095,6 +3095,8 @@ $string['voice:error_noprovider'] = 'Hlasový přepis není na tomto webu nastav
 $string['voice:error_badresponse'] = 'Služba přepisu vrátila něco neočekávaného. Zkuste to prosím znovu.';
 
 $string['settings:max_audio_mb'] = 'Maximální velikost nahrávky (MB)';
-$string['settings:max_audio_mb_desc'] = 'Největší hlasová nahrávka, kterou může student nahrát, v megabajtech. Mezi 1 a 200; výchozí je 25.<br>Na tomto serveru PHP povoluje post_max_size = {$a->postmax} a upload_max_filesize = {$a->uploadmax}, takže skutečně vynucovaná velikost je nyní {$a->effective} MB. Vždy platí menší z vašeho nastavení a limitů PHP.';
+$string['settings:max_audio_mb_desc'] = 'Největší hlasová nahrávka, kterou může student nahrát, v megabajtech. Mezi {$a->min} a {$a->max}; výchozí je {$a->default}.<br>Na tomto serveru PHP povoluje post_max_size = {$a->postmax} a upload_max_filesize = {$a->uploadmax}, takže skutečně vynucovaná velikost je nyní {$a->effective} MB. Vždy platí menší z vašeho nastavení a limitů PHP.';
 $string['settings:max_audio_mb_capped'] = 'Limitem na tomto serveru je PHP, nikoli toto nastavení. Aby studenti mohli využít celou zde nastavenou velikost, zvyšte post_max_size a upload_max_filesize v php.ini alespoň na {$a}.';
 $string['voice:error_unavailable'] = 'Služba přepisu není právě teď dostupná. Zkuste to prosím za chvíli znovu.';
+
+$string['settings:max_audio_mb_range'] = 'Zadejte číslo mezi {$a->min} a {$a->max}. Vyšší hodnoty nelze dodržet: koncový bod omezuje na {$a->max}, takže pole by uvádělo limit, který kód nevynucuje.';

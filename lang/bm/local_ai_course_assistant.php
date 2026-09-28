@@ -3123,6 +3123,8 @@ $string['voice:error_noprovider'] = 'Kumakan sɛbɛnni ma labɛn nin siti kan. A
 $string['voice:error_badresponse'] = 'Sɛbɛnni baara ye fɛn dɔ lasegin min ma lajɛ. Aw ye a lajɛ kokura.';
 
 $string['settings:max_audio_mb'] = 'Kumakan bonya belebele (MB)';
-$string['settings:max_audio_mb_desc'] = 'Kalanden bɛ se ka kumakan min bila, o bonya belebele, MB la. 1 ni 200 cɛ; a kɔnɔna ye 25 ye.<br>Nin sɛrɛwɛri kan, PHP bɛ sɔn post_max_size = {$a->postmax} ni upload_max_filesize = {$a->uploadmax} ma, o la sisan bonya min bɛ baara la ye {$a->effective} MB ye. I ka labɛnni ni PHP ka dan cɛ, min ka dɔgɔ o de bɛ se tuma bɛɛ.';
+$string['settings:max_audio_mb_desc'] = 'Kalanden bɛ se ka kumakan min bila, o bonya belebele, MB la. {$a->min} ni {$a->max} cɛ; a kɔnɔna ye {$a->default} ye.<br>Nin sɛrɛwɛri kan, PHP bɛ sɔn post_max_size = {$a->postmax} ni upload_max_filesize = {$a->uploadmax} ma, o la sisan bonya min bɛ baara la ye {$a->effective} MB ye. I ka labɛnni ni PHP ka dan cɛ, min ka dɔgɔ o de bɛ se tuma bɛɛ.';
 $string['settings:max_audio_mb_capped'] = 'Nin sɛrɛwɛri kan, PHP de ye dan ye, nin labɛnni tɛ. Walisa kalandenw ka se ka bonya bɛɛ kɛ min sigira yan, aw ye post_max_size ni upload_max_filesize yɛlɛma php.ini kɔnɔ ka se {$a} ma.';
 $string['voice:error_unavailable'] = 'Sɛbɛnni baara tɛ sɔrɔ sisan. Aw ye a lajɛ kokura dɔɔnin kɔfɛ.';
+
+$string['settings:max_audio_mb_range'] = 'Jate sɛbɛn {$a->min} ni {$a->max} cɛ. Jate belebele tɛ se ka kɛ: dan bɛ se {$a->max} ma, o la yɔrɔ bɛ dan fɔ min tɛ kɛ.';

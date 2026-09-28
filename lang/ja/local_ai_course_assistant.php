@@ -3093,6 +3093,8 @@ $string['voice:error_noprovider'] = 'このサイトでは音声文字起こし�
 $string['voice:error_badresponse'] = '文字起こしサービスから予期しない応答が返されました。もう一度お試しください。';
 
 $string['settings:max_audio_mb'] = '録音の最大サイズ (MB)';
-$string['settings:max_audio_mb_desc'] = '学習者がアップロードできる音声録音の最大サイズ (メガバイト)。1 から 200 の範囲で、既定値は 25 です。<br>このサーバーでは PHP が post_max_size = {$a->postmax}、upload_max_filesize = {$a->uploadmax} を許可しているため、現在実際に適用されるサイズは {$a->effective} MB です。この設定と PHP 自身の制限のうち、必ず小さいほうが適用されます。';
+$string['settings:max_audio_mb_desc'] = '学習者がアップロードできる音声録音の最大サイズ (メガバイト)。{$a->min} から {$a->max} の範囲で、既定値は {$a->default} です。<br>このサーバーでは PHP が post_max_size = {$a->postmax}、upload_max_filesize = {$a->uploadmax} を許可しているため、現在実際に適用されるサイズは {$a->effective} MB です。この設定と PHP 自身の制限のうち、必ず小さいほうが適用されます。';
 $string['settings:max_audio_mb_capped'] = 'このサーバーでは PHP が上限であり、この設定ではありません。ここで設定したサイズを学習者がすべて使えるようにするには、php.ini の post_max_size と upload_max_filesize を少なくとも {$a} に引き上げてください。';
 $string['voice:error_unavailable'] = '文字起こしサービスは現在利用できません。しばらくしてからもう一度お試しください。';
+
+$string['settings:max_audio_mb_range'] = '{$a->min} から {$a->max} までの数値を入力してください。これより大きい値は適用できません。エンドポイントは {$a->max} に制限するため、フィールドがコードの実際の制限と食い違うことになります。';

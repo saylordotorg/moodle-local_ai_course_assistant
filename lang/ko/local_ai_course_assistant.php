@@ -3093,6 +3093,8 @@ $string['voice:error_noprovider'] = '이 사이트에는 음성 전사가 설정
 $string['voice:error_badresponse'] = '전사 서비스가 예기치 않은 응답을 반환했습니다. 다시 시도해 주세요.';
 
 $string['settings:max_audio_mb'] = '최대 녹음 크기 (MB)';
-$string['settings:max_audio_mb_desc'] = '학습자가 업로드할 수 있는 음성 녹음의 최대 크기(메가바이트)입니다. 1에서 200 사이이며 기본값은 25입니다.<br>이 서버에서 PHP는 post_max_size = {$a->postmax}, upload_max_filesize = {$a->uploadmax}를 허용하므로 지금 실제로 적용되는 크기는 {$a->effective} MB입니다. 이 설정과 PHP 자체 제한 중 항상 더 작은 값이 적용됩니다.';
+$string['settings:max_audio_mb_desc'] = '학습자가 업로드할 수 있는 음성 녹음의 최대 크기(메가바이트)입니다. {$a->min}에서 {$a->max} 사이이며 기본값은 {$a->default}입니다.<br>이 서버에서 PHP는 post_max_size = {$a->postmax}, upload_max_filesize = {$a->uploadmax}를 허용하므로 지금 실제로 적용되는 크기는 {$a->effective} MB입니다. 이 설정과 PHP 자체 제한 중 항상 더 작은 값이 적용됩니다.';
 $string['settings:max_audio_mb_capped'] = '이 서버에서는 이 설정이 아니라 PHP가 한도를 정합니다. 학습자가 여기에서 설정한 크기를 모두 사용할 수 있게 하려면 php.ini의 post_max_size와 upload_max_filesize를 최소 {$a}로 올리세요.';
 $string['voice:error_unavailable'] = '전사 서비스를 지금은 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.';
+
+$string['settings:max_audio_mb_range'] = '{$a->min}에서 {$a->max} 사이의 숫자를 입력하세요. 더 큰 값은 적용할 수 없습니다. 엔드포인트가 {$a->max}로 제한하므로 필드가 코드와 다른 한도를 표시하게 됩니다.';

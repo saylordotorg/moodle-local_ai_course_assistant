@@ -3115,6 +3115,8 @@ $string['voice:error_noprovider'] = 'A ko ṣeto kikọ ohun sori ayelujara yii.
 $string['voice:error_badresponse'] = 'Iṣẹ kikọ naa da nkan airotẹlẹ pada. Jọwọ gbiyanju lẹẹkansi.';
 
 $string['settings:max_audio_mb'] = 'Iwọn gbigbasilẹ ti o pọ julọ (MB)';
-$string['settings:max_audio_mb_desc'] = 'Gbigbasilẹ ohun ti o tobi julọ ti akẹkọ le gbe sori ẹrọ, ni megabyte. Laarin 1 ati 200; aiyipada ni 25.<br>Lori olupin yii PHP gba post_max_size = {$a->postmax} ati upload_max_filesize = {$a->uploadmax} laaye, nitorinaa iwọn ti a fi lelẹ gangan ni bayi ni {$a->effective} MB. Eyi ti o kere laarin eto rẹ ati awọn opin PHP ni yoo maa ṣiṣẹ nigbagbogbo.';
+$string['settings:max_audio_mb_desc'] = 'Gbigbasilẹ ohun ti o tobi julọ ti akẹkọ le gbe sori ẹrọ, ni megabyte. Laarin {$a->min} ati {$a->max}; aiyipada ni {$a->default}.<br>Lori olupin yii PHP gba post_max_size = {$a->postmax} ati upload_max_filesize = {$a->uploadmax} laaye, nitorinaa iwọn ti a fi lelẹ gangan ni bayi ni {$a->effective} MB. Eyi ti o kere laarin eto rẹ ati awọn opin PHP ni yoo maa ṣiṣẹ nigbagbogbo.';
 $string['settings:max_audio_mb_capped'] = 'PHP ni o ṣeto opin lori olupin yii, kii ṣe eto yii. Ki awọn akẹkọ le lo gbogbo iwọn ti a ṣeto nibi, gbe post_max_size ati upload_max_filesize soke ninu php.ini si o kere ju {$a}.';
 $string['voice:error_unavailable'] = 'Iṣẹ kikọ ko si ni bayi. Jọwọ gbiyanju lẹẹkansi laipẹ.';
+
+$string['settings:max_audio_mb_range'] = 'Tẹ nọmba kan laarin {$a->min} ati {$a->max} sii. A ko le bọwọ fun awọn iye ti o tobi ju: opin naa dín si {$a->max}, nitorinaa aaye naa yoo sọ opin ti koodu ko fi lelẹ.';

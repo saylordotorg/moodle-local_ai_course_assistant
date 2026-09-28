@@ -3095,6 +3095,8 @@ $string['voice:error_noprovider'] = 'Puheen tekstitystä ei ole määritetty tä
 $string['voice:error_badresponse'] = 'Tekstityspalvelu palautti jotain odottamatonta. Yritä uudelleen.';
 
 $string['settings:max_audio_mb'] = 'Tallenteen enimmäiskoko (Mt)';
-$string['settings:max_audio_mb_desc'] = 'Suurin äänitallenne, jonka opiskelija saa ladata, megatavuina. Välillä 1 ja 200; oletus on 25.<br>Tällä palvelimella PHP sallii post_max_size = {$a->postmax} ja upload_max_filesize = {$a->uploadmax}, joten juuri nyt tosiasiassa voimassa oleva koko on {$a->effective} Mt. Pienempi asetuksestasi ja PHP:n omista rajoista on aina voimassa.';
+$string['settings:max_audio_mb_desc'] = 'Suurin äänitallenne, jonka opiskelija saa ladata, megatavuina. Välillä {$a->min} ja {$a->max}; oletus on {$a->default}.<br>Tällä palvelimella PHP sallii post_max_size = {$a->postmax} ja upload_max_filesize = {$a->uploadmax}, joten juuri nyt tosiasiassa voimassa oleva koko on {$a->effective} Mt. Pienempi asetuksestasi ja PHP:n omista rajoista on aina voimassa.';
 $string['settings:max_audio_mb_capped'] = 'Rajan asettaa tällä palvelimella PHP, ei tämä asetus. Jotta opiskelijat voivat käyttää tässä asetetun koon kokonaan, nosta php.ini-tiedostossa post_max_size ja upload_max_filesize vähintään arvoon {$a}.';
 $string['voice:error_unavailable'] = 'Tekstityspalvelu ei ole juuri nyt käytettävissä. Yritä hetken kuluttua uudelleen.';
+
+$string['settings:max_audio_mb_range'] = 'Anna luku väliltä {$a->min} ja {$a->max}. Suurempia arvoja ei voi noudattaa: päätepiste rajaa arvoon {$a->max}, joten kenttä ilmoittaisi rajan, jota koodi ei valvo.';

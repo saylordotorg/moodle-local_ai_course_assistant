@@ -3115,6 +3115,8 @@ $string['voice:error_noprovider'] = 'Bindug baat defaruñu ko ci sit bii. Jokkoo
 $string['voice:error_badresponse'] = 'Sarwisu bind bi delloo na benn mbir bu ñu séentuwul. Jéemaatal.';
 
 $string['settings:max_audio_mb'] = 'Yaatuwaayu enrejistarmaan bi gëna mag (MB)';
-$string['settings:max_audio_mb_desc'] = 'Enrejistarmaanu baat bi gëna mag bi jàngkat bi mana yeb, ci megaoctet. Ci diggante 1 ak 200; li ñu tànn ci njëkk mooy 25.<br>Ci sarwëer bii, PHP dafay may post_max_size = {$a->postmax} ak upload_max_filesize = {$a->uploadmax}, kon yaatuwaay bi ñuy jëfandikoo léegi mooy {$a->effective} MB. Li gëna tuuti ci sa tànneef ak dayoy PHP mooy jëf saa su nekk.';
+$string['settings:max_audio_mb_desc'] = 'Enrejistarmaanu baat bi gëna mag bi jàngkat bi mana yeb, ci megaoctet. Ci diggante {$a->min} ak {$a->max}; li ñu tànn ci njëkk mooy {$a->default}.<br>Ci sarwëer bii, PHP dafay may post_max_size = {$a->postmax} ak upload_max_filesize = {$a->uploadmax}, kon yaatuwaay bi ñuy jëfandikoo léegi mooy {$a->effective} MB. Li gëna tuuti ci sa tànneef ak dayoy PHP mooy jëf saa su nekk.';
 $string['settings:max_audio_mb_capped'] = 'Ci sarwëer bii, PHP moo doon dayo bi, du tànneef bii. Ngir jàngkat yi mana jëfandikoo yaatuwaay bi ñu tànn fii bépp, yokkal post_max_size ak upload_max_filesize ci php.ini ba {$a} lu néew néew.';
 $string['voice:error_unavailable'] = 'Sarwisu bind bi amul léegi. Jéemaatal ci kanam tuuti.';
+
+$string['settings:max_audio_mb_range'] = 'Bindal benn limu ci diggante {$a->min} ak {$a->max}. Limu gëna mag mënul ñu ko topp: dan bi mooy {$a->max}, kon barab bi dina wax dayo bu kod bi dul jëfandikoo.';

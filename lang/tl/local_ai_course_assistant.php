@@ -3139,6 +3139,8 @@ $string['voice:error_noprovider'] = 'Hindi naka-set up ang voice transcription s
 $string['voice:error_badresponse'] = 'Nagbalik ng hindi inaasahang tugon ang transcription service. Pakisubukan ulit.';
 
 $string['settings:max_audio_mb'] = 'Pinakamalaking laki ng recording (MB)';
-$string['settings:max_audio_mb_desc'] = 'Ang pinakamalaking voice recording na maaaring i-upload ng isang mag-aaral, sa megabytes. Sa pagitan ng 1 at 200; ang default ay 25.<br>Sa server na ito, pinapayagan ng PHP ang post_max_size = {$a->postmax} at upload_max_filesize = {$a->uploadmax}, kaya ang laking talagang ipinapatupad ngayon ay {$a->effective} MB. Ang mas maliit sa pagitan ng iyong setting at ng sariling limitasyon ng PHP ang laging masusunod.';
+$string['settings:max_audio_mb_desc'] = 'Ang pinakamalaking voice recording na maaaring i-upload ng isang mag-aaral, sa megabytes. Sa pagitan ng {$a->min} at {$a->max}; ang default ay {$a->default}.<br>Sa server na ito, pinapayagan ng PHP ang post_max_size = {$a->postmax} at upload_max_filesize = {$a->uploadmax}, kaya ang laking talagang ipinapatupad ngayon ay {$a->effective} MB. Ang mas maliit sa pagitan ng iyong setting at ng sariling limitasyon ng PHP ang laging masusunod.';
 $string['settings:max_audio_mb_capped'] = 'Ang PHP ang naglilimita sa server na ito, hindi ang setting na ito. Para magamit ng mga mag-aaral ang buong laking nakatakda rito, itaas ang post_max_size at upload_max_filesize sa php.ini sa hindi bababa sa {$a}.';
 $string['voice:error_unavailable'] = 'Hindi available ngayon ang transcription service. Pakisubukan ulit maya-maya.';
+
+$string['settings:max_audio_mb_range'] = 'Maglagay ng numero sa pagitan ng {$a->min} at {$a->max}. Hindi maigagalang ang mas malalaking halaga: nililimitahan ng endpoint sa {$a->max}, kaya magsasaad ang field ng limitasyong hindi ipinapatupad ng code.';

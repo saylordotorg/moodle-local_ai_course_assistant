@@ -499,21 +499,31 @@ class security {
     }
 
     /**
-     * The effective cap as a whole number of megabytes, for showing to a person.
+     * The effective cap in megabytes, as a string, for showing to a person.
      *
      * One function so the settings page and the learner's error message cannot
      * state different numbers for the same limit. Review found the page using
      * round(x, 1) and the errors using floor(x): at upload_max_filesize = 2500K
      * the admin read 2.4 MB and the learner read 2 MB.
      *
-     * Floors, so the number shown is always one the learner can actually send,
-     * but never below 1: a PHP limit under a megabyte would otherwise render as
-     * "under about 0 MB", which is not advice.
+     * NEVER ROUNDS UP. The number shown has to be one the learner can actually
+     * send, so this floors, to one decimal place. An earlier version floored to
+     * a whole number and then applied max(1, ...) to avoid printing "0 MB",
+     * which reintroduced this release's own defect at the bottom of the range:
+     * with a 1 KB PHP limit it told the learner "under about 1 MB", wrong by a
+     * factor of a thousand, and at 1048575 bytes it said 1 MB while a 1 MB file
+     * was refused. Understating is harmless; overstating sends the learner back
+     * to fail again.
      *
-     * @return int Megabytes, at least 1.
+     * A whole number prints without a decimal, so the ordinary case reads
+     * "25 MB" rather than "25.0 MB".
+     *
+     * @return string Megabytes, floored to one decimal.
      */
-    public static function max_audio_mb_display(): int {
-        return max(1, (int) floor(self::max_audio_bytes() / (1024 * 1024)));
+    public static function max_audio_mb_display(): string {
+        $mb = floor(self::max_audio_bytes() / (1024 * 1024) * 10) / 10;
+
+        return $mb == (int) $mb ? (string) (int) $mb : (string) $mb;
     }
 
     /**

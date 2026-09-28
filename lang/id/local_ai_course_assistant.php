@@ -3147,6 +3147,8 @@ $string['voice:error_noprovider'] = 'Transkripsi suara belum disiapkan di situs 
 $string['voice:error_badresponse'] = 'Layanan transkripsi mengembalikan sesuatu yang tidak terduga. Silakan coba lagi.';
 
 $string['settings:max_audio_mb'] = 'Ukuran rekaman maksimum (MB)';
-$string['settings:max_audio_mb_desc'] = 'Rekaman suara terbesar yang boleh diunggah pelajar, dalam megabita. Antara 1 dan 200; defaultnya 25.<br>Di server ini PHP mengizinkan post_max_size = {$a->postmax} dan upload_max_filesize = {$a->uploadmax}, sehingga ukuran yang benar-benar diberlakukan saat ini adalah {$a->effective} MB. Yang lebih kecil antara pengaturan Anda dan batas PHP selalu yang berlaku.';
+$string['settings:max_audio_mb_desc'] = 'Rekaman suara terbesar yang boleh diunggah pelajar, dalam megabita. Antara {$a->min} dan {$a->max}; defaultnya {$a->default}.<br>Di server ini PHP mengizinkan post_max_size = {$a->postmax} dan upload_max_filesize = {$a->uploadmax}, sehingga ukuran yang benar-benar diberlakukan saat ini adalah {$a->effective} MB. Yang lebih kecil antara pengaturan Anda dan batas PHP selalu yang berlaku.';
 $string['settings:max_audio_mb_capped'] = 'Batasnya di server ini adalah PHP, bukan pengaturan ini. Agar pelajar dapat menggunakan seluruh ukuran yang diatur di sini, naikkan post_max_size dan upload_max_filesize di php.ini menjadi setidaknya {$a}.';
 $string['voice:error_unavailable'] = 'Layanan transkripsi sedang tidak tersedia. Silakan coba lagi sebentar lagi.';
+
+$string['settings:max_audio_mb_range'] = 'Masukkan angka antara {$a->min} dan {$a->max}. Nilai yang lebih besar tidak dapat dipenuhi: endpoint membatasi ke {$a->max}, sehingga kolom ini akan menyatakan batas yang tidak diberlakukan kode.';

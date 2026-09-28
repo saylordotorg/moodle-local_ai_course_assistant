@@ -6,7 +6,7 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 
 **Release Date:** September 2026
 **Plugin build:** 2026092800
-**Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1; supported through 5.3.
+**Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1. `version.php` declares support through 5.2.
 **License:** GPL v3+
 **Maturity:** Stable. In production on Saylor's Learn and Degrees sites.
 
@@ -49,7 +49,7 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 - **Spoken Responses:** Text-to-speech playback of answers
 - **Live Voice Mode:** Optional two-way spoken conversation using OpenAI's Realtime API, with a live transcript and ELL coaching
 - **Self-hosted Speech-to-Text:** Point at any OpenAI-compatible Whisper server for transcription at no per-minute cost
-- **Recording Size Limit:** Configurable (default 25 MB). Note that PHP's own `post_max_size` (default 8 MB) and `upload_max_filesize` (default 2 MB) are both below that, and the smaller limit always wins. The settings page prints your server's real values next to the setting, so you can see which number is actually in force before a learner finds out for you. Raise both to at least 26M in `php.ini` to give learners the full 25 MB
+- **Recording Size Limit:** Configurable (default 25 MB). Note that PHP's own `post_max_size` (default 8 MB) and `upload_max_filesize` (default 2 MB) are both below that, and the smaller limit always wins. The settings page prints your server's real values next to the setting, so you can see which number is actually in force before a learner finds out for you. Raise both to at least one megabyte above whatever you set here, in `php.ini`, for learners to get the full amount
 
 ### Retrieval (RAG)
 - **Semantic Retrieval:** Answers are grounded in the actual course content rather than general web knowledge. Indexes pages, books, files, PDF, DOCX, PPTX, H5P and SCORM content, plus transcripts for embedded video

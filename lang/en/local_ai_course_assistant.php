@@ -1821,7 +1821,8 @@ $string['soapbox:no_stt']           = 'No transcription provider is configured. 
 // at render time, so an admin sees the real ceiling on their own server rather
 // than a number from the documentation.
 $string['settings:max_audio_mb'] = 'Maximum recording size (MB)';
-$string['settings:max_audio_mb_desc'] = 'The largest voice recording a learner may upload, in megabytes. Between 1 and 200; the default is 25.<br>On this server PHP allows post_max_size = {$a->postmax} and upload_max_filesize = {$a->uploadmax}, so the size actually enforced right now is {$a->effective} MB. The smaller of your setting and PHP\'s own limits always wins.';
+$string['settings:max_audio_mb_desc'] = 'The largest voice recording a learner may upload, in megabytes. Between {$a->min} and {$a->max}; the default is {$a->default}.<br>On this server PHP allows post_max_size = {$a->postmax} and upload_max_filesize = {$a->uploadmax}, so the size actually enforced right now is {$a->effective} MB. The smaller of your setting and PHP\'s own limits always wins.';
+$string['settings:max_audio_mb_range'] = 'Enter a number between {$a->min} and {$a->max}. Larger values cannot be honoured: the endpoint clamps to {$a->max}, so the field would state a limit the code would not enforce.';
 $string['settings:max_audio_mb_capped'] = 'PHP on this server is the limit, not this setting. To let learners use the full size set here, raise post_max_size and upload_max_filesize in php.ini to at least {$a}.';
 
 $string['voice:error_toolarge']     = 'That recording is too large. Try a shorter clip, under about {$a} MB.';

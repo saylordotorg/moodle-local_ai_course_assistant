@@ -3118,6 +3118,8 @@ $string['voice:error_noprovider'] = 'Spraaktranscriptie is niet ingesteld op dez
 $string['voice:error_badresponse'] = 'De transcriptiedienst gaf een onverwacht antwoord. Probeer het opnieuw.';
 
 $string['settings:max_audio_mb'] = 'Maximale opnamegrootte (MB)';
-$string['settings:max_audio_mb_desc'] = 'De grootste spraakopname die een cursist mag uploaden, in megabytes. Tussen 1 en 200; de standaard is 25.<br>Op deze server staat PHP post_max_size = {$a->postmax} en upload_max_filesize = {$a->uploadmax} toe, dus de grootte die op dit moment daadwerkelijk wordt afgedwongen is {$a->effective} MB. De kleinste van je instelling en PHP\'s eigen limieten geldt altijd.';
+$string['settings:max_audio_mb_desc'] = 'De grootste spraakopname die een cursist mag uploaden, in megabytes. Tussen {$a->min} en {$a->max}; de standaard is {$a->default}.<br>Op deze server staat PHP post_max_size = {$a->postmax} en upload_max_filesize = {$a->uploadmax} toe, dus de grootte die op dit moment daadwerkelijk wordt afgedwongen is {$a->effective} MB. De kleinste van je instelling en PHP\'s eigen limieten geldt altijd.';
 $string['settings:max_audio_mb_capped'] = 'De limiet op deze server is PHP, niet deze instelling. Om cursisten de volledige hier ingestelde grootte te laten gebruiken, verhoog je post_max_size en upload_max_filesize in php.ini naar minstens {$a}.';
 $string['voice:error_unavailable'] = 'De transcriptiedienst is op dit moment niet beschikbaar. Probeer het zo meteen opnieuw.';
+
+$string['settings:max_audio_mb_range'] = 'Voer een getal tussen {$a->min} en {$a->max} in. Grotere waarden kunnen niet worden nageleefd: het eindpunt begrenst op {$a->max}, dus het veld zou een limiet noemen die de code niet afdwingt.';

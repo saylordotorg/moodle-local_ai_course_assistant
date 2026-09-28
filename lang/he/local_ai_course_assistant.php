@@ -3134,6 +3134,8 @@ $string['voice:error_noprovider'] = 'תמלול קולי אינו מוגדר ב�
 $string['voice:error_badresponse'] = 'שירות התמלול החזיר תשובה לא צפויה. נסו שוב.';
 
 $string['settings:max_audio_mb'] = 'גודל הקלטה מרבי (מ"ב)';
-$string['settings:max_audio_mb_desc'] = 'ההקלטה הקולית הגדולה ביותר שלומד יכול להעלות, במגה-בייט. בין 1 ל-200; ברירת המחדל היא 25.<br>בשרת הזה PHP מתיר post_max_size = {$a->postmax} ו-upload_max_filesize = {$a->uploadmax}, ולכן הגודל שנאכף בפועל כרגע הוא {$a->effective} מ"ב. הקטן מבין ההגדרה שלכם לבין מגבלות PHP הוא זה שתמיד קובע.';
+$string['settings:max_audio_mb_desc'] = 'ההקלטה הקולית הגדולה ביותר שלומד יכול להעלות, במגה-בייט. בין {$a->min} ל-{$a->max}; ברירת המחדל היא {$a->default}.<br>בשרת הזה PHP מתיר post_max_size = {$a->postmax} ו-upload_max_filesize = {$a->uploadmax}, ולכן הגודל שנאכף בפועל כרגע הוא {$a->effective} מ"ב. הקטן מבין ההגדרה שלכם לבין מגבלות PHP הוא זה שתמיד קובע.';
 $string['settings:max_audio_mb_capped'] = 'המגבלה בשרת הזה היא PHP, לא ההגדרה הזו. כדי שהלומדים יוכלו להשתמש במלוא הגודל שנקבע כאן, העלו את post_max_size ואת upload_max_filesize בקובץ php.ini ל-{$a} לפחות.';
 $string['voice:error_unavailable'] = 'שירות התמלול אינו זמין כרגע. נסו שוב בעוד רגע.';
+
+$string['settings:max_audio_mb_range'] = 'הזינו מספר בין {$a->min} ל-{$a->max}. ערכים גדולים יותר לא ניתנים לאכיפה: נקודת הקצה מגבילה ל-{$a->max}, כך שהשדה יציג מגבלה שהקוד אינו אוכף.';

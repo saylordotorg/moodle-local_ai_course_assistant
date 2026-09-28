@@ -3131,6 +3131,8 @@ $string['voice:error_noprovider'] = '本站点尚未设置语音转录。请联�
 $string['voice:error_badresponse'] = '转录服务返回了意外的结果。请重试。';
 
 $string['settings:max_audio_mb'] = '录音最大容量（MB）';
-$string['settings:max_audio_mb_desc'] = '学习者可上传的最大语音录音容量，单位为兆字节。取值 1 至 200，默认 25。<br>本服务器上 PHP 允许 post_max_size = {$a->postmax}、upload_max_filesize = {$a->uploadmax}，因此当前实际生效的容量为 {$a->effective} MB。此设置与 PHP 自身限制中较小的一个始终生效。';
+$string['settings:max_audio_mb_desc'] = '学习者可上传的最大语音录音容量，单位为兆字节。取值 {$a->min} 至 {$a->max}，默认 {$a->default}。<br>本服务器上 PHP 允许 post_max_size = {$a->postmax}、upload_max_filesize = {$a->uploadmax}，因此当前实际生效的容量为 {$a->effective} MB。此设置与 PHP 自身限制中较小的一个始终生效。';
 $string['settings:max_audio_mb_capped'] = '本服务器的限制来自 PHP，而非此设置。若希望学习者能使用此处设置的完整容量，请将 php.ini 中的 post_max_size 和 upload_max_filesize 提高到至少 {$a}。';
 $string['voice:error_unavailable'] = '转录服务当前不可用。请稍后重试。';
+
+$string['settings:max_audio_mb_range'] = '请输入 {$a->min} 到 {$a->max} 之间的数字。更大的值无法生效：端点会限制为 {$a->max}，届时此字段声明的上限与代码实际执行的并不一致。';

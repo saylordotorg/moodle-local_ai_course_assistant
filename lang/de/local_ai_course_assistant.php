@@ -3095,6 +3095,8 @@ $string['voice:error_noprovider'] = 'Die Sprachtranskription ist auf dieser Webs
 $string['voice:error_badresponse'] = 'Der Transkriptionsdienst hat etwas Unerwartetes zurückgegeben. Bitte versuchen Sie es erneut.';
 
 $string['settings:max_audio_mb'] = 'Maximale Aufnahmegröße (MB)';
-$string['settings:max_audio_mb_desc'] = 'Die größte Sprachaufnahme, die Lernende hochladen dürfen, in Megabyte. Zwischen 1 und 200; Standard ist 25.<br>Auf diesem Server erlaubt PHP post_max_size = {$a->postmax} und upload_max_filesize = {$a->uploadmax}, die derzeit tatsächlich durchgesetzte Größe beträgt also {$a->effective} MB. Es gilt immer der kleinere Wert aus Ihrer Einstellung und den PHP-Grenzen.';
+$string['settings:max_audio_mb_desc'] = 'Die größte Sprachaufnahme, die Lernende hochladen dürfen, in Megabyte. Zwischen {$a->min} und {$a->max}; Standard ist {$a->default}.<br>Auf diesem Server erlaubt PHP post_max_size = {$a->postmax} und upload_max_filesize = {$a->uploadmax}, die derzeit tatsächlich durchgesetzte Größe beträgt also {$a->effective} MB. Es gilt immer der kleinere Wert aus Ihrer Einstellung und den PHP-Grenzen.';
 $string['settings:max_audio_mb_capped'] = 'Die Grenze auf diesem Server setzt PHP, nicht diese Einstellung. Damit Lernende die hier eingestellte Größe voll nutzen können, erhöhen Sie post_max_size und upload_max_filesize in der php.ini auf mindestens {$a}.';
 $string['voice:error_unavailable'] = 'Der Transkriptionsdienst ist derzeit nicht verfügbar. Bitte versuchen Sie es in Kürze erneut.';
+
+$string['settings:max_audio_mb_range'] = 'Geben Sie eine Zahl zwischen {$a->min} und {$a->max} ein. Größere Werte lassen sich nicht einhalten: der Endpunkt begrenzt auf {$a->max}, das Feld würde also ein Limit nennen, das der Code nicht durchsetzt.';

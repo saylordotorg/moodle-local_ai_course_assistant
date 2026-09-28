@@ -3126,6 +3126,8 @@ $string['voice:error_noprovider'] = 'Barreeffamni sagalee marsariitii kana irrat
 $string['voice:error_badresponse'] = 'Tajaajilli barreeffamaa deebii hin eegamne deebise. Maaloo irra deebi\'ii yaali.';
 
 $string['settings:max_audio_mb'] = 'Guddina waraabbii ol\'aanaa (MB)';
-$string['settings:max_audio_mb_desc'] = 'Waraabbii sagalee guddaan barataan olkaa\'uu danda\'u, megabaayitiidhaan. 1 fi 200 gidduu; durtiin 25 dha.<br>Sarvara kana irratti PHP post_max_size = {$a->postmax} fi upload_max_filesize = {$a->uploadmax} hayyama, kanaafuu guddinni amma dhugumaan hojiirra oolu {$a->effective} MB dha. Qindaa\'ina kee fi daangaa PHP gidduudhaa inni xiqqaan yeroo hunda kan hojiirra oolu dha.';
+$string['settings:max_audio_mb_desc'] = 'Waraabbii sagalee guddaan barataan olkaa\'uu danda\'u, megabaayitiidhaan. {$a->min} fi {$a->max} gidduu; durtiin {$a->default} dha.<br>Sarvara kana irratti PHP post_max_size = {$a->postmax} fi upload_max_filesize = {$a->uploadmax} hayyama, kanaafuu guddinni amma dhugumaan hojiirra oolu {$a->effective} MB dha. Qindaa\'ina kee fi daangaa PHP gidduudhaa inni xiqqaan yeroo hunda kan hojiirra oolu dha.';
 $string['settings:max_audio_mb_capped'] = 'Sarvara kana irratti daangaan PHP dha malee qindaa\'ina kana miti. Barattoonni guddina asitti qindaa\'e guutuu akka fayyadamaniif php.ini keessatti post_max_size fi upload_max_filesize yoo xiqqaate gara {$a} tti ol kaasi.';
 $string['voice:error_unavailable'] = 'Tajaajilli barreeffamaa yeroo ammaa hin argamu. Maaloo yeroo muraasa booda irra deebi\'ii yaali.';
+
+$string['settings:max_audio_mb_range'] = 'Lakkoofsa {$a->min} fi {$a->max} gidduu jiru galchi. Gatiin isaa caalu hojiirra ooluu hin danda\'u: dhumti {$a->max} irratti daangessa, kanaaf dirreen daangaa koodiin hin hojjenne ibsa.';

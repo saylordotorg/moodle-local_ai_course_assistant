@@ -3093,6 +3093,8 @@ $string['voice:error_noprovider'] = 'لم يتم إعداد التفريغ ال�
 $string['voice:error_badresponse'] = 'أعادت خدمة التفريغ استجابة غير متوقعة. يرجى المحاولة مرة أخرى.';
 
 $string['settings:max_audio_mb'] = 'الحد الأقصى لحجم التسجيل (ميجابايت)';
-$string['settings:max_audio_mb_desc'] = 'أكبر تسجيل صوتي يمكن للمتعلم رفعه، بالميجابايت. بين 1 و200؛ القيمة الافتراضية 25.<br>على هذا الخادم يسمح PHP بـ post_max_size = {$a->postmax} و upload_max_filesize = {$a->uploadmax}، لذا فإن الحجم المطبَّق فعليًا الآن هو {$a->effective} ميجابايت. الأصغر بين إعدادك وحدود PHP هو الذي يسري دائمًا.';
+$string['settings:max_audio_mb_desc'] = 'أكبر تسجيل صوتي يمكن للمتعلم رفعه، بالميجابايت. بين {$a->min} و{$a->max}؛ القيمة الافتراضية {$a->default}.<br>على هذا الخادم يسمح PHP بـ post_max_size = {$a->postmax} و upload_max_filesize = {$a->uploadmax}، لذا فإن الحجم المطبَّق فعليًا الآن هو {$a->effective} ميجابايت. الأصغر بين إعدادك وحدود PHP هو الذي يسري دائمًا.';
 $string['settings:max_audio_mb_capped'] = 'الحد على هذا الخادم هو PHP وليس هذا الإعداد. لتمكين المتعلمين من استخدام الحجم الكامل المحدد هنا، ارفع post_max_size و upload_max_filesize في php.ini إلى {$a} على الأقل.';
 $string['voice:error_unavailable'] = 'خدمة التفريغ الصوتي غير متاحة حاليًا. يرجى المحاولة مرة أخرى بعد قليل.';
+
+$string['settings:max_audio_mb_range'] = 'أدخل رقمًا بين {$a->min} و{$a->max}. القيم الأكبر لا يمكن تطبيقها: تقتصر نقطة النهاية على {$a->max}، فيصبح الحقل معلنًا حدًا لا ينفذه الكود.';
