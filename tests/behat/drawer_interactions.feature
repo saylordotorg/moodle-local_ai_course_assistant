@@ -145,6 +145,40 @@ Feature: SOLA drawer interactions beyond send-receive
     And focus should be on ".aica-consent-scroll"
 
   @javascript
+  Scenario: After accepting the notice, reopening still puts focus in the drawer
+    # Found in the third review round, in the fix from the second.
+    #
+    # Accepting consent sets banner.style.display = 'none' and calls release().
+    # It never removes the banner and never marks the banner itself inert, since
+    # inert only ever went on its siblings. So on every later open the selector
+    # still matched, focus was aimed at a display:none scroll region, which
+    # focus() ignores, and the input and drawer fallbacks were skipped because a
+    # target had already been chosen.
+    #
+    # The learner accepted the notice, closed the drawer, reopened it, and was
+    # back to focus on <body>. The same WCAG 2.4.3 defect, one interaction later,
+    # introduced by the fix for the interaction before it.
+    Given the following "users" exist:
+      | username | firstname | lastname | email              |
+      | newbie   | New       | Learner  | newbie@example.com |
+    And the following "course enrolments" exist:
+      | user   | course | role    |
+      | newbie | DI1    | student |
+    And the following "user preferences" exist:
+      | user   | preference                                | value |
+      | newbie | local_ai_course_assistant_intro_dismissed | 1     |
+    And I log in as "newbie"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    And I read and accept the SOLA consent notice
+    And I press the escape key
+    Then "#local-ai-course-assistant-drawer" "css_element" should not be visible
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    And focus should be inside "#local-ai-course-assistant-drawer"
+    And focus should be on ".local-ai-course-assistant__input"
+
+  @javascript
   Scenario: On a phone the assistant takes focus without opening the keyboard
     # The mobile half of the same fix, and the reason it is not simply "focus
     # the message box". Focusing a textarea on a phone opens the on-screen

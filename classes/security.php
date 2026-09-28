@@ -571,13 +571,18 @@ class security {
      * @return void
      */
     public static function log_operational_failure(string $message): void {
-        // phpcs:ignore moodle.PHP.ForbiddenFunctions.Found
         // moodle-cs lists error_log alongside print_r as a development debugging
         // function. Here it is the deliberate choice and the docblock says why:
         // it is the only core-free channel that writes at every debug level, and
         // debugging() writes nothing on a production site. A custom event plus a
         // logstore row would add database writes on an error path that fires
         // once per failed request during an outage.
+        //
+        // The sniff is FoundWithAlternative, not Found: moodle-cs knows what it
+        // would rather you called, and says so. The directive has to name that
+        // code and sit on the line immediately above the call, because a
+        // standalone phpcs:ignore covers exactly one following line.
+        // phpcs:ignore moodle.PHP.ForbiddenFunctions.FoundWithAlternative
         error_log('SOLA: ' . $message);
     }
 

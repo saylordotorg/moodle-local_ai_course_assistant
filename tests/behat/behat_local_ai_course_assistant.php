@@ -332,4 +332,46 @@ JS;
             );
         }
     }
+
+    /**
+     * Read and accept the consent notice the way a learner has to.
+     *
+     * The Accept button starts disabled and consent_gate.js only enables it once
+     * the notice has been scrolled to the bottom, or once it is short enough not
+     * to need scrolling. A step that clicked the button directly would be
+     * clicking a disabled control, so this scrolls first and waits for the gate
+     * to release it.
+     *
+     * @Given /^I read and accept the SOLA consent notice$/
+     * @throws ExpectationException
+     */
+    public function i_read_and_accept_the_sola_consent_notice(): void {
+        $this->getSession()->evaluateScript(
+            "(function () {"
+            . " var s = document.querySelector('.aica-consent-scroll');"
+            . " if (s) { s.scrollTop = s.scrollHeight; s.dispatchEvent(new Event('scroll')); }"
+            . "})();"
+        );
+
+        // The gate reacts to the scroll event and to a ResizeObserver, so give
+        // it a moment rather than assuming the next statement sees the result.
+        $this->spin(
+            function () {
+                $enabled = $this->getSession()->evaluateScript(
+                    "return !!document.querySelector('.aica-consent-accept:not([disabled])');"
+                );
+                if (!$enabled) {
+                    throw new ExpectationException(
+                        'The consent Accept button is still disabled after scrolling the notice.',
+                        $this->getSession()
+                    );
+                }
+                return true;
+            },
+            false,
+            10
+        );
+
+        $this->execute('behat_general::i_click_on', ['.aica-consent-accept', 'css_element']);
+    }
 }

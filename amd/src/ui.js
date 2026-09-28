@@ -1925,7 +1925,16 @@ define([
 
         let focusinto = null;
         var banner = drawer.querySelector('.aica-consent-banner');
-        if (banner && !inert(banner)) {
+        // Visible, not merely present. Accepting consent sets
+        // banner.style.display = 'none' and calls release(); it never removes
+        // the banner and never marks the banner itself inert, because inert
+        // only ever went on its siblings. So on every later open in the same
+        // page the selector still matches, and without this check focus went to
+        // a display:none scroll region, which focus() ignores, while the input
+        // and drawer fallbacks below were skipped because focusinto was already
+        // set. The learner accepted the notice, closed the drawer, reopened it,
+        // and was back to focus on <body>: the same defect, one interaction later.
+        if (banner && !inert(banner) && banner.getClientRects().length > 0) {
             focusinto = banner.querySelector('.aica-consent-scroll') || banner;
         }
 
