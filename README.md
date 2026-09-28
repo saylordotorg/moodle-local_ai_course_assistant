@@ -7,10 +7,53 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 **Release Date:** September 2026
 **Plugin build:** 2026092800
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1. `version.php` declares support through 5.2.
+**Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+
 **Maturity:** Stable. In production on Saylor's Learn and Degrees sites.
 
 See the [Changelog](https://github.com/saylordotorg/moodle-local_ai_course_assistant/wiki/Changelog) for what's new and the [GitHub Releases](https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases) page for the canonical version list.
+
+## Moodle Workplace
+
+**Not tested. On a multi-tenant Workplace site, not recommended today.**
+
+This is stated explicitly because silence reads as tacit support. Asked in
+[#246](https://github.com/saylordotorg/moodle-local_ai_course_assistant/issues/246).
+
+CI covers Moodle LMS only: 4.5, 5.0 and 5.1, on PHP 8.1 to 8.3, with PostgreSQL
+and MariaDB. There is no Workplace instance in our infrastructure, so there is no
+evidence either way, which is not the same as believing it works.
+
+The plugin contains no reference to Workplace, tenants or `tool_tenant`. It was
+written for a single-tenant site because that is what Saylor runs.
+
+**The specific risk.** Four admin pages are gated on system context and query
+learner data with no tenant predicate: `analytics.php`, `audit_log.php`,
+`rag_admin.php` and `prompt_metrics.php`. `analytics::get_overview(0)` means
+every course on the site.
+
+In a standard Workplace setup a tenant administrator holds their role inside the
+tenant's category and so fails that system-context check, which is protective.
+But it is an accident of how the gating was written rather than a boundary anyone
+designed, and it inverts badly: if a deployment grants a tenant admin any
+system-level manager role, they would see learner conversations, prompt text and
+AI spend from every tenant. Chat messages are stored in full.
+
+Course-scoped surfaces are sound by comparison. `instructor_dashboard.php`
+resolves a `courseid` and checks `context_course`, which is correct under
+multi-tenancy as well.
+
+Workspaces, dynamic rules and shared spaces are all untested. The widget renders
+from a `before_footer_html_generation` hook and bails when the course is
+`SITEID`; whether a workspace presents as a course context that passes that check
+is unknown.
+
+**If you evaluate it**, start on a non-production tenant, open those four admin
+pages as whichever role your tenant admins actually hold, and confirm what they
+can see before any learner uses it. Findings are welcome in an issue and will be
+documented here. A tenant-scoping contribution would be considered on its merits:
+the four pages need a tenant predicate and the analytics queries need to accept
+one.
 
 ## Credits
 
