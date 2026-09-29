@@ -3129,7 +3129,6 @@ $string['voice:error_unavailable'] = 'Sɛbɛnni baara tɛ sɔrɔ sisan. Aw ye a 
 
 $string['settings:max_audio_mb_range'] = 'Jate sɛbɛn {$a->min} ni {$a->max} cɛ. Jate belebele tɛ se ka kɛ: dan bɛ se {$a->max} ma, o la yɔrɔ bɛ dan fɔ min tɛ kɛ.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Dɛmɛbaga baara kɛ kalan kɔkan';
 $string['settings:support_enabled'] = 'Dɛmɛli cogoya daminɛ kalanw kɔkan';
 $string['settings:support_enabled_desc'] = 'Kalandenw bɛ se ka [[tutorshort]] dayɛlɛ ɲɛw kan minnu tɛ kalan ye, i n’a fɔ tableau de bord walima u ka profil kan, walasa ka ɲininkali kɛ tɔgɔsɛbɛnni, sɛbɛn sɔrɔli, tekiniki gɛlɛyaw ani dɛmɛli ɲininkali wɛrɛw kan. Dɛmɛli kalan ka kan ka sigi duguma fɔlɔ. Kalandenw mago bɛ se in na hali bi: "Dɛmɛbaga baara kɛ kalan kɔkan", o se bɛ don baarakɛla dansɛgɛninw bɛɛ bolo u yɛrɛma.';

@@ -3115,7 +3115,6 @@ $string['voice:error_unavailable'] = 'Ọrụ ederede adịghị ugbu a. Biko nw
 
 $string['settings:max_audio_mb_range'] = 'Tinye ọnụọgụ dị n\'etiti {$a->min} na {$a->max}. Enweghị ike ịnabata ụkpụrụ buru ibu karịa: njedebe na-amachi na {$a->max}, ya mere ubi ga-ekwu oke koodu na-adịghị amanye.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Jiri onye enyemaka ahụ na mpụga usoro ihe ọmụmụ';
 $string['settings:support_enabled'] = 'Gbanye ọnọdụ nkwado na mpụga usoro ihe ọmụmụ';
 $string['settings:support_enabled_desc'] = 'Na-enye ndị mmụta ohere imepe [[tutorshort]] na ibe ndị na-abụghị usoro ihe ọmụmụ, dị ka dashboard ma ọ bụ profaịlụ ha, ịjụ ajụjụ gbasara ndebanye aha, asambodo, nsogbu teknụzụ na ajụjụ nkwado ndị ọzọ. Ọ chọrọ ka a họpụta usoro ihe ọmụmụ nkwado n\'okpuru. Ndị mmụta ka chọrọ ikike "Jiri onye enyemaka ahụ na mpụga usoro ihe ọmụmụ", nke ndị ọrụ banyere n\'akaụntụ ha nwere na ndabara.';

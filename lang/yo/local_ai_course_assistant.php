@@ -3121,7 +3121,6 @@ $string['voice:error_unavailable'] = 'Iṣẹ kikọ ko si ni bayi. Jọwọ gbi
 
 $string['settings:max_audio_mb_range'] = 'Tẹ nọmba kan laarin {$a->min} ati {$a->max} sii. A ko le bọwọ fun awọn iye ti o tobi ju: opin naa dín si {$a->max}, nitorinaa aaye naa yoo sọ opin ti koodu ko fi lelẹ.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Lo olùrànlọ́wọ́ náà níta ẹ̀kọ́ kan';
 $string['settings:support_enabled'] = 'Mú ipò ìrànlọ́wọ́ ṣiṣẹ́ níta àwọn ẹ̀kọ́';
 $string['settings:support_enabled_desc'] = 'Fàyè gba àwọn akẹ́kọ̀ọ́ láti ṣí [[tutorshort]] sórí àwọn ojú-ìwé tí kì í ṣe ẹ̀kọ́, bíi ojú-ìwé ìṣàkóso tàbí profáìlì wọn, láti béèrè nípa ìforúkọsílẹ̀, ìwé-ẹ̀rí, ìṣòro ìmọ̀-ẹ̀rọ àti àwọn ìbéèrè ìrànlọ́wọ́ mìíràn. Ó nílò ẹ̀kọ́ ìrànlọ́wọ́ tí a gbọ́dọ̀ yàn nísàlẹ̀. Àwọn akẹ́kọ̀ọ́ ṣì nílò agbára "Lo olùrànlọ́wọ́ náà níta ẹ̀kọ́ kan", tí àwọn olùlò tí a ti fọwọ́sí ti ní tẹ́lẹ̀.';

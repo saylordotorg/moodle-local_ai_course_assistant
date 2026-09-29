@@ -3137,7 +3137,6 @@ $string['voice:error_unavailable'] = '转录服务当前不可用。请稍后重
 
 $string['settings:max_audio_mb_range'] = '请输入 {$a->min} 到 {$a->max} 之间的数字。更大的值无法生效：端点会限制为 {$a->max}，届时此字段声明的上限与代码实际执行的并不一致。';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = '在课程之外使用助手';
 $string['settings:support_enabled'] = '启用课程之外的支持模式';
 $string['settings:support_enabled_desc'] = '允许学习者在仪表板、个人资料等非课程页面打开 [[tutorshort]]，咨询选课注册、证书、技术故障等支持类问题。需要在下方指定一门支持课程。学习者还须具备“在课程之外使用助手”权限，已认证用户默认拥有该权限。';

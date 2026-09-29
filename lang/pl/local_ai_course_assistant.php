@@ -3100,7 +3100,6 @@ $string['voice:error_unavailable'] = 'Usługa transkrypcji jest w tej chwili nie
 
 $string['settings:max_audio_mb_range'] = 'Wpisz liczbę od {$a->min} do {$a->max}. Większych wartości nie da się zachować: punkt końcowy ogranicza do {$a->max}, więc pole podawałoby limit, którego kod nie egzekwuje.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Korzystanie z asystenta poza kursem';
 $string['settings:support_enabled'] = 'Włącz tryb wsparcia poza kursami';
 $string['settings:support_enabled_desc'] = 'Pozwala studentom otwierać [[tutorshort]] na stronach niebędących kursem, na przykład na kokpicie lub w profilu, aby zadawać pytania o zapisy, certyfikaty, problemy techniczne i inne sprawy wymagające wsparcia. Wymaga wskazania kursu wsparcia poniżej. Studenci muszą też mieć uprawnienie „Korzystanie z asystenta poza kursem”, które domyślnie przysługuje uwierzytelnionym użytkownikom.';

@@ -3101,7 +3101,6 @@ $string['voice:error_unavailable'] = 'Tekstityspalvelu ei ole juuri nyt käytett
 
 $string['settings:max_audio_mb_range'] = 'Anna luku väliltä {$a->min} ja {$a->max}. Suurempia arvoja ei voi noudattaa: päätepiste rajaa arvoon {$a->max}, joten kenttä ilmoittaisi rajan, jota koodi ei valvo.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Käytä avustajaa kurssien ulkopuolella';
 $string['settings:support_enabled'] = 'Ota tukitila käyttöön kurssien ulkopuolella';
 $string['settings:support_enabled_desc'] = 'Anna opiskelijoiden avata [[tutorshort]] myös muilla kuin kurssisivuilla, kuten työpöydällä tai omassa profiilissaan, ja kysyä ilmoittautumisesta, todistuksista, teknisistä ongelmista ja muista tukiasioista. Edellyttää, että alle on valittu tukikurssi. Lisäksi opiskelijalla on oltava oikeus "Käytä avustajaa kurssien ulkopuolella", joka on kirjautuneilla käyttäjillä oletuksena.';

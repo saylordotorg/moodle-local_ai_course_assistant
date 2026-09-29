@@ -3145,7 +3145,6 @@ $string['voice:error_unavailable'] = 'Huduma ya unukuzi haipatikani kwa sasa. Ta
 
 $string['settings:max_audio_mb_range'] = 'Weka nambari kati ya {$a->min} na {$a->max}. Thamani kubwa zaidi haziwezi kuheshimiwa: kiunganishi hupunguza hadi {$a->max}, hivyo sehemu hii ingetaja kikomo ambacho msimbo hautekelezi.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Tumia msaidizi nje ya kozi';
 $string['settings:support_enabled'] = 'Washa hali ya msaada nje ya kozi';
 $string['settings:support_enabled_desc'] = 'Huwaruhusu wanafunzi kufungua [[tutorshort]] kwenye kurasa zisizo za kozi, kama dashibodi au wasifu wao, ili kuuliza kuhusu usajili, vyeti, matatizo ya kiufundi na maswali mengine ya msaada. Ni lazima uweke kozi ya msaada hapa chini. Zaidi ya hayo, wanafunzi wanahitaji uwezo wa "Tumia msaidizi nje ya kozi", ambao watumiaji waliothibitishwa wanao kwa chaguo-msingi.';

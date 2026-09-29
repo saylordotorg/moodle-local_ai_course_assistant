@@ -3121,7 +3121,6 @@ $string['voice:error_unavailable'] = 'Sarwisu bind bi amul léegi. Jéemaatal ci
 
 $string['settings:max_audio_mb_range'] = 'Bindal benn limu ci diggante {$a->min} ak {$a->max}. Limu gëna mag mënul ñu ko topp: dan bi mooy {$a->max}, kon barab bi dina wax dayo bu kod bi dul jëfandikoo.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Jëfandikoo ndimbalkat bi ci biti kurs';
 $string['settings:support_enabled'] = 'Ubbi mode ndimbal bi ci biti kurs yi';
 $string['settings:support_enabled_desc'] = 'Mayal ndongo yi ñu ubbi [[tutorshort]] ci xët yi dul kurs, ni tableau de bord bi walla seen profil, ngir laaj ci inskripsion, atestasion, jafe-jafe yu teknik ak yeneen laaj yu ndimbal. Fàww nga def benn kurs ndimbal ci suuf. Ndongo yi war nañu am it kàttan gi tudd "Jëfandikoo ndimbalkat bi ci biti kurs", te jëfandikukat yi ñu wóoraale ñoo ko am ci seen bopp.';

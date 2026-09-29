@@ -3099,7 +3099,6 @@ $string['voice:error_unavailable'] = '전사 서비스를 지금은 사용할 �
 
 $string['settings:max_audio_mb_range'] = '{$a->min}에서 {$a->max} 사이의 숫자를 입력하세요. 더 큰 값은 적용할 수 없습니다. 엔드포인트가 {$a->max}로 제한하므로 필드가 코드와 다른 한도를 표시하게 됩니다.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = '코스 밖에서 어시스턴트 사용';
 $string['settings:support_enabled'] = '코스 밖에서 지원 모드 활성화';
 $string['settings:support_enabled_desc'] = '대시보드나 프로필처럼 코스가 아닌 페이지에서도 학습자가 [[tutorshort]]를 열어 수강 등록, 수료증, 기술적 문제 등 지원 관련 질문을 할 수 있게 합니다. 아래에서 지원 코스를 지정해야 작동합니다. 또한 학습자에게 "코스 밖에서 어시스턴트 사용" 권한이 있어야 하며, 인증된 사용자에게는 기본으로 부여되어 있습니다.';

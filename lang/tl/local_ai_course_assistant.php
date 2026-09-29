@@ -3145,7 +3145,6 @@ $string['voice:error_unavailable'] = 'Hindi available ngayon ang transcription s
 
 $string['settings:max_audio_mb_range'] = 'Maglagay ng numero sa pagitan ng {$a->min} at {$a->max}. Hindi maigagalang ang mas malalaking halaga: nililimitahan ng endpoint sa {$a->max}, kaya magsasaad ang field ng limitasyong hindi ipinapatupad ng code.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Gamitin ang assistant sa labas ng kurso';
 $string['settings:support_enabled'] = 'I-enable ang support mode sa labas ng mga kurso';
 $string['settings:support_enabled_desc'] = 'Payagan ang mga mag-aaral na buksan ang [[tutorshort]] sa mga pahinang hindi kurso, gaya ng dashboard o ng kanilang profile, para magtanong tungkol sa enrolment, sertipiko, teknikal na problema at iba pang katanungan sa suporta. Kailangang may nakatakdang kurso para sa suporta sa ibaba. Kailangan pa rin ng mga mag-aaral ang kakayahang "Gamitin ang assistant sa labas ng kurso", na taglay ng mga authenticated user bilang default.';

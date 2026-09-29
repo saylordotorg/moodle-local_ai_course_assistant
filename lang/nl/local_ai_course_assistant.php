@@ -3124,7 +3124,6 @@ $string['voice:error_unavailable'] = 'De transcriptiedienst is op dit moment nie
 
 $string['settings:max_audio_mb_range'] = 'Voer een getal tussen {$a->min} en {$a->max} in. Grotere waarden kunnen niet worden nageleefd: het eindpunt begrenst op {$a->max}, dus het veld zou een limiet noemen die de code niet afdwingt.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'De assistent buiten een cursus gebruiken';
 $string['settings:support_enabled'] = 'Ondersteuningsmodus buiten cursussen inschakelen';
 $string['settings:support_enabled_desc'] = 'Laat cursisten [[tutorshort]] openen op pagina\'s die geen cursus zijn, zoals het dashboard of hun profiel, om vragen te stellen over inschrijving, certificaten, technische problemen en andere ondersteuningsvragen. Hiervoor moet hieronder een ondersteuningscursus zijn ingesteld. Cursisten hebben daarnaast het toegangsrecht "De assistent buiten een cursus gebruiken" nodig, dat geauthenticeerde gebruikers standaard hebben.';

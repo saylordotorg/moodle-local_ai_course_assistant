@@ -3099,7 +3099,6 @@ $string['voice:error_unavailable'] = '文字起こしサービスは現在利用
 
 $string['settings:max_audio_mb_range'] = '{$a->min} から {$a->max} までの数値を入力してください。これより大きい値は適用できません。エンドポイントは {$a->max} に制限するため、フィールドがコードの実際の制限と食い違うことになります。';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'コース外でアシスタントを使用する';
 $string['settings:support_enabled'] = 'コース外でのサポートモードを有効にする';
 $string['settings:support_enabled_desc'] = 'ダッシュボードやプロフィールなど、コース以外のページでも学習者が [[tutorshort]] を開き、受講登録、修了証、技術的なトラブルといったサポートに関する質問ができるようになります。利用するには、下でサポートコースを指定してください。あわせて、学習者には「コース外でアシスタントを使用する」ケーパビリティが必要です。認証済みユーザには既定で付与されています。';

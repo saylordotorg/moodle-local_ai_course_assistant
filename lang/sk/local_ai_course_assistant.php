@@ -3100,7 +3100,6 @@ $string['voice:error_unavailable'] = 'Služba prepisu momentálne nie je dostupn
 
 $string['settings:max_audio_mb_range'] = 'Zadajte číslo medzi {$a->min} a {$a->max}. Vyššie hodnoty nemožno dodržať: koncový bod obmedzuje na {$a->max}, takže pole by uvádzalo limit, ktorý kód nevynucuje.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Používať asistenta mimo kurzu';
 $string['settings:support_enabled'] = 'Povoliť režim podpory mimo kurzov';
 $string['settings:support_enabled_desc'] = 'Umožní študujúcim otvoriť [[tutorshort]] aj na stránkach, ktoré nie sú kurzom, napríklad na nástenke alebo v profile, a pýtať sa na zápis, certifikáty, technické problémy a ďalšie otázky pre podporu. Vyžaduje nastavenie kurzu podpory nižšie. Študujúci navyše potrebujú oprávnenie „Používať asistenta mimo kurzu“, ktoré overení používatelia majú predvolene.';

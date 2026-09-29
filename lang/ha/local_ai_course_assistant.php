@@ -3128,7 +3128,6 @@ $string['voice:error_unavailable'] = 'Sabis ɗin rubutawa ba ya samuwa a yanzu. 
 
 $string['settings:max_audio_mb_range'] = 'Shigar da lamba tsakanin {$a->min} da {$a->max}. Ba za a iya girmama manyan kimomi ba: wurin ƙarshe yana iyakance zuwa {$a->max}, don haka filin zai bayyana iyakar da lambar ba ta aiwatarwa.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Yi amfani da mataimakin a wajen kwas';
 $string['settings:support_enabled'] = 'Kunna yanayin tallafi a wajen kwasa-kwasan';
 $string['settings:support_enabled_desc'] = 'Yana ba ɗalibai damar buɗe [[tutorshort]] a shafukan da ba na kwas ba, kamar dashboard ko bayanan martabarsu, don yin tambaya kan rajista, takaddun shaida, matsalolin fasaha da sauran tambayoyin tallafi. Dole ne a saita kwas ɗin tallafi a ƙasa. Har yanzu ɗalibai na buƙatar izinin "Yi amfani da mataimakin a wajen kwas", wanda masu amfani da suka shiga da asusu ke da shi ta asali.';

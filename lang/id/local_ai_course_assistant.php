@@ -3153,7 +3153,6 @@ $string['voice:error_unavailable'] = 'Layanan transkripsi sedang tidak tersedia.
 
 $string['settings:max_audio_mb_range'] = 'Masukkan angka antara {$a->min} dan {$a->max}. Nilai yang lebih besar tidak dapat dipenuhi: endpoint membatasi ke {$a->max}, sehingga kolom ini akan menyatakan batas yang tidak diberlakukan kode.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Gunakan asisten di luar kursus';
 $string['settings:support_enabled'] = 'Aktifkan mode dukungan di luar kursus';
 $string['settings:support_enabled_desc'] = 'Izinkan pelajar membuka [[tutorshort]] di halaman yang bukan kursus, seperti dasbor atau halaman profil mereka, untuk bertanya tentang pendaftaran, sertifikat, masalah teknis, dan pertanyaan dukungan lainnya. Kursus dukungan harus ditetapkan di bawah ini. Pelajar tetap memerlukan kemampuan "Gunakan asisten di luar kursus", yang secara bawaan dimiliki oleh pengguna terautentikasi.';

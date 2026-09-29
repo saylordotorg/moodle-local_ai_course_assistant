@@ -3144,7 +3144,6 @@ $string['voice:error_unavailable'] = 'Perkhidmatan transkripsi tidak tersedia se
 
 $string['settings:max_audio_mb_range'] = 'Masukkan nombor antara {$a->min} dan {$a->max}. Nilai yang lebih besar tidak dapat dipatuhi: titik akhir mengehadkan kepada {$a->max}, jadi medan ini akan menyatakan had yang tidak dikuatkuasakan oleh kod.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Guna pembantu di luar kursus';
 $string['settings:support_enabled'] = 'Aktifkan mod sokongan di luar kursus';
 $string['settings:support_enabled_desc'] = 'Benarkan pelajar membuka [[tutorshort]] pada halaman yang bukan kursus, seperti papan pemuka atau halaman profil mereka, untuk bertanya tentang pendaftaran, sijil, masalah teknikal dan soalan sokongan yang lain. Kursus sokongan perlu ditetapkan di bawah. Pelajar masih memerlukan keupayaan "Guna pembantu di luar kursus", yang dimiliki oleh pengguna yang disahkan secara lalai.';
