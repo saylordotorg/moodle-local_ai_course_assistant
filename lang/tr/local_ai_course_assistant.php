@@ -3101,7 +3101,6 @@ $string['voice:error_unavailable'] = 'Yazıya dökme hizmeti şu anda kullanıla
 
 $string['settings:max_audio_mb_range'] = '{$a->min} ile {$a->max} arasında bir sayı girin. Daha büyük değerler uygulanamaz: uç nokta {$a->max} değerine sınırlar, bu yüzden alan kodun uygulamadığı bir sınırı belirtmiş olur.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Asistanı kurs dışında kullanma';
 $string['settings:support_enabled'] = 'Kurs dışında destek modunu etkinleştir';
 $string['settings:support_enabled_desc'] = 'Öğrencilerin kontrol paneli veya profil sayfaları gibi bir kursa ait olmayan sayfalarda [[tutorshort]] asistanını açıp kayıt, sertifika, teknik sorunlar ve diğer destek konularında soru sormasına olanak tanır. Aşağıda bir destek kursunun belirlenmiş olması gerekir. Öğrencilerin ayrıca, kimliği doğrulanmış kullanıcılarda varsayılan olarak bulunan "Asistanı kurs dışında kullanma" yeteneğine sahip olması gerekir.';

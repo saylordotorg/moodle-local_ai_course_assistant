@@ -3099,7 +3099,6 @@ $string['voice:error_unavailable'] = 'Transkripsjonstjenesten er ikke tilgjengel
 
 $string['settings:max_audio_mb_range'] = 'Skriv inn et tall mellom {$a->min} og {$a->max}. Større verdier kan ikke overholdes: endepunktet begrenser til {$a->max}, så feltet ville oppgi en grense koden ikke håndhever.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Bruke assistenten utenfor et kurs';
 $string['settings:support_enabled'] = 'Slå på støttemodus utenfor kurs';
 $string['settings:support_enabled_desc'] = 'La studentene åpne [[tutorshort]] på sider som ikke er et kurs, for eksempel kontrollpanelet eller profilen sin, slik at de kan spørre om påmelding, kursbevis, tekniske problemer og andre støttespørsmål. Det krever at det er valgt et støttekurs nedenfor. Studentene må dessuten ha rettigheten "Bruke assistenten utenfor et kurs", som innloggede brukere har som standard.';

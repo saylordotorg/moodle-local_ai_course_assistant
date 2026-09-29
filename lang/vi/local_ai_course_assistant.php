@@ -3121,7 +3121,6 @@ $string['voice:error_unavailable'] = 'Dịch vụ chuyển giọng nói hiện k
 
 $string['settings:max_audio_mb_range'] = 'Nhập một số từ {$a->min} đến {$a->max}. Giá trị lớn hơn không thể được tôn trọng: điểm cuối giới hạn ở {$a->max}, nên trường này sẽ nêu một giới hạn mà mã không thực thi.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Sử dụng trợ lý bên ngoài khóa học';
 $string['settings:support_enabled'] = 'Bật chế độ hỗ trợ bên ngoài khóa học';
 $string['settings:support_enabled_desc'] = 'Cho phép học viên mở [[tutorshort]] trên những trang không thuộc khóa học, chẳng hạn như bảng điều khiển hoặc trang hồ sơ cá nhân, để hỏi về ghi danh, chứng chỉ, sự cố kỹ thuật và các câu hỏi hỗ trợ khác. Cần thiết lập một khóa học hỗ trợ ở bên dưới. Học viên vẫn phải có quyền "Sử dụng trợ lý bên ngoài khóa học", vốn được cấp mặc định cho người dùng đã xác thực.';

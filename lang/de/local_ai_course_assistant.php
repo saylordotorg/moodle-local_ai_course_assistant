@@ -3101,7 +3101,6 @@ $string['voice:error_unavailable'] = 'Der Transkriptionsdienst ist derzeit nicht
 
 $string['settings:max_audio_mb_range'] = 'Geben Sie eine Zahl zwischen {$a->min} und {$a->max} ein. Größere Werte lassen sich nicht einhalten: der Endpunkt begrenzt auf {$a->max}, das Feld würde also ein Limit nennen, das der Code nicht durchsetzt.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Den Assistenten außerhalb eines Kurses verwenden';
 $string['settings:support_enabled'] = 'Supportmodus außerhalb von Kursen aktivieren';
 $string['settings:support_enabled_desc'] = 'Erlaubt Lernenden, [[tutorshort]] auch auf Seiten zu öffnen, die zu keinem Kurs gehören, etwa im Dashboard oder im eigenen Profil, um Fragen zu Einschreibung, Zertifikaten, technischen Problemen und anderen Supportthemen zu stellen. Dafür muss unten ein Supportkurs festgelegt sein. Zusätzlich benötigen Lernende weiterhin das Recht „Den Assistenten außerhalb eines Kurses verwenden“, über das authentifizierte Nutzer/innen standardmäßig verfügen.';

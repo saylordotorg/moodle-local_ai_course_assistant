@@ -3145,7 +3145,6 @@ $string['voice:error_unavailable'] = 'Adeegga qoraalku hadda ma diyaar aha. Fadl
 
 $string['settings:max_audio_mb_range'] = 'Geli tiro u dhaxaysa {$a->min} iyo {$a->max}. Qiimayaasha ka weyn lama fulin karo: barta dhamaadka waxay ku xaddidaysaa {$a->max}, sidaas darteed goobtu waxay sheegi lahayd xad aan koodku fulin.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Isticmaal kaaliyaha meel koorsi ka baxsan';
 $string['settings:support_enabled'] = 'Daar habka taageerada ee koorsooyinka ka baxsan';
 $string['settings:support_enabled_desc'] = 'Waxay ardayda u oggolaanaysaa inay [[tutorshort]] ka furaan bogag aan koorsi ahayn, sida dashboard-ka ama astaantooda, si ay u weydiiyaan diiwaangelinta, shahaadooyinka, dhibaatooyinka farsamada iyo su\'aalo kale oo taageero ah. Waxaa lagama maarmaan ah in hoos laga doorto koorsi taageero. Weliba ardaydu waxay u baahan yihiin awoodda "Isticmaal kaaliyaha meel koorsi ka baxsan", taas oo isticmaalayaasha la xaqiijiyay ay si caadi ah u haystaan.';

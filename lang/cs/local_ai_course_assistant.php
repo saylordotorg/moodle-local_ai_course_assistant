@@ -3101,7 +3101,6 @@ $string['voice:error_unavailable'] = 'Služba přepisu není právě teď dostup
 
 $string['settings:max_audio_mb_range'] = 'Zadejte číslo mezi {$a->min} a {$a->max}. Vyšší hodnoty nelze dodržet: koncový bod omezuje na {$a->max}, takže pole by uvádělo limit, který kód nevynucuje.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Používat asistenta mimo kurz';
 $string['settings:support_enabled'] = 'Povolit režim podpory mimo kurzy';
 $string['settings:support_enabled_desc'] = 'Umožní studujícím otevřít [[tutorshort]] i na stránkách, které nejsou kurzem, například na nástěnce nebo v profilu, a ptát se na zápis, certifikáty, technické potíže a další dotazy na podporu. Vyžaduje nastavení kurzu podpory níže. Studující navíc potřebují oprávnění „Používat asistenta mimo kurz“, které mají ověření uživatelé ve výchozím nastavení.';

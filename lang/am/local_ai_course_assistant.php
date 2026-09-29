@@ -3128,7 +3128,6 @@ $string['voice:error_unavailable'] = 'የግልባጭ አገልግሎቱ በአ�
 
 $string['settings:max_audio_mb_range'] = 'ከ{$a->min} እስከ {$a->max} ያለ ቁጥር ያስገቡ። ከዚያ የሚበልጥ ዋጋ ሊከበር አይችልም፦ መጨረሻው ነጥብ ወደ {$a->max} ይገድባል፣ ስለዚህ ሜዳው የማይተገበር ገደብ ይገልጻል።';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'ከኮርስ ውጭ ረዳቱን መጠቀም';
 $string['settings:support_enabled'] = 'ከኮርሶች ውጭ የድጋፍ ሁነታን አንቃ';
 $string['settings:support_enabled_desc'] = 'ተማሪዎች እንደ ዳሽቦርድ ወይም መገለጫቸው ባሉ ኮርስ ባልሆኑ ገጾች ላይ [[tutorshort]]ን ከፍተው ስለ ምዝገባ፣ ሰርተፊኬቶች፣ ቴክኒካዊ ችግሮችና ሌሎች የድጋፍ ጥያቄዎች እንዲጠይቁ ያስችላል። ከታች የድጋፍ ኮርስ መመረጥ ይኖርበታል። ተማሪዎች አሁንም «ከኮርስ ውጭ ረዳቱን መጠቀም» የሚለው ፈቃድ ያስፈልጋቸዋል፤ ይህም በነባሪነት ለተረጋገጡ ተጠቃሚዎች ተሰጥቷል።';

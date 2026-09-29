@@ -3128,7 +3128,6 @@ $string['voice:error_unavailable'] = 'El servicio de transcripción no está dis
 
 $string['settings:max_audio_mb_range'] = 'Introduce un número entre {$a->min} y {$a->max}. Los valores mayores no pueden respetarse: el endpoint limita a {$a->max}, así que el campo indicaría un límite que el código no aplica.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Usar el asistente fuera de un curso';
 $string['settings:support_enabled'] = 'Habilitar el modo de soporte fuera de los cursos';
 $string['settings:support_enabled_desc'] = 'Permite que los estudiantes abran [[tutorshort]] en páginas que no pertenecen a un curso, como el Área personal o su perfil, para preguntar sobre matriculación, certificados, problemas técnicos y otras cuestiones de soporte. Es necesario indicar abajo un curso de soporte. Además, los estudiantes necesitan la capacidad «Usar el asistente fuera de un curso», que los usuarios autenticados tienen de forma predeterminada.';

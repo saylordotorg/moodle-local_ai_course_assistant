@@ -3145,7 +3145,6 @@ $string['voice:error_unavailable'] = 'Isevisi yokubhala ayitholakali okwamanje. 
 
 $string['settings:max_audio_mb_range'] = 'Faka inombolo ephakathi kuka-{$a->min} no-{$a->max}. Amanani amakhulu kunalawa awakwazi ukulandelwa: i-endpoint inciphisa ibe ngu-{$a->max}, ngakho lensimu ingasho umkhawulo ikhodi engawuphoqeleli.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Sebenzisa umsizi ngaphandle kwekhosi';
 $string['settings:support_enabled'] = 'Vula imodi yosizo ngaphandle kwamakhosi';
 $string['settings:support_enabled_desc'] = 'Ivumela abafundi ukuvula [[tutorshort]] emakhasini angewona ikhosi, njengedeshibhodi noma iphrofayela yabo, ukuze babuze ngokubhalisa, izitifiketi, izinkinga zobuchwepheshe neminye imibuzo yosizo. Kudinga ikhosi losizo elisethwe ngezansi. Abafundi basadinga ikhono elithi "Sebenzisa umsizi ngaphandle kwekhosi", elinikezwa ngokuzenzakalela abasebenzisi abaqinisekisiwe.';

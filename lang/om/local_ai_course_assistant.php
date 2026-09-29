@@ -3132,7 +3132,6 @@ $string['voice:error_unavailable'] = 'Tajaajilli barreeffamaa yeroo ammaa hin ar
 
 $string['settings:max_audio_mb_range'] = 'Lakkoofsa {$a->min} fi {$a->max} gidduu jiru galchi. Gatiin isaa caalu hojiirra ooluu hin danda\'u: dhumti {$a->max} irratti daangessa, kanaaf dirreen daangaa koodiin hin hojjenne ibsa.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Gargaaraa koorsii alatti fayyadami';
 $string['settings:support_enabled'] = 'Haala deeggarsaa koorsiiwwan alatti dandeessisi';
 $string['settings:support_enabled_desc'] = 'Barattoonni fuulawwan koorsii hin taane irratti, fakkeenyaaf daashboordii yookaan piroofaayilii isaanii irratti, [[tutorshort]] banuudhaan waaʼee galmee, waraqaa ragaa, rakkoo teeknikaa fi gaaffilee deeggarsaa biroo akka gaafatan heyyama. Kun koorsii deeggarsaa armaan gadii qindaaʼuu barbaada. Barattoonni ammas dandeettii "Gargaaraa koorsii alatti fayyadami" jedhamu qabaachuu qabu; fayyadamtoonni mirkanaaʼan durumaan isa qabu.';

@@ -3140,7 +3140,6 @@ $string['voice:error_unavailable'] = 'Az átírási szolgáltatás jelenleg nem 
 
 $string['settings:max_audio_mb_range'] = 'Adjon meg egy számot {$a->min} és {$a->max} között. Ennél nagyobb érték nem tartható be: a végpont {$a->max} értékre korlátoz, így a mező olyan határt közölne, amelyet a kód nem érvényesít.';
 
-// v7.5.7: support mode outside courses.
 $string['ai_course_assistant:usesupport'] = 'Az asszisztens használata kurzuson kívül';
 $string['settings:support_enabled'] = 'Támogatási mód engedélyezése kurzusokon kívül';
 $string['settings:support_enabled_desc'] = 'Lehetővé teszi a tanulóknak, hogy a(z) [[tutorshort]] asszisztenst olyan oldalakon is megnyissák, amelyek nem egy kurzushoz tartoznak, például az irányítópulton vagy a saját profiljukon, és beiratkozással, oklevelekkel, technikai gondokkal és egyéb támogatási kérdésekkel forduljanak hozzá. Ehhez alább meg kell adni egy támogatási kurzust. A tanulóknak emellett szükségük van „Az asszisztens használata kurzuson kívül” képességre, amellyel a hitelesített felhasználók alapértelmezés szerint rendelkeznek.';
