@@ -1501,7 +1501,7 @@ $string['soapbox:no_browser_stt'] = 'Denne browser understøtter ikke talegenken
 $string['soapbox:browser_note'] = 'Denne tale transskriberes i din browser. Intet uploades. Fungerer bedst i Chrome og Safari.';
 $string['soapbox:server_note'] = 'Din optagelse uploades udelukkende til transskription og gemmes ikke.';
 $string['soapbox:error'] = 'Denne tale kunne ikke vurderes lige nu. Prøv igen om et øjeblik.';
-$string['soapbox:audio_too_large'] = 'Den optagelse er for stor. Hold taler under cirka 25 MB (omtrent 20 minutter).';
+$string['soapbox:audio_too_large'] = 'Optagelsen er for stor. Hold taler under cirka {$a} MB.';
 $string['soapbox:no_stt'] = 'Der er ikke konfigureret nogen transskriptionsudbyder. Bed din administrator om at opsætte Whisper eller aktivere transskription i browseren.';
 $string['soapbox:result_heading'] = 'Rubrikscorer';
 $string['soapbox:overall_heading'] = 'Samlet';
@@ -3087,3 +3087,23 @@ $string['outcomes:state_unavailable'] = 'Dette resultat er ikke tilgængeligt li
 $string['cachedef_outcomesattainment'] = 'Opnåelse af uddannelsens læringsmål pr. studerende og kursus';
 
 $string['cachedef_vectors'] = 'RAG-embedding-vektorer til hentningsindekset';
+
+$string['voice:error_toolarge'] = 'Optagelsen er for stor. Prøv et kortere klip på under cirka {$a} MB.';
+$string['voice:error_noaudio'] = 'Der blev ikke modtaget nogen optagelse. Prøv at optage igen.';
+$string['voice:error_format'] = 'Det lydformat understøttes ikke. Prøv at optage igen.';
+$string['voice:error_noprovider'] = 'Taletransskription er ikke sat op på dette websted. Kontakt din administrator.';
+$string['voice:error_badresponse'] = 'Transskriptionstjenesten returnerede noget uventet. Prøv igen.';
+
+$string['settings:max_audio_mb'] = 'Maksimal optagelsesstørrelse (MB)';
+$string['settings:max_audio_mb_desc'] = 'Den største lydoptagelse, en studerende må uploade, i megabyte. Mellem {$a->min} og {$a->max}; standarden er {$a->default}.<br>På denne server tillader PHP post_max_size = {$a->postmax} og upload_max_filesize = {$a->uploadmax}, så den størrelse, der faktisk håndhæves lige nu, er {$a->effective} MB. Den mindste af din indstilling og PHP\'s egne grænser vinder altid.';
+$string['settings:max_audio_mb_capped'] = 'Grænsen på denne server er PHP, ikke denne indstilling. For at studerende kan bruge hele den størrelse, der er sat her, skal du hæve post_max_size og upload_max_filesize i php.ini til mindst {$a}.';
+$string['voice:error_unavailable'] = 'Transskriptionstjenesten er ikke tilgængelig lige nu. Prøv igen om lidt.';
+
+$string['settings:max_audio_mb_range'] = 'Indtast et tal mellem {$a->min} og {$a->max}. Større værdier kan ikke overholdes: endepunktet begrænser til {$a->max}, så feltet ville angive en grænse, koden ikke håndhæver.';
+
+$string['ai_course_assistant:usesupport'] = 'Brug assistenten uden for et kursus';
+$string['settings:support_enabled'] = 'Aktivér supporttilstand uden for kurser';
+$string['settings:support_enabled_desc'] = 'Lad studerende åbne [[tutorshort]] på sider, der ikke er et kursus, for eksempel dashboardet eller deres profil, så de kan spørge om tilmelding, kursusbeviser, tekniske problemer og andre supportspørgsmål. Det kræver, at der er valgt et supportkursus nedenfor. Studerende skal desuden have rettigheden "Brug assistenten uden for et kursus", som godkendte brugere har som standard.';
+$string['settings:support_courseid'] = 'Supportkursus';
+$string['settings:support_courseid_desc'] = 'ID\'et på et synligt kursus, der indeholder jeres kom godt i gang-, onboarding- og introduktionsmateriale. Supportsamtaler besvares ud fra dette kursus og FAQ\'en ovenfor og registreres på kurset. Lad feltet stå tomt for at slå supporttilstand fra. Forsiden (kursus 1) accepteres ikke.';
+$string['support:promptrole'] = 'Du besvarer et supportspørgsmål, der er stillet uden for alle kurser. Den studerende spørger ikke til kursusindhold, så henvis ikke tilbage til det. Svar ud fra FAQ\'en og det supportmateriale, du har fået. Hvis du ikke kan svare præcist, så sig det ligeud og tilbyd at sende spørgsmålet videre til supportteamet.';

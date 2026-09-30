@@ -1764,6 +1764,61 @@ if ($hassiteconfig) {
         $sttchoices
     ));
 
+    // Maximum audio upload size (v7.5.5). The description below reports what PHP
+    // on THIS server will actually accept, because the setting alone is a number
+    // an admin can type and be wrong about: PHP's post_max_size (default 8 MB)
+    // and upload_max_filesize (default 2 MB) are both under the 25 MB default,
+    // and the smaller of the two wins no matter what is set here. Rendering the
+    // detected values turns "why did a long recording fail" into something the
+    // admin can see before a learner reports it.
+    $phplimit = \local_ai_course_assistant\security::php_upload_limit_bytes();
+    $maxaudiodesc = get_string('settings:max_audio_mb_desc', 'local_ai_course_assistant', (object) [
+        // Derived from the constants rather than written into 46 lang files.
+        // Change MIN_AUDIO_MB or MAX_AUDIO_MB with the bounds hardcoded in the
+        // string and every locale silently states the wrong range.
+        'min'       => \local_ai_course_assistant\security::MIN_AUDIO_MB,
+        'max'       => \local_ai_course_assistant\security::MAX_AUDIO_MB,
+        'default'   => (int) (\local_ai_course_assistant\security::MAX_AUDIO_BYTES / (1024 * 1024)),
+        'postmax'   => (string) ini_get('post_max_size'),
+        'uploadmax' => (string) ini_get('upload_max_filesize'),
+        // The same helper the learner's error message uses. These printed
+        // different numbers for one limit until review caught it: the page
+        // rounded and the error floored, so at upload_max_filesize = 2500K the
+        // admin read 2.4 MB and the learner read 2 MB.
+        'effective' => (string) \local_ai_course_assistant\security::max_audio_mb_display(),
+    ]);
+    // The warning names the ini value that would actually unblock the setting the
+    // admin has chosen, not a fixed 26M. An admin who set 50 here needs 51M, and
+    // telling them 26M would be the same defect this release is about: a number
+    // that was right for the default and wrong for them.
+    // configured_audio_mb() rather than get_config(...) ?: 25. The ?: form read
+    // a stored "0" as falsy and reported 25 while the endpoint enforced 1, and
+    // took a stored "300" at face value to advise raising php.ini to 301M for
+    // 100 MB the endpoint would never allow. One helper, one answer.
+    $configuredmb = \local_ai_course_assistant\security::configured_audio_mb();
+    $configuredbytes = $configuredmb * 1024 * 1024;
+    if ($phplimit > 0 && $phplimit < $configuredbytes) {
+        $maxaudiodesc .= '<br><strong class="text-danger">'
+            . get_string(
+                'settings:max_audio_mb_capped',
+                'local_ai_course_assistant',
+                ($configuredmb + 1) . 'M'
+            )
+            . '</strong>';
+    }
+    // A subclass rather than PARAM_INT alone: PARAM_INT accepts any integer, so
+    // an admin could save 500, see 500 in the box, and have the endpoint enforce
+    // 200. The field would then disagree with the code in the same way this
+    // release exists to stop the error message disagreeing with the cap.
+    $settings->add(new \local_ai_course_assistant\admin_setting_audio_mb(
+        'local_ai_course_assistant/max_audio_mb',
+        get_string('settings:max_audio_mb', 'local_ai_course_assistant'),
+        $maxaudiodesc,
+        (string) (\local_ai_course_assistant\security::MAX_AUDIO_BYTES / (1024 * 1024)),
+        PARAM_INT,
+        6
+    ));
+
     // Selfhosted Whisper STT server (v6.2.0). Any OpenAI compatible
     // transcription server works: whisper-server Docker, speaches
     // (faster-whisper), or whisper.cpp server.
@@ -2743,6 +2798,30 @@ if ($hassiteconfig) {
         ),
         '',
         PARAM_RAW_TRIMMED
+    ));
+
+    // v7.5.7: support mode. Sits with the FAQ and supplemental courses because it
+    // is the same idea carried outside the course boundary: the FAQ is the answer
+    // an administrator wrote down, a supplemental course is an answer that already
+    // exists as a course, and this is the surface that lets a learner reach either
+    // one when they are not in a course at all.
+    //
+    // Bound to a real course id rather than SITEID on purpose -- see the header of
+    // \local_ai_course_assistant\support_mode for the five things SITEID already
+    // means and the two of them that would produce wrong answers.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/support_enabled',
+        \local_ai_course_assistant\branding::str('settings:support_enabled'),
+        \local_ai_course_assistant\branding::str('settings:support_enabled_desc'),
+        0
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/support_courseid',
+        \local_ai_course_assistant\branding::str('settings:support_courseid'),
+        \local_ai_course_assistant\branding::str('settings:support_courseid_desc'),
+        '',
+        PARAM_INT
     ));
 
     $settings->add(new admin_setting_configcheckbox(

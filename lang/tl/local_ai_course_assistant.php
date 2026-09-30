@@ -1546,7 +1546,7 @@ $string['soapbox:no_browser_stt'] = 'Hindi sinusuportahan ng browser na ito ang 
 $string['soapbox:browser_note'] = 'Tina-transcribe ang talumpating ito sa iyong browser. Walang ina-upload. Pinakamahusay na gumagana sa Chrome at Safari.';
 $string['soapbox:server_note'] = 'Ina-upload ang iyong recording para sa transkripsyon lamang at hindi iniimbak.';
 $string['soapbox:error'] = 'Hindi maiskor ang talumpating ito sa ngayon. Subukang muli sa ilang sandali.';
-$string['soapbox:audio_too_large'] = 'Masyadong malaki ang recording na iyon. Panatilihing wala sa 25 MB ang mga talumpati (humigit-kumulang 20 minuto).';
+$string['soapbox:audio_too_large'] = 'Masyadong malaki ang recording na ito. Panatilihing wala sa {$a} MB ang mga talumpati.';
 $string['soapbox:no_stt'] = 'Walang naka-configure na transkripsyon provider. Hilingin sa iyong administrator na i-set up ang Whisper o i-enable ang transkripsyon sa browser.';
 $string['soapbox:result_heading'] = 'Mga iskor sa rubric';
 $string['soapbox:overall_heading'] = 'Pangkalahatan';
@@ -3131,3 +3131,23 @@ $string['outcomes:state_unavailable'] = 'Hindi available ang resultang ito sa ng
 $string['cachedef_outcomesattainment'] = 'Pagkamit ng outcome ng programa bawat mag-aaral at kurso';
 
 $string['cachedef_vectors'] = 'Mga embedding vector ng RAG para sa index ng pagkuha';
+
+$string['voice:error_toolarge'] = 'Masyadong malaki ang recording na ito. Subukan ang mas maikling clip, mas mababa sa mga {$a} MB.';
+$string['voice:error_noaudio'] = 'Walang natanggap na recording. Pakisubukang mag-record ulit.';
+$string['voice:error_format'] = 'Hindi suportado ang audio format na iyon. Pakisubukang mag-record ulit.';
+$string['voice:error_noprovider'] = 'Hindi naka-set up ang voice transcription sa site na ito. Makipag-ugnayan sa iyong administrator.';
+$string['voice:error_badresponse'] = 'Nagbalik ng hindi inaasahang tugon ang transcription service. Pakisubukan ulit.';
+
+$string['settings:max_audio_mb'] = 'Pinakamalaking laki ng recording (MB)';
+$string['settings:max_audio_mb_desc'] = 'Ang pinakamalaking voice recording na maaaring i-upload ng isang mag-aaral, sa megabytes. Sa pagitan ng {$a->min} at {$a->max}; ang default ay {$a->default}.<br>Sa server na ito, pinapayagan ng PHP ang post_max_size = {$a->postmax} at upload_max_filesize = {$a->uploadmax}, kaya ang laking talagang ipinapatupad ngayon ay {$a->effective} MB. Ang mas maliit sa pagitan ng iyong setting at ng sariling limitasyon ng PHP ang laging masusunod.';
+$string['settings:max_audio_mb_capped'] = 'Ang PHP ang naglilimita sa server na ito, hindi ang setting na ito. Para magamit ng mga mag-aaral ang buong laking nakatakda rito, itaas ang post_max_size at upload_max_filesize sa php.ini sa hindi bababa sa {$a}.';
+$string['voice:error_unavailable'] = 'Hindi available ngayon ang transcription service. Pakisubukan ulit maya-maya.';
+
+$string['settings:max_audio_mb_range'] = 'Maglagay ng numero sa pagitan ng {$a->min} at {$a->max}. Hindi maigagalang ang mas malalaking halaga: nililimitahan ng endpoint sa {$a->max}, kaya magsasaad ang field ng limitasyong hindi ipinapatupad ng code.';
+
+$string['ai_course_assistant:usesupport'] = 'Gamitin ang assistant sa labas ng kurso';
+$string['settings:support_enabled'] = 'I-enable ang support mode sa labas ng mga kurso';
+$string['settings:support_enabled_desc'] = 'Payagan ang mga mag-aaral na buksan ang [[tutorshort]] sa mga pahinang hindi kurso, gaya ng dashboard o ng kanilang profile, para magtanong tungkol sa enrolment, sertipiko, teknikal na problema at iba pang katanungan sa suporta. Kailangang may nakatakdang kurso para sa suporta sa ibaba. Kailangan pa rin ng mga mag-aaral ang kakayahang "Gamitin ang assistant sa labas ng kurso", na taglay ng mga authenticated user bilang default.';
+$string['settings:support_courseid'] = 'Kurso para sa suporta';
+$string['settings:support_courseid_desc'] = 'Ang ID ng isang nakikitang kurso na naglalaman ng iyong materyal sa pagsisimula, onboarding at orientation. Sinasagot ang mga usapang pansuporta mula sa kursong ito kasama ang FAQ sa itaas, at doon din itinatala. Iwanang blangko para i-off ang support mode. Hindi tinatanggap ang site home (kurso 1).';
+$string['support:promptrole'] = 'Sumasagot ka ng tanong na pansuporta mula sa labas ng anumang kurso. Hindi tungkol sa materyal ng kurso ang tinatanong ng mag-aaral, kaya huwag mo siyang ibalik doon. Sumagot mula sa FAQ at sa materyal pansuportang ibinigay sa iyo. Kung hindi ka makakasagot nang tumpak, sabihin mo ito nang malinaw at mag-alok na ipasa ang tanong sa support team.';

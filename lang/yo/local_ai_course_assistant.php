@@ -1522,7 +1522,7 @@ $string['soapbox:no_browser_stt'] = 'Aṣawakiri yii ko ṣe atilẹyin idanim�
 $string['soapbox:browser_note'] = 'A kọ ọrọ yii silẹ ninu aṣawakiri rẹ. Ko si ohunkohun ti a gbe soke. O ṣiṣẹ daradara julọ ni Chrome ati Safari.';
 $string['soapbox:server_note'] = 'A gbe igbasilẹ rẹ soke fun iwe afọwọkọ nikan ati pe a ko fipamọ rẹ.';
 $string['soapbox:error'] = 'A ko le fun ọrọ yii ni ami ni bayi. Tun gbiyanju ni iṣẹju diẹ.';
-$string['soapbox:audio_too_large'] = 'Igbasilẹ yẹn tobi ju. Jẹ ki awọn ọrọ wa labẹ nipa 25 MB (nipa iṣẹju 20).';
+$string['soapbox:audio_too_large'] = 'Gbigbasilẹ yii tobi ju. Jẹ ki awọn ọrọ wa labẹ nipa MB {$a}.';
 $string['soapbox:no_stt'] = 'A ko ṣeto olupese iwe afọwọkọ kankan. Beere lọwọ alabojuto rẹ lati ṣeto Whisper tabi tan iwe afọwọkọ aṣawakiri.';
 $string['soapbox:result_heading'] = 'Awọn ami rubric';
 $string['soapbox:overall_heading'] = 'Lapapọ';
@@ -3107,3 +3107,23 @@ $string['outcomes:state_unavailable'] = 'Àbájáde yìí kò sí ní àkókò y
 $string['cachedef_outcomesattainment'] = 'Ìmúṣẹ àbájáde ìtòlẹ́sẹẹsẹ fún akẹ́kọ̀ọ́ àti ẹ̀kọ́ kọ̀ọ̀kan';
 
 $string['cachedef_vectors'] = 'Àwọn vẹ́ktọ̀ embedding RAG fún àtọ́ka ìgbàpadà';
+
+$string['voice:error_toolarge'] = 'Gbigbasilẹ yii tobi ju. Gbiyanju agekuru kukuru, labẹ bii MB {$a}.';
+$string['voice:error_noaudio'] = 'A ko gba gbigbasilẹ kankan. Jọwọ gbiyanju lati gbasilẹ lẹẹkansi.';
+$string['voice:error_format'] = 'A ko ṣe atilẹyin fun ọna ohun yẹn. Jọwọ gbiyanju lati gbasilẹ lẹẹkansi.';
+$string['voice:error_noprovider'] = 'A ko ṣeto kikọ ohun sori ayelujara yii. Jọwọ kan si alabojuto rẹ.';
+$string['voice:error_badresponse'] = 'Iṣẹ kikọ naa da nkan airotẹlẹ pada. Jọwọ gbiyanju lẹẹkansi.';
+
+$string['settings:max_audio_mb'] = 'Iwọn gbigbasilẹ ti o pọ julọ (MB)';
+$string['settings:max_audio_mb_desc'] = 'Gbigbasilẹ ohun ti o tobi julọ ti akẹkọ le gbe sori ẹrọ, ni megabyte. Laarin {$a->min} ati {$a->max}; aiyipada ni {$a->default}.<br>Lori olupin yii PHP gba post_max_size = {$a->postmax} ati upload_max_filesize = {$a->uploadmax} laaye, nitorinaa iwọn ti a fi lelẹ gangan ni bayi ni {$a->effective} MB. Eyi ti o kere laarin eto rẹ ati awọn opin PHP ni yoo maa ṣiṣẹ nigbagbogbo.';
+$string['settings:max_audio_mb_capped'] = 'PHP ni o ṣeto opin lori olupin yii, kii ṣe eto yii. Ki awọn akẹkọ le lo gbogbo iwọn ti a ṣeto nibi, gbe post_max_size ati upload_max_filesize soke ninu php.ini si o kere ju {$a}.';
+$string['voice:error_unavailable'] = 'Iṣẹ kikọ ko si ni bayi. Jọwọ gbiyanju lẹẹkansi laipẹ.';
+
+$string['settings:max_audio_mb_range'] = 'Tẹ nọmba kan laarin {$a->min} ati {$a->max} sii. A ko le bọwọ fun awọn iye ti o tobi ju: opin naa dín si {$a->max}, nitorinaa aaye naa yoo sọ opin ti koodu ko fi lelẹ.';
+
+$string['ai_course_assistant:usesupport'] = 'Lo olùrànlọ́wọ́ náà níta ẹ̀kọ́ kan';
+$string['settings:support_enabled'] = 'Mú ipò ìrànlọ́wọ́ ṣiṣẹ́ níta àwọn ẹ̀kọ́';
+$string['settings:support_enabled_desc'] = 'Fàyè gba àwọn akẹ́kọ̀ọ́ láti ṣí [[tutorshort]] sórí àwọn ojú-ìwé tí kì í ṣe ẹ̀kọ́, bíi ojú-ìwé ìṣàkóso tàbí profáìlì wọn, láti béèrè nípa ìforúkọsílẹ̀, ìwé-ẹ̀rí, ìṣòro ìmọ̀-ẹ̀rọ àti àwọn ìbéèrè ìrànlọ́wọ́ mìíràn. Ó nílò ẹ̀kọ́ ìrànlọ́wọ́ tí a gbọ́dọ̀ yàn nísàlẹ̀. Àwọn akẹ́kọ̀ọ́ ṣì nílò agbára "Lo olùrànlọ́wọ́ náà níta ẹ̀kọ́ kan", tí àwọn olùlò tí a ti fọwọ́sí ti ní tẹ́lẹ̀.';
+$string['settings:support_courseid'] = 'Ẹ̀kọ́ ìrànlọ́wọ́';
+$string['settings:support_courseid_desc'] = 'ID ẹ̀kọ́ kan tí ó hàn, tí ó ní àwọn ohun èlò ìbẹ̀rẹ̀, ìfáàrà àti ìtọ́sọ́nà rẹ nínú. A ó dáhùn àwọn ìjíròrò ìrànlọ́wọ́ láti inú ẹ̀kọ́ yìí àti FAQ tí ó wà lókè, a ó sì kọ wọ́n sí ẹ̀kọ́ náà. Fi sílẹ̀ ní òfo láti pa ipò ìrànlọ́wọ́ mọ́. Ojú-ìwé ilé sáìtì (ẹ̀kọ́ 1) kò ṣe é gbà.';
+$string['support:promptrole'] = 'O ń dáhùn ìbéèrè ìrànlọ́wọ́ kan tí ó wá láti òde gbogbo ẹ̀kọ́. Akẹ́kọ̀ọ́ náà kò béèrè nípa àkóónú ẹ̀kọ́, nítorí náà má ṣe darí rẹ̀ padà síbẹ̀. Dáhùn láti inú FAQ àti àwọn ohun èlò ìrànlọ́wọ́ tí a fún ọ. Bí o kò bá lè dáhùn ní pípé, sọ bẹ́ẹ̀ ní kedere, kí o sì fi ọwọ́ sí i pé o lè fi ìbéèrè náà ránṣẹ́ sí ẹgbẹ́ ìrànlọ́wọ́.';

@@ -1529,7 +1529,7 @@ $string['soapbox:no_browser_stt'] = 'Wannan birawsa ba ta tallafawa gane magana 
 $string['soapbox:browser_note'] = 'Ana rubuta wannan jawabin cikin birawsa naka. Ba a ɗora komai ba. Yana aiki mafi kyau a Chrome da Safari.';
 $string['soapbox:server_note'] = 'Ana ɗora rikodinka don rubutawa kawai kuma ba a adana shi ba.';
 $string['soapbox:error'] = 'Ba a iya ba wannan jawabin maki yanzu ba. Ka sake gwadawa cikin ɗan lokaci.';
-$string['soapbox:audio_too_large'] = 'Wannan rikodin ya yi girma sosai. Ka kiyaye jawabai a ƙasa da kusan 25 MB (kusan minti 20).';
+$string['soapbox:audio_too_large'] = 'Wannan rikodin ya yi girma sosai. Ka kiyaye jawabai a ƙasa da kusan MB {$a}.';
 $string['soapbox:no_stt'] = 'Ba a saita mai bayar da rubutawa ba. Ka nemi mai gudanarwa ya saita Whisper ko ya kunna rubutawa ta birawsa.';
 $string['soapbox:result_heading'] = 'Makin ma\'auni';
 $string['soapbox:overall_heading'] = 'Gaba ɗaya';
@@ -3114,3 +3114,23 @@ $string['outcomes:state_unavailable'] = 'Wannan sakamakon ba ya samuwa a yanzu. 
 $string['cachedef_outcomesattainment'] = 'Matakin cimma sakamakon shiri na kowane xalibi da kowane kwas';
 
 $string['cachedef_vectors'] = 'Vektocin embedding na RAG don ƙididdigar dawowa';
+
+$string['voice:error_toolarge'] = 'Wannan rikodin ya yi girma sosai. Gwada gajeren rikodi, kasa da kusan MB {$a}.';
+$string['voice:error_noaudio'] = 'Ba a karɓi wani rikodi ba. Da fatan za a sake gwada yin rikodi.';
+$string['voice:error_format'] = 'Ba a goyan bayan wannan tsarin sauti ba. Da fatan za a sake gwada yin rikodi.';
+$string['voice:error_noprovider'] = 'Ba a saita rubuta murya a wannan shafin ba. Da fatan za a tuntuɓi mai gudanarwa.';
+$string['voice:error_badresponse'] = 'Sabis ɗin rubutawa ya mayar da wani abu da ba a tsammani ba. Da fatan za a sake gwadawa.';
+
+$string['settings:max_audio_mb'] = 'Matsakaicin girman rikodi (MB)';
+$string['settings:max_audio_mb_desc'] = 'Mafi girman rikodin murya da ɗalibi zai iya ɗorawa, a megabyte. Tsakanin {$a->min} zuwa {$a->max}; tsoho shine {$a->default}.<br>A wannan sabar PHP yana ba da izinin post_max_size = {$a->postmax} da upload_max_filesize = {$a->uploadmax}, don haka girman da ake aiwatarwa a yanzu shine {$a->effective} MB. Ƙaramin tsakanin saitinka da iyakokin PHP koyaushe shine ke aiki.';
+$string['settings:max_audio_mb_capped'] = 'Iyaka a wannan sabar PHP ne, ba wannan saitin ba. Domin ɗalibai su iya amfani da cikakken girman da aka saita anan, ka ɗaga post_max_size da upload_max_filesize a php.ini zuwa aƙalla {$a}.';
+$string['voice:error_unavailable'] = 'Sabis ɗin rubutawa ba ya samuwa a yanzu. Da fatan za a sake gwadawa nan da ɗan lokaci.';
+
+$string['settings:max_audio_mb_range'] = 'Shigar da lamba tsakanin {$a->min} da {$a->max}. Ba za a iya girmama manyan kimomi ba: wurin ƙarshe yana iyakance zuwa {$a->max}, don haka filin zai bayyana iyakar da lambar ba ta aiwatarwa.';
+
+$string['ai_course_assistant:usesupport'] = 'Yi amfani da mataimakin a wajen kwas';
+$string['settings:support_enabled'] = 'Kunna yanayin tallafi a wajen kwasa-kwasan';
+$string['settings:support_enabled_desc'] = 'Yana ba ɗalibai damar buɗe [[tutorshort]] a shafukan da ba na kwas ba, kamar dashboard ko bayanan martabarsu, don yin tambaya kan rajista, takaddun shaida, matsalolin fasaha da sauran tambayoyin tallafi. Dole ne a saita kwas ɗin tallafi a ƙasa. Har yanzu ɗalibai na buƙatar izinin "Yi amfani da mataimakin a wajen kwas", wanda masu amfani da suka shiga da asusu ke da shi ta asali.';
+$string['settings:support_courseid'] = 'Kwas ɗin tallafi';
+$string['settings:support_courseid_desc'] = 'Lambar ID ta wani kwas da ake gani wanda ke ɗauke da kayan farawa, gabatarwa da sanin muhalli. Ana amsa tattaunawar tallafi daga wannan kwas tare da tambayoyin da ake yawan yi da ke sama, kuma ana yin rikodinsu a kansa. Ka bar shi fanko don kashe yanayin tallafi. Ba a karɓar shafin gida na rukunin yanar gizo (kwas 1).';
+$string['support:promptrole'] = 'Kana amsa tambayar tallafi da aka yi daga wajen kowane kwas. Ɗalibin ba ya tambaya kan kayan kwas ba, don haka kada ka mai da shi ga kayan kwas. Ka amsa daga tambayoyin da ake yawan yi da kayan tallafin da aka ba ka. Idan ba za ka iya amsawa daidai ba, ka faɗi haka a sarari kuma ka ba da shawarar mika tambayar ga ƙungiyar tallafi.';

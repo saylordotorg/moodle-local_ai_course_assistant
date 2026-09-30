@@ -1515,7 +1515,7 @@ $string['soapbox:no_browser_stt'] = 'Ihe nchọgharị a anaghị akwado nghọt
 $string['soapbox:browser_note'] = 'A na-atụgharị okwu a n\'ime ihe nchọgharị gị. Ọ dịghị ihe a na-ebugo. Ọ na-arụ ọrụ nke ọma na Chrome na Safari.';
 $string['soapbox:server_note'] = 'A na-ebugo ndekọ gị maka ntụgharị okwu naanị, a naghịkwa echekwa ya.';
 $string['soapbox:error'] = 'Enweghị ike inye okwu a akara ugbu a. Nwaa ọzọ n\'oge na-adịghị anya.';
-$string['soapbox:audio_too_large'] = 'Ndekọ ahụ buru ibu nke ukwuu. Mee ka okwu dịrị n\'okpuru ihe dịka 25 MB (ihe dịka nkeji 20).';
+$string['soapbox:audio_too_large'] = 'Ndekọ a buru ibu nke ukwuu. Mee ka okwu dịrị n\'okpuru ihe dịka MB {$a}.';
 $string['soapbox:no_stt'] = 'A hazighị onye na-enye ntụgharị okwu ọ bụla. Rịọ onye nchịkwa gị ka ọ hazie Whisper ma ọ bụ kwe ka ntụgharị okwu ihe nchọgharị rụọ ọrụ.';
 $string['soapbox:result_heading'] = 'Akara usoro nyocha';
 $string['soapbox:overall_heading'] = 'N\'ozuzu';
@@ -3101,3 +3101,23 @@ $string['outcomes:state_unavailable'] = 'A pụghị inweta nsonaazụ a ugbu a.
 $string['cachedef_outcomesattainment'] = 'Mmezu nsonaazụ mmemme kwa nwa akwụkwọ na nkuzi';
 
 $string['cachedef_vectors'] = 'Vector embedding RAG maka ndeksị nweghachi';
+
+$string['voice:error_toolarge'] = 'Ndekọ a buru ibu nke ukwuu. Nwaa ndekọ dị mkpụmkpụ, nke na-erughị ihe dịka MB {$a}.';
+$string['voice:error_noaudio'] = 'Enwetaghị ndekọ ọ bụla. Biko nwaa ịdekọ ọzọ.';
+$string['voice:error_format'] = 'A naghị akwado ụdị ụda ahụ. Biko nwaa ịdekọ ọzọ.';
+$string['voice:error_noprovider'] = 'Edeghị ederede olu na saịtị a. Biko kpọtụrụ onye nchịkwa gị.';
+$string['voice:error_badresponse'] = 'Ọrụ ederede weghachiri ihe a na-atụghị anya ya. Biko nwaa ọzọ.';
+
+$string['settings:max_audio_mb'] = 'Nha ndekọ kachasị (MB)';
+$string['settings:max_audio_mb_desc'] = 'Ndekọ olu kachasị ukwuu onye mmụta nwere ike ibudata, na megabyte. N\'etiti {$a->min} na {$a->max}; ndabara bụ {$a->default}.<br>Na sava a PHP na-enye ohere post_max_size = {$a->postmax} na upload_max_filesize = {$a->uploadmax}, ya mere nha a na-emanye ugbu a bụ {$a->effective} MB. Nke dị ntakịrị n\'etiti ntọala gị na oke PHP nwere na-emeri mgbe niile.';
+$string['settings:max_audio_mb_capped'] = 'Oke dị na sava a bụ PHP, ọ bụghị ntọala a. Ka ndị mmụta wee nwee ike iji nha zuru ezu edobere ebe a, welie post_max_size na upload_max_filesize na php.ini ruo opekempe {$a}.';
+$string['voice:error_unavailable'] = 'Ọrụ ederede adịghị ugbu a. Biko nwaa ọzọ n\'oge na-adịghị anya.';
+
+$string['settings:max_audio_mb_range'] = 'Tinye ọnụọgụ dị n\'etiti {$a->min} na {$a->max}. Enweghị ike ịnabata ụkpụrụ buru ibu karịa: njedebe na-amachi na {$a->max}, ya mere ubi ga-ekwu oke koodu na-adịghị amanye.';
+
+$string['ai_course_assistant:usesupport'] = 'Jiri onye enyemaka ahụ na mpụga usoro ihe ọmụmụ';
+$string['settings:support_enabled'] = 'Gbanye ọnọdụ nkwado na mpụga usoro ihe ọmụmụ';
+$string['settings:support_enabled_desc'] = 'Na-enye ndị mmụta ohere imepe [[tutorshort]] na ibe ndị na-abụghị usoro ihe ọmụmụ, dị ka dashboard ma ọ bụ profaịlụ ha, ịjụ ajụjụ gbasara ndebanye aha, asambodo, nsogbu teknụzụ na ajụjụ nkwado ndị ọzọ. Ọ chọrọ ka a họpụta usoro ihe ọmụmụ nkwado n\'okpuru. Ndị mmụta ka chọrọ ikike "Jiri onye enyemaka ahụ na mpụga usoro ihe ọmụmụ", nke ndị ọrụ banyere n\'akaụntụ ha nwere na ndabara.';
+$string['settings:support_courseid'] = 'Usoro ihe ọmụmụ nkwado';
+$string['settings:support_courseid_desc'] = 'ID nke usoro ihe ọmụmụ a na-ahụ anya nke nwere ihe mmalite, nnabata na ntọala gị. A na-aza mkparịta ụka nkwado site na usoro ihe ọmụmụ a tinyere ajụjụ ndị a na-ajụkarị dị n\'elu, a na-edekwa ha n\'okpuru ya. Hapụ ya ka ọ tọgbọrọ chakoo iji gbanyụọ ọnọdụ nkwado. A naghị anabata ụlọ saịtị ahụ (usoro ihe ọmụmụ 1).';
+$string['support:promptrole'] = 'Ị na-aza ajụjụ nkwado sitere na mpụga usoro ihe ọmụmụ ọ bụla. Onye mmụta ahụ anaghị ajụ maka ihe ọmụmụ nke usoro ihe ọmụmụ, ya mere eduganyela ya na ya. Zaa site na ajụjụ ndị a na-ajụkarị na ihe nkwado e nyere gị. Ọ bụrụ na ị nweghị ike ịza nke ọma, kwuo ya n\'ụzọ doro anya ma nye aka ibuga ajụjụ ahụ na ndị otu nkwado.';

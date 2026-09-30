@@ -91,6 +91,253 @@ Feature: SOLA drawer interactions beyond send-receive
     And I should see "Second message" in the ".local-ai-course-assistant__messages" "css_element"
 
   @javascript
+  Scenario: Opening the assistant puts the keyboard in it
+    # The drawer has had role="dialog", an aria-label and a Tab trap since
+    # v6.x, and until v7.5.5 it never took focus when it opened. Every
+    # assertion about the markup passed the whole time, because the markup was
+    # right; what was missing was one call, and its absence is only observable
+    # as document.activeElement, which only a browser has.
+    #
+    # The consequence for a keyboard user was a dialog opening in front of them
+    # with the keyboard still behind it, and a Tab trap that could not engage
+    # because it acts only once focus is already inside.
+    Given I log in as "student1"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    And focus should be inside "#local-ai-course-assistant-drawer"
+    And focus should be on ".local-ai-course-assistant__input"
+
+  @javascript
+  Scenario: With consent still pending, focus goes into the consent notice
+    # The case the first version of this fix missed, found in review.
+    #
+    # While consent is pending, consent_gate.js puts `inert` on every sibling of
+    # the banner, which is the whole rest of the drawer. focus() on an inert
+    # element is a silent no-op, so targeting the message box did nothing:
+    # focus stayed on <body> and a screen reader announced nothing, in the one
+    # case where a modal notice most needs to be found and read.
+    #
+    # The learner here has dismissed the intro but NOT given consent, which is
+    # the state that isolates this. A brand-new learner does not reach it: the
+    # welcome panel renders a moment later and focuses its own Continue button
+    # in a requestAnimationFrame, so it wins whatever this code does. That is
+    # also why the review's predicted symptom is not visible on a first-ever
+    # open, and why this scenario sets intro_dismissed.
+    #
+    # Every other scenario in this plugin sets aica_sola_consent_given in its
+    # Background, which is why none of them saw any of it.
+    Given the following "users" exist:
+      | username | firstname | lastname | email              |
+      | newbie   | New       | Learner  | newbie@example.com |
+    And the following "course enrolments" exist:
+      | user   | course | role    |
+      | newbie | DI1    | student |
+    And the following "user preferences" exist:
+      | user   | preference                                | value |
+      | newbie | local_ai_course_assistant_intro_dismissed | 1     |
+    And I log in as "newbie"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    And ".aica-consent-banner" "css_element" should be visible
+    And focus should be inside "#local-ai-course-assistant-drawer"
+    And focus should be on ".aica-consent-scroll"
+
+  @javascript
+  Scenario: After accepting the notice, reopening still puts focus in the drawer
+    # Found in the third review round, in the fix from the second.
+    #
+    # Accepting consent sets banner.style.display = 'none' and calls release().
+    # It never removes the banner and never marks the banner itself inert, since
+    # inert only ever went on its siblings. So on every later open the selector
+    # still matched, focus was aimed at a display:none scroll region, which
+    # focus() ignores, and the input and drawer fallbacks were skipped because a
+    # target had already been chosen.
+    #
+    # The learner accepted the notice, closed the drawer, reopened it, and was
+    # back to focus on <body>. The same WCAG 2.4.3 defect, one interaction later,
+    # introduced by the fix for the interaction before it.
+    Given the following "users" exist:
+      | username | firstname | lastname | email              |
+      | newbie   | New       | Learner  | newbie@example.com |
+    And the following "course enrolments" exist:
+      | user   | course | role    |
+      | newbie | DI1    | student |
+    And the following "user preferences" exist:
+      | user   | preference                                | value |
+      | newbie | local_ai_course_assistant_intro_dismissed | 1     |
+    And I log in as "newbie"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    And I read and accept the SOLA consent notice
+    # Focus must survive the Accept itself, not only a later reopen.
+    # consent_gate.js hides the banner while the Accept button holds focus, so
+    # without a release observer on the drawer focus falls to <body> with the
+    # dialog still open. The per-panel observer cannot cover it: a learner who
+    # has already dismissed the intro has no welcome panel at all.
+    Then focus should be inside "#local-ai-course-assistant-drawer"
+    And I press the escape key
+    Then "#local-ai-course-assistant-drawer" "css_element" should not be visible
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    And focus should be inside "#local-ai-course-assistant-drawer"
+    And focus should be on ".local-ai-course-assistant__input"
+
+  @javascript
+  Scenario: Reopening after the History tab still puts focus in the message box
+    # Found in the fourth review round, and the reason the focus code stopped
+    # predicting which element can take focus.
+    #
+    # The drawer keeps its --mode-history class between opens, and the CSS hides
+    # the input area with display:none in that mode. handleToggle called
+    # UI.toggleDrawer() before setBottomMode('chat'), so the focus code chose an
+    # input that was not being rendered, focus() did nothing, and the learner
+    # got no focus at all. Nothing was inert, so every inert-aware check passed
+    # it as a fine target.
+    #
+    # Two changes make this pass: setBottomMode now runs before the drawer
+    # opens, and the focus code verifies document.activeElement instead of
+    # trusting that its chosen element accepted focus.
+    Given I log in as "student1"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    And I click on "[data-mode=\"history\"]" "css_element"
+    And I press the escape key
+    Then "#local-ai-course-assistant-drawer" "css_element" should not be visible
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    And focus should be inside "#local-ai-course-assistant-drawer"
+    And focus should be on ".local-ai-course-assistant__input"
+
+  @javascript
+  Scenario: A brand-new learner cannot dismiss the intro past a pending consent notice
+    # Found in the fourth review round. The most common first run of all, and
+    # no scenario could see it: every consent scenario sets intro_dismissed,
+    # and every other scenario sets consent. This one sets neither.
+    #
+    # showIntroModal inserts the welcome panel as a NEW child of the drawer and
+    # focuses its Continue button a frame later. consent_gate.js sealed the
+    # drawer's children with `inert` once, at init, so a panel inserted after
+    # that snapshot escapes the seal entirely. The result was a Continue button
+    # focused, tabbable and clickable in front of a modal consent notice the
+    # learner had not read: the intro could be dismissed without the notice
+    # ever being acknowledged.
+    #
+    # The panel now marks itself inert while consent is pending and releases
+    # that when the notice does, via a MutationObserver on the pending class.
+    # Marking it inert without the release would have been worse than the bug:
+    # a Continue button the learner can see and never press.
+    Given the following "users" exist:
+      | username | firstname | lastname | email            |
+      | fresh    | Fresh     | Start    | fresh@example.com |
+    And the following "course enrolments" exist:
+      | user  | course | role    |
+      | fresh | DI1    | student |
+    And I log in as "fresh"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then ".aica-consent-banner" "css_element" should be visible
+    And focus should be inside "#local-ai-course-assistant-drawer"
+    And the welcome panel should be sealed while consent is pending
+    # The release path. The fourth round called it "not optional" and nothing
+    # tested it: deleting removeAttribute('inert') left every scenario green.
+    # An unreleased seal is a Continue button the learner can see and never
+    # press, which is worse than the bug the seal fixes.
+    When I read and accept the SOLA consent notice
+    Then the welcome panel should be released
+
+  @javascript
+  Scenario: A first open under a quiz attempt lock does not strand the keyboard
+    # Found in the fifth review round, in the fourth round's fix.
+    #
+    # The candidate loop was correct at the moment it ran: on a first open the
+    # input is enabled, so it took focus and the loop stopped there, which is
+    # the right answer. handleToggle then called setInputEnabled(false) for the
+    # attempt lock, and disabling the element that HAS focus makes the browser
+    # drop focus to <body>. Only on a first open: on any later one the input is
+    # already disabled and the loop skips past it.
+    #
+    # So the fix was not another candidate. It was recognising that focus
+    # placement is not a one-off at open time. setInputEnabled() now re-places
+    # focus when it disables the element holding it, which covers every caller
+    # rather than the two that happen to do it today.
+    #
+    # This stages a real in-progress attempt rather than driving
+    # setInputEnabled through the module directly, so it exercises the server
+    # side too: quiz_lock::is_locked_for, the data-attempt-locked attribute,
+    # and handleToggle's branch, not just the mechanism at the end of them.
+    Given the following "activities" exist:
+      | activity | name        | course | idnumber |
+      | quiz     | Locked Quiz | DI1    | quiz1    |
+    And the following "question categories" exist:
+      | contextlevel | reference | name           |
+      | Course       | DI1       | Test questions |
+    And the following "questions" exist:
+      | questioncategory | qtype     | name | questiontext    |
+      | Test questions   | truefalse | TF1  | Is this a test? |
+    And quiz "Locked Quiz" contains the following questions:
+      | question | page |
+      | TF1      | 1    |
+    And user "student1" has started an attempt at quiz "Locked Quiz"
+    And I log in as "student1"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    # Assert the lock ACTUALLY engaged before asserting anything about focus.
+    # Without this the scenario passes whether or not the lock fires, and a
+    # mutation removing the refocus survived it for exactly that reason: no
+    # lock, no setInputEnabled(false), nothing for the fix to do.
+    And the assistant input should be disabled by the lock
+    And focus should be inside "#local-ai-course-assistant-drawer"
+
+  @javascript
+  Scenario: A hidden-level quiz view page does not strand the keyboard
+    # Found in review round six, which corrected the round-five revert.
+    #
+    # I reverted a focus guard after checking that init() disables the input
+    # before any open. It does, but only for attemptLocked. quizLocked is a
+    # different flag: the per-quiz assistance level `hidden`, set on a quiz's
+    # VIEW page as well as its attempt page. So a learner on the view page of a
+    # hidden-level quiz, with no attempt started, had quizLocked true and
+    # attemptLocked false. The input was enabled when focusIntoDrawer ran, took
+    # focus, and was then disabled by handleToggle, which drops focus to <body>.
+    #
+    # My browser check staged a real attempt, which sets attemptLocked, so it
+    # exercised the branch init() already covered and the revert looked safe.
+    # init() now disables the input for both locks.
+    Given the following "activities" exist:
+      | activity | name        | course | idnumber |
+      | quiz     | Hidden Quiz | DI1    | quiz2    |
+    And the SOLA assistance level for quiz "Hidden Quiz" is "hidden"
+    And I log in as "student1"
+    When I am on the "Hidden Quiz" "quiz activity" page
+    And I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    And the assistant input should be disabled by the lock
+    And focus should be inside "#local-ai-course-assistant-drawer"
+
+  @javascript
+  Scenario: On a phone the assistant takes focus without opening the keyboard
+    # The mobile half of the same fix, and the reason it is not simply "focus
+    # the message box". Focusing a textarea on a phone opens the on-screen
+    # keyboard, which would cover the drawer the learner just opened with a
+    # keyboard they did not ask for. So under 600px focus goes to the dialog
+    # container instead: still inside, still announced by its aria-label, the
+    # Tab trap still engages on the first Tab, and nothing is typed into until
+    # the learner picks the message box themselves.
+    #
+    # 600px is the breakpoint updatePagePush already uses to decide the drawer
+    # overlays rather than pushes the page.
+    Given I log in as "student1"
+    And I am on "Test Course" course homepage
+    And I change window size to "mobile"
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    And focus should be inside "#local-ai-course-assistant-drawer"
+    And focus should be on "#local-ai-course-assistant-drawer"
+
+  @javascript
   Scenario: Every panel a learner can open is free of template artefacts
     # The bottom-nav panels, Progress and History, are reachable by any learner
     # and were reached by no scenario until v7.5.4. The help panel was in the
@@ -100,7 +347,15 @@ Feature: SOLA drawer interactions beyond send-receive
     # This walks the learner-reachable surfaces and asserts the thing that is
     # cheap to check and expensive to miss: no Mustache tag, no unresolved
     # branding token, no unsubstituted placeholder, no raw string key.
-    Given I log in as "student1"
+    #
+    # The Progress control does not exist unless mastery AND the mastery
+    # dashboard are on for THIS course. The first version of this scenario
+    # clicked it without turning either on and failed with "not found", which was
+    # the truthful answer: there was no control. The second gate's config key
+    # contains the course id, so it cannot be written in a Background table
+    # before the generator has assigned one; hence a step, not a row.
+    Given the mastery progress tab is enabled for course "DI1"
+    And I log in as "student1"
     And I am on "Test Course" course homepage
     When I click on "#local-ai-course-assistant-toggle" "css_element"
     Then "#local-ai-course-assistant-drawer" should not leak template syntax
@@ -110,3 +365,47 @@ Feature: SOLA drawer interactions beyond send-receive
     And ".local-ai-course-assistant__history-panel" should not leak template syntax
     And I click on "[data-mode=\"chat\"]" "css_element"
     And ".local-ai-course-assistant__starters" should not leak template syntax
+
+  @javascript
+  Scenario: An oversized recording is refused before it reaches the provider
+    # The guard this pins is at transcribe.php, and until now nothing proved it
+    # FIRES. PHPUnit cannot enter that file: it declares AJAX_SCRIPT and gates on
+    # is_uploaded_file(), so the unit tests can only read the source and assert the
+    # guard is present and correctly ordered. Deleting just the `exit;` from the
+    # guard body leaves every one of those assertions green while an oversized clip
+    # goes to the provider and is billed, and the provider's JSON refusal reaches
+    # the learner base64-encoded as audio that decodes to silence.
+    #
+    # A real browser POST carries the session cookie and the page's sesskey, so it
+    # satisfies require_login, require_sesskey and require_capability and arrives at
+    # the guard the way a learner's own recording does.
+    #
+    # The first version of this scenario got HTTP 200 and I could not say why,
+    # because the step captured only the status. The answer, once the body was
+    # captured: PHP discards a body over post_max_size (default 8 MB) in its
+    # entirety, so $_POST and $_FILES both arrive empty, require_sesskey throws on
+    # a sesskey that went in the bin with the audio, and Moodle's AJAX handler
+    # answers that at HTTP 200. MAX_AUDIO_BYTES is 25 MB, so on a stock PHP the
+    # 25 MB guard was never the guard that ran. transcribe.php now detects the
+    # discarded body before require_sesskey and answers 413 itself, so this
+    # scenario gets the same answer whatever post_max_size is set to.
+    #
+    # 26214401 bytes is one over security::MAX_AUDIO_BYTES (25 * 1024 * 1024).
+    Given I log in as "student1"
+    And I am on "Test Course" course homepage
+    When I post a 26214401 byte audio clip to the transcription endpoint
+    Then the transcription endpoint should have refused with 413
+
+  @javascript
+  Scenario: An empty recording is refused before it reaches the provider
+    # The same guard, the cheap half of it: the condition is `$size <= 0 || $size >
+    # MAX`, so a zero-byte clip exercises the identical refusal without pushing 26MB
+    # through the browser. Worth having as well as the oversized case, because a
+    # microphone that produced nothing is the failure a learner actually hits, and
+    # because if the oversized scenario ever gets skipped for being slow this one
+    # still holds the line.
+    Given I log in as "student1"
+    And I am on "Test Course" course homepage
+    When I post a 0 byte audio clip to the transcription endpoint
+    Then the transcription endpoint should have refused with 413
+

@@ -1502,7 +1502,7 @@ $string['soapbox:no_browser_stt'] = 'Ce navigateur ne prend pas en charge la rec
 $string['soapbox:browser_note'] = 'Ce discours est transcrit dans votre navigateur. Rien n\'est téléversé. Fonctionne mieux dans Chrome et Safari.';
 $string['soapbox:server_note'] = 'Votre enregistrement est téléversé uniquement pour la transcription et n\'est pas conservé.';
 $string['soapbox:error'] = 'Impossible d\'évaluer ce discours pour le moment. Réessayez dans un instant.';
-$string['soapbox:audio_too_large'] = 'Cet enregistrement est trop volumineux. Limitez les discours à environ 25 MB (environ 20 minutes).';
+$string['soapbox:audio_too_large'] = 'Cet enregistrement est trop volumineux. Limitez les discours à environ {$a} Mo.';
 $string['soapbox:no_stt'] = 'Aucun fournisseur de transcription n\'est configuré. Demandez à votre administrateur de configurer Whisper ou d\'activer la transcription navigateur.';
 $string['soapbox:result_heading'] = 'Scores de la grille';
 $string['soapbox:overall_heading'] = 'Global';
@@ -3088,3 +3088,23 @@ $string['outcomes:state_unavailable'] = 'Ce résultat n\'est pas disponible pour
 $string['cachedef_outcomesattainment'] = 'Atteinte des acquis du programme par apprenant et par cours';
 
 $string['cachedef_vectors'] = 'Vecteurs d\'embedding RAG pour l\'index de récupération';
+
+$string['voice:error_toolarge'] = 'Cet enregistrement est trop volumineux. Essayez un extrait plus court, de moins de {$a} Mo environ.';
+$string['voice:error_noaudio'] = 'Aucun enregistrement n\'a été reçu. Veuillez réessayer d\'enregistrer.';
+$string['voice:error_format'] = 'Ce format audio n\'est pas pris en charge. Veuillez réessayer d\'enregistrer.';
+$string['voice:error_noprovider'] = 'La transcription vocale n\'est pas configurée sur ce site. Veuillez contacter votre administrateur.';
+$string['voice:error_badresponse'] = 'Le service de transcription a renvoyé une réponse inattendue. Veuillez réessayer.';
+
+$string['settings:max_audio_mb'] = 'Taille maximale d\'enregistrement (Mo)';
+$string['settings:max_audio_mb_desc'] = 'Le plus gros enregistrement vocal qu\'un apprenant peut téléverser, en mégaoctets. Entre {$a->min} et {$a->max} ; la valeur par défaut est {$a->default}.<br>Sur ce serveur, PHP autorise post_max_size = {$a->postmax} et upload_max_filesize = {$a->uploadmax}, donc la taille réellement appliquée en ce moment est de {$a->effective} Mo. C\'est toujours la plus petite valeur entre votre réglage et les limites propres à PHP qui s\'applique.';
+$string['settings:max_audio_mb_capped'] = 'Sur ce serveur, c\'est PHP qui fixe la limite, pas ce réglage. Pour que les apprenants puissent utiliser toute la taille définie ici, augmentez post_max_size et upload_max_filesize dans php.ini à au moins {$a}.';
+$string['voice:error_unavailable'] = 'Le service de transcription n\'est pas disponible pour le moment. Veuillez réessayer dans un instant.';
+
+$string['settings:max_audio_mb_range'] = 'Saisissez un nombre entre {$a->min} et {$a->max}. Les valeurs supérieures ne peuvent pas être respectées : le point de terminaison plafonne à {$a->max}, le champ annoncerait donc une limite que le code n\'applique pas.';
+
+$string['ai_course_assistant:usesupport'] = 'Utiliser l\'assistant en dehors d\'un cours';
+$string['settings:support_enabled'] = 'Activer le mode assistance en dehors des cours';
+$string['settings:support_enabled_desc'] = 'Permet aux apprenants d\'ouvrir [[tutorshort]] sur des pages qui ne relèvent pas d\'un cours, comme le tableau de bord ou leur profil, afin de poser des questions sur l\'inscription, les certificats, les problèmes techniques et d\'autres demandes d\'assistance. Un cours d\'assistance doit être défini ci-dessous. Les apprenants doivent en outre disposer de la capacité « Utiliser l\'assistant en dehors d\'un cours », accordée par défaut aux utilisateurs authentifiés.';
+$string['settings:support_courseid'] = 'Cours d\'assistance';
+$string['settings:support_courseid_desc'] = 'L\'identifiant numérique d\'un cours visible contenant vos ressources de prise en main, d\'accueil et d\'orientation. Les conversations d\'assistance s\'appuient sur ce cours ainsi que sur la FAQ ci-dessus, et y sont enregistrées. Laissez le champ vide pour désactiver le mode assistance. L\'accueil du site (cours 1) n\'est pas accepté.';
+$string['support:promptrole'] = 'Vous répondez à une question d\'assistance posée en dehors de tout cours. L\'apprenant ne s\'interroge pas sur le contenu du cours : ne l\'y renvoyez pas. Répondez à partir de la FAQ et des ressources d\'assistance qui vous ont été fournies. Si vous ne pouvez pas répondre avec exactitude, dites-le clairement et proposez de transmettre la question à l\'équipe d\'assistance.';

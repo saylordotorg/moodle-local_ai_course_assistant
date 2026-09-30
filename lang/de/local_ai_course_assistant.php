@@ -1501,7 +1501,7 @@ $string['soapbox:no_browser_stt'] = 'Dieser Browser unterstützt keine Spracherk
 $string['soapbox:browser_note'] = 'Diese Rede wird in Ihrem Browser transkribiert. Es wird nichts hochgeladen. Funktioniert am besten in Chrome und Safari.';
 $string['soapbox:server_note'] = 'Ihre Aufnahme wird nur zur Transkription hochgeladen und nicht gespeichert.';
 $string['soapbox:error'] = 'Diese Rede konnte gerade nicht bewertet werden. Versuchen Sie es in einem Moment erneut.';
-$string['soapbox:audio_too_large'] = 'Diese Aufnahme ist zu groß. Halten Sie Reden unter etwa 25 MB (ungefähr 20 Minuten).';
+$string['soapbox:audio_too_large'] = 'Diese Aufnahme ist zu groß. Halten Sie Reden unter etwa {$a} MB.';
 $string['soapbox:no_stt'] = 'Es ist kein Transkriptionsanbieter konfiguriert. Bitten Sie Ihre Administratorin oder Ihren Administrator, Whisper einzurichten oder die Transkription im Browser zu aktivieren.';
 $string['soapbox:result_heading'] = 'Bewertungsraster-Punktzahlen';
 $string['soapbox:overall_heading'] = 'Gesamt';
@@ -3087,3 +3087,23 @@ $string['outcomes:state_unavailable'] = 'Dieses Ergebnis ist derzeit nicht verf�
 $string['cachedef_outcomesattainment'] = 'Erreichung der Studiengangs-Lernergebnisse pro Lernendem und Kurs';
 
 $string['cachedef_vectors'] = 'RAG-Embedding-Vektoren für den Abrufindex';
+
+$string['voice:error_toolarge'] = 'Diese Aufnahme ist zu groß. Versuchen Sie einen kürzeren Clip unter etwa {$a} MB.';
+$string['voice:error_noaudio'] = 'Es ist keine Aufnahme angekommen. Bitte nehmen Sie erneut auf.';
+$string['voice:error_format'] = 'Dieses Audioformat wird nicht unterstützt. Bitte nehmen Sie erneut auf.';
+$string['voice:error_noprovider'] = 'Die Sprachtranskription ist auf dieser Website nicht eingerichtet. Bitte wenden Sie sich an Ihre Administration.';
+$string['voice:error_badresponse'] = 'Der Transkriptionsdienst hat etwas Unerwartetes zurückgegeben. Bitte versuchen Sie es erneut.';
+
+$string['settings:max_audio_mb'] = 'Maximale Aufnahmegröße (MB)';
+$string['settings:max_audio_mb_desc'] = 'Die größte Sprachaufnahme, die Lernende hochladen dürfen, in Megabyte. Zwischen {$a->min} und {$a->max}; Standard ist {$a->default}.<br>Auf diesem Server erlaubt PHP post_max_size = {$a->postmax} und upload_max_filesize = {$a->uploadmax}, die derzeit tatsächlich durchgesetzte Größe beträgt also {$a->effective} MB. Es gilt immer der kleinere Wert aus Ihrer Einstellung und den PHP-Grenzen.';
+$string['settings:max_audio_mb_capped'] = 'Die Grenze auf diesem Server setzt PHP, nicht diese Einstellung. Damit Lernende die hier eingestellte Größe voll nutzen können, erhöhen Sie post_max_size und upload_max_filesize in der php.ini auf mindestens {$a}.';
+$string['voice:error_unavailable'] = 'Der Transkriptionsdienst ist derzeit nicht verfügbar. Bitte versuchen Sie es in Kürze erneut.';
+
+$string['settings:max_audio_mb_range'] = 'Geben Sie eine Zahl zwischen {$a->min} und {$a->max} ein. Größere Werte lassen sich nicht einhalten: der Endpunkt begrenzt auf {$a->max}, das Feld würde also ein Limit nennen, das der Code nicht durchsetzt.';
+
+$string['ai_course_assistant:usesupport'] = 'Den Assistenten außerhalb eines Kurses verwenden';
+$string['settings:support_enabled'] = 'Supportmodus außerhalb von Kursen aktivieren';
+$string['settings:support_enabled_desc'] = 'Erlaubt Lernenden, [[tutorshort]] auch auf Seiten zu öffnen, die zu keinem Kurs gehören, etwa im Dashboard oder im eigenen Profil, um Fragen zu Einschreibung, Zertifikaten, technischen Problemen und anderen Supportthemen zu stellen. Dafür muss unten ein Supportkurs festgelegt sein. Zusätzlich benötigen Lernende weiterhin das Recht „Den Assistenten außerhalb eines Kurses verwenden“, über das authentifizierte Nutzer/innen standardmäßig verfügen.';
+$string['settings:support_courseid'] = 'Supportkurs';
+$string['settings:support_courseid_desc'] = 'Die ID eines sichtbaren Kurses mit Ihren Einstiegs-, Onboarding- und Orientierungsmaterialien. Supportgespräche werden aus diesem Kurs und den oben hinterlegten FAQ beantwortet und diesem Kurs zugeordnet gespeichert. Leer lassen, um den Supportmodus auszuschalten. Die Startseite der Website (Kurs 1) wird nicht akzeptiert.';
+$string['support:promptrole'] = 'Sie beantworten eine Supportfrage außerhalb jedes Kurses. Die lernende Person fragt nicht nach Kursinhalten, verweisen Sie sie also nicht darauf. Antworten Sie anhand der FAQ und der Ihnen bereitgestellten Supportmaterialien. Wenn Sie nicht zutreffend antworten können, sagen Sie das klar und bieten Sie an, die Frage an das Supportteam weiterzugeben.';

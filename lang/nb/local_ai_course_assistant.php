@@ -1500,7 +1500,7 @@ $string['soapbox:no_browser_stt'] = 'Denne nettleseren støtter ikke talegjenkje
 $string['soapbox:browser_note'] = 'Denne talen transkriberes i nettleseren din. Ingenting lastes opp. Fungerer best i Chrome og Safari.';
 $string['soapbox:server_note'] = 'Opptaket ditt lastes opp bare for transkripsjon og lagres ikke.';
 $string['soapbox:error'] = 'Kunne ikke vurdere denne talen akkurat nå. Prøv igjen om et øyeblikk.';
-$string['soapbox:audio_too_large'] = 'Det opptaket er for stort. Hold taler under omtrent 25 MB (rundt 20 minutter).';
+$string['soapbox:audio_too_large'] = 'Dette opptaket er for stort. Hold taler under omtrent {$a} MB.';
 $string['soapbox:no_stt'] = 'Ingen transkripsjonsleverandør er konfigurert. Be administratoren din om å sette opp Whisper eller aktivere nettlesertranskripsjon.';
 $string['soapbox:result_heading'] = 'Rubrikkpoeng';
 $string['soapbox:overall_heading'] = 'Totalt';
@@ -3085,3 +3085,23 @@ $string['outcomes:state_unavailable'] = 'Dette resultatet er ikke tilgjengelig a
 $string['cachedef_outcomesattainment'] = 'Oppnåelse av læringsutbytte i studieprogrammet per student og emne';
 
 $string['cachedef_vectors'] = 'RAG-embeddingvektorer for innhentingsindeksen';
+
+$string['voice:error_toolarge'] = 'Dette opptaket er for stort. Prøv et kortere klipp på under cirka {$a} MB.';
+$string['voice:error_noaudio'] = 'Det kom ikke inn noe opptak. Prøv å ta opp på nytt.';
+$string['voice:error_format'] = 'Dette lydformatet støttes ikke. Prøv å ta opp på nytt.';
+$string['voice:error_noprovider'] = 'Taletranskripsjon er ikke satt opp på dette nettstedet. Ta kontakt med administratoren.';
+$string['voice:error_badresponse'] = 'Transkripsjonstjenesten returnerte noe uventet. Prøv igjen.';
+
+$string['settings:max_audio_mb'] = 'Maksimal opptaksstørrelse (MB)';
+$string['settings:max_audio_mb_desc'] = 'Det største lydopptaket en student kan laste opp, i megabyte. Mellom {$a->min} og {$a->max}; standarden er {$a->default}.<br>På denne serveren tillater PHP post_max_size = {$a->postmax} og upload_max_filesize = {$a->uploadmax}, så størrelsen som faktisk håndheves nå, er {$a->effective} MB. Den minste av innstillingen din og PHPs egne grenser gjelder alltid.';
+$string['settings:max_audio_mb_capped'] = 'Grensen på denne serveren settes av PHP, ikke av denne innstillingen. For at studentene skal kunne bruke hele størrelsen som er satt her, øk post_max_size og upload_max_filesize i php.ini til minst {$a}.';
+$string['voice:error_unavailable'] = 'Transkripsjonstjenesten er ikke tilgjengelig akkurat nå. Prøv igjen om litt.';
+
+$string['settings:max_audio_mb_range'] = 'Skriv inn et tall mellom {$a->min} og {$a->max}. Større verdier kan ikke overholdes: endepunktet begrenser til {$a->max}, så feltet ville oppgi en grense koden ikke håndhever.';
+
+$string['ai_course_assistant:usesupport'] = 'Bruke assistenten utenfor et kurs';
+$string['settings:support_enabled'] = 'Slå på støttemodus utenfor kurs';
+$string['settings:support_enabled_desc'] = 'La studentene åpne [[tutorshort]] på sider som ikke er et kurs, for eksempel kontrollpanelet eller profilen sin, slik at de kan spørre om påmelding, kursbevis, tekniske problemer og andre støttespørsmål. Det krever at det er valgt et støttekurs nedenfor. Studentene må dessuten ha rettigheten "Bruke assistenten utenfor et kurs", som innloggede brukere har som standard.';
+$string['settings:support_courseid'] = 'Støttekurs';
+$string['settings:support_courseid_desc'] = 'ID-en til et synlig kurs som inneholder materiellet deres for kom i gang, introduksjon og orientering. Støttesamtaler besvares ut fra dette kurset og FAQ-en ovenfor, og registreres på det. La feltet stå tomt for å slå av støttemodus. Forsiden på nettstedet (kurs 1) godtas ikke.';
+$string['support:promptrole'] = 'Du svarer på et støttespørsmål som er stilt utenfor alle kurs. Studenten spør ikke om kursinnhold, så ikke henvis tilbake til det. Svar ut fra FAQ-en og støttematerialet du har fått. Hvis du ikke kan svare presist, si det rett ut og tilby å sende spørsmålet videre til støtteteamet.';

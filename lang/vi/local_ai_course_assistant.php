@@ -1522,7 +1522,7 @@ $string['soapbox:no_browser_stt'] = 'Trình duyệt này không hỗ trợ nhậ
 $string['soapbox:browser_note'] = 'Bài nói này được phiên âm trong trình duyệt của bạn. Không có gì được tải lên. Hoạt động tốt nhất trong Chrome và Safari.';
 $string['soapbox:server_note'] = 'Bản ghi của bạn chỉ được tải lên để phiên âm và không được lưu trữ.';
 $string['soapbox:error'] = 'Hiện không thể chấm điểm bài nói này. Hãy thử lại sau giây lát.';
-$string['soapbox:audio_too_large'] = 'Bản ghi đó quá lớn. Hãy giữ các bài nói dưới khoảng 25 MB (khoảng 20 phút).';
+$string['soapbox:audio_too_large'] = 'Bản ghi này quá lớn. Hãy giữ các bài nói dưới khoảng {$a} MB.';
 $string['soapbox:no_stt'] = 'Chưa cấu hình nhà cung cấp phiên âm nào. Hãy đề nghị quản trị viên của bạn thiết lập Whisper hoặc bật phiên âm trên trình duyệt.';
 $string['soapbox:result_heading'] = 'Điểm theo thang đánh giá';
 $string['soapbox:overall_heading'] = 'Tổng thể';
@@ -3107,3 +3107,23 @@ $string['outcomes:state_unavailable'] = 'Hiện chưa xem được kết quả n
 $string['cachedef_outcomesattainment'] = 'Mức độ đạt kết quả đầu ra chương trình theo từng học viên và khóa học';
 
 $string['cachedef_vectors'] = 'Vectơ embedding RAG cho chỉ mục truy xuất';
+
+$string['voice:error_toolarge'] = 'Bản ghi này quá lớn. Hãy thử một đoạn ngắn hơn, dưới khoảng {$a} MB.';
+$string['voice:error_noaudio'] = 'Không nhận được bản ghi nào. Vui lòng thử ghi âm lại.';
+$string['voice:error_format'] = 'Định dạng âm thanh đó không được hỗ trợ. Vui lòng thử ghi âm lại.';
+$string['voice:error_noprovider'] = 'Chuyển giọng nói thành văn bản chưa được thiết lập trên trang này. Vui lòng liên hệ quản trị viên.';
+$string['voice:error_badresponse'] = 'Dịch vụ chuyển giọng nói trả về kết quả không mong đợi. Vui lòng thử lại.';
+
+$string['settings:max_audio_mb'] = 'Kích thước bản ghi tối đa (MB)';
+$string['settings:max_audio_mb_desc'] = 'Bản ghi giọng nói lớn nhất mà người học có thể tải lên, tính bằng megabyte. Từ {$a->min} đến {$a->max}; mặc định là {$a->default}.<br>Trên máy chủ này, PHP cho phép post_max_size = {$a->postmax} và upload_max_filesize = {$a->uploadmax}, nên kích thước thực sự được áp dụng lúc này là {$a->effective} MB. Giá trị nhỏ hơn giữa cài đặt của bạn và giới hạn của chính PHP luôn được áp dụng.';
+$string['settings:max_audio_mb_capped'] = 'Giới hạn trên máy chủ này là do PHP, không phải cài đặt này. Để người học dùng được trọn kích thước đặt ở đây, hãy tăng post_max_size và upload_max_filesize trong php.ini lên ít nhất {$a}.';
+$string['voice:error_unavailable'] = 'Dịch vụ chuyển giọng nói hiện không khả dụng. Vui lòng thử lại sau giây lát.';
+
+$string['settings:max_audio_mb_range'] = 'Nhập một số từ {$a->min} đến {$a->max}. Giá trị lớn hơn không thể được tôn trọng: điểm cuối giới hạn ở {$a->max}, nên trường này sẽ nêu một giới hạn mà mã không thực thi.';
+
+$string['ai_course_assistant:usesupport'] = 'Sử dụng trợ lý bên ngoài khóa học';
+$string['settings:support_enabled'] = 'Bật chế độ hỗ trợ bên ngoài khóa học';
+$string['settings:support_enabled_desc'] = 'Cho phép học viên mở [[tutorshort]] trên những trang không thuộc khóa học, chẳng hạn như bảng điều khiển hoặc trang hồ sơ cá nhân, để hỏi về ghi danh, chứng chỉ, sự cố kỹ thuật và các câu hỏi hỗ trợ khác. Cần thiết lập một khóa học hỗ trợ ở bên dưới. Học viên vẫn phải có quyền "Sử dụng trợ lý bên ngoài khóa học", vốn được cấp mặc định cho người dùng đã xác thực.';
+$string['settings:support_courseid'] = 'Khóa học hỗ trợ';
+$string['settings:support_courseid_desc'] = 'ID của một khóa học đang hiển thị, chứa tài liệu hướng dẫn bắt đầu, làm quen và định hướng của bạn. Các cuộc trò chuyện hỗ trợ được trả lời dựa trên khóa học này cùng với FAQ ở trên, và được ghi nhận vào khóa học đó. Để trống để tắt chế độ hỗ trợ. Không chấp nhận trang chủ của trang web (khóa học 1).';
+$string['support:promptrole'] = 'Bạn đang trả lời một câu hỏi hỗ trợ từ bên ngoài mọi khóa học. Học viên không hỏi về nội dung khóa học, vì vậy đừng hướng họ trở lại đó. Hãy trả lời dựa trên FAQ và tài liệu hỗ trợ đã được cung cấp cho bạn. Nếu không thể trả lời chính xác, hãy nói rõ điều đó và đề nghị chuyển câu hỏi cho đội ngũ hỗ trợ.';

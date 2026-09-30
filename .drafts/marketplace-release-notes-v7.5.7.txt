@@ -1,0 +1,33 @@
+Version 7.5.7 (build 2026092802)
+
+The assistant can now answer support questions outside a course. It is off by default and changes nothing on a site that does not enable it.
+
+NEW: SUPPORT MODE
+
+Until now the assistant only rendered inside a course. A learner who could not find the syllabus, could not work out how to submit an assignment, or could not get their certificate had no way to reach it. That is the group with the most urgent questions and the least ability to self-serve.
+
+An administrator turns on "Enable support mode outside courses" and names a real, visible course holding the getting started, onboarding and orientation material. The assistant then appears on pages that are not a course, such as the dashboard, a user profile and the site home. It answers from that course plus the site FAQ, with no course material and no assumption that the learner is studying anything. When it cannot answer accurately it says so plainly and offers to pass the question to the support team, using the existing Zendesk escalation path.
+
+Learners need a new capability, local/ai_course_assistant:usesupport, declared at system context. Authenticated users hold it by default and an administrator can revoke it. It is deliberately a separate capability rather than an extra archetype on the existing :use capability, because archetypes apply at every context and would have switched the widget on in every course by inheritance.
+
+WHY IT BINDS TO A DESIGNATED COURSE
+
+The obvious implementation is to render off-course and pass the site course id. That was measured against the code and rejected. The site course id already carries five distinct meanings in this plugin, and two of them would have produced wrong answers rather than merely untidy ones.
+
+Conversations are keyed unique on user and course, and a site-course conversation already exists because the Learning Radar feature writes to it. Message history does not filter on interaction type, so a support conversation would have loaded that internal prose as its own chat history, into the prompt and into the drawer. Separately, the spend cap is per course, so every user's support traffic across the whole site would have metered against the site course's single cap.
+
+Binding to an administrator-designated real course avoids both by construction. The conversation gets its own row, spend meters against a course an administrator configures, the system prompt cache key stays distinct, the embedding migration can see the chunks, and every existing per-course capability check keeps working against a context that genuinely exists.
+
+ACADEMIC INTEGRITY
+
+The quiz lock scopes to the course a request comes from. The support surface has no course of its own, and scoping the lock to a course that holds no quizzes would mean it never fired. Every chat path on the support surface therefore falls back to the site-wide test, which is the conservative direction for an integrity control. Per-course scoping inside a course is unchanged.
+
+Features that belong to a course are suppressed on the support surface rather than offered and then refused: practice quizzes, study plans, flashcards, the progress panel, voice mode, spoken presentation practice, study reminders, the satisfaction survey and the active-learner indicator.
+
+EVERYTHING ELSE
+
+Unchanged from 7.5.6, which corrected a contrast failure in the first-run privacy notice, and 7.5.5, which fixed keyboard focus handling in the drawer, made the audio recording limit configurable and translated the remaining voice error messages.
+
+UPGRADE NOTES
+
+This release adds a capability, so the plugin version increases and Moodle installs it on upgrade as usual. No schema change and no upgrade step. Support mode ships off; an existing site sees no change until an administrator enables it and names a course.

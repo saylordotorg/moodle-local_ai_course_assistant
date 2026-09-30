@@ -1500,7 +1500,7 @@ $string['soapbox:no_browser_stt'] = '이 브라우저는 브라우저 내 음성
 $string['soapbox:browser_note'] = '이 스피치는 브라우저에서 전사됩니다. 아무것도 업로드되지 않습니다. Chrome 및 Safari에서 가장 잘 작동합니다.';
 $string['soapbox:server_note'] = '녹음은 전사 목적으로만 업로드되며 저장되지 않습니다.';
 $string['soapbox:error'] = '지금은 이 스피치를 채점할 수 없습니다. 잠시 후 다시 시도하세요.';
-$string['soapbox:audio_too_large'] = '이 녹음은 너무 큽니다. 스피치를 약 25 MB(대략 20분) 미만으로 유지하세요.';
+$string['soapbox:audio_too_large'] = '이 녹음은 용량이 너무 큽니다. 스피치를 약 {$a}MB 미만으로 유지하세요.';
 $string['soapbox:no_stt'] = '구성된 전사 제공자가 없습니다. 관리자에게 Whisper를 설정하거나 브라우저 전사를 활성화하도록 요청하세요.';
 $string['soapbox:result_heading'] = '루브릭 점수';
 $string['soapbox:overall_heading'] = '종합';
@@ -3085,3 +3085,23 @@ $string['outcomes:state_unavailable'] = '이 결과는 지금 확인할 수 없�
 $string['cachedef_outcomesattainment'] = '학습자·강좌별 프로그램 성취목표 달성도';
 
 $string['cachedef_vectors'] = 'RAG 검색 색인용 임베딩 벡터';
+
+$string['voice:error_toolarge'] = '이 녹음은 용량이 너무 큽니다. 약 {$a}MB 미만의 짧은 클립을 시도해 보세요.';
+$string['voice:error_noaudio'] = '녹음이 수신되지 않았습니다. 다시 녹음해 보세요.';
+$string['voice:error_format'] = '이 오디오 형식은 지원되지 않습니다. 다시 녹음해 보세요.';
+$string['voice:error_noprovider'] = '이 사이트에는 음성 전사가 설정되어 있지 않습니다. 관리자에게 문의하세요.';
+$string['voice:error_badresponse'] = '전사 서비스가 예기치 않은 응답을 반환했습니다. 다시 시도해 주세요.';
+
+$string['settings:max_audio_mb'] = '최대 녹음 크기 (MB)';
+$string['settings:max_audio_mb_desc'] = '학습자가 업로드할 수 있는 음성 녹음의 최대 크기(메가바이트)입니다. {$a->min}에서 {$a->max} 사이이며 기본값은 {$a->default}입니다.<br>이 서버에서 PHP는 post_max_size = {$a->postmax}, upload_max_filesize = {$a->uploadmax}를 허용하므로 지금 실제로 적용되는 크기는 {$a->effective} MB입니다. 이 설정과 PHP 자체 제한 중 항상 더 작은 값이 적용됩니다.';
+$string['settings:max_audio_mb_capped'] = '이 서버에서는 이 설정이 아니라 PHP가 한도를 정합니다. 학습자가 여기에서 설정한 크기를 모두 사용할 수 있게 하려면 php.ini의 post_max_size와 upload_max_filesize를 최소 {$a}로 올리세요.';
+$string['voice:error_unavailable'] = '전사 서비스를 지금은 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.';
+
+$string['settings:max_audio_mb_range'] = '{$a->min}에서 {$a->max} 사이의 숫자를 입력하세요. 더 큰 값은 적용할 수 없습니다. 엔드포인트가 {$a->max}로 제한하므로 필드가 코드와 다른 한도를 표시하게 됩니다.';
+
+$string['ai_course_assistant:usesupport'] = '코스 밖에서 어시스턴트 사용';
+$string['settings:support_enabled'] = '코스 밖에서 지원 모드 활성화';
+$string['settings:support_enabled_desc'] = '대시보드나 프로필처럼 코스가 아닌 페이지에서도 학습자가 [[tutorshort]]를 열어 수강 등록, 수료증, 기술적 문제 등 지원 관련 질문을 할 수 있게 합니다. 아래에서 지원 코스를 지정해야 작동합니다. 또한 학습자에게 "코스 밖에서 어시스턴트 사용" 권한이 있어야 하며, 인증된 사용자에게는 기본으로 부여되어 있습니다.';
+$string['settings:support_courseid'] = '지원 코스';
+$string['settings:support_courseid_desc'] = '시작 안내, 온보딩, 오리엔테이션 자료가 들어 있는, 학습자에게 보이는 코스의 ID입니다. 지원 대화는 이 코스와 위의 FAQ를 바탕으로 답변되며 이 코스에 기록됩니다. 비워 두면 지원 모드가 꺼집니다. 사이트 홈(코스 1)은 사용할 수 없습니다.';
+$string['support:promptrole'] = '지금 코스 밖에서 들어온 지원 질문에 답하고 있다. 학습자는 코스 내용을 묻는 것이 아니므로 코스 자료로 유도하지 마라. 제공된 FAQ와 지원 자료를 근거로 답하라. 정확하게 답할 수 없으면 그 사실을 분명히 밝히고, 질문을 지원팀에 전달하겠다고 제안하라.';

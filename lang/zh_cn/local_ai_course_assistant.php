@@ -1522,7 +1522,7 @@ $string['soapbox:no_browser_stt'] = '此浏览器不支持浏览器内语音识�
 $string['soapbox:browser_note'] = '本次演讲在您的浏览器中转写。不会上传任何内容。在 Chrome 和 Safari 中效果最佳。';
 $string['soapbox:server_note'] = '您的录音仅为转写而上传，不会被存储。';
 $string['soapbox:error'] = '目前无法为本次演讲评分。请稍后再试。';
-$string['soapbox:audio_too_large'] = '该录音过大。请将演讲控制在约 25 MB 以内（大约 20 分钟）。';
+$string['soapbox:audio_too_large'] = '这段录音太大了。请将演讲控制在约 {$a} MB 以内。';
 $string['soapbox:no_stt'] = '未配置任何转写提供商。请请管理员设置 Whisper 或启用浏览器转写。';
 $string['soapbox:result_heading'] = '评分标准得分';
 $string['soapbox:overall_heading'] = '总体';
@@ -3123,3 +3123,23 @@ $string['outcomes:state_unavailable'] = '这项结果目前无法显示。没有
 $string['cachedef_outcomesattainment'] = '按学习者和课程的学习项目成果达成度';
 
 $string['cachedef_vectors'] = '供检索索引使用的 RAG 嵌入向量';
+
+$string['voice:error_toolarge'] = '这段录音太大了。请尝试较短的录音，控制在约 {$a} MB 以内。';
+$string['voice:error_noaudio'] = '未收到任何录音。请重新录制。';
+$string['voice:error_format'] = '不支持该音频格式。请重新录制。';
+$string['voice:error_noprovider'] = '本站点尚未设置语音转录。请联系管理员。';
+$string['voice:error_badresponse'] = '转录服务返回了意外的结果。请重试。';
+
+$string['settings:max_audio_mb'] = '录音最大容量（MB）';
+$string['settings:max_audio_mb_desc'] = '学习者可上传的最大语音录音容量，单位为兆字节。取值 {$a->min} 至 {$a->max}，默认 {$a->default}。<br>本服务器上 PHP 允许 post_max_size = {$a->postmax}、upload_max_filesize = {$a->uploadmax}，因此当前实际生效的容量为 {$a->effective} MB。此设置与 PHP 自身限制中较小的一个始终生效。';
+$string['settings:max_audio_mb_capped'] = '本服务器的限制来自 PHP，而非此设置。若希望学习者能使用此处设置的完整容量，请将 php.ini 中的 post_max_size 和 upload_max_filesize 提高到至少 {$a}。';
+$string['voice:error_unavailable'] = '转录服务当前不可用。请稍后重试。';
+
+$string['settings:max_audio_mb_range'] = '请输入 {$a->min} 到 {$a->max} 之间的数字。更大的值无法生效：端点会限制为 {$a->max}，届时此字段声明的上限与代码实际执行的并不一致。';
+
+$string['ai_course_assistant:usesupport'] = '在课程之外使用助手';
+$string['settings:support_enabled'] = '启用课程之外的支持模式';
+$string['settings:support_enabled_desc'] = '允许学习者在仪表板、个人资料等非课程页面打开 [[tutorshort]]，咨询选课注册、证书、技术故障等支持类问题。需要在下方指定一门支持课程。学习者还须具备“在课程之外使用助手”权限，已认证用户默认拥有该权限。';
+$string['settings:support_courseid'] = '支持课程';
+$string['settings:support_courseid_desc'] = '存放入门指南、新手引导和导览材料的课程的 ID，该课程须为可见状态。支持对话依据这门课程和上方的常见问题作答，并记入该课程。留空即关闭支持模式。站点首页（课程 1）不可用作支持课程。';
+$string['support:promptrole'] = '你正在回答来自课程之外的支持类问题。学习者问的不是课程内容，因此不要把他们引回课程材料。请依据常见问题和提供给你的支持材料作答。如果无法准确回答，就直说，并主动提出把问题转交给支持团队。';

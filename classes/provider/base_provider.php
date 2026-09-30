@@ -871,7 +871,10 @@ abstract class base_provider implements provider_interface {
         $realcli = CLI_SCRIPT && !(defined('PHPUNIT_TEST') && PHPUNIT_TEST);
         $lockedattempt = $realcli
             ? null
-            : \local_ai_course_assistant\quiz_lock::active_attempt((int) $USER->id, $courseid);
+            : \local_ai_course_assistant\quiz_lock::active_attempt(
+                (int) $USER->id,
+                \local_ai_course_assistant\support_mode::integrity_scope((int) $courseid)
+            );
         if ($lockedattempt !== null) {
             // v7.2.7: the refusal is auditable. This is the chokepoint every
             // surface except the SSE stream reaches, and sse.php records its own

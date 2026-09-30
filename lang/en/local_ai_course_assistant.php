@@ -61,6 +61,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:provider'] = 'The AI pr
 // Capabilities.
 $string['ai_course_assistant:use'] = 'Use AI tutor chat';
 $string['ai_course_assistant:viewanalytics'] = 'View AI tutor chat analytics';
+$string['ai_course_assistant:usesupport'] = 'Use the assistant outside a course';
 $string['ai_course_assistant:manage'] = 'Manage AI tutor chat settings (Administrator role)';
 
 // Settings.
@@ -256,6 +257,11 @@ $string['settings:supplemental_courses'] = 'Supplemental courses';
 $string['settings:supplemental_courses_desc'] = 'Course IDs whose content [[tutorshort]] may also draw on when answering, separated by commas. Use this for material that lives in another course and applies everywhere, such as a student orientation or resource centre: a learner asking about exam policy then gets the answer from that course instead of nothing.
 
 The courses must already be indexed for retrieval; nothing extra is embedded, so adding one here is immediate and costs nothing. Hidden courses are ignored. Activities inside a listed course, however, are indexed as the administrator who reindexed it saw them, so a hidden or restricted activity’s text can be quoted back to a learner even though no link to it is shown. Only list courses whose whole content is suitable for the audience. Maximum {$a} courses. A per-course setting, where present, replaces this list rather than adding to it.';
+$string['settings:support_enabled'] = 'Enable support mode outside courses';
+$string['settings:support_enabled_desc'] = 'Let learners open [[tutorshort]] on pages that are not a course, such as the dashboard or their profile, to ask about enrolment, certificates, technical problems and other support questions. Requires a support course to be set below. Learners still need the "Use the assistant outside a course" capability, which authenticated users hold by default.';
+$string['settings:support_courseid'] = 'Support course';
+$string['settings:support_courseid_desc'] = 'The ID of a visible course holding your getting started, onboarding and orientation material. Support conversations are answered from this course plus the FAQ above, and are recorded against it. Leave empty to turn support mode off. The site home (course 1) is not accepted.';
+$string['support:promptrole'] = 'You are answering a support question from outside any course. The learner is not asking about course material, so do not redirect them to it. Answer from the FAQ and the support material you have been given. If you cannot answer accurately, say so plainly and offer to pass the question to the support team.';
 $string['settings:faq_content'] = 'FAQ Content';
 $string['settings:faq_content_desc'] = 'Enter FAQ entries (one per line in the format: Q: question | A: answer). These will be provided to the AI to answer common support questions.';
 $string['settings:zendesk_enabled'] = 'Enable Zendesk Escalation';
@@ -1811,8 +1817,27 @@ $string['soapbox:err_provider']     = 'The AI scoring service could not be reach
 $string['soapbox:err_parse']        = 'The AI returned an unexpected response. Please try again.';
 $string['soapbox:err_disabled']     = 'Speech practice is not enabled for this course.';
 $string['soapbox:err_transcribe']   = 'Your recording could not be transcribed. Please try again, and check that your microphone is working.';
-$string['soapbox:audio_too_large']  = 'That recording is too large. Keep speeches under about 25 MB (roughly 20 minutes).';
+$string['soapbox:audio_too_large']  = 'That recording is too large. Keep speeches under about {$a} MB.';
 $string['soapbox:no_stt']           = 'No transcription provider is configured. Ask your administrator to set up Whisper or enable browser transcription.';
+// Voice transcription errors. These reach a learner verbatim in the transcript
+// area, so they are translated like any other learner-facing text. Until 7.5.5
+// they were English literals in transcribe.php and soapbox_transcribe.php: a
+// learner reading the interface in Spanish was told "Unsupported audio format."
+// Maximum audio upload size. The _desc placeholders are filled from ini_get()
+// at render time, so an admin sees the real ceiling on their own server rather
+// than a number from the documentation.
+$string['settings:max_audio_mb'] = 'Maximum recording size (MB)';
+$string['settings:max_audio_mb_desc'] = 'The largest voice recording a learner may upload, in megabytes. Between {$a->min} and {$a->max}; the default is {$a->default}.<br>On this server PHP allows post_max_size = {$a->postmax} and upload_max_filesize = {$a->uploadmax}, so the size actually enforced right now is {$a->effective} MB. The smaller of your setting and PHP\'s own limits always wins.';
+$string['settings:max_audio_mb_range'] = 'Enter a number between {$a->min} and {$a->max}. Larger values cannot be honoured: the endpoint clamps to {$a->max}, so the field would state a limit the code would not enforce.';
+$string['settings:max_audio_mb_capped'] = 'PHP on this server is the limit, not this setting. To let learners use the full size set here, raise post_max_size and upload_max_filesize in php.ini to at least {$a}.';
+
+$string['voice:error_toolarge']     = 'That recording is too large. Try a shorter clip, under about {$a} MB.';
+$string['voice:error_noaudio']      = 'No recording was received. Please try recording again.';
+$string['voice:error_format']       = 'That audio format is not supported. Please try recording again.';
+$string['voice:error_noprovider']   = 'Voice transcription is not set up on this site. Please contact your administrator.';
+$string['voice:error_badresponse']  = 'The transcription service returned something unexpected. Please try again.';
+$string['voice:error_unavailable']  = 'The transcription service is not available right now. Please try again in a moment.';
+
 $string['soapbox:result_heading']   = 'Rubric scores';
 $string['soapbox:overall_heading']  = 'Overall';
 $string['soapbox:tips_heading']     = 'Tips for next time';

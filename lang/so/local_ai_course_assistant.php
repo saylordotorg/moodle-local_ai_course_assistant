@@ -1546,7 +1546,7 @@ $string['soapbox:no_browser_stt'] = 'Barawsarkani ma taageero aqoonsiga hadalka 
 $string['soapbox:browser_note'] = 'Khudbaddan waxaa lagu qoraal-rogaa barawsarkaaga. Waxba lama soo gudbiyo. Si fiican ayey uga shaqeysaa Chrome iyo Safari.';
 $string['soapbox:server_note'] = 'Duubistaada waxaa loo soo gudbiyaa qoraal-rogis oo kaliya lamana keydiyo.';
 $string['soapbox:error'] = 'Hadda lama qiimayn karo khudbaddan. Isku day daqiiqad ka dib.';
-$string['soapbox:audio_too_large'] = 'Duubistaas aad bay u weyn tahay. Ka dhig khudbadaha ka yar qiyaastii 25 MB (qiyaastii 20 daqiiqo).';
+$string['soapbox:audio_too_large'] = 'Duubistan aad bay u weyn tahay. Ka dhig khudbadaha ka yar qiyaastii {$a} MB.';
 $string['soapbox:no_stt'] = 'Ma jiro bixiye qoraal-rogis oo la habeeyay. Weydiiso maamulkaaga inuu dejiyo Whisper ama uu furo qoraal-rogista barawsarka.';
 $string['soapbox:result_heading'] = 'Dhibcaha qiyaas-hagaha';
 $string['soapbox:overall_heading'] = 'Guud ahaan';
@@ -3131,3 +3131,23 @@ $string['outcomes:state_unavailable'] = 'Natiijadan hadda lama heli karo. Cidna 
 $string['cachedef_outcomesattainment'] = 'Gaadhista natiijooyinka barnaamijka ee arday kasta iyo koorso kasta';
 
 $string['cachedef_vectors'] = 'Vectors-ka embedding-ka RAG ee indekska soo-helitaanka';
+
+$string['voice:error_toolarge'] = 'Duubistan aad bay u weyn tahay. Isku day duubis gaaban, ka yar ilaa {$a} MB.';
+$string['voice:error_noaudio'] = 'Wax duubis ah lama helin. Fadlan mar kale isku day inaad duubto.';
+$string['voice:error_format'] = 'Qaabkaas codka lama taageero. Fadlan mar kale isku day inaad duubto.';
+$string['voice:error_noprovider'] = 'Qorista codka laguma dejin goobtan. Fadlan la xiriir maamulahaaga.';
+$string['voice:error_badresponse'] = 'Adeegga qoraalku wuxuu soo celiyay jawaab aan la filayn. Fadlan mar kale isku day.';
+
+$string['settings:max_audio_mb'] = 'Cabbirka ugu badan ee duubista (MB)';
+$string['settings:max_audio_mb_desc'] = 'Duubista codka ugu weyn ee ardaygu soo geli karo, oo megabyte lagu qiyaaso. Inta u dhaxaysa {$a->min} iyo {$a->max}; caadiga waa {$a->default}.<br>Serverkan PHP wuxuu ogolaanayaa post_max_size = {$a->postmax} iyo upload_max_filesize = {$a->uploadmax}, sidaas darteed cabbirka dhab ahaan hadda la fulinayo waa {$a->effective} MB. Midka ka yar ee u dhexeeya dejintaada iyo xadka PHP ayaa had iyo jeer shaqeeya.';
+$string['settings:max_audio_mb_capped'] = 'Xadka serverkan waa PHP, ma ahan dejintan. Si ardaydu u isticmaalaan cabbirka buuxa ee halkan lagu dejiyay, kor u qaad post_max_size iyo upload_max_filesize ee php.ini ugu yaraan {$a}.';
+$string['voice:error_unavailable'] = 'Adeegga qoraalku hadda ma diyaar aha. Fadlan mar kale isku day daqiiqado kadib.';
+
+$string['settings:max_audio_mb_range'] = 'Geli tiro u dhaxaysa {$a->min} iyo {$a->max}. Qiimayaasha ka weyn lama fulin karo: barta dhamaadka waxay ku xaddidaysaa {$a->max}, sidaas darteed goobtu waxay sheegi lahayd xad aan koodku fulin.';
+
+$string['ai_course_assistant:usesupport'] = 'Isticmaal kaaliyaha meel koorsi ka baxsan';
+$string['settings:support_enabled'] = 'Daar habka taageerada ee koorsooyinka ka baxsan';
+$string['settings:support_enabled_desc'] = 'Waxay ardayda u oggolaanaysaa inay [[tutorshort]] ka furaan bogag aan koorsi ahayn, sida dashboard-ka ama astaantooda, si ay u weydiiyaan diiwaangelinta, shahaadooyinka, dhibaatooyinka farsamada iyo su\'aalo kale oo taageero ah. Waxaa lagama maarmaan ah in hoos laga doorto koorsi taageero. Weliba ardaydu waxay u baahan yihiin awoodda "Isticmaal kaaliyaha meel koorsi ka baxsan", taas oo isticmaalayaasha la xaqiijiyay ay si caadi ah u haystaan.';
+$string['settings:support_courseid'] = 'Koorsada taageerada';
+$string['settings:support_courseid_desc'] = 'Aqoonsiga (ID) koorsi muuqda oo ay ku jiraan agabkaaga bilowga, soo-dhoweynta iyo hordhaca. Wada-hadallada taageerada waxaa laga jawaabaa koorsadan iyo FAQ-ga kor ku xusan, waxaana lagu diiwaangeliyaa koorsadaas. Bannaan u dhaaf si aad u damiso habka taageerada. Bogga hore ee goobta (koorsada 1) lama aqbalo.';
+$string['support:promptrole'] = 'Waxaad ka jawaabaysaa su\'aal taageero oo ka timid meel koorsi ka baxsan. Ardaygu ma weydiinayo waxa koorsada ku jira, sidaas darteed ha u dirin agabka koorsada. Ka jawaab FAQ-ga iyo agabka taageerada ee lagu siiyay. Haddaadan si sax ah uga jawaabi karin, si cad u sheeg, kadibna u soo bandhig inaad su\'aasha u gudbiso kooxda taageerada.';

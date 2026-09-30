@@ -147,7 +147,7 @@ class send_message extends external_api {
         $lockedattempt = (!CLI_SCRIPT && !empty($USER->id))
             ? \local_ai_course_assistant\quiz_lock::active_attempt(
                 (int) $USER->id,
-                (int) $params['courseid']
+                \local_ai_course_assistant\support_mode::integrity_scope((int) $params['courseid'])
             )
             : null;
         if ($lockedattempt !== null) {

@@ -1,0 +1,31 @@
+PASTE AS A COMMENT ON CONTRIB-10574
+
+--- only if you decide to supersede the submitted version; see the note at the bottom ---
+
+Hello,
+
+A further version is available, v7.5.7. I want to be clear about what is in it before you spend review time, because it adds a capability and a new surface rather than only fixing defects.
+
+WHAT CHANGED SINCE v7.5.5
+
+v7.5.6 fixed one accessibility defect. The first-run privacy notice carried the only prefers-color-scheme rule in the stylesheet, so in dark mode the panel background went dark while its text, which is set inline in the template, did not follow. Measured on the shipped values the body text sat at 1.24:1 against its background where WCAG AA asks for 4.5:1, and the affected text is the privacy notice itself. The rule is removed rather than patched, because the widget has no other dark-mode support and one dark surface whose text cannot follow it is not a step toward having any.
+
+v7.5.7 adds an optional support mode. It is off by default. An administrator enables it and names a real, visible course holding orientation material; the assistant then renders on pages that are not a course and answers from that course plus the site FAQ, escalating to the site's support system when it cannot answer accurately.
+
+THINGS IN IT THAT ARE YOUR CONCERN AS A REVIEWER
+
+A new capability, local/ai_course_assistant:usesupport, declared at CONTEXT_SYSTEM with 'user' => CAP_ALLOW. It is deliberately separate from local/ai_course_assistant:use rather than an added archetype on it, because archetypes apply at every context and adding 'user' to :use would have granted the widget in every course by inheritance and defeated the existing per-course opt-out.
+
+The capability is enforced through a single helper rather than at each call site. On a support turn the request is validated at system context instead of the course context, because Moodle's external_api::validate_context() ends in require_login() with redirect prevention and therefore enforces enrolment, and a support learner is by definition not enrolled in the support course. Ordinary course requests are unaffected and still validate the course context.
+
+Academic integrity is preserved deliberately rather than incidentally. The quiz lock normally scopes to the course a request comes from; the support surface has no course of its own, and scoping the lock to a designated course that holds no quizzes would have meant it never fired. Every chat path on that surface falls back to the site-wide test instead. Per-course scoping inside a course is unchanged.
+
+Features that require the per-course capability are suppressed on the support surface rather than offered and then refused.
+
+VERIFICATION
+
+Full plugin suite 1,934 tests, 0 failures. Behat 31 scenarios, 361 steps, 0 failures. Security validator corpus 36 of 36. PHP lint clean across 585 files. The CI matrix covers PHP 8.1 to 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL, and is green on all nine combinations.
+
+NOTE BEFORE SENDING
+
+Do not post this if you would rather v7.5.5 be reviewed as submitted. Swapping the version mid-review resets the reviewer's context, and v7.5.7 adds a capability and a new surface, which is more to review rather than less. If the aim is to clear the existing findings quickly, leave v7.5.5 in place and offer v7.5.7 afterwards.

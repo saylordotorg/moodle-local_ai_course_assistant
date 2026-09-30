@@ -36,6 +36,22 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
+    // Use the assistant on pages that are not a course (dashboard, profile, site
+    // home), against the administrator-designated support course.
+    //
+    // A SEPARATE capability at CONTEXT_SYSTEM, not an extra archetype on :use.
+    // Archetypes apply at every context, so granting 'user' => CAP_ALLOW on :use
+    // would switch the widget on in every course by inheritance and defeat the
+    // per-course opt-out that default_course_mode provides.
+    //
+    // 'guest' is deliberately absent: Phase 1 is the authenticated case only.
+    'local/ai_course_assistant:usesupport' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'user' => CAP_ALLOW,
+        ],
+    ],
     // View usage and analytics dashboards (academic support + administrators).
     'local/ai_course_assistant:viewanalytics' => [
         'captype' => 'read',

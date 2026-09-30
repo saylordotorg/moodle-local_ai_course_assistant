@@ -5890,12 +5890,29 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
     line-height: 1.55;
 }
 
-@media (prefers-color-scheme: dark) {
-    .aica-consent-banner {
-        background: #1b2430;
-        color: #e6ecf2;
-    }
-}
+/* No dark-mode rule here on purpose.
+ *
+ * There used to be one: background #1b2430, color #e6ecf2. It was the only
+ * prefers-color-scheme rule in this entire stylesheet, and it made the consent
+ * notice the one dark surface in a widget whose drawer is hardcoded
+ * `background: #fff` (see .local-ai-course-assistant__drawer). Worse, the
+ * banner's contents carry inline colours from the template, and inline styles
+ * beat a media query on specificity, so the text stayed light-mode dark on a
+ * dark background. Measured on the shipped values:
+ *
+ *   body text  #333     on #1b2430  ->   1.24:1   (WCAG AA needs 4.5:1)
+ *   link       #023e8a  on #1b2430  ->   1.53:1
+ *   hint       #666     on #1b2430  ->   2.73:1
+ *
+ * A learner in OS dark mode got an unreadable privacy notice, and it cleared
+ * as soon as they accepted it, which is the worst possible moment for it to be
+ * unreadable. Reported with a screenshot after v7.5.5.
+ *
+ * Removing the rule rather than fixing the three colours: the banner then
+ * matches the white drawer it sits on, and the same values measure 12.63:1,
+ * 10.20:1 and 5.74:1 on white. Giving the widget real dark-mode support is a
+ * separate piece of work than making one orphan surface dark.
+ */
 
 /* Everything outside the banner is unreachable while consent is pending.
    `inert` covers pointer, focus and assistive tech in one attribute; the

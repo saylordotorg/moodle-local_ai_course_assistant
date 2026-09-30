@@ -1501,7 +1501,7 @@ $string['soapbox:no_browser_stt'] = 'Tento prohlížeč nepodporuje rozpoznává
 $string['soapbox:browser_note'] = 'Tento projev je přepisován ve vašem prohlížeči. Nic se nenahrává na server. Nejlépe funguje v prohlížečích Chrome a Safari.';
 $string['soapbox:server_note'] = 'Vaše nahrávka je odeslána pouze za účelem přepisu a neukládá se.';
 $string['soapbox:error'] = 'Tento projev nyní nelze ohodnotit. Zkuste to za chvíli znovu.';
-$string['soapbox:audio_too_large'] = 'Tato nahrávka je příliš velká. Udržujte projevy pod přibližně 25 MB (zhruba 20 minut).';
+$string['soapbox:audio_too_large'] = 'Tato nahrávka je příliš velká. Udržujte projevy pod přibližně {$a} MB.';
 $string['soapbox:no_stt'] = 'Není nakonfigurován žádný poskytovatel přepisu. Požádejte svého správce o nastavení Whisper nebo o povolení přepisu v prohlížeči.';
 $string['soapbox:result_heading'] = 'Skóre podle hodnoticí tabulky';
 $string['soapbox:overall_heading'] = 'Celkově';
@@ -3087,3 +3087,23 @@ $string['outcomes:state_unavailable'] = 'Tento výsledek teď není k dispozici.
 $string['cachedef_outcomesattainment'] = 'Dosažení výstupů studijního programu na studenta a kurz';
 
 $string['cachedef_vectors'] = 'Vektory embeddingů RAG pro vyhledávací index';
+
+$string['voice:error_toolarge'] = 'Tato nahrávka je příliš velká. Zkuste kratší záznam, zhruba pod {$a} MB.';
+$string['voice:error_noaudio'] = 'Nedorazila žádná nahrávka. Zkuste nahrát znovu.';
+$string['voice:error_format'] = 'Tento zvukový formát není podporován. Zkuste nahrát znovu.';
+$string['voice:error_noprovider'] = 'Hlasový přepis není na tomto webu nastaven. Obraťte se prosím na správce.';
+$string['voice:error_badresponse'] = 'Služba přepisu vrátila něco neočekávaného. Zkuste to prosím znovu.';
+
+$string['settings:max_audio_mb'] = 'Maximální velikost nahrávky (MB)';
+$string['settings:max_audio_mb_desc'] = 'Největší hlasová nahrávka, kterou může student nahrát, v megabajtech. Mezi {$a->min} a {$a->max}; výchozí je {$a->default}.<br>Na tomto serveru PHP povoluje post_max_size = {$a->postmax} a upload_max_filesize = {$a->uploadmax}, takže skutečně vynucovaná velikost je nyní {$a->effective} MB. Vždy platí menší z vašeho nastavení a limitů PHP.';
+$string['settings:max_audio_mb_capped'] = 'Limitem na tomto serveru je PHP, nikoli toto nastavení. Aby studenti mohli využít celou zde nastavenou velikost, zvyšte post_max_size a upload_max_filesize v php.ini alespoň na {$a}.';
+$string['voice:error_unavailable'] = 'Služba přepisu není právě teď dostupná. Zkuste to prosím za chvíli znovu.';
+
+$string['settings:max_audio_mb_range'] = 'Zadejte číslo mezi {$a->min} a {$a->max}. Vyšší hodnoty nelze dodržet: koncový bod omezuje na {$a->max}, takže pole by uvádělo limit, který kód nevynucuje.';
+
+$string['ai_course_assistant:usesupport'] = 'Používat asistenta mimo kurz';
+$string['settings:support_enabled'] = 'Povolit režim podpory mimo kurzy';
+$string['settings:support_enabled_desc'] = 'Umožní studujícím otevřít [[tutorshort]] i na stránkách, které nejsou kurzem, například na nástěnce nebo v profilu, a ptát se na zápis, certifikáty, technické potíže a další dotazy na podporu. Vyžaduje nastavení kurzu podpory níže. Studující navíc potřebují oprávnění „Používat asistenta mimo kurz“, které mají ověření uživatelé ve výchozím nastavení.';
+$string['settings:support_courseid'] = 'Kurz podpory';
+$string['settings:support_courseid_desc'] = 'ID viditelného kurzu, ve kterém máte materiály pro začátek práce, úvodní seznámení a orientaci. Odpovědi v režimu podpory vycházejí z tohoto kurzu a z často kladených dotazů výše a zaznamenávají se k němu. Chcete-li režim podpory vypnout, ponechte pole prázdné. Titulní stránku webu (kurz 1) nelze použít.';
+$string['support:promptrole'] = 'Odpovídáš na dotaz podpory položený mimo jakýkoli kurz. Studující se neptá na obsah kurzu, neodkazuj ho tedy na něj. Odpovídej z často kladených dotazů a z materiálů podpory, které máš k dispozici. Pokud nedokážeš odpovědět přesně, řekni to otevřeně a nabídni předání dotazu týmu podpory.';

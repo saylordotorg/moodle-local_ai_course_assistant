@@ -1522,7 +1522,22 @@ define([
         initSpeech();
         syncVoicePanel();
         UI.setModeButtonsEnabled(!quizLocked && !attemptLocked);
-        if (attemptLocked) {
+        // Both locks, not just attemptLocked. quizLocked is the per-quiz
+        // assistance level `hidden`, and it is set on a quiz's VIEW page as well
+        // as its attempt page, so a learner can have quizLocked true and
+        // attemptLocked false: no attempt is in progress yet.
+        //
+        // Disabling here, before any open, is what stops the focus defect rather
+        // than any guard later. handleToggle disables the input AFTER the drawer
+        // opens, and disabling the element that currently has focus makes the
+        // browser drop focus to <body>. attemptLocked was already covered here;
+        // quizLocked was not, so on a hidden-level quiz view page the first open
+        // focused an enabled input and then lost it.
+        //
+        // handleSend refuses both flags anyway, so the input now matches what
+        // the server will do. The setInputEnabled(false) calls in handleToggle
+        // become no-ops, which is harmless.
+        if (attemptLocked || quizLocked) {
             UI.setInputEnabled(false);
             // The practice-quiz button is not a mode button, so setModeButtons
             // does not reach it. Left live it is the same self-contradicting
@@ -3715,7 +3730,9 @@ define([
                 // tab. Used only when the model does not emit a SOLA_NEXT
                 // block; otherwise the parsed chips win.
                 fallbackChips: ['Tell me more', 'Give me an example',
-                    'Quiz me on this', 'End conversation'],
+                    'Quiz me on this', 'End conversation'].filter(function(c) {
+                        return isQuizEnabled() || c !== 'Quiz me on this';
+                    }),
             });
             return;
         }
@@ -5139,9 +5156,24 @@ define([
         if (isFirstVisit) {
             UI.preWelcome();
         }
+        // setBottomMode BEFORE toggleDrawer, not after. The drawer keeps its
+        // --mode-history or --mode-voice class between opens, and both hide
+        // .local-ai-course-assistant__input-area with display:none. Opening
+        // first meant toggleDrawer chose its focus target while the input was
+        // still hidden, so a learner who used History, closed the drawer and
+        // reopened it got the drawer container rather than the message box.
+        // Putting the drawer back in chat mode first makes the input real
+        // before anything looks for it.
+        //
+        // The guard is belt and braces rather than load-bearing: handleToggle
+        // has already returned through handleReset() above if the drawer was
+        // open, so this is only ever reached on the way in. Kept so the call
+        // cannot fire on a close if that early return is ever removed.
+        if (!UI.isOpen()) {
+            setBottomMode('chat', {force: true});
+        }
         const opened = UI.toggleDrawer();
         if (opened) {
-            setBottomMode('chat', {force: true});
             syncVoicePanel();
             hydrateMasteryChip();
         }
@@ -5442,6 +5474,31 @@ define([
     };
 
     /**
+     * Whether the practice quiz is available on this surface.
+     *
+     * False in support mode. Suppressing the starter chip is not enough on its
+     * own: quiz is also reachable by TYPING ("quiz me on the introduction"),
+     * which detectQuizIntent intercepts, and through the SOLA_NEXT fallback
+     * chips, which offer "Quiz me on this" independently of the starter list.
+     * generate_quiz is still gated on the per-course capability, so every one of
+     * those routes ends in an error for a support learner.
+     *
+     * @returns {boolean}
+     */
+    const isQuizEnabled = function() {
+        // Resolve the widget root here rather than closing over one. There is no
+        // module-level `root` in this file -- every sibling helper takes it as a
+        // parameter -- so a bare reference is a ReferenceError at call time, not
+        // a quiet undefined. The first version of this function had exactly that
+        // bug, and because the throw happened inside the send handler it killed
+        // the whole turn: three Behat chat scenarios failed with the assistant
+        // reply never rendering. Same resolution as getDefaultVoice().
+        const el = (UI.getElements && UI.getElements().root)
+            || document.getElementById('local-ai-course-assistant');
+        return !!(el && el.dataset.quizEnabled === '1');
+    };
+
+    /**
      * Detect whether the user's message is requesting a practice quiz.
      * Used to intercept natural-language quiz requests (e.g. from STT)
      * and route them to the interactive quiz UI instead of plain chat.
@@ -5556,7 +5613,7 @@ define([
 
         // Intercept quiz intent (e.g. from STT: "quiz me on the introduction")
         // and route to the interactive quiz UI instead of plain chat.
-        if (detectQuizIntent(text)) {
+        if (isQuizEnabled() && detectQuizIntent(text)) {
             UI.clearInput();
             UI.autoResizeInput();
             UI.updateSendButton();
@@ -5743,9 +5800,12 @@ define([
                     } else if (parsed.text.trim().length > 0) {
                         // Smart fallback chips: comprehension-focused for long responses.
                         const wordCount = parsed.text.trim().split(/\s+/).length;
-                        const chips = wordCount > 120
+                        const chips = (wordCount > 120
                             ? ['Quiz me on this', 'Summarize this', 'Give me an example']
-                            : ['Tell me more', 'Give me an example', 'Quiz me on this'];
+                            : ['Tell me more', 'Give me an example', 'Quiz me on this'])
+                            .filter(function(c) {
+                                return isQuizEnabled() || c !== 'Quiz me on this';
+                            });
                         UI.showSuggestions(chips, handleSuggestionClick);
                     }
                 }

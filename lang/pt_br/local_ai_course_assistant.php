@@ -1522,7 +1522,7 @@ $string['soapbox:no_browser_stt'] = 'Este navegador não oferece suporte ao reco
 $string['soapbox:browser_note'] = 'Este discurso é transcrito no seu navegador. Nada é enviado. Funciona melhor no Chrome e no Safari.';
 $string['soapbox:server_note'] = 'Sua gravação é enviada apenas para transcrição e não é armazenada.';
 $string['soapbox:error'] = 'Não foi possível avaliar este discurso agora. Tente novamente em instantes.';
-$string['soapbox:audio_too_large'] = 'Essa gravação é grande demais. Mantenha os discursos abaixo de cerca de 25 MB (aproximadamente 20 minutos).';
+$string['soapbox:audio_too_large'] = 'Essa gravação é muito grande. Mantenha os discursos abaixo de cerca de {$a} MB.';
 $string['soapbox:no_stt'] = 'Nenhum provedor de transcrição está configurado. Peça ao seu administrador para configurar o Whisper ou habilitar a transcrição no navegador.';
 $string['soapbox:result_heading'] = 'Notas da rubrica';
 $string['soapbox:overall_heading'] = 'Geral';
@@ -3107,3 +3107,23 @@ $string['outcomes:state_unavailable'] = 'Este resultado não está disponível n
 $string['cachedef_outcomesattainment'] = 'Atingimento de resultados do programa por estudante e curso';
 
 $string['cachedef_vectors'] = 'Vetores de incorporação RAG para o índice de recuperação';
+
+$string['voice:error_toolarge'] = 'Essa gravação é muito grande. Tente um trecho mais curto, com menos de cerca de {$a} MB.';
+$string['voice:error_noaudio'] = 'Nenhuma gravação foi recebida. Tente gravar novamente.';
+$string['voice:error_format'] = 'Esse formato de áudio não é compatível. Tente gravar novamente.';
+$string['voice:error_noprovider'] = 'A transcrição de voz não está configurada neste site. Entre em contato com o administrador.';
+$string['voice:error_badresponse'] = 'O serviço de transcrição retornou algo inesperado. Tente novamente.';
+
+$string['settings:max_audio_mb'] = 'Tamanho máximo da gravação (MB)';
+$string['settings:max_audio_mb_desc'] = 'A maior gravação de voz que um estudante pode enviar, em megabytes. Entre {$a->min} e {$a->max}; o padrão é {$a->default}.<br>Neste servidor o PHP permite post_max_size = {$a->postmax} e upload_max_filesize = {$a->uploadmax}, então o tamanho realmente aplicado agora é {$a->effective} MB. Sempre vale o menor valor entre a sua configuração e os limites do próprio PHP.';
+$string['settings:max_audio_mb_capped'] = 'O limite neste servidor é o PHP, não esta configuração. Para que os estudantes possam usar todo o tamanho definido aqui, aumente post_max_size e upload_max_filesize no php.ini para pelo menos {$a}.';
+$string['voice:error_unavailable'] = 'O serviço de transcrição não está disponível no momento. Tente novamente em instantes.';
+
+$string['settings:max_audio_mb_range'] = 'Digite um número entre {$a->min} e {$a->max}. Valores maiores não podem ser respeitados: o endpoint limita a {$a->max}, então o campo indicaria um limite que o código não aplica.';
+
+$string['ai_course_assistant:usesupport'] = 'Usar o assistente fora de um curso';
+$string['settings:support_enabled'] = 'Ativar o modo de suporte fora dos cursos';
+$string['settings:support_enabled_desc'] = 'Permite que os alunos abram o [[tutorshort]] em páginas que não pertencem a um curso, como o Painel ou o perfil deles, para perguntar sobre matrícula, certificados, problemas técnicos e outras questões de suporte. É preciso definir um curso de suporte abaixo. Os alunos também precisam da capacidade «Usar o assistente fora de um curso», que os usuários autenticados têm por padrão.';
+$string['settings:support_courseid'] = 'Curso de suporte';
+$string['settings:support_courseid_desc'] = 'O ID numérico de um curso visível que contenha o seu material de primeiros passos, integração e orientação. As conversas de suporte são respondidas com base nesse curso e nas perguntas frequentes acima, e ficam registradas nele. Deixe em branco para desativar o modo de suporte. A página inicial do site (curso 1) não é aceita.';
+$string['support:promptrole'] = 'Você está respondendo a uma pergunta de suporte feita fora de qualquer curso. O aluno não está perguntando sobre o conteúdo do curso, portanto não o direcione para lá. Responda com base nas perguntas frequentes e no material de suporte que lhe foi fornecido. Se não puder responder com precisão, diga isso com clareza e ofereça-se para encaminhar a pergunta à equipe de suporte.';

@@ -1540,7 +1540,7 @@ $string['soapbox:no_browser_stt'] = 'דפדפן זה אינו תומך בזיה�
 $string['soapbox:browser_note'] = 'נאום זה מתומלל בדפדפן שלך. שום דבר אינו מועלה. פועל הכי טוב ב-Chrome וב-Safari.';
 $string['soapbox:server_note'] = 'ההקלטה שלך מועלית לצורך תמלול בלבד ואינה נשמרת.';
 $string['soapbox:error'] = 'לא ניתן לנקד נאום זה כעת. נסה שוב בעוד רגע.';
-$string['soapbox:audio_too_large'] = 'ההקלטה הזו גדולה מדי. שמור על נאומים מתחת לכ-25 MB (כ-20 דקות).';
+$string['soapbox:audio_too_large'] = 'ההקלטה הזו גדולה מדי. שמרו על נאומים מתחת לכ-{$a} מ"ב.';
 $string['soapbox:no_stt'] = 'לא הוגדר ספק תמלול. בקש מהמנהל להגדיר את Whisper או להפעיל תמלול בדפדפן.';
 $string['soapbox:result_heading'] = 'ניקוד מחוון';
 $string['soapbox:overall_heading'] = 'כולל';
@@ -3126,3 +3126,23 @@ $string['outcomes:state_unavailable'] = 'התוצאה הזו אינה זמינה
 $string['cachedef_outcomesattainment'] = 'השגת תוצרי הלמידה של התוכנית לכל לומד וקורס';
 
 $string['cachedef_vectors'] = 'וקטורי embedding של RAG לאינדקס האחזור';
+
+$string['voice:error_toolarge'] = 'ההקלטה הזו גדולה מדי. נסו קטע קצר יותר, מתחת ל-{$a} מ"ב בקירוב.';
+$string['voice:error_noaudio'] = 'לא התקבלה הקלטה. נסו להקליט שוב.';
+$string['voice:error_format'] = 'פורמט האודיו הזה אינו נתמך. נסו להקליט שוב.';
+$string['voice:error_noprovider'] = 'תמלול קולי אינו מוגדר באתר הזה. פנו למנהל המערכת.';
+$string['voice:error_badresponse'] = 'שירות התמלול החזיר תשובה לא צפויה. נסו שוב.';
+
+$string['settings:max_audio_mb'] = 'גודל הקלטה מרבי (מ"ב)';
+$string['settings:max_audio_mb_desc'] = 'ההקלטה הקולית הגדולה ביותר שלומד יכול להעלות, במגה-בייט. בין {$a->min} ל-{$a->max}; ברירת המחדל היא {$a->default}.<br>בשרת הזה PHP מתיר post_max_size = {$a->postmax} ו-upload_max_filesize = {$a->uploadmax}, ולכן הגודל שנאכף בפועל כרגע הוא {$a->effective} מ"ב. הקטן מבין ההגדרה שלכם לבין מגבלות PHP הוא זה שתמיד קובע.';
+$string['settings:max_audio_mb_capped'] = 'המגבלה בשרת הזה היא PHP, לא ההגדרה הזו. כדי שהלומדים יוכלו להשתמש במלוא הגודל שנקבע כאן, העלו את post_max_size ואת upload_max_filesize בקובץ php.ini ל-{$a} לפחות.';
+$string['voice:error_unavailable'] = 'שירות התמלול אינו זמין כרגע. נסו שוב בעוד רגע.';
+
+$string['settings:max_audio_mb_range'] = 'הזינו מספר בין {$a->min} ל-{$a->max}. ערכים גדולים יותר לא ניתנים לאכיפה: נקודת הקצה מגבילה ל-{$a->max}, כך שהשדה יציג מגבלה שהקוד אינו אוכף.';
+
+$string['ai_course_assistant:usesupport'] = 'שימוש בעוזר מחוץ לקורס';
+$string['settings:support_enabled'] = 'הפעלת מצב תמיכה מחוץ לקורסים';
+$string['settings:support_enabled_desc'] = 'מאפשר ללומדים לפתוח את [[tutorshort]] בעמודים שאינם קורס, כגון לוח הבקרה או הפרופיל האישי, ולשאול על הרשמה, תעודות, תקלות טכניות ושאלות תמיכה אחרות. יש להגדיר קורס תמיכה בהמשך. הלומדים עדיין זקוקים להרשאה "שימוש בעוזר מחוץ לקורס", הנתונה כברירת מחדל למשתמשים מאומתים.';
+$string['settings:support_courseid'] = 'קורס תמיכה';
+$string['settings:support_courseid_desc'] = 'מזהה של קורס גלוי שבו נמצאים חומרי הפתיחה, הקליטה וההתמצאות שלכם. שיחות תמיכה נענות מתוך הקורס הזה ומתוך השאלות הנפוצות שלמעלה, ונרשמות עליו. השאירו ריק כדי לכבות את מצב התמיכה. עמוד הבית של האתר (קורס 1) אינו מתקבל.';
+$string['support:promptrole'] = 'אתה עונה על שאלת תמיכה שנשאלה מחוץ לכל קורס. הלומד אינו שואל על חומר הקורס, ולכן אל תפנה אותו אליו. ענה על סמך השאלות הנפוצות וחומרי התמיכה שניתנו לך. אם אינך יכול לענות במדויק, אמור זאת בפשטות והצע להעביר את השאלה לצוות התמיכה.';

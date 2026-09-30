@@ -1528,7 +1528,7 @@ $string['soapbox:no_browser_stt'] = 'ይህ አሳሽ በአሳሽ ውስጥ የ
 $string['soapbox:browser_note'] = 'ይህ ንግግር በአሳሽዎ ውስጥ ይገለበጣል። ምንም አይሰቀልም። በ Chrome እና Safari ውስጥ በተሻለ ሁኔታ ይሰራል።';
 $string['soapbox:server_note'] = 'ቀረጻዎ ለግልባጭ ብቻ ይሰቀላል እና አይቀመጥም።';
 $string['soapbox:error'] = 'ይህን ንግግር አሁን ነጥብ መስጠት አልተቻለም። ከጥቂት ቆይታ በኋላ እንደገና ይሞክሩ።';
-$string['soapbox:audio_too_large'] = 'ያ ቀረጻ በጣም ትልቅ ነው። ንግግሮችን ከ 25 MB ያህል በታች ያቆዩ (በግምት 20 ደቂቃ)።';
+$string['soapbox:audio_too_large'] = 'ይህ ቅጂ በጣም ትልቅ ነው። ንግግሮችን ከ{$a} ሜባ በታች ያቆዩ።';
 $string['soapbox:no_stt'] = 'ምንም የግልባጭ አቅራቢ አልተዋቀረም። አስተዳዳሪዎ Whisper እንዲያዋቅር ወይም የአሳሽ ግልባጭ እንዲያነቃ ይጠይቁ።';
 $string['soapbox:result_heading'] = 'የመለኪያ ነጥቦች';
 $string['soapbox:overall_heading'] = 'አጠቃላይ';
@@ -3114,3 +3114,23 @@ $string['outcomes:state_unavailable'] = 'ይህ ውጤት በአሁኑ ጊዜ �
 $string['cachedef_outcomesattainment'] = 'የፕሮግራም ውጤት ማሳካት ደረጃ በተማሪና በኮርስ';
 
 $string['cachedef_vectors'] = 'ለማምጣት ማውጫ የRAG ኤምቤዲንግ ቬክተሮች';
+
+$string['voice:error_toolarge'] = 'ይህ ቅጂ በጣም ትልቅ ነው። ከ{$a} ሜባ በታች የሆነ አጭር ቅጂ ይሞክሩ።';
+$string['voice:error_noaudio'] = 'ምንም ቅጂ አልደረሰም። እባክዎ እንደገና ለመቅዳት ይሞክሩ።';
+$string['voice:error_format'] = 'ይህ የድምፅ ቅርጸት አይደገፍም። እባክዎ እንደገና ለመቅዳት ይሞክሩ።';
+$string['voice:error_noprovider'] = 'በዚህ ጣቢያ ላይ የድምፅ ግልባጭ አልተዋቀረም። እባክዎ አስተዳዳሪዎን ያነጋግሩ።';
+$string['voice:error_badresponse'] = 'የግልባጭ አገልግሎቱ ያልተጠበቀ ነገር መልሷል። እባክዎ እንደገና ይሞክሩ።';
+
+$string['settings:max_audio_mb'] = 'ከፍተኛ የቅጂ መጠን (ሜባ)';
+$string['settings:max_audio_mb_desc'] = 'አንድ ተማሪ ሊጭን የሚችለው ትልቁ የድምፅ ቅጂ በሜጋባይት። ከ{$a->min} እስከ {$a->max}፤ ነባሪው {$a->default} ነው።<br>በዚህ አገልጋይ ላይ PHP post_max_size = {$a->postmax} እና upload_max_filesize = {$a->uploadmax} ይፈቅዳል፤ ስለዚህ አሁን በተግባር የሚተገበረው መጠን {$a->effective} ሜባ ነው። ከእርስዎ ቅንብር እና ከPHP ገደቦች ትንሹ ሁልጊዜ ያሸንፋል።';
+$string['settings:max_audio_mb_capped'] = 'በዚህ አገልጋይ ላይ ገደቡ PHP ነው እንጂ ይህ ቅንብር አይደለም። ተማሪዎች እዚህ የተቀመጠውን ሙሉ መጠን እንዲጠቀሙ በphp.ini ውስጥ post_max_size እና upload_max_filesize ቢያንስ ወደ {$a} ከፍ ያድርጉ።';
+$string['voice:error_unavailable'] = 'የግልባጭ አገልግሎቱ በአሁኑ ጊዜ አይገኝም። እባክዎ ከጥቂት ጊዜ በኋላ እንደገና ይሞክሩ።';
+
+$string['settings:max_audio_mb_range'] = 'ከ{$a->min} እስከ {$a->max} ያለ ቁጥር ያስገቡ። ከዚያ የሚበልጥ ዋጋ ሊከበር አይችልም፦ መጨረሻው ነጥብ ወደ {$a->max} ይገድባል፣ ስለዚህ ሜዳው የማይተገበር ገደብ ይገልጻል።';
+
+$string['ai_course_assistant:usesupport'] = 'ከኮርስ ውጭ ረዳቱን መጠቀም';
+$string['settings:support_enabled'] = 'ከኮርሶች ውጭ የድጋፍ ሁነታን አንቃ';
+$string['settings:support_enabled_desc'] = 'ተማሪዎች እንደ ዳሽቦርድ ወይም መገለጫቸው ባሉ ኮርስ ባልሆኑ ገጾች ላይ [[tutorshort]]ን ከፍተው ስለ ምዝገባ፣ ሰርተፊኬቶች፣ ቴክኒካዊ ችግሮችና ሌሎች የድጋፍ ጥያቄዎች እንዲጠይቁ ያስችላል። ከታች የድጋፍ ኮርስ መመረጥ ይኖርበታል። ተማሪዎች አሁንም «ከኮርስ ውጭ ረዳቱን መጠቀም» የሚለው ፈቃድ ያስፈልጋቸዋል፤ ይህም በነባሪነት ለተረጋገጡ ተጠቃሚዎች ተሰጥቷል።';
+$string['settings:support_courseid'] = 'የድጋፍ ኮርስ';
+$string['settings:support_courseid_desc'] = 'የመግቢያ፣ የመቀበያና የመተዋወቂያ ይዘትዎን የያዘ የሚታይ ኮርስ መለያ ቁጥር። የድጋፍ ውይይቶች ከዚህ ኮርስና ከላይ ካሉት ተደጋጋሚ ጥያቄዎች ተነስተው ይመለሳሉ፣ በዚሁ ኮርስ ስርም ይመዘገባሉ። የድጋፍ ሁነታን ለማጥፋት ባዶ ይተዉት። የጣቢያው መነሻ ገጽ (ኮርስ 1) አይቀበልም።';
+$string['support:promptrole'] = 'ከማንኛውም ኮርስ ውጭ የቀረበ የድጋፍ ጥያቄ እየመለስክ ነው። ተማሪው ስለ ኮርሱ ይዘት እየጠየቀ አይደለም፤ ስለዚህ ወደ ኮርሱ ይዘት አትመልሰው። ከተደጋጋሚ ጥያቄዎችና ከተሰጠህ የድጋፍ ይዘት ተነስተህ መልስ። በትክክል መመለስ ካልቻልክ በግልጽ ተናገር፤ ጥያቄውን ለድጋፍ ቡድኑ ለማስተላለፍ አቅርብ።';

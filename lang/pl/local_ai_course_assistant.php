@@ -1501,7 +1501,7 @@ $string['soapbox:no_browser_stt'] = 'Ta przeglądarka nie obsługuje rozpoznawan
 $string['soapbox:browser_note'] = 'To przemówienie jest transkrybowane w Twojej przeglądarce. Nic nie jest przesyłane. Działa najlepiej w Chrome i Safari.';
 $string['soapbox:server_note'] = 'Twoje nagranie jest przesyłane wyłącznie w celu transkrypcji i nie jest przechowywane.';
 $string['soapbox:error'] = 'Nie udało się teraz ocenić tego przemówienia. Spróbuj ponownie za chwilę.';
-$string['soapbox:audio_too_large'] = 'To nagranie jest zbyt duże. Utrzymuj przemówienia poniżej około 25 MB (mniej więcej 20 minut).';
+$string['soapbox:audio_too_large'] = 'To nagranie jest za duże. Utrzymuj przemówienia poniżej około {$a} MB.';
 $string['soapbox:no_stt'] = 'Nie skonfigurowano żadnego dostawcy transkrypcji. Poproś administratora o skonfigurowanie Whisper lub włączenie transkrypcji w przeglądarce.';
 $string['soapbox:result_heading'] = 'Wyniki rubryki';
 $string['soapbox:overall_heading'] = 'Ogółem';
@@ -3086,3 +3086,23 @@ $string['outcomes:state_unavailable'] = 'Ten wynik jest w tej chwili niedostępn
 $string['cachedef_outcomesattainment'] = 'Stopień osiągnięcia efektów kształcenia programu na uczącego się i kurs';
 
 $string['cachedef_vectors'] = 'Wektory embeddingów RAG dla indeksu wyszukiwania';
+
+$string['voice:error_toolarge'] = 'To nagranie jest za duże. Spróbuj krótszego fragmentu, poniżej około {$a} MB.';
+$string['voice:error_noaudio'] = 'Nie otrzymano nagrania. Spróbuj nagrać ponownie.';
+$string['voice:error_format'] = 'Ten format audio nie jest obsługiwany. Spróbuj nagrać ponownie.';
+$string['voice:error_noprovider'] = 'Transkrypcja głosu nie jest skonfigurowana w tej witrynie. Skontaktuj się z administratorem.';
+$string['voice:error_badresponse'] = 'Usługa transkrypcji zwróciła nieoczekiwaną odpowiedź. Spróbuj ponownie.';
+
+$string['settings:max_audio_mb'] = 'Maksymalny rozmiar nagrania (MB)';
+$string['settings:max_audio_mb_desc'] = 'Największe nagranie głosowe, jakie może przesłać uczący się, w megabajtach. Od {$a->min} do {$a->max}; domyślnie {$a->default}.<br>Na tym serwerze PHP zezwala na post_max_size = {$a->postmax} i upload_max_filesize = {$a->uploadmax}, więc rozmiar faktycznie egzekwowany w tej chwili to {$a->effective} MB. Zawsze obowiązuje mniejsza z wartości: Twoje ustawienie albo limity samego PHP.';
+$string['settings:max_audio_mb_capped'] = 'Limit na tym serwerze wyznacza PHP, a nie to ustawienie. Aby uczący się mogli wykorzystać cały ustawiony tutaj rozmiar, zwiększ post_max_size i upload_max_filesize w php.ini do co najmniej {$a}.';
+$string['voice:error_unavailable'] = 'Usługa transkrypcji jest w tej chwili niedostępna. Spróbuj ponownie za chwilę.';
+
+$string['settings:max_audio_mb_range'] = 'Wpisz liczbę od {$a->min} do {$a->max}. Większych wartości nie da się zachować: punkt końcowy ogranicza do {$a->max}, więc pole podawałoby limit, którego kod nie egzekwuje.';
+
+$string['ai_course_assistant:usesupport'] = 'Korzystanie z asystenta poza kursem';
+$string['settings:support_enabled'] = 'Włącz tryb wsparcia poza kursami';
+$string['settings:support_enabled_desc'] = 'Pozwala studentom otwierać [[tutorshort]] na stronach niebędących kursem, na przykład na kokpicie lub w profilu, aby zadawać pytania o zapisy, certyfikaty, problemy techniczne i inne sprawy wymagające wsparcia. Wymaga wskazania kursu wsparcia poniżej. Studenci muszą też mieć uprawnienie „Korzystanie z asystenta poza kursem”, które domyślnie przysługuje uwierzytelnionym użytkownikom.';
+$string['settings:support_courseid'] = 'Kurs wsparcia';
+$string['settings:support_courseid_desc'] = 'Numer ID widocznego kursu zawierającego materiały wprowadzające, powitalne i orientacyjne. Odpowiedzi w trybie wsparcia są oparte na tym kursie oraz na powyższych najczęstszych pytaniach i są do niego zapisywane. Pozostaw pole puste, aby wyłączyć tryb wsparcia. Strona główna witryny (kurs 1) nie jest akceptowana.';
+$string['support:promptrole'] = 'Odpowiadasz na pytanie o wsparcie zadane poza jakimkolwiek kursem. Student nie pyta o materiał kursu, więc go do niego nie odsyłaj. Odpowiadaj na podstawie najczęstszych pytań i przekazanych Ci materiałów wsparcia. Jeśli nie możesz odpowiedzieć rzetelnie, powiedz to wprost i zaproponuj przekazanie pytania zespołowi wsparcia.';

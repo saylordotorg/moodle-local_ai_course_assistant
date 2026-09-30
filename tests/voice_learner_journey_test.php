@@ -568,10 +568,16 @@ final class voice_learner_journey_test extends \advanced_testcase {
      * @return void
      */
     public function test_both_direct_voice_endpoints_gate_before_they_spend(): void {
+        // v7.5.7: the capability line is now support_mode::require_use(), which
+        // enforces the same :use capability for every ordinary request and
+        // additionally admits a support learner who holds :usesupport. Voice in
+        // and out are part of a chat turn, not a course feature, and both buttons
+        // are on screen in support mode. What this test pins is unchanged: an
+        // auth gate, then a rate-limit gate, then the paid call -- in that order.
         $guards = [
             'require_login();',
             'require_sesskey();',
-            'require_capability(\'local/ai_course_assistant:use\', $context);',
+            'support_mode::require_use(',
             'voice_registry::resolve(',
             'new \curl()',
         ];
@@ -676,13 +682,18 @@ final class voice_learner_journey_test extends \advanced_testcase {
     /**
      * An empty or oversized recording is refused before it reaches a provider.
      *
-     * MAX_AUDIO_BYTES has zero test references anywhere in the tree. The
-     * `$size <= 0` half is the absent-value case that matters: filesize()
+     * The `$size <= 0` half is the absent-value case that matters: filesize()
      * returns 0 or false for an unreadable or empty temp file, and a zero must
      * be refused rather than treated as a valid very small clip. If this
      * breaks, a learner whose recording failed silently uploads nothing, waits
      * for a 30-second provider round trip, and gets an empty transcript -- and
      * a 25 MB clip is paid for in full before anyone looks at it.
+     *
+     * Since 7.5.5 the ceiling is max_audio_bytes(), not the MAX_AUDIO_BYTES
+     * constant: an admin can move it, and PHP's own limits cap whatever they
+     * choose. The constant is still what an unconfigured site gets, so it is
+     * still worth pinning, but the endpoint must read the function or the
+     * setting does nothing.
      *
      * @return void
      */
@@ -690,17 +701,24 @@ final class voice_learner_journey_test extends \advanced_testcase {
         $this->assertSame(
             25 * 1024 * 1024,
             security::MAX_AUDIO_BYTES,
-            'The audio upload cap moved; 25 MB is what the endpoint documents and bills against.'
+            'The default audio upload cap moved; 25 MB is what an unconfigured site gets.'
         );
 
+        // Pinned as ordered fragments rather than as one block of source text.
+        // The block form broke the moment the get_string() call gained its size
+        // argument in 7.5.5 and had to be reformatted across four lines, and a
+        // test that fails on reformatting teaches you to edit the test rather
+        // than read it. What has to hold is the ORDER: the size is checked, the
+        // refusal is sent, execution stops, and all of that happens before any
+        // request goes to a provider that would bill for it.
         $this->assert_appears_in_order(
             $this->endpoint_source('transcribe.php'),
             [
-                "if (\$size <= 0 || \$size > \\local_ai_course_assistant\\security::MAX_AUDIO_BYTES) {\n"
-                    . "    http_response_code(413);\n"
-                    . "    echo json_encode(['error' => 'Audio file too large.']);\n"
-                    . "    exit;\n"
-                    . '}',
+                "if (\$size <= 0 || \$size > \\local_ai_course_assistant\\security::max_audio_bytes()) {",
+                'http_response_code(413);',
+                "get_string(",
+                "'voice:error_toolarge',",
+                'exit;',
                 'new \curl()',
             ],
             'transcribe.php'

@@ -1501,7 +1501,7 @@ $string['soapbox:no_browser_stt'] = 'Acest browser nu acceptă recunoașterea vo
 $string['soapbox:browser_note'] = 'Acest discurs este transcris în browserul dumneavoastră. Nu se încarcă nimic. Funcționează cel mai bine în Chrome și Safari.';
 $string['soapbox:server_note'] = 'Înregistrarea dumneavoastră este încărcată doar pentru transcriere și nu este stocată.';
 $string['soapbox:error'] = 'Acest discurs nu a putut fi punctat acum. Reîncercați peste un moment.';
-$string['soapbox:audio_too_large'] = 'Acea înregistrare este prea mare. Păstrați discursurile sub aproximativ 25 MB (aproximativ 20 de minute).';
+$string['soapbox:audio_too_large'] = 'Această înregistrare este prea mare. Păstrați discursurile sub aproximativ {$a} MB.';
 $string['soapbox:no_stt'] = 'Nu este configurat niciun furnizor de transcriere. Cereți administratorului să configureze Whisper sau să activeze transcrierea în browser.';
 $string['soapbox:result_heading'] = 'Punctaje rubrică';
 $string['soapbox:overall_heading'] = 'În ansamblu';
@@ -3086,3 +3086,23 @@ $string['outcomes:state_unavailable'] = 'Acest rezultat nu este disponibil momen
 $string['cachedef_outcomesattainment'] = 'Gradul de atingere a rezultatelor programului per cursant și curs';
 
 $string['cachedef_vectors'] = 'Vectori de încorporare RAG pentru indexul de regăsire';
+
+$string['voice:error_toolarge'] = 'Această înregistrare este prea mare. Încercați un fragment mai scurt, sub aproximativ {$a} MB.';
+$string['voice:error_noaudio'] = 'Nu a fost primită nicio înregistrare. Încercați să înregistrați din nou.';
+$string['voice:error_format'] = 'Acest format audio nu este acceptat. Încercați să înregistrați din nou.';
+$string['voice:error_noprovider'] = 'Transcrierea vocală nu este configurată pe acest site. Contactați administratorul.';
+$string['voice:error_badresponse'] = 'Serviciul de transcriere a returnat un răspuns neașteptat. Încercați din nou.';
+
+$string['settings:max_audio_mb'] = 'Dimensiunea maximă a înregistrării (MB)';
+$string['settings:max_audio_mb_desc'] = 'Cea mai mare înregistrare vocală pe care o poate încărca un cursant, în megaocteți. Între {$a->min} și {$a->max}; valoarea implicită este {$a->default}.<br>Pe acest server PHP permite post_max_size = {$a->postmax} și upload_max_filesize = {$a->uploadmax}, așa că dimensiunea aplicată efectiv acum este {$a->effective} MB. Se aplică întotdeauna valoarea mai mică dintre setarea dumneavoastră și limitele PHP.';
+$string['settings:max_audio_mb_capped'] = 'Limita pe acest server este dată de PHP, nu de această setare. Pentru ca participanții să poată folosi întreaga dimensiune setată aici, creșteți post_max_size și upload_max_filesize în php.ini la cel puțin {$a}.';
+$string['voice:error_unavailable'] = 'Serviciul de transcriere nu este disponibil în acest moment. Încercați din nou peste puțin timp.';
+
+$string['settings:max_audio_mb_range'] = 'Introduceți un număr între {$a->min} și {$a->max}. Valorile mai mari nu pot fi respectate: punctul final limitează la {$a->max}, deci câmpul ar indica o limită pe care codul nu o aplică.';
+
+$string['ai_course_assistant:usesupport'] = 'Utilizarea asistentului în afara unui curs';
+$string['settings:support_enabled'] = 'Activarea modului de asistență în afara cursurilor';
+$string['settings:support_enabled_desc'] = 'Permite cursanților să deschidă [[tutorshort]] și pe pagini care nu aparțin unui curs, precum tabloul de bord sau profilul propriu, pentru a pune întrebări despre înscriere, certificate, probleme tehnice și alte subiecte de asistență. Este necesar să fie setat mai jos un curs de asistență. În plus, cursanții au nevoie de capabilitatea „Utilizarea asistentului în afara unui curs”, pe care utilizatorii autentificați o dețin în mod implicit.';
+$string['settings:support_courseid'] = 'Curs de asistență';
+$string['settings:support_courseid_desc'] = 'ID-ul numeric al unui curs vizibil care conține materialele de început, de integrare și de orientare. Conversațiile de asistență primesc răspuns din acest curs și din întrebările frecvente de mai sus și sunt înregistrate în dreptul lui. Lăsați gol pentru a dezactiva modul de asistență. Prima pagină a site-ului (cursul 1) nu este acceptată.';
+$string['support:promptrole'] = 'Răspunzi la o întrebare de asistență pusă în afara oricărui curs. Cursantul nu întreabă despre materialul cursului, așa că nu îl redirecționa către acesta. Răspunde pe baza întrebărilor frecvente și a materialelor de asistență care ți-au fost puse la dispoziție. Dacă nu poți răspunde cu exactitate, spune acest lucru clar și oferă-te să transmiți întrebarea echipei de asistență.';

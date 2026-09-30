@@ -52,8 +52,22 @@ class security {
         'application/ogg',
     ];
 
-    /** @var int Maximum audio upload size in bytes (25 MB). */
+    /**
+     * Default maximum audio upload size in bytes (25 MB).
+     *
+     * This is the DEFAULT, not the effective limit. Call max_audio_bytes() for
+     * that: an admin can raise or lower it with the max_audio_mb setting, and
+     * PHP's own limits cap whatever they choose.
+     *
+     * @var int
+     */
     public const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
+
+    /** @var int Lowest value the max_audio_mb setting is allowed to take, in MB. */
+    public const MIN_AUDIO_MB = 1;
+
+    /** @var int Highest value the max_audio_mb setting is allowed to take, in MB. */
+    public const MAX_AUDIO_MB = 200;
 
     /**
      * Return true only if the URL is a safe https endpoint not pointing at a
@@ -306,6 +320,280 @@ class security {
             return true;
         }
         return false;
+    }
+
+    /**
+     * True when PHP threw the whole request body away because it exceeded
+     * post_max_size, so the endpoint is looking at an empty $_POST and $_FILES
+     * for a request that plainly carried a payload.
+     *
+     * This is not a hypothetical. MAX_AUDIO_BYTES is 25 MB and PHP's compiled
+     * default post_max_size is 8 MB, so on a stock configuration the 25 MB guard
+     * is unreachable: PHP discards the body first, both superglobals come back
+     * empty, and the endpoint's own require_sesskey() is the code that fails,
+     * because the sesskey went into the bin with everything else. Moodle's AJAX
+     * exception handler answers that with HTTP 200 and an exception payload, so
+     * a learner who records a long clip gets "invalid sesskey" and is invited to
+     * log in again, and the log records a CSRF failure that never happened.
+     *
+     * The caller must run this BEFORE require_sesskey(), which is safe: the
+     * branch reads nothing, writes nothing, and answers with a size refusal that
+     * an attacker could equally well obtain by reading the source.
+     *
+     * Detection is CONTENT_LENGTH against an empty pair of superglobals. A
+     * genuine POST with no fields is indistinguishable from this at the PHP
+     * level, which is why CONTENT_LENGTH must be positive: a body was sent and
+     * nothing arrived.
+     *
+     * CALL THIS ONLY FROM AN ENDPOINT THAT READS A FORM-ENCODED OR MULTIPART
+     * BODY. PHP never populates $_POST from a JSON body whatever its size, so on
+     * an endpoint that reads php://input this returns true for every well-formed
+     * request. Both current callers, transcribe.php and soapbox_transcribe.php,
+     * take multipart uploads.
+     *
+     * @param array $server $_SERVER.
+     * @param array $post   $_POST.
+     * @param array $files  $_FILES.
+     * @return bool
+     */
+    public static function oversized_post_was_discarded(array $server, array $post, array $files): bool {
+        if (strtoupper((string) ($server['REQUEST_METHOD'] ?? '')) !== 'POST') {
+            return false;
+        }
+        if (!empty($post) || !empty($files)) {
+            return false;
+        }
+        return ((int) ($server['CONTENT_LENGTH'] ?? 0)) > 0;
+    }
+
+    /**
+     * True when a per-file upload error means "too big", as opposed to "absent"
+     * or "broken".
+     *
+     * UPLOAD_ERR_INI_SIZE is upload_max_filesize, whose PHP default is 2 MB, and
+     * UPLOAD_ERR_FORM_SIZE is a MAX_FILE_SIZE field in the form. Both leave
+     * tmp_name empty, so without this the endpoint reports "No audio file
+     * provided" with HTTP 400 for a file that was provided and was too large.
+     *
+     * @param int $error The $_FILES[...]['error'] value.
+     * @return bool
+     */
+    public static function upload_error_is_size(int $error): bool {
+        return $error === UPLOAD_ERR_INI_SIZE || $error === UPLOAD_ERR_FORM_SIZE;
+    }
+
+    /**
+     * Parse a PHP ini size value ("8M", "1G", "512K", "-1", "") into bytes.
+     *
+     * Returns 0 for the two values that mean "no limit": an empty string, and
+     * -1, which is what post_max_size uses to disable the check entirely. A
+     * caller treats 0 as "PHP imposes no ceiling here", NOT as "zero bytes
+     * allowed", which is the trap in this function and the reason it is its own
+     * method with its own test.
+     *
+     * @param string|false $value Raw ini value, e.g. from ini_get().
+     * @return int Bytes, or 0 for unlimited/unset.
+     */
+    public static function parse_ini_bytes($value): int {
+        $raw = trim((string) $value);
+        if ($raw === '') {
+            return 0;
+        }
+        $number = (int) $raw;
+        if ($number < 0) {
+            return 0;
+        }
+        $suffix = strtolower(substr($raw, -1));
+        if ($suffix === 'g') {
+            return $number * 1024 * 1024 * 1024;
+        }
+        if ($suffix === 'm') {
+            return $number * 1024 * 1024;
+        }
+        if ($suffix === 'k') {
+            return $number * 1024;
+        }
+        return $number;
+    }
+
+    /**
+     * The largest audio upload PHP will actually let through, in bytes, or 0 if
+     * PHP imposes no ceiling.
+     *
+     * Two settings both apply and the smaller wins. post_max_size (default 8 MB)
+     * bounds the whole request body; exceed it and PHP discards the body in full,
+     * which is the failure oversized_post_was_discarded() exists to catch.
+     * upload_max_filesize (default 2 MB) bounds the single file; exceed it and
+     * the file arrives with UPLOAD_ERR_INI_SIZE and an empty tmp_name.
+     *
+     * Both PHP defaults are below MAX_AUDIO_BYTES, so on a stock configuration
+     * SOLA's own cap is not the one that fires. That is why this exists: an
+     * admin who sets max_audio_mb to 50 on a server with post_max_size 8M has
+     * configured a number that cannot happen, and should be told so rather than
+     * discover it from a learner.
+     *
+     * @return int Bytes, or 0 if neither ini setting imposes a limit.
+     */
+    public static function php_upload_limit_bytes(): int {
+        $post = self::parse_ini_bytes(ini_get('post_max_size'));
+        $file = self::parse_ini_bytes(ini_get('upload_max_filesize'));
+
+        $limits = array_filter([$post, $file], static function (int $bytes): bool {
+            return $bytes > 0;
+        });
+
+        return $limits ? (int) min($limits) : 0;
+    }
+
+    /**
+     * The effective maximum audio upload size in bytes.
+     *
+     * The admin setting, clamped to [MIN_AUDIO_MB, MAX_AUDIO_MB], and then
+     * capped by whatever PHP will accept. The PHP cap is applied last and
+     * silently, because it is not a preference: a larger configured value is
+     * simply unreachable, and enforcing the configured number would mean
+     * refusing at a size PHP already refused at differently.
+     *
+     * get_config() returns false before the setting has ever been saved, which
+     * is every existing installation on upgrade, so the default has to be
+     * MAX_AUDIO_BYTES rather than zero.
+     *
+     * @return int Bytes.
+     */
+    public static function max_audio_bytes(): int {
+        $bytes = self::configured_audio_mb() * 1024 * 1024;
+
+        $phplimit = self::php_upload_limit_bytes();
+        if ($phplimit > 0 && $phplimit < $bytes) {
+            return $phplimit;
+        }
+
+        return $bytes;
+    }
+
+    /**
+     * The max_audio_mb setting, resolved and clamped, in megabytes.
+     *
+     * The single place that decides what the stored value means, because review
+     * on PR 258 found two places deciding it differently. settings.php used
+     * `get_config(...) ?: 25` with no clamp, so a stored "0" read as falsy and
+     * became 25 while the endpoint enforced 1, and a stored "300" produced
+     * advice to raise php.ini to 301M for 100 MB that could never be used.
+     * PARAM_INT on the setting does not enforce a range either, so out-of-range
+     * values do get stored.
+     *
+     * get_config() returns false before the setting has ever been saved, which
+     * is every installation on upgrade day, so the unset case must land on the
+     * documented default rather than on zero.
+     *
+     * @return int Megabytes, within [MIN_AUDIO_MB, MAX_AUDIO_MB].
+     */
+    public static function configured_audio_mb(): int {
+        $configured = get_config('local_ai_course_assistant', 'max_audio_mb');
+
+        if ($configured === false || $configured === null || trim((string) $configured) === '') {
+            return (int) (self::MAX_AUDIO_BYTES / (1024 * 1024));
+        }
+
+        return max(self::MIN_AUDIO_MB, min(self::MAX_AUDIO_MB, (int) $configured));
+    }
+
+    /**
+     * The effective cap in megabytes, as a string, for showing to a person.
+     *
+     * One function so the settings page and the learner's error message cannot
+     * state different numbers for the same limit. Review found the page using
+     * round(x, 1) and the errors using floor(x): at upload_max_filesize = 2500K
+     * the admin read 2.4 MB and the learner read 2 MB.
+     *
+     * NEVER ROUNDS UP. The number shown has to be one the learner can actually
+     * send, so this floors, to one decimal place. An earlier version floored to
+     * a whole number and then applied max(1, ...) to avoid printing "0 MB",
+     * which reintroduced this release's own defect at the bottom of the range:
+     * with a 1 KB PHP limit it told the learner "under about 1 MB", wrong by a
+     * factor of a thousand, and at 1048575 bytes it said 1 MB while a 1 MB file
+     * was refused. Understating is harmless; overstating sends the learner back
+     * to fail again.
+     *
+     * A whole number prints without a decimal, so the ordinary case reads
+     * "25 MB" rather than "25.0 MB".
+     *
+     * @return string Megabytes, floored to one decimal.
+     */
+    public static function max_audio_mb_display(): string {
+        $mb = floor(self::max_audio_bytes() / (1024 * 1024) * 10) / 10;
+
+        return $mb == (int) $mb ? (string) (int) $mb : (string) $mb;
+    }
+
+    /**
+     * A provider URL reduced to the part that is safe to write to a log.
+     *
+     * Scheme, host and port only. A self-hosted endpoint can legitimately carry
+     * credentials, as https://user:pass@host/v1/audio or as ?api_key=..., and
+     * error logs are routinely shipped to aggregators, ticket attachments and
+     * support threads that are less trusted than the server they came from.
+     * Logging the raw URL puts a working key in all of those places.
+     *
+     * Raised in review on PR 258: the SSRF branch logged $cfg['endpoint'] whole,
+     * while the HTTP-status branch immediately below it already logged only the
+     * host. The host is the part an administrator actually needs, because it
+     * tells them which endpoint their configuration is pointing at.
+     *
+     * @param string $url The configured endpoint.
+     * @return string Scheme, host and port, or '(unparseable)'.
+     */
+    public static function loggable_endpoint(string $url): string {
+        $parts = parse_url($url);
+        if ($parts === false || empty($parts['host'])) {
+            return '(unparseable)';
+        }
+        $out = (!empty($parts['scheme']) ? $parts['scheme'] . '://' : '') . $parts['host'];
+        if (!empty($parts['port'])) {
+            $out .= ':' . $parts['port'];
+        }
+        return $out;
+    }
+
+    /**
+     * Record an operational failure where an administrator will actually find it.
+     *
+     * NOT debugging(). debugging($msg, DEBUG_DEVELOPER) returns at its first
+     * condition unless $CFG->debug is set to DEVELOPER, and production sites run
+     * at NONE or MINIMAL, so a diagnostic sent that way on a live site is not
+     * written anywhere at all. Code review caught exactly that in 7.5.5: two
+     * diagnostics had been moved out of the learner's response body and into
+     * debugging(), with comments claiming an administrator could read them. On
+     * every production site they had simply been deleted, which is worse than
+     * where they started, because before the change they at least reached the
+     * browser console.
+     *
+     * error_log() writes regardless of Moodle's debug level, to whatever the
+     * server's error_log directive points at. The SOLA prefix is what makes the
+     * line greppable next to everything else PHP puts there.
+     *
+     * Use this for a failure an administrator needs to diagnose later and a
+     * learner must not be shown: a rejected provider URL, an upstream status
+     * code, a credential problem. It is not for anything routine; it has no rate
+     * limit, and a provider outage will write one line per request.
+     *
+     * @param string $message What failed, with the detail needed to act on it.
+     * @return void
+     */
+    public static function log_operational_failure(string $message): void {
+        // moodle-cs lists error_log alongside print_r as a development debugging
+        // function. Here it is the deliberate choice and the docblock says why:
+        // it is the only core-free channel that writes at every debug level, and
+        // debugging() writes nothing on a production site. A custom event plus a
+        // logstore row would add database writes on an error path that fires
+        // once per failed request during an outage.
+        //
+        // The sniff is FoundWithAlternative, not Found: moodle-cs knows what it
+        // would rather you called, and says so. The directive has to name that
+        // code and sit on the line immediately above the call, because a
+        // standalone phpcs:ignore covers exactly one following line.
+        // phpcs:ignore moodle.PHP.ForbiddenFunctions.FoundWithAlternative
+        error_log('SOLA: ' . $message);
     }
 
     /**
