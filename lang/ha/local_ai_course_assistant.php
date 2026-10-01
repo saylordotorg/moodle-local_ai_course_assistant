@@ -3161,3 +3161,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Haka kuma a yi binciken gani kan 
 $string['soapbox:assign_visible'] = 'Ana gani ga ɗalibai';
 $string['soapbox:assign_err_min_seconds'] = 'Ka shigar da aƙalla daƙiƙa 1';
 $string['soapbox:assign_err_minmax'] = 'Mafi ƙarancin tsawo ba zai iya wuce mafi yawa ba';
+$string['privacy:path:email_optout'] = 'Dakatar da imel';

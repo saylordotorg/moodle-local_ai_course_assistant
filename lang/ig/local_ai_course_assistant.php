@@ -3149,3 +3149,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Megharịakwa nyocha ọhụụ n
 $string['soapbox:assign_visible'] = 'Na-apụta nye ụmụ akwụkwọ';
 $string['soapbox:assign_err_min_seconds'] = 'Tinye opekempe sekọnd 1';
 $string['soapbox:assign_err_minmax'] = 'Ogologo kacha nta agaghị akarị nke kacha ukwuu';
+$string['privacy:path:email_optout'] = 'Ịkwụsị ozi ígwè';

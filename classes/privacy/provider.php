@@ -428,7 +428,84 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             'userid' => $userid,
         ]);
 
+        // Email opt-outs live at the system context, not in a course.
+        //
+        // The row holds an email address and its courseid is almost always
+        // null, because the only thing that writes one is the unsubscribe link,
+        // which is followed by someone who is not logged in. Every query above
+        // joins courseid to a course context, so these rows were returned by
+        // nothing: a learner who had asked us to stop emailing them could not
+        // have that address exported or erased, and deleting their account did
+        // not remove it either, because delete_data_for_user only runs for a
+        // context discovery returned. Issue #284.
+        //
+        // record() fills userid at the point of opt-out now, and an upgrade
+        // step backfills the rows that already existed, so these are reachable
+        // by userid. See email_optout_match() for why matching on the address
+        // itself was considered and rejected.
+        if (self::has_system_context_data($userid)) {
+            $contextlist->add_system_context();
+        }
+
         return $contextlist;
+    }
+
+    /**
+     * Whether this user holds any system-context row.
+     *
+     * Kept separate because discovery, export and erasure all have to agree on
+     * what "this user's email opt-outs" means, and three copies of the same
+     * OR-on-email condition would drift. See the note in
+     * get_contexts_for_userid() for why the email half exists.
+     *
+     * @param int $userid
+     * @return bool
+     */
+    private static function has_system_context_data(int $userid): bool {
+        global $DB;
+
+        [$sql, $params] = self::email_optout_match($userid);
+        if ($sql === '') {
+            return false;
+        }
+
+        try {
+            return $DB->record_exists_select(
+                'local_ai_course_assistant_email_optout', $sql, $params);
+        } catch (\Throwable $e) {
+            // Table absent on an older install.
+            return false;
+        }
+    }
+
+    /**
+     * The WHERE clause matching one user's opt-out rows.
+     *
+     * Deliberately userid only, which is the decision taken on issue #284.
+     * Matching on the address as well would also catch rows whose userid could
+     * never be resolved, but one address can belong to more than one account
+     * once deleted users are counted, so erasing for one person could remove a
+     * different person's suppression and start emailing them again. Filling
+     * userid at the point of opt-out, and backfilling what already existed,
+     * closes the gap without that risk.
+     *
+     * What remains uncovered is an address that matched no account, or two, at
+     * the moment it unsubscribed. Those are administrator and mailing-list
+     * destinations rather than learners with a Moodle account, and they stay
+     * null by design; the column is nullable for exactly that case.
+     *
+     * Returns ['', []] for a non-user, so a caller cannot accidentally match
+     * every row with a null userid.
+     *
+     * @param int $userid
+     * @return array{0: string, 1: array}
+     */
+    private static function email_optout_match(int $userid): array {
+        if ($userid <= 0) {
+            return ['', []];
+        }
+
+        return ['userid = :userid', ['userid' => $userid]];
     }
 
     /**
@@ -534,6 +611,10 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         // conversation so each conversation exports as its own sub-context in
         // the writer, exactly as the privacy API expects.
         foreach ($contextlist->get_contexts() as $context) {
+            if ($context->contextlevel === CONTEXT_SYSTEM) {
+                self::export_email_optouts($userid, $context);
+                continue;
+            }
             if ($context->contextlevel !== CONTEXT_COURSE) {
                 continue;
             }
@@ -844,6 +925,51 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
     }
 
     /**
+     * Export the user's email opt-outs at the system context.
+     *
+     * These were exported by nothing before issue #284, because the row's
+     * courseid is null and every other export path is per course. The address
+     * is the learner's own, so it belongs in their subject access response
+     * along with what they unsubscribed from and when.
+     *
+     * @param int $userid
+     * @param \context $context The system context.
+     */
+    private static function export_email_optouts(int $userid, \context $context): void {
+        global $DB;
+
+        [$where, $params] = self::email_optout_match($userid);
+        if ($where === '') {
+            return;
+        }
+
+        try {
+            $rows = $DB->get_records_select(
+                'local_ai_course_assistant_email_optout', $where, $params, 'timecreated ASC');
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        if (!$rows) {
+            return;
+        }
+
+        $data = [];
+        foreach ($rows as $row) {
+            $data[] = (object) [
+                'email' => $row->email,
+                'optout_type' => $row->optout_type,
+                'timecreated' => transform::datetime($row->timecreated),
+            ];
+        }
+
+        writer::with_context($context)->export_data(
+            [get_string('privacy:path:email_optout', 'local_ai_course_assistant')],
+            (object) ['optouts' => $data]
+        );
+    }
+
+    /**
      * Delete all data for all users in a context.
      *
      * @param \context $context
@@ -1040,8 +1166,19 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         // is purged by userid once, outside the per-course loop. Covers the
         // case the 2026-06-08 audit flagged where a hard-deleted user would
         // otherwise leave opt-out rows containing their email behind.
+        // Issue #284: this runs now, because discovery returns the system
+        // context for a user holding opt-out rows. Before that it could not,
+        // and the address survived both erasure and account deletion.
+        //
+        // Erasing the row does re-subscribe that address, because the
+        // suppression IS the data. That is the correct outcome for an erasure
+        // request whose whole subject is the learner's email address.
         try {
-            $DB->delete_records('local_ai_course_assistant_email_optout', ['userid' => $userid]);
+            [$where, $params] = self::email_optout_match($userid);
+            if ($where !== '') {
+                $DB->delete_records_select(
+                    'local_ai_course_assistant_email_optout', $where, $params);
+            }
         } catch (\Throwable $e) {
             /* table absent on older installs */
         }
@@ -1148,7 +1285,11 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             self::purge_soapbox_recordings($userid, (int) $context->instanceid);
             // v5.10.x: email opt-out is user-global; purge by userid.
             try {
-                $DB->delete_records('local_ai_course_assistant_email_optout', ['userid' => $userid]);
+                [$optwhere, $optparams] = self::email_optout_match((int) $userid);
+                if ($optwhere !== '') {
+                    $DB->delete_records_select(
+                        'local_ai_course_assistant_email_optout', $optwhere, $optparams);
+                }
             } catch (\Throwable $e) {
                 /* ignore */
             }

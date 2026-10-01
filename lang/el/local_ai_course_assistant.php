@@ -3175,3 +3175,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Να εκτελείται επί�
 $string['soapbox:assign_visible'] = 'Ορατό στους μαθητές';
 $string['soapbox:assign_err_min_seconds'] = 'Εισαγάγετε τουλάχιστον 1 δευτερόλεπτο';
 $string['soapbox:assign_err_minmax'] = 'Η ελάχιστη διάρκεια δεν μπορεί να υπερβαίνει τη μέγιστη';
+$string['privacy:path:email_optout'] = 'Εξαιρέσεις email';

@@ -3161,3 +3161,4 @@ $string['soapbox:assign_slide_vision_help'] = 'ለምስላዊ ንድፍ አስ�
 $string['soapbox:assign_visible'] = 'ለተማሪዎች የሚታይ';
 $string['soapbox:assign_err_min_seconds'] = 'ቢያንስ 1 ሰከንድ አስገባ';
 $string['soapbox:assign_err_minmax'] = 'ዝቅተኛው ርዝመት ከከፍተኛው መብለጥ አይችልም';
+$string['privacy:path:email_optout'] = 'የኢሜል ምዝገባ ስረዛዎች';

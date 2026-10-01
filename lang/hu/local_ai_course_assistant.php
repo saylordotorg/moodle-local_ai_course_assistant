@@ -3174,3 +3174,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Vizuális áttekintés futtatása
 $string['soapbox:assign_visible'] = 'Látható a tanulóknak';
 $string['soapbox:assign_err_min_seconds'] = 'Adjon meg legalább 1 másodpercet';
 $string['soapbox:assign_err_minmax'] = 'A minimális hossz nem haladhatja meg a maximálisat';
+$string['privacy:path:email_optout'] = 'E-mail-leiratkozások';

@@ -3186,3 +3186,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Jalankan juga analisis penglihata
 $string['soapbox:assign_visible'] = 'Terlihat oleh siswa';
 $string['soapbox:assign_err_min_seconds'] = 'Masukkan setidaknya 1 detik';
 $string['soapbox:assign_err_minmax'] = 'Durasi minimum tidak boleh melebihi durasi maksimum';
+$string['privacy:path:email_optout'] = 'Berhenti berlangganan email';

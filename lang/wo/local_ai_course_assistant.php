@@ -3155,3 +3155,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Defal it benn saytu bu gis ci nat
 $string['soapbox:assign_visible'] = 'Jàngkat yi dinañu ko gis';
 $string['soapbox:assign_err_min_seconds'] = 'Duggalal 1 simili ci lu gëna tuuti';
 $string['soapbox:assign_err_minmax'] = 'Guddaay gi gëna tuuti mënul a ëpp gi gëna mag';
+$string['privacy:path:email_optout'] = 'Génn ci imeel yi';

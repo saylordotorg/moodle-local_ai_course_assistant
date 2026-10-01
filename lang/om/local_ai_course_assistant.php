@@ -3166,3 +3166,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Yaadota dizaayinii mul\'ataa arga
 $string['soapbox:assign_visible'] = 'Barattootaaf ni mul\'ata';
 $string['soapbox:assign_err_min_seconds'] = 'Yoo xiqqaate sekondii 1 galchi';
 $string['soapbox:assign_err_minmax'] = 'Dheerinni xiqqaan kan guddaa caaluu hin danda\'u';
+$string['privacy:path:email_optout'] = 'Imeelii irraa bahuu';

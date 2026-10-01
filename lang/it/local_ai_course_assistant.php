@@ -3172,3 +3172,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Analizza anche le immagini delle 
 $string['soapbox:assign_visible'] = 'Visibile agli studenti';
 $string['soapbox:assign_err_min_seconds'] = 'Inserisci almeno 1 secondo';
 $string['soapbox:assign_err_minmax'] = 'La durata minima non può superare quella massima';
+$string['privacy:path:email_optout'] = 'Esclusioni email';

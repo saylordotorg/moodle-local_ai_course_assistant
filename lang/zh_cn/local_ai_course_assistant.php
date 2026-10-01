@@ -3170,3 +3170,4 @@ $string['soapbox:assign_slide_vision_help'] = '同时对幻灯片图像进行一
 $string['soapbox:assign_visible'] = '对学生可见';
 $string['soapbox:assign_err_min_seconds'] = '请至少输入 1 秒';
 $string['soapbox:assign_err_minmax'] = '最短时长不能超过最长时长';
+$string['privacy:path:email_optout'] = '电子邮件退订';

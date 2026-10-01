@@ -3132,3 +3132,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Kjør også en bildeanalyse av ly
 $string['soapbox:assign_visible'] = 'Synlig for studenter';
 $string['soapbox:assign_err_min_seconds'] = 'Angi minst 1 sekund';
 $string['soapbox:assign_err_minmax'] = 'Minste lengde kan ikke være større enn største lengde';
+$string['privacy:path:email_optout'] = 'E-postavmeldinger';

@@ -3134,3 +3134,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Navyše spustiť vizuálny precho
 $string['soapbox:assign_visible'] = 'Viditeľné pre študentov';
 $string['soapbox:assign_err_min_seconds'] = 'Zadajte aspoň 1 sekundu';
 $string['soapbox:assign_err_minmax'] = 'Minimálna dĺžka nemôže presiahnuť maximálnu';
+$string['privacy:path:email_optout'] = 'Odhlásenia z e-mailov';

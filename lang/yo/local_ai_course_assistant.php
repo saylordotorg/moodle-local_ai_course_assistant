@@ -3155,3 +3155,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Tún ṣe àyẹ̀wò ojú lórí
 $string['soapbox:assign_visible'] = 'Ó hàn sí àwọn akẹ́kọ̀ọ́';
 $string['soapbox:assign_err_min_seconds'] = 'Tẹ ó kéré jù ìṣẹ́jú-àáyá 1';
 $string['soapbox:assign_err_minmax'] = 'Ìgùn tí ó kéré jùlọ kò lè pọ̀ ju ìgùn tí ó pọ̀ jùlọ lọ';
+$string['privacy:path:email_optout'] = 'Ìfagilé ìmèèlì';

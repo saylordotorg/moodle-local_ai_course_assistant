@@ -3132,3 +3132,4 @@ $string['soapbox:assign_slide_vision_help'] = 'スライド画像に対しても
 $string['soapbox:assign_visible'] = '学生に表示する';
 $string['soapbox:assign_err_min_seconds'] = '1 秒以上を入力してください';
 $string['soapbox:assign_err_minmax'] = '最短の長さは最長の長さを超えられません';
+$string['privacy:path:email_optout'] = 'メール配信停止';

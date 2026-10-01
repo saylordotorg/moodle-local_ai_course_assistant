@@ -3135,3 +3135,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Görsel tasarım notları için s
 $string['soapbox:assign_visible'] = 'Öğrencilere görünür';
 $string['soapbox:assign_err_min_seconds'] = 'En az 1 saniye girin';
 $string['soapbox:assign_err_minmax'] = 'En az uzunluk, en fazla uzunluğu aşamaz';
+$string['privacy:path:email_optout'] = 'E-posta aboneliğinden çıkmalar';

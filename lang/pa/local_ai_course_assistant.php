@@ -3154,3 +3154,4 @@ $string['soapbox:assign_slide_vision_help'] = 'ਦ੍ਰਿਸ਼-ਡਿਜ਼�
 $string['soapbox:assign_visible'] = 'ਵਿਦਿਆਰਥੀਆਂ ਨੂੰ ਦਿਖਾਈ ਦਿੰਦਾ';
 $string['soapbox:assign_err_min_seconds'] = 'ਘੱਟੋ-ਘੱਟ 1 ਸਕਿੰਟ ਦਰਜ ਕਰੋ';
 $string['soapbox:assign_err_minmax'] = 'ਘੱਟੋ-ਘੱਟ ਲੰਬਾਈ ਵੱਧ ਤੋਂ ਵੱਧ ਲੰਬਾਈ ਤੋਂ ਵੱਡੀ ਨਹੀਂ ਹੋ ਸਕਦੀ';
+$string['privacy:path:email_optout'] = 'ਈਮੇਲ ਔਪਟ-ਆਊਟ';

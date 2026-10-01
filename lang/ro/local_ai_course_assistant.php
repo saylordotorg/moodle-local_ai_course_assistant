@@ -3134,3 +3134,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Rulează suplimentar o trecere de
 $string['soapbox:assign_visible'] = 'Vizibil pentru cursanți';
 $string['soapbox:assign_err_min_seconds'] = 'Introduceți cel puțin 1 secundă';
 $string['soapbox:assign_err_minmax'] = 'Durata minimă nu poate depăși durata maximă';
+$string['privacy:path:email_optout'] = 'Dezabonări de la e-mailuri';

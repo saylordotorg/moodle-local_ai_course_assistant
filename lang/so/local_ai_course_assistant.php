@@ -3178,3 +3178,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Sidoo kale ku samee baaris aragti
 $string['soapbox:assign_visible'] = 'Ardayda ayaa arki kara';
 $string['soapbox:assign_err_min_seconds'] = 'Geli ugu yaraan 1 ilbiriqsi';
 $string['soapbox:assign_err_minmax'] = 'Dhererka ugu yar kama badnaan karo kan ugu badan';
+$string['privacy:path:email_optout'] = 'Ka bixitaanka iimaylka';

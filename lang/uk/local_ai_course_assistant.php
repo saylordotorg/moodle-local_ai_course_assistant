@@ -3174,3 +3174,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Також виконувати �
 $string['soapbox:assign_visible'] = 'Видиме для студентів';
 $string['soapbox:assign_err_min_seconds'] = 'Введіть щонайменше 1 секунду';
 $string['soapbox:assign_err_minmax'] = 'Мінімальна тривалість не може перевищувати максимальну';
+$string['privacy:path:email_optout'] = 'Відмови від електронних листів';
