@@ -470,10 +470,23 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         }
 
         try {
-            return $DB->record_exists_select(
-                'local_ai_course_assistant_email_optout', $sql, $params);
+            if ($DB->record_exists_select(
+                    'local_ai_course_assistant_email_optout', $sql, $params)) {
+                return true;
+            }
         } catch (\Throwable $e) {
             // Table absent on an older install.
+        }
+
+        // Issue #285: audit rows written outside any course. consent_given and
+        // data_download_self are learner actions recorded with courseid 0, and
+        // the row carries their IP address and user agent. Every other audit
+        // query joins courseid to a course context, so course 0 matched none of
+        // them and a data request never reached these.
+        try {
+            return $DB->record_exists('local_ai_course_assistant_audit',
+                ['userid' => $userid, 'courseid' => 0]);
+        } catch (\Throwable $e) {
             return false;
         }
     }
@@ -613,6 +626,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         foreach ($contextlist->get_contexts() as $context) {
             if ($context->contextlevel === CONTEXT_SYSTEM) {
                 self::export_email_optouts($userid, $context);
+                self::export_systemwide_audit($userid, $context);
                 continue;
             }
             if ($context->contextlevel !== CONTEXT_COURSE) {
@@ -970,6 +984,42 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
     }
 
     /**
+     * Export audit rows the learner generated outside any course.
+     *
+     * Issue #285. consent_given and data_download_self are recorded with
+     * courseid 0, and the row holds the learner's IP address and user agent.
+     * The per-course export above keys on the course context, so these were
+     * disclosed to nobody. Shape matches that export deliberately, so a reader
+     * of the bundle sees the same fields in both places.
+     *
+     * @param int $userid
+     * @param \context $context The system context.
+     */
+    private static function export_systemwide_audit(int $userid, \context $context): void {
+        global $DB;
+
+        try {
+            $entries = $DB->get_records('local_ai_course_assistant_audit',
+                ['userid' => $userid, 'courseid' => 0], 'timecreated ASC');
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        foreach ($entries as $entry) {
+            writer::with_context($context)->export_data(
+                [get_string('pluginname', 'local_ai_course_assistant'), 'audit_log', $entry->id],
+                (object) [
+                    'action' => $entry->action,
+                    'ipaddress' => $entry->ipaddress,
+                    'useragent' => $entry->useragent,
+                    'details' => $entry->details,
+                    'timecreated' => transform::datetime($entry->timecreated),
+                ]
+            );
+        }
+    }
+
+    /**
      * Delete all data for all users in a context.
      *
      * @param \context $context
@@ -1179,6 +1229,16 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                 $DB->delete_records_select(
                     'local_ai_course_assistant_email_optout', $where, $params);
             }
+        } catch (\Throwable $e) {
+            /* table absent on older installs */
+        }
+
+        // Issue #285: audit rows outside any course. Consistent with the
+        // per-course audit deletion above, which already removes these rows
+        // when they carry a course.
+        try {
+            $DB->delete_records('local_ai_course_assistant_audit',
+                ['userid' => $userid, 'courseid' => 0]);
         } catch (\Throwable $e) {
             /* table absent on older installs */
         }

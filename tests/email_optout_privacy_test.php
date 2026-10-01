@@ -223,4 +223,69 @@ final class email_optout_privacy_test extends \advanced_testcase {
                 ['email' => 'byebye@example.com']),
             'a hard-deleted user left an opt-out row containing their email address');
     }
+
+    /**
+     * An audit row written outside any course is discoverable (issue #285).
+     *
+     * consent_given and data_download_self are learner actions recorded with
+     * courseid 0, and the row carries the learner's IP address and user agent.
+     * Every audit query in the provider keyed on courseid, so course 0 matched
+     * none of them.
+     */
+    public function test_an_audit_row_outside_a_course_is_discoverable(): void {
+        $user = $this->getDataGenerator()->create_user();
+        audit_logger::log('consent_given', (int) $user->id, 0, []);
+
+        $contexts = privacy\provider::get_contexts_for_userid((int) $user->id);
+        $ids = array_map('intval', $contexts->get_contextids());
+
+        $this->assertContains((int) \context_system::instance()->id, $ids,
+            'the learner has an audit row holding their IP address and no context was '
+                . 'returned for it, so it can be neither exported nor erased');
+    }
+
+    /**
+     * That audit row is exported and then erased.
+     */
+    public function test_an_audit_row_outside_a_course_is_exported_and_erased(): void {
+        global $DB;
+
+        $user = $this->getDataGenerator()->create_user();
+        audit_logger::log('data_download_self', (int) $user->id, 0, ['bundle_keys' => ['a']]);
+
+        $context = \context_system::instance();
+        $contextlist = new approved_contextlist(
+            $user, 'local_ai_course_assistant', [$context->id]);
+
+        privacy\provider::export_user_data($contextlist);
+        $this->assertTrue(writer::with_context($context)->has_any_data(),
+            'the audit row was not disclosed in the subject access export');
+
+        privacy\provider::delete_data_for_user($contextlist);
+        $this->assertFalse(
+            $DB->record_exists('local_ai_course_assistant_audit',
+                ['userid' => $user->id, 'courseid' => 0]),
+            'the learner asked for erasure and an audit row holding their IP address remains');
+    }
+
+    /**
+     * Erasing one learner leaves another learner audit row alone.
+     */
+    public function test_erasing_audit_rows_is_scoped_to_the_one_learner(): void {
+        global $DB;
+
+        $user = $this->getDataGenerator()->create_user();
+        $other = $this->getDataGenerator()->create_user();
+        audit_logger::log('consent_given', (int) $user->id, 0, []);
+        audit_logger::log('consent_given', (int) $other->id, 0, []);
+
+        $contextlist = new approved_contextlist(
+            $user, 'local_ai_course_assistant', [\context_system::instance()->id]);
+        privacy\provider::delete_data_for_user($contextlist);
+
+        $this->assertTrue(
+            $DB->record_exists('local_ai_course_assistant_audit',
+                ['userid' => $other->id, 'courseid' => 0]),
+            'erasing one learner removed a different learner audit row');
+    }
 }
