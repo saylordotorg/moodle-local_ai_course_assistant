@@ -129,7 +129,7 @@ Communicate in a friendly, caring, encouraging, witty, and motivating way. Be co
 ## Safety
 Do not engage in abusive, hateful, discriminatory, or inappropriate conversations. Set firm but kind boundaries and redirect to productive topics.';
 $string['remoteconfigurl'] = 'Remote config URL';
-$string['remoteconfigurl_desc'] = 'URL to a JSON file containing remotely-managed plugin configuration (system prompt, instruction blocks, model default). Must be HTTPS. Leave blank to use the default GitHub URL. Local admin settings always take priority over remote config values.';
+$string['remoteconfigurl_desc'] = 'URL to a JSON file containing remotely-managed plugin configuration (system prompt, instruction blocks, model default). Must be HTTPS. Leave blank to disable remote configuration (the default). Local admin settings always take priority over remote config values.';
 $string['settings:temperature'] = 'Temperature';
 $string['settings:temperature_desc'] = 'Controls randomness. Lower values are more focused, higher values more creative. Range: 0.0 to 2.0.';
 $string['settings:maxhistory'] = 'Max Conversation History';
@@ -1757,8 +1757,7 @@ $string['soapbox:howto_eyes']      = 'Look at the camera lens, not at your own p
 $string['soapbox:howto_hands']     = 'Give yourself room to move your hands, and speak at your normal volume. Record one full take: pauses, restarts and the odd stumble are normal and are not marked down.';
 $string['soapbox:howto_feedback']  = 'A few minutes after you finish you will get a score and written feedback on every rubric criterion, including your body language and camera presence when your camera was on.';
 $string['soapbox:retention_heading'] = 'Your video is deleted after {$a} days.';
-$string['soapbox:retention_line'] = 'Each recording is deleted automatically {$a} days after you make it, and the exact date is shown against every attempt below. Your scores, written feedback and transcript are kept. Use the Download link to save any video you want to keep '
-    . 'before that date.';
+$string['soapbox:retention_line'] = 'Each recording is deleted automatically {$a} days after you make it, and the exact date is shown against every attempt below. Your scores, written feedback and transcript are kept. Use the Download link to save any video you want to keep before that date.';
 $string['soapbox:present_privacy'] = 'Your recording is uploaded to [[uniname]] storage so it can be transcribed and scored. Only you and site administrators can open it. It is deleted automatically {$a} days after you record it, together with the still frames used for body-language feedback. Your transcript, scores and feedback are kept after the video is gone, so download anything you want to keep.';
 $string['soapbox:col_deletes']     = 'Deletes on';
 $string['soapbox:watch']           = 'Watch';

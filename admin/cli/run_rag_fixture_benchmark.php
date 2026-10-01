@@ -368,13 +368,13 @@ if ($setgrade['blocked']) {
 // ---------- Fixture anchor integrity preflight ----------
 // Recall scoring matches on expected_chunk_id, and falls back to a text match
 // when a reindex has renumbered the chunks. That fallback truncates the anchor
-// to ANCHOR_MATCH_BYTES (see the str_contains() calls further down). Two ways
+// to LOCAL_AI_COURSE_ASSISTANT_ANCHOR_MATCH_BYTES (see the str_contains() calls further down). Two ways
 // an anchor can be quietly useless: it is not a verbatim substring of its own
 // chunk (whitespace was normalised when it was generated), or its truncated
 // prefix also appears in an overlapping neighbour, so any of them scores a hit.
 // Both fail silently, and only once the chunk ids have gone stale -- which is
 // exactly when the anchor is the only thing left. Check it up front instead.
-define('ANCHOR_MATCH_BYTES', 50);
+define('LOCAL_AI_COURSE_ASSISTANT_ANCHOR_MATCH_BYTES', 50);
 $anchorstale = 0;
 $anchormissing = 0;
 $anchorbroken = [];
@@ -420,7 +420,7 @@ if ($fxids) {
             $anchor,
             $content,
             $courseblob[$course],
-            ANCHOR_MATCH_BYTES
+            LOCAL_AI_COURSE_ASSISTANT_ANCHOR_MATCH_BYTES
         );
         if ($status === 'notverbatim') {
             $anchorbroken[] = $label;
@@ -432,7 +432,7 @@ if ($fxids) {
 $anchorbad = count($anchorbroken) + count($anchorambiguous);
 echo "Anchor preflight: {$anchorstale} stale chunk id(s), {$anchormissing} without a text anchor, "
     . count($anchorbroken) . " anchor(s) not verbatim, " . count($anchorambiguous)
-    . " ambiguous at " . ANCHOR_MATCH_BYTES . " bytes\n";
+    . " ambiguous at " . LOCAL_AI_COURSE_ASSISTANT_ANCHOR_MATCH_BYTES . " bytes\n";
 if ($anchorbad > 0 || ($anchorstale > 0 && $anchormissing > 0)) {
     echo "\n!! WARNING: fixture anchors are not sound; recall figures from this run may be wrong.\n";
     if ($anchorbroken) {
@@ -441,7 +441,8 @@ if ($anchorbad > 0 || ($anchorstale > 0 && $anchormissing > 0)) {
             . (count($anchorbroken) > 8 ? ', +' . (count($anchorbroken) - 8) . ' more' : '') . "\n";
     }
     if ($anchorambiguous) {
-        echo "   ambiguous at " . ANCHOR_MATCH_BYTES . " bytes (an overlapping neighbour also scores a hit): "
+        echo "   ambiguous at " . LOCAL_AI_COURSE_ASSISTANT_ANCHOR_MATCH_BYTES
+            . " bytes (an overlapping neighbour also scores a hit): "
             . implode(', ', array_slice($anchorambiguous, 0, 8))
             . (count($anchorambiguous) > 8 ? ', +' . (count($anchorambiguous) - 8) . ' more' : '') . "\n";
     }

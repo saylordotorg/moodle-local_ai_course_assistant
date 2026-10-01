@@ -1999,6 +1999,29 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026091800, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026100100) {
+        // CONTRIB-10574 #267: remote configuration becomes opt-in.
+        //
+        // Until now this setting shipped with the Saylor repository's raw
+        // GitHub URL as its default, and an empty value fell back to the same
+        // URL, so clearing it did not switch the feature off. Every site
+        // therefore fetched a file from one organisation's branch once an hour
+        // and applied its system prompt, instruction blocks and default model
+        // to the assistant its learners talk to.
+        //
+        // The default is now empty and empty means disabled. Sites that still
+        // carry the old default never chose it, so it is removed here. A site
+        // that set its OWN url made a deliberate choice and keeps it: this
+        // compares against the exact historic default and touches nothing else.
+        // The comparison and the cache purge live in remote_config_manager so
+        // that a test can exercise the real logic. An inline copy here could
+        // only be covered by a test that reimplements it, and that test would
+        // pass whatever this step actually did.
+        \local_ai_course_assistant\remote_config_manager::clear_historic_default();
+
+        upgrade_plugin_savepoint(true, 2026100100, 'local', 'ai_course_assistant');
+    }
+
 
     return true;
 }

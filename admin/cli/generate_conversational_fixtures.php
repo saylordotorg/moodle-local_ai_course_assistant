@@ -105,13 +105,13 @@ TXT
 // two or three neighbours, and a shorter-than-unique anchor silently credits a
 // hit against the wrong chunk. Keep this in step with ANCHOR_MATCH_BYTES in
 // run_rag_fixture_benchmark.php.
-const GENCONV_ANCHOR_BYTES = 50;
+const LOCAL_AI_COURSE_ASSISTANT_GENCONV_ANCHOR_BYTES = 50;
 
 // Candidate pool per course, as a multiple of --per-course. Anchoring rejects
 // near-duplicate chunks, and a course whose material overlaps heavily can reject
 // a lot of them, so the pool has to be several times the quota for the quota to
 // be reachable at all. A course that still cannot fill it fails the run.
-const GENCONV_POOL_MULTIPLIER = 5;
+const LOCAL_AI_COURSE_ASSISTANT_GENCONV_POOL_MULTIPLIER = 5;
 
 $courses = array_values(array_filter(array_map(
     fn($c) => (int) trim($c),
@@ -131,7 +131,7 @@ $out = [
     'created'         => date('Y-m-d'),
     'description'     => 'Conversational RAG fixtures generated from indexed chunks.',
     'anchor_contract' => 'expected_substring is a verbatim substring of the chunk '
-        . 'content whose first ' . GENCONV_ANCHOR_BYTES . ' bytes are unique within '
+        . 'content whose first ' . LOCAL_AI_COURSE_ASSISTANT_GENCONV_ANCHOR_BYTES . ' bytes are unique within '
         . 'the course (that is the length the benchmark harness truncates to).',
     'fixtures'        => [],
 ];
@@ -168,7 +168,7 @@ foreach ($courses as $cid) {
         'id',
         'id, content',
         0,
-        $percourse * GENCONV_POOL_MULTIPLIER
+        $percourse * LOCAL_AI_COURSE_ASSISTANT_GENCONV_POOL_MULTIPLIER
     );
     $n = 0;
     foreach ($rows as $r) {
@@ -192,11 +192,11 @@ foreach ($courses as $cid) {
         $anchor = local_ai_course_assistant_genconv_anchor(
             $content,
             $courseblob,
-            GENCONV_ANCHOR_BYTES
+            LOCAL_AI_COURSE_ASSISTANT_GENCONV_ANCHOR_BYTES
         );
         if ($anchor === '') {
             $rejected[] = "course {$cid} / {$item} (chunk id " . (int) $r->id . '): '
-                . 'no substring is unique in its first ' . GENCONV_ANCHOR_BYTES
+                . 'no substring is unique in its first ' . LOCAL_AI_COURSE_ASSISTANT_GENCONV_ANCHOR_BYTES
                 . ' bytes across the course -- near-duplicate of an overlapping chunk';
             continue;
         }
@@ -207,7 +207,7 @@ foreach ($courses as $cid) {
             $anchor,
             $content,
             $courseblob,
-            GENCONV_ANCHOR_BYTES
+            LOCAL_AI_COURSE_ASSISTANT_GENCONV_ANCHOR_BYTES
         );
         if ($status !== '') {
             cli_error("Internal error: anchor for course {$cid} / {$item} is '{$status}'. "
@@ -233,7 +233,7 @@ foreach ($courses as $cid) {
     cli_writeln(" course {$cid}: {$n}");
     if ($n < $percourse) {
         $shortfall[] = "course {$cid}: {$n} of {$percourse} requested (its pool of "
-            . ($percourse * GENCONV_POOL_MULTIPLIER) . ' chunks was exhausted; see the '
+            . ($percourse * LOCAL_AI_COURSE_ASSISTANT_GENCONV_POOL_MULTIPLIER) . ' chunks was exhausted; see the '
             . 'rejected list above)';
     }
 }
@@ -266,7 +266,7 @@ if ($shortfall) {
         cli_error("Refusing to report success: the set is short of --per-course={$percourse} "
             . 'on ' . count($shortfall) . ' course(s), so a run against it would be measured '
             . 'on fewer rows than asked for without anyone noticing. Lower --per-course for '
-            . 'those courses, raise GENCONV_POOL_MULTIPLIER, index courses whose chunks '
+            . 'those courses, raise LOCAL_AI_COURSE_ASSISTANT_GENCONV_POOL_MULTIPLIER, index courses whose chunks '
             . 'overlap less, or pass --allow-short to accept a smaller set deliberately.', 3);
     }
 }
@@ -318,7 +318,7 @@ function local_ai_course_assistant_genconv_ask(string $key, string $model, strin
 // two marker comments below and evaluates it on its own, so this region must
 // hold function declarations ONLY: no globals, no DB, no I/O, no constants and
 // no executable statements. The anchor length is passed in rather than read
-// from GENCONV_ANCHOR_BYTES for the same reason.
+// from LOCAL_AI_COURSE_ASSISTANT_GENCONV_ANCHOR_BYTES for the same reason.
 // ============================================================================
 // GENCONV-PURE-BEGIN
 

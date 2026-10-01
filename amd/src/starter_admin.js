@@ -40,7 +40,29 @@ define([], function() {
          * @param {String} config.resetconfirm Confirm text for the reset-to-defaults forms.
          * @returns {void}
          */
+        /**
+         * Read the config from the list element's data attribute.
+         *
+         * It used to arrive as a js_call_amd argument, which Moodle warned
+         * about on every page load: the payload is about 9 KB against a 1 KB
+         * advisory limit. Arguments are serialised into the page's JS call, so
+         * a data attribute is the right carrier for anything this size.
+         *
+         * @param {Object} [config] Legacy argument form, still honoured.
+         */
         init: function(config) {
+            if (!config) {
+                var host = document.getElementById('aica-starters-list');
+                var raw = host ? host.getAttribute('data-config') : null;
+                if (!raw) {
+                    return;
+                }
+                try {
+                    config = JSON.parse(raw);
+                } catch (e) {
+                    return;
+                }
+            }
 
             var ICONS = config.icons;
             var ICON_LABELS = config.iconlabels;

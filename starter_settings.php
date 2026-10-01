@@ -127,6 +127,14 @@ $templatedata = [
 ];
 
 echo $OUTPUT->header();
+$templatedata['configjson'] = json_encode([
+    'icons' => $icons,
+    'iconlabels' => $iconlabels,
+    'strings' => $jsstrings,
+    'starters' => $starters,
+    'resetconfirm' => get_string('starters:reset_confirm', 'local_ai_course_assistant'),
+], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
 echo $OUTPUT->render_from_template('local_ai_course_assistant/starter_settings', $templatedata);
 
 // v7.2.0 (CONTRIB-10574 #201): the 229-line inline <script> that used to sit
@@ -134,12 +142,12 @@ echo $OUTPUT->render_from_template('local_ai_course_assistant/starter_settings',
 // data that was previously echoed into the page as JSON literals. The
 // resetconfirm string replaces the inline onsubmit confirm the reset forms
 // carried before the template conversion; starter_admin.js binds it.
-$PAGE->requires->js_call_amd('local_ai_course_assistant/starter_admin', 'init', [[
-    'icons' => $icons,
-    'iconlabels' => $iconlabels,
-    'strings' => $jsstrings,
-    'starters' => $starters,
-    'resetconfirm' => get_string('starters:reset_confirm', 'local_ai_course_assistant'),
-]]);
+// v7.6.0 (CONTRIB-10574 #277): the config travels in a data attribute, not as a
+// js_call_amd argument. Measured at 9,262 characters against the 1,024-character
+// limit Moodle warns at, so every load of this page printed "Too much data
+// passed as arguments to js_call_amd". Arguments are serialised into the page's
+// JS call and are the wrong carrier for a payload this size; a data attribute is
+// what the Moodle docs point at for exactly this case.
+$PAGE->requires->js_call_amd('local_ai_course_assistant/starter_admin', 'init');
 
 echo $OUTPUT->footer();

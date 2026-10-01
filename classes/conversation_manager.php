@@ -636,6 +636,15 @@ class conversation_manager {
             throw new \moodle_exception('nopermissions', 'error');
         }
 
+        // Ratings point at a message, so they have to go before the messages
+        // they reference. Leaving them behind outlived the conversation the
+        // learner asked to clear, and left rows that privacy discovery could
+        // not reach once the convs row was gone.
+        $DB->delete_records_select(
+            'local_ai_course_assistant_msg_ratings',
+            'messageid IN (SELECT id FROM {local_ai_course_assistant_msgs} WHERE conversationid = :convid)',
+            ['convid' => $conversationid]
+        );
         $DB->delete_records('local_ai_course_assistant_msgs', ['conversationid' => $conversationid]);
         $DB->delete_records('local_ai_course_assistant_convs', ['id' => $conversationid]);
     }
