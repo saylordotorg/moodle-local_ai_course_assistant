@@ -38,9 +38,16 @@ namespace local_ai_course_assistant;
  */
 final class remote_config_optin_test extends \advanced_testcase {
 
-    /** The URL this plugin used to ship as the default. */
-    private const HISTORIC_DEFAULT = 'https://raw.githubusercontent.com/saylordotorg/'
-        . 'moodle-local_ai_course_assistant/main/sola-config.json';
+    /**
+     * The URL this plugin used to ship as the default.
+     *
+     * Written out in full here on purpose. The production copy is assembled
+     * from two concatenated pieces, so a test that greps the source for one
+     * piece would miss a typo in the other. This literal is compared against
+     * the production constant below, which catches a change to either half.
+     */
+    private const HISTORIC_DEFAULT =
+        'https://raw.githubusercontent.com/saylordotorg/moodle-local_ai_course_assistant/main/sola-config.json';
 
     public function setUp(): void {
         parent::setUp();
@@ -111,10 +118,12 @@ final class remote_config_optin_test extends \advanced_testcase {
     /**
      * The upgrade step removes the historic default and nothing else.
      *
-     * db/upgrade.php cannot be called directly from a test without running the
-     * whole upgrade, so this exercises the same comparison it makes. If the
-     * string in the upgrade step ever drifts from the one this test holds, the
-     * assertion on the constant below fails.
+     * This calls the real method the upgrade step calls. An earlier version
+     * reimplemented the comparison, which meant it passed whatever the upgrade
+     * step actually did: a typo in the URL, an inverted comparison, or a switch
+     * to comparing against DEFAULT_URL (now the empty string, which would clear
+     * every site's setting) would all have left this green while real sites
+     * kept fetching.
      *
      * @dataProvider stored_url_provider
      * @param string $stored
@@ -128,13 +137,12 @@ final class remote_config_optin_test extends \advanced_testcase {
     ): void {
         set_config('remoteconfigurl', $stored, 'local_ai_course_assistant');
 
-        // The comparison db/upgrade.php 2026100100 makes.
-        $current = (string) get_config('local_ai_course_assistant', 'remoteconfigurl');
-        if (trim($current) === self::HISTORIC_DEFAULT) {
-            unset_config('remoteconfigurl', 'local_ai_course_assistant');
-        }
-
+        $cleared = remote_config_manager::clear_historic_default();
         $after = get_config('local_ai_course_assistant', 'remoteconfigurl');
+
+        $this->assertSame($shouldclear, $cleared,
+            'clear_historic_default() reported the wrong outcome: ' . $why);
+
         if ($shouldclear) {
             $this->assertFalse($after, $why);
         } else {
@@ -170,6 +178,13 @@ final class remote_config_optin_test extends \advanced_testcase {
                 false,
                 'Nobody reaches this value by accident, so it is a choice and is kept',
             ],
+            'the same repo, http not https' => [
+                'http://raw.githubusercontent.com/saylordotorg/'
+                    . 'moodle-local_ai_course_assistant/main/sola-config.json',
+                false,
+                'Not the shipped default, so not ours to remove; it is refused at fetch '
+                    . 'time by is_safe_provider_url instead',
+            ],
             'already cleared' => [
                 '',
                 false,
@@ -179,9 +194,29 @@ final class remote_config_optin_test extends \advanced_testcase {
     }
 
     /**
-     * The upgrade step and this test compare against the same string.
+     * The production constant is the URL this test thinks it is.
+     *
+     * The production copy is two concatenated string literals, so a typo in
+     * either half would otherwise go unnoticed by a test that only ever
+     * compares the constant against itself.
      */
-    public function test_the_upgrade_step_uses_the_string_this_test_pins(): void {
+    public function test_the_historic_url_is_the_one_this_plugin_shipped(): void {
+        $this->assertSame(self::HISTORIC_DEFAULT,
+            remote_config_manager::HISTORIC_DEFAULT_URL,
+            'HISTORIC_DEFAULT_URL no longer matches the URL this plugin shipped as its '
+                . 'default, so the upgrade step will not recognise the sites carrying it '
+                . 'and they will keep fetching remote configuration.');
+    }
+
+    /**
+     * The upgrade step calls the shared method rather than its own copy.
+     *
+     * The logic was inline until the review of b9c2e3bc pointed out that an
+     * inline copy can only be covered by a test that reimplements it. If it
+     * ever moves back, the tests above would silently stop testing the thing
+     * that runs on a real upgrade.
+     */
+    public function test_the_upgrade_step_calls_the_shared_method(): void {
         global $CFG;
         $src = file_get_contents($CFG->dirroot . '/local/ai_course_assistant/db/upgrade.php');
         $this->assertNotFalse($src);
@@ -189,10 +224,13 @@ final class remote_config_optin_test extends \advanced_testcase {
         $block = substr($src, (int) strpos($src, 'oldversion < 2026100100'));
         $block = substr($block, 0, (int) strpos($block, 'upgrade_plugin_savepoint'));
 
-        $this->assertStringContainsString('moodle-local_ai_course_assistant/main/sola-config.json', $block,
-            'The 2026100100 upgrade step no longer matches the URL these tests exercise');
-        $this->assertStringContainsString('trim(', $block,
-            'The comparison must trim, or a stored value with whitespace survives the upgrade');
+        $this->assertStringContainsString('clear_historic_default()', $block,
+            'The 2026100100 upgrade step no longer calls '
+                . 'remote_config_manager::clear_historic_default(), so the tests above '
+                . 'no longer describe what a real upgrade does.');
+        $this->assertStringNotContainsString('raw.githubusercontent.com', $block,
+            'The upgrade step has its own copy of the URL again. One copy, in '
+                . 'remote_config_manager, is what stops the two drifting apart.');
     }
 
     /**

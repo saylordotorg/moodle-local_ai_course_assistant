@@ -48,6 +48,7 @@ Exit 2 means the run was inconclusive and must not be reported either way.
 import argparse
 import fcntl
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -92,7 +93,9 @@ def main() -> int:
             shutil.copy2(source, target)
 
             original = open(source, encoding='utf-8').read()
-            hits = original.count(args.find)
+            # count() misses overlapping matches ('aa' in 'aaa' counts 1), and an
+            # anchor that overlaps itself is exactly the kind that needs the warning.
+            hits = len(re.findall('(?=' + re.escape(args.find) + ')', original))
             if hits == 0:
                 print('the --find text is not present in the file, so the mutation '
                       'would be a no-op and the verdict meaningless', file=sys.stderr)
@@ -121,8 +124,30 @@ def main() -> int:
             mutated = original.replace(args.find, args.replace, 1)
             open(target, 'w', encoding='utf-8').write(mutated)
 
-            result = run(f'cd {MOODLE} && vendor/bin/phpunit --filter {args.filter!r}',
-                         timeout=args.timeout)
+            # A mutation that does not parse makes every test that loads the class
+            # fail, which the verdict below reads as ERRORS and reports as CAUGHT.
+            # That is a wrong verdict: it says the test pins the behaviour when all
+            # it proved is that PHP rejects a syntax error. Seen on 2026-10-01,
+            # where a --replace that unbalanced a parenthesis reported CAUGHT.
+            if target.endswith('.php'):
+                lint = run(f'php -l {target!r}')
+                if lint.returncode != 0:
+                    print('INCONCLUSIVE: the mutated file does not parse, so every '
+                          'test loading it would error and the verdict would say '
+                          'CAUGHT for the wrong reason:\n'
+                          + (lint.stdout + lint.stderr).strip(), file=sys.stderr)
+                    return INCONCLUSIVE
+
+            try:
+                result = run(f'cd {MOODLE} && vendor/bin/phpunit --filter {args.filter!r}',
+                             timeout=args.timeout)
+            except subprocess.TimeoutExpired:
+                # Uncaught, this propagates and Python exits 1, which is the exact
+                # exit code that means SURVIVED. A run that never finished is not
+                # evidence about anything.
+                print(f'INCONCLUSIVE: phpunit did not finish within {args.timeout}s. '
+                      'No verdict; raise --timeout or narrow --filter.', file=sys.stderr)
+                return INCONCLUSIVE
             output = result.stdout + result.stderr
 
             # The mutation must still be on disk. If it is not, something reverted
@@ -139,9 +164,26 @@ def main() -> int:
                       'reports as success.', file=sys.stderr)
                 return INCONCLUSIVE
 
+            # SURVIVED has to be earned by a run that actually reported a clean
+            # pass, not merely inferred from the absence of the word FAILURES.
+            # "PHPUnit environment is not initialised", "initialised for a
+            # different version" (likely the first time anyone runs this after a
+            # version.php bump), a bootstrap fatal and a dead database all produce
+            # output containing neither FAILURES nor ERRORS, and all used to be
+            # reported as SURVIVED: the test looks useless and the defect looks
+            # unpinned, which is the lie this whole script exists to prevent.
             caught = ('FAILURES' in output) or ('ERRORS' in output)
+            passed = any(ln.startswith('OK (') or ln.startswith('OK, but')
+                         for ln in output.splitlines())
             summary = next((ln for ln in output.splitlines()
                             if ln.startswith('Tests:') or ln.startswith('OK')), '')
+
+            if not caught and not passed:
+                print('INCONCLUSIVE: phpunit reported neither a clean pass nor a '
+                      'failure, so it probably never ran the test. Last lines:\n'
+                      + '\n'.join(output.splitlines()[-12:]), file=sys.stderr)
+                return INCONCLUSIVE
+
             print(('CAUGHT' if caught else 'SURVIVED') + f'  {summary}')
             print(f'  mutation: {args.file}: {args.find[:70]!r} -> {args.replace[:40]!r}')
             return 0 if caught else 1

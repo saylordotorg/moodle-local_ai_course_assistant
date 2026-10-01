@@ -2013,23 +2013,11 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // carry the old default never chose it, so it is removed here. A site
         // that set its OWN url made a deliberate choice and keeps it: this
         // compares against the exact historic default and touches nothing else.
-        $historicdefault = 'https://raw.githubusercontent.com/saylordotorg/'
-            . 'moodle-local_ai_course_assistant/main/sola-config.json';
-        $current = (string) get_config('local_ai_course_assistant', 'remoteconfigurl');
-        if (trim($current) === $historicdefault) {
-            unset_config('remoteconfigurl', 'local_ai_course_assistant');
-            // The cached copy outlives the setting by up to an hour otherwise,
-            // so a site would keep serving remote prompt text after the upgrade
-            // that disabled it.
-            try {
-                \cache::make('local_ai_course_assistant', 'remoteconfig')->purge();
-            } catch (\Throwable $e) {
-                // A cache that cannot be purged is not a reason to fail an
-                // upgrade; it expires within the hour regardless.
-                debugging('SOLA: could not purge remoteconfig cache: ' . $e->getMessage(),
-                    DEBUG_DEVELOPER);
-            }
-        }
+        // The comparison and the cache purge live in remote_config_manager so
+        // that a test can exercise the real logic. An inline copy here could
+        // only be covered by a test that reimplements it, and that test would
+        // pass whatever this step actually did.
+        \local_ai_course_assistant\remote_config_manager::clear_historic_default();
 
         upgrade_plugin_savepoint(true, 2026100100, 'local', 'ai_course_assistant');
     }

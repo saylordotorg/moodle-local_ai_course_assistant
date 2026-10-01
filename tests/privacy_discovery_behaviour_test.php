@@ -126,10 +126,20 @@ final class privacy_discovery_behaviour_test extends \advanced_testcase {
     public function test_a_row_in_any_listed_table_makes_the_learner_discoverable(): void {
         $undiscoverable = [];
         $uncounted = [];
+        $overreaching = [];
+        $overcounted = [];
 
         foreach ($this->declared_tables() as $table) {
             $course = $this->getDataGenerator()->create_course();
             $user = $this->getDataGenerator()->create_user();
+            // The negative control. A second learner in the same course with no
+            // row of their own. Without this, a query that lost its userid
+            // filter, or joined on the wrong column, would return the course for
+            // everyone and every assertion above would still pass, because the
+            // inserted row puts the course in the result regardless of who owns
+            // it. Discovery that returns too much is its own privacy problem: it
+            // exports one learner's course to another's data request.
+            $bystander = $this->getDataGenerator()->create_user();
             $context = \context_course::instance($course->id);
 
             $this->insert_minimal_row($table, (int) $user->id, (int) $course->id);
@@ -137,12 +147,18 @@ final class privacy_discovery_behaviour_test extends \advanced_testcase {
             if (!in_array((int) $context->id, $this->discovered_context_ids((int) $user->id), true)) {
                 $undiscoverable[] = $table;
             }
+            if (in_array((int) $context->id, $this->discovered_context_ids((int) $bystander->id), true)) {
+                $overreaching[] = $table;
+            }
 
             $userlist = new \core_privacy\local\request\userlist($context, 'local_ai_course_assistant');
             privacy\provider::get_users_in_context($userlist);
             $found = array_map('intval', $userlist->get_userids());
             if (!in_array((int) $user->id, $found, true)) {
                 $uncounted[] = $table;
+            }
+            if (in_array((int) $bystander->id, $found, true)) {
+                $overcounted[] = $table;
             }
         }
 
@@ -155,6 +171,17 @@ final class privacy_discovery_behaviour_test extends \advanced_testcase {
         $this->assertSame([], $uncounted,
             "get_users_in_context() does not return a learner holding a row in these tables, "
                 . "so a course-level deletion skips them:\n  " . implode("\n  ", $uncounted));
+
+        $this->assertSame([], $overreaching,
+            "get_contexts_for_userid() returned this course for a learner who holds no row "
+                . "in it at all, so the query behind these tables is not filtering on userid. "
+                . "One learner's course would appear in another learner's data request:\n  "
+                . implode("\n  ", $overreaching));
+
+        $this->assertSame([], $overcounted,
+            "get_users_in_context() listed a learner who holds no row in the course, so a "
+                . "course-level deletion would delete data belonging to someone who has "
+                . "none here:\n  " . implode("\n  ", $overcounted));
     }
 
     /**
