@@ -975,9 +975,9 @@ $string['sandbox:run'] = 'Hojjedhu';
 $string['sandbox:running'] = 'Hojjetaa jira…';
 $string['sandbox:clear'] = 'Bu\'aa haqi';
 $string['sandbox:output_heading'] = 'Bu\'aa';
-$string['sandbox:privacy_note'] = 'Koodiin fi bu\'aan biraawzara kee keessa turu. Homtuu gara sarvarii kamiyyuu hin ergamu. Sirni hojjachiiftuu CDN uummataa irraa yeroo jalqabaa qofa fe\'ama, daawwannaa itti aanuuf immoo ni kuufama.';
+$string['sandbox:privacy_note'] = 'Koodiin fi bu\'aan isaa biraawzarii kee keessa turu. Wanti ati barreessitu ykn fiigsitu tokkollee gara sarvarii kamiyyuu hin ergamu. Python runtime mataan isaa yeroo tokko bakka bulchaan marsariitii kee qindeesse irraa buufama, achiis daawwannaa itti aananiif ni kuufama.';
 $string['sandbox:toggle'] = 'Koorsii kanaaf saanduqa shaakalaa Python dandeessisi';
-$string['sandbox:toggle_help'] = 'Fuula barataaf kennamu kan barattoonni Pyodide gidduu Python guutummaatti biraawzara isaanii keessatti barreessanii hojjachiisan ni dabala. Durtiidhaan cufaa dha. Koorsiiwwan hojii koodii qabaniif bani; kanneen hin qabneef immoo cufaa dhiisi.';
+$string['sandbox:toggle_help'] = 'Fuula barataaf kennamu kan barattoonni Pyodide gidduu Python guutummaatti biraawzara isaanii keessatti barreessanii hojjachiisan ni dabala. Durtiidhaan cufaa dha. Koorsiiwwan hojii koodii qabaniif bani; kanneen hin qabneef immoo cufaa dhiisi. Bulchaan marsariitii akkasumas qindaa\'ina plugin keessatti bakka Python runtime murteessuu qaba: hamma inni duwwaa ta\'etti wanti fe\'amu waan hin jirreef saanduqni shaakalaa cufaa ta\'ee hafa.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Gargaaraa Koorsii AI — Koorsiiwwan';
@@ -3138,3 +3138,31 @@ $string['settings:support_enabled_desc'] = 'Barattoonni fuulawwan koorsii hin ta
 $string['settings:support_courseid'] = 'Koorsii deeggarsaa';
 $string['settings:support_courseid_desc'] = 'ID koorsii mulʼatu tokkoo kan meeshaalee jalqabbii, seensaa fi qajeelfama kee qabatee jiru. Haasawwan deeggarsaa koorsii kanaa fi FAQ armaan olii irraa deebii argatu, akkasumas koorsicha jalatti galmaaʼu. Haala deeggarsaa dhaamsuuf duwwaa dhiisi. Fuulli jalqabaa marsariitii (koorsii 1) hin fudhatamu.';
 $string['support:promptrole'] = 'Ati gaaffii deeggarsaa koorsii kamiyyuu alaa dhufe deebisaa jirta. Barataan waaʼee qabiyyee koorsii hin gaafanne, kanaaf gara isaatti hin deebisin. FAQ fi meeshaalee deeggarsaa siif kennaman irraa deebisi. Sirriitti deebisuu yoo hin dandeenye, ifatti himi, gaaffii sana gara garee deeggarsaatti dabarsuuf fedhii agarsiisi.';
+
+$string['sandbox:noruntimeurl'] = 'Sandboxiin Python koorsii kanaaf banaa dha, garuu iddoon sirna Python marsariitii kanaaf hin qindoofne, kanaaf wanti fe\'amu hin jiru. Bulchaan qindaa\'ina pilagiinii keessatti isa qindeessuu danda\'a.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Yeroo sandboxiin Python banaa ta\'u, barbaadaan barataa sirna Python iddoo bulchaan marsariitii qindeesse irraa buusa; iddoon sun kan qaama sadaffaa ta\'uu danda\'a. Koodiin sandboxii keessatti barreeffameefi bu\'aan isaa meeshaa irratti hafu, eessayyuu hin ergaman.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Teessoo IP barataa, kan gaaffiin ergamuu qofaan nama sirna sana dhiyeessuuf ifa ta\'u.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Barbaadaafi sirna hojii barataa, akka user agent gaaffii sanaatti kan ergaman.';
+
+// Soapbox assignment form + avatar picker labels.
+$string['settings:avatar_numbered'] = 'Fakkii {$a}';
+$string['settings:avatar_custom'] = 'Kan dhuunfaa: {$a}';
+$string['soapbox:assign_name'] = 'Maqaa hojii';
+$string['soapbox:assign_required'] = 'Dirreen kun barbaachisaa dha';
+$string['soapbox:assign_intro'] = 'Qajeelfama';
+$string['soapbox:assign_recordtype'] = 'Gosa waraabbii';
+$string['soapbox:assign_mode_video'] = 'Viidiyoo';
+$string['soapbox:assign_mode_audio'] = 'Sagalee qofa';
+$string['soapbox:assign_min_seconds'] = 'Dheerina xiqqaa (sekondii)';
+$string['soapbox:assign_max_seconds'] = 'Dheerina guddaa (sekondii)';
+$string['soapbox:assign_seccap'] = 'Dheerina ol\'aanaa marsariitii: sekondii {$a}.';
+$string['soapbox:assign_max_attempts'] = 'Yaaliiwwan hayyamaman (0 = daangaa hin qabu)';
+$string['soapbox:assign_stored_attempts'] = 'Waraabbiiwwan barataa tokkoof kuufaman';
+$string['soapbox:assign_reccap'] = 'Baay\'ina waraabbii ol\'aanaa marsariitiin barataa tokkoof kuusu: {$a}.';
+$string['soapbox:assign_slides'] = 'Saahidoota';
+$string['soapbox:assign_slides_help'] = 'Barattoonni kuusaa PDF akka fe\'anii fi yeroo waraabanitti saahidoota fuula duraatti akka tarkaanfachiisan heyyami';
+$string['soapbox:assign_slide_vision'] = 'Yaada deebii dizaayinii mul\'ataa saahidaa';
+$string['soapbox:assign_slide_vision_help'] = 'Yaadota dizaayinii mul\'ataa argachuuf suuraawwan saahidaa irrattis sakatta\'insa agartuu raawwadhu (Saahidoota, akkasumas qindaa\'ina slide-vision Soapbox marsariitii barbaada)';
+$string['soapbox:assign_visible'] = 'Barattootaaf ni mul\'ata';
+$string['soapbox:assign_err_min_seconds'] = 'Yoo xiqqaate sekondii 1 galchi';
+$string['soapbox:assign_err_minmax'] = 'Dheerinni xiqqaan kan guddaa caaluu hin danda\'u';

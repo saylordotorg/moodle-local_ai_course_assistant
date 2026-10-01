@@ -967,9 +967,9 @@ $string['sandbox:run'] = 'Uitvoeren';
 $string['sandbox:running'] = 'Bezig met uitvoeren…';
 $string['sandbox:clear'] = 'Uitvoer wissen';
 $string['sandbox:output_heading'] = 'Uitvoer';
-$string['sandbox:privacy_note'] = 'Code en uitvoer blijven in je browser. Er wordt niets naar een server gestuurd. De runtime wordt alleen de eerste keer van een openbare CDN geladen en daarna in de cache bewaard voor volgende bezoeken.';
+$string['sandbox:privacy_note'] = 'Code en uitvoer blijven in je browser. Niets van wat je schrijft of uitvoert wordt naar een server gestuurd. Alleen de Python-runtime zelf wordt één keer gedownload van de locatie die je sitebeheerder heeft ingesteld, en daarna in de cache bewaard voor latere bezoeken.';
 $string['sandbox:toggle'] = 'De Python-sandbox voor deze cursus inschakelen';
-$string['sandbox:toggle_help'] = 'Voegt een pagina voor cursisten toe waarop studenten via Pyodide volledig in hun browser Python kunnen schrijven en uitvoeren. Standaard uit. Schakel dit in voor cursussen met programmeerwerk; laat het uit voor cursussen zonder.';
+$string['sandbox:toggle_help'] = 'Voegt een pagina voor cursisten toe waarop studenten via Pyodide volledig in hun browser Python kunnen schrijven en uitvoeren. Standaard uit. Schakel dit in voor cursussen met programmeerwerk; laat het uit voor cursussen zonder. Een sitebeheerder moet daarnaast de locatie van de Python-runtime invullen in de plugin-instellingen: zolang dat veld leeg is, blijft de sandbox uit, want er valt niets te laden.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'AI-cursusassistent — Cursussen';
@@ -3130,3 +3130,30 @@ $string['settings:support_enabled_desc'] = 'Laat cursisten [[tutorshort]] openen
 $string['settings:support_courseid'] = 'Ondersteuningscursus';
 $string['settings:support_courseid_desc'] = 'Het ID van een zichtbare cursus met uw introductie-, onboarding- en oriëntatiemateriaal. Ondersteuningsgesprekken worden beantwoord op basis van deze cursus en de FAQ hierboven, en worden bij deze cursus vastgelegd. Laat leeg om de ondersteuningsmodus uit te schakelen. De startpagina van de site (cursus 1) wordt niet geaccepteerd.';
 $string['support:promptrole'] = 'Je beantwoordt een ondersteuningsvraag die buiten een cursus is gesteld. De cursist vraagt niet naar cursusinhoud, dus verwijs er niet naar terug. Beantwoord de vraag op basis van de FAQ en het ondersteuningsmateriaal dat je hebt gekregen. Als je niet nauwkeurig kunt antwoorden, zeg dat dan gewoon en bied aan de vraag door te geven aan het ondersteuningsteam.';
+
+$string['sandbox:noruntimeurl'] = 'De Python-sandbox staat aan voor deze cursus, maar de site heeft geen locatie voor de Python-runtime ingesteld, dus er valt niets te laden. Een beheerder kan er een instellen in de plugin-instellingen.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Als de Python-sandbox is ingeschakeld, downloadt de browser van de deelnemer de Python-runtime van de locatie die de sitebeheerder heeft ingesteld, die van een derde partij kan zijn. Code die in de sandbox wordt geschreven en de uitvoer ervan blijven op het apparaat en worden nooit ergens naartoe gestuurd.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Het IP-adres van de deelnemer, dat alleen al door het opvragen bekend wordt bij wie de runtime aanbiedt.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'De browser en het besturingssysteem van de deelnemer, verzonden als user agent van dat verzoek.';
+
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Aangepast: {$a}';
+$string['soapbox:assign_name'] = 'Naam van de opdracht';
+$string['soapbox:assign_required'] = 'Dit veld is verplicht';
+$string['soapbox:assign_intro'] = 'Instructies';
+$string['soapbox:assign_recordtype'] = 'Type opname';
+$string['soapbox:assign_mode_video'] = 'Video';
+$string['soapbox:assign_mode_audio'] = 'Alleen audio';
+$string['soapbox:assign_min_seconds'] = 'Minimale lengte (seconden)';
+$string['soapbox:assign_max_seconds'] = 'Maximale lengte (seconden)';
+$string['soapbox:assign_seccap'] = 'Maximale lengte voor de site: {$a} seconden.';
+$string['soapbox:assign_max_attempts'] = 'Toegestane pogingen (0 = onbeperkt)';
+$string['soapbox:assign_stored_attempts'] = 'Opnames die per student worden bewaard';
+$string['soapbox:assign_reccap'] = 'Maximumaantal opnames dat de site per student bewaart: {$a}.';
+$string['soapbox:assign_slides'] = 'Dia\'s';
+$string['soapbox:assign_slides_help'] = 'Studenten een PDF-diaset laten uploaden en de dia\'s laten doorbladeren tijdens het opnemen';
+$string['soapbox:assign_slide_vision'] = 'Feedback op het visuele ontwerp van de dia\'s';
+$string['soapbox:assign_slide_vision_help'] = 'Ook de dia-afbeeldingen door beeldherkenning halen voor opmerkingen over het visuele ontwerp (vereist Dia\'s en de Soapbox-instelling voor diabeeldherkenning op de site)';
+$string['soapbox:assign_visible'] = 'Zichtbaar voor studenten';
+$string['soapbox:assign_err_min_seconds'] = 'Voer minstens 1 seconde in';
+$string['soapbox:assign_err_minmax'] = 'De minimale lengte mag niet groter zijn dan de maximale';

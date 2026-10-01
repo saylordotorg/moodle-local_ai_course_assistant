@@ -2243,6 +2243,28 @@ if ($hassiteconfig) {
             \local_ai_course_assistant\branding::apply(get_string($stringkey . '_desc', 'local_ai_course_assistant')),
             0
         ));
+        // v7.6.1 (CONTRIB-10574 #271): where the browser loads the Python
+        // runtime from. No default, and empty means the sandbox stays off --
+        // the same opt-in shape as remoteconfigurl. Without this the page
+        // fetched Pyodide from a hard-coded CDN, which told that CDN the IP
+        // address of every learner who opened the sandbox.
+        if ($key === 'code_sandbox_enabled') {
+            $settings->add(new admin_setting_configtext(
+                'local_ai_course_assistant/' . \local_ai_course_assistant\code_sandbox::BASE_URL_SETTING,
+                get_string('settings:code_sandbox_pyodide_baseurl', 'local_ai_course_assistant'),
+                get_string('settings:code_sandbox_pyodide_baseurl_desc', 'local_ai_course_assistant'),
+                '',
+                // PARAM_URL is deliberately the looser of the two checks here.
+                // code_sandbox::validate() is narrower (https only, no
+                // credentials, no query, no fragment) and is what actually
+                // decides whether the sandbox runs, so a value this field
+                // accepts can still leave the feature off. Tightening the form
+                // to match would be better UX; it is not a security boundary,
+                // because validate() runs on every use regardless of what was
+                // saved. See tests/code_sandbox_runtime_url_test.php.
+                PARAM_URL
+            ));
+        }
         // Talking-avatar provider config sits directly under its toggle so the
         // "configure a provider below" notice points at the fields beneath it.
         if ($key === 'talking_avatar_enabled') {
@@ -2683,14 +2705,22 @@ if ($hassiteconfig) {
     ];
     for ($i = 2; $i <= 10; $i++) {
         $num = str_pad($i, 2, '0', STR_PAD_LEFT);
-        $avatarchoices["avatar_{$num}"] = "Avatar {$i}";
+        $avatarchoices["avatar_{$num}"] = get_string(
+            'settings:avatar_numbered',
+            'local_ai_course_assistant',
+            $i
+        );
     }
     // Append admin-uploaded custom avatars to the selectable list. The filearea
     // is managed by the admin_setting_configstoredfile widget below; any file
     // uploaded there becomes a selectable default.
     require_once(__DIR__ . '/lib.php');
     foreach (local_ai_course_assistant_get_custom_avatars() as $av) {
-        $avatarchoices[$av['key']] = 'Custom: ' . $av['label'];
+        $avatarchoices[$av['key']] = get_string(
+            'settings:avatar_custom',
+            'local_ai_course_assistant',
+            $av['label']
+        );
     }
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/avatar',

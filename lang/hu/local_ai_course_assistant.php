@@ -983,9 +983,9 @@ $string['sandbox:run'] = 'Futtatás';
 $string['sandbox:running'] = 'Futtatás…';
 $string['sandbox:clear'] = 'Kimenet törlése';
 $string['sandbox:output_heading'] = 'Kimenet';
-$string['sandbox:privacy_note'] = 'A kód és a kimenet a böngészőjében marad. Semmi nem kerül elküldésre semmilyen szerverre. A futtatókörnyezet csak az első alkalommal töltődik le egy nyilvános CDN-ről, és a későbbi látogatásokhoz gyorsítótárazódik.';
+$string['sandbox:privacy_note'] = 'A kód és a kimenet a böngészőjében marad. Semmi sem kerül szerverre abból, amit ír vagy futtat. Magát a Python futtatókörnyezetet a rendszer egyszer tölti le arról a helyről, amelyet az oldal rendszergazdája megadott, majd gyorsítótárazza a későbbi látogatásokhoz.';
 $string['sandbox:toggle'] = 'A Python homokozó engedélyezése ehhez a kurzushoz';
-$string['sandbox:toggle_help'] = 'Hozzáad egy tanulóknak szóló oldalt, ahol a Pyodide segítségével teljes egészében a böngészőjükben írhatnak és futtathatnak Python kódot. Alapértelmezés szerint kikapcsolva. Kapcsolja be a programozási feladatokat tartalmazó kurzusoknál; a többinél hagyja kikapcsolva.';
+$string['sandbox:toggle_help'] = 'Hozzáad egy tanulóknak szóló oldalt, ahol a Pyodide segítségével teljes egészében a böngészőjükben írhatnak és futtathatnak Python kódot. Alapértelmezés szerint kikapcsolva. Kapcsolja be a programozási feladatokat tartalmazó kurzusoknál; a többinél hagyja kikapcsolva. Az oldal rendszergazdájának a bővítmény beállításaiban meg kell adnia a Python futtatókörnyezet helyét is: amíg ez üres, a homokozó kikapcsolva marad, mert nincs mit betölteni.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'AI Kurzus Asszisztens — Kurzusok';
@@ -3146,3 +3146,31 @@ $string['settings:support_enabled_desc'] = 'Lehetővé teszi a tanulóknak, hogy
 $string['settings:support_courseid'] = 'Támogatási kurzus';
 $string['settings:support_courseid_desc'] = 'Egy látható kurzus azonosítója, amely a kezdő lépésekhez, a beilleszkedéshez és a tájékozódáshoz szükséges anyagokat tartalmazza. A támogatási beszélgetések ebből a kurzusból és a fenti gyakori kérdésekből kapnak választ, és ehhez a kurzushoz kerülnek rögzítésre. Hagyja üresen a támogatási mód kikapcsolásához. A webhely kezdőlapja (1-es kurzus) nem fogadható el.';
 $string['support:promptrole'] = 'Kurzuson kívülről érkező támogatási kérdésre válaszolsz. A tanuló nem a kurzus anyagáról kérdez, ezért ne irányítsd oda vissza. A gyakori kérdésekből és a rendelkezésedre bocsátott támogatási anyagból válaszolj. Ha nem tudsz pontos választ adni, mondd ki ezt egyenesen, és ajánld fel, hogy továbbítod a kérdést a támogatási csapatnak.';
+
+$string['sandbox:noruntimeurl'] = 'A Python-homokozó be van kapcsolva ehhez a kurzushoz, de az oldalon nincs beállítva a Python futtatókörnyezet helye, így nincs mit betölteni. Egy adminisztrátor beállíthatja a bővítmény beállításaiban.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Ha a Python-homokozó be van kapcsolva, a tanuló böngészője letölti a Python futtatókörnyezetet arról a helyről, amelyet az oldal adminisztrátora beállított, és amely harmadik félhez is tartozhat. A homokozóban írt kód és annak kimenete az eszközön marad, és soha nem kerül sehová elküldésre.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'A tanuló IP-címe, amelyet már maga a kérés felfed a futtatókörnyezetet kiszolgáló fél előtt.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'A tanuló böngészője és operációs rendszere, amelyet a kérés user agent mezője küld el.';
+
+// Avatar picker labels and the Soapbox assignment create/edit form (v7.6.1).
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Egyéni: {$a}';
+$string['soapbox:assign_name'] = 'Feladat neve';
+$string['soapbox:assign_required'] = 'Ez a mező kötelező';
+$string['soapbox:assign_intro'] = 'Útmutató';
+$string['soapbox:assign_recordtype'] = 'Felvétel típusa';
+$string['soapbox:assign_mode_video'] = 'Videó';
+$string['soapbox:assign_mode_audio'] = 'Csak hang';
+$string['soapbox:assign_min_seconds'] = 'Minimális hossz (másodperc)';
+$string['soapbox:assign_max_seconds'] = 'Maximális hossz (másodperc)';
+$string['soapbox:assign_seccap'] = 'Az oldalon beállított maximális hossz: {$a} másodperc.';
+$string['soapbox:assign_max_attempts'] = 'Engedélyezett próbálkozások (0 = korlátlan)';
+$string['soapbox:assign_stored_attempts'] = 'Tanulónként megőrzött felvételek';
+$string['soapbox:assign_reccap'] = 'Az oldalon tanulónként megőrizhető felvételek maximális száma: {$a}.';
+$string['soapbox:assign_slides'] = 'Diák';
+$string['soapbox:assign_slides_help'] = 'A tanulók feltölthetnek PDF diakészletet, és felvétel közben léptethetik a diákat';
+$string['soapbox:assign_slide_vision'] = 'Diavizuáldesign-visszajelzés';
+$string['soapbox:assign_slide_vision_help'] = 'Vizuális áttekintés futtatása a diaképeken is, vizuáldesign-megjegyzésekért (szükséges hozzá a Diák beállítás és az oldal Soapbox diavizuális beállítása)';
+$string['soapbox:assign_visible'] = 'Látható a tanulóknak';
+$string['soapbox:assign_err_min_seconds'] = 'Adjon meg legalább 1 másodpercet';
+$string['soapbox:assign_err_minmax'] = 'A minimális hossz nem haladhatja meg a maximálisat';

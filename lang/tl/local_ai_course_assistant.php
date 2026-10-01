@@ -988,9 +988,9 @@ $string['sandbox:run'] = 'Run';
 $string['sandbox:running'] = 'Pinapatakbo…';
 $string['sandbox:clear'] = 'Burahin ang output';
 $string['sandbox:output_heading'] = 'Output';
-$string['sandbox:privacy_note'] = 'Nananatili sa iyong browser ang code at ang output. Walang ipinapadala sa anumang server. Kinukuha ang runtime mula sa isang pampublikong CDN sa unang pagkakataon lamang at naka-cache para sa mga susunod na pagbisita.';
+$string['sandbox:privacy_note'] = 'Nananatili sa iyong browser ang code at ang output nito. Walang anumang isinusulat o pinapatakbo mo ang ipinapadala sa kahit anong server. Ang Python runtime lang ang minsang kinukuha mula sa lokasyong itinakda ng administrador ng iyong site, at pagkatapos ay nasa cache na para sa mga susunod na pagbisita.';
 $string['sandbox:toggle'] = 'I-enable ang Python sandbox para sa kursong ito';
-$string['sandbox:toggle_help'] = 'Nagdaragdag ng pahina para sa mag-aaral kung saan makakapagsulat at makakapagpatakbo ng Python ang mga estudyante nang buo sa loob ng kanilang browser sa pamamagitan ng Pyodide. Naka-off bilang default. I-enable para sa mga kursong may gawaing pagko-code; iwanang naka-off para sa mga kursong wala.';
+$string['sandbox:toggle_help'] = 'Nagdaragdag ng pahina para sa mag-aaral kung saan makakapagsulat at makakapagpatakbo ng Python ang mga estudyante nang buo sa loob ng kanilang browser sa pamamagitan ng Pyodide. Naka-off bilang default. I-enable para sa mga kursong may gawaing pagko-code; iwanang naka-off para sa mga kursong wala. Kailangan ding itakda ng administrador ng site ang lokasyon ng Python runtime sa mga setting ng plugin: hangga\'t blangko iyon, mananatiling naka-off ang sandbox, dahil wala namang maikakarga.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'AI Course Assistant — Mga Kurso';
@@ -3151,3 +3151,30 @@ $string['settings:support_enabled_desc'] = 'Payagan ang mga mag-aaral na buksan 
 $string['settings:support_courseid'] = 'Kurso para sa suporta';
 $string['settings:support_courseid_desc'] = 'Ang ID ng isang nakikitang kurso na naglalaman ng iyong materyal sa pagsisimula, onboarding at orientation. Sinasagot ang mga usapang pansuporta mula sa kursong ito kasama ang FAQ sa itaas, at doon din itinatala. Iwanang blangko para i-off ang support mode. Hindi tinatanggap ang site home (kurso 1).';
 $string['support:promptrole'] = 'Sumasagot ka ng tanong na pansuporta mula sa labas ng anumang kurso. Hindi tungkol sa materyal ng kurso ang tinatanong ng mag-aaral, kaya huwag mo siyang ibalik doon. Sumagot mula sa FAQ at sa materyal pansuportang ibinigay sa iyo. Kung hindi ka makakasagot nang tumpak, sabihin mo ito nang malinaw at mag-alok na ipasa ang tanong sa support team.';
+
+$string['sandbox:noruntimeurl'] = 'Naka-on ang Python sandbox para sa kursong ito, pero walang nakatakdang lokasyon ng Python runtime sa site, kaya wala itong maikarga. Puwedeng magtakda nito ang isang administrator sa mga setting ng plugin.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Kapag naka-on ang Python sandbox, dina-download ng browser ng mag-aaral ang Python runtime mula sa lokasyong itinakda ng administrator ng site, na maaaring pag-aari ng ibang kumpanya. Ang code na isinulat sa sandbox at ang output nito ay nananatili sa device at hindi kailanman ipinapadala kahit saan.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Ang IP address ng mag-aaral, na nalalaman ng naghahain ng runtime dahil lang sa paghiling nito.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Ang browser at operating system ng mag-aaral, ipinapadala bilang user agent ng kahilingang iyon.';
+
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Pasadya: {$a}';
+$string['soapbox:assign_name'] = 'Pangalan ng takdang-aralin';
+$string['soapbox:assign_required'] = 'Kailangang punan ang field na ito';
+$string['soapbox:assign_intro'] = 'Mga tagubilin';
+$string['soapbox:assign_recordtype'] = 'Uri ng recording';
+$string['soapbox:assign_mode_video'] = 'Video';
+$string['soapbox:assign_mode_audio'] = 'Audio lamang';
+$string['soapbox:assign_min_seconds'] = 'Pinakamaikling haba (segundo)';
+$string['soapbox:assign_max_seconds'] = 'Pinakamahabang haba (segundo)';
+$string['soapbox:assign_seccap'] = 'Pinakamahabang haba sa site: {$a} segundo.';
+$string['soapbox:assign_max_attempts'] = 'Bilang ng pagsubok na pinapayagan (0 = walang hangganan)';
+$string['soapbox:assign_stored_attempts'] = 'Mga recording na itinatago bawat mag-aaral';
+$string['soapbox:assign_reccap'] = 'Pinakamaraming recording na itinatago ng site bawat mag-aaral: {$a}.';
+$string['soapbox:assign_slides'] = 'Mga slide';
+$string['soapbox:assign_slides_help'] = 'Payagan ang mga mag-aaral na mag-upload ng PDF deck at isulong ang mga slide habang nagre-record';
+$string['soapbox:assign_slide_vision'] = 'Feedback sa visual-design ng slide';
+$string['soapbox:assign_slide_vision_help'] = 'Magpatakbo rin ng vision pass sa mga larawan ng slide para sa mga tala sa visual-design (kailangan ang Mga slide, at ang setting ng slide-vision ng Soapbox sa site)';
+$string['soapbox:assign_visible'] = 'Nakikita ng mga mag-aaral';
+$string['soapbox:assign_err_min_seconds'] = 'Maglagay ng hindi bababa sa 1 segundo';
+$string['soapbox:assign_err_minmax'] = 'Hindi maaaring lumampas ang pinakamaikling haba sa pinakamahabang haba';

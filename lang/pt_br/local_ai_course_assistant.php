@@ -964,9 +964,9 @@ $string['sandbox:run'] = 'Executar';
 $string['sandbox:running'] = 'Executando…';
 $string['sandbox:clear'] = 'Limpar saída';
 $string['sandbox:output_heading'] = 'Saída';
-$string['sandbox:privacy_note'] = 'O código e a saída permanecem no seu navegador. Nada é enviado a nenhum servidor. O runtime é baixado de um CDN público apenas na primeira vez e fica em cache para as visitas seguintes.';
+$string['sandbox:privacy_note'] = 'O código e a saída ficam no seu navegador. Nada do que você escreve ou executa é enviado a nenhum servidor. O próprio runtime do Python é baixado uma única vez do local que o administrador do site configurou e depois fica em cache para as próximas visitas.';
 $string['sandbox:toggle'] = 'Ativar o sandbox Python para este curso';
-$string['sandbox:toggle_help'] = 'Adiciona uma página para os estudantes onde eles podem escrever e executar Python inteiramente no navegador, via Pyodide. Desativado por padrão. Ative nos cursos com trabalho de programação; deixe desativado nos demais.';
+$string['sandbox:toggle_help'] = 'Adiciona uma página para os estudantes onde eles podem escrever e executar Python inteiramente no navegador, via Pyodide. Desativado por padrão. Ative nos cursos com trabalho de programação; deixe desativado nos demais. O administrador do site também precisa informar o local do runtime do Python nas configurações do plugin: enquanto esse campo estiver vazio, o sandbox continua desativado, porque não há nada para carregar.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Assistente de Curso com IA — Cursos';
@@ -3127,3 +3127,30 @@ $string['settings:support_enabled_desc'] = 'Permite que os alunos abram o [[tuto
 $string['settings:support_courseid'] = 'Curso de suporte';
 $string['settings:support_courseid_desc'] = 'O ID numérico de um curso visível que contenha o seu material de primeiros passos, integração e orientação. As conversas de suporte são respondidas com base nesse curso e nas perguntas frequentes acima, e ficam registradas nele. Deixe em branco para desativar o modo de suporte. A página inicial do site (curso 1) não é aceita.';
 $string['support:promptrole'] = 'Você está respondendo a uma pergunta de suporte feita fora de qualquer curso. O aluno não está perguntando sobre o conteúdo do curso, portanto não o direcione para lá. Responda com base nas perguntas frequentes e no material de suporte que lhe foi fornecido. Se não puder responder com precisão, diga isso com clareza e ofereça-se para encaminhar a pergunta à equipe de suporte.';
+
+$string['sandbox:noruntimeurl'] = 'O sandbox Python está ativado neste curso, mas o site não tem um local do runtime Python definido, então não há nada para carregar. Um administrador pode definir um nas configurações do plugin.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Quando o sandbox Python está ativado, o navegador do estudante baixa o runtime Python do local configurado pelo administrador do site, que pode pertencer a terceiros. O código escrito no sandbox e sua saída ficam no dispositivo e nunca são enviados a lugar nenhum.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'O endereço IP do estudante, revelado a quem hospeda o runtime pelo próprio ato de solicitá-lo.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'O navegador e o sistema operacional do estudante, enviados como user agent dessa solicitação.';
+
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Personalizado: {$a}';
+$string['soapbox:assign_name'] = 'Nome da tarefa';
+$string['soapbox:assign_required'] = 'Este campo é obrigatório';
+$string['soapbox:assign_intro'] = 'Instruções';
+$string['soapbox:assign_recordtype'] = 'Tipo de gravação';
+$string['soapbox:assign_mode_video'] = 'Vídeo';
+$string['soapbox:assign_mode_audio'] = 'Somente áudio';
+$string['soapbox:assign_min_seconds'] = 'Duração mínima (segundos)';
+$string['soapbox:assign_max_seconds'] = 'Duração máxima (segundos)';
+$string['soapbox:assign_seccap'] = 'Duração máxima do site: {$a} segundos.';
+$string['soapbox:assign_max_attempts'] = 'Tentativas permitidas (0 = ilimitadas)';
+$string['soapbox:assign_stored_attempts'] = 'Gravações mantidas por aluno';
+$string['soapbox:assign_reccap'] = 'Máximo de gravações mantidas por aluno no site: {$a}.';
+$string['soapbox:assign_slides'] = 'Slides';
+$string['soapbox:assign_slides_help'] = 'Permitir que os alunos enviem um PDF de slides e avancem os slides enquanto gravam';
+$string['soapbox:assign_slide_vision'] = 'Retorno sobre o design visual dos slides';
+$string['soapbox:assign_slide_vision_help'] = 'Também analisar as imagens dos slides com visão computacional para gerar observações sobre o design visual (requer Slides e a configuração de visão de slides do Soapbox no site)';
+$string['soapbox:assign_visible'] = 'Visível para os alunos';
+$string['soapbox:assign_err_min_seconds'] = 'Informe pelo menos 1 segundo';
+$string['soapbox:assign_err_minmax'] = 'A duração mínima não pode ser maior que a máxima';

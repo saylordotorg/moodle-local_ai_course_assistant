@@ -86,7 +86,6 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
         cfg = {
             sseUrl: root.dataset.sseUrl,
             exportUrl: root.dataset.exportUrl,
-            scheduleUrl: root.dataset.scheduleUrl,
             redashUrl: root.dataset.redashUrl,
             hasRedash: root.dataset.hasRedash === '1',
             sesskey: root.dataset.sesskey,
@@ -769,25 +768,28 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
         });
         document.querySelectorAll('.radar-sched-toggle').forEach(function(b) {
             b.addEventListener('click', function() {
-                var body = new URLSearchParams();
-                body.append('sesskey', cfg.sesskey);
-                body.append('action', 'toggle');
-                body.append('id', b.dataset.id);
-                body.append('enabled', b.dataset.enabled);
-                fetch(cfg.scheduleUrl, { method: 'POST', credentials: 'same-origin', body: body }).then(function() {
+                Ajax.call([{
+                    methodname: 'local_ai_course_assistant_toggle_radar_schedule',
+                    args: { id: parseInt(b.dataset.id, 10), enabled: b.dataset.enabled === '1' }
+                }])[0].then(function() {
                     window.location.reload();
+                    return null;
+                }).catch(function(e) {
+                    alert(strs.saveFailed.replace('{$a}', (e && e.message) || ''));
                 });
             });
         });
         document.querySelectorAll('.radar-sched-delete').forEach(function(b) {
             b.addEventListener('click', function() {
                 if (!confirm('Delete this schedule?')) { return; }
-                var body = new URLSearchParams();
-                body.append('sesskey', cfg.sesskey);
-                body.append('action', 'delete');
-                body.append('id', b.dataset.id);
-                fetch(cfg.scheduleUrl, { method: 'POST', credentials: 'same-origin', body: body }).then(function() {
+                Ajax.call([{
+                    methodname: 'local_ai_course_assistant_delete_radar_schedule',
+                    args: { id: parseInt(b.dataset.id, 10) }
+                }])[0].then(function() {
                     window.location.reload();
+                    return null;
+                }).catch(function(e) {
+                    alert(strs.saveFailed.replace('{$a}', (e && e.message) || ''));
                 });
             });
         });
@@ -815,10 +817,14 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
     }
 
     function loadAndEditSchedule(id) {
-        var url = cfg.scheduleUrl + '?action=get&id=' + id + '&sesskey=' + encodeURIComponent(cfg.sesskey);
-        fetch(url, { credentials: 'same-origin' }).then(function(r) { return r.json(); }).then(function(j) {
-            if (!j.ok) { alert(strs.scheduleLoadFailed.replace('{$a}', j.error || '')); return; }
-            openScheduleModal(j.schedule, j.schedule.query);
+        Ajax.call([{
+            methodname: 'local_ai_course_assistant_get_radar_schedule',
+            args: { id: parseInt(id, 10) }
+        }])[0].then(function(schedule) {
+            openScheduleModal(schedule, schedule.query);
+            return null;
+        }).catch(function(e) {
+            alert(strs.scheduleLoadFailed.replace('{$a}', (e && e.message) || ''));
         });
     }
 
@@ -899,28 +905,48 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
         document.getElementById('radar-schedule-close').addEventListener('click', close);
         document.getElementById('radar-schedule-cancel').addEventListener('click', close);
         document.getElementById('radar-schedule-save').addEventListener('click', function() {
-            var body = new URLSearchParams();
-            body.append('sesskey', cfg.sesskey);
-            body.append('action', 'save');
-            if (existing) { body.append('id', existing.id); }
-            body.append('name', document.getElementById('rs-name').value);
-            body.append('query', document.getElementById('rs-query').value);
-            body.append('frequency', document.getElementById('rs-frequency').value);
-            body.append('format', document.getElementById('rs-format').value);
-            body.append('provider', document.getElementById('rs-provider').value);
-            body.append('model', document.getElementById('rs-model').value);
-            body.append('recipient_email', document.getElementById('rs-email').value);
-            body.append('slack_webhook', document.getElementById('rs-slack').value);
-            body.append('teams_webhook', document.getElementById('rs-teams').value);
-            body.append('courseids', document.getElementById('rs-courseids').value);
-            body.append('range_days', document.getElementById('rs-range').value);
-            body.append('enabled', document.getElementById('rs-enabled').checked ? '1' : '0');
-            fetch(cfg.scheduleUrl, { method: 'POST', credentials: 'same-origin', body: body })
-                .then(function(r) { return r.json(); })
-                .then(function(j) {
-                    if (j.ok) { window.location.reload(); }
-                    else { alert(strs.saveFailed.replace('{$a}', j.error || '')); }
-                });
+            // Normalise before sending. The old AJAX endpoint read these with
+            // optional_param(), which cleaned a value silently; the external
+            // service declares PARAM_SEQUENCE and PARAM_EMAIL, and
+            // external_value::validate() THROWS when the cleaned value differs
+            // from what was submitted. So "2, 5, 12" typed with spaces, which
+            // saved fine before, came back as "Invalid parameter value
+            // detected" with no clue which field was wrong. Doing the cleaning
+            // here keeps the stricter server-side check and gives the admin
+            // back the forgiving field they had.
+            var courseids = document.getElementById('rs-courseids').value
+                .split(',')
+                .map(function(part) { return part.trim(); })
+                .filter(function(part) { return part !== ''; })
+                .join(',');
+
+            var args = {
+                name: document.getElementById('rs-name').value,
+                query: document.getElementById('rs-query').value,
+                frequency: document.getElementById('rs-frequency').value,
+                format: document.getElementById('rs-format').value,
+                provider: document.getElementById('rs-provider').value,
+                model: document.getElementById('rs-model').value,
+                recipient_email: document.getElementById('rs-email').value.trim(),
+                slack_webhook: document.getElementById('rs-slack').value.trim(),
+                teams_webhook: document.getElementById('rs-teams').value.trim(),
+                courseids: courseids,
+                range_days: document.getElementById('rs-range').value,
+                enabled: document.getElementById('rs-enabled').checked
+            };
+            if (existing) { args.id = parseInt(existing.id, 10); }
+            // filterprovider is deliberately never sent: the modal has no input
+            // for it, and omitting it is what tells the service to keep the
+            // stored value rather than clear it.
+            Ajax.call([{
+                methodname: 'local_ai_course_assistant_save_radar_schedule',
+                args: args
+            }])[0].then(function() {
+                window.location.reload();
+                return null;
+            }).catch(function(e) {
+                alert(strs.saveFailed.replace('{$a}', (e && e.message) || ''));
+            });
         });
     }
 

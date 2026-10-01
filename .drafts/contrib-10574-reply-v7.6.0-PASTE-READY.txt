@@ -1,0 +1,159 @@
+Hello Volodymyr,
+
+Thank you for the detailed issues. Eight of the fourteen are fixed in v7.6.0,
+including both approval blockers. The remaining six are listed at the end with
+what each one needs, so you can see what is deliberate and what is still coming.
+
+I checked every finding against the current code before acting on it. Five were
+wrong or incomplete, and I have said so below rather than quietly working around
+it, because in three of those cases the correction changed the fix.
+
+FIXED
+
+#267 Remote AI behavior (blocker). You are right, and it was worse than the
+issue describes: because an empty value fell back to the same URL, an
+administrator could not switch it off at all. DEFAULT_URL is now an empty string,
+empty means disabled, and nothing falls back.
+
+Shipping an empty default only protects new installations, so there is also an
+upgrade step. It clears the setting where the stored value exactly matches the
+historic default, since a site carrying that value never chose it, and leaves a
+site that set its own URL untouched. It also purges the config cache, which would
+otherwise keep serving remote prompt text for up to an hour after the upgrade
+that disabled it.
+
+One consequence worth stating plainly, since it is the only behavior change in
+this release that reaches learners. The model is resolved as: per-call override,
+then the admin model setting, then the remote config's model_default, then the
+provider default. A site that never set a model explicitly has been running on
+whatever that remote file said. With remote configuration off it now falls
+through to the provider's own default instead. That is the correct behavior for
+a plugin that should not be taking instructions from someone else's repository,
+but it is a change, so it is called out in the release notes with the advice to
+set the model explicitly before upgrading.
+
+#268 Privacy provider (blocker). All ten tables are now in both discovery
+methods, and so are two more. The underlying cause was that each method carried
+one hand-written query per table, so adding a table meant remembering to add two
+more blocks, which is why this came back after the June fix. Both methods now
+iterate a single list, and a test reads db/install.xml and fails when any table
+with a userid and a courseid is missing from it.
+
+I'll be honest about the two extra tables, because the way they were found says
+something about the fix. My first attempt exempted msgs and msg_ratings on the
+grounds that both hang off a conversation, so a learner holding either was
+already discoverable through the conversations table. The code does not honour
+that: clearing a conversation deletes the conversation and its messages and
+leaves the ratings, and learners reach that path through the trash button in the
+chat header. Rate a reply, press Clear, never return to that course, and you hold
+rows in a course that neither discovery method returns, so a subject access
+request exports nothing of them and an erasure request leaves them in place.
+That is the same defect you filed, surviving inside its own fix.
+
+Both tables are now listed. Clearing a conversation also deletes its ratings now,
+which is what a learner pressing Clear is asking for. And the exemption list is
+down to a single entry (soapbox recordings, which have no courseid and reach a
+course through their assignment, with their own join in both methods); anything
+added to it in future has to come with a test that builds the orphan case and
+proves discovery still finds it.
+
+The test that reads db/install.xml could not have caught this, because reading
+source and schema is not the same as running them. There is now a second test
+that inserts a real row into each listed table for a fresh learner in a fresh
+course and asserts both discovery methods return them. That also covers a case
+the schema check cannot see: a column present in install.xml but removed by a
+later upgrade step would still have looked covered.
+
+On the external locations in the second half of #268: those declarations are not
+in this release. They are a documentation change rather than a code change and I
+did not want them holding up the two blockers. They are next.
+
+#269 Already fixed. cachedef_vectors has been present since 7.5.3. You reviewed
+7.5.2, which is also the subject of the question at the end of this comment.
+
+#270 Fixed, and narrower than the issue suggests. There is exactly one impure
+assignment in the plugin, at line 1760 rather than 1751, and it is the only one
+across all 46 language files. Worth flagging for other plugins: searching for the
+concatenation pattern produces false positives, because a quotation mark inside
+prose followed by a sentence-ending period looks identical to a grep. Forty-plus
+valid strings in Swahili, Slovak and Polish match it. I found the real one by
+tokenizing every language file instead.
+
+#272 Fixed. Chart.js now comes from core/chartjs as an AMD dependency. The
+bundled copy, both define.amd guard scripts and thirdpartylibs.xml are all
+deleted; Chart.js was that file's only entry, so the plugin no longer ships any
+third-party code.
+
+#276 Fixed, but not the way the issue suggests. Enumerating the per-course
+setting prefixes would not hold: several modules mint their own
+"<setting>_course_<id>" keys, so any list would need updating whenever one is
+added. The observer now reads the plugin's settings through get_config() and
+removes by suffix, which covers every present and future key in one pass.
+
+#277 Fixed. The payload measured 9,262 characters against the 1,024-character
+limit, so it now travels in a data attribute.
+
+#279 Fixed, and there were three, not one. The two you did not cite are
+file-scope const declarations in admin/cli/generate_conversational_fixtures.php,
+which are global constants exactly as define() is. All three now carry the
+prefix.
+
+#280 Partly fixed. The README version and the Moodle 5.3 claim were both
+corrected between 7.5.2 and now; the README names the shipped release and
+version.php declares 4.5 to 5.2. The Marketplace listing text is the part still
+outstanding and I will update it before resubmitting.
+
+STILL OPEN
+
+#271 Pyodide. Accepted in substance. One correction: the sandbox is behind an
+administrator feature flag that ships off, so it is not a default dependency in
+the sense of running on every site. The CDN URLs are hardcoded with no override,
+which is the real problem, and that is what will be fixed: an administrator-set
+base URL, empty meaning the feature is off, with the external request documented.
+
+#273 Templates, Output API and AMD. Accepted. This is the largest item, roughly
+3,800 lines across seven pages plus nine inline scripts, and it will come as its
+own release rather than riding alongside security fixes.
+
+#274 Hard-coded interface text. Accepted, and you missed one: settings.php has a
+second hard-coded avatar label on the line above the one cited. The cost here is
+that this plugin ships 46 locales with a test that fails on untranslated strings,
+so 34 new keys means 1,564 translations.
+
+#275 External services. Accepted for the four live radar actions and the avatar
+session. One correction: action=list has no caller anywhere, so it will be
+deleted rather than ported.
+
+#278 Templates for HTML in JavaScript. Accepted, and it will be done tab by tab
+rather than as one rewrite.
+
+ONE THING WORTH REPORTING THAT YOU DID NOT FIND
+
+The reason #270 reached you is that this plugin's own drift test parses language
+files with a regular expression requiring a semicolon immediately after the
+closing quote. It silently dropped that key, and 27 others: 2,910 keys parsed
+against 2,938 defined. The string was invisible to our CI. Fixing that parser is
+worth more than fixing the one string, and it is tracked.
+
+VERIFICATION
+
+1,952 tests, 0 failures, 7 skipped. Security validator corpus 36 of 36. PHP lint
+clean across 588 files. The CI matrix covers PHP 8.1 to 8.3 against Moodle 4.5,
+5.0 and 5.1, on MariaDB and PostgreSQL, and all twelve jobs are green on the
+v7.6.0 commit.
+
+Every new test in this release was verified by planting the defect it describes
+and watching it fail, which is also how the msg_ratings hole above was found.
+
+A QUESTION BEFORE I RESUBMIT
+
+Issue #280 says the submitted release is 7.5.2. I posted on 26 September that
+7.5.5 had been submitted, so we might have a misunderstanding of what is in the
+queue.I would rather sort that out than have v7.6.0 sit behind the same gap.
+Could you confirm which version the directory currently has for review? If 7.5.5
+never arrived, I will resubmit from scratch rather than assume.
+
+Thanks again. The two blockers were both fair, and the first one in particular
+was a real hole.
+
+Tom

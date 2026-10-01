@@ -1,0 +1,67 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/essay_feedback
+
+    Learner-facing essay feedback form. Replaces the echoed HTML in
+    essay_feedback.php with a template rendered through the Output API
+    (CONTRIB-10574 #273); the inline <script> moved to
+    amd/src/essay_feedback.js and the inline style attributes to styles.css.
+
+    The result area is left empty on purpose: the AMD module fills it by
+    rendering local_ai_course_assistant/essay_feedback_result once a score
+    comes back, so the markup for AI-supplied text is never concatenated by
+    hand.
+
+    Context variables required for this template:
+    * courseid - course the draft belongs to
+
+    Example context (json):
+    {
+        "courseid": 2
+    }
+}}
+<div class="sola-essay" data-courseid="{{courseid}}">
+    <h2>{{#str}}essay_feedback:title, local_ai_course_assistant{{/str}}</h2>
+    <p class="text-muted">{{#str}}essay_feedback:intro, local_ai_course_assistant{{/str}}</p>
+
+    <form id="aica-essay-form" class="sola-essay-form">
+        <div class="form-group">
+            <label for="aica-essay-rubric">
+                <strong>{{#str}}essay_feedback:rubric_label, local_ai_course_assistant{{/str}}</strong>
+            </label>
+            <small class="form-text text-muted">
+                {{#str}}essay_feedback:rubric_help, local_ai_course_assistant{{/str}}
+            </small>
+            <textarea id="aica-essay-rubric" name="rubric" rows="4" class="sola-essay-textarea"></textarea>
+        </div>
+        <div class="form-group sola-essay-group">
+            <label for="aica-essay-text">
+                <strong>{{#str}}essay_feedback:essay_label, local_ai_course_assistant{{/str}}</strong>
+            </label>
+            <textarea id="aica-essay-text" name="essay" rows="14" class="sola-essay-textarea"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2" id="aica-essay-submit">
+            {{#str}}essay_feedback:submit, local_ai_course_assistant{{/str}}
+        </button>
+        <span id="aica-essay-status" class="ml-2 text-muted sola-essay-hidden" role="status">
+            {{#str}}essay_feedback:scoring, local_ai_course_assistant{{/str}}
+        </span>
+    </form>
+
+    <div id="aica-essay-result" class="sola-essay-result sola-essay-hidden" aria-live="polite"></div>
+</div>

@@ -134,7 +134,7 @@ final class support_mode_suppression_test extends \advanced_testcase {
             'surveyenabled'           => 'get_survey',
             'usertestingenabled'      => 'get_usertesting',
             'voicetabenabled'         => 'get_realtime_token',
-            'talkingavatarenabled'    => 'talking_avatar_session',
+            'talkingavatarenabled'    => 'start_avatar_session',
             'quizenabled'             => 'generate_quiz',
         ];
 

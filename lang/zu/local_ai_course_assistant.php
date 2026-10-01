@@ -988,9 +988,9 @@ $string['sandbox:run'] = 'Sebenzisa';
 $string['sandbox:running'] = 'Iyasebenza…';
 $string['sandbox:clear'] = 'Sula okukhishwayo';
 $string['sandbox:output_heading'] = 'Okukhishwayo';
-$string['sandbox:privacy_note'] = 'Ikhodi nokukhishwayo kuhlala kusiphequluli sakho. Akukho okuthunyelwa kunoma iyiphi iseva. I-runtime ilayishwa kusuka ku-CDN yomphakathi ngesikhathi sokuqala kuphela futhi igcinwa enqolobaneni ukuze isetshenziswe ekuvakasheleni okulandelayo.';
+$string['sandbox:privacy_note'] = 'Ikhodi nomphumela wayo kuhlala kusiphequluli sakho. Akukho okubhalayo noma okusebenzisayo okuthunyelwa kunoma yisiphi iseva. I-Python runtime ngokwayo ilandwa kanye kuphela endaweni emiswe umlawuli wesayithi lakho, bese igcinwa kunqolobane ukuze isetshenziswe ekuvakasheni okulandelayo.';
 $string['sandbox:toggle'] = 'Vula i-sandbox ye-Python kulesi sifundo';
-$string['sandbox:toggle_help'] = 'Kungeza ikhasi elibhekene nomfundi lapho abafundi bengabhala khona futhi basebenzise i-Python ngokuphelele kusiphequluli sabo nge-Pyodide. Ivaliwe ngokuzenzakalela. Yivule ezifundweni ezinomsebenzi wekhodi; yiyeke ivaliwe ezifundweni ezingenawo.';
+$string['sandbox:toggle_help'] = 'Kungeza ikhasi elibhekene nomfundi lapho abafundi bengabhala khona futhi basebenzise i-Python ngokuphelele kusiphequluli sabo nge-Pyodide. Ivaliwe ngokuzenzakalela. Yivule ezifundweni ezinomsebenzi wekhodi; yiyeke ivaliwe ezifundweni ezingenawo. Umlawuli wesayithi kumele futhi abeke indawo ye-Python runtime kuzilungiselelo ze-plugin: uma leyo ndawo ingenalutho, i-sandbox ihlala icishiwe, ngoba akukho okungalayishwa.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Umsizi Wesifundo we-AI — Izifundo';
@@ -3151,3 +3151,31 @@ $string['settings:support_enabled_desc'] = 'Ivumela abafundi ukuvula [[tutorshor
 $string['settings:support_courseid'] = 'Ikhosi losizo';
 $string['settings:support_courseid_desc'] = 'I-ID yekhosi elibonakalayo eliqukethe izinto zakho zokuqalisa, zokwethula nezokuqondisa. Izingxoxo zosizo ziphendulwa kusukela kuleli khosi kanye nakuma-FAQ angenhla, futhi ziqoshwa kulo. Shiya kungenalutho ukuze uvale imodi yosizo. Ikhaya lesayithi (ikhosi 1) alamukelwa.';
 $string['support:promptrole'] = 'Uphendula umbuzo wosizo ovela ngaphandle kwanoma yiliphi ikhosi. Umfundi akabuzi ngokuqukethwe kwekhosi, ngakho ungamdluliseli kukho. Phendula usuka kuma-FAQ nakuzinto zosizo onikezwe zona. Uma ungakwazi ukuphendula ngokunembile, yisho lokho ngokusobala bese unikela ngokudlulisela umbuzo ethimbeni losizo.';
+
+$string['sandbox:noruntimeurl'] = 'Isandbox ye-Python ivuliwe kule nkambo, kodwa isayithi ayinayo indawo yokusebenza kwe-Python emisiwe, ngakho ayikho into engalayishwa. Umlawuli angayimisa kuzilungiselelo ze-plugin.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Uma isandbox ye-Python ivuliwe, isiphequluli somfundi silanda isixhumi sokusebenza se-Python endaweni emiswe umlawuli wesayithi, okungenzeka ingeyenkampani yangaphandle. Ikhodi ebhalwe kusandbox nemiphumela yayo kuhlala edivayisini futhi akuthunyelwa ndawo.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Ikheli le-IP lomfundi, elidalulwa kulowo onikeza isixhumi sokusebenza ngenxa nje yokucela kwayo.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Isiphequluli nesistimu yokusebenza yomfundi, okuthunyelwa njenge-user agent yaleso sicelo.';
+
+// Soapbox assignment form + avatar picker labels.
+$string['settings:avatar_numbered'] = 'I-avatar {$a}';
+$string['settings:avatar_custom'] = 'Okwezifiso: {$a}';
+$string['soapbox:assign_name'] = 'Igama lomsebenzi';
+$string['soapbox:assign_required'] = 'Lesi sikhala siyadingeka';
+$string['soapbox:assign_intro'] = 'Imiyalelo';
+$string['soapbox:assign_recordtype'] = 'Uhlobo lokuqopha';
+$string['soapbox:assign_mode_video'] = 'Ividiyo';
+$string['soapbox:assign_mode_audio'] = 'Umsindo kuphela';
+$string['soapbox:assign_min_seconds'] = 'Ubude obuncane (amasekhondi)';
+$string['soapbox:assign_max_seconds'] = 'Ubude obukhulu (amasekhondi)';
+$string['soapbox:assign_seccap'] = 'Ubude obukhulu besayithi: amasekhondi angu-{$a}.';
+$string['soapbox:assign_max_attempts'] = 'Imizamo evunyelwe (0 = akunamkhawulo)';
+$string['soapbox:assign_stored_attempts'] = 'Okuqoshiwe okugcinwa umfundi ngamunye';
+$string['soapbox:assign_reccap'] = 'Inani eliphezulu lesayithi lokuqoshiwe okugcinwa umfundi ngamunye: {$a}.';
+$string['soapbox:assign_slides'] = 'Amaslayidi';
+$string['soapbox:assign_slides_help'] = 'Vumela abafundi balayishe umbuthano we-PDF futhi baqhubekisele phambili amaslayidi ngenkathi beqopha';
+$string['soapbox:assign_slide_vision'] = 'Impendulo ngomklamo obonakalayo wamaslayidi';
+$string['soapbox:assign_slide_vision_help'] = 'Phinda wenze ukuhlola kokubona ezithombeni zamaslayidi ukuze uthole amanothi omklamo obonakalayo (kudinga Amaslayidi, nesilungiselelo sesayithi se-Soapbox sokubona amaslayidi)';
+$string['soapbox:assign_visible'] = 'Iyabonakala kubafundi';
+$string['soapbox:assign_err_min_seconds'] = 'Faka okungenani isekhondi elingu-1';
+$string['soapbox:assign_err_minmax'] = 'Ubude obuncane abunakudlula obukhulu';

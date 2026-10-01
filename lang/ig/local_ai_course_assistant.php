@@ -958,9 +958,9 @@ $string['sandbox:run'] = 'Mee';
 $string['sandbox:running'] = 'Na-agba ọsọ…';
 $string['sandbox:clear'] = 'Hichapụ mmepụta';
 $string['sandbox:output_heading'] = 'Mmepụta';
-$string['sandbox:privacy_note'] = 'Koodu na mmepụta na-anọ n\'ime ihe nchọgharị gị. Ọ dịghị ihe a na-eziga na sava ọ bụla. A na-ebudata ebe ọ na-agba ọsọ site na CDN ọha naanị na mbụ, e chekwaakwa ya maka nleta ndị na-abịa.';
+$string['sandbox:privacy_note'] = 'Koodu gị na ihe ọ na-ewepụta na-anọgide na ihe nchọgharị gị. Ọ dịghị ihe ị na-ede ma ọ bụ na-agba a na-eziga na sava ọ bụla. A na-ebudata Python runtime n\'onwe ya naanị otu ugboro site n\'ebe onye nchịkwa saịtị gị hazịrị, mgbe ahụ echekwaa ya maka nleta ndị na-abịa.';
 $string['sandbox:toggle'] = 'Gbanye sandbox Python maka kọọsị a';
-$string['sandbox:toggle_help'] = 'Ọ na-agbakwunye ibe nke ndị mmụta ebe ụmụ akwụkwọ nwere ike ide ma gbaa Python ọsọ kpamkpam n\'ime ihe nchọgharị ha site na Pyodide. Gbanyụrụ site na ndabara. Gbanye ya maka kọọsị ndị nwere ọrụ koodu; hapụ ya gbanyụọ maka ndị na-enweghị.';
+$string['sandbox:toggle_help'] = 'Ọ na-agbakwunye ibe nke ndị mmụta ebe ụmụ akwụkwọ nwere ike ide ma gbaa Python ọsọ kpamkpam n\'ime ihe nchọgharị ha site na Pyodide. Gbanyụrụ site na ndabara. Gbanye ya maka kọọsị ndị nwere ọrụ koodu; hapụ ya gbanyụọ maka ndị na-enweghị. Onye nchịkwa saịtị ga-edekwa ebe Python runtime dị na ntọala plugin: ogologo oge ọ tọgbọrọ chakoo, sandbox ga-anọgide na-agbanyụ, n\'ihi na o nweghị ihe a ga-ebudata.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Onye Enyemaka AI Nkuzi — Kọọsị';
@@ -3121,3 +3121,31 @@ $string['settings:support_enabled_desc'] = 'Na-enye ndị mmụta ohere imepe [[
 $string['settings:support_courseid'] = 'Usoro ihe ọmụmụ nkwado';
 $string['settings:support_courseid_desc'] = 'ID nke usoro ihe ọmụmụ a na-ahụ anya nke nwere ihe mmalite, nnabata na ntọala gị. A na-aza mkparịta ụka nkwado site na usoro ihe ọmụmụ a tinyere ajụjụ ndị a na-ajụkarị dị n\'elu, a na-edekwa ha n\'okpuru ya. Hapụ ya ka ọ tọgbọrọ chakoo iji gbanyụọ ọnọdụ nkwado. A naghị anabata ụlọ saịtị ahụ (usoro ihe ọmụmụ 1).';
 $string['support:promptrole'] = 'Ị na-aza ajụjụ nkwado sitere na mpụga usoro ihe ọmụmụ ọ bụla. Onye mmụta ahụ anaghị ajụ maka ihe ọmụmụ nke usoro ihe ọmụmụ, ya mere eduganyela ya na ya. Zaa site na ajụjụ ndị a na-ajụkarị na ihe nkwado e nyere gị. Ọ bụrụ na ị nweghị ike ịza nke ọma, kwuo ya n\'ụzọ doro anya ma nye aka ibuga ajụjụ ahụ na ndị otu nkwado.';
+
+$string['sandbox:noruntimeurl'] = 'Agbanyere sandbox Python maka nkuzi a, mana saịtị ahụ enweghị ebe e debere ihe ọrụ Python, ya mere ọ dịghị ihe a ga-ebudata. Onye nchịkwa nwere ike ịtọ ya na ntọala ngwa a.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Mgbe sandbox Python na-arụ ọrụ, ihe nchọgharị nke onye mmụta na-ebudata ihe ọrụ Python site n\'ebe onye nchịkwa saịtị hazila, nke nwere ike ịbụ nke ndị ọzọ. Koodu edere na sandbox na nsonaazụ ya na-anọgide na ngwaọrụ ahụ, a dịghị ezigara ya ebe ọ bụla.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Adreesị IP nke onye mmụta, nke a na-ekpughe nye onye na-enye ihe ọrụ ahụ naanị site n\'izipu arịrịọ ahụ.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Ihe nchọgharị na sistemu arụmọrụ nke onye mmụta, nke e zigara dịka user agent nke arịrịọ ahụ.';
+
+// Soapbox assignment form + avatar picker labels.
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Nke ahaziri onwe: {$a}';
+$string['soapbox:assign_name'] = 'Aha ọrụ';
+$string['soapbox:assign_required'] = 'Ọ dị mkpa ka e dejupụta mpaghara a';
+$string['soapbox:assign_intro'] = 'Ntụziaka';
+$string['soapbox:assign_recordtype'] = 'Ụdị ndekọ';
+$string['soapbox:assign_mode_video'] = 'Vidiyo';
+$string['soapbox:assign_mode_audio'] = 'Naanị ụda';
+$string['soapbox:assign_min_seconds'] = 'Ogologo kacha nta (sekọnd)';
+$string['soapbox:assign_max_seconds'] = 'Ogologo kacha ukwuu (sekọnd)';
+$string['soapbox:assign_seccap'] = 'Ogologo kachasị nke saịtị: sekọnd {$a}.';
+$string['soapbox:assign_max_attempts'] = 'Ọnụọgụ mgbalị a na-anabata (0 = enweghị oke)';
+$string['soapbox:assign_stored_attempts'] = 'Ndekọ e chekwara maka nwa akwụkwọ ọ bụla';
+$string['soapbox:assign_reccap'] = 'Ọnụọgụ ndekọ kachasị saịtị na-echekwa maka nwa akwụkwọ ọ bụla: {$a}.';
+$string['soapbox:assign_slides'] = 'Slide';
+$string['soapbox:assign_slides_help'] = 'Kwe ka ụmụ akwụkwọ bugoo deck PDF ma na-aga n\'ihu na slide ka ha na-edekọ';
+$string['soapbox:assign_slide_vision'] = 'Nzaghachi gbasara imewe anya nke slide';
+$string['soapbox:assign_slide_vision_help'] = 'Megharịakwa nyocha ọhụụ n\'onyonyo slide maka ndetu imewe anya (ọ chọrọ Slide, na ntọala slide-vision nke Soapbox na saịtị)';
+$string['soapbox:assign_visible'] = 'Na-apụta nye ụmụ akwụkwọ';
+$string['soapbox:assign_err_min_seconds'] = 'Tinye opekempe sekọnd 1';
+$string['soapbox:assign_err_minmax'] = 'Ogologo kacha nta agaghị akarị nke kacha ukwuu';

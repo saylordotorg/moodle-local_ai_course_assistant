@@ -943,9 +943,9 @@ $string['sandbox:run'] = 'Kør';
 $string['sandbox:running'] = 'Kører…';
 $string['sandbox:clear'] = 'Ryd resultat';
 $string['sandbox:output_heading'] = 'Resultat';
-$string['sandbox:privacy_note'] = 'Kode og resultat bliver i din browser. Intet sendes til nogen server. Køretidsmiljøet hentes kun fra et offentligt CDN første gang og gemmes i cachen til senere besøg.';
+$string['sandbox:privacy_note'] = 'Kode og output bliver i din browser. Intet af det, du skriver eller kører, sendes til en server. Selve Python-runtimen hentes én gang fra den placering, din sideadministrator har angivet, og gemmes derefter i cachen til senere besøg.';
 $string['sandbox:toggle'] = 'Aktiver Python-sandkassen for dette kursus';
-$string['sandbox:toggle_help'] = 'Tilføjer en side for studerende, hvor de kan skrive og køre Python helt i deres browser via Pyodide. Slået fra som standard. Aktivér den på kurser med kodeopgaver; lad den være slået fra på kurser uden.';
+$string['sandbox:toggle_help'] = 'Tilføjer en side for studerende, hvor de kan skrive og køre Python helt i deres browser via Pyodide. Slået fra som standard. Aktivér den på kurser med kodeopgaver; lad den være slået fra på kurser uden. En sideadministrator skal desuden angive placeringen af Python-runtimen i plugin-indstillingerne: så længe feltet er tomt, forbliver sandkassen slået fra, for der er ikke noget at hente.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'AI-kursusassistent — kurser';
@@ -3107,3 +3107,30 @@ $string['settings:support_enabled_desc'] = 'Lad studerende åbne [[tutorshort]] 
 $string['settings:support_courseid'] = 'Supportkursus';
 $string['settings:support_courseid_desc'] = 'ID\'et på et synligt kursus, der indeholder jeres kom godt i gang-, onboarding- og introduktionsmateriale. Supportsamtaler besvares ud fra dette kursus og FAQ\'en ovenfor og registreres på kurset. Lad feltet stå tomt for at slå supporttilstand fra. Forsiden (kursus 1) accepteres ikke.';
 $string['support:promptrole'] = 'Du besvarer et supportspørgsmål, der er stillet uden for alle kurser. Den studerende spørger ikke til kursusindhold, så henvis ikke tilbage til det. Svar ud fra FAQ\'en og det supportmateriale, du har fået. Hvis du ikke kan svare præcist, så sig det ligeud og tilbyd at sende spørgsmålet videre til supportteamet.';
+
+$string['sandbox:noruntimeurl'] = 'Python-sandkassen er slået til for dette kursus, men der er ikke angivet en placering af Python-runtime for sitet, så der er intet at indlæse. En administrator kan angive en i plugin-indstillingerne.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Når Python-sandkassen er slået til, henter den lærendes browser Python-runtime fra den placering, siteadministratoren har konfigureret, og den kan tilhøre en tredjepart. Kode, der skrives i sandkassen, og dens output bliver på enheden og sendes aldrig nogen steder hen.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Den lærendes IP-adresse, som alene ved forespørgslen afsløres over for den, der leverer runtime.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Den lærendes browser og styresystem, sendt som user agent for den forespørgsel.';
+
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Tilpasset: {$a}';
+$string['soapbox:assign_name'] = 'Opgavens navn';
+$string['soapbox:assign_required'] = 'Dette felt er påkrævet';
+$string['soapbox:assign_intro'] = 'Instruktioner';
+$string['soapbox:assign_recordtype'] = 'Optagelsestype';
+$string['soapbox:assign_mode_video'] = 'Video';
+$string['soapbox:assign_mode_audio'] = 'Kun lyd';
+$string['soapbox:assign_min_seconds'] = 'Mindste længde (sekunder)';
+$string['soapbox:assign_max_seconds'] = 'Største længde (sekunder)';
+$string['soapbox:assign_seccap'] = 'Sitets største længde: {$a} sekunder.';
+$string['soapbox:assign_max_attempts'] = 'Tilladte forsøg (0 = ubegrænset)';
+$string['soapbox:assign_stored_attempts'] = 'Optagelser der gemmes pr. studerende';
+$string['soapbox:assign_reccap'] = 'Sitets største antal optagelser, der gemmes pr. studerende: {$a}.';
+$string['soapbox:assign_slides'] = 'Slides';
+$string['soapbox:assign_slides_help'] = 'Lad studerende uploade en PDF-slidesamling og skifte slide, mens de optager';
+$string['soapbox:assign_slide_vision'] = 'Feedback på slidenes visuelle design';
+$string['soapbox:assign_slide_vision_help'] = 'Kør også en billedanalyse af slidebillederne for at få noter om det visuelle design (kræver Slides og sitets Soapbox-indstilling for slidebilledanalyse)';
+$string['soapbox:assign_visible'] = 'Synlig for studerende';
+$string['soapbox:assign_err_min_seconds'] = 'Angiv mindst 1 sekund';
+$string['soapbox:assign_err_minmax'] = 'Den mindste længde må ikke overstige den største';

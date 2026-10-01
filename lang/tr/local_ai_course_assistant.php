@@ -943,9 +943,9 @@ $string['sandbox:run'] = 'Çalıştır';
 $string['sandbox:running'] = 'Çalıştırılıyor…';
 $string['sandbox:clear'] = 'Çıktıyı temizle';
 $string['sandbox:output_heading'] = 'Çıktı';
-$string['sandbox:privacy_note'] = 'Kod ve çıktı tarayıcınızda kalır. Hiçbir sunucuya hiçbir şey gönderilmez. Çalışma ortamı yalnızca ilk seferde herkese açık bir CDN\'den yüklenir ve sonraki ziyaretler için önbelleğe alınır.';
+$string['sandbox:privacy_note'] = 'Kod ve çıktı tarayıcınızda kalır. Yazdığınız veya çalıştırdığınız hiçbir şey bir sunucuya gönderilmez. Yalnızca Python çalışma ortamının kendisi, site yöneticinizin yapılandırdığı konumdan bir kez indirilir ve sonraki ziyaretler için önbelleğe alınır.';
 $string['sandbox:toggle'] = 'Bu ders için Python korumalı alanını etkinleştir';
-$string['sandbox:toggle_help'] = 'Öğrencilerin Pyodide aracılığıyla tamamen tarayıcılarında Python yazıp çalıştırabilecekleri, öğrenciye dönük bir sayfa ekler. Varsayılan olarak kapalı. Kod çalışması olan dersler için etkinleştirin; olmayanlarda kapalı bırakın.';
+$string['sandbox:toggle_help'] = 'Öğrencilerin Pyodide aracılığıyla tamamen tarayıcılarında Python yazıp çalıştırabilecekleri, öğrenciye dönük bir sayfa ekler. Varsayılan olarak kapalı. Kod çalışması olan dersler için etkinleştirin; olmayanlarda kapalı bırakın. Site yöneticisinin ayrıca eklenti ayarlarında Python çalışma ortamının konumunu belirtmesi gerekir: bu alan boş kaldığı sürece yüklenecek bir şey olmadığından korumalı alan kapalı kalır.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'AI Ders Asistanı — Dersler';
@@ -3107,3 +3107,31 @@ $string['settings:support_enabled_desc'] = 'Öğrencilerin kontrol paneli veya p
 $string['settings:support_courseid'] = 'Destek kursu';
 $string['settings:support_courseid_desc'] = 'Başlangıç, tanıtım ve oryantasyon materyallerinizi içeren görünür bir kursun sayısal kimliği. Destek konuşmaları bu kurs ve yukarıdaki SSS temel alınarak yanıtlanır ve bu kursa kaydedilir. Destek modunu kapatmak için boş bırakın. Sitenin ana sayfası (kurs 1) kabul edilmez.';
 $string['support:promptrole'] = 'Herhangi bir kursun dışından gelen bir destek sorusunu yanıtlıyorsunuz. Öğrenci kurs içeriğiyle ilgili bir şey sormuyor, bu nedenle onu kurs içeriğine yönlendirmeyin. Yanıtınızı SSS ve size verilen destek materyallerine dayandırın. Doğru bir yanıt veremiyorsanız bunu açıkça söyleyin ve soruyu destek ekibine iletmeyi önerin.';
+
+$string['sandbox:noruntimeurl'] = 'Python kum havuzu bu ders için açık, ancak sitede Python çalışma zamanı konumu ayarlanmadığı için yüklenecek bir şey yok. Bir yönetici bunu eklenti ayarlarından belirleyebilir.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Python kum havuzu etkinleştirildiğinde, öğrencinin tarayıcısı Python çalışma zamanını site yöneticisinin yapılandırdığı ve üçüncü bir tarafa ait olabilecek konumdan indirir. Kum havuzunda yazılan kod ve çıktısı cihazda kalır, hiçbir yere gönderilmez.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Öğrencinin IP adresi; istek yapılmasıyla birlikte çalışma zamanını sunan tarafa açıklanır.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Öğrencinin tarayıcısı ve işletim sistemi, o isteğin user agent bilgisi olarak gönderilir.';
+
+// Avatar picker labels and the Soapbox assignment create/edit form (v7.6.1).
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Özel: {$a}';
+$string['soapbox:assign_name'] = 'Ödev adı';
+$string['soapbox:assign_required'] = 'Bu alan zorunludur';
+$string['soapbox:assign_intro'] = 'Yönergeler';
+$string['soapbox:assign_recordtype'] = 'Kayıt türü';
+$string['soapbox:assign_mode_video'] = 'Video';
+$string['soapbox:assign_mode_audio'] = 'Yalnızca ses';
+$string['soapbox:assign_min_seconds'] = 'En az uzunluk (saniye)';
+$string['soapbox:assign_max_seconds'] = 'En fazla uzunluk (saniye)';
+$string['soapbox:assign_seccap'] = 'Site genelinde en fazla uzunluk: {$a} saniye.';
+$string['soapbox:assign_max_attempts'] = 'İzin verilen deneme sayısı (0 = sınırsız)';
+$string['soapbox:assign_stored_attempts'] = 'Öğrenci başına saklanan kayıt sayısı';
+$string['soapbox:assign_reccap'] = 'Site genelinde öğrenci başına saklanan en fazla kayıt sayısı: {$a}.';
+$string['soapbox:assign_slides'] = 'Slaytlar';
+$string['soapbox:assign_slides_help'] = 'Öğrencilerin PDF sunu destesi yüklemesine ve kayıt sırasında slaytları ilerletmesine izin ver';
+$string['soapbox:assign_slide_vision'] = 'Slayt görsel tasarım geri bildirimi';
+$string['soapbox:assign_slide_vision_help'] = 'Görsel tasarım notları için slayt görüntüleri üzerinde ayrıca bir görüntü işleme geçişi çalıştır (Slaytlar seçeneğini ve sitedeki Soapbox slayt görüntü işleme ayarını gerektirir)';
+$string['soapbox:assign_visible'] = 'Öğrencilere görünür';
+$string['soapbox:assign_err_min_seconds'] = 'En az 1 saniye girin';
+$string['soapbox:assign_err_minmax'] = 'En az uzunluk, en fazla uzunluğu aşamaz';

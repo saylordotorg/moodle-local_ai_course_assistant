@@ -970,9 +970,9 @@ $string['sandbox:run'] = 'አስኪድ';
 $string['sandbox:running'] = 'በማስኬድ ላይ…';
 $string['sandbox:clear'] = 'ውጽዓትን አጽዳ';
 $string['sandbox:output_heading'] = 'ውጽዓት';
-$string['sandbox:privacy_note'] = 'ኮድና ውጽዓት በአሳሽዎ ውስጥ ይቆያሉ። ወደ ማንኛውም አገልጋይ ምንም አይላክም። ማስኬጃው ለመጀመሪያ ጊዜ ብቻ ከይፋዊ CDN ይጫናል እና ለቀጣይ ጉብኝቶች ይቀመጣል።';
+$string['sandbox:privacy_note'] = 'ኮድዎና ውጤቱ በአሳሽዎ ውስጥ ይቀራሉ። የሚጽፉት ወይም የሚያስኬዱት ነገር ወደ ማንኛውም አገልጋይ አይላክም። የPython ማስኬጃው ራሱ ግን የጣቢያዎ አስተዳዳሪ ካዋቀረው ቦታ አንድ ጊዜ ይወርዳል፣ ከዚያም ለቀጣይ ጉብኝቶች ይቀመጣል።';
 $string['sandbox:toggle'] = 'ለዚህ ኮርስ የPython ሳንድቦክስን አንቃ';
-$string['sandbox:toggle_help'] = 'ተማሪዎች በPyodide በኩል Python ሙሉ በሙሉ በአሳሻቸው ውስጥ መጻፍና ማስኬድ የሚችሉበት ለተማሪ የተዘጋጀ ገጽ ይጨምራል። በነባሪ ጠፍቷል። የኮድ ሥራ ላላቸው ኮርሶች ያንቁ፤ የኮድ ሥራ ለሌላቸው ኮርሶች ጠፍቶ ይተዉት።';
+$string['sandbox:toggle_help'] = 'ተማሪዎች በPyodide በኩል Python ሙሉ በሙሉ በአሳሻቸው ውስጥ መጻፍና ማስኬድ የሚችሉበት ለተማሪ የተዘጋጀ ገጽ ይጨምራል። በነባሪ ጠፍቷል። የኮድ ሥራ ላላቸው ኮርሶች ያንቁ፤ የኮድ ሥራ ለሌላቸው ኮርሶች ጠፍቶ ይተዉት። የጣቢያው አስተዳዳሪ በተጨማሪ በተሰኪው ቅንብሮች ውስጥ የPython ማስኬጃ ቦታን ማዘጋጀት አለበት፤ ያ ባዶ እስከሆነ ድረስ የሚጫን ነገር ስለሌለ ሳንድቦክሱ ጠፍቶ ይቆያል።';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'የAI ኮርስ ረዳት — ኮርሶች';
@@ -3134,3 +3134,30 @@ $string['settings:support_enabled_desc'] = 'ተማሪዎች እንደ ዳሽቦ�
 $string['settings:support_courseid'] = 'የድጋፍ ኮርስ';
 $string['settings:support_courseid_desc'] = 'የመግቢያ፣ የመቀበያና የመተዋወቂያ ይዘትዎን የያዘ የሚታይ ኮርስ መለያ ቁጥር። የድጋፍ ውይይቶች ከዚህ ኮርስና ከላይ ካሉት ተደጋጋሚ ጥያቄዎች ተነስተው ይመለሳሉ፣ በዚሁ ኮርስ ስርም ይመዘገባሉ። የድጋፍ ሁነታን ለማጥፋት ባዶ ይተዉት። የጣቢያው መነሻ ገጽ (ኮርስ 1) አይቀበልም።';
 $string['support:promptrole'] = 'ከማንኛውም ኮርስ ውጭ የቀረበ የድጋፍ ጥያቄ እየመለስክ ነው። ተማሪው ስለ ኮርሱ ይዘት እየጠየቀ አይደለም፤ ስለዚህ ወደ ኮርሱ ይዘት አትመልሰው። ከተደጋጋሚ ጥያቄዎችና ከተሰጠህ የድጋፍ ይዘት ተነስተህ መልስ። በትክክል መመለስ ካልቻልክ በግልጽ ተናገር፤ ጥያቄውን ለድጋፍ ቡድኑ ለማስተላለፍ አቅርብ።';
+
+$string['sandbox:noruntimeurl'] = 'ለዚህ ኮርስ የፓይተን ሳንድቦክስ በርቷል፣ ነገር ግን ለጣቢያው የፓይተን ማስኬጃ ቦታ አልተቀመጠም፣ ስለዚህ የሚጫን ነገር የለም። አስተዳዳሪ በተሰኪው ቅንብሮች ውስጥ ቦታውን ማስቀመጥ ይችላል።';
+$string['privacy:metadata:code_sandbox_runtime'] = 'የፓይተን ሳንድቦክስ ሲበራ የተማሪው አሳሽ የፓይተንን ማስኬጃ የጣቢያው አስተዳዳሪ ካዘጋጀው ቦታ ያወርዳል፤ ይህ ቦታ የሦስተኛ ወገን ሊሆን ይችላል። በሳንድቦክሱ የተጻፈው ኮድና ውጤቱ በመሣሪያው ላይ ይቀራሉ፣ ወደ የትም አይላኩም።';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'የተማሪው የIP አድራሻ፣ ጥያቄው በመላኩ ብቻ ማስኬጃውን ለሚያቀርበው ወገን ይገለጻል።';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'የተማሪው አሳሽና ኦፐሬቲንግ ሲስተም፣ የዚያ ጥያቄ user agent ሆነው ይላካሉ።';
+
+$string['settings:avatar_numbered'] = 'አቫታር {$a}';
+$string['settings:avatar_custom'] = 'ብጁ፦ {$a}';
+$string['soapbox:assign_name'] = 'የስራው ስም';
+$string['soapbox:assign_required'] = 'ይህ መስክ ያስፈልጋል';
+$string['soapbox:assign_intro'] = 'መመሪያዎች';
+$string['soapbox:assign_recordtype'] = 'የቀረጻ ዓይነት';
+$string['soapbox:assign_mode_video'] = 'ቪዲዮ';
+$string['soapbox:assign_mode_audio'] = 'ድምፅ ብቻ';
+$string['soapbox:assign_min_seconds'] = 'ዝቅተኛ ርዝመት (በሰከንድ)';
+$string['soapbox:assign_max_seconds'] = 'ከፍተኛ ርዝመት (በሰከንድ)';
+$string['soapbox:assign_seccap'] = 'የጣቢያው ከፍተኛ ርዝመት፦ {$a} ሰከንድ።';
+$string['soapbox:assign_max_attempts'] = 'የሚፈቀዱ ሙከራዎች (0 = ያልተገደበ)';
+$string['soapbox:assign_stored_attempts'] = 'በአንድ ተማሪ የሚቀመጡ ቀረጻዎች';
+$string['soapbox:assign_reccap'] = 'በአንድ ተማሪ የሚቀመጡ ቀረጻዎች የጣቢያው ከፍተኛ ቁጥር፦ {$a}።';
+$string['soapbox:assign_slides'] = 'ስላይዶች';
+$string['soapbox:assign_slides_help'] = 'ተማሪዎች የPDF ስላይድ ስብስብ እንዲጭኑና ሲቀዱ ስላይዶቹን እንዲያራምዱ ፍቀድ';
+$string['soapbox:assign_slide_vision'] = 'የስላይድ ምስላዊ ንድፍ ግብረመልስ';
+$string['soapbox:assign_slide_vision_help'] = 'ለምስላዊ ንድፍ አስተያየቶች በስላይድ ምስሎች ላይ የእይታ ቅኝትም አካሂድ (ስላይዶችና የጣቢያው የSoapbox ስላይድ-እይታ ቅንብር ያስፈልጋሉ)';
+$string['soapbox:assign_visible'] = 'ለተማሪዎች የሚታይ';
+$string['soapbox:assign_err_min_seconds'] = 'ቢያንስ 1 ሰከንድ አስገባ';
+$string['soapbox:assign_err_minmax'] = 'ዝቅተኛው ርዝመት ከከፍተኛው መብለጥ አይችልም';

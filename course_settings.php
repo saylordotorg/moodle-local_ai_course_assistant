@@ -770,7 +770,10 @@ echo html_writer::div(
                     <small class="form-text text-muted">
                         <?php echo get_string('sandbox:toggle_help', 'local_ai_course_assistant'); ?>
                     </small>
-                    <?php if ($sbon) { ?>
+                    <?php // v7.6.1: the link only works once a runtime location is set
+                          // site-wide, so show why it is missing rather than a button
+                          // that lands on an error page. ?>
+                    <?php if (\local_ai_course_assistant\code_sandbox::is_available($courseid)) { ?>
                     <div class="mt-1">
                         <a href="<?php echo (new moodle_url(
                             '/local/ai_course_assistant/sandbox.php',
@@ -779,6 +782,10 @@ echo html_writer::div(
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('sandbox:link', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
+                    </div>
+                    <?php } else if ($sbon) { ?>
+                    <div class="mt-1 text-warning">
+                        <?php echo get_string('sandbox:noruntimeurl', 'local_ai_course_assistant'); ?>
                     </div>
                     <?php } ?>
                 </div>

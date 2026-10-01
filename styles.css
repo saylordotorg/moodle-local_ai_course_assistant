@@ -6054,3 +6054,18 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
         color: CanvasText;
     }
 }
+
+/* Essay feedback page (moved from inline styles in essay_feedback.php and from
+   the inline script it used to echo, CONTRIB-10574 #273). The width cap and the
+   textarea sizing were style="" attributes; .sola-essay-hidden replaces the
+   style.display toggling the old script did by hand. */
+.sola-essay { max-width: 860px; margin: 0 auto; }
+.sola-essay-form { margin-top: 14px; }
+.sola-essay-group { margin-top: 12px; }
+.sola-essay-textarea { width: 100%; font-family: inherit; font-size: 14px; }
+.sola-essay-result { margin-top: 24px; }
+.sola-essay-table { width: 100%; }
+.sola-essay-col-score { width: 80px; }
+.sola-essay-score { font-family: monospace; }
+.sola-essay-subheading { margin-top: 18px; }
+.sola-essay-hidden { display: none; }

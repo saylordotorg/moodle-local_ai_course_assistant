@@ -720,7 +720,6 @@ $templatedata = $templatestrings + [
         ['range' => $range]
     ))->out(false),
     'courses_admin_url' => (new moodle_url('/local/ai_course_assistant/courses_admin.php'))->out(false),
-    'radar_schedule_url' => (new moodle_url('/local/ai_course_assistant/radar_schedule.php'))->out(false),
     'radar_export_url' => (new moodle_url('/local/ai_course_assistant/radar_export.php'))->out(false),
     'radar_name_prompt' => get_string('radar:js_name_prompt', 'local_ai_course_assistant'),
     'radar_redash_name_tpl' => \local_ai_course_assistant\branding::str('radar:redash_default_name'),

@@ -147,6 +147,8 @@ $string['settings:avatar_desc'] = 'Select the avatar icon for the chat widget bu
 $string['settings:institution_name'] = 'Institution Name';
 $string['settings:institution_name_desc'] = 'The name of the institution displayed in the system prompt, avatar labels, and demo content. Change this when rebranding.';
 $string['settings:avatar_saylor'] = '{$a} Logo (Default)';
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Custom: {$a}';
 $string['settings:avatar_color'] = 'Avatar Border Color';
 $string['settings:avatar_color_desc'] = 'Border color of the floating avatar button. Use a hex value, e.g. #023e8a.';
 $string['settings:avatar_fill'] = 'Avatar Background Color';
@@ -1783,6 +1785,26 @@ $string['soapbox:assign_created']   = 'Assignment created.';
 $string['soapbox:assign_delete_confirm'] = 'Delete "{$a}" and all its recordings? This cannot be undone.';
 $string['soapbox:assign_edit_heading'] = 'Edit Soapbox assignment';
 $string['soapbox:assign_new_heading']  = 'New Soapbox assignment';
+// Soapbox assignment create/edit form (classes/form/soapbox_assignment_form.php).
+$string['soapbox:assign_name']          = 'Assignment name';
+$string['soapbox:assign_required']      = 'This field is required';
+$string['soapbox:assign_intro']         = 'Instructions';
+$string['soapbox:assign_recordtype']    = 'Recording type';
+$string['soapbox:assign_mode_video']    = 'Video';
+$string['soapbox:assign_mode_audio']    = 'Audio only';
+$string['soapbox:assign_min_seconds']   = 'Minimum length (seconds)';
+$string['soapbox:assign_max_seconds']   = 'Maximum length (seconds)';
+$string['soapbox:assign_seccap']        = 'Site maximum length: {$a} seconds.';
+$string['soapbox:assign_max_attempts']  = 'Attempts allowed (0 = unlimited)';
+$string['soapbox:assign_stored_attempts'] = 'Recordings kept per student';
+$string['soapbox:assign_reccap']        = 'Site maximum recordings kept per student: {$a}.';
+$string['soapbox:assign_slides']        = 'Slides';
+$string['soapbox:assign_slides_help']   = 'Let students upload a PDF deck and advance slides while recording';
+$string['soapbox:assign_slide_vision']  = 'Slide visual-design feedback';
+$string['soapbox:assign_slide_vision_help'] = 'Also run a vision pass over the slide images for visual-design notes (requires Slides, and the site Soapbox slide-vision setting)';
+$string['soapbox:assign_visible']       = 'Visible to students';
+$string['soapbox:assign_err_min_seconds'] = 'Enter at least 1 second';
+$string['soapbox:assign_err_minmax']    = 'Minimum length cannot exceed the maximum';
 $string['soapbox:audio_ready']      = 'Audio only. Your microphone will be recorded; your camera is not used.';
 $string['soapbox:audio_recording']  = 'Recording audio...';
 $string['soapbox:disabled']         = 'Soapbox is not enabled for this course.';
@@ -1873,9 +1895,9 @@ $string['sandbox:run']             = 'Run';
 $string['sandbox:running']         = 'Running…';
 $string['sandbox:clear']           = 'Clear output';
 $string['sandbox:output_heading']  = 'Output';
-$string['sandbox:privacy_note']    = 'Code and output stay in your browser. Nothing is sent to any server. The runtime is loaded from a public CDN the first time only and is cached for subsequent visits.';
+$string['sandbox:privacy_note']    = 'Code and output stay in your browser. Nothing you write or run is sent to any server. The Python runtime itself is downloaded once from the location your site administrator configured, then cached for later visits.';
 $string['sandbox:toggle']          = 'Enable the Python sandbox for this course';
-$string['sandbox:toggle_help']     = 'Adds a learner-facing page where students can write and run Python entirely in their browser via Pyodide. Off by default. Enable for courses with code work; leave off for courses without.';
+$string['sandbox:toggle_help']     = 'Adds a learner-facing page where students can write and run Python entirely in their browser via Pyodide. Off by default. Enable for courses with code work; leave off for courses without. A site administrator also has to set the Python runtime location in the plugin settings: while that is blank the sandbox stays off, because there is nothing to load.';
 
 // Mastery admin settings (v3.9.17).
 $string['settings:objectives_admin_link'] = 'Open learning objectives & mastery';
@@ -3009,7 +3031,8 @@ $string['usertesting_admin:default_title'] = '[[tutorshort]] Usability Test';
 $string['usertesting_admin:rating_label_default'] = 'Rate this task';
 
 // --- from newstrings_f.php ---
-// Learning Radar delivery endpoints (radar_export.php / radar_schedule.php).
+// Learning Radar delivery endpoint (radar_export.php) and the schedule
+// external services (classes/external/*_radar_schedule.php).
 $string['radar:err_email_required'] = 'Recipient email is required';
 $string['radar:err_slack_webhook_required'] = 'Slack webhook URL is required';
 $string['radar:err_teams_webhook_required'] = 'Teams webhook URL is required';
@@ -3394,3 +3417,13 @@ $string['embedmigration:faq_reembedded'] = 'Re-embedded the FAQ: {$a} chunk(s).'
 $string['embedmigration:faq_error'] = 'The FAQ could not be re-embedded: {$a}';
 $string['task:migrate_course_embeddings'] = 'Migrate one course to a new embedding model';
 $string['settings:embed_migration_provider_inherit'] = 'Use the provider configured above';
+
+// Python sandbox runtime location (v7.6.1, CONTRIB-10574 #271).
+$string['settings:code_sandbox_pyodide_baseurl'] = 'Python runtime location';
+$string['settings:code_sandbox_pyodide_baseurl_desc'] = 'The https base URL the Python sandbox loads the Pyodide runtime from, for example <code>https://cdn.jsdelivr.net/pyodide/v0.27.0/full/</code>. The runtime is about 10 MB and is fetched by each learner\'s browser, so whoever serves this URL learns the IP address and browser of every learner who opens the sandbox. If that\'s a third-party CDN, say so in your site\'s privacy notice, or host a copy of the Pyodide release on your own site and point this at it. Leave this blank (the default) and the sandbox stays off, whatever the course and site toggles say. Nothing is requested until you fill it in.';
+$string['sandbox:noruntimeurl'] = 'The Python sandbox is on for this course, but the site has no Python runtime location set, so there\'s nothing to load. An administrator can set one in the plugin settings.';
+
+// Privacy: the sandbox runtime request (v7.6.1, CONTRIB-10574 #271).
+$string['privacy:metadata:code_sandbox_runtime'] = 'When the Python sandbox is enabled, the learner\'s browser downloads the Python runtime from the location the site administrator configured, which may belong to a third party. Code written in the sandbox and its output stay on the device and are never sent anywhere.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'The learner IP address, disclosed to whoever serves the runtime by the act of requesting it.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'The learner browser and operating system, sent as the user agent of that request.';

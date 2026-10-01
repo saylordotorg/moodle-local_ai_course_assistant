@@ -964,9 +964,9 @@ $string['sandbox:run'] = 'Doxal';
 $string['sandbox:running'] = 'Mungiy dox…';
 $string['sandbox:clear'] = 'Far li génn';
 $string['sandbox:output_heading'] = 'Li génn';
-$string['sandbox:privacy_note'] = 'Kod bi ak li génn dañuy des ci sa naróbull. Dara du dem ci benn sarwa. Runtime bi ci CDN bu ubbeeku lañu koy yeb benn yoon rekk, ba noppi ñu denc ko ngir ñëw yi ci topp.';
+$string['sandbox:privacy_note'] = 'Sa kod ak li mu génne dañuy des ci sa naawukaay. Lu nga bind walla doxal, dara du ñëw ci benn serwóor. Python runtime bi moom, benn yoon lañu koy yebbi ci bérab bi sàrgalkatu sit bi tëral, ba noppi ñu denc ko ngir ñëw yu topp.';
 $string['sandbox:toggle'] = 'Ubbil sandbox Python bi ngir njàng bii';
-$string['sandbox:toggle_help'] = 'Dina yokk benn xët bu jàngkat yi, fu ndongo yi mën a bind te doxal Python ci seen naróbull rekk ci Pyodide. Tëju na ci ndoortel. Ubbil ko ci cours yi am liggéeyu kod; bàyyil ko tëju ci yi ko amul.';
+$string['sandbox:toggle_help'] = 'Dina yokk benn xët bu jàngkat yi, fu ndongo yi mën a bind te doxal Python ci seen naróbull rekk ci Pyodide. Tëju na ci ndoortel. Ubbil ko ci cours yi am liggéeyu kod; bàyyil ko tëju ci yi ko amul. Sàrgalkatu sit bi war na it tëral bérab bu Python runtime ci tëraliinu plugin bi: su bérab boobu neenee, sandbox bi dina des fey, ndax amul dara lu ñuy yeb.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Jëkkëru Njàng AI — Njàng yi';
@@ -3127,3 +3127,31 @@ $string['settings:support_enabled_desc'] = 'Mayal ndongo yi ñu ubbi [[tutorshor
 $string['settings:support_courseid'] = 'Kurs ndimbal';
 $string['settings:support_courseid_desc'] = 'ID bu benn kurs bu ñuy gis, bu ëmb say jumtukaay yu tàmbali, yu jàppale ndongo yu bees ak yu jubbanti. Waxtaan yu ndimbal dañuy jóge ci kurs boobu ak FAQ bi ci kaw, te ñu koy bind ci kurs boobu. Bàyyil ko dara ngir fey mode ndimbal bi. Kër site bi (kurs 1) duñu ko nangu.';
 $string['support:promptrole'] = 'Yaa ngi tontu benn laaj ndimbal bu jóge ci biti kurs. Ndongo li laajul ci njël kurs bi, kon bu ko yóbbe fa. Tontul jóge ci FAQ bi ak ci njël ndimbal li ñu la jox. Su fekkee mënuloo tontu bu wóor, waxal ko ci lu leer te joxe yoon ngir yóbbu laaj bi ci ekibu ndimbal bi.';
+
+$string['sandbox:noruntimeurl'] = 'Sandbox bu Python dafa ubbeeku ci jàng bii, waaye sit bi amul benn bérab bu ñu def ngir masin bu Python, kon amul dara lu ñuy yeb. Kilifa gi mën na ko def ci tegtal yu plugin bi.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Bu sandbox bu Python ubbeeku, naawukaay bu jàngalekat bi dafay yeb masin bu Python ci bérab bi kilifa gu sit bi tànn, bu mën a doon bu ñeneen. Kodd bi ñu bind ci sandbox bi ak li mu génne dañuy des ci jumtukaay bi, duñu ko yónnee fenn.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Adrees IP bu jàngalekat bi, bu ñuy xamal ki joxe masin bi ndax rekk ñu ko ñaan.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Naawukaay ak sistem bu jàngalekat bi, ñuy yónnee ni user agent bu ñaan boobu.';
+
+// Soapbox assignment form + avatar picker labels.
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Bu ñu defaraat: {$a}';
+$string['soapbox:assign_name'] = 'Turu liggéey bi';
+$string['soapbox:assign_required'] = 'Fàww nga fees barab bii';
+$string['soapbox:assign_intro'] = 'Ndigal yi';
+$string['soapbox:assign_recordtype'] = 'Xeetu enrejistrëmaan';
+$string['soapbox:assign_mode_video'] = 'Wideyo';
+$string['soapbox:assign_mode_audio'] = 'Baat rekk';
+$string['soapbox:assign_min_seconds'] = 'Guddaay gi gëna tuuti (simili)';
+$string['soapbox:assign_max_seconds'] = 'Guddaay gi gëna mag (simili)';
+$string['soapbox:assign_seccap'] = 'Guddaay bi gën a mag ci sit bi: {$a} simili.';
+$string['soapbox:assign_max_attempts'] = 'Jéem yi ñu may (0 = amul dig)';
+$string['soapbox:assign_stored_attempts'] = 'Enrejistrëmaan yi ñuy denc ci jàngkat bu nekk';
+$string['soapbox:assign_reccap'] = 'Limu enrejistrëmaan bi gën a mag bi sit bi di denc ci jàngkat bu nekk: {$a}.';
+$string['soapbox:assign_slides'] = 'Slide yi';
+$string['soapbox:assign_slides_help'] = 'Mayal jàngkat yi ñu upload benn deck PDF te jàll slide yi bu ñuy enregistrer';
+$string['soapbox:assign_slide_vision'] = 'Feedback ci melokaanu slide yi';
+$string['soapbox:assign_slide_vision_help'] = 'Defal it benn saytu bu gis ci nataal yu slide yi ngir am ay xalaat ci melokaan (dafa laaj Slide yi, ak tegtalu slide-vision bu Soapbox ci sit bi)';
+$string['soapbox:assign_visible'] = 'Jàngkat yi dinañu ko gis';
+$string['soapbox:assign_err_min_seconds'] = 'Duggalal 1 simili ci lu gëna tuuti';
+$string['soapbox:assign_err_minmax'] = 'Guddaay gi gëna tuuti mënul a ëpp gi gëna mag';

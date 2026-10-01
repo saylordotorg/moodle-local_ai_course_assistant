@@ -141,9 +141,13 @@ worth more than fixing the one string, and it is tracked.
 
 VERIFICATION
 
-1,937 tests, 0 failures. Security validator corpus 36 of 36. PHP lint clean
-across 586 files. The CI matrix covers PHP 8.1 to 8.3 against Moodle 4.5, 5.0 and
-5.1, on MariaDB and PostgreSQL.
+1,952 tests, 0 failures, 7 skipped. Security validator corpus 36 of 36. PHP lint
+clean across 588 files. The CI matrix covers PHP 8.1 to 8.3 against Moodle 4.5,
+5.0 and 5.1, on MariaDB and PostgreSQL, and all twelve jobs are green on the
+v7.6.0 commit.
+
+Every new test in this release was verified by planting the defect it describes
+and watching it fail, which is also how the msg_ratings hole above was found.
 
 A QUESTION BEFORE I RESUBMIT
 

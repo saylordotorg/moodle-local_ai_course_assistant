@@ -943,9 +943,9 @@ $string['sandbox:run'] = 'Rulează';
 $string['sandbox:running'] = 'Se rulează…';
 $string['sandbox:clear'] = 'Ștergeți rezultatul';
 $string['sandbox:output_heading'] = 'Rezultat';
-$string['sandbox:privacy_note'] = 'Codul și rezultatul rămân în browserul dumneavoastră. Nu se trimite nimic către niciun server. Mediul de execuție este încărcat de pe un CDN public doar prima dată și este păstrat în cache pentru vizitele următoare.';
+$string['sandbox:privacy_note'] = 'Codul și rezultatul rămân în browserul tău. Nimic din ce scrii sau rulezi nu este trimis către vreun server. Mediul de execuție Python în sine se descarcă o singură dată din locația configurată de administratorul site-ului, apoi este păstrat în cache pentru vizitele următoare.';
 $string['sandbox:toggle'] = 'Activează sandbox-ul Python pentru acest curs';
-$string['sandbox:toggle_help'] = 'Adaugă o pagină destinată cursanților, unde studenții pot scrie și rula cod Python în întregime în browserul lor, prin Pyodide. Dezactivat implicit. Activați-l pentru cursurile cu lucru pe cod; lăsați-l dezactivat pentru celelalte.';
+$string['sandbox:toggle_help'] = 'Adaugă o pagină destinată cursanților, unde studenții pot scrie și rula cod Python în întregime în browserul lor, prin Pyodide. Dezactivat implicit. Activați-l pentru cursurile cu lucru pe cod; lăsați-l dezactivat pentru celelalte. Administratorul site-ului trebuie de asemenea să indice locația mediului de execuție Python în setările pluginului: cât timp câmpul este gol, sandbox-ul rămâne oprit, pentru că nu are ce să încarce.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Asistent de curs AI — Cursuri';
@@ -3106,3 +3106,31 @@ $string['settings:support_enabled_desc'] = 'Permite cursanților să deschidă [
 $string['settings:support_courseid'] = 'Curs de asistență';
 $string['settings:support_courseid_desc'] = 'ID-ul numeric al unui curs vizibil care conține materialele de început, de integrare și de orientare. Conversațiile de asistență primesc răspuns din acest curs și din întrebările frecvente de mai sus și sunt înregistrate în dreptul lui. Lăsați gol pentru a dezactiva modul de asistență. Prima pagină a site-ului (cursul 1) nu este acceptată.';
 $string['support:promptrole'] = 'Răspunzi la o întrebare de asistență pusă în afara oricărui curs. Cursantul nu întreabă despre materialul cursului, așa că nu îl redirecționa către acesta. Răspunde pe baza întrebărilor frecvente și a materialelor de asistență care ți-au fost puse la dispoziție. Dacă nu poți răspunde cu exactitate, spune acest lucru clar și oferă-te să transmiți întrebarea echipei de asistență.';
+
+$string['sandbox:noruntimeurl'] = 'Spațiul de lucru Python este activat pentru acest curs, dar site-ul nu are setată o locație pentru mediul de rulare Python, deci nu există nimic de încărcat. Un administrator poate seta una în setările pluginului.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Când spațiul de lucru Python este activat, browserul cursantului descarcă mediul de rulare Python din locația configurată de administratorul site-ului, care poate aparține unei terțe părți. Codul scris în spațiul de lucru și rezultatul acestuia rămân pe dispozitiv și nu sunt trimise niciodată nicăieri.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Adresa IP a cursantului, dezvăluită celui care găzduiește mediul de rulare prin simplul fapt al cererii.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Browserul și sistemul de operare ale cursantului, trimise ca user agent al acelei cereri.';
+
+// Avatar picker labels and the Soapbox assignment create/edit form (v7.6.1).
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Personalizat: {$a}';
+$string['soapbox:assign_name'] = 'Numele temei';
+$string['soapbox:assign_required'] = 'Acest câmp este obligatoriu';
+$string['soapbox:assign_intro'] = 'Instrucțiuni';
+$string['soapbox:assign_recordtype'] = 'Tip de înregistrare';
+$string['soapbox:assign_mode_video'] = 'Video';
+$string['soapbox:assign_mode_audio'] = 'Doar audio';
+$string['soapbox:assign_min_seconds'] = 'Durată minimă (secunde)';
+$string['soapbox:assign_max_seconds'] = 'Durată maximă (secunde)';
+$string['soapbox:assign_seccap'] = 'Durata maximă pe site: {$a} secunde.';
+$string['soapbox:assign_max_attempts'] = 'Încercări permise (0 = nelimitat)';
+$string['soapbox:assign_stored_attempts'] = 'Înregistrări păstrate per cursant';
+$string['soapbox:assign_reccap'] = 'Numărul maxim de înregistrări păstrate per cursant pe site: {$a}.';
+$string['soapbox:assign_slides'] = 'Slide-uri';
+$string['soapbox:assign_slides_help'] = 'Permiteți cursanților să încarce un pachet de slide-uri PDF și să avanseze slide-urile în timpul înregistrării';
+$string['soapbox:assign_slide_vision'] = 'Feedback de design vizual al slide-urilor';
+$string['soapbox:assign_slide_vision_help'] = 'Rulează suplimentar o trecere de viziune peste imaginile slide-urilor pentru note de design vizual (necesită Slide-uri și setarea de viziune pentru slide-urile Soapbox de pe site)';
+$string['soapbox:assign_visible'] = 'Vizibil pentru cursanți';
+$string['soapbox:assign_err_min_seconds'] = 'Introduceți cel puțin 1 secundă';
+$string['soapbox:assign_err_minmax'] = 'Durata minimă nu poate depăși durata maximă';

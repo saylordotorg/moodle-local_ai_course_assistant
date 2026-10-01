@@ -988,9 +988,9 @@ $string['sandbox:run'] = 'Socodsii';
 $string['sandbox:running'] = 'Socodsiinaya…';
 $string['sandbox:clear'] = 'Nadiifi wax-soo-saarka';
 $string['sandbox:output_heading'] = 'Wax-soo-saarka';
-$string['sandbox:privacy_note'] = 'Koodhka iyo wax-soo-saarku waxay ku hadhayaan browser-kaaga. Waxba server looma dirayo. Runtime-ka waxaa laga soo raraa CDN dadweyne markii ugu horreysay oo kaliya, waxaana loo kaydiyaa booqashooyinka danbe.';
+$string['sandbox:privacy_note'] = 'Koodhka iyo wixii ka soo baxa waxay ku hadhayaan daalacashadaada. Waxba aad qorto ama aad socodsiiso looma dirayo server. Shaqeeyaha Python laftiisa hal mar ayaa laga soo dejiyaa goobta uu maamulaha goobtaadu dejiyay, kaddibna waa la kaydiyaa booqashooyinka soo socda.';
 $string['sandbox:toggle'] = 'Fur sandbox-ka Python koorsadan';
-$string['sandbox:toggle_help'] = 'Wuxuu ku daraa bog ardayga u socda oo ardaydu ku qori karaan kuna socodsiin karaan Python gabi ahaanba browser-kooda iyagoo isticmaalaya Pyodide. Si caadi ah waa damsan yahay. U fur koorsooyinka leh shaqo koodh; ka tag damsan koorsooyinka aan lahayn.';
+$string['sandbox:toggle_help'] = 'Wuxuu ku daraa bog ardayga u socda oo ardaydu ku qori karaan kuna socodsiin karaan Python gabi ahaanba browser-kooda iyagoo isticmaalaya Pyodide. Si caadi ah waa damsan yahay. U fur koorsooyinka leh shaqo koodh; ka tag damsan koorsooyinka aan lahayn. Maamulaha goobta waa inuu sidoo kale ku cayimaa goobta shaqeeyaha Python ee dejinta plugin-ka: inta ay madhan tahay, sandbox-ku wuu damsanaanayaa, maxaa yeelay wax la soo rogo ma jiraan.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Kaaliyaha Koorsada AI — Koorsooyinka';
@@ -3151,3 +3151,30 @@ $string['settings:support_enabled_desc'] = 'Waxay ardayda u oggolaanaysaa inay [
 $string['settings:support_courseid'] = 'Koorsada taageerada';
 $string['settings:support_courseid_desc'] = 'Aqoonsiga (ID) koorsi muuqda oo ay ku jiraan agabkaaga bilowga, soo-dhoweynta iyo hordhaca. Wada-hadallada taageerada waxaa laga jawaabaa koorsadan iyo FAQ-ga kor ku xusan, waxaana lagu diiwaangeliyaa koorsadaas. Bannaan u dhaaf si aad u damiso habka taageerada. Bogga hore ee goobta (koorsada 1) lama aqbalo.';
 $string['support:promptrole'] = 'Waxaad ka jawaabaysaa su\'aal taageero oo ka timid meel koorsi ka baxsan. Ardaygu ma weydiinayo waxa koorsada ku jira, sidaas darteed ha u dirin agabka koorsada. Ka jawaab FAQ-ga iyo agabka taageerada ee lagu siiyay. Haddaadan si sax ah uga jawaabi karin, si cad u sheeg, kadibna u soo bandhig inaad su\'aasha u gudbiso kooxda taageerada.';
+
+$string['sandbox:noruntimeurl'] = 'Sanduuqa tijaabada ee Python waa shidan yahay koorsadan, laakiin goobta lagu shubo Python lama dejin barta, sidaas darteed wax la soo raro ma jiraan. Maamulaha ayaa ka dejin kara goobta goobaha dejinta ee balaastigga.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Marka sanduuqa tijaabada ee Python la shido, biraawsarka ardayga wuxuu ka soo dejiyaa barnaamijka Python goobta uu maamulaha barta dejiyey, taasoo laga yaabo inay cid saddexaad leedahay. Koodhka lagu qoro sanduuqa iyo wixii ka soo baxa waxay ku hadhaan qalabka, meelna lama dirayo.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Cinwaanka IP-ga ardayga, oo la ogaado cidda bixisa barnaamijka markii codsiga la diro oo kaliya.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Biraawsarka iyo nidaamka qalabka ardayga, oo loo diro sida user agent-ka codsigaas.';
+
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Gaar ah: {$a}';
+$string['soapbox:assign_name'] = 'Magaca hawsha';
+$string['soapbox:assign_required'] = 'Goobtan waa lagama maarmaan';
+$string['soapbox:assign_intro'] = 'Tilmaamaha';
+$string['soapbox:assign_recordtype'] = 'Nooca duubitaanka';
+$string['soapbox:assign_mode_video'] = 'Muuqaal';
+$string['soapbox:assign_mode_audio'] = 'Maqal keliya';
+$string['soapbox:assign_min_seconds'] = 'Dhererka ugu yar (ilbiriqsi)';
+$string['soapbox:assign_max_seconds'] = 'Dhererka ugu badan (ilbiriqsi)';
+$string['soapbox:assign_seccap'] = 'Dhererka ugu badan ee goobta: {$a} ilbiriqsi.';
+$string['soapbox:assign_max_attempts'] = 'Isku dayada la oggol yahay (0 = xad la\'aan)';
+$string['soapbox:assign_stored_attempts'] = 'Duubitaannada arday kasta loo hayo';
+$string['soapbox:assign_reccap'] = 'Tirada ugu badan ee goobta ee duubitaannada arday kasta loo hayo: {$a}.';
+$string['soapbox:assign_slides'] = 'Slaydhyada';
+$string['soapbox:assign_slides_help'] = 'U oggolow ardayda inay soo geliyaan dek PDF ah oo ay slaydhyada hor u dhaqaajiyaan intay duubayaan';
+$string['soapbox:assign_slide_vision'] = 'Jawaab celin ku saabsan naqshadda muuqaalka ee slaydhyada';
+$string['soapbox:assign_slide_vision_help'] = 'Sidoo kale ku samee baaris aragti ah sawirrada slaydhyada si aad u hesho faallooyin ku saabsan naqshadda muuqaalka (waxay u baahan tahay Slaydhyada iyo dejinta goobta ee aragtida slaydhyada Soapbox)';
+$string['soapbox:assign_visible'] = 'Ardayda ayaa arki kara';
+$string['soapbox:assign_err_min_seconds'] = 'Geli ugu yaraan 1 ilbiriqsi';
+$string['soapbox:assign_err_minmax'] = 'Dhererka ugu yar kama badnaan karo kan ugu badan';

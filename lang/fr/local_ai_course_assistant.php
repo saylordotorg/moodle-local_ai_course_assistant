@@ -944,9 +944,9 @@ $string['sandbox:run'] = 'Exécuter';
 $string['sandbox:running'] = 'Exécution en cours…';
 $string['sandbox:clear'] = 'Effacer la sortie';
 $string['sandbox:output_heading'] = 'Sortie';
-$string['sandbox:privacy_note'] = 'Le code et la sortie restent dans votre navigateur. Rien n\'est envoyé à un serveur. L\'environnement d\'exécution n\'est chargé depuis un CDN public que la première fois, puis il est mis en cache pour les visites suivantes.';
+$string['sandbox:privacy_note'] = 'Le code et la sortie restent dans votre navigateur. Rien de ce que vous écrivez ou exécutez n\'est envoyé à un serveur. L\'environnement d\'exécution Python lui-même est téléchargé une seule fois depuis l\'emplacement configuré par l\'administrateur de votre site, puis mis en cache pour les visites suivantes.';
 $string['sandbox:toggle'] = 'Activer le bac à sable Python pour ce cours';
-$string['sandbox:toggle_help'] = 'Ajoute une page destinée aux apprenants où les étudiants peuvent écrire et exécuter du Python entièrement dans leur navigateur via Pyodide. Désactivé par défaut. Activez-le pour les cours comportant de la programmation ; laissez-le désactivé pour les autres.';
+$string['sandbox:toggle_help'] = 'Ajoute une page destinée aux apprenants où les étudiants peuvent écrire et exécuter du Python entièrement dans leur navigateur via Pyodide. Désactivé par défaut. Activez-le pour les cours comportant de la programmation ; laissez-le désactivé pour les autres. Un administrateur du site doit également indiquer l\'emplacement de l\'environnement d\'exécution Python dans les réglages du plugin : tant que ce champ est vide, le bac à sable reste désactivé, car il n\'y a rien à charger.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Assistant de cours IA — Cours';
@@ -3108,3 +3108,30 @@ $string['settings:support_enabled_desc'] = 'Permet aux apprenants d\'ouvrir [[tu
 $string['settings:support_courseid'] = 'Cours d\'assistance';
 $string['settings:support_courseid_desc'] = 'L\'identifiant numérique d\'un cours visible contenant vos ressources de prise en main, d\'accueil et d\'orientation. Les conversations d\'assistance s\'appuient sur ce cours ainsi que sur la FAQ ci-dessus, et y sont enregistrées. Laissez le champ vide pour désactiver le mode assistance. L\'accueil du site (cours 1) n\'est pas accepté.';
 $string['support:promptrole'] = 'Vous répondez à une question d\'assistance posée en dehors de tout cours. L\'apprenant ne s\'interroge pas sur le contenu du cours : ne l\'y renvoyez pas. Répondez à partir de la FAQ et des ressources d\'assistance qui vous ont été fournies. Si vous ne pouvez pas répondre avec exactitude, dites-le clairement et proposez de transmettre la question à l\'équipe d\'assistance.';
+
+$string['sandbox:noruntimeurl'] = 'Le bac à sable Python est activé pour ce cours, mais aucun emplacement de moteur Python n\'est configuré pour le site, il n\'y a donc rien à charger. Un administrateur peut en définir un dans les réglages du plugin.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Lorsque le bac à sable Python est activé, le navigateur de l\'apprenant télécharge le moteur Python depuis l\'emplacement configuré par l\'administrateur du site, qui peut appartenir à un tiers. Le code écrit dans le bac à sable et ses résultats restent sur l\'appareil et ne sont jamais envoyés nulle part.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'L\'adresse IP de l\'apprenant, divulguée à l\'hébergeur du moteur par le simple fait de le demander.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Le navigateur et le système d\'exploitation de l\'apprenant, envoyés comme agent utilisateur de cette requête.';
+
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Personnalisé : {$a}';
+$string['soapbox:assign_name'] = 'Nom du devoir';
+$string['soapbox:assign_required'] = 'Ce champ est obligatoire';
+$string['soapbox:assign_intro'] = 'Consignes';
+$string['soapbox:assign_recordtype'] = 'Type d\'enregistrement';
+$string['soapbox:assign_mode_video'] = 'Vidéo';
+$string['soapbox:assign_mode_audio'] = 'Audio uniquement';
+$string['soapbox:assign_min_seconds'] = 'Durée minimale (secondes)';
+$string['soapbox:assign_max_seconds'] = 'Durée maximale (secondes)';
+$string['soapbox:assign_seccap'] = 'Durée maximale du site : {$a} secondes.';
+$string['soapbox:assign_max_attempts'] = 'Tentatives autorisées (0 = illimité)';
+$string['soapbox:assign_stored_attempts'] = 'Enregistrements conservés par apprenant';
+$string['soapbox:assign_reccap'] = 'Nombre maximal d\'enregistrements conservés par apprenant sur le site : {$a}.';
+$string['soapbox:assign_slides'] = 'Diapositives';
+$string['soapbox:assign_slides_help'] = 'Permettre aux apprenants de téléverser un jeu de diapositives PDF et de les faire défiler pendant l\'enregistrement';
+$string['soapbox:assign_slide_vision'] = 'Retour sur la conception visuelle des diapositives';
+$string['soapbox:assign_slide_vision_help'] = 'Analyser également les images des diapositives par vision artificielle afin d\'obtenir des remarques sur la conception visuelle (nécessite Diapositives et le réglage de vision des diapositives Soapbox du site)';
+$string['soapbox:assign_visible'] = 'Visible par les apprenants';
+$string['soapbox:assign_err_min_seconds'] = 'Saisissez au moins 1 seconde';
+$string['soapbox:assign_err_minmax'] = 'La durée minimale ne peut pas dépasser la durée maximale';
