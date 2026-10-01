@@ -44,6 +44,22 @@ USAGE
 Exit 0 means the test CAUGHT the defect, which is the outcome you want.
 Exit 1 means the test passed with the defect present, so it does not pin it.
 Exit 2 means the run was inconclusive and must not be reported either way.
+WHAT THIS CANNOT PROVE
+----------------------
+Two limits worth knowing before trusting a verdict.
+
+Mutating db/install.xml proves nothing about a DB-backed test. The phpunit
+database is built once at init and is not rebuilt when install.xml changes, so
+an advanced_testcase reading through $DB sees the schema as it was, whatever
+the file now says, and reports SURVIVED regardless of what it pins. Only
+source-reading tests (privacy_discovery_coverage_test, which parses the file
+itself) actually see such a mutation.
+
+Only --file is synced to the Moodle tree. If the TEST file in the repo is
+newer than the deployed copy, the verdict describes the deployed test, not the
+one you just wrote. rsync the plugin before proving anything you have just
+edited.
+
 """
 import argparse
 import fcntl
@@ -109,6 +125,13 @@ def read_verdict(output):
         # numbers, so a substring check against it never saw the Skipped count
         # sitting on the next line.
         counts = {}
+        # The plain "OK (1 test, 0 assertions)" shape has no Tests: line at all,
+        # so it used to skip this check entirely and report SURVIVED while the
+        # docstring promised otherwise. Moodle's phpunit.xml does not treat a
+        # zero-assertion test as risky, so that shape is reachable.
+        plain = re.search(r'^OK \((\d+) tests?, (\d+) assertions?\)', output, re.M)
+        if plain:
+            counts = {'Tests': int(plain.group(1)), 'Assertions': int(plain.group(2))}
         for ln in lines:
             if ln.startswith('Tests:'):
                 for part in ln.rstrip('.').split(','):
@@ -182,9 +205,34 @@ def main() -> int:
         # interleaving, which is the bug this file exists to prevent.
         fcntl.flock(lock, fcntl.LOCK_EX)
         try:
+            # Read the repo file ONCE, and use this exact string for both the
+            # baseline and the mutation. copy2() followed by a later read left a
+            # window: the flock covers the deployed tree, not the repo, so a save
+            # in an editor (or another agent) during a baseline that can run for
+            # minutes meant the baseline tested version A while the mutation was
+            # applied to version B.
+            original = open(source, encoding='utf-8').read()
+
+            # Anchor checks before the baseline, so a mistyped --find fails in
+            # milliseconds instead of after a full clean run.
+            hits = len(re.findall('(?=' + re.escape(args.find) + ')', original))
+            if hits == 0:
+                print('the --find text is not present in the file, so the mutation '
+                      'would be a no-op and the verdict meaningless', file=sys.stderr)
+                return INCONCLUSIVE
+            if hits > 1:
+                print(f'the --find text appears {hits} times in {args.file}. '
+                      'replace() would mutate only the first, which is probably '
+                      'not the one you mean, and a mutation of the wrong line '
+                      'reports SURVIVED exactly like a test that does not catch '
+                      'the defect. Extend --find with a neighbouring line until '
+                      'it matches once.', file=sys.stderr)
+                return INCONCLUSIVE
+
             # Start from the repo's copy of just this file, so a previous run's
             # mutation cannot be mistaken for ours.
-            shutil.copy2(source, target)
+            with open(target, 'w', encoding='utf-8') as fh:
+                fh.write(original)
 
             # Baseline. Without it, a filter whose test ALREADY fails on clean
             # code reports CAUGHT for every mutation, including one on a line
@@ -218,35 +266,6 @@ def main() -> int:
                           'any CAUGHT here would be meaningless. Fix the test first.\n'
                           f'  baseline: {bsummary}', file=sys.stderr)
                     return INCONCLUSIVE
-
-            original = open(source, encoding='utf-8').read()
-            # count() misses overlapping matches ('aa' in 'aaa' counts 1), and an
-            # anchor that overlaps itself is exactly the kind that needs the warning.
-            hits = len(re.findall('(?=' + re.escape(args.find) + ')', original))
-            if hits == 0:
-                print('the --find text is not present in the file, so the mutation '
-                      'would be a no-op and the verdict meaningless', file=sys.stderr)
-                return INCONCLUSIVE
-
-            # An ambiguous --find is the quietest way to get a wrong verdict.
-            # replace(..., 1) hits whichever copy comes first in the file, which
-            # is rarely the one meant. On 2026-10-01, proving that the privacy
-            # discovery test catches a table dropped from COURSE_USER_TABLES
-            # used a --find that appears five times in provider.php: four times
-            # inside the export and delete arrays and once in the constant. The
-            # mutation landed on an export array, discovery was untouched, and
-            # the script reported SURVIVED about a test that catches the defect
-            # perfectly. A no-op mutation and a mutation of the wrong line
-            # produce the same SURVIVED, so neither can be trusted unless the
-            # anchor is unique.
-            if hits > 1:
-                print(f'the --find text appears {hits} times in {args.file}. '
-                      'replace() would mutate only the first, which is probably '
-                      'not the one you mean, and a mutation of the wrong line '
-                      'reports SURVIVED exactly like a test that does not catch '
-                      'the defect. Extend --find with a neighbouring line until '
-                      'it matches once.', file=sys.stderr)
-                return INCONCLUSIVE
 
             mutated = original.replace(args.find, args.replace, 1)
             open(target, 'w', encoding='utf-8').write(mutated)

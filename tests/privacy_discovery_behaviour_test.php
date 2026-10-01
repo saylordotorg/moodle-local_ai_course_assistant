@@ -130,14 +130,32 @@ final class privacy_discovery_behaviour_test extends \advanced_testcase {
             $next = ++self::$filler;
             if ($column->meta_type === 'I' || $column->meta_type === 'N'
                     || $column->meta_type === 'F') {
-                // Narrow columns cannot hold the counter. outreach_log.dryrun is
-                // one digit, and a value of 141 is rejected outright under
-                // strict mode. Wrap into the column's range instead of clamping,
-                // so a narrow column still varies between rows rather than
-                // becoming a constant that could collide in a unique index.
-                $digits = (int) ($column->max_length ?? 0);
-                $cap = ($digits >= 1 && $digits <= 9) ? ((int) str_repeat('9', $digits)) : PHP_INT_MAX;
-                $record[$name] = $cap === PHP_INT_MAX ? $next : ($next % ($cap + 1));
+                // Narrow columns cannot hold the counter. outreach_log.dryrun
+                // is declared one digit and MySQL rejects 141 outright under
+                // strict mode.
+                //
+                // The cap is a fixed 99 rather than something derived from the
+                // reported width, because max_length is the DRIVER'S precision,
+                // not the declared XMLDB length: convs.userid is LENGTH="10" in
+                // install.xml and MySQL reports 19. Deriving a cap from it would
+                // mean a different cap per driver for the same column, which is
+                // the sort of difference that passes locally on MySQL and fails
+                // only in the pgsql CI jobs.
+                //
+                // 99 is safe everywhere. The narrowest integer type Moodle emits
+                // is MySQL's TINYINT at 127; Postgres has no TINYINT and maps
+                // those to SMALLINT at 32767. Wrapping rather than clamping
+                // keeps narrow columns varying between rows instead of becoming
+                // a constant, which would collide if one ever joined a unique
+                // index. None does today: no unique index on any listed table
+                // covers a narrow integer column.
+                // For a decimal, max_length is the PRECISION and the integer
+                // part only holds precision minus scale: obj_att.weight and
+                // flashcards.ease are number(5,2), so 999.99 is their ceiling,
+                // and plans.hours_per_week is number(5,1). Subtracting the scale
+                // is what makes "wrap into the column's range" true for them too.
+                $digits = (int) ($column->max_length ?? 0) - (int) ($column->scale ?? 0);
+                $record[$name] = ($digits >= 1 && $digits < 10) ? ($next % 100) : $next;
             } else {
                 $value = 'x' . $next;
                 $max = (int) ($column->max_length ?? 0);
