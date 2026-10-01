@@ -224,6 +224,24 @@ final class remote_config_optin_test extends \advanced_testcase {
         $block = substr($src, (int) strpos($src, 'oldversion < 2026100100'));
         $block = substr($block, 0, (int) strpos($block, 'upgrade_plugin_savepoint'));
 
+        // Strip comments before looking for the call. A commented-out call still
+        // contains the substring, so the plain scrape passed on a step that did
+        // nothing. This cannot see a dead branch (if (false)), and that limit is
+        // accepted: the test is a tripwire against the logic growing back inline,
+        // not proof that the step executes.
+        $code = '';
+        foreach (token_get_all('<?php ' . $block) as $token) {
+            if (is_array($token)) {
+                if ($token[0] === T_COMMENT || $token[0] === T_DOC_COMMENT) {
+                    continue;
+                }
+                $code .= $token[1];
+            } else {
+                $code .= $token;
+            }
+        }
+        $block = $code;
+
         $this->assertStringContainsString('clear_historic_default()', $block,
             'The 2026100100 upgrade step no longer calls '
                 . 'remote_config_manager::clear_historic_default(), so the tests above '

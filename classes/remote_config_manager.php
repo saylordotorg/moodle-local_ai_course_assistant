@@ -83,6 +83,12 @@ class remote_config_manager {
      * is why this compares against the exact historic string and touches
      * nothing else.
      *
+     * DO NOT CHANGE THE BEHAVIOUR OF THIS METHOD while the 2026100100 upgrade
+     * step still calls it. An upgrade step is history: a site upgrading from
+     * 7.5.x years from now runs today's step against tomorrow's code, so an
+     * "improvement" here silently rewrites what that step did. If different
+     * behaviour is ever needed, add a new method and a new upgrade step.
+     *
      * @return bool True if the setting was cleared.
      */
     public static function clear_historic_default(): bool {

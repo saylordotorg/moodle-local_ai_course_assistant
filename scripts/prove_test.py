@@ -68,6 +68,96 @@ def run(cmd, **kw):
     return subprocess.run(cmd, shell=True, capture_output=True, text=True, env=env, **kw)
 
 
+def read_verdict(output):
+    """Decide what a phpunit run actually said.
+
+    Returns (caught, summary, why). caught is None when the run proves nothing,
+    and `why` then explains it. Every branch here exists because the simpler
+    version of this function reported a confident verdict about a run that had
+    not tested anything.
+
+    - A run that never reached a test prints neither FAILURES nor ERRORS.
+      "PHPUnit environment is not initialised", "initialised for a different
+      version" (the first run after any version.php bump), a bootstrap fatal and
+      a dead database all look like this, and all used to read as SURVIVED.
+    - A run whose only matching test was SKIPPED prints
+      "OK, but incomplete, skipped, or risky tests!" with zero assertions. That
+      is the same nothing-happened case as "No tests executed", and it used to
+      read as SURVIVED.
+    - FAILURES and ERRORS were matched anywhere in the output, so a test whose
+      own message or stdout contained either word could flip the verdict. They
+      are anchored to the start of a line now, and a run reporting both is
+      refused rather than guessed at.
+    """
+    lines = output.splitlines()
+    summary = next((ln for ln in lines
+                    if ln.startswith('Tests:') or ln.startswith('OK')), '')
+
+    caught = any(ln.startswith('FAILURES!') or ln.startswith('ERRORS!') for ln in lines)
+    passed = any(ln.startswith('OK (') or ln.startswith('OK, but') for ln in lines)
+
+    if caught and passed:
+        return None, summary, ('phpunit reported both a pass and a failure, which '
+                               'one run cannot do. Verdict refused.')
+    if not caught and not passed:
+        return None, summary, ('phpunit reported neither a clean pass nor a failure, '
+                               'so it probably never ran the test.')
+    if not caught:
+        # A pass only counts if assertions actually ran. Read the counts rather
+        # than grepping the summary string: the first line starting with 'OK' is
+        # "OK, but incomplete, skipped, or risky tests!", which carries no
+        # numbers, so a substring check against it never saw the Skipped count
+        # sitting on the next line.
+        counts = {}
+        for ln in lines:
+            if ln.startswith('Tests:'):
+                for part in ln.rstrip('.').split(','):
+                    bits = part.strip().split(':')
+                    if len(bits) == 2 and bits[1].strip().isdigit():
+                        counts[bits[0].strip()] = int(bits[1].strip())
+                break
+
+        if counts:
+            tests = counts.get('Tests', 0)
+            inert = counts.get('Skipped', 0) + counts.get('Incomplete', 0)
+            if counts.get('Assertions', 0) == 0:
+                return None, summary, ('the run made no assertions at all, so nothing '
+                                       'survived anything.')
+            if tests and inert >= tests:
+                return None, summary, ('every matching test was skipped or incomplete, '
+                                       'so none of them ran against the mutation.')
+    return caught, summary, ''
+
+
+def syntax_ok(path):
+    """Check a mutated file still parses. Returns (ok, message).
+
+    A mutation that breaks the file makes every test that loads it error, which
+    the verdict reads as CAUGHT. That says the test pins the behaviour when all
+    it proved is that the file is now broken.
+    """
+    if path.endswith('.php'):
+        lint = run(f'php -l {path!r}')
+        if lint.returncode == 127:
+            return False, 'php is not on PATH, so the mutation could not be checked'
+        return lint.returncode == 0, (lint.stdout + lint.stderr).strip()
+    if path.endswith('.json'):
+        import json
+        try:
+            json.load(open(path, encoding='utf-8'))
+            return True, ''
+        except Exception as e:
+            return False, f'invalid JSON: {e}'
+    if path.endswith('.xml'):
+        import xml.etree.ElementTree as ET
+        try:
+            ET.parse(path)
+            return True, ''
+        except Exception as e:
+            return False, f'invalid XML: {e}'
+    return True, ''
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('--file', required=True, help='Plugin-relative path to mutate.')
@@ -75,6 +165,10 @@ def main() -> int:
     ap.add_argument('--replace', default='', help='Replacement text; empty deletes it.')
     ap.add_argument('--filter', required=True, help='phpunit --filter expression.')
     ap.add_argument('--timeout', type=int, default=900)
+    ap.add_argument('--skip-baseline', action='store_true',
+                    help='Do not run the filter on clean code first. Halves the '
+                         'runtime and gives up the only check that the test '
+                         'passes before the mutation.')
     args = ap.parse_args()
 
     source = os.path.join(REPO, args.file)
@@ -91,6 +185,39 @@ def main() -> int:
             # Start from the repo's copy of just this file, so a previous run's
             # mutation cannot be mistaken for ours.
             shutil.copy2(source, target)
+
+            # Baseline. Without it, a filter whose test ALREADY fails on clean
+            # code reports CAUGHT for every mutation, including one on a line
+            # the test never reaches. That is the mirror of the ambiguous-anchor
+            # bug: a confident verdict about something that was never tested.
+            # It is not hypothetical. On 2026-10-01 a test broken by its own
+            # fixture (a duplicate key on a second insert) raised a
+            # dml_write_exception, phpunit reported ERRORS, and this script
+            # printed CAUGHT. The mutation was irrelevant and the proof was
+            # worthless.
+            if not args.skip_baseline:
+                try:
+                    base = run(f'cd {MOODLE} && vendor/bin/phpunit --filter {args.filter!r}',
+                               timeout=args.timeout)
+                except subprocess.TimeoutExpired:
+                    print(f'INCONCLUSIVE: the baseline run did not finish within '
+                          f'{args.timeout}s.', file=sys.stderr)
+                    return INCONCLUSIVE
+                baseout = base.stdout + base.stderr
+                if 'No tests executed' in baseout:
+                    print('INCONCLUSIVE: the filter matched no tests on clean code, '
+                          'which phpunit reports as success.', file=sys.stderr)
+                    return INCONCLUSIVE
+                bverdict, bsummary, bwhy = read_verdict(baseout)
+                if bverdict is None:
+                    print('INCONCLUSIVE: the baseline run proves nothing: ' + bwhy
+                          + '\n' + '\n'.join(baseout.splitlines()[-12:]), file=sys.stderr)
+                    return INCONCLUSIVE
+                if bverdict:
+                    print('INCONCLUSIVE: the test already fails on UNMUTATED code, so '
+                          'any CAUGHT here would be meaningless. Fix the test first.\n'
+                          f'  baseline: {bsummary}', file=sys.stderr)
+                    return INCONCLUSIVE
 
             original = open(source, encoding='utf-8').read()
             # count() misses overlapping matches ('aa' in 'aaa' counts 1), and an
@@ -124,19 +251,12 @@ def main() -> int:
             mutated = original.replace(args.find, args.replace, 1)
             open(target, 'w', encoding='utf-8').write(mutated)
 
-            # A mutation that does not parse makes every test that loads the class
-            # fail, which the verdict below reads as ERRORS and reports as CAUGHT.
-            # That is a wrong verdict: it says the test pins the behaviour when all
-            # it proved is that PHP rejects a syntax error. Seen on 2026-10-01,
-            # where a --replace that unbalanced a parenthesis reported CAUGHT.
-            if target.endswith('.php'):
-                lint = run(f'php -l {target!r}')
-                if lint.returncode != 0:
-                    print('INCONCLUSIVE: the mutated file does not parse, so every '
-                          'test loading it would error and the verdict would say '
-                          'CAUGHT for the wrong reason:\n'
-                          + (lint.stdout + lint.stderr).strip(), file=sys.stderr)
-                    return INCONCLUSIVE
+            ok, detail = syntax_ok(target)
+            if not ok:
+                print('INCONCLUSIVE: the mutated file is not valid, so every test '
+                      'loading it would error and the verdict would say CAUGHT for '
+                      'the wrong reason:\n' + detail, file=sys.stderr)
+                return INCONCLUSIVE
 
             try:
                 result = run(f'cd {MOODLE} && vendor/bin/phpunit --filter {args.filter!r}',
@@ -164,29 +284,15 @@ def main() -> int:
                       'reports as success.', file=sys.stderr)
                 return INCONCLUSIVE
 
-            # SURVIVED has to be earned by a run that actually reported a clean
-            # pass, not merely inferred from the absence of the word FAILURES.
-            # "PHPUnit environment is not initialised", "initialised for a
-            # different version" (likely the first time anyone runs this after a
-            # version.php bump), a bootstrap fatal and a dead database all produce
-            # output containing neither FAILURES nor ERRORS, and all used to be
-            # reported as SURVIVED: the test looks useless and the defect looks
-            # unpinned, which is the lie this whole script exists to prevent.
-            caught = ('FAILURES' in output) or ('ERRORS' in output)
-            passed = any(ln.startswith('OK (') or ln.startswith('OK, but')
-                         for ln in output.splitlines())
-            summary = next((ln for ln in output.splitlines()
-                            if ln.startswith('Tests:') or ln.startswith('OK')), '')
-
-            if not caught and not passed:
-                print('INCONCLUSIVE: phpunit reported neither a clean pass nor a '
-                      'failure, so it probably never ran the test. Last lines:\n'
+            verdict, summary, why = read_verdict(output)
+            if verdict is None:
+                print('INCONCLUSIVE: ' + why + '\n'
                       + '\n'.join(output.splitlines()[-12:]), file=sys.stderr)
                 return INCONCLUSIVE
 
-            print(('CAUGHT' if caught else 'SURVIVED') + f'  {summary}')
+            print(('CAUGHT' if verdict else 'SURVIVED') + f'  {summary}')
             print(f'  mutation: {args.file}: {args.find[:70]!r} -> {args.replace[:40]!r}')
-            return 0 if caught else 1
+            return 0 if verdict else 1
         finally:
             shutil.copy2(source, target)
             fcntl.flock(lock, fcntl.LOCK_UN)

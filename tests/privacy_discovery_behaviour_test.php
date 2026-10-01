@@ -78,6 +78,9 @@ final class privacy_discovery_behaviour_test extends \advanced_testcase {
             privacy\provider::get_contexts_for_userid($userid)->get_contextids());
     }
 
+    /** @var int Counter making each generated column value unique. */
+    private static $filler = 0;
+
     /**
      * Insert one minimal row, filling whatever the schema insists on.
      *
@@ -106,8 +109,41 @@ final class privacy_discovery_behaviour_test extends \advanced_testcase {
                 $record[$name] = $courseid;
                 continue;
             }
-            if (!empty($column->not_null) && $column->has_default === false) {
-                $record[$name] = $column->meta_type === 'I' || $column->meta_type === 'N' ? 0 : '';
+            if (empty($column->not_null)) {
+                continue;
+            }
+
+            // Every not-null column gets a value, and every value is distinct.
+            //
+            // Two earlier versions of this were wrong in ways worth recording.
+            // Filling with a constant 0 broke as soon as a second row was
+            // inserted, because msg_ratings has a unique index on messageid.
+            // Skipping columns that report a default then broke on reminders,
+            // whose unique unsubscribe_token is a NOTNULL char that MySQL
+            // reports as defaulting to the empty string, so two rows both got
+            // '' and collided.
+            //
+            // Both surfaced as a dml_write_exception, which phpunit reports as
+            // an ERROR, which the mutation harness counted as the test catching
+            // its defect. A test broken in this way produces a false CAUGHT and
+            // looks like proof.
+            $next = ++self::$filler;
+            if ($column->meta_type === 'I' || $column->meta_type === 'N'
+                    || $column->meta_type === 'F') {
+                // Narrow columns cannot hold the counter. outreach_log.dryrun is
+                // one digit, and a value of 141 is rejected outright under
+                // strict mode. Wrap into the column's range instead of clamping,
+                // so a narrow column still varies between rows rather than
+                // becoming a constant that could collide in a unique index.
+                $digits = (int) ($column->max_length ?? 0);
+                $cap = ($digits >= 1 && $digits <= 9) ? ((int) str_repeat('9', $digits)) : PHP_INT_MAX;
+                $record[$name] = $cap === PHP_INT_MAX ? $next : ($next % ($cap + 1));
+            } else {
+                $value = 'x' . $next;
+                $max = (int) ($column->max_length ?? 0);
+                $record[$name] = ($max > 0 && strlen($value) > $max)
+                    ? substr($value, 0, $max)
+                    : $value;
             }
         }
 
@@ -132,17 +168,29 @@ final class privacy_discovery_behaviour_test extends \advanced_testcase {
         foreach ($this->declared_tables() as $table) {
             $course = $this->getDataGenerator()->create_course();
             $user = $this->getDataGenerator()->create_user();
-            // The negative control. A second learner in the same course with no
-            // row of their own. Without this, a query that lost its userid
-            // filter, or joined on the wrong column, would return the course for
-            // everyone and every assertion above would still pass, because the
-            // inserted row puts the course in the result regardless of who owns
-            // it. Discovery that returns too much is its own privacy problem: it
-            // exports one learner's course to another's data request.
+            // The negative control, and it has to hold a row of its own in a
+            // DIFFERENT course to be worth anything.
+            //
+            // A bystander with no rows anywhere only tests half of what it looks
+            // like it tests. get_users_in_context() runs SELECT DISTINCT userid
+            // FROM {table} WHERE courseid = :courseid, and a query over a table
+            // cannot return a userid that is not in that table. However wrong
+            // the course predicate was, a learner holding nothing could never be
+            // returned, so that assertion could not fail. Giving them a row
+            // elsewhere makes them a learner the query could wrongly reach.
+            //
+            // What each half catches once the row exists: the contexts assertion
+            // catches a lost userid filter, which would return this course for
+            // everybody; the userlist assertion catches a lost or wrong courseid
+            // filter, which would hand a course-level deletion a learner whose
+            // data lives in another course entirely. Discovery that returns too
+            // much is its own privacy defect, not merely an inefficiency.
             $bystander = $this->getDataGenerator()->create_user();
+            $elsewhere = $this->getDataGenerator()->create_course();
             $context = \context_course::instance($course->id);
 
             $this->insert_minimal_row($table, (int) $user->id, (int) $course->id);
+            $this->insert_minimal_row($table, (int) $bystander->id, (int) $elsewhere->id);
 
             if (!in_array((int) $context->id, $this->discovered_context_ids((int) $user->id), true)) {
                 $undiscoverable[] = $table;
@@ -179,9 +227,10 @@ final class privacy_discovery_behaviour_test extends \advanced_testcase {
                 . implode("\n  ", $overreaching));
 
         $this->assertSame([], $overcounted,
-            "get_users_in_context() listed a learner who holds no row in the course, so a "
-                . "course-level deletion would delete data belonging to someone who has "
-                . "none here:\n  " . implode("\n  ", $overcounted));
+            "get_users_in_context() listed a learner whose only row in these tables belongs "
+                . "to a different course, so the course predicate is not filtering. A "
+                . "course-level deletion would delete another course's data:\n  "
+                . implode("\n  ", $overcounted));
     }
 
     /**
