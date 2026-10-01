@@ -1,6 +1,6 @@
 Hello Volodymyr,
 
-Apologies for the . I had this written after v7.6.0 and did not send it,
+Thank you for your review! I had this written after v7.6.0 and did not send it,
 so this covers two releases rather than one.
 
 Of the fourteen issues, thirteen are now fixed. The fourteenth is the Marketplace
@@ -162,9 +162,8 @@ Oromo hit the same thing through a different string.
 
 It stayed invisible because the plugin's own locale is English, the English
 strings contain no apostrophe, and nothing tested a rendered page's JavaScript.
-The strings go through json_encode now, and two tests read the page itself and
-fail if any lang string is put into a JavaScript literal without it, which is
-what stops a new locale reintroducing it.
+The strings go through json_encode now, and a test runs every real translation
+through the encoder so a new locale cannot reintroduce it.
 
 I mention it because it is the kind of thing a review that reads code in English
 will not catch, and other multilingual plugins will have the same shape of bug.
