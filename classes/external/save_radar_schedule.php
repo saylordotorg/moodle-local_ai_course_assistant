@@ -42,7 +42,17 @@ class save_radar_schedule extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'id' => new external_value(PARAM_INT, 'Schedule id, 0 to create', VALUE_DEFAULT, 0),
-            'name' => new external_value(PARAM_TEXT, 'Schedule name', VALUE_DEFAULT, ''),
+            // PARAM_RAW here, cleaned to PARAM_TEXT inside execute(). Declaring
+            // it PARAM_TEXT makes external_value::validate() THROW when the
+            // cleaned value differs from the submitted one, and strip_tags()
+            // eats everything from the first '<'. The modal pre-fills the name
+            // from the first 60 characters of the analyst query, and analyst
+            // queries routinely say things like "grade <70 in week 3", so a
+            // perfectly ordinary name was rejected with "Invalid parameter
+            // value detected" and no indication of which field was wrong. The
+            // old AJAX endpoint cleaned it silently and saved. Cleaning inside
+            // execute() keeps the stored value safe and the field forgiving.
+            'name' => new external_value(PARAM_RAW, 'Schedule name', VALUE_DEFAULT, ''),
             // PARAM_RAW is required: the scheduled Learning Radar query is
             // free-form analyst prose that routinely carries newlines, quotes,
             // LaTeX and fenced code blocks. It is stored verbatim, sent to the
@@ -55,7 +65,9 @@ class save_radar_schedule extends external_api {
             // "meta-llama/Llama-3.1-8B-Instruct"), which PARAM_ALPHANUMEXT
             // would strip. PARAM_TEXT is lossless for those while stripping
             // markup.
-            'model' => new external_value(PARAM_TEXT, 'Model slug, empty for the provider default',
+            // Same reasoning as name: PARAM_RAW in, cleaned to PARAM_TEXT in
+            // execute(), so a slug the cleaner would alter cannot throw.
+            'model' => new external_value(PARAM_RAW, 'Model slug, empty for the provider default',
                 VALUE_DEFAULT, ''),
             'frequency' => new external_value(PARAM_ALPHA, 'daily | weekly | monthly', VALUE_DEFAULT, 'weekly'),
             'recipient_email' => new external_value(PARAM_EMAIL, 'Report recipient', VALUE_DEFAULT, ''),
@@ -142,6 +154,10 @@ class save_radar_schedule extends external_api {
 
         $data = $params;
         $data['model'] = trim($params['model']);
+        // Clean what the declarations no longer clean for us.
+        $data['name'] = clean_param($params['name'], PARAM_TEXT);
+        $data['model'] = trim(clean_param($params['model'], PARAM_TEXT));
+
         $data['range_days'] = $params['range_days'] === ''
             ? '' : (string) clean_param($params['range_days'], PARAM_INT);
         $data['enabled'] = !empty($params['enabled']) ? 1 : 0;

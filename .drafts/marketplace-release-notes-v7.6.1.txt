@@ -8,7 +8,7 @@ If you run the optional code sandbox on a French, Turkish or Oromo site, it has 
 
 The page built three JavaScript strings by dropping a translated message straight between single quotes. The French translation of the load-error message is "Impossible de charger l'environnement d'exécution Python", and the first apostrophe ends the string early. The browser then throws out the whole script, so the Python runtime never loads, the Run button never binds and the output pane never appears. Nothing in the English interface shows the problem, because the English message has no apostrophe.
 
-Translated text now goes through a JSON encoder that emits its own quotes, and a test runs every real translation through that encoder so a future locale cannot bring the bug back.
+Translated text now goes through a JSON encoder that emits its own quotes, and two tests read the page itself and fail if any translated string is dropped into JavaScript without it, so a future locale cannot bring the bug back.
 
 THE SANDBOX NO LONGER HARDCODES A CDN
 

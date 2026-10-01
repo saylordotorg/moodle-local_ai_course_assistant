@@ -384,4 +384,46 @@ final class external_radar_schedule_avatar_test extends \advanced_testcase {
         $keys = array_keys(start_avatar_session::execute_parameters()->keys);
         $this->assertSame(['courseid', 'lang', 'greeting'], $keys);
     }
+
+    /**
+     * A schedule name containing "<" saves, as it did before the port.
+     *
+     * The modal pre-fills the name from the first 60 characters of the analyst
+     * query, and analyst queries say things like "grade <70 in week 3".
+     * Declaring the parameter PARAM_TEXT made external_value::validate() throw,
+     * because strip_tags() eats everything from the first "<" and validate()
+     * refuses any value the cleaner would alter. The old AJAX endpoint cleaned
+     * it silently and saved. The parameter is PARAM_RAW now and execute()
+     * cleans it, so the field is forgiving again and what lands in the database
+     * is still clean text.
+     */
+    public function test_a_name_containing_an_angle_bracket_still_saves(): void {
+        $this->setAdminUser();
+
+        $result = save_radar_schedule::execute(0, 'grade <70 in week 3', 'Who is struggling?');
+        $this->assertArrayHasKey('id', $result);
+
+        $stored = radar_schedule_manager::get((int) $result['id']);
+        $this->assertNotEmpty($stored, 'the schedule should exist');
+        $this->assertStringNotContainsString('<', $stored->name,
+            'the stored name should be cleaned, even though the input was accepted');
+        $this->assertStringStartsWith('grade', $stored->name);
+    }
+
+    /**
+     * A model slug with dots and slashes survives.
+     *
+     * Vendor slugs look like "meta-llama/Llama-3.1-8B-Instruct". The same
+     * PARAM_TEXT change that broke names would have thrown on anything the
+     * cleaner altered here too.
+     */
+    public function test_a_vendor_model_slug_still_saves(): void {
+        $this->setAdminUser();
+
+        $result = save_radar_schedule::execute(
+            0, 'Nightly', 'What went wrong?', 'openai', 'meta-llama/Llama-3.1-8B-Instruct');
+        $stored = radar_schedule_manager::get((int) $result['id']);
+
+        $this->assertSame('meta-llama/Llama-3.1-8B-Instruct', $stored->model);
+    }
 }

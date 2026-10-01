@@ -914,9 +914,14 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
             // detected" with no clue which field was wrong. Doing the cleaning
             // here keeps the stricter server-side check and gives the admin
             // back the forgiving field they had.
+            // Match PARAM_SEQUENCE exactly, which is preg_replace('/[^0-9,]/', '').
+            // Trimming alone was not enough: "-3", "abc", "2;5" and "2 5" all
+            // still differ from their cleaned form, and external_value::validate()
+            // throws on any difference, so they produced the same opaque
+            // "Invalid parameter value detected" the spaces used to.
             var courseids = document.getElementById('rs-courseids').value
+                .replace(/[^0-9,]/g, '')
                 .split(',')
-                .map(function(part) { return part.trim(); })
                 .filter(function(part) { return part !== ''; })
                 .join(',');
 

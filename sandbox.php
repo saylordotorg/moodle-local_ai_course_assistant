@@ -141,7 +141,7 @@ the bundle pulls hash-stamped sub-files of its own, so SRI on the loader
 script alone would protect little and would break every self-hosted copy.
 -->
 <script>
-window.languagePluginUrl = <?php echo json_encode($pyodidebase, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+window.languagePluginUrl = <?php echo json_encode($pyodidebase, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE); ?>;
 </script>
 <script src="<?php echo s(\local_ai_course_assistant\code_sandbox::pyodide_asset_url('pyodide.js')); ?>"></script>
 
@@ -173,13 +173,13 @@ window.languagePluginUrl = <?php echo json_encode($pyodidebase, JSON_UNESCAPED_S
                 'sys.stdout = _aica_out\n' +
                 'sys.stderr = _aica_err\n'
             );
-            status.textContent = <?php echo json_encode(get_string('sandbox:ready', 'local_ai_course_assistant'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+            status.textContent = <?php echo json_encode(get_string('sandbox:ready', 'local_ai_course_assistant'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE); ?>;
             status.style.background = '#ecfdf5';
             status.style.borderColor = '#a7f3d0';
             status.style.color = '#065f46';
             runBtn.disabled = false;
         } catch (e) {
-            status.textContent = <?php echo json_encode(get_string('sandbox:load_error', 'local_ai_course_assistant'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+            status.textContent = <?php echo json_encode(get_string('sandbox:load_error', 'local_ai_course_assistant'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE); ?>;
             status.style.background = '#fef2f2';
             status.style.borderColor = '#fecaca';
             status.style.color = '#991b1b';
@@ -252,7 +252,7 @@ window.languagePluginUrl = <?php echo json_encode($pyodidebase, JSON_UNESCAPED_S
                 init();
             } else if (++attempts > 60) {
                 clearInterval(t);
-                status.textContent = <?php echo json_encode(get_string('sandbox:load_error', 'local_ai_course_assistant'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+                status.textContent = <?php echo json_encode(get_string('sandbox:load_error', 'local_ai_course_assistant'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE); ?>;
             }
         }, 250);
     }

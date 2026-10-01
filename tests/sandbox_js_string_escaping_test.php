@@ -111,14 +111,49 @@ final class sandbox_js_string_escaping_test extends \basic_testcase {
     }
 
     /**
-     * The real translations survive the encoder intact.
+     * No translation makes the encoder return false.
      *
-     * The apostrophes are the point. If this ever fails, a locale file has
-     * something the encoder cannot represent, which is the condition that
-     * broke the page in the first place.
+     * This replaces a test that could not fail. The earlier version asserted
+     * that the encoded form of each translation carried no raw quote or angle
+     * bracket, which the HEX flags guarantee unconditionally: it never read
+     * sandbox.php, so it passed just as happily against the buggy page. Review
+     * caught that, and it was overstated in three places as "the part that
+     * would have caught the original". It would not have. What catches a new
+     * locale is the two tests above, which read the page.
+     *
+     * There is still something real to pin here, and it is the one remaining
+     * way a lang string can blank the script. json_encode returns false on
+     * invalid UTF-8, and `status.textContent = ;` is a syntax error, so a
+     * mangled customlang edit would kill the page exactly as the apostrophe
+     * did. JSON_INVALID_UTF8_SUBSTITUTE prevents that, and this asserts both
+     * halves: the flag is present at every site, and every shipped translation
+     * encodes to something non-empty.
      */
-    public function test_the_translations_that_broke_the_page_now_encode_cleanly(): void {
+    public function test_no_translation_can_make_the_encoder_return_false(): void {
         $root = __DIR__ . '/..';
+
+        $src = file_get_contents($root . '/sandbox.php');
+        $this->assertNotFalse($src);
+        // Check each site, not a count. Counting let a site lose the flag as
+        // long as some other json_encode on the page still carried it, which is
+        // exactly what the proof run showed: removing one flag SURVIVED.
+        preg_match_all('/json_encode\(\s*get_string\([^)]*\)\s*,([^;]*?)\)\s*;/s', $src, $m);
+        $this->assertNotEmpty($m[1], 'sanity: the page should encode lang strings');
+
+        $unguarded = [];
+        foreach ($m[1] as $i => $flags) {
+            if (strpos($flags, 'JSON_INVALID_UTF8_SUBSTITUTE') === false) {
+                $unguarded[] = 'site ' . ($i + 1) . ': ' . trim(preg_replace('/\s+/', ' ', $flags));
+            }
+        }
+
+        $this->assertSame([], $unguarded,
+            "These json_encode calls on a lang string in sandbox.php lack "
+                . "JSON_INVALID_UTF8_SUBSTITUTE:\n  " . implode("\n  ", $unguarded)
+                . "\nWithout it, invalid UTF-8 from a customlang edit makes json_encode "
+                . "return false, the literal renders as nothing, and the whole script "
+                . "block dies the same way the apostrophe killed it.");
+
         $keys = ['sandbox:ready', 'sandbox:load_error'];
         $checked = 0;
         $problems = [];
@@ -137,24 +172,17 @@ final class sandbox_js_string_escaping_test extends \basic_testcase {
                 if (!preg_match("/\\\$string\['" . preg_quote($key, '/') . "'\]\s*=\s*'(.*)';/", $contents, $m)) {
                     continue;
                 }
-                // Undo the PHP single-quote escaping to get the real value.
                 $value = str_replace(["\\'", '\\\\'], ["'", '\\'], $m[1]);
                 $checked++;
 
                 $encoded = json_encode($value,
-                    JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+                    JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+                        | JSON_INVALID_UTF8_SUBSTITUTE);
 
-                if ($encoded === false) {
-                    $problems[] = "{$locale}/{$key}: json_encode failed, "
-                        . json_last_error_msg();
-                    continue;
-                }
-                // A correctly encoded literal has no raw quote, angle bracket or
-                // newline that could terminate it or open a tag.
-                $inner = substr($encoded, 1, -1);
-                if (preg_match('/(?<!\\\\)[\'"<>]|\R/', $inner)) {
-                    $problems[] = "{$locale}/{$key}: encoded form still carries a raw "
-                        . "quote, angle bracket or newline";
+                if ($encoded === false || $encoded === '""') {
+                    $problems[] = "{$locale}/{$key}: encodes to "
+                        . var_export($encoded, true)
+                        . ', which would render as an empty or missing JS literal';
                 }
             }
         }
