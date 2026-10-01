@@ -2071,6 +2071,55 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100102, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026100103) {
+        // Issue #283: keep the rated text with the rating.
+        //
+        // add_message() caps a conversation at 100 messages and deletes the
+        // oldest beyond that. It never touched msg_ratings, so a rating on a
+        // trimmed message kept a messageid that no longer resolved. Every
+        // consumer joins through that column with an INNER JOIN, so a learner's
+        // thumbs-down silently stopped appearing in the instructor review queue
+        // and in the negative-rating counts once the conversation got long
+        // enough. The longer and more active the conversation, the more likely
+        // the feedback was lost, which is backwards.
+        //
+        // The row keeps a copy of the text it was reacting to, so the feedback
+        // survives the trim with enough context for an instructor to act on.
+        $table = new xmldb_table('local_ai_course_assistant_msg_ratings');
+        $field = new xmldb_field('rated_excerpt', XMLDB_TYPE_TEXT, null, null, null, null, null, 'comment');
+        if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            // Backfill from the messages that are still there. Ratings already
+            // orphaned cannot be recovered; this stops the ones that still have
+            // a message from being lost at the next trim.
+            $sql = "UPDATE {local_ai_course_assistant_msg_ratings}
+                       SET rated_excerpt = (
+                           SELECT " . $DB->sql_substr('m.message', 1, 1000) . "
+                             FROM {local_ai_course_assistant_msgs} m
+                            WHERE m.id = {local_ai_course_assistant_msg_ratings}.messageid)
+                     WHERE rated_excerpt IS NULL";
+            try {
+                $DB->execute($sql);
+            } catch (\Throwable $e) {
+                // A correlated UPDATE is not portable everywhere. Fall back to
+                // a row-by-row backfill rather than leaving the column empty.
+                $rs = $DB->get_recordset_sql(
+                    "SELECT r.id, " . $DB->sql_substr('m.message', 1, 1000) . " AS excerpt
+                       FROM {local_ai_course_assistant_msg_ratings} r
+                       JOIN {local_ai_course_assistant_msgs} m ON m.id = r.messageid
+                      WHERE r.rated_excerpt IS NULL");
+                foreach ($rs as $row) {
+                    $DB->set_field('local_ai_course_assistant_msg_ratings',
+                        'rated_excerpt', $row->excerpt, ['id' => $row->id]);
+                }
+                $rs->close();
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026100103, 'local', 'ai_course_assistant');
+    }
+
 
     return true;
 }

@@ -5,7 +5,7 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 ## Version 7.6.2
 
 **Release Date:** October 2026
-**Plugin build:** 2026100102
+**Plugin build:** 2026100103
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1. `version.php` declares support through 5.2.
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+

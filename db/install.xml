@@ -71,6 +71,7 @@
         <FIELD NAME="rating" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="1 = thumbs up, -1 = thumbs down"/>
         <FIELD NAME="is_hallucination" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 = student flagged this as a hallucination"/>
         <FIELD NAME="comment" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Optional note on why thumbs down or hallucination"/>
+        <FIELD NAME="rated_excerpt" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Copy of the rated message text, kept so the feedback survives the conversation history cap (issue #283)"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
