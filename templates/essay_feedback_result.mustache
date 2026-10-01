@@ -1,0 +1,80 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/essay_feedback_result
+
+    Rubric scores for one essay feedback run, rendered by
+    amd/src/essay_feedback.js through core/templates (CONTRIB-10574 #273).
+    Everything here is model-supplied text, so every value is rendered through
+    a plain double-brace variable rather than a triple-brace one: Mustache
+    escapes it, which is what replaces the hand-rolled escaper the old inline
+    script used before concatenating innerHTML.
+
+    Context variables required for this template:
+    * criteria - rows, each with: name, stars, score, feedback
+    * overall - overall comment, empty when the model returned none
+    * hasrevisions - true when revisions is non-empty
+    * revisions - list of {text} revision suggestions
+
+    Example context (json):
+    {
+        "criteria": [
+            {"name": "Thesis", "stars": "●●●○", "score": 3,
+             "feedback": "Clear claim, but it arrives late."}
+        ],
+        "overall": "A solid draft that needs tighter structure.",
+        "hasrevisions": true,
+        "revisions": [{"text": "Move the thesis into the first paragraph."}]
+    }
+}}
+<h3>{{#str}}essay_feedback:result_heading, local_ai_course_assistant{{/str}}</h3>
+<table class="generaltable sola-essay-table">
+    <thead>
+        <tr>
+            <th>{{#str}}essay_feedback:col_criterion, local_ai_course_assistant{{/str}}</th>
+            <th class="sola-essay-col-score">
+                {{#str}}essay_feedback:col_score, local_ai_course_assistant{{/str}}
+            </th>
+            <th>{{#str}}essay_feedback:col_feedback, local_ai_course_assistant{{/str}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#criteria}}
+        <tr>
+            <td>{{name}}</td>
+            <td class="sola-essay-score"><span aria-hidden="true">{{stars}}</span> {{score}}/4</td>
+            <td>{{feedback}}</td>
+        </tr>
+        {{/criteria}}
+    </tbody>
+</table>
+{{#overall}}
+    <h4 class="sola-essay-subheading">
+        {{#str}}essay_feedback:overall_heading, local_ai_course_assistant{{/str}}
+    </h4>
+    <p>{{overall}}</p>
+{{/overall}}
+{{#hasrevisions}}
+<h4 class="sola-essay-subheading">
+    {{#str}}essay_feedback:revisions_heading, local_ai_course_assistant{{/str}}
+</h4>
+<ol>
+    {{#revisions}}
+    <li>{{text}}</li>
+    {{/revisions}}
+</ol>
+{{/hasrevisions}}

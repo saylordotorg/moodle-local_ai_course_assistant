@@ -24,7 +24,8 @@
 define([
     'local_ai_course_assistant/markdown',
     'local_ai_course_assistant/quiz',
-], function(Markdown, Quiz) {
+    'local_ai_course_assistant/repository',
+], function(Markdown, Quiz, Repository) {
 
     /** @type {HTMLElement} */
     let root = null;
@@ -6379,7 +6380,7 @@ define([
 
     /**
      * Open or close a talking-avatar iframe surface inside the drawer.
-     * Calls talking_avatar_session.php for the embed_url; on failure shows
+     * Calls the start_avatar_session external service for the embed_url; on failure shows
      * a non-blocking notification. Records the session row id so the
      * heartbeat can close it on dismissal or page unload.
      *
@@ -6420,24 +6421,12 @@ define([
             setExpanded(false);
         });
 
-        const sesskey = (root && root.dataset.sesskey) || (M && M.cfg && M.cfg.sesskey) || '';
-        const params = new URLSearchParams();
-        params.set('sesskey', sesskey);
-        params.set('courseid', String(courseId));
-        // v7.1.1: empty, not 'en'. sse.php treats an empty lang as "detect from
-        // the learner's writing"; sending 'en' whenever they had not explicitly
-        // picked a language meant that detection path never ran, so a learner
-        // writing Spanish got English back. An explicit choice still wins.
-        params.set('lang', lang || '');
-
-        fetch(M.cfg.wwwroot + '/local/ai_course_assistant/talking_avatar_session.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: params.toString(),
-            credentials: 'same-origin',
-        }).then(function(r) {
-            return r.json();
-        }).then(function(json) {
+        // v7.1.1: empty lang, not 'en'. sse.php treats an empty lang as "detect
+        // from the learner's writing"; sending 'en' whenever they had not
+        // explicitly picked a language meant that detection path never ran, so
+        // a learner writing Spanish got English back. An explicit choice still
+        // wins.
+        Repository.startAvatarSession(courseId, lang || '', '').then(function(json) {
             const loading = panel.querySelector('.aica-talking-avatar-panel__loading');
             if (loading) { loading.remove(); }
             if (!json || !json.ok || !json.embed_url) {

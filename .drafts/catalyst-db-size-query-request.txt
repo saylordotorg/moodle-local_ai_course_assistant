@@ -1,0 +1,64 @@
+TO: Catalyst support
+SUBJECT: Request: run two read-only queries on the Learn and Degrees databases
+
+Hi team,
+
+We'd like to understand what's driving database size on learn.saylor.org and
+degrees.saylor.org. We can't read the production databases ourselves, so could
+you run the two read-only queries below on each site and send back the output?
+
+Both are SELECTs against information_schema and one plugin table. Neither
+writes anything, and neither reads learner content. They should each return in
+well under a second.
+
+QUERY 1: the twenty largest tables
+
+SELECT table_name,
+       ROUND((data_length + index_length) / 1024 / 1024, 1) AS size_mb,
+       table_rows
+  FROM information_schema.tables
+ WHERE table_schema = DATABASE()
+ ORDER BY (data_length + index_length) DESC
+ LIMIT 20;
+
+QUERY 2: the SOLA embedding columns
+
+SELECT COUNT(*) AS chunks,
+       SUM(embedding IS NOT NULL) AS has_json,
+       SUM(embedding_bin IS NOT NULL) AS has_binary,
+       SUM(embedding IS NOT NULL AND embedding_bin IS NOT NULL) AS has_both,
+       SUM(embedding IS NOT NULL AND embedding_bin IS NULL) AS json_only
+  FROM mdl_local_ai_course_assistant_chunks;
+
+(Adjust the mdl_ prefix if the sites use a different one.)
+
+WHY WE'RE ASKING
+
+On our five dev sites the SOLA chunks table was the largest table on every one
+of them, because each embedding is stored twice: once packed into a binary
+column, which is what retrieval reads, and once as a JSON array of floats,
+which is about three times the size and is only a fallback. That was a
+deliberate, temporary rollback path during a format transition, and it was
+never removed.
+
+Clearing the redundant copies and running OPTIMIZE TABLE freed 392 MB across
+the dev fleet, about 59 percent. On our main dev site the table went from
+463 MB to 176 MB.
+
+We are NOT asking you to change anything yet. Query 2 is the one that decides
+whether a cleanup is safe, because of something we found the hard way: on two
+of our five dev sites, some rows had the JSON copy and no binary. For those
+rows the JSON is the only copy of the vector, so deleting it destroys the
+embedding and costs a paid re-embed to recover, with search quality quietly
+degraded until someone notices. Three of the five sites had none, which is
+exactly what makes it dangerous to generalise from one site.
+
+So: if json_only comes back as 0 on a site, a cleanup there is safe and we'll
+come back to you with an exact statement and a maintenance window. If it comes
+back non-zero, we need to backfill those rows first.
+
+No rush on this, and please tell us if you'd rather we filed it differently or
+if there's a standing cost for ad-hoc queries.
+
+Thanks,
+Tom

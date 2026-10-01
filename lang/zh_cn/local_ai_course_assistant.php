@@ -964,9 +964,9 @@ $string['sandbox:run'] = '运行';
 $string['sandbox:running'] = '正在运行…';
 $string['sandbox:clear'] = '清除输出';
 $string['sandbox:output_heading'] = '输出';
-$string['sandbox:privacy_note'] = '代码和输出都保留在您的浏览器中，不会发送到任何服务器。运行环境仅在首次访问时从公共 CDN 加载，之后访问将使用缓存。';
+$string['sandbox:privacy_note'] = '代码和输出只留在你的浏览器里。你写的或运行的任何内容都不会发送到任何服务器。只有 Python 运行时本身会从站点管理员配置的位置下载一次，之后便会缓存下来供以后访问使用。';
 $string['sandbox:toggle'] = '为本课程启用 Python 沙盒';
-$string['sandbox:toggle_help'] = '为学习者添加一个页面，让学生可以通过 Pyodide 完全在浏览器中编写和运行 Python。默认关闭。请为有编程作业的课程启用；其他课程保持关闭。';
+$string['sandbox:toggle_help'] = '为学习者添加一个页面，让学生可以通过 Pyodide 完全在浏览器中编写和运行 Python。默认关闭。请为有编程作业的课程启用；其他课程保持关闭。 站点管理员还需要在插件设置中填写 Python 运行时的位置：只要该项为空，就没有东西可加载，沙盒会保持关闭。';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'AI 课程助手 — 课程';
@@ -3143,3 +3143,30 @@ $string['settings:support_enabled_desc'] = '允许学习者在仪表板、个人
 $string['settings:support_courseid'] = '支持课程';
 $string['settings:support_courseid_desc'] = '存放入门指南、新手引导和导览材料的课程的 ID，该课程须为可见状态。支持对话依据这门课程和上方的常见问题作答，并记入该课程。留空即关闭支持模式。站点首页（课程 1）不可用作支持课程。';
 $string['support:promptrole'] = '你正在回答来自课程之外的支持类问题。学习者问的不是课程内容，因此不要把他们引回课程材料。请依据常见问题和提供给你的支持材料作答。如果无法准确回答，就直说，并主动提出把问题转交给支持团队。';
+
+$string['sandbox:noruntimeurl'] = '本课程已启用 Python 沙盒，但站点未设置 Python 运行时的位置，因此没有可加载的内容。管理员可在插件设置中指定位置。';
+$string['privacy:metadata:code_sandbox_runtime'] = '启用 Python 沙盒后，学习者的浏览器会从站点管理员配置的位置下载 Python 运行时，该位置可能属于第三方。在沙盒中编写的代码及其输出仅保留在本机，不会发送到任何地方。';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = '学习者的 IP 地址，仅因发出该请求即会被运行时的提供方获知。';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = '学习者的浏览器和操作系统，作为该请求的 user agent 一并发送。';
+
+$string['settings:avatar_numbered'] = '头像 {$a}';
+$string['settings:avatar_custom'] = '自定义：{$a}';
+$string['soapbox:assign_name'] = '作业名称';
+$string['soapbox:assign_required'] = '此项为必填';
+$string['soapbox:assign_intro'] = '说明';
+$string['soapbox:assign_recordtype'] = '录制类型';
+$string['soapbox:assign_mode_video'] = '视频';
+$string['soapbox:assign_mode_audio'] = '仅音频';
+$string['soapbox:assign_min_seconds'] = '最短时长（秒）';
+$string['soapbox:assign_max_seconds'] = '最长时长（秒）';
+$string['soapbox:assign_seccap'] = '站点最长时长：{$a} 秒。';
+$string['soapbox:assign_max_attempts'] = '允许的尝试次数（0 = 不限）';
+$string['soapbox:assign_stored_attempts'] = '每位学生保留的录音数';
+$string['soapbox:assign_reccap'] = '站点规定每位学生最多保留的录音数：{$a}。';
+$string['soapbox:assign_slides'] = '幻灯片';
+$string['soapbox:assign_slides_help'] = '允许学生上传 PDF 演示文稿，并在录制时逐张切换幻灯片';
+$string['soapbox:assign_slide_vision'] = '幻灯片视觉设计反馈';
+$string['soapbox:assign_slide_vision_help'] = '同时对幻灯片图像进行一次视觉分析，生成视觉设计说明（需要启用“幻灯片”，以及站点的 Soapbox 幻灯片视觉分析设置）';
+$string['soapbox:assign_visible'] = '对学生可见';
+$string['soapbox:assign_err_min_seconds'] = '请至少输入 1 秒';
+$string['soapbox:assign_err_minmax'] = '最短时长不能超过最长时长';

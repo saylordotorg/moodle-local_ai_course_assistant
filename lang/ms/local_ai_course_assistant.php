@@ -982,9 +982,9 @@ $string['sandbox:run'] = 'Jalankan';
 $string['sandbox:running'] = 'Sedang berjalan…';
 $string['sandbox:clear'] = 'Kosongkan keluaran';
 $string['sandbox:output_heading'] = 'Keluaran';
-$string['sandbox:privacy_note'] = 'Kod dan keluaran kekal dalam pelayar anda. Tiada apa-apa dihantar ke mana-mana pelayan. Masa jalan dimuatkan daripada CDN awam pada kali pertama sahaja dan disimpan dalam cache untuk lawatan berikutnya.';
+$string['sandbox:privacy_note'] = 'Kod dan outputnya kekal dalam pelayar anda. Tiada apa-apa yang anda tulis atau jalankan dihantar ke mana-mana pelayan. Runtime Python itu sendiri dimuat turun sekali daripada lokasi yang ditetapkan oleh pentadbir tapak anda, kemudian disimpan dalam cache untuk lawatan berikutnya.';
 $string['sandbox:toggle'] = 'Aktifkan kotak pasir Python untuk kursus ini';
-$string['sandbox:toggle_help'] = 'Menambah halaman khusus tempat pelajar boleh menulis dan menjalankan Python sepenuhnya dalam pelayar melalui Pyodide. Dimatikan secara lalai. Aktifkan untuk kursus yang melibatkan kerja pengekodan; biarkan dimatikan untuk kursus yang tidak.';
+$string['sandbox:toggle_help'] = 'Menambah halaman khusus tempat pelajar boleh menulis dan menjalankan Python sepenuhnya dalam pelayar melalui Pyodide. Dimatikan secara lalai. Aktifkan untuk kursus yang melibatkan kerja pengekodan; biarkan dimatikan untuk kursus yang tidak. Pentadbir tapak juga perlu menetapkan lokasi runtime Python dalam tetapan pemalam: selagi ruang itu kosong, kotak pasir kekal dimatikan kerana tiada apa-apa untuk dimuatkan.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Pembantu Kursus AI — Kursus';
@@ -3150,3 +3150,30 @@ $string['settings:support_enabled_desc'] = 'Benarkan pelajar membuka [[tutorshor
 $string['settings:support_courseid'] = 'Kursus sokongan';
 $string['settings:support_courseid_desc'] = 'ID sebuah kursus yang kelihatan dan mengandungi bahan permulaan, pengenalan dan orientasi anda. Perbualan sokongan dijawab berdasarkan kursus ini bersama FAQ di atas, dan direkodkan padanya. Biarkan kosong untuk mematikan mod sokongan. Laman utama tapak (kursus 1) tidak diterima.';
 $string['support:promptrole'] = 'Anda sedang menjawab soalan sokongan dari luar mana-mana kursus. Pelajar tidak bertanya tentang bahan kursus, jadi jangan rujuk mereka kepada bahan tersebut. Jawab berdasarkan FAQ dan bahan sokongan yang telah diberikan kepada anda. Jika anda tidak dapat menjawab dengan tepat, nyatakan hal itu dengan jelas dan tawarkan untuk menyerahkan soalan tersebut kepada pasukan sokongan.';
+
+$string['sandbox:noruntimeurl'] = 'Sandbox Python dihidupkan untuk kursus ini, tetapi laman ini belum menetapkan lokasi runtime Python, jadi tiada apa-apa untuk dimuatkan. Pentadbir boleh menetapkannya dalam tetapan plugin.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Apabila sandbox Python dihidupkan, pelayar pelajar memuat turun runtime Python dari lokasi yang ditetapkan oleh pentadbir laman, yang mungkin milik pihak ketiga. Kod yang ditulis dalam sandbox dan hasilnya kekal pada peranti dan tidak pernah dihantar ke mana-mana.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Alamat IP pelajar, yang terdedah kepada penyedia runtime hanya kerana permintaan itu dibuat.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Pelayar dan sistem pengendalian pelajar, dihantar sebagai user agent permintaan tersebut.';
+
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Tersuai: {$a}';
+$string['soapbox:assign_name'] = 'Nama tugasan';
+$string['soapbox:assign_required'] = 'Medan ini wajib diisi';
+$string['soapbox:assign_intro'] = 'Arahan';
+$string['soapbox:assign_recordtype'] = 'Jenis rakaman';
+$string['soapbox:assign_mode_video'] = 'Video';
+$string['soapbox:assign_mode_audio'] = 'Audio sahaja';
+$string['soapbox:assign_min_seconds'] = 'Tempoh minimum (saat)';
+$string['soapbox:assign_max_seconds'] = 'Tempoh maksimum (saat)';
+$string['soapbox:assign_seccap'] = 'Tempoh maksimum tapak: {$a} saat.';
+$string['soapbox:assign_max_attempts'] = 'Bilangan percubaan dibenarkan (0 = tanpa had)';
+$string['soapbox:assign_stored_attempts'] = 'Rakaman yang disimpan bagi setiap pelajar';
+$string['soapbox:assign_reccap'] = 'Bilangan maksimum rakaman yang disimpan tapak bagi setiap pelajar: {$a}.';
+$string['soapbox:assign_slides'] = 'Slaid';
+$string['soapbox:assign_slides_help'] = 'Benarkan pelajar memuat naik dek PDF dan menukar slaid semasa merakam';
+$string['soapbox:assign_slide_vision'] = 'Maklum balas reka bentuk visual slaid';
+$string['soapbox:assign_slide_vision_help'] = 'Jalankan juga laluan penglihatan ke atas imej slaid untuk nota reka bentuk visual (memerlukan Slaid, dan tetapan slide-vision Soapbox pada tapak)';
+$string['soapbox:assign_visible'] = 'Kelihatan kepada pelajar';
+$string['soapbox:assign_err_min_seconds'] = 'Masukkan sekurang-kurangnya 1 saat';
+$string['soapbox:assign_err_minmax'] = 'Tempoh minimum tidak boleh melebihi tempoh maksimum';

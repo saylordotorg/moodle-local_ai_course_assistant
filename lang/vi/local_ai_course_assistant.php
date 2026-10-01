@@ -964,9 +964,9 @@ $string['sandbox:run'] = 'Chạy';
 $string['sandbox:running'] = 'Đang chạy…';
 $string['sandbox:clear'] = 'Xóa kết quả';
 $string['sandbox:output_heading'] = 'Kết quả';
-$string['sandbox:privacy_note'] = 'Mã và kết quả chỉ nằm trong trình duyệt của bạn. Không có gì được gửi tới bất kỳ máy chủ nào. Môi trường chạy chỉ được tải từ một CDN công khai trong lần đầu tiên và được lưu vào bộ nhớ đệm cho những lần truy cập sau.';
+$string['sandbox:privacy_note'] = 'Mã nguồn và kết quả vẫn nằm trong trình duyệt của bạn. Không có gì bạn viết hay chạy được gửi tới bất kỳ máy chủ nào. Chỉ riêng bộ thực thi Python được tải một lần từ vị trí mà quản trị viên trang đã cấu hình, rồi được lưu vào bộ nhớ đệm cho những lần sau.';
 $string['sandbox:toggle'] = 'Bật sandbox Python cho khóa học này';
-$string['sandbox:toggle_help'] = 'Thêm một trang dành cho học viên, nơi họ có thể viết và chạy Python hoàn toàn trong trình duyệt qua Pyodide. Mặc định tắt. Hãy bật cho các khóa học có phần lập trình; để tắt với các khóa học không có.';
+$string['sandbox:toggle_help'] = 'Thêm một trang dành cho học viên, nơi họ có thể viết và chạy Python hoàn toàn trong trình duyệt qua Pyodide. Mặc định tắt. Hãy bật cho các khóa học có phần lập trình; để tắt với các khóa học không có. Quản trị viên trang cũng phải đặt vị trí bộ thực thi Python trong phần cài đặt của plugin: khi ô đó còn trống thì sandbox vẫn tắt, vì không có gì để tải.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Trợ Lý AI Khóa Học — Các khóa học';
@@ -3127,3 +3127,30 @@ $string['settings:support_enabled_desc'] = 'Cho phép học viên mở [[tutorsh
 $string['settings:support_courseid'] = 'Khóa học hỗ trợ';
 $string['settings:support_courseid_desc'] = 'ID của một khóa học đang hiển thị, chứa tài liệu hướng dẫn bắt đầu, làm quen và định hướng của bạn. Các cuộc trò chuyện hỗ trợ được trả lời dựa trên khóa học này cùng với FAQ ở trên, và được ghi nhận vào khóa học đó. Để trống để tắt chế độ hỗ trợ. Không chấp nhận trang chủ của trang web (khóa học 1).';
 $string['support:promptrole'] = 'Bạn đang trả lời một câu hỏi hỗ trợ từ bên ngoài mọi khóa học. Học viên không hỏi về nội dung khóa học, vì vậy đừng hướng họ trở lại đó. Hãy trả lời dựa trên FAQ và tài liệu hỗ trợ đã được cung cấp cho bạn. Nếu không thể trả lời chính xác, hãy nói rõ điều đó và đề nghị chuyển câu hỏi cho đội ngũ hỗ trợ.';
+
+$string['sandbox:noruntimeurl'] = 'Hộp cát Python đang bật cho khóa học này, nhưng trang web chưa đặt vị trí môi trường chạy Python nên không có gì để tải. Quản trị viên có thể đặt vị trí đó trong phần cài đặt của plugin.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Khi hộp cát Python được bật, trình duyệt của người học sẽ tải môi trường chạy Python từ vị trí do quản trị viên trang web cấu hình, vị trí này có thể thuộc về một bên thứ ba. Mã viết trong hộp cát và kết quả của nó vẫn nằm trên thiết bị và không bao giờ được gửi đi đâu.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Địa chỉ IP của người học, bị tiết lộ cho bên cung cấp môi trường chạy ngay khi yêu cầu được gửi.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Trình duyệt và hệ điều hành của người học, được gửi kèm làm user agent của yêu cầu đó.';
+
+$string['settings:avatar_numbered'] = 'Hình đại diện {$a}';
+$string['settings:avatar_custom'] = 'Tùy chỉnh: {$a}';
+$string['soapbox:assign_name'] = 'Tên bài tập';
+$string['soapbox:assign_required'] = 'Trường này là bắt buộc';
+$string['soapbox:assign_intro'] = 'Hướng dẫn';
+$string['soapbox:assign_recordtype'] = 'Loại bản ghi';
+$string['soapbox:assign_mode_video'] = 'Video';
+$string['soapbox:assign_mode_audio'] = 'Chỉ âm thanh';
+$string['soapbox:assign_min_seconds'] = 'Thời lượng tối thiểu (giây)';
+$string['soapbox:assign_max_seconds'] = 'Thời lượng tối đa (giây)';
+$string['soapbox:assign_seccap'] = 'Thời lượng tối đa của trang: {$a} giây.';
+$string['soapbox:assign_max_attempts'] = 'Số lần thử được phép (0 = không giới hạn)';
+$string['soapbox:assign_stored_attempts'] = 'Số bản ghi giữ lại cho mỗi học viên';
+$string['soapbox:assign_reccap'] = 'Số bản ghi tối đa trang giữ lại cho mỗi học viên: {$a}.';
+$string['soapbox:assign_slides'] = 'Trang chiếu';
+$string['soapbox:assign_slides_help'] = 'Cho phép học viên tải lên bộ trang chiếu PDF và chuyển trang chiếu trong khi ghi';
+$string['soapbox:assign_slide_vision'] = 'Phản hồi thiết kế hình ảnh trang chiếu';
+$string['soapbox:assign_slide_vision_help'] = 'Chạy thêm một lượt phân tích hình ảnh trên các ảnh trang chiếu để có ghi chú về thiết kế hình ảnh (cần bật Trang chiếu và thiết lập phân tích hình ảnh trang chiếu Soapbox của trang)';
+$string['soapbox:assign_visible'] = 'Hiển thị với học viên';
+$string['soapbox:assign_err_min_seconds'] = 'Nhập ít nhất 1 giây';
+$string['soapbox:assign_err_minmax'] = 'Thời lượng tối thiểu không được vượt quá thời lượng tối đa';

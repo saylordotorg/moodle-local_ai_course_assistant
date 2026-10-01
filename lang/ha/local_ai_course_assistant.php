@@ -972,9 +972,9 @@ $string['sandbox:run'] = 'Gudanar';
 $string['sandbox:running'] = 'Ana gudanarwa…';
 $string['sandbox:clear'] = 'Share fitarwa';
 $string['sandbox:output_heading'] = 'Fitarwa';
-$string['sandbox:privacy_note'] = 'Kod da fitarwa suna zama a cikin birawsa naka. Ba a aika komai zuwa kowace uwar garke ba. Ana loda injin aiki daga CDN na jama\'a a karo na farko kawai kuma ana adana shi don ziyara na gaba.';
+$string['sandbox:privacy_note'] = 'Lambar ka da sakamakonta suna zama a cikin burauzar ka. Babu abin da ka rubuta ko ka gudanar da ake aikawa zuwa wani uwar garke. Injin Python kansa ana sauke shi sau ɗaya daga wurin da mai gudanar da shafin ya saita, sannan a adana shi don ziyarce-ziyarce na gaba.';
 $string['sandbox:toggle'] = 'Kunna sandbox na Python don wannan kwas';
-$string['sandbox:toggle_help'] = 'Yana ƙara shafi ga masu koyo inda ɗalibai za su iya rubutawa da gudanar da Python gaba ɗaya a cikin birawsa nasu ta hanyar Pyodide. A kashe ta tsohuwa. Ka kunna shi don kwasa-kwasan da ke da aikin shirye-shirye; ka bar shi a kashe don waɗanda ba su da shi.';
+$string['sandbox:toggle_help'] = 'Yana ƙara shafi ga masu koyo inda ɗalibai za su iya rubutawa da gudanar da Python gaba ɗaya a cikin birawsa nasu ta hanyar Pyodide. A kashe ta tsohuwa. Ka kunna shi don kwasa-kwasan da ke da aikin shirye-shirye; ka bar shi a kashe don waɗanda ba su da shi. Mai gudanar da shafin kuma dole ya saita wurin injin Python a cikin saitunan plugin: muddin wannan filin babu komai, sandbox ɗin zai ci gaba da kashewa, domin babu abin da za a loda.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Mataimakin Horo na AI — Kwasa-kwasai';
@@ -3134,3 +3134,30 @@ $string['settings:support_enabled_desc'] = 'Yana ba ɗalibai damar buɗe [[tutor
 $string['settings:support_courseid'] = 'Kwas ɗin tallafi';
 $string['settings:support_courseid_desc'] = 'Lambar ID ta wani kwas da ake gani wanda ke ɗauke da kayan farawa, gabatarwa da sanin muhalli. Ana amsa tattaunawar tallafi daga wannan kwas tare da tambayoyin da ake yawan yi da ke sama, kuma ana yin rikodinsu a kansa. Ka bar shi fanko don kashe yanayin tallafi. Ba a karɓar shafin gida na rukunin yanar gizo (kwas 1).';
 $string['support:promptrole'] = 'Kana amsa tambayar tallafi da aka yi daga wajen kowane kwas. Ɗalibin ba ya tambaya kan kayan kwas ba, don haka kada ka mai da shi ga kayan kwas. Ka amsa daga tambayoyin da ake yawan yi da kayan tallafin da aka ba ka. Idan ba za ka iya amsawa daidai ba, ka faɗi haka a sarari kuma ka ba da shawarar mika tambayar ga ƙungiyar tallafi.';
+
+$string['sandbox:noruntimeurl'] = 'An kunna sandbox na Python don wannan karatun, amma ba a saita wurin injin Python don shafin ba, don haka babu abin da za a loda. Mai gudanarwa zai iya saita shi a cikin saitunan plugin.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Idan sandbox na Python yana aiki, burauzar ɗalibi tana sauke injin Python daga wurin da mai gudanar da shafin ya saita, wanda yana iya zama na wani kamfani na waje. Lambar da aka rubuta a cikin sandbox da sakamakonta suna zama a na\'urar kuma ba a aika su ko\'ina.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Adireshin IP na ɗalibi, wanda ake bayyana wa mai bayar da injin ta hanyar aika buƙatar kawai.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Burauza da tsarin aiki na ɗalibi, ana aika su a matsayin user agent na wannan buƙatar.';
+
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Na musamman: {$a}';
+$string['soapbox:assign_name'] = 'Sunan aikin';
+$string['soapbox:assign_required'] = 'Ana buƙatar wannan filin';
+$string['soapbox:assign_intro'] = 'Umarnai';
+$string['soapbox:assign_recordtype'] = 'Nau\'in rikodi';
+$string['soapbox:assign_mode_video'] = 'Bidiyo';
+$string['soapbox:assign_mode_audio'] = 'Sauti kaɗai';
+$string['soapbox:assign_min_seconds'] = 'Mafi ƙarancin tsawo (daƙiƙa)';
+$string['soapbox:assign_max_seconds'] = 'Mafi yawan tsawo (daƙiƙa)';
+$string['soapbox:assign_seccap'] = 'Mafi yawan tsawo na rukunin yanar gizo: daƙiƙa {$a}.';
+$string['soapbox:assign_max_attempts'] = 'Yawan ƙoƙarin da aka yarda (0 = ba iyaka)';
+$string['soapbox:assign_stored_attempts'] = 'Rikodin da ake ajiyewa ga kowane ɗalibi';
+$string['soapbox:assign_reccap'] = 'Iyakar rukunin yanar gizo ta rikodin da ake ajiyewa ga kowane ɗalibi: {$a}.';
+$string['soapbox:assign_slides'] = 'Slides';
+$string['soapbox:assign_slides_help'] = 'Bar ɗalibai su loda deck na PDF kuma su ci gaba da slides yayin yin rikodi';
+$string['soapbox:assign_slide_vision'] = 'Ra\'ayi kan zanen gani na slides';
+$string['soapbox:assign_slide_vision_help'] = 'Haka kuma a yi binciken gani kan hotunan slides don samun bayanin zanen gani (yana buƙatar Slides, da saitin binciken slides na Soapbox na rukunin yanar gizo)';
+$string['soapbox:assign_visible'] = 'Ana gani ga ɗalibai';
+$string['soapbox:assign_err_min_seconds'] = 'Ka shigar da aƙalla daƙiƙa 1';
+$string['soapbox:assign_err_minmax'] = 'Mafi ƙarancin tsawo ba zai iya wuce mafi yawa ba';

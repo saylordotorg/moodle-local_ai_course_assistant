@@ -169,16 +169,84 @@ define(['core/ajax', 'core/templates', 'core/chartjs'], function(Ajax, Templates
         });
     }
 
+    // The spinner is built with createElement rather than rendered from a
+    // template because showLoading runs synchronously right before the AJAX
+    // call. A template render is a promise, and on a cold template cache it can
+    // resolve AFTER the data has come back and the pane has been repainted,
+    // which would put the spinner back on top of the finished tab. It is also
+    // the "small fragment" case the reviewer said may stay as it is.
     function showLoading(pane) {
         var content = pane.querySelector('.sola-analytics-content');
-        if (content) {
-            content.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted">' + s('loading') + '</p></div>';
-        }
+        if (!content) { return; }
+        while (content.firstChild) { content.removeChild(content.firstChild); }
+        var wrap = document.createElement('div');
+        wrap.className = 'text-center p-4';
+        var spinner = document.createElement('div');
+        spinner.className = 'spinner-border text-primary';
+        spinner.setAttribute('role', 'status');
+        var label = document.createElement('p');
+        label.className = 'mt-2 text-muted';
+        label.textContent = s('loading');
+        wrap.appendChild(spinner);
+        wrap.appendChild(label);
+        content.appendChild(wrap);
     }
 
     function hideLoading(pane) {
         var spinner = pane.querySelector('.spinner-border');
         if (spinner) { spinner.remove(); }
+    }
+
+    /**
+     * Render a pane from a Mustache template instead of an innerHTML string
+     * (CONTRIB-10574 #278). Chart.js work has to run in the callback: the
+     * canvases only exist in the document once the render promise has settled.
+     *
+     * @param {String} paneid DOM id of the pane
+     * @param {String} name Template name, without the component prefix
+     * @param {Object} context Template context
+     * @param {Function} after Optional callback run after the nodes are in place
+     */
+    function renderPane(paneid, name, context, after) {
+        var pane = document.getElementById(paneid);
+        if (!pane) { return; }
+        var content = pane.querySelector('.sola-analytics-content');
+        if (!content) { return; }
+        // Two-argument then(), not then().catch(): the rejection handler must
+        // only see a failed template render. Chained as a catch it would also
+        // swallow anything thrown by after(), and a Chart.js error would then
+        // wipe the tab that had just rendered correctly and replace it with
+        // "Error loading data".
+        Templates.render('local_ai_course_assistant/' + name, context).then(function(html, js) {
+            Templates.replaceNodeContents(content, html, js);
+            if (after) { after(); }
+            return null;
+        }, function() {
+            content.textContent = s('error_loading') + '.';
+            return null;
+        });
+    }
+
+    /**
+     * Render a muted empty-state note into a pane.
+     *
+     * @param {String} paneid DOM id of the pane
+     * @param {String} message Text to show
+     */
+    function renderNote(paneid, message) {
+        renderPane(paneid, 'analytics_message', {danger: false, message: message});
+    }
+
+    /**
+     * Build the stat-tile context the tab templates iterate over.
+     *
+     * @param {Array} pairs Array of [label, value] pairs
+     * @returns {Array} Array of {label, value} objects
+     */
+    function statCards(pairs) {
+        return pairs.map(function(pair) {
+            return {label: pair[0], value: pair[1]};
+        });
     }
 
     // ────────────────────────────────────────────────────────
@@ -203,36 +271,38 @@ define(['core/ajax', 'core/templates', 'core/chartjs'], function(Ajax, Templates
     // ── Tab 1: Overall Usage ──
 
     function renderOverall(data) {
-        var pane = document.getElementById('sola-pane-overall');
-        if (!pane) { return; }
         var enrollment = data.enrollment || {};
         var overview = data.overview || {};
         var sessions = data.sessions || {};
         var returnrate = data.return_rate || {};
-        var html = '<div class="sola-stat-cards">' +
-            // The server nests these (see get_analytics_overall::execute):
-            // enrollment, overview, sessions and return_rate are each their own
-            // object. Reading them at the top level meant every one of the six
-            // tiles resolved to undefined and rendered 0 -- including TOTAL
-            // STUDENTS, which is a plain enrolment count, on courses with a
-            // hundred participants. Same shape as the chart wiring fixed in
-            // 7.2.3: the payload grew a level and the dashboard did not follow.
-            statCard(s('total_students'), enrollment.total_enrolled || 0, 'users') +
-            statCard(s('active_ai_users'), overview.active_students || 0, 'chat') +
-            statCard(s('msgs_per_student'), overview.avg_messages_per_student || 0, 'message') +
-            statCard(s('avg_session'), formatMinutes(sessions.avg_duration_minutes || 0), 'clock') +
-            statCard(s('return_rate'), (returnrate.return_rate_pct || 0) + '%', 'return') +
-            statCard(s('total_sessions'), sessions.total_sessions || 0, 'sessions') +
-            '</div>';
-        html += '<div class="row mt-4">';
-        html += '<div class="col-md-12 mb-4"><h5>Daily Usage Trend</h5><canvas id="sola-chart-daily" height="80"></canvas></div>';
-        html += '</div><div class="row">';
-        html += '<div class="col-md-6 mb-4"><h5>Hour of Day</h5><canvas id="sola-chart-hourly" height="120"></canvas></div>';
-        html += '<div class="col-md-6 mb-4"><h5>Day of Week</h5><canvas id="sola-chart-dow" height="120"></canvas></div>';
-        html += '</div>';
+        // The server nests these (see get_analytics_overall::execute):
+        // enrollment, overview, sessions and return_rate are each their own
+        // object. Reading them at the top level meant every one of the six
+        // tiles resolved to undefined and rendered 0 -- including TOTAL
+        // STUDENTS, which is a plain enrolment count, on courses with a
+        // hundred participants. Same shape as the chart wiring fixed in
+        // 7.2.3: the payload grew a level and the dashboard did not follow.
+        var cards = statCards([
+            [s('total_students'), enrollment.total_enrolled || 0],
+            [s('active_ai_users'), overview.active_students || 0],
+            [s('msgs_per_student'), overview.avg_messages_per_student || 0],
+            [s('avg_session'), formatMinutes(sessions.avg_duration_minutes || 0)],
+            [s('return_rate'), (returnrate.return_rate_pct || 0) + '%'],
+            [s('total_sessions'), sessions.total_sessions || 0],
+        ]);
 
-        pane.querySelector('.sola-analytics-content').innerHTML = html;
+        renderPane('sola-pane-overall', 'analytics_tab_overall', {cards: cards}, function() {
+            drawOverallCharts(data);
+        });
+    }
 
+    /**
+     * Draw the three Overall-tab charts. Split out of renderOverall so it can
+     * run once the template render has put the canvases in the document.
+     *
+     * @param {Object} data Service payload for the overall tab
+     */
+    function drawOverallCharts(data) {
         // Draw charts.
         if (data.daily_usage && data.daily_usage.length) {
             charts['daily'] = createChart('sola-chart-daily', 'line', {
@@ -322,54 +392,81 @@ define(['core/ajax', 'core/templates', 'core/chartjs'], function(Ajax, Templates
     }
 
     function renderByCourse(data) {
-        var pane = document.getElementById('sola-pane-bycourse');
-        if (!pane) { return; }
         var courses = Array.isArray(data) ? data : (data.courses || []);
         if (!courses.length) {
-            pane.querySelector('.sola-analytics-content').innerHTML = '<p class="text-muted">' + s('no_course_data') + '</p>';
+            renderNote('sola-pane-bycourse', s('no_course_data'));
             return;
         }
-        var html = '<div class="row mb-4"><div class="col-12"><canvas id="sola-chart-bycourse" height="' + Math.max(80, courses.length * 25) + '"></canvas></div></div>';
-        html += '<table class="table table-sm table-striped sola-analytics-table"><thead><tr>' +
-            '<th>' + esc(s('course')) + '</th>' + '<th>' + esc(s('active_ai_users')) + '</th>' + '<th>' + esc(s('messages')) + '</th>' + '<th>' + esc(s('msgs_per_student')) + '</th>' + '<th>' + esc(s('return_rate')) + '</th>' + '<th>' + esc(s('avg_session')) + '</th>' +
-            '</tr></thead><tbody>';
-        courses.forEach(function(c) {
-            var m = courseMetrics(c);
-            html += '<tr><td>' + esc(courseLabel(c)) + '</td>' +
-                '<td>' + m.active_students + '</td>' +
-                '<td>' + m.total_messages + '</td>' +
-                '<td>' + m.avg_messages_per_student + '</td>' +
-                '<td>' + m.return_rate_pct + '%</td>' +
-                '<td>' + formatMinutes(m.avg_session_minutes) + '</td></tr>';
-        });
-        html += '</tbody></table>';
-        pane.querySelector('.sola-analytics-content').innerHTML = html;
+        var context = {
+            chartheight: Math.max(80, courses.length * 25),
+            str_course: s('course'),
+            str_active: s('active_ai_users'),
+            str_messages: s('messages'),
+            str_permsg: s('msgs_per_student'),
+            str_returnrate: s('return_rate'),
+            str_avgsession: s('avg_session'),
+            rows: courses.map(function(c) {
+                var m = courseMetrics(c);
+                return {
+                    course: courseLabel(c),
+                    active: m.active_students,
+                    messages: m.total_messages,
+                    permsg: m.avg_messages_per_student,
+                    returnrate: m.return_rate_pct + '%',
+                    avgsession: formatMinutes(m.avg_session_minutes),
+                };
+            }),
+        };
 
-        charts['bycourse'] = createChart('sola-chart-bycourse', 'bar', {
-            labels: courses.map(function(c) { return c.shortname || courseLabel(c); }),
-            datasets: [{label: s('messages'), data: courses.map(function(c) { return courseMetrics(c).total_messages; }), backgroundColor: COLORS[0]}],
-        }, {indexAxis: 'y'});
+        renderPane('sola-pane-bycourse', 'analytics_tab_bycourse', context, function() {
+            charts['bycourse'] = createChart('sola-chart-bycourse', 'bar', {
+                labels: courses.map(function(c) { return c.shortname || courseLabel(c); }),
+                datasets: [{
+                    label: s('messages'),
+                    data: courses.map(function(c) { return courseMetrics(c).total_messages; }),
+                    backgroundColor: COLORS[0],
+                }],
+            }, {indexAxis: 'y'});
+        });
     }
 
     // ── Tab 3: AI vs Non-Users ──
 
     function renderComparison(data) {
-        var pane = document.getElementById('sola-pane-comparison');
-        if (!pane) { return; }
         var ai = data.ai_users || {};
         var non = data.non_users || {};
-        var html = '<div class="sola-stat-cards">' +
-            statCard(s('ai_users'), ai.count || 0, 'users') +
-            statCard(s('non_users'), non.count || 0, 'users') +
-            '</div>';
-        html += '<div class="row mt-4"><div class="col-md-8"><canvas id="sola-chart-comparison" height="120"></canvas></div></div>';
-        html += '<table class="table table-sm mt-4"><thead><tr><th>Metric</th><th>AI Users</th><th>Non-Users</th></tr></thead><tbody>';
-        html += compRow('Avg Grade (%)', fmt(ai.avg_grade), fmt(non.avg_grade));
-        html += compRow('Completion Rate', fmt(ai.completion_rate) + '%', fmt(non.completion_rate) + '%');
-        html += compRow('Avg Days to Complete', fmt(ai.avg_days_to_completion), fmt(non.avg_days_to_completion));
-        html += '</tbody></table>';
-        pane.querySelector('.sola-analytics-content').innerHTML = html;
+        var context = {
+            cards: statCards([
+                [s('ai_users'), ai.count || 0],
+                [s('non_users'), non.count || 0],
+            ]),
+            rows: [
+                {metric: 'Avg Grade (%)', aival: fmt(ai.avg_grade), nonval: fmt(non.avg_grade)},
+                {
+                    metric: 'Completion Rate',
+                    aival: fmt(ai.completion_rate) + '%',
+                    nonval: fmt(non.completion_rate) + '%',
+                },
+                {
+                    metric: 'Avg Days to Complete',
+                    aival: fmt(ai.avg_days_to_completion),
+                    nonval: fmt(non.avg_days_to_completion),
+                },
+            ],
+        };
 
+        renderPane('sola-pane-comparison', 'analytics_tab_comparison', context, function() {
+            drawComparisonChart(ai, non);
+        });
+    }
+
+    /**
+     * Draw the AI vs non-user bar chart once its canvas is in the document.
+     *
+     * @param {Object} ai AI-user metrics
+     * @param {Object} non Non-user metrics
+     */
+    function drawComparisonChart(ai, non) {
         charts['comparison'] = createChart('sola-chart-comparison', 'bar', {
             labels: ['Avg Grade (%)', 'Completion Rate (%)', 'Days to Complete'],
             datasets: [
@@ -382,84 +479,112 @@ define(['core/ajax', 'core/templates', 'core/chartjs'], function(Ajax, Templates
     // ── Tab 4: By Unit ──
 
     function renderByUnit(data) {
-        var pane = document.getElementById('sola-pane-byunit');
-        if (!pane) { return; }
         var units = Array.isArray(data) ? data : (data.units || []);
         if (!units.length) {
-            pane.querySelector('.sola-analytics-content').innerHTML = '<p class="text-muted">' + s('no_unit_data') + '</p>';
+            renderNote('sola-pane-byunit', s('no_unit_data'));
             return;
         }
-        var html = '<div class="row mb-4"><div class="col-12"><canvas id="sola-chart-byunit" height="' + Math.max(80, units.length * 30) + '"></canvas></div></div>';
-        html += '<table class="table table-sm table-striped"><thead><tr>' + '<th>' + esc(s('section')) + '</th>' + '<th>' + esc(s('active_ai_users')) + '</th>' + '<th>' + esc(s('messages')) + '</th>' + '<th>' + esc(s('msgs_per_student')) + '</th>' + '</tr></thead><tbody>';
-        units.forEach(function(u) {
-            var avg = u.student_count > 0 ? (u.message_count / u.student_count).toFixed(1) : 0;
-            html += '<tr><td>' + esc(u.section_name) + '</td><td>' + u.student_count + '</td><td>' + u.message_count + '</td><td>' + avg + '</td></tr>';
-        });
-        html += '</tbody></table>';
-        pane.querySelector('.sola-analytics-content').innerHTML = html;
+        var context = {
+            chartheight: Math.max(80, units.length * 30),
+            str_section: s('section'),
+            str_active: s('active_ai_users'),
+            str_messages: s('messages'),
+            str_permsg: s('msgs_per_student'),
+            rows: units.map(function(u) {
+                return {
+                    section: u.section_name,
+                    students: u.student_count,
+                    messages: u.message_count,
+                    permsg: u.student_count > 0 ? (u.message_count / u.student_count).toFixed(1) : 0,
+                };
+            }),
+        };
 
-        charts['byunit'] = createChart('sola-chart-byunit', 'bar', {
-            labels: units.map(function(u) { return u.section_name; }),
-            datasets: [
-                {label: s('students'), data: units.map(function(u) { return u.student_count; }), backgroundColor: COLORS[0]},
-                {label: s('messages'), data: units.map(function(u) { return u.message_count; }), backgroundColor: COLORS[2]},
-            ],
-        }, {indexAxis: 'y'});
+        renderPane('sola-pane-byunit', 'analytics_tab_byunit', context, function() {
+            charts['byunit'] = createChart('sola-chart-byunit', 'bar', {
+                labels: units.map(function(u) { return u.section_name; }),
+                datasets: [
+                    {
+                        label: s('students'),
+                        data: units.map(function(u) { return u.student_count; }),
+                        backgroundColor: COLORS[0],
+                    },
+                    {
+                        label: s('messages'),
+                        data: units.map(function(u) { return u.message_count; }),
+                        backgroundColor: COLORS[2],
+                    },
+                ],
+            }, {indexAxis: 'y'});
+        });
     }
 
     // ── Tab 5: Usage Types ──
 
     function renderUsageTypes(data) {
-        var pane = document.getElementById('sola-pane-usagetypes');
-        if (!pane) { return; }
         var types = Array.isArray(data) ? data : (data.types || []);
-        var html = '<div class="row"><div class="col-md-6"><canvas id="sola-chart-usagetypes" height="200"></canvas></div>';
-        html += '<div class="col-md-6"><table class="table table-sm mt-3"><thead><tr><th>Type</th><th>Count</th><th>%</th></tr></thead><tbody>';
-        types.forEach(function(t) {
-            html += '<tr><td>' + esc(formatTypeName(t.type)) + '</td><td>' + t.count + '</td><td>' + (t.pct || 0).toFixed(1) + '%</td></tr>';
-        });
-        html += '</tbody></table></div></div>';
-        pane.querySelector('.sola-analytics-content').innerHTML = html;
+        var context = {
+            rows: types.map(function(t) {
+                return {
+                    name: formatTypeName(t.type),
+                    count: t.count,
+                    pct: (t.pct || 0).toFixed(1) + '%',
+                };
+            }),
+        };
 
-        if (types.length) {
+        renderPane('sola-pane-usagetypes', 'analytics_tab_usagetypes', context, function() {
+            if (!types.length) { return; }
             charts['usagetypes'] = createChart('sola-chart-usagetypes', 'doughnut', {
                 labels: types.map(function(t) { return formatTypeName(t.type); }),
-                datasets: [{data: types.map(function(t) { return t.count; }), backgroundColor: COLORS.slice(0, types.length)}],
+                datasets: [{
+                    data: types.map(function(t) { return t.count; }),
+                    backgroundColor: COLORS.slice(0, types.length),
+                }],
             });
-        }
+        });
     }
 
     // ── Tab 6: Themes ──
 
     function renderThemes(data) {
-        var pane = document.getElementById('sola-pane-themes');
-        if (!pane) { return; }
         var keywords = Array.isArray(data) ? data : (data.keywords || []);
         if (!keywords.length) {
-            pane.querySelector('.sola-analytics-content').innerHTML = '<p class="text-muted">' + s('no_keyword_data') + '</p>';
+            renderNote('sola-pane-themes', s('no_keyword_data'));
             return;
         }
         var top20 = keywords.slice(0, 20);
-        var html = '<div class="row mb-4"><div class="col-12"><canvas id="sola-chart-themes" height="' + Math.max(80, top20.length * 22) + '"></canvas></div></div>';
-        html += '<table class="table table-sm table-striped"><thead><tr><th>Keyword</th><th>Frequency</th><th>Category</th></tr></thead><tbody>';
-        keywords.forEach(function(k) {
-            var badge = k.category === 'concept' ? 'primary' : (k.category === 'navigation' ? 'warning' : 'info');
-            html += '<tr><td>' + esc(k.keyword) + '</td><td>' + k.frequency + '</td><td><span class="badge badge-' + badge + ' bg-' + badge + '">' + esc(k.category) + '</span></td></tr>';
-        });
-        html += '</tbody></table>';
-        pane.querySelector('.sola-analytics-content').innerHTML = html;
+        var context = {
+            chartheight: Math.max(80, top20.length * 22),
+            rows: keywords.map(function(k) {
+                return {
+                    keyword: k.keyword,
+                    frequency: k.frequency,
+                    category: k.category,
+                    // One of three fixed values, never raw server data, so it
+                    // is safe to interpolate into the badge class attribute.
+                    badge: k.category === 'concept'
+                        ? 'primary'
+                        : (k.category === 'navigation' ? 'warning' : 'info'),
+                };
+            }),
+        };
 
-        charts['themes'] = createChart('sola-chart-themes', 'bar', {
-            labels: top20.map(function(k) { return k.keyword; }),
-            datasets: [{label: s('frequency'), data: top20.map(function(k) { return k.frequency; }), backgroundColor: COLORS[0]}],
-        }, {indexAxis: 'y'});
+        renderPane('sola-pane-themes', 'analytics_tab_themes', context, function() {
+            charts['themes'] = createChart('sola-chart-themes', 'bar', {
+                labels: top20.map(function(k) { return k.keyword; }),
+                datasets: [{
+                    label: s('frequency'),
+                    data: top20.map(function(k) { return k.frequency; }),
+                    backgroundColor: COLORS[0],
+                }],
+            }, {indexAxis: 'y'});
+        });
     }
 
     // ── Tab 7: Feedback ──
 
     function renderFeedback(data) {
-        var pane = document.getElementById('sola-pane-feedback');
-        if (!pane) { return; }
         // The server sends rating_summary / survey_summary / messages_to_resolution
         // / negative_feedback (get_analytics_feedback::execute builds $result with
         // those keys). This read the four names below instead, so every lookup was
@@ -471,50 +596,57 @@ define(['core/ajax', 'core/templates', 'core/chartjs'], function(Ajax, Templates
         var resolution = data.messages_to_resolution || data.resolution || {};
         var negatives = data.negative_feedback || data.negatives || [];
 
-        var html = '<div class="sola-stat-cards">' +
-            statCard(s('thumbs_up'), ratings.thumbs_up || 0, 'up') +
-            statCard(s('thumbs_down'), ratings.thumbs_down || 0, 'down') +
-            statCard(s('hallucination_flags'), ratings.hallucination_flags || 0, 'flag') +
-            statCard(s('avg_star_rating'), fmt(survey.avg_star_rating || 0) + '/5', 'star') +
-            statCard(s('avg_msgs_resolution'), fmt(resolution.avg_messages || 0), 'resolve') +
-            statCard(s('survey_respondents'), survey.survey_respondents || 0, 'survey') +
-            '</div>';
+        var hasratings = !!(ratings.thumbs_up || ratings.thumbs_down);
+        var hasstars = !!survey.rating_distribution;
 
-        html += '<div class="row mt-4">';
-        if (ratings.thumbs_up || ratings.thumbs_down) {
-            html += '<div class="col-md-4"><h5>Message Ratings</h5><canvas id="sola-chart-msgratings" height="200"></canvas></div>';
-        }
-        if (survey.rating_distribution) {
-            html += '<div class="col-md-4"><h5>Star Rating Distribution</h5><canvas id="sola-chart-stars" height="200"></canvas></div>';
-        }
-        html += '</div>';
+        var context = {
+            cards: statCards([
+                [s('thumbs_up'), ratings.thumbs_up || 0],
+                [s('thumbs_down'), ratings.thumbs_down || 0],
+                [s('hallucination_flags'), ratings.hallucination_flags || 0],
+                [s('avg_star_rating'), fmt(survey.avg_star_rating || 0) + '/5'],
+                [s('avg_msgs_resolution'), fmt(resolution.avg_messages || 0)],
+                [s('survey_respondents'), survey.survey_respondents || 0],
+            ]),
+            hasratings: hasratings,
+            hasstars: hasstars,
+            hasnegatives: negatives.length > 0,
+            // Both of these carry free text -- an excerpt of the AI reply and
+            // the learner's own comment. Mustache escapes them; the string
+            // build this replaces depended on esc() being called by hand at
+            // every concatenation point.
+            negatives: negatives.map(function(n) {
+                return {
+                    excerpt: n.message_excerpt || '',
+                    comment: n.comment || '—',
+                    hallucination: n.is_hallucination ? 'Yes' : 'No',
+                    date: formatDate(n.timecreated),
+                };
+            }),
+        };
 
-        if (negatives.length) {
-            html += '<h5 class="mt-4">Recent Negative Feedback</h5>';
-            html += '<table class="table table-sm table-striped"><thead><tr><th>Message Excerpt</th><th>Comment</th><th>Hallucination?</th><th>Date</th></tr></thead><tbody>';
-            negatives.forEach(function(n) {
-                html += '<tr><td>' + esc(n.message_excerpt || '') + '</td><td>' + esc(n.comment || '—') + '</td>' +
-                    '<td>' + (n.is_hallucination ? 'Yes' : 'No') + '</td>' +
-                    '<td>' + formatDate(n.timecreated) + '</td></tr>';
-            });
-            html += '</tbody></table>';
-        }
-
-        pane.querySelector('.sola-analytics-content').innerHTML = html;
-
-        if (ratings.thumbs_up || ratings.thumbs_down) {
-            charts['msgratings'] = createChart('sola-chart-msgratings', 'pie', {
-                labels: ['Thumbs Up', 'Thumbs Down'],
-                datasets: [{data: [ratings.thumbs_up || 0, ratings.thumbs_down || 0], backgroundColor: [COLORS[2], COLORS[4]]}],
-            });
-        }
-        if (survey.rating_distribution) {
-            var dist = survey.rating_distribution;
-            charts['stars'] = createChart('sola-chart-stars', 'bar', {
-                labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
-                datasets: [{label: s('responses'), data: [dist['1'] || 0, dist['2'] || 0, dist['3'] || 0, dist['4'] || 0, dist['5'] || 0], backgroundColor: COLORS[0]}],
-            });
-        }
+        renderPane('sola-pane-feedback', 'analytics_tab_feedback', context, function() {
+            if (hasratings) {
+                charts['msgratings'] = createChart('sola-chart-msgratings', 'pie', {
+                    labels: ['Thumbs Up', 'Thumbs Down'],
+                    datasets: [{
+                        data: [ratings.thumbs_up || 0, ratings.thumbs_down || 0],
+                        backgroundColor: [COLORS[2], COLORS[4]],
+                    }],
+                });
+            }
+            if (hasstars) {
+                var dist = survey.rating_distribution;
+                charts['stars'] = createChart('sola-chart-stars', 'bar', {
+                    labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+                    datasets: [{
+                        label: s('responses'),
+                        data: [dist['1'] || 0, dist['2'] || 0, dist['3'] || 0, dist['4'] || 0, dist['5'] || 0],
+                        backgroundColor: COLORS[0],
+                    }],
+                });
+            }
+        });
     }
 
     // ────────────────────────────────────────────────────────
@@ -539,19 +671,9 @@ define(['core/ajax', 'core/templates', 'core/chartjs'], function(Ajax, Templates
     // Utility helpers
     // ────────────────────────────────────────────────────────
 
-    function statCard(label, value, icon) {
-        return '<div class="sola-stat-card"><div class="sola-stat-value">' + value + '</div><div class="sola-stat-label">' + label + '</div></div>';
-    }
-
-    function compRow(label, aiVal, nonVal) {
-        return '<tr><td>' + label + '</td><td>' + aiVal + '</td><td>' + nonVal + '</td></tr>';
-    }
-
-    function esc(str) {
-        var div = document.createElement('div');
-        div.appendChild(document.createTextNode(str));
-        return div.innerHTML;
-    }
+    // statCard(), compRow() and esc() lived here. They existed only to build
+    // HTML strings for innerHTML; the tab templates do that markup now and
+    // Mustache does the escaping, so all three are gone (CONTRIB-10574 #278).
 
     function fmt(val) {
         if (val === null || val === undefined) { return '—'; }

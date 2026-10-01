@@ -222,6 +222,18 @@ final class lang_completeness_test extends \basic_testcase {
         // point of the description.
         'settings:soapbox_gesture_vision',
         'settings:soapbox_gesture_vision_desc',
+        // code_sandbox_pyodide_baseurl is the third pair, and it is here for the
+        // same reason. The description's whole job is to tell an administrator
+        // that filling the field in makes every learner's browser fetch about
+        // 10 MB from whatever host they name, disclosing learner IP addresses to
+        // it, and that leaving it blank keeps the sandbox off. An administrator
+        // who acts on a slightly wrong translation of that has made a privacy
+        // decision they did not mean to make. The learner-facing half of the
+        // same feature -- the no-runtime notice and the three privacy strings --
+        // IS translated into all 45 locales, because learners cannot choose to
+        // read the English.
+        'settings:code_sandbox_pyodide_baseurl',
+        'settings:code_sandbox_pyodide_baseurl_desc',
     ];
 
     /**

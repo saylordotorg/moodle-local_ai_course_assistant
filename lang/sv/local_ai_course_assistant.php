@@ -943,9 +943,9 @@ $string['sandbox:run'] = 'Kör';
 $string['sandbox:running'] = 'Körs…';
 $string['sandbox:clear'] = 'Rensa utdata';
 $string['sandbox:output_heading'] = 'Utdata';
-$string['sandbox:privacy_note'] = 'Kod och utdata stannar i din webbläsare. Ingenting skickas till någon server. Körmiljön laddas från ett publikt CDN endast första gången och cachas för kommande besök.';
+$string['sandbox:privacy_note'] = 'Kod och utdata stannar i din webbläsare. Inget av det du skriver eller kör skickas till någon server. Själva Python-körmiljön hämtas en gång från den plats som din webbplatsadministratör har angett och sparas sedan i cachen till senare besök.';
 $string['sandbox:toggle'] = 'Aktivera Python-sandlådan för den här kursen';
-$string['sandbox:toggle_help'] = 'Lägger till en sida för studenter där de kan skriva och köra Python helt i webbläsaren via Pyodide. Avstängt som standard. Aktivera för kurser med kodarbete; lämna av för kurser utan.';
+$string['sandbox:toggle_help'] = 'Lägger till en sida för studenter där de kan skriva och köra Python helt i webbläsaren via Pyodide. Avstängt som standard. Aktivera för kurser med kodarbete; lämna av för kurser utan. En webbplatsadministratör måste dessutom ange var Python-körmiljön finns i tilläggets inställningar: så länge fältet är tomt förblir sandlådan avstängd, eftersom det inte finns något att hämta.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'AI-kursassistent — kurser';
@@ -3106,3 +3106,30 @@ $string['settings:support_enabled_desc'] = 'Låt studerande öppna [[tutorshort]
 $string['settings:support_courseid'] = 'Supportkurs';
 $string['settings:support_courseid_desc'] = 'ID:t för en synlig kurs som innehåller ert material för att komma igång, introduktion och orientering. Supportkonversationer besvaras utifrån den kursen och FAQ:n ovan, och registreras på den. Lämna tomt för att stänga av supportläget. Webbplatsens startsida (kurs 1) godtas inte.';
 $string['support:promptrole'] = 'Du besvarar en supportfråga som har ställts utanför alla kurser. Den studerande frågar inte om kursinnehållet, så hänvisa inte tillbaka till det. Svara utifrån FAQ:n och det supportmaterial du har fått. Om du inte kan svara korrekt ska du säga det rakt ut och erbjuda dig att skicka frågan vidare till supportteamet.';
+
+$string['sandbox:noruntimeurl'] = 'Python-sandlådan är påslagen för den här kursen, men webbplatsen har ingen plats för Python-körmiljön angiven, så det finns inget att läsa in. En administratör kan ange en i pluginets inställningar.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'När Python-sandlådan är aktiverad hämtar deltagarens webbläsare Python-körmiljön från den plats som webbplatsadministratören har konfigurerat, och den kan tillhöra en tredje part. Kod som skrivs i sandlådan och dess utdata stannar på enheten och skickas aldrig någonstans.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Deltagarens IP-adress, som röjs för den som tillhandahåller körmiljön enbart genom att den begärs.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Deltagarens webbläsare och operativsystem, som skickas som user agent för den begäran.';
+
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Anpassad: {$a}';
+$string['soapbox:assign_name'] = 'Uppgiftens namn';
+$string['soapbox:assign_required'] = 'Det här fältet är obligatoriskt';
+$string['soapbox:assign_intro'] = 'Instruktioner';
+$string['soapbox:assign_recordtype'] = 'Inspelningstyp';
+$string['soapbox:assign_mode_video'] = 'Video';
+$string['soapbox:assign_mode_audio'] = 'Endast ljud';
+$string['soapbox:assign_min_seconds'] = 'Minsta längd (sekunder)';
+$string['soapbox:assign_max_seconds'] = 'Största längd (sekunder)';
+$string['soapbox:assign_seccap'] = 'Webbplatsens största längd: {$a} sekunder.';
+$string['soapbox:assign_max_attempts'] = 'Tillåtna försök (0 = obegränsat)';
+$string['soapbox:assign_stored_attempts'] = 'Inspelningar som sparas per studerande';
+$string['soapbox:assign_reccap'] = 'Webbplatsens högsta antal inspelningar som sparas per studerande: {$a}.';
+$string['soapbox:assign_slides'] = 'Bilder';
+$string['soapbox:assign_slides_help'] = 'Låt studerande ladda upp en PDF-presentation och bläddra i bilderna medan de spelar in';
+$string['soapbox:assign_slide_vision'] = 'Återkoppling på bildernas visuella utformning';
+$string['soapbox:assign_slide_vision_help'] = 'Kör även en bildanalys av bilderna för att få kommentarer om den visuella utformningen (kräver Bilder och webbplatsens Soapbox-inställning för bildanalys)';
+$string['soapbox:assign_visible'] = 'Synlig för studerande';
+$string['soapbox:assign_err_min_seconds'] = 'Ange minst 1 sekund';
+$string['soapbox:assign_err_minmax'] = 'Minsta längd får inte överstiga största längd';

@@ -1,0 +1,85 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/analytics_tab_bycourse
+
+    By Course tab of the analytics dashboard. Replaces the innerHTML string
+    that amd/src/analytics_dashboard.js used to build for this pane
+    (CONTRIB-10574 #278). Course names come back from the web service and are
+    auto-escaped here instead of being hand-escaped in JavaScript.
+
+    Context variables required for this template:
+    * chartheight - pixel height for the bar chart canvas
+    * str_course - column heading for the course name
+    * str_active - column heading for active AI users
+    * str_messages - column heading for the message count
+    * str_permsg - column heading for messages per student
+    * str_returnrate - column heading for the return rate
+    * str_avgsession - column heading for the average session length
+    * rows - one entry per course, each with course, active, messages,
+      permsg, returnrate and avgsession
+
+    Example context (json):
+    {
+        "chartheight": 80,
+        "str_course": "Course",
+        "str_active": "Active AI users",
+        "str_messages": "Messages",
+        "str_permsg": "Messages per student",
+        "str_returnrate": "Return rate",
+        "str_avgsession": "Average session",
+        "rows": [
+            {
+                "course": "Introduction to Business",
+                "active": "41",
+                "messages": "612",
+                "permsg": "14.9",
+                "returnrate": "38%",
+                "avgsession": "7 min"
+            }
+        ]
+    }
+}}
+<div class="row mb-4">
+    <div class="col-12">
+        <canvas id="sola-chart-bycourse" height="{{chartheight}}"></canvas>
+    </div>
+</div>
+<table class="table table-sm table-striped sola-analytics-table">
+    <thead>
+        <tr>
+            <th>{{str_course}}</th>
+            <th>{{str_active}}</th>
+            <th>{{str_messages}}</th>
+            <th>{{str_permsg}}</th>
+            <th>{{str_returnrate}}</th>
+            <th>{{str_avgsession}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#rows}}
+            <tr>
+                <td>{{course}}</td>
+                <td>{{active}}</td>
+                <td>{{messages}}</td>
+                <td>{{permsg}}</td>
+                <td>{{returnrate}}</td>
+                <td>{{avgsession}}</td>
+            </tr>
+        {{/rows}}
+    </tbody>
+</table>

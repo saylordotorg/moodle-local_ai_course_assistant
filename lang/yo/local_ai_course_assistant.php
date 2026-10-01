@@ -964,9 +964,9 @@ $string['sandbox:run'] = 'Ṣiṣẹ́';
 $string['sandbox:running'] = 'Ń ṣiṣẹ́…';
 $string['sandbox:clear'] = 'Pa àbájáde rẹ́';
 $string['sandbox:output_heading'] = 'Àbájáde';
-$string['sandbox:privacy_note'] = 'Kóòdù àti àbájáde ń dúró nínú aṣàwákiri rẹ. A kò fi ohunkóhun ránṣẹ́ sí server kankan. A ń gbé ẹ̀rọ ìṣiṣẹ́ náà wọlé láti CDN gbogbo ènìyàn ní ìgbà àkọ́kọ́ nìkan, a sì ń fi pamọ́ fún àwọn ìbẹ̀wò tí ó tẹ̀lé.';
+$string['sandbox:privacy_note'] = 'Kóòdù àti àbájáde rẹ̀ máa ń wà nínú ẹ̀rọ aṣàwákiri rẹ. Ohunkóhun tí o bá kọ tàbí tí o bá ṣiṣẹ́ kò ní rán sí ẹ̀rọ olùpèsè kankan. Ẹ̀rọ ìṣiṣẹ́ Python fúnra rẹ̀ nìkan ni a ń gbà sílẹ̀ lẹ́ẹ̀kan láti ibi tí alámòjútó ojúlé rẹ ṣètò, lẹ́yìn náà a ó fi pamọ́ fún àwọn ìbẹ̀wò tó ń bọ̀.';
 $string['sandbox:toggle'] = 'Mú sandbox Python ṣiṣẹ́ fún ẹ̀kọ́ yìí';
-$string['sandbox:toggle_help'] = 'Ó ń fi ojú-ìwé kan kún fún akẹ́kọ̀ọ́ níbi tí wọ́n ti lè kọ kí wọ́n sì ṣiṣẹ́ Python pátápátá nínú aṣàwákiri wọn nípasẹ̀ Pyodide. Ó wà ní pípa ní ìbẹ̀rẹ̀. Mú un ṣiṣẹ́ fún àwọn ẹ̀kọ́ tí ó ní iṣẹ́ kóòdù; fi sílẹ̀ ní pípa fún àwọn tí kò ní.';
+$string['sandbox:toggle_help'] = 'Ó ń fi ojú-ìwé kan kún fún akẹ́kọ̀ọ́ níbi tí wọ́n ti lè kọ kí wọ́n sì ṣiṣẹ́ Python pátápátá nínú aṣàwákiri wọn nípasẹ̀ Pyodide. Ó wà ní pípa ní ìbẹ̀rẹ̀. Mú un ṣiṣẹ́ fún àwọn ẹ̀kọ́ tí ó ní iṣẹ́ kóòdù; fi sílẹ̀ ní pípa fún àwọn tí kò ní. Alámòjútó ojúlé náà gbọ́dọ̀ tún ṣètò ibi tí ẹ̀rọ ìṣiṣẹ́ Python wà nínú ètò plugin: níwọ̀n ìgbà tí ààyè yẹn bá ṣófo, sandbox yóò wà ní pípa, nítorí kò sí ohun tí a lè gbé wọlé.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Olùrànlọ́wọ́ Ẹ̀kọ́ AI — Àwọn Ẹ̀kọ́';
@@ -3127,3 +3127,31 @@ $string['settings:support_enabled_desc'] = 'Fàyè gba àwọn akẹ́kọ̀ọ�
 $string['settings:support_courseid'] = 'Ẹ̀kọ́ ìrànlọ́wọ́';
 $string['settings:support_courseid_desc'] = 'ID ẹ̀kọ́ kan tí ó hàn, tí ó ní àwọn ohun èlò ìbẹ̀rẹ̀, ìfáàrà àti ìtọ́sọ́nà rẹ nínú. A ó dáhùn àwọn ìjíròrò ìrànlọ́wọ́ láti inú ẹ̀kọ́ yìí àti FAQ tí ó wà lókè, a ó sì kọ wọ́n sí ẹ̀kọ́ náà. Fi sílẹ̀ ní òfo láti pa ipò ìrànlọ́wọ́ mọ́. Ojú-ìwé ilé sáìtì (ẹ̀kọ́ 1) kò ṣe é gbà.';
 $string['support:promptrole'] = 'O ń dáhùn ìbéèrè ìrànlọ́wọ́ kan tí ó wá láti òde gbogbo ẹ̀kọ́. Akẹ́kọ̀ọ́ náà kò béèrè nípa àkóónú ẹ̀kọ́, nítorí náà má ṣe darí rẹ̀ padà síbẹ̀. Dáhùn láti inú FAQ àti àwọn ohun èlò ìrànlọ́wọ́ tí a fún ọ. Bí o kò bá lè dáhùn ní pípé, sọ bẹ́ẹ̀ ní kedere, kí o sì fi ọwọ́ sí i pé o lè fi ìbéèrè náà ránṣẹ́ sí ẹgbẹ́ ìrànlọ́wọ́.';
+
+$string['sandbox:noruntimeurl'] = 'A ti tan sandbox Python fún ẹ̀kọ́ yìí, ṣùgbọ́n a kò tíì ṣàgbékalẹ̀ ibi tí ẹ̀rọ Python wà fún ojú-ìwé yìí, nítorí náà kò sí ohun tí a lè gbé wọlé. Alákòóso lè ṣàgbékalẹ̀ rẹ̀ nínú ètò plugin.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Nígbà tí sandbox Python bá ń ṣiṣẹ́, ẹ̀rọ aṣàwákiri akẹ́kọ̀ọ́ yóò gba ẹ̀rọ Python wọlé láti ibi tí alákòóso ojú-ìwé ti ṣàgbékalẹ̀, èyí tí ó lè jẹ́ ti ẹnìkẹta. Kóòdù tí a kọ nínú sandbox àti àbájáde rẹ̀ yóò wà lórí ẹ̀rọ náà, a kò sì ní fi ránṣẹ́ sí ibikíbi.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Àdírẹ́sì IP akẹ́kọ̀ọ́, tí ó di mímọ̀ fún ẹni tí ó ń pèsè ẹ̀rọ náà kìkì nípa fífi ìbéèrè náà ránṣẹ́.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Aṣàwákiri àti ẹ̀rọ ìṣiṣẹ́ akẹ́kọ̀ọ́, tí a fi ránṣẹ́ gẹ́gẹ́ bí user agent ìbéèrè náà.';
+
+// Soapbox assignment form + avatar picker labels.
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Àṣàyàn ara ẹni: {$a}';
+$string['soapbox:assign_name'] = 'Orúkọ iṣẹ́-àyànfúnni';
+$string['soapbox:assign_required'] = 'A gbọ́dọ̀ kún pápá yìí';
+$string['soapbox:assign_intro'] = 'Àwọn ìtọ́sọ́nà';
+$string['soapbox:assign_recordtype'] = 'Irú àkọsílẹ̀';
+$string['soapbox:assign_mode_video'] = 'Fídíò';
+$string['soapbox:assign_mode_audio'] = 'Ohùn nìkan';
+$string['soapbox:assign_min_seconds'] = 'Ìgùn tí ó kéré jùlọ (ìṣẹ́jú-àáyá)';
+$string['soapbox:assign_max_seconds'] = 'Ìgùn tí ó pọ̀ jùlọ (ìṣẹ́jú-àáyá)';
+$string['soapbox:assign_seccap'] = 'Ìgùn tí ó pọ̀ jùlọ lórí sáìtì yìí: ìṣẹ́jú-àáyá {$a}.';
+$string['soapbox:assign_max_attempts'] = 'Iye ìgbìyànjú tí a gbà láàyè (0 = láìní ààlà)';
+$string['soapbox:assign_stored_attempts'] = 'Àwọn àkọsílẹ̀ tí a pamọ́ fún akẹ́kọ̀ọ́ kọ̀ọ̀kan';
+$string['soapbox:assign_reccap'] = 'Iye àkọsílẹ̀ tí ó pọ̀ jùlọ tí sáìtì yìí ń pamọ́ fún akẹ́kọ̀ọ́ kọ̀ọ̀kan: {$a}.';
+$string['soapbox:assign_slides'] = 'Àwọn ìfaláti';
+$string['soapbox:assign_slides_help'] = 'Fàyè gba àwọn akẹ́kọ̀ọ́ láti fi àkójọ PDF sí orí ẹ̀rọ, kí wọ́n sì máa tẹ àwọn ìfaláti síwájú bí wọ́n ṣe ń ṣàkọsílẹ̀';
+$string['soapbox:assign_slide_vision'] = 'Èsì lórí ìrísí àwọn ìfaláti';
+$string['soapbox:assign_slide_vision_help'] = 'Tún ṣe àyẹ̀wò ojú lórí àwọn àwòrán ìfaláti fún àwọn àkíyèsí nípa ìrísí (ó nílò Àwọn ìfaláti, àti ìṣètò ìrísí ìfaláti Soapbox lórí sáìtì)';
+$string['soapbox:assign_visible'] = 'Ó hàn sí àwọn akẹ́kọ̀ọ́';
+$string['soapbox:assign_err_min_seconds'] = 'Tẹ ó kéré jù ìṣẹ́jú-àáyá 1';
+$string['soapbox:assign_err_minmax'] = 'Ìgùn tí ó kéré jùlọ kò lè pọ̀ ju ìgùn tí ó pọ̀ jùlọ lọ';

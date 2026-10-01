@@ -937,9 +937,9 @@ $string['sandbox:run'] = '실행';
 $string['sandbox:running'] = '실행 중…';
 $string['sandbox:clear'] = '출력 지우기';
 $string['sandbox:output_heading'] = '출력';
-$string['sandbox:privacy_note'] = '코드와 출력은 브라우저 안에만 머무릅니다. 서버로 전송되는 것은 없습니다. 런타임은 처음 한 번만 공개 CDN에서 불러오며, 이후 방문에는 캐시된 것이 사용됩니다.';
+$string['sandbox:privacy_note'] = '코드와 출력은 브라우저 안에만 남습니다. 작성하거나 실행한 내용은 어떤 서버로도 전송되지 않습니다. Python 런타임 자체만 사이트 관리자가 설정한 위치에서 한 번 내려받은 뒤, 다음 방문을 위해 캐시됩니다.';
 $string['sandbox:toggle'] = '이 강좌에서 Python 샌드박스 활성화';
-$string['sandbox:toggle_help'] = '학생이 Pyodide를 통해 브라우저 안에서 Python을 작성하고 그대로 실행할 수 있는 학습자용 페이지를 추가합니다. 기본값은 꺼짐입니다. 코드 작업이 있는 강좌에서 활성화하고, 그렇지 않은 강좌에서는 꺼 두세요.';
+$string['sandbox:toggle_help'] = '학생이 Pyodide를 통해 브라우저 안에서 Python을 작성하고 그대로 실행할 수 있는 학습자용 페이지를 추가합니다. 기본값은 꺼짐입니다. 코드 작업이 있는 강좌에서 활성화하고, 그렇지 않은 강좌에서는 꺼 두세요. 사이트 관리자가 플러그인 설정에서 Python 런타임 위치도 지정해야 합니다. 그 값이 비어 있는 동안에는 불러올 것이 없으므로 샌드박스는 꺼진 상태로 유지됩니다.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'AI 코스 어시스턴트 — 강좌';
@@ -3105,3 +3105,30 @@ $string['settings:support_enabled_desc'] = '대시보드나 프로필처럼 코�
 $string['settings:support_courseid'] = '지원 코스';
 $string['settings:support_courseid_desc'] = '시작 안내, 온보딩, 오리엔테이션 자료가 들어 있는, 학습자에게 보이는 코스의 ID입니다. 지원 대화는 이 코스와 위의 FAQ를 바탕으로 답변되며 이 코스에 기록됩니다. 비워 두면 지원 모드가 꺼집니다. 사이트 홈(코스 1)은 사용할 수 없습니다.';
 $string['support:promptrole'] = '지금 코스 밖에서 들어온 지원 질문에 답하고 있다. 학습자는 코스 내용을 묻는 것이 아니므로 코스 자료로 유도하지 마라. 제공된 FAQ와 지원 자료를 근거로 답하라. 정확하게 답할 수 없으면 그 사실을 분명히 밝히고, 질문을 지원팀에 전달하겠다고 제안하라.';
+
+$string['sandbox:noruntimeurl'] = '이 강좌에서는 Python 샌드박스가 켜져 있지만, 사이트에 Python 런타임 위치가 설정되어 있지 않아 불러올 것이 없습니다. 관리자가 플러그인 설정에서 위치를 지정할 수 있습니다.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Python 샌드박스를 사용하면 학습자의 브라우저가 사이트 관리자가 설정한 위치에서 Python 런타임을 내려받으며, 그 위치는 제3자의 것일 수 있습니다. 샌드박스에서 작성한 코드와 그 출력은 기기에 남으며 어디에도 전송되지 않습니다.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = '학습자의 IP 주소로, 요청을 보내는 것만으로 런타임을 제공하는 쪽에 알려집니다.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = '학습자의 브라우저와 운영체제로, 해당 요청의 user agent로 전송됩니다.';
+
+$string['settings:avatar_numbered'] = '아바타 {$a}';
+$string['settings:avatar_custom'] = '사용자 지정: {$a}';
+$string['soapbox:assign_name'] = '과제 이름';
+$string['soapbox:assign_required'] = '필수 입력 항목입니다';
+$string['soapbox:assign_intro'] = '안내';
+$string['soapbox:assign_recordtype'] = '녹음·녹화 유형';
+$string['soapbox:assign_mode_video'] = '비디오';
+$string['soapbox:assign_mode_audio'] = '오디오만';
+$string['soapbox:assign_min_seconds'] = '최소 길이(초)';
+$string['soapbox:assign_max_seconds'] = '최대 길이(초)';
+$string['soapbox:assign_seccap'] = '사이트 최대 길이: {$a}초.';
+$string['soapbox:assign_max_attempts'] = '허용 시도 횟수(0 = 무제한)';
+$string['soapbox:assign_stored_attempts'] = '학생 1명당 보관하는 녹화 수';
+$string['soapbox:assign_reccap'] = '사이트에서 학생 1명당 보관하는 최대 녹화 수: {$a}.';
+$string['soapbox:assign_slides'] = '슬라이드';
+$string['soapbox:assign_slides_help'] = '학생이 PDF 덱을 업로드하고 녹화하면서 슬라이드를 넘길 수 있게 합니다';
+$string['soapbox:assign_slide_vision'] = '슬라이드 시각 디자인 피드백';
+$string['soapbox:assign_slide_vision_help'] = '슬라이드 이미지에 대해서도 비전 패스를 실행해 시각 디자인 노트를 생성합니다(슬라이드 옵션과 사이트의 Soapbox 슬라이드 비전 설정이 필요합니다)';
+$string['soapbox:assign_visible'] = '학생에게 공개';
+$string['soapbox:assign_err_min_seconds'] = '최소 1초 이상 입력하세요';
+$string['soapbox:assign_err_minmax'] = '최소 길이는 최대 길이를 초과할 수 없습니다';

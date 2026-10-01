@@ -943,9 +943,9 @@ $string['sandbox:run'] = 'Suorita';
 $string['sandbox:running'] = 'Suoritetaan…';
 $string['sandbox:clear'] = 'Tyhjennä tuloste';
 $string['sandbox:output_heading'] = 'Tuloste';
-$string['sandbox:privacy_note'] = 'Koodi ja tuloste pysyvät selaimessasi. Mitään ei lähetetä palvelimelle. Ajoympäristö ladataan julkisesta CDN-palvelusta vain ensimmäisellä kerralla, ja se tallennetaan välimuistiin seuraavia käyntejä varten.';
+$string['sandbox:privacy_note'] = 'Koodi ja tuloste pysyvät selaimessasi. Mitään kirjoittamaasi tai suorittamaasi ei lähetetä millekään palvelimelle. Itse Python-ajoympäristö ladataan kerran sijainnista, jonka sivuston ylläpitäjä on määrittänyt, ja tallennetaan sen jälkeen välimuistiin myöhempiä käyntejä varten.';
 $string['sandbox:toggle'] = 'Ota Python-hiekkalaatikko käyttöön tällä kurssilla';
-$string['sandbox:toggle_help'] = 'Lisää oppijoille tarkoitetun sivun, jolla opiskelijat voivat kirjoittaa ja suorittaa Python-koodia kokonaan selaimessaan Pyodiden avulla. Oletuksena pois käytöstä. Ota käyttöön kursseilla, joilla ohjelmoidaan; jätä pois muilta.';
+$string['sandbox:toggle_help'] = 'Lisää oppijoille tarkoitetun sivun, jolla opiskelijat voivat kirjoittaa ja suorittaa Python-koodia kokonaan selaimessaan Pyodiden avulla. Oletuksena pois käytöstä. Ota käyttöön kursseilla, joilla ohjelmoidaan; jätä pois muilta. Sivuston ylläpitäjän on lisäksi asetettava Python-ajoympäristön sijainti liitännäisen asetuksiin: niin kauan kuin kenttä on tyhjä, hiekkalaatikko pysyy pois päältä, koska ladattavaa ei ole.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'AI-kurssiavustaja — Kurssit';
@@ -3107,3 +3107,30 @@ $string['settings:support_enabled_desc'] = 'Anna opiskelijoiden avata [[tutorsho
 $string['settings:support_courseid'] = 'Tukikurssi';
 $string['settings:support_courseid_desc'] = 'Sen näkyvissä olevan kurssin tunniste (ID), jolla ovat aloitus-, perehdytys- ja opastusmateriaalisi. Tukikeskusteluihin vastataan tämän kurssin ja yllä olevan UKK:n pohjalta, ja ne kirjataan tälle kurssille. Jätä tyhjäksi, jos haluat poistaa tukitilan käytöstä. Sivuston etusivua (kurssi 1) ei hyväksytä.';
 $string['support:promptrole'] = 'Vastaat tukikysymykseen, joka on esitetty kurssien ulkopuolella. Opiskelija ei kysy kurssimateriaalista, joten älä ohjaa häntä siihen. Vastaa UKK:n ja saamasi tukimateriaalin perusteella. Jos et pysty vastaamaan täsmällisesti, sano se suoraan ja tarjoudu välittämään kysymyksen tukitiimille.';
+
+$string['sandbox:noruntimeurl'] = 'Python-hiekkalaatikko on käytössä tällä kurssilla, mutta sivustolle ei ole määritetty Python-ajoympäristön sijaintia, joten ladattavaa ei ole. Ylläpitäjä voi määrittää sen liitännäisen asetuksissa.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Kun Python-hiekkalaatikko on käytössä, opiskelijan selain lataa Python-ajoympäristön sivuston ylläpitäjän määrittämästä sijainnista, joka voi kuulua kolmannelle osapuolelle. Hiekkalaatikossa kirjoitettu koodi ja sen tuloste pysyvät laitteella eikä niitä lähetetä minnekään.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Opiskelijan IP-osoite, joka paljastuu ajoympäristön tarjoajalle jo pyynnön tekemisestä.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Opiskelijan selain ja käyttöjärjestelmä, jotka lähetetään kyseisen pyynnön user agent -tietona.';
+
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Mukautettu: {$a}';
+$string['soapbox:assign_name'] = 'Tehtävän nimi';
+$string['soapbox:assign_required'] = 'Tämä kenttä on pakollinen';
+$string['soapbox:assign_intro'] = 'Ohjeet';
+$string['soapbox:assign_recordtype'] = 'Nauhoituksen tyyppi';
+$string['soapbox:assign_mode_video'] = 'Video';
+$string['soapbox:assign_mode_audio'] = 'Vain ääni';
+$string['soapbox:assign_min_seconds'] = 'Vähimmäispituus (sekuntia)';
+$string['soapbox:assign_max_seconds'] = 'Enimmäispituus (sekuntia)';
+$string['soapbox:assign_seccap'] = 'Sivuston enimmäispituus: {$a} sekuntia.';
+$string['soapbox:assign_max_attempts'] = 'Sallitut yritykset (0 = rajoittamaton)';
+$string['soapbox:assign_stored_attempts'] = 'Säilytettävät nauhoitukset opiskelijaa kohden';
+$string['soapbox:assign_reccap'] = 'Sivuston enimmäismäärä säilytettäviä nauhoituksia opiskelijaa kohden: {$a}.';
+$string['soapbox:assign_slides'] = 'Diat';
+$string['soapbox:assign_slides_help'] = 'Salli opiskelijoiden ladata PDF-diasarja ja siirtyä dioissa eteenpäin tallennuksen aikana';
+$string['soapbox:assign_slide_vision'] = 'Palaute diojen visuaalisesta ilmeestä';
+$string['soapbox:assign_slide_vision_help'] = 'Analysoi myös diakuvat konenäöllä, jotta saat huomioita visuaalisesta ilmeestä (edellyttää Diat-asetusta ja sivuston Soapbox-diakuva-analyysiasetusta)';
+$string['soapbox:assign_visible'] = 'Näkyy opiskelijoille';
+$string['soapbox:assign_err_min_seconds'] = 'Syötä vähintään 1 sekunti';
+$string['soapbox:assign_err_minmax'] = 'Vähimmäispituus ei voi olla enimmäispituutta suurempi';

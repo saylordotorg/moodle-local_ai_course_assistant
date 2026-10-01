@@ -983,9 +983,9 @@ $string['sandbox:run'] = 'הרצה';
 $string['sandbox:running'] = 'מריץ…';
 $string['sandbox:clear'] = 'נקה פלט';
 $string['sandbox:output_heading'] = 'פלט';
-$string['sandbox:privacy_note'] = 'הקוד והפלט נשארים בדפדפן שלך. שום דבר אינו נשלח לשרת כלשהו. סביבת ההרצה נטענת מ-CDN ציבורי בפעם הראשונה בלבד ונשמרת במטמון לביקורים הבאים.';
+$string['sandbox:privacy_note'] = 'הקוד והפלט נשארים בדפדפן שלך. שום דבר שאתה כותב או מריץ אינו נשלח לשרת כלשהו. סביבת ההרצה של Python עצמה יורדת פעם אחת מהמיקום שמנהל האתר הגדיר, ולאחר מכן נשמרת במטמון לביקורים הבאים.';
 $string['sandbox:toggle'] = 'הפעלת ארגז החול של Python לקורס זה';
-$string['sandbox:toggle_help'] = 'מוסיף עמוד ללומדים שבו תלמידים יכולים לכתוב ולהריץ Python כולו בתוך הדפדפן שלהם באמצעות Pyodide. כבוי כברירת מחדל. הפעילו אותו בקורסים הכוללים עבודת קוד; השאירו כבוי בקורסים שאין בהם.';
+$string['sandbox:toggle_help'] = 'מוסיף עמוד ללומדים שבו תלמידים יכולים לכתוב ולהריץ Python כולו בתוך הדפדפן שלהם באמצעות Pyodide. כבוי כברירת מחדל. הפעילו אותו בקורסים הכוללים עבודת קוד; השאירו כבוי בקורסים שאין בהם. על מנהל האתר גם להגדיר את מיקום סביבת ההרצה של Python בהגדרות התוסף: כל עוד השדה ריק, ארגז החול נשאר כבוי, מפני שאין מה לטעון.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'עוזר קורס AI — קורסים';
@@ -3146,3 +3146,30 @@ $string['settings:support_enabled_desc'] = 'מאפשר ללומדים לפתוח
 $string['settings:support_courseid'] = 'קורס תמיכה';
 $string['settings:support_courseid_desc'] = 'מזהה של קורס גלוי שבו נמצאים חומרי הפתיחה, הקליטה וההתמצאות שלכם. שיחות תמיכה נענות מתוך הקורס הזה ומתוך השאלות הנפוצות שלמעלה, ונרשמות עליו. השאירו ריק כדי לכבות את מצב התמיכה. עמוד הבית של האתר (קורס 1) אינו מתקבל.';
 $string['support:promptrole'] = 'אתה עונה על שאלת תמיכה שנשאלה מחוץ לכל קורס. הלומד אינו שואל על חומר הקורס, ולכן אל תפנה אותו אליו. ענה על סמך השאלות הנפוצות וחומרי התמיכה שניתנו לך. אם אינך יכול לענות במדויק, אמור זאת בפשטות והצע להעביר את השאלה לצוות התמיכה.';
+
+$string['sandbox:noruntimeurl'] = 'ארגז החול של פייתון מופעל בקורס הזה, אבל לא הוגדר באתר מיקום לסביבת ההרצה של פייתון, ולכן אין מה לטעון. מנהל מערכת יכול להגדיר אותו בהגדרות התוסף.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'כאשר ארגז החול של פייתון מופעל, הדפדפן של הלומד מוריד את סביבת ההרצה של פייתון מהמיקום שהגדיר מנהל האתר, שעשוי להיות שייך לצד שלישי. הקוד שנכתב בארגז החול והפלט שלו נשארים במכשיר ולעולם אינם נשלחים לשום מקום.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'כתובת ה-IP של הלומד, הנחשפת למי שמארח את סביבת ההרצה עצם שליחת הבקשה.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'הדפדפן ומערכת ההפעלה של הלומד, הנשלחים כ-user agent של אותה בקשה.';
+
+$string['settings:avatar_numbered'] = 'אוואטר {$a}';
+$string['settings:avatar_custom'] = 'מותאם אישית: {$a}';
+$string['soapbox:assign_name'] = 'שם המטלה';
+$string['soapbox:assign_required'] = 'יש למלא שדה זה';
+$string['soapbox:assign_intro'] = 'הוראות';
+$string['soapbox:assign_recordtype'] = 'סוג ההקלטה';
+$string['soapbox:assign_mode_video'] = 'וידאו';
+$string['soapbox:assign_mode_audio'] = 'אודיו בלבד';
+$string['soapbox:assign_min_seconds'] = 'אורך מזערי (שניות)';
+$string['soapbox:assign_max_seconds'] = 'אורך מרבי (שניות)';
+$string['soapbox:assign_seccap'] = 'האורך המרבי באתר: {$a} שניות.';
+$string['soapbox:assign_max_attempts'] = 'מספר הניסיונות המותר (0 = ללא הגבלה)';
+$string['soapbox:assign_stored_attempts'] = 'הקלטות שנשמרות לכל לומד';
+$string['soapbox:assign_reccap'] = 'המספר המרבי באתר של הקלטות שנשמרות לכל לומד: {$a}.';
+$string['soapbox:assign_slides'] = 'שקופיות';
+$string['soapbox:assign_slides_help'] = 'אפשרו ללומדים להעלות מצגת PDF ולקדם את השקופיות תוך כדי ההקלטה';
+$string['soapbox:assign_slide_vision'] = 'משוב על העיצוב החזותי של השקופיות';
+$string['soapbox:assign_slide_vision_help'] = 'הריצו גם מעבר ראייה ממוחשבת על תמונות השקופיות לקבלת הערות על העיצוב החזותי (דורש את השקופיות ואת הגדרת ראיית השקופיות של Soapbox באתר)';
+$string['soapbox:assign_visible'] = 'גלוי ללומדים';
+$string['soapbox:assign_err_min_seconds'] = 'יש להזין שנייה אחת לפחות';
+$string['soapbox:assign_err_minmax'] = 'האורך המזערי אינו יכול לעלות על המרבי';

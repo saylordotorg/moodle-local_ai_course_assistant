@@ -1,0 +1,103 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/analytics_tab_feedback
+
+    AI Feedback tab of the analytics dashboard. Replaces the innerHTML string
+    that amd/src/analytics_dashboard.js used to build for this pane
+    (CONTRIB-10574 #278).
+
+    This pane is the worst of the seven for injection: the negative-feedback
+    table prints an excerpt of the AI reply alongside the learner's free-text
+    comment. Both now go through Mustache escaping rather than a hand-rolled
+    helper called at each concatenation point.
+
+    The headings and column labels are still literal English, exactly as they
+    were in the JavaScript this replaces.
+
+    Context variables required for this template:
+    * cards - array of stat tiles, each with a value and a label
+    * hasratings - true to show the thumbs up/down pie canvas
+    * hasstars - true to show the star distribution canvas
+    * hasnegatives - true when there is at least one negative rating to list
+    * negatives - one entry per negative rating, each with excerpt, comment,
+      hallucination and date
+
+    Example context (json):
+    {
+        "cards": [
+            {"value": "214", "label": "Thumbs up"},
+            {"value": "9", "label": "Thumbs down"}
+        ],
+        "hasratings": true,
+        "hasstars": true,
+        "hasnegatives": true,
+        "negatives": [
+            {
+                "excerpt": "Opportunity cost is the value of...",
+                "comment": "This did not answer my question",
+                "hallucination": "No",
+                "date": "9/14/2026"
+            }
+        ]
+    }
+}}
+<div class="sola-stat-cards">
+    {{#cards}}
+        <div class="sola-stat-card">
+            <div class="sola-stat-value">{{value}}</div>
+            <div class="sola-stat-label">{{label}}</div>
+        </div>
+    {{/cards}}
+</div>
+<div class="row mt-4">
+    {{#hasratings}}
+        <div class="col-md-4">
+            <h5>Message Ratings</h5>
+            <canvas id="sola-chart-msgratings" height="200"></canvas>
+        </div>
+    {{/hasratings}}
+    {{#hasstars}}
+        <div class="col-md-4">
+            <h5>Star Rating Distribution</h5>
+            <canvas id="sola-chart-stars" height="200"></canvas>
+        </div>
+    {{/hasstars}}
+</div>
+{{#hasnegatives}}
+    <h5 class="mt-4">Recent Negative Feedback</h5>
+    <table class="table table-sm table-striped">
+        <thead>
+            <tr>
+                <th>Message Excerpt</th>
+                <th>Comment</th>
+                <th>Hallucination?</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#negatives}}
+                <tr>
+                    <td>{{excerpt}}</td>
+                    <td>{{comment}}</td>
+                    <td>{{hallucination}}</td>
+                    <td>{{date}}</td>
+                </tr>
+            {{/negatives}}
+        </tbody>
+    </table>
+{{/hasnegatives}}

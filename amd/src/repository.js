@@ -503,8 +503,29 @@ define(['core/ajax'], function(Ajax) {
         }])[0];
     };
 
+    /**
+     * Open a real-time talking-avatar session.
+     *
+     * Resolves with {ok, reason, error, session_rowid, embed_url, ...}: a
+     * refusal (feature off, rate limited, a session already open, provider
+     * unconfigured, upstream failure) resolves with ok:false and a message to
+     * show, it does not reject. Only a capability or transport failure rejects.
+     *
+     * @param {number} courseid
+     * @param {string} lang Two-letter ISO 639-1 hint, '' to let the provider decide.
+     * @param {string} [greeting] Optional opening line.
+     * @returns {Promise}
+     */
+    const startAvatarSession = function(courseid, lang, greeting) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_start_avatar_session',
+            args: {courseid: courseid, lang: lang || '', greeting: greeting || ''},
+        }])[0];
+    };
+
     return {
         sendMessage: sendMessage,
+        startAvatarSession: startAvatarSession,
         getHistory: getHistory,
         clearHistory: clearHistory,
         getConfig: getConfig,

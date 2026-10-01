@@ -943,9 +943,9 @@ $string['sandbox:run'] = 'Uruchom';
 $string['sandbox:running'] = 'Uruchamianie…';
 $string['sandbox:clear'] = 'Wyczyść wyjście';
 $string['sandbox:output_heading'] = 'Wyjście';
-$string['sandbox:privacy_note'] = 'Kod i wyjście pozostają w Twojej przeglądarce. Nic nie jest wysyłane na żaden serwer. Środowisko uruchomieniowe jest pobierane z publicznego CDN tylko za pierwszym razem i zapisywane w pamięci podręcznej na kolejne wizyty.';
+$string['sandbox:privacy_note'] = 'Kod i wynik pozostają w Twojej przeglądarce. Nic z tego, co piszesz lub uruchamiasz, nie jest wysyłane na żaden serwer. Samo środowisko uruchomieniowe Pythona pobierane jest raz z lokalizacji skonfigurowanej przez administratora witryny, a potem zapisywane w pamięci podręcznej na kolejne wizyty.';
 $string['sandbox:toggle'] = 'Włącz piaskownicę Python dla tego kursu';
-$string['sandbox:toggle_help'] = 'Dodaje stronę dla uczących się, na której studenci mogą pisać i uruchamiać kod Python w całości w swojej przeglądarce za pomocą Pyodide. Domyślnie wyłączone. Włącz w kursach z zadaniami programistycznymi; w pozostałych pozostaw wyłączone.';
+$string['sandbox:toggle_help'] = 'Dodaje stronę dla uczących się, na której studenci mogą pisać i uruchamiać kod Python w całości w swojej przeglądarce za pomocą Pyodide. Domyślnie wyłączone. Włącz w kursach z zadaniami programistycznymi; w pozostałych pozostaw wyłączone. Administrator witryny musi dodatkowo wskazać lokalizację środowiska Pythona w ustawieniach wtyczki: dopóki pole jest puste, piaskownica pozostaje wyłączona, bo nie ma czego wczytać.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Asystent kursu AI — Kursy';
@@ -3106,3 +3106,31 @@ $string['settings:support_enabled_desc'] = 'Pozwala studentom otwierać [[tutors
 $string['settings:support_courseid'] = 'Kurs wsparcia';
 $string['settings:support_courseid_desc'] = 'Numer ID widocznego kursu zawierającego materiały wprowadzające, powitalne i orientacyjne. Odpowiedzi w trybie wsparcia są oparte na tym kursie oraz na powyższych najczęstszych pytaniach i są do niego zapisywane. Pozostaw pole puste, aby wyłączyć tryb wsparcia. Strona główna witryny (kurs 1) nie jest akceptowana.';
 $string['support:promptrole'] = 'Odpowiadasz na pytanie o wsparcie zadane poza jakimkolwiek kursem. Student nie pyta o materiał kursu, więc go do niego nie odsyłaj. Odpowiadaj na podstawie najczęstszych pytań i przekazanych Ci materiałów wsparcia. Jeśli nie możesz odpowiedzieć rzetelnie, powiedz to wprost i zaproponuj przekazanie pytania zespołowi wsparcia.';
+
+$string['sandbox:noruntimeurl'] = 'Piaskownica Pythona jest włączona dla tego kursu, ale witryna nie ma ustawionej lokalizacji środowiska uruchomieniowego Pythona, więc nie ma czego wczytać. Administrator może ją ustawić w ustawieniach wtyczki.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Gdy piaskownica Pythona jest włączona, przeglądarka uczącego się pobiera środowisko uruchomieniowe Pythona z lokalizacji skonfigurowanej przez administratora witryny, która może należeć do strony trzeciej. Kod napisany w piaskownicy i jego wynik pozostają na urządzeniu i nigdy nigdzie nie są wysyłane.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Adres IP uczącego się, ujawniany dostawcy środowiska uruchomieniowego już przez samo wysłanie żądania.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Przeglądarka i system operacyjny uczącego się, wysyłane jako user agent tego żądania.';
+
+// Avatar picker labels and the Soapbox assignment create/edit form (v7.6.1).
+$string['settings:avatar_numbered'] = 'Awatar {$a}';
+$string['settings:avatar_custom'] = 'Niestandardowy: {$a}';
+$string['soapbox:assign_name'] = 'Nazwa zadania';
+$string['soapbox:assign_required'] = 'To pole jest wymagane';
+$string['soapbox:assign_intro'] = 'Instrukcje';
+$string['soapbox:assign_recordtype'] = 'Typ nagrania';
+$string['soapbox:assign_mode_video'] = 'Wideo';
+$string['soapbox:assign_mode_audio'] = 'Tylko dźwięk';
+$string['soapbox:assign_min_seconds'] = 'Minimalna długość (sekundy)';
+$string['soapbox:assign_max_seconds'] = 'Maksymalna długość (sekundy)';
+$string['soapbox:assign_seccap'] = 'Maksymalna długość w witrynie: {$a} sekund.';
+$string['soapbox:assign_max_attempts'] = 'Dozwolona liczba podejść (0 = bez limitu)';
+$string['soapbox:assign_stored_attempts'] = 'Liczba przechowywanych nagrań na studenta';
+$string['soapbox:assign_reccap'] = 'Maksymalna liczba nagrań przechowywanych na studenta w witrynie: {$a}.';
+$string['soapbox:assign_slides'] = 'Slajdy';
+$string['soapbox:assign_slides_help'] = 'Pozwól studentom przesłać talię slajdów w PDF i przełączać slajdy podczas nagrywania';
+$string['soapbox:assign_slide_vision'] = 'Informacja zwrotna o projekcie wizualnym slajdów';
+$string['soapbox:assign_slide_vision_help'] = 'Wykonaj dodatkowo analizę wizualną obrazów slajdów, aby uzyskać uwagi o projekcie wizualnym (wymaga opcji Slajdy oraz ustawienia analizy wizualnej slajdów Soapbox w witrynie)';
+$string['soapbox:assign_visible'] = 'Widoczne dla studentów';
+$string['soapbox:assign_err_min_seconds'] = 'Wpisz co najmniej 1 sekundę';
+$string['soapbox:assign_err_minmax'] = 'Minimalna długość nie może przekraczać maksymalnej';

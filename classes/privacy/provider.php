@@ -328,6 +328,18 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             'report' => 'privacy:metadata:radar_webhook:report',
         ], 'privacy:metadata:radar_webhook');
 
+        // CONTRIB-10574 #271. The Python sandbox loads its runtime straight
+        // into the learner's browser from the location an administrator
+        // configures, which may be a third-party CDN. No learner content ever
+        // leaves the device, but the request itself discloses the learner's IP
+        // address and user agent to whoever serves that location, so it is
+        // declared here. A site that leaves the location unset never makes the
+        // request: the sandbox is off.
+        $collection->add_external_location_link('code_sandbox_runtime', [
+            'ipaddress' => 'privacy:metadata:code_sandbox_runtime:ipaddress',
+            'useragent' => 'privacy:metadata:code_sandbox_runtime:useragent',
+        ], 'privacy:metadata:code_sandbox_runtime');
+
         return $collection;
     }
 

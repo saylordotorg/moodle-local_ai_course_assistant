@@ -1,0 +1,51 @@
+Version 7.6.0 (build 2026100100)
+
+This release answers the plugin directory review. Eight of the fourteen findings are fixed, including both approval blockers. One of them changes behavior on sites that never set a model, so please read the upgrade note before you upgrade.
+
+BLOCKER: REMOTE CONFIGURATION IS NOW OPT-IN
+
+Every installation of this plugin used to fetch a JSON file from one GitHub repository once an hour and apply its system prompt, instruction blocks and default model to the assistant its learners talk to. The setting shipped with that URL as its default, and an empty value fell back to the same URL, so an administrator could not switch it off by clearing the field.
+
+That meant anyone able to write to that file could change what the assistant tells learners on every site running the plugin, including the house rules that carry the self harm and crisis guidance, and could change which model gets billed. No plugin release, no code review, no administrator action.
+
+Remote configuration is now opt-in. The setting ships empty, empty means disabled, and there is nothing to fall back to. An upgrade step clears the setting on sites that still carry the old default, since they never chose it, and leaves a site that set its own URL alone.
+
+BLOCKER: THE PRIVACY PROVIDER NOW FINDS ALL LEARNER DATA
+
+Twelve tables that link a learner to a course were invisible to subject access and deletion requests. A learner who had only used flashcards in a course was returned by neither discovery method, so a data request exported nothing of theirs and an erasure request left it in place.
+
+The cause was structural rather than an oversight about any one table. Both discovery methods carried one hand written query per table, so adding a table meant remembering to add two more blocks, and over several releases nobody did. Both now iterate a single list, and a test reads the schema file and fails when a table is missing from it.
+
+Two of those twelve were found by reviewing the fix for the other ten. The first attempt exempted the message and rating tables because both hang off a conversation, so a learner holding either looked discoverable through the conversation row. The code does not keep that promise: clearing a conversation deletes the conversation and its messages and leaves the ratings behind, and learners reach that path through the trash button in the chat header. Rate a reply, press Clear, never return to that course, and you held rows in a course no data request could reach. Clearing a conversation now deletes its ratings too, which is what a learner pressing Clear is asking for.
+
+THE PLUGIN NO LONGER SHIPS THIRD PARTY CODE
+
+Chart.js now comes from Moodle core as an AMD dependency. The bundled copy, the two scripts that worked around its module loader, and the third party libraries declaration are all deleted. Chart.js was the only entry in that file.
+
+ALSO IN THIS RELEASE
+
+The Remote config URL setting no longer tells administrators that a blank value means the default GitHub URL, which is now the opposite of what the code does.
+
+The course deletion observer reads per course settings through the configuration API instead of querying the database directly, so it removes every per course key rather than a hard coded list.
+
+The conversation starter admin page passes its configuration in a data attribute rather than as a JavaScript call argument, which Moodle warned about on every page load.
+
+Three global constants in the command line scripts now carry the plugin's name prefix.
+
+UPGRADE NOTE: CHECK YOUR MODEL SETTING FIRST
+
+This is the one change in the release that can reach learners, and it is easy to miss because it looks like a security fix with no runtime effect.
+
+The plugin picks a model in this order: a per call override, then the admin Model setting, then the remote configuration's default model, then the provider's own default. A site that never set Model explicitly has therefore been running on whatever the remote file said. Once remote configuration is off, that site falls through to each provider's own default instead, which is a different model.
+
+So before you upgrade, check whether Model is set on your site. If it is, nothing changes. If it is blank, set it to whatever you are running today, then upgrade.
+
+STILL TO COME
+
+Six of the fourteen findings are not in this release and are tracked openly: the Pyodide CDN dependency in the optional code sandbox, the remaining template and Output API migration, thirty four hard coded interface strings, five AJAX endpoints that should be external services, and HTML built in JavaScript that should use templates. The largest of those is roughly 3,800 lines and will come as its own release rather than riding alongside security fixes.
+
+VERIFICATION
+
+1,952 tests, 0 failures. Security validator corpus 36 of 36. PHP lint clean across 588 files. The CI matrix covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1 on both MariaDB and PostgreSQL, and all twelve jobs are green on this commit.
+
+Every test added in this release was verified by planting the defect it describes and watching it fail. That is how the message rating hole above was found, inside the fix for the issue it belongs to.

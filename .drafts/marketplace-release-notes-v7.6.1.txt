@@ -1,0 +1,41 @@
+Version 7.6.1 (build 2026100101)
+
+Five more findings from the plugin directory review, plus a bug that has been breaking the optional Python sandbox on every non-English site that uses an apostrophe.
+
+THE PYTHON SANDBOX WAS DEAD IN SEVERAL LANGUAGES
+
+If you run the optional code sandbox on a French, Turkish or Oromo site, it has not been working, and this release is the fix.
+
+The page built three JavaScript strings by dropping a translated message straight between single quotes. The French translation of the load-error message is "Impossible de charger l'environnement d'exécution Python", and the first apostrophe ends the string early. The browser then throws out the whole script, so the Python runtime never loads, the Run button never binds and the output pane never appears. Nothing in the English interface shows the problem, because the English message has no apostrophe.
+
+Translated text now goes through a JSON encoder that emits its own quotes, and two tests read the page itself and fail if any translated string is dropped into JavaScript without it, so a future locale cannot bring the bug back.
+
+THE SANDBOX NO LONGER HARDCODES A CDN
+
+Pyodide, the Python runtime the sandbox uses, was fetched from a hardcoded public CDN with no way for an administrator to change it.
+
+There is now a "Pyodide base URL" setting. Point it at your own mirror if you want to, and leave it blank if you don't want the sandbox at all: blank means the feature is off, with no fallback. The setting description states plainly that whoever serves that URL learns the IP address and browser of every learner who opens the sandbox, and the privacy provider declares the same thing.
+
+FIVE AJAX ENDPOINTS ARE NOW EXTERNAL SERVICES
+
+The four Learning Radar schedule actions and the avatar session endpoint are now proper Moodle external functions, registered in db/services.php, with their capability and context checks intact. Two standalone endpoint files are deleted.
+
+One behavior note for administrators who use Learning Radar schedules: the course filter field is more forgiving than it was for a short while during this change. You can type "2, 5, 12" with spaces and it saves.
+
+THIRTY-FOUR INTERFACE STRINGS ARE NOW TRANSLATABLE
+
+Hard-coded English text in the Soapbox assignment form and the avatar picker is now proper language strings, translated into all 46 locales rather than left in English for the next release.
+
+TEMPLATES AND THE OUTPUT API
+
+HTML that JavaScript used to build by hand now renders Moodle templates, and one admin page has moved to the Output API. Both are partial on purpose: the remaining work is roughly 3,800 lines across six more pages, and it will come as its own release rather than being half-done here.
+
+UPGRADE NOTES
+
+No schema change and no upgrade step. One new setting, which ships blank. If you were using the code sandbox, note that it will stay off until you fill in the Pyodide base URL, which is deliberate: the previous behavior silently sent every learner to a third-party CDN.
+
+If you are upgrading from 7.5.x rather than 7.6.0, read the 7.6.0 notes as well. That release made remote configuration opt-in, and it has an upgrade note about checking your Model setting before you upgrade.
+
+VERIFICATION
+
+1,989 tests, 0 failures, 7 skipped. Security validator corpus 36 of 36. PHP lint clean across 595 files. All 25 JavaScript bundles parse. The CI matrix covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1 on both MariaDB and PostgreSQL.

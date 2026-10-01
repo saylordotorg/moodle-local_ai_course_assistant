@@ -943,9 +943,9 @@ $string['sandbox:run'] = 'Spustit';
 $string['sandbox:running'] = 'Spouštím…';
 $string['sandbox:clear'] = 'Vymazat výstup';
 $string['sandbox:output_heading'] = 'Výstup';
-$string['sandbox:privacy_note'] = 'Kód i výstup zůstávají ve vašem prohlížeči. Nic se neodesílá na žádný server. Běhové prostředí se načítá z veřejné CDN pouze při prvním použití a pro další návštěvy se uloží do mezipaměti.';
+$string['sandbox:privacy_note'] = 'Kód i výstup zůstávají ve vašem prohlížeči. Nic z toho, co napíšete nebo spustíte, se neodesílá na žádný server. Samotné běhové prostředí Pythonu se jednou stáhne z umístění, které nastavil správce webu, a pak se uloží do mezipaměti pro další návštěvy.';
 $string['sandbox:toggle'] = 'Povolit Python sandbox pro tento kurz';
-$string['sandbox:toggle_help'] = 'Přidá stránku pro studenty, kde mohou psát a spouštět Python přímo ve svém prohlížeči pomocí Pyodide. Ve výchozím nastavení vypnuto. Zapněte u kurzů, které pracují s kódem; u ostatních ponechte vypnuté.';
+$string['sandbox:toggle_help'] = 'Přidá stránku pro studenty, kde mohou psát a spouštět Python přímo ve svém prohlížeči pomocí Pyodide. Ve výchozím nastavení vypnuto. Zapněte u kurzů, které pracují s kódem; u ostatních ponechte vypnuté. Správce webu musí navíc v nastavení pluginu zadat umístění běhového prostředí Pythonu: dokud je prázdné, zůstává sandbox vypnutý, protože není co načíst.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'AI asistent kurzu — Kurzy';
@@ -3107,3 +3107,31 @@ $string['settings:support_enabled_desc'] = 'Umožní studujícím otevřít [[tu
 $string['settings:support_courseid'] = 'Kurz podpory';
 $string['settings:support_courseid_desc'] = 'ID viditelného kurzu, ve kterém máte materiály pro začátek práce, úvodní seznámení a orientaci. Odpovědi v režimu podpory vycházejí z tohoto kurzu a z často kladených dotazů výše a zaznamenávají se k němu. Chcete-li režim podpory vypnout, ponechte pole prázdné. Titulní stránku webu (kurz 1) nelze použít.';
 $string['support:promptrole'] = 'Odpovídáš na dotaz podpory položený mimo jakýkoli kurz. Studující se neptá na obsah kurzu, neodkazuj ho tedy na něj. Odpovídej z často kladených dotazů a z materiálů podpory, které máš k dispozici. Pokud nedokážeš odpovědět přesně, řekni to otevřeně a nabídni předání dotazu týmu podpory.';
+
+$string['sandbox:noruntimeurl'] = 'Pythonové pískoviště je pro tento kurz zapnuté, ale web nemá nastavené umístění běhového prostředí Pythonu, takže není co načíst. Správce je může nastavit v nastavení pluginu.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Když je pythonové pískoviště zapnuté, prohlížeč studujícího stáhne běhové prostředí Pythonu z umístění, které nastavil správce webu a které může patřit třetí straně. Kód napsaný v pískovišti i jeho výstup zůstávají v zařízení a nikam se neodesílají.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'IP adresa studujícího, která se poskytovateli běhového prostředí prozradí už samotným požadavkem.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Prohlížeč a operační systém studujícího, odeslané jako user agent tohoto požadavku.';
+
+// Avatar picker labels and the Soapbox assignment create/edit form (v7.6.1).
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Vlastní: {$a}';
+$string['soapbox:assign_name'] = 'Název úkolu';
+$string['soapbox:assign_required'] = 'Toto pole je povinné';
+$string['soapbox:assign_intro'] = 'Pokyny';
+$string['soapbox:assign_recordtype'] = 'Typ nahrávky';
+$string['soapbox:assign_mode_video'] = 'Video';
+$string['soapbox:assign_mode_audio'] = 'Pouze zvuk';
+$string['soapbox:assign_min_seconds'] = 'Minimální délka (sekundy)';
+$string['soapbox:assign_max_seconds'] = 'Maximální délka (sekundy)';
+$string['soapbox:assign_seccap'] = 'Maximální délka na webu: {$a} sekund.';
+$string['soapbox:assign_max_attempts'] = 'Povolený počet pokusů (0 = bez omezení)';
+$string['soapbox:assign_stored_attempts'] = 'Počet uchovávaných nahrávek na studenta';
+$string['soapbox:assign_reccap'] = 'Maximální počet nahrávek uchovávaných na studenta na webu: {$a}.';
+$string['soapbox:assign_slides'] = 'Snímky';
+$string['soapbox:assign_slides_help'] = 'Umožnit studentům nahrát sadu snímků v PDF a posouvat snímky během nahrávání';
+$string['soapbox:assign_slide_vision'] = 'Zpětná vazba k vizuálnímu designu snímků';
+$string['soapbox:assign_slide_vision_help'] = 'Navíc spustit vizuální průchod přes obrázky snímků pro poznámky k vizuálnímu designu (vyžaduje Snímky a webové nastavení vizuální analýzy snímků Soapbox)';
+$string['soapbox:assign_visible'] = 'Viditelné pro studenty';
+$string['soapbox:assign_err_min_seconds'] = 'Zadejte alespoň 1 sekundu';
+$string['soapbox:assign_err_minmax'] = 'Minimální délka nemůže překročit maximální';

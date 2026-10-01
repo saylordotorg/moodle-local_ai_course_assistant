@@ -2255,7 +2255,7 @@ define([
         }
 
         // Talking avatar header toggle. Opens or closes an iframe surface fed
-        // by talking_avatar_session.php.
+        // by the start_avatar_session external service.
         const avatarBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-talking-avatar') : null;
         if (avatarBtn) {
             avatarBtn.addEventListener('click', function() {

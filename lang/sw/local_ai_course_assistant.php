@@ -988,9 +988,9 @@ $string['sandbox:run'] = 'Kimbiza';
 $string['sandbox:running'] = 'Inakimbiza…';
 $string['sandbox:clear'] = 'Futa matokeo';
 $string['sandbox:output_heading'] = 'Matokeo';
-$string['sandbox:privacy_note'] = 'Msimbo na matokeo hubaki ndani ya kivinjari chako. Hakuna kinachotumwa kwa seva yoyote. Mazingira ya utekelezaji hupakiwa kutoka CDN ya umma mara ya kwanza tu na huhifadhiwa katika akiba kwa ziara zinazofuata.';
+$string['sandbox:privacy_note'] = 'Msimbo na matokeo yake hubaki kwenye kivinjari chako. Hakuna chochote unachoandika au kuendesha kinachotumwa kwa seva yoyote. Mazingira ya kuendesha Python yenyewe hupakuliwa mara moja kutoka mahali alipoweka msimamizi wa tovuti yako, kisha huhifadhiwa kwa ziara zijazo.';
 $string['sandbox:toggle'] = 'Wezesha sanduku la mchanga la Python kwa kozi hii';
-$string['sandbox:toggle_help'] = 'Huongeza ukurasa wa wanafunzi ambapo wanaweza kuandika na kuendesha Python kikamilifu ndani ya kivinjari chao kupitia Pyodide. Kimezimwa kwa chaguomsingi. Washa kwa kozi zenye kazi za msimbo; acha kimezimwa kwa kozi zisizo nazo.';
+$string['sandbox:toggle_help'] = 'Huongeza ukurasa wa wanafunzi ambapo wanaweza kuandika na kuendesha Python kikamilifu ndani ya kivinjari chao kupitia Pyodide. Kimezimwa kwa chaguomsingi. Washa kwa kozi zenye kazi za msimbo; acha kimezimwa kwa kozi zisizo nazo. Msimamizi wa tovuti pia anapaswa kuweka mahali pa mazingira ya kuendesha Python katika mipangilio ya programu-jalizi: nafasi hiyo ikiwa tupu, sanduku la mchanga hubaki limezimwa, kwa sababu hakuna cha kupakia.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'Msaidizi wa Kozi wa AI — Kozi';
@@ -3151,3 +3151,30 @@ $string['settings:support_enabled_desc'] = 'Huwaruhusu wanafunzi kufungua [[tuto
 $string['settings:support_courseid'] = 'Kozi ya msaada';
 $string['settings:support_courseid_desc'] = 'Kitambulisho (ID) cha kozi inayoonekana yenye nyenzo zako za kuanza, za kuwakaribisha wanafunzi wapya na za utangulizi. Mazungumzo ya msaada hujibiwa kwa kutumia kozi hii pamoja na Maswali Yanayoulizwa Mara kwa Mara hapo juu, na hurekodiwa chini yake. Acha wazi ili kuzima hali ya msaada. Ukurasa wa mwanzo wa tovuti (kozi 1) haukubaliki.';
 $string['support:promptrole'] = 'Unajibu swali la msaada lililoulizwa nje ya kozi yoyote. Mwanafunzi hauulizi kuhusu maudhui ya kozi, kwa hivyo usimuelekeze huko. Jibu kwa kutumia Maswali Yanayoulizwa Mara kwa Mara na nyenzo za msaada ulizopewa. Kama huwezi kujibu kwa usahihi, sema hivyo wazi kisha jitolee kupeleka swali kwa timu ya msaada.';
+
+$string['sandbox:noruntimeurl'] = 'Sanduku la majaribio la Python limewashwa kwa kozi hii, lakini tovuti haijawekewa mahali pa mazingira ya kuendesha Python, kwa hivyo hakuna cha kupakia. Msimamizi anaweza kuweka mahali hapo katika mipangilio ya programu-jalizi.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Sanduku la majaribio la Python likiwashwa, kivinjari cha mwanafunzi hupakua mazingira ya kuendesha Python kutoka mahali alipoweka msimamizi wa tovuti, ambapo panaweza kuwa pa mtu wa tatu. Msimbo ulioandikwa humo na matokeo yake hubaki kwenye kifaa na hayatumwi popote.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Anwani ya IP ya mwanafunzi, ambayo hufichuliwa kwa anayetoa mazingira hayo kwa sababu tu ombi limetumwa.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Kivinjari na mfumo wa uendeshaji wa mwanafunzi, hutumwa kama user agent ya ombi hilo.';
+
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'Maalum: {$a}';
+$string['soapbox:assign_name'] = 'Jina la kazi';
+$string['soapbox:assign_required'] = 'Sehemu hii inahitajika';
+$string['soapbox:assign_intro'] = 'Maelekezo';
+$string['soapbox:assign_recordtype'] = 'Aina ya kurekodi';
+$string['soapbox:assign_mode_video'] = 'Video';
+$string['soapbox:assign_mode_audio'] = 'Sauti pekee';
+$string['soapbox:assign_min_seconds'] = 'Urefu wa chini (sekunde)';
+$string['soapbox:assign_max_seconds'] = 'Urefu wa juu (sekunde)';
+$string['soapbox:assign_seccap'] = 'Urefu wa juu wa tovuti: sekunde {$a}.';
+$string['soapbox:assign_max_attempts'] = 'Majaribio yanayoruhusiwa (0 = bila kikomo)';
+$string['soapbox:assign_stored_attempts'] = 'Rekodi zinazohifadhiwa kwa kila mwanafunzi';
+$string['soapbox:assign_reccap'] = 'Kiwango cha juu cha tovuti cha rekodi zinazohifadhiwa kwa kila mwanafunzi: {$a}.';
+$string['soapbox:assign_slides'] = 'Slaidi';
+$string['soapbox:assign_slides_help'] = 'Ruhusu wanafunzi kupakia deki ya PDF na kuendeleza slaidi wanaporekodi';
+$string['soapbox:assign_slide_vision'] = 'Maoni kuhusu muundo wa kuona wa slaidi';
+$string['soapbox:assign_slide_vision_help'] = 'Pia pitisha uchanganuzi wa picha kwenye picha za slaidi ili kupata maoni ya muundo wa kuona (kunahitaji Slaidi, pamoja na mpangilio wa tovuti wa uchanganuzi wa slaidi za Soapbox)';
+$string['soapbox:assign_visible'] = 'Inaonekana kwa wanafunzi';
+$string['soapbox:assign_err_min_seconds'] = 'Weka angalau sekunde 1';
+$string['soapbox:assign_err_minmax'] = 'Urefu wa chini hauwezi kuzidi urefu wa juu';

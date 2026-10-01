@@ -56,6 +56,17 @@ if (!\local_ai_course_assistant\feature_flags::resolve('code_sandbox', $courseid
     throw new \moodle_exception('sandbox:disabled', 'local_ai_course_assistant');
 }
 
+// CONTRIB-10574 #271: the Python runtime used to be fetched from a hard-coded
+// jsDelivr URL, so opening this page sent every learner's IP address and user
+// agent to a third party nobody had agreed to. The location is now an admin
+// setting with no default, and empty means off, exactly as with
+// remoteconfigurl in 7.6.0. No fallback: an admin who leaves it blank has said
+// no to the outbound request, and the page must not quietly find another way.
+$pyodidebase = \local_ai_course_assistant\code_sandbox::pyodide_base_url();
+if ($pyodidebase === '') {
+    throw new \moodle_exception('sandbox:noruntimeurl', 'local_ai_course_assistant');
+}
+
 $pageurl = new moodle_url('/local/ai_course_assistant/sandbox.php', ['courseid' => $courseid]);
 $PAGE->set_url($pageurl);
 $PAGE->set_context($context);
@@ -66,10 +77,12 @@ $PAGE->set_heading($course->fullname);
 
 // Note: NOT calling security::send_security_headers() here — the bundled
 // Moodle CSP from the theme is permissive enough for Pyodide's WASM
-// fetches from jsdelivr. The default CSP we ship in
-// classes/security.php restricts script-src to 'self' which would block
-// Pyodide. The sandbox page is the one place we accept the looser CSP
-// since Pyodide must load WASM + scripts from cdn.jsdelivr.net.
+// fetches. The default CSP we ship in classes/security.php restricts
+// script-src to 'self', which would block a runtime hosted anywhere else.
+// The sandbox page is the one place we accept the looser CSP, because
+// Pyodide loads scripts and WASM from the configured runtime location.
+// An operator who wants 'self' back can host the runtime on this site and
+// point the setting at it.
 
 echo $OUTPUT->header();
 ?>
@@ -120,16 +133,17 @@ for n in range(1, 11):
 
 <!--
 Pyodide loader. Loads ~10MB of WASM the first time. Subsequent loads hit
-the browser cache. Subresource-integrity intentionally omitted because
-the Pyodide bundle includes hash-stamped sub-files; SRI on the loader
-script alone provides limited protection. Operators worried about
-supply-chain risk can self-host Pyodide and override the URL via the
-data-pyodide-base attribute below.
+the browser cache. The base URL is the code_sandbox_pyodide_baseurl admin
+setting; operators worried about supply-chain risk, or about disclosing
+learner IP addresses to a CDN, host the runtime themselves and point the
+setting at their own copy. Subresource-integrity is intentionally omitted:
+the bundle pulls hash-stamped sub-files of its own, so SRI on the loader
+script alone would protect little and would break every self-hosted copy.
 -->
 <script>
-window.languagePluginUrl = 'https://cdn.jsdelivr.net/pyodide/v0.27.0/full/';
+window.languagePluginUrl = <?php echo json_encode($pyodidebase, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE); ?>;
 </script>
-<script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
+<script src="<?php echo s(\local_ai_course_assistant\code_sandbox::pyodide_asset_url('pyodide.js')); ?>"></script>
 
 <script>
 (function() {
@@ -148,7 +162,7 @@ window.languagePluginUrl = 'https://cdn.jsdelivr.net/pyodide/v0.27.0/full/';
         loading = true;
         try {
             pyodide = await window.loadPyodide({
-                indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.27.0/full/'
+                indexURL: window.languagePluginUrl
             });
             // Capture stdout + stderr by redirecting Python sys streams
             // to JS console batchers we read after each run().
@@ -159,13 +173,13 @@ window.languagePluginUrl = 'https://cdn.jsdelivr.net/pyodide/v0.27.0/full/';
                 'sys.stdout = _aica_out\n' +
                 'sys.stderr = _aica_err\n'
             );
-            status.textContent = '<?php echo get_string('sandbox:ready', 'local_ai_course_assistant'); ?>';
+            status.textContent = <?php echo json_encode(get_string('sandbox:ready', 'local_ai_course_assistant'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE); ?>;
             status.style.background = '#ecfdf5';
             status.style.borderColor = '#a7f3d0';
             status.style.color = '#065f46';
             runBtn.disabled = false;
         } catch (e) {
-            status.textContent = '<?php echo get_string('sandbox:load_error', 'local_ai_course_assistant'); ?>';
+            status.textContent = <?php echo json_encode(get_string('sandbox:load_error', 'local_ai_course_assistant'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE); ?>;
             status.style.background = '#fef2f2';
             status.style.borderColor = '#fecaca';
             status.style.color = '#991b1b';
@@ -238,7 +252,7 @@ window.languagePluginUrl = 'https://cdn.jsdelivr.net/pyodide/v0.27.0/full/';
                 init();
             } else if (++attempts > 60) {
                 clearInterval(t);
-                status.textContent = '<?php echo get_string('sandbox:load_error', 'local_ai_course_assistant'); ?>';
+                status.textContent = <?php echo json_encode(get_string('sandbox:load_error', 'local_ai_course_assistant'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE); ?>;
             }
         }, 250);
     }

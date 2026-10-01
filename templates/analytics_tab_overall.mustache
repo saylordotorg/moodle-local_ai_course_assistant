@@ -1,0 +1,63 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/analytics_tab_overall
+
+    Overall Usage tab of the analytics dashboard. Replaces the innerHTML string
+    that amd/src/analytics_dashboard.js used to build for this pane
+    (CONTRIB-10574 #278). The canvases are deliberately empty: Chart.js draws
+    into them once the rendered nodes are in the document.
+
+    The three chart headings are still literal English, exactly as they were in
+    the JavaScript this replaces. Translating them needs new analytics_js keys
+    and is tracked separately under the i18n issue, not here.
+
+    Context variables required for this template:
+    * cards - array of stat tiles, each with a value and a label
+
+    Example context (json):
+    {
+        "cards": [
+            {"value": "128", "label": "Total students"},
+            {"value": "41", "label": "Active AI users"}
+        ]
+    }
+}}
+<div class="sola-stat-cards">
+    {{#cards}}
+        <div class="sola-stat-card">
+            <div class="sola-stat-value">{{value}}</div>
+            <div class="sola-stat-label">{{label}}</div>
+        </div>
+    {{/cards}}
+</div>
+<div class="row mt-4">
+    <div class="col-md-12 mb-4">
+        <h5>Daily Usage Trend</h5>
+        <canvas id="sola-chart-daily" height="80"></canvas>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <h5>Hour of Day</h5>
+        <canvas id="sola-chart-hourly" height="120"></canvas>
+    </div>
+    <div class="col-md-6 mb-4">
+        <h5>Day of Week</h5>
+        <canvas id="sola-chart-dow" height="120"></canvas>
+    </div>
+</div>

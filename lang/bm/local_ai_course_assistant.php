@@ -971,9 +971,9 @@ $string['sandbox:run'] = 'Run';
 $string['sandbox:running'] = 'A bɛ boli la…';
 $string['sandbox:clear'] = 'Bɔfɛnw jɔsi';
 $string['sandbox:output_heading'] = 'Bɔfɛnw';
-$string['sandbox:privacy_note'] = 'Kɔdi ni bɔfɛnw bɛ to i ka navigateur kɔnɔ. Foyi tɛ ci serveur si ma. Baaracogo bɛ ladon CDN kɛnɛma dɔ la siɲɛ fɔlɔ dɔrɔn, o kɔ a bɛ mara cache la nataw kama.';
+$string['sandbox:privacy_note'] = 'I ka kode ni a jaabi bɛ to i ka ɲɛfɛlan kɔnɔ. I bɛ min sɛbɛn walima k\'a boli, o tɛ ci sɛrvɛri si ma. Python boliwale yɛrɛ bɛ jigin siɲɛ kelen ka bɔ yɔrɔ la min latigɛra siti ɲɛmɔgɔ fɛ, o kɔ a bɛ mara kɔfɛ taamaw kama.';
 $string['sandbox:toggle'] = 'Python baarakɛyɔrɔ dabɔ nin kalanso in kama';
-$string['sandbox:toggle_help'] = 'A bɛ ɲɛ dɔ fara kalandenw ye min kan u bɛ se ka Python sɛbɛn ka a boli u ka navigateur yɛrɛ kɔnɔ Pyodide barika la. A datugulen don fɔlɔ la. A da kalansow la minnu bɛ kode baara kɛ; a to datugulen na tɔw la.';
+$string['sandbox:toggle_help'] = 'A bɛ ɲɛ dɔ fara kalandenw ye min kan u bɛ se ka Python sɛbɛn ka a boli u ka navigateur yɛrɛ kɔnɔ Pyodide barika la. A datugulen don fɔlɔ la. A da kalansow la minnu bɛ kode baara kɛ; a to datugulen na tɔw la. Siti ɲɛmɔgɔ ka kan fana ka Python boliwale yɔrɔ sigi plugin ka labɛnw kɔnɔ: ni o yɔrɔ lankolon don, sandbox bɛ to faga la, barisa foyi tɛ yen ka jigin.';
 
 // v4.2: courses_admin page.
 $string['courses_admin:title'] = 'AI Kalanso Dɛmɛbaga — Kalansow';
@@ -3135,3 +3135,31 @@ $string['settings:support_enabled_desc'] = 'Kalandenw bɛ se ka [[tutorshort]] d
 $string['settings:support_courseid'] = 'Dɛmɛli kalan';
 $string['settings:support_courseid_desc'] = 'Kalan yerelen dɔ ka ID min kɔnɔ i ka daminɛli, ladonni ani ɲɛminɛli fɛnw bɛ. Dɛmɛli barow bɛ jaabi ka bɔ o kalan ani FAQ min bɛ sanfɛ la, ani u bɛ sɛbɛn o kalan tɔgɔ la. A to lankolon walasa ka dɛmɛli cogoya faga. Site kunfɛla (kalan 1) tɛ minɛ.';
 $string['support:promptrole'] = 'I bɛ dɛmɛli ɲininkali dɔ jaabi min bɔra kalan si kɔkan. Kalanden tɛ ɲininkali kɛ kalan kɔnɔkow kan, o la kana a bila ka taa o fan fɛ. Jaabi ta FAQ ani dɛmɛli fɛnw na minnu dira i ma. Ni i tɛ se ka jaabi tilennen di, o fɔ ka jɛ, ani i ka a fɔ ko i bɛ se ka ɲininkali in lase dɛmɛli jɛkulu ma.';
+
+$string['sandbox:noruntimeurl'] = 'Python sandbox bɛ baara la nin kalan in na, nka sitiw ma Python baarakɛminɛn yɔrɔ sigi, o la foyi tɛ yen ka lajɛ. Ɲɛmɔgɔ bɛ se k\'a sigi plugin labɛnw kɔnɔ.';
+$string['privacy:metadata:code_sandbox_runtime'] = 'Ni Python sandbox bɛ baara la, kalanden ka navigatɛri bɛ Python baarakɛminɛn jigin yɔrɔ min sigira sitiw ɲɛmɔgɔ fɛ, o yɔrɔ bɛ se ka kɛ mɔgɔ wɛrɛ ta ye. Kodi min sɛbɛnna sandbox kɔnɔ ani a jaabi bɛ to minɛn kan, u tɛ ci yɔrɔ si la.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'Kalanden ka IP adrɛsi, min bɛ don mɔgɔ min bɛ baarakɛminɛn di la, ɲinini cili dɔrɔn fɛ.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'Kalanden ka navigatɛri ani baarakɛcogo sistɛmu, minnu bɛ ci i n\'a fɔ o ɲinini ka user agent.';
+
+// Soapbox assignment form + avatar picker labels.
+$string['settings:avatar_numbered'] = 'Avatar {$a}';
+$string['settings:avatar_custom'] = 'I yɛrɛ ta: {$a}';
+$string['soapbox:assign_name'] = 'Baara tɔgɔ';
+$string['soapbox:assign_required'] = 'Nin yɔrɔ ka kan ka fa';
+$string['soapbox:assign_intro'] = 'Ladilikanw';
+$string['soapbox:assign_recordtype'] = 'Sɛbɛnni suguya';
+$string['soapbox:assign_mode_video'] = 'Wideyo';
+$string['soapbox:assign_mode_audio'] = 'Kumakan dɔrɔn';
+$string['soapbox:assign_min_seconds'] = 'Janya dɔgɔmanba (sekondi)';
+$string['soapbox:assign_max_seconds'] = 'Janya belebeleba (sekondi)';
+$string['soapbox:assign_seccap'] = 'Siti ka janya dan: sekondi {$a}.';
+$string['soapbox:assign_max_attempts'] = 'Kɔrɔbɔli hakɛ min bɛ sɔn (0 = dan tɛ)';
+$string['soapbox:assign_stored_attempts'] = 'Sɛbɛnni minnu bɛ mara kalanden kelen-kelen ye';
+$string['soapbox:assign_reccap'] = 'Siti ka sɛbɛnni dan min bɛ mara kalanden kelen-kelen ye: {$a}.';
+$string['soapbox:assign_slides'] = 'Slidew';
+$string['soapbox:assign_slides_help'] = 'Kalandenw bɛ se ka PDF gafe da kan ani ka slidew taama ka taa sɛbɛnni waati la';
+$string['soapbox:assign_slide_vision'] = 'Slide ɲɛjirali cogoya jaabili';
+$string['soapbox:assign_slide_vision_help'] = 'Ka ye-sɛgɛsɛgɛli kɛ slide jaw kan fana walasa ka hakilinaw di u cogoya kan (slidew mago bɛ a la, ani siti ka Soapbox slide-vision labɛn)';
+$string['soapbox:assign_visible'] = 'A bɛ ye kalandenw fɛ';
+$string['soapbox:assign_err_min_seconds'] = 'A dɔgɔyalen na, sekondi 1 sɛbɛn';
+$string['soapbox:assign_err_minmax'] = 'Janya dɔgɔmanba tɛ se ka tɛmɛ janya belebeleba kan';
