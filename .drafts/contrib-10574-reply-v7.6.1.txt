@@ -1,0 +1,212 @@
+Hello Volodymyr,
+
+Apologies for the . I had this written after v7.6.0 and did not send it,
+so this covers two releases rather than one.
+
+Of the fourteen issues, thirteen are now fixed. The fourteenth is the Marketplace
+listing text, which I cannot change from here. More on that at the end, because
+it is also the reason you may still be looking at 7.5.2.
+
+I checked every finding against the current code before acting on it. Five were
+wrong or incomplete as filed, and I have said so below rather than quietly
+working around them, because in three of those cases the correction changed the
+fix.
+
+WHERE THE CODE IS
+
+Everything described here is on the main branch and tagged:
+
+  https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases
+
+v7.6.0 carries both approval blockers. v7.6.1 carries the remaining five code
+findings. Each release page has the full notes and a zip built from the tag.
+
+FIXED IN v7.6.0
+
+#267 Remote AI behavior (blocker). You are right, and it was worse than the
+issue describes: because an empty value fell back to the same URL, an
+administrator could not switch it off at all. The default is now an empty
+string, empty means disabled, and nothing falls back.
+
+Shipping an empty default only protects new installations, so there is also an
+upgrade step. It clears the setting where the stored value exactly matches the
+historic default, since a site carrying that value never chose it, and leaves a
+site that set its own URL untouched. It also purges the config cache, which
+would otherwise keep serving remote prompt text for up to an hour after the
+upgrade that disabled it.
+
+One consequence worth stating plainly, since it is the only change in that
+release that reaches learners. The model is resolved as: per-call override, then
+the admin model setting, then the remote config's model_default, then the
+provider default. A site that never set a model explicitly had been running on
+whatever that remote file said, and now falls through to the provider's own
+default. That is the correct behavior for a plugin that should not take
+instructions from someone else's repository, but it is a change, so the release
+notes tell administrators to set the model explicitly before upgrading.
+
+#268 Privacy provider (blocker). All ten tables are in both discovery methods,
+and so are two more.
+
+I want to be straight about those two, because how they were found says
+something about the fix. My first attempt exempted msgs and msg_ratings on the
+grounds that both hang off a conversation, so a learner holding either was
+already discoverable through the conversations table. The code does not honor
+that: clearing a conversation deletes the conversation and its messages and
+leaves the ratings, and learners reach that path through the trash button in the
+chat header. Rate a reply, press Clear, never return to that course, and you hold
+rows in a course that neither discovery method returns, so a subject access
+request exports nothing of them and an erasure request leaves them in place.
+That is the same defect you filed, surviving inside its own fix.
+
+Both tables are listed now. Clearing a conversation also deletes its ratings,
+which is what a learner pressing Clear is asking for. The exemption list is down
+to one entry, soapbox recordings, which have no courseid and reach a course
+through their assignment with their own join in both methods. Anything added to
+that list in future has to come with a test that builds the orphan case and
+proves discovery still finds it.
+
+The test that reads db/install.xml could not have caught this, because reading
+source and schema is not the same as running them. A second test now inserts a
+real row into each listed table for a fresh learner in a fresh course and asserts
+both discovery methods return them, with a second learner in the same course who
+holds nothing, so a query that lost its userid filter fails too. That also covers
+a case the schema check cannot see: a column present in install.xml but removed
+by a later upgrade step would still have looked covered.
+
+#269 Already fixed. cachedef_vectors has been present since 7.5.3.
+
+#270 Fixed, and narrower than the issue suggests. There is exactly one impure
+assignment in the plugin, at line 1760 rather than 1751, and it is the only one
+across all 46 language files. Worth flagging for other plugins: searching for the
+concatenation pattern produces false positives, because a quotation mark inside
+prose followed by a sentence-ending period looks identical to a grep. Forty-plus
+valid strings in Swahili, Slovak and Polish match it. I found the real one by
+tokenizing every language file instead.
+
+#272 Fixed. Chart.js now comes from core/chartjs as an AMD dependency. The
+bundled copy, both define.amd guard scripts and thirdpartylibs.xml are deleted;
+Chart.js was that file's only entry, so the plugin ships no third-party code at
+all now.
+
+#276 Fixed, but not the way the issue suggests. Enumerating the per-course
+setting prefixes would not hold: several modules mint their own
+"<setting>_course_<id>" keys, so any list would need updating whenever one is
+added. The observer reads the plugin's settings through get_config() and removes
+by suffix, which covers every present and future key in one pass.
+
+#277 Fixed. The payload measured 9,262 characters against the 1,024-character
+limit, so it now travels in a data attribute.
+
+#279 Fixed, and there were three, not one. The two you did not cite are
+file-scope const declarations in admin/cli/generate_conversational_fixtures.php,
+which are global constants exactly as define() is. All three carry the prefix.
+
+FIXED IN v7.6.1
+
+#271 Pyodide. Accepted in substance, with one correction: the sandbox is behind
+an administrator feature flag that ships off, so it was not a dependency on every
+site. The hardcoded URLs were the real problem and they are gone. There is now an
+administrator-set base URL, and an empty value means the sandbox is off, with no
+fallback, matching the shape of the #267 fix. The privacy provider declares what
+the host of that URL learns, which is each learner's IP address and browser, and
+the setting description says so before an administrator fills it in.
+
+Your excerpt quoted two hardcoded URLs. There were three. The third was inside
+the loadPyodide() call further down the page, so fixing only the quoted lines
+would have left the WASM still coming from the CDN.
+
+I did not bundle Pyodide or add a thirdpartylibs.xml entry. The full
+distribution is about 10 MB of WASM and hash-stamped sub-files, which is not
+something to carry in a plugin zip, and your own second alternative is the route
+taken.
+
+#273 Templates, Output API and AMD. Partially done, deliberately. One page is
+migrated completely and the remaining six are inventoried. The whole item is
+roughly 3,800 lines, and a half-migrated page is worse than an untouched one, so
+the rest will come as its own release rather than riding alongside security
+fixes.
+
+#274 Hard-coded interface text. Fixed, and you missed one: settings.php had a
+second hard-coded avatar label on the line above the one you cited. All of them
+are lang strings now, translated into all 46 locales. They landed English-only
+first, which turned this plugin's own translation-parity test red, and that test
+exists precisely to refuse "the translations follow next release".
+
+#275 External services. Fixed for the four live radar actions and the avatar
+session. One correction: action=list had no caller anywhere in the codebase, so
+it was deleted rather than ported.
+
+Porting them tightened input validation in a way the interface had not caught up
+with, which is worth recording because it is not obvious:
+external_value::validate() throws when a cleaned value differs from what was
+submitted, where the old optional_param() cleaned it silently. An administrator
+typing "2, 5, 12" with spaces into the course filter got "Invalid parameter
+value detected" and no saved schedule. The interface normalizes before sending
+now, so the server-side check stays strict and the field is forgiving again.
+
+#278 Templates for HTML in JavaScript. Partially done, tab by tab, prioritizing
+anywhere AI output or learner text reached innerHTML.
+
+ONE THING YOU DID NOT FIND, AND IT MATTERS MORE THAN MOST OF THE LIST
+
+The optional Python sandbox has been completely broken on several non-English
+sites, in every release that shipped it.
+
+sandbox.php built three JavaScript string literals by echoing a translated
+message between single quotes. The French translation of the load-error string
+is "Impossible de charger l'environnement d'exécution Python". The first
+apostrophe closes the literal, the rest is a syntax error, and the browser
+discards the entire inline script. Not one broken message: the Pyodide loader,
+the Run button binding and the output pane, none of which ever run. Turkish and
+Oromo hit the same thing through a different string.
+
+It stayed invisible because the plugin's own locale is English, the English
+strings contain no apostrophe, and nothing tested a rendered page's JavaScript.
+The strings go through json_encode now, and a test runs every real translation
+through the encoder so a new locale cannot reintroduce it.
+
+I mention it because it is the kind of thing a review that reads code in English
+will not catch, and other multilingual plugins will have the same shape of bug.
+
+ALSO WORTH REPORTING
+
+The reason #270 reached you is that this plugin's own drift test parsed language
+files with a regular expression requiring a semicolon immediately after the
+closing quote. It silently dropped that key, and 27 others: 2,910 keys parsed
+against 2,938 defined. The string was invisible to our CI. Fixing that parser was
+worth more than fixing the one string.
+
+VERIFICATION
+
+1,989 tests, 0 failures, 7 skipped. Security validator corpus 36 of 36. PHP lint
+clean across 595 files. All 25 JavaScript bundles parse. The CI matrix covers PHP
+8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on MariaDB and PostgreSQL.
+
+Every test added across these two releases was verified by planting the defect it
+describes and watching it fail. That is how the msg_ratings hole in #268 was
+found, inside the fix for the issue it belongs to.
+
+THE PART I CANNOT DO, AND A QUESTION
+
+I am not able to upload v7.6.0 or v7.6.1 to the plugins directory, so the version
+you have in front of you is not the version these fixes are in. That is also why
+#280 is only half closed: the README and version metadata are corrected in the
+code, but the listing text on moodle.org is not something I can edit.
+
+Until that is sorted, the releases above are the accurate source for what the
+code does.
+
+Two things would help:
+
+1. Could you confirm which version the directory currently has for review? Issue
+   #280 says 7.5.2. I posted on 26 September that 7.5.5 had been submitted, so
+   one of us has a wrong picture of what is in the queue, and I would rather sort
+   that out than have these fixes sit behind the same gap.
+
+2. If there is a step I am missing to get a new version in front of you, or
+   someone I should ask, please point me at it.
+
+Thanks again. Both blockers were fair, and the first one in particular was a real
+hole.
+
+Tom
