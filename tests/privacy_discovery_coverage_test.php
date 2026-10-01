@@ -45,13 +45,20 @@ final class privacy_discovery_coverage_test extends \basic_testcase {
     /**
      * Tables reachable through another table's row, so not listed directly.
      *
-     * msgs and msg_ratings hang off a conversation, so a learner holding either
-     * is already found through convs. sbx_rec reaches a course through its
-     * assignment rather than a courseid of its own, and has its own query.
+     * One entry only, and it earns it. sbx_rec has no courseid of its own, so
+     * it cannot be queried the way the listed tables are; it reaches a course
+     * through its assignment and has its own join in both discovery methods.
+     *
+     * msgs and msg_ratings used to sit here on the grounds that they hang off
+     * a conversation. That was wrong, and the exemption is what hid it:
+     * clear_conversation() deletes convs and msgs but leaves msg_ratings, so a
+     * learner who rated a reply and then pressed Clear held rows in a course
+     * that neither discovery method returned. Anything added here needs a
+     * behavioural test proving the orphan case is still discoverable, not an
+     * argument that it ought to be. See
+     * privacy_discovery_behaviour_test::test_a_rating_outliving_its_conversation_is_still_discoverable.
      */
     private const INDIRECT = [
-        'local_ai_course_assistant_msgs',
-        'local_ai_course_assistant_msg_ratings',
         'local_ai_course_assistant_sbx_rec',
     ];
 

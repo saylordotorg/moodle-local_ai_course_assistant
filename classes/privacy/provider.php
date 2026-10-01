@@ -345,14 +345,24 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      * db/install.xml with a userid and a courseid belongs here, and
      * tests/privacy_discovery_coverage_test.php fails if it is missing.
      *
-     * msgs and msg_ratings are deliberately absent: both hang off a
-     * conversation row, so a learner holding them is already discovered
-     * through convs, and querying them again would only repeat work.
+     * msgs and msg_ratings are listed even though both carry a
+     * conversationid, because "it hangs off convs" is not a guarantee the
+     * code keeps. clear_conversation() deletes msgs and the convs row and
+     * leaves msg_ratings behind, and a learner reaches it through the trash
+     * button (external\clear_history). Rate a reply, press Clear, never chat
+     * in that course again, and you hold msg_ratings rows with no convs row:
+     * neither discovery method returned the course, so export skipped the
+     * rows and deletion left them in place. Listing both costs two queries
+     * and stops discovery depending on every future delete path keeping the
+     * tables in step.
      *
-     * Reported as an approval blocker (CONTRIB-10574, issue #268).
+     * Reported as an approval blocker (CONTRIB-10574, issue #268); the
+     * msg_ratings orphan was found in adversarial review of the first fix.
      */
     private const COURSE_USER_TABLES = [
         'local_ai_course_assistant_convs',
+        'local_ai_course_assistant_msgs',
+        'local_ai_course_assistant_msg_ratings',
         'local_ai_course_assistant_plans',
         'local_ai_course_assistant_reminders',
         'local_ai_course_assistant_feedback',
@@ -409,6 +419,11 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         return $contextlist;
     }
 
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param userlist $userlist The userlist containing the list of users who have data in this context.
+     */
     public static function get_users_in_context(userlist $userlist): void {
         $context = $userlist->get_context();
         if ($context->contextlevel !== CONTEXT_COURSE) {

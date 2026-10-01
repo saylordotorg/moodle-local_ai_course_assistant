@@ -92,9 +92,30 @@ def main() -> int:
             shutil.copy2(source, target)
 
             original = open(source, encoding='utf-8').read()
-            if args.find not in original:
+            hits = original.count(args.find)
+            if hits == 0:
                 print('the --find text is not present in the file, so the mutation '
                       'would be a no-op and the verdict meaningless', file=sys.stderr)
+                return INCONCLUSIVE
+
+            # An ambiguous --find is the quietest way to get a wrong verdict.
+            # replace(..., 1) hits whichever copy comes first in the file, which
+            # is rarely the one meant. On 2026-10-01, proving that the privacy
+            # discovery test catches a table dropped from COURSE_USER_TABLES
+            # used a --find that appears five times in provider.php: four times
+            # inside the export and delete arrays and once in the constant. The
+            # mutation landed on an export array, discovery was untouched, and
+            # the script reported SURVIVED about a test that catches the defect
+            # perfectly. A no-op mutation and a mutation of the wrong line
+            # produce the same SURVIVED, so neither can be trusted unless the
+            # anchor is unique.
+            if hits > 1:
+                print(f'the --find text appears {hits} times in {args.file}. '
+                      'replace() would mutate only the first, which is probably '
+                      'not the one you mean, and a mutation of the wrong line '
+                      'reports SURVIVED exactly like a test that does not catch '
+                      'the defect. Extend --find with a neighbouring line until '
+                      'it matches once.', file=sys.stderr)
                 return INCONCLUSIVE
 
             mutated = original.replace(args.find, args.replace, 1)
