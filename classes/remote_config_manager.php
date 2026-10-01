@@ -28,8 +28,32 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class remote_config_manager {
-    /** Default remote config URL (overridable in plugin settings). */
-    const DEFAULT_URL = 'https://raw.githubusercontent.com/saylordotorg/moodle-local_ai_course_assistant/main/sola-config.json';
+    /**
+     * No default URL. Remote configuration is OFF unless an administrator sets one.
+     *
+     * This constant used to hold the Saylor repository's raw GitHub URL, and
+     * get() fell back to it whenever the setting was empty. The effect was that
+     * every installation of this plugin, on any site, fetched a file from a
+     * branch of one organisation's repository once an hour and applied its
+     * `system_prompt`, `instruction_blocks` and `model_default` to the assistant
+     * its learners talk to. Clearing the setting did not switch it off, because
+     * empty fell back to the same URL.
+     *
+     * That put learner-facing behaviour, including the house-style block that
+     * carries the self-harm and crisis guidance, and the choice of which model
+     * is billed, under the control of whoever could write to that file, with no
+     * plugin release, no code review and no administrator upgrade in between.
+     *
+     * Remote configuration is now opt-in: the setting ships empty, empty means
+     * disabled, and there is nothing to fall back to. Prompt defaults live in
+     * released code and language strings, so a behaviour change goes through the
+     * same administrator-controlled upgrade path as any other code change.
+     *
+     * Reported as an approval blocker under the Moodle security guidelines
+     * (CONTRIB-10574, issue #267), and the same principle as the self-updater
+     * removed after the previous review (issue #204).
+     */
+    const DEFAULT_URL = '';
 
     /** Cache TTL in seconds (1 hour). */
     const CACHE_TTL = 3600;
@@ -46,8 +70,14 @@ class remote_config_manager {
             return $cached;
         }
 
-        $url = get_config('local_ai_course_assistant', 'remoteconfigurl') ?: self::DEFAULT_URL;
-        $url = trim($url);
+        // Empty means disabled. There is deliberately no fallback: an
+        // administrator who clears this setting has switched remote
+        // configuration off, and must be able to rely on that.
+        $url = trim((string) get_config('local_ai_course_assistant', 'remoteconfigurl'));
+        if ($url === '') {
+            $cache->set('config', []);
+            return [];
+        }
 
         // Defence in depth: HTTPS, allowlist, no private/reserved IPs.
         if (!$url || !security::is_safe_provider_url($url)) {

@@ -186,21 +186,24 @@ class observer {
         // until something reindexed it.
         \local_ai_course_assistant\rag_retriever::flush_cache($courseid);
 
-        // Per-course overrides live in config_plugins keyed by course id.
-        foreach ($DB->get_records_select(
-            'config_plugins',
-            'plugin = :plugin AND ' . $DB->sql_like('name', ':pattern'),
-            [
-                'plugin' => 'local_ai_course_assistant',
-                'pattern' => '%' . $DB->sql_like_escape('_course_' . $courseid),
-            ],
-            '',
-            'id, name'
-        ) as $row) {
-            // Belt and braces: only a name whose trailing id is exactly this
-            // course, so _course_5 never matches while deleting course 15.
-            if (preg_match('/_course_' . $courseid . '$/', $row->name)) {
-                unset_config($row->name, 'local_ai_course_assistant');
+        // Per-course overrides are plugin settings whose name ends in
+        // "_course_<id>". They are read through the configuration API rather
+        // than by querying config_plugins directly: the table layout is core's
+        // to change, and a direct read also bypasses the config cache, so a
+        // value removed here could still be served from it.
+        //
+        // get_config() with no name returns every setting for the plugin as an
+        // object, which is one cached read rather than one query per prefix.
+        // That matters because there is no fixed list of prefixes to enumerate:
+        // course_config_manager, feature_flags and several feature modules each
+        // mint their own "<setting>_course_<id>" keys, and any future one is
+        // covered here automatically by the suffix rule.
+        $suffix = '_course_' . $courseid;
+        foreach ((array) get_config('local_ai_course_assistant') as $name => $unused) {
+            // Anchored on the END of the name, so deleting course 5 cannot
+            // match a setting belonging to course 15 or 51.
+            if (substr($name, -strlen($suffix)) === $suffix) {
+                unset_config($name, 'local_ai_course_assistant');
             }
         }
     }

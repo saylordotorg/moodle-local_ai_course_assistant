@@ -32,7 +32,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
+define(['core/ajax', 'core/templates', 'core/chartjs'], function(Ajax, Templates, Chart) {
 
     var config = {};
     var cache = {};
@@ -524,13 +524,6 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
     function createChart(canvasId, type, data, extraOpts) {
         var canvas = document.getElementById(canvasId);
         if (!canvas) { return null; }
-        if (typeof Chart === 'undefined') {
-            // Was a bare `return null`, which rendered an empty canvas and said
-            // nothing. Chart.js failing to load is an operator-visible fault and
-            // should not masquerade as "no data for this period".
-            window.console.error('SOLA: Chart.js is not loaded; cannot draw ' + canvasId + '.');
-            return null;
-        }
         var opts = {
             responsive: true,
             maintainAspectRatio: true,

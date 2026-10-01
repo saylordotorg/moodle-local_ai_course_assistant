@@ -342,12 +342,12 @@ final class rag_harness_test extends \basic_testcase {
         global $CFG;
         $root = $CFG->dirroot . '/local/ai_course_assistant/admin/cli/';
         $this->assertStringContainsString(
-            "define('ANCHOR_MATCH_BYTES', " . self::ANCHOR_BYTES . ')',
+            "define('LOCAL_AI_COURSE_ASSISTANT_ANCHOR_MATCH_BYTES', " . self::ANCHOR_BYTES . ')',
             file_get_contents($root . 'run_rag_fixture_benchmark.php'),
             'the harness truncation length moved; the generator enforces uniqueness at it'
         );
         $this->assertStringContainsString(
-            'const GENCONV_ANCHOR_BYTES = ' . self::ANCHOR_BYTES . ';',
+            'const LOCAL_AI_COURSE_ASSISTANT_GENCONV_ANCHOR_BYTES = ' . self::ANCHOR_BYTES . ';',
             file_get_contents($root . 'generate_conversational_fixtures.php'),
             'the generator must enforce uniqueness at the length the harness matches on'
         );

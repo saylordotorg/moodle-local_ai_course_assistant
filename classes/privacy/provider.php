@@ -332,6 +332,47 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
     }
 
     /**
+     * Every table that links a learner to a course.
+     *
+     * Both discovery methods iterate this list. They used to carry one
+     * copy-pasted SQL block per table, and ten tables were never added to
+     * either: flashcards, obj_att, learner_goals, streak, learner_memory,
+     * profiles, struggle_signal, outreach_log, avatar_sess and email_optout.
+     * A learner who had only used flashcards in a course was invisible to a
+     * data request, so their data was neither exported nor deleted.
+     *
+     * Keeping the list in one place is the control. A table added to
+     * db/install.xml with a userid and a courseid belongs here, and
+     * tests/privacy_discovery_coverage_test.php fails if it is missing.
+     *
+     * msgs and msg_ratings are deliberately absent: both hang off a
+     * conversation row, so a learner holding them is already discovered
+     * through convs, and querying them again would only repeat work.
+     *
+     * Reported as an approval blocker (CONTRIB-10574, issue #268).
+     */
+    private const COURSE_USER_TABLES = [
+        'local_ai_course_assistant_convs',
+        'local_ai_course_assistant_plans',
+        'local_ai_course_assistant_reminders',
+        'local_ai_course_assistant_feedback',
+        'local_ai_course_assistant_survey_resp',
+        'local_ai_course_assistant_ut_resp',
+        'local_ai_course_assistant_audit',
+        'local_ai_course_assistant_practice_scores',
+        'local_ai_course_assistant_flashcards',
+        'local_ai_course_assistant_obj_att',
+        'local_ai_course_assistant_learner_goals',
+        'local_ai_course_assistant_streak',
+        'local_ai_course_assistant_learner_memory',
+        'local_ai_course_assistant_profiles',
+        'local_ai_course_assistant_struggle_signal',
+        'local_ai_course_assistant_outreach_log',
+        'local_ai_course_assistant_avatar_sess',
+        'local_ai_course_assistant_email_optout',
+    ];
+
+    /**
      * Get the list of contexts that contain user data.
      *
      * @param int $userid
@@ -340,85 +381,25 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
     public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new contextlist();
 
-        $sql = "SELECT DISTINCT ctx.id
-                  FROM {local_ai_course_assistant_convs} c
-                  JOIN {context} ctx ON ctx.instanceid = c.courseid AND ctx.contextlevel = :contextlevel
-                 WHERE c.userid = :userid";
+        foreach (self::COURSE_USER_TABLES as $table) {
+            $sql = "SELECT DISTINCT ctx.id
+                      FROM {" . $table . "} t
+                      JOIN {context} ctx
+                        ON ctx.instanceid = t.courseid AND ctx.contextlevel = :contextlevel
+                     WHERE t.userid = :userid";
+            $contextlist->add_from_sql($sql, [
+                'contextlevel' => CONTEXT_COURSE,
+                'userid' => $userid,
+            ]);
+        }
 
-        $contextlist->add_from_sql($sql, [
-            'contextlevel' => CONTEXT_COURSE,
-            'userid' => $userid,
-        ]);
-
-        // Also include contexts from study plans and reminders.
-        $sql = "SELECT DISTINCT ctx.id
-                  FROM {local_ai_course_assistant_plans} p
-                  JOIN {context} ctx ON ctx.instanceid = p.courseid AND ctx.contextlevel = :contextlevel
-                 WHERE p.userid = :userid";
-        $contextlist->add_from_sql($sql, [
-            'contextlevel' => CONTEXT_COURSE,
-            'userid' => $userid,
-        ]);
-
-        $sql = "SELECT DISTINCT ctx.id
-                  FROM {local_ai_course_assistant_reminders} r
-                  JOIN {context} ctx ON ctx.instanceid = r.courseid AND ctx.contextlevel = :contextlevel
-                 WHERE r.userid = :userid";
-        $contextlist->add_from_sql($sql, [
-            'contextlevel' => CONTEXT_COURSE,
-            'userid' => $userid,
-        ]);
-
-        $sql = "SELECT DISTINCT ctx.id
-                  FROM {local_ai_course_assistant_feedback} f
-                  JOIN {context} ctx ON ctx.instanceid = f.courseid AND ctx.contextlevel = :contextlevel
-                 WHERE f.userid = :userid";
-        $contextlist->add_from_sql($sql, [
-            'contextlevel' => CONTEXT_COURSE,
-            'userid' => $userid,
-        ]);
-
-        $sql = "SELECT DISTINCT ctx.id
-                  FROM {local_ai_course_assistant_survey_resp} sr
-                  JOIN {context} ctx ON ctx.instanceid = sr.courseid AND ctx.contextlevel = :contextlevel
-                 WHERE sr.userid = :userid";
-        $contextlist->add_from_sql($sql, [
-            'contextlevel' => CONTEXT_COURSE,
-            'userid' => $userid,
-        ]);
-
-        $sql = "SELECT DISTINCT ctx.id
-                  FROM {local_ai_course_assistant_ut_resp} ur
-                  JOIN {context} ctx ON ctx.instanceid = ur.courseid AND ctx.contextlevel = :contextlevel
-                 WHERE ur.userid = :userid";
-        $contextlist->add_from_sql($sql, [
-            'contextlevel' => CONTEXT_COURSE,
-            'userid' => $userid,
-        ]);
-
-        $sql = "SELECT DISTINCT ctx.id
-                  FROM {local_ai_course_assistant_audit} a
-                  JOIN {context} ctx ON ctx.instanceid = a.courseid AND ctx.contextlevel = :contextlevel
-                 WHERE a.userid = :userid";
-        $contextlist->add_from_sql($sql, [
-            'contextlevel' => CONTEXT_COURSE,
-            'userid' => $userid,
-        ]);
-
-        $sql = "SELECT DISTINCT ctx.id
-                  FROM {local_ai_course_assistant_practice_scores} ps
-                  JOIN {context} ctx ON ctx.instanceid = ps.courseid AND ctx.contextlevel = :contextlevel
-                 WHERE ps.userid = :userid";
-        $contextlist->add_from_sql($sql, [
-            'contextlevel' => CONTEXT_COURSE,
-            'userid' => $userid,
-        ]);
-
-        // v6.8.20 Soapbox recordings (keyed on the assignment; join to course).
+        // Soapbox recordings hang off an assignment rather than a course, so
+        // they are joined through the assignment row rather than listed above.
         $sql = "SELECT DISTINCT ctx.id
                   FROM {local_ai_course_assistant_sbx_rec} r
                   JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
-                  JOIN {context} ctx ON ctx.instanceid = a.courseid AND ctx.contextlevel = :contextlevel
+                  JOIN {context} ctx
+                    ON ctx.instanceid = a.courseid AND ctx.contextlevel = :contextlevel
                  WHERE r.userid = :userid";
         $contextlist->add_from_sql($sql, [
             'contextlevel' => CONTEXT_COURSE,
@@ -428,58 +409,20 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         return $contextlist;
     }
 
-    /**
-     * Get the list of users within a specific context.
-     *
-     * @param userlist $userlist
-     */
     public static function get_users_in_context(userlist $userlist): void {
         $context = $userlist->get_context();
         if ($context->contextlevel !== CONTEXT_COURSE) {
             return;
         }
 
-        $sql = "SELECT DISTINCT userid
-                  FROM {local_ai_course_assistant_convs}
-                 WHERE courseid = :courseid";
-        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
+        foreach (self::COURSE_USER_TABLES as $table) {
+            $sql = "SELECT DISTINCT userid
+                      FROM {" . $table . "}
+                     WHERE courseid = :courseid";
+            $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
+        }
 
-        $sql = "SELECT DISTINCT userid
-                  FROM {local_ai_course_assistant_plans}
-                 WHERE courseid = :courseid";
-        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
-
-        $sql = "SELECT DISTINCT userid
-                  FROM {local_ai_course_assistant_reminders}
-                 WHERE courseid = :courseid";
-        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
-
-        $sql = "SELECT DISTINCT userid
-                  FROM {local_ai_course_assistant_feedback}
-                 WHERE courseid = :courseid";
-        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
-
-        $sql = "SELECT DISTINCT userid
-                  FROM {local_ai_course_assistant_survey_resp}
-                 WHERE courseid = :courseid";
-        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
-
-        $sql = "SELECT DISTINCT userid
-                  FROM {local_ai_course_assistant_ut_resp}
-                 WHERE courseid = :courseid";
-        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
-
-        $sql = "SELECT DISTINCT userid
-                  FROM {local_ai_course_assistant_audit}
-                 WHERE courseid = :courseid";
-        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
-
-        $sql = "SELECT DISTINCT userid
-                  FROM {local_ai_course_assistant_practice_scores}
-                 WHERE courseid = :courseid";
-        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
-
-        // v6.8.20 Soapbox recordings (keyed on the assignment; join to course).
+        // Soapbox recordings reach the course through their assignment.
         $sql = "SELECT DISTINCT r.userid
                   FROM {local_ai_course_assistant_sbx_rec} r
                   JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
