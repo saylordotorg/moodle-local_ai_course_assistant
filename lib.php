@@ -79,6 +79,32 @@ function local_ai_course_assistant_pluginfile($course, $cm, $context, $filearea,
 }
 
 /**
+ * Drop the cached remote configuration after the URL setting is saved.
+ *
+ * admin_setting::set_updatedcallback() takes a function NAME, so this has to be
+ * a plain function rather than a static method; it is a one-line wrapper around
+ * remote_config_manager::invalidate().
+ *
+ * Issue #282. get() caches for an hour, so without this an administrator who
+ * cleared the field to switch remote configuration off kept getting remote
+ * values, including the system prompt, until the TTL expired. The 2026100100
+ * upgrade step already purged the cache for exactly that reason; the admin form
+ * had no equivalent.
+ *
+ * @return void
+ */
+function local_ai_course_assistant_invalidate_remote_config(): void {
+    try {
+        \local_ai_course_assistant\remote_config_manager::invalidate();
+    } catch (\Throwable $e) {
+        // A cache that cannot be purged must not block saving a setting; it
+        // expires within the hour regardless.
+        debugging('SOLA: could not invalidate remote config cache: ' . $e->getMessage(),
+            DEBUG_DEVELOPER);
+    }
+}
+
+/**
  * Return the list of admin-uploaded custom avatars.
  *
  * @return array List of ['key' => 'custom:<hash>', 'label' => display name, 'url' => moodle_url]

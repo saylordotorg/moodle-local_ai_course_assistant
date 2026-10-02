@@ -3134,3 +3134,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Wykonaj dodatkowo analizę wizual
 $string['soapbox:assign_visible'] = 'Widoczne dla studentów';
 $string['soapbox:assign_err_min_seconds'] = 'Wpisz co najmniej 1 sekundę';
 $string['soapbox:assign_err_minmax'] = 'Minimalna długość nie może przekraczać maksymalnej';
+$string['privacy:path:email_optout'] = 'Rezygnacje z e-maili';

@@ -3153,3 +3153,4 @@ $string['soapbox:assign_slide_vision_help'] = 'दृश्य-डिजाइ�
 $string['soapbox:assign_visible'] = 'विद्यार्थीहरूलाई देखिने';
 $string['soapbox:assign_err_min_seconds'] = 'कम्तीमा 1 सेकेन्ड प्रविष्ट गर्नुहोस्';
 $string['soapbox:assign_err_minmax'] = 'न्यूनतम लम्बाइ अधिकतमभन्दा बढी हुन सक्दैन';
+$string['privacy:path:email_optout'] = 'इमेल अप्ट-आउट';

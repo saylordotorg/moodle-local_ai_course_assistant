@@ -3178,3 +3178,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Magpatakbo rin ng vision pass sa 
 $string['soapbox:assign_visible'] = 'Nakikita ng mga mag-aaral';
 $string['soapbox:assign_err_min_seconds'] = 'Maglagay ng hindi bababa sa 1 segundo';
 $string['soapbox:assign_err_minmax'] = 'Hindi maaaring lumampas ang pinakamaikling haba sa pinakamahabang haba';
+$string['privacy:path:email_optout'] = 'Mga pag-opt out sa email';

@@ -3155,3 +3155,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Также выполнять в�
 $string['soapbox:assign_visible'] = 'Видно студентам';
 $string['soapbox:assign_err_min_seconds'] = 'Введите не менее 1 секунды';
 $string['soapbox:assign_err_minmax'] = 'Минимальная длительность не может превышать максимальную';
+$string['privacy:path:email_optout'] = 'Отписки от электронных писем';

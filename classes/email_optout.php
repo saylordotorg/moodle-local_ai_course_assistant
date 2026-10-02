@@ -95,7 +95,7 @@ class email_optout {
         $DB->insert_record('local_ai_course_assistant_email_optout', (object)[
             'email' => $email,
             'optout_type' => $type,
-            'userid' => $userid,
+            'userid' => $userid ?? self::resolve_userid($email),
             'courseid' => $courseid,
             'timecreated' => time(),
         ]);
@@ -127,6 +127,47 @@ class email_optout {
      */
     public static function normalize(string $email): string {
         return strtolower(trim($email));
+    }
+
+    /**
+     * The Moodle user this address belongs to, when exactly one owns it.
+     *
+     * The unsubscribe link is followed by someone who is almost never logged
+     * in, so record() used to store a NULL userid for every real opt-out. That
+     * made the row undiscoverable: both privacy discovery methods and both
+     * erasure paths key on userid, and NULL matches none of them, so an address
+     * a learner had asked us to stop emailing could be neither exported on a
+     * subject access request nor removed on an erasure request, nor cleared by
+     * deleting the account. Reported as issue #284.
+     *
+     * Deliberately strict. Only a single non-deleted, unconfirmed-or-confirmed
+     * account on this Moodle instance counts. If two accounts share the address
+     * there is no single owner, and guessing would attach one person's opt-out
+     * to another person's data request. If none match, the address belongs to
+     * an administrator or a mailing destination that is not a Moodle user at
+     * all, which is what the nullable column is for.
+     *
+     * The privacy provider also matches these rows by email, so a row left with
+     * a NULL userid here is still found for whoever owns that address.
+     *
+     * @param string $email Already normalized.
+     * @return int|null
+     */
+    public static function resolve_userid(string $email): ?int {
+        global $DB, $CFG;
+
+        if ($email === '') {
+            return null;
+        }
+
+        $matches = $DB->get_fieldset_select(
+            'user',
+            'id',
+            'LOWER(email) = :email AND deleted = 0 AND mnethostid = :mnethostid',
+            ['email' => $email, 'mnethostid' => $CFG->mnet_localhost_id]
+        );
+
+        return count($matches) === 1 ? (int) reset($matches) : null;
     }
 
     /**

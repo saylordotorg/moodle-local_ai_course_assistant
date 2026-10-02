@@ -3154,3 +3154,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Chạy thêm một lượt phân 
 $string['soapbox:assign_visible'] = 'Hiển thị với học viên';
 $string['soapbox:assign_err_min_seconds'] = 'Nhập ít nhất 1 giây';
 $string['soapbox:assign_err_minmax'] = 'Thời lượng tối thiểu không được vượt quá thời lượng tối đa';
+$string['privacy:path:email_optout'] = 'Hủy nhận email';

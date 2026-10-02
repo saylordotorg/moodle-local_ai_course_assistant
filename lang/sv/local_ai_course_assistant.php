@@ -3133,3 +3133,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Kör även en bildanalys av bilde
 $string['soapbox:assign_visible'] = 'Synlig för studerande';
 $string['soapbox:assign_err_min_seconds'] = 'Ange minst 1 sekund';
 $string['soapbox:assign_err_minmax'] = 'Minsta längd får inte överstiga största längd';
+$string['privacy:path:email_optout'] = 'E-postavanmälningar';

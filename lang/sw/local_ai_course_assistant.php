@@ -3178,3 +3178,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Pia pitisha uchanganuzi wa picha 
 $string['soapbox:assign_visible'] = 'Inaonekana kwa wanafunzi';
 $string['soapbox:assign_err_min_seconds'] = 'Weka angalau sekunde 1';
 $string['soapbox:assign_err_minmax'] = 'Urefu wa chini hauwezi kuzidi urefu wa juu';
+$string['privacy:path:email_optout'] = 'Kujiondoa kwenye barua pepe';

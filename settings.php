@@ -245,13 +245,21 @@ if ($hassiteconfig) {
         PARAM_TEXT
     ));
 
-    $settings->add(new admin_setting_configtext(
+    // Issue #282: the fetched config is cached for an hour, so without a
+    // callback an administrator who cleared this field to switch remote
+    // configuration OFF kept getting remote values until the TTL expired. That
+    // is the same stale window the 2026100100 upgrade step purges the cache to
+    // close; the upgrade path was right and the admin-form path was not.
+    $remoteconfigsetting = new admin_setting_configtext(
         'local_ai_course_assistant/remoteconfigurl',
         get_string('remoteconfigurl', 'local_ai_course_assistant'),
         get_string('remoteconfigurl_desc', 'local_ai_course_assistant'),
         \local_ai_course_assistant\remote_config_manager::DEFAULT_URL,
         PARAM_URL
-    ));
+    );
+    $remoteconfigsetting->set_updatedcallback(
+        'local_ai_course_assistant_invalidate_remote_config');
+    $settings->add($remoteconfigsetting);
 
     // ── Section: AI Provider & Models ───────────────────────────────────────
     $settings->add(new admin_setting_description(

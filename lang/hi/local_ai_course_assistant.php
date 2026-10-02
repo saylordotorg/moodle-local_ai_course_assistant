@@ -3162,3 +3162,4 @@ $string['soapbox:assign_slide_vision_help'] = 'दृश्य-डिज़ा�
 $string['soapbox:assign_visible'] = 'शिक्षार्थियों को दिखाई दे';
 $string['soapbox:assign_err_min_seconds'] = 'कम से कम 1 सेकंड दर्ज करें';
 $string['soapbox:assign_err_minmax'] = 'न्यूनतम अवधि अधिकतम से अधिक नहीं हो सकती';
+$string['privacy:path:email_optout'] = 'ईमेल ऑप्ट-आउट';

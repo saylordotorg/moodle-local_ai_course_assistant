@@ -3132,3 +3132,4 @@ $string['soapbox:assign_slide_vision_help'] = 'إجراء تحليل بصري أ
 $string['soapbox:assign_visible'] = 'ظاهرة للمتعلّمين';
 $string['soapbox:assign_err_min_seconds'] = 'أدخل ثانية واحدة على الأقل';
 $string['soapbox:assign_err_minmax'] = 'لا يمكن أن يتجاوز الحد الأدنى للمدة الحدَّ الأقصى';
+$string['privacy:path:email_optout'] = 'إلغاء الاشتراك في البريد الإلكتروني';

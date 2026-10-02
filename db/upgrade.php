@@ -2022,6 +2022,104 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100100, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026100102) {
+        // Issue #284: backfill the owner of each email opt-out.
+        //
+        // The only thing that writes these rows is the unsubscribe link, which
+        // is followed by someone who is not logged in, so every real opt-out
+        // stored a null userid. Discovery, export and both erasure paths key on
+        // userid, so an address a learner had asked us to stop emailing could
+        // not be exported on a subject access request, could not be erased on
+        // request, and survived deletion of the account.
+        //
+        // record() fills it going forward. This fills what already exists,
+        // using the same rule: a row is claimed only when exactly one live
+        // local account holds that address. Two accounts means no single owner
+        // and guessing would attach one person's opt-out to another person's
+        // data request. No account means an administrator or mailing
+        // destination that is not a Moodle user, which is what the nullable
+        // column is for.
+        $table = new xmldb_table('local_ai_course_assistant_email_optout');
+        if ($dbman->table_exists($table)) {
+            $sql = "SELECT o.id, MIN(u.id) AS userid, COUNT(u.id) AS matches
+                      FROM {local_ai_course_assistant_email_optout} o
+                      JOIN {user} u
+                        ON LOWER(u.email) = o.email
+                       AND u.deleted = 0
+                       AND u.mnethostid = :mnethostid
+                     WHERE o.userid IS NULL
+                  GROUP BY o.id";
+
+            $claimed = 0;
+            $rs = $DB->get_recordset_sql($sql, ['mnethostid' => $CFG->mnet_localhost_id]);
+            foreach ($rs as $row) {
+                if ((int) $row->matches !== 1) {
+                    // Ambiguous: leave it null rather than pick one.
+                    continue;
+                }
+                $DB->set_field('local_ai_course_assistant_email_optout',
+                    'userid', (int) $row->userid, ['id' => (int) $row->id]);
+                $claimed++;
+            }
+            $rs->close();
+
+            if ($claimed > 0) {
+                mtrace("SOLA: claimed {$claimed} email opt-out row(s) for their owner (#284).");
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026100102, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026100103) {
+        // Issue #283: keep the rated text with the rating.
+        //
+        // add_message() caps a conversation at 100 messages and deletes the
+        // oldest beyond that. It never touched msg_ratings, so a rating on a
+        // trimmed message kept a messageid that no longer resolved. Every
+        // consumer joins through that column with an INNER JOIN, so a learner's
+        // thumbs-down silently stopped appearing in the instructor review queue
+        // and in the negative-rating counts once the conversation got long
+        // enough. The longer and more active the conversation, the more likely
+        // the feedback was lost, which is backwards.
+        //
+        // The row keeps a copy of the text it was reacting to, so the feedback
+        // survives the trim with enough context for an instructor to act on.
+        $table = new xmldb_table('local_ai_course_assistant_msg_ratings');
+        $field = new xmldb_field('rated_excerpt', XMLDB_TYPE_TEXT, null, null, null, null, null, 'comment');
+        if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            // Backfill from the messages that are still there. Ratings already
+            // orphaned cannot be recovered; this stops the ones that still have
+            // a message from being lost at the next trim.
+            $sql = "UPDATE {local_ai_course_assistant_msg_ratings}
+                       SET rated_excerpt = (
+                           SELECT " . $DB->sql_substr('m.message', 1, 1000) . "
+                             FROM {local_ai_course_assistant_msgs} m
+                            WHERE m.id = {local_ai_course_assistant_msg_ratings}.messageid)
+                     WHERE rated_excerpt IS NULL";
+            try {
+                $DB->execute($sql);
+            } catch (\Throwable $e) {
+                // A correlated UPDATE is not portable everywhere. Fall back to
+                // a row-by-row backfill rather than leaving the column empty.
+                $rs = $DB->get_recordset_sql(
+                    "SELECT r.id, " . $DB->sql_substr('m.message', 1, 1000) . " AS excerpt
+                       FROM {local_ai_course_assistant_msg_ratings} r
+                       JOIN {local_ai_course_assistant_msgs} m ON m.id = r.messageid
+                      WHERE r.rated_excerpt IS NULL");
+                foreach ($rs as $row) {
+                    $DB->set_field('local_ai_course_assistant_msg_ratings',
+                        'rated_excerpt', $row->excerpt, ['id' => $row->id]);
+                }
+                $rs->close();
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026100103, 'local', 'ai_course_assistant');
+    }
+
 
     return true;
 }

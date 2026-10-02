@@ -1511,7 +1511,7 @@ class analytics {
         $params = [];
         $where = '1 = 1';
         if ($courseid > 0) {
-            $where .= ' AND m.courseid = :courseid';
+            $where .= ' AND r.courseid = :courseid';
             $params['courseid'] = $courseid;
         }
         if ($since > 0) {
@@ -1526,7 +1526,7 @@ class analytics {
                         SUM(CASE WHEN r.is_hallucination = 1 THEN 1 ELSE 0 END) AS hallucination_flags,
                         COUNT(r.id) AS total_ratings
                       FROM {local_ai_course_assistant_msg_ratings} r
-                      JOIN {local_ai_course_assistant_msgs} m ON m.id = r.messageid
+                 LEFT JOIN {local_ai_course_assistant_msgs} m ON m.id = r.messageid
                      WHERE {$where}";
             $row = $DB->get_record_sql($sql, $params);
 
@@ -1608,7 +1608,7 @@ class analytics {
             $ratingparams = [];
             $ratingwhere = 'r.rating = 1';
             if ($courseid > 0) {
-                $ratingwhere .= ' AND msg.courseid = :courseid';
+                $ratingwhere .= ' AND r.courseid = :courseid';
                 $ratingparams['courseid'] = $courseid;
             }
             if ($since > 0) {
@@ -1617,7 +1617,7 @@ class analytics {
             }
             $sql = "SELECT r.messageid
                       FROM {local_ai_course_assistant_msg_ratings} r
-                      JOIN {local_ai_course_assistant_msgs} msg ON msg.id = r.messageid
+                 LEFT JOIN {local_ai_course_assistant_msgs} msg ON msg.id = r.messageid
                      WHERE {$ratingwhere}";
             $ratedids = $DB->get_fieldset_sql($sql, $ratingparams);
             $ratedset = array_flip($ratedids);
@@ -1693,7 +1693,7 @@ class analytics {
             $params = [];
             $where = 'r.rating = -1';
             if ($courseid > 0) {
-                $where .= ' AND m.courseid = :courseid';
+                $where .= ' AND r.courseid = :courseid';
                 $params['courseid'] = $courseid;
             }
             if ($since > 0) {
@@ -1701,10 +1701,10 @@ class analytics {
                 $params['since'] = $since;
             }
 
-            $sql = "SELECT r.id, SUBSTRING(m.message, 1, 200) AS message_excerpt,
+            $sql = "SELECT r.id, SUBSTRING(COALESCE(m.message, r.rated_excerpt), 1, 200) AS message_excerpt,
                            r.comment, r.is_hallucination, r.timecreated, r.userid
                       FROM {local_ai_course_assistant_msg_ratings} r
-                      JOIN {local_ai_course_assistant_msgs} m ON m.id = r.messageid
+                 LEFT JOIN {local_ai_course_assistant_msgs} m ON m.id = r.messageid
                      WHERE {$where}
                      ORDER BY r.timecreated DESC";
             $rows = $DB->get_records_sql($sql, $params, 0, $limit);

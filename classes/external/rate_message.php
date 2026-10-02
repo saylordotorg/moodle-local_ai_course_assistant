@@ -131,6 +131,12 @@ class rate_message extends external_api {
             $record->rating = $rating;
             $record->is_hallucination = $is_hallucination;
             $record->comment = $comment;
+            // Issue #283: keep the text the learner was reacting to. The
+            // conversation cap deletes the oldest messages once a conversation
+            // passes 100, and every consumer of this table joins through
+            // messageid, so without this copy the thumbs-down silently left the
+            // instructor review queue the moment the message was trimmed.
+            $record->rated_excerpt = \core_text::substr((string) $message->message, 0, 1000);
             $record->timecreated = $now;
             $record->timemodified = $now;
             $DB->insert_record('local_ai_course_assistant_msg_ratings', $record);

@@ -290,6 +290,12 @@ class instructor_analytics {
 
         $sql = "SELECT m.cmid, COUNT(r.id) AS neg
                   FROM {local_ai_course_assistant_msg_ratings} r
+                  -- Issue #283: INNER JOIN on purpose. This groups by m.cmid to
+                  -- attribute negative ratings to a module, and a rating whose
+                  -- message was trimmed has no module to attribute it to. A
+                  -- LEFT JOIN would add rows that GROUP BY m.cmid then discards,
+                  -- or worse, lumps under a null key. The feedback is not lost:
+                  -- it is in the review queue, which is course-scoped.
                   JOIN {local_ai_course_assistant_msgs} m ON m.id = r.messageid
                  WHERE r.courseid = :courseid
                    AND r.rating = -1

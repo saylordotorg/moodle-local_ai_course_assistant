@@ -3154,3 +3154,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Também analisar as imagens dos s
 $string['soapbox:assign_visible'] = 'Visível para os alunos';
 $string['soapbox:assign_err_min_seconds'] = 'Informe pelo menos 1 segundo';
 $string['soapbox:assign_err_minmax'] = 'A duração mínima não pode ser maior que a máxima';
+$string['privacy:path:email_optout'] = 'Cancelamentos de e-mail';

@@ -3173,3 +3173,4 @@ $string['soapbox:assign_slide_vision_help'] = 'הריצו גם מעבר ראיי
 $string['soapbox:assign_visible'] = 'גלוי ללומדים';
 $string['soapbox:assign_err_min_seconds'] = 'יש להזין שנייה אחת לפחות';
 $string['soapbox:assign_err_minmax'] = 'האורך המזערי אינו יכול לעלות על המרבי';
+$string['privacy:path:email_optout'] = 'ביטולי הרשמה לדוא"ל';

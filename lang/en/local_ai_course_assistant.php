@@ -764,6 +764,7 @@ $string['privacy:metadata:email_optout'] = 'Per-recipient email opt-out preferen
 $string['privacy:metadata:email_optout:email'] = 'The recipient email address the opt-out applies to.';
 $string['privacy:metadata:email_optout:optout_type'] = 'The email type the recipient has opted out of.';
 $string['privacy:metadata:email_optout:userid'] = 'The Moodle user the opt-out belongs to, when known.';
+$string['privacy:path:email_optout'] = 'Email opt-outs';
 // v7.5.2: model-registry tables added in v7.4.0. Each records which site
 // administrator made a configuration change. Declared, but never exported or
 // erased: the rows are site configuration, not learner data.

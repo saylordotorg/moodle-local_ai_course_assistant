@@ -3134,3 +3134,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Zusätzlich die Folienbilder per 
 $string['soapbox:assign_visible'] = 'Für Studierende sichtbar';
 $string['soapbox:assign_err_min_seconds'] = 'Geben Sie mindestens 1 Sekunde ein';
 $string['soapbox:assign_err_minmax'] = 'Die Mindestlänge darf die maximale Länge nicht überschreiten';
+$string['privacy:path:email_optout'] = 'E-Mail-Abmeldungen';

@@ -62,11 +62,20 @@ class review_queue {
         $rows = [];
 
         // 1. Negative ratings on assistant messages in this course.
+        // Issue #283: LEFT JOIN, and filter on the rating's own courseid.
+        //
+        // The conversation cap deletes the oldest messages once a conversation
+        // passes 100, and it does not delete their ratings. With an INNER JOIN
+        // and a filter on m.courseid, a learner's thumbs-down silently left
+        // this queue the moment their message was trimmed, which is backwards:
+        // the longer and more engaged the conversation, the more likely the
+        // feedback disappeared. rated_excerpt keeps the text the learner was
+        // reacting to, so the row still says something an instructor can act on.
         $rsql = "SELECT r.id AS sourceid, r.timecreated AS twhen, r.rating, r.userid,
-                        m.message, m.courseid
+                        COALESCE(m.message, r.rated_excerpt) AS message, r.courseid
                    FROM {local_ai_course_assistant_msg_ratings} r
-                   JOIN {local_ai_course_assistant_msgs} m ON m.id = r.messageid
-                  WHERE m.courseid = :courseid AND r.rating = -1
+              LEFT JOIN {local_ai_course_assistant_msgs} m ON m.id = r.messageid
+                  WHERE r.courseid = :courseid AND r.rating = -1
                   ORDER BY r.timecreated DESC";
         try {
             foreach ($DB->get_records_sql($rsql, ['courseid' => $courseid], 0, $limit) as $r) {

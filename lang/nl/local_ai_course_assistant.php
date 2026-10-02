@@ -3157,3 +3157,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Ook de dia-afbeeldingen door beel
 $string['soapbox:assign_visible'] = 'Zichtbaar voor studenten';
 $string['soapbox:assign_err_min_seconds'] = 'Voer minstens 1 seconde in';
 $string['soapbox:assign_err_minmax'] = 'De minimale lengte mag niet groter zijn dan de maximale';
+$string['privacy:path:email_optout'] = 'E-mailafmeldingen';

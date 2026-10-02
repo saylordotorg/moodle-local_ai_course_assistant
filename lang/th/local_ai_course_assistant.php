@@ -3133,3 +3133,4 @@ $string['soapbox:assign_slide_vision_help'] = 'วิเคราะห์ภา
 $string['soapbox:assign_visible'] = 'นักเรียนมองเห็นได้';
 $string['soapbox:assign_err_min_seconds'] = 'กรอกอย่างน้อย 1 วินาที';
 $string['soapbox:assign_err_minmax'] = 'ความยาวต่ำสุดต้องไม่เกินความยาวสูงสุด';
+$string['privacy:path:email_optout'] = 'การยกเลิกรับอีเมล';

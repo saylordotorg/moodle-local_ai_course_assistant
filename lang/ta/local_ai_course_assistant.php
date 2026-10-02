@@ -3155,3 +3155,4 @@ $string['soapbox:assign_slide_vision_help'] = 'காட்சி-வடிவ�
 $string['soapbox:assign_visible'] = 'மாணவர்களுக்குக் காணக்கூடியது';
 $string['soapbox:assign_err_min_seconds'] = 'குறைந்தது 1 வினாடியை உள்ளிடவும்';
 $string['soapbox:assign_err_minmax'] = 'குறைந்தபட்ச நீளம் அதிகபட்சத்தைவிட அதிகமாக இருக்கக் கூடாது';
+$string['privacy:path:email_optout'] = 'மின்னஞ்சல் விலகல்கள்';

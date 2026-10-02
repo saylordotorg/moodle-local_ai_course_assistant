@@ -3134,3 +3134,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Analysoi myös diakuvat konenäö
 $string['soapbox:assign_visible'] = 'Näkyy opiskelijoille';
 $string['soapbox:assign_err_min_seconds'] = 'Syötä vähintään 1 sekunti';
 $string['soapbox:assign_err_minmax'] = 'Vähimmäispituus ei voi olla enimmäispituutta suurempi';
+$string['privacy:path:email_optout'] = 'Sähköpostin peruutukset';

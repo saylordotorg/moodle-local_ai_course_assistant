@@ -3179,3 +3179,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Phinda wenze ukuhlola kokubona ez
 $string['soapbox:assign_visible'] = 'Iyabonakala kubafundi';
 $string['soapbox:assign_err_min_seconds'] = 'Faka okungenani isekhondi elingu-1';
 $string['soapbox:assign_err_minmax'] = 'Ubude obuncane abunakudlula obukhulu';
+$string['privacy:path:email_optout'] = 'Ukuyeka ama-imeyili';

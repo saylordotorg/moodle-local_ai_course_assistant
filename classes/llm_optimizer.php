@@ -234,6 +234,11 @@ class llm_optimizer {
             "SELECT COUNT(r.id) AS rated,
                     SUM(CASE WHEN r.rating > 0 THEN 1 ELSE 0 END) AS up
                FROM {local_ai_course_assistant_msg_ratings} r
+               -- Issue #283: INNER JOIN on purpose. Every predicate below is
+               -- message-side (provider, model_name, role), and a rating whose
+               -- message was trimmed cannot be attributed to a model. Including
+               -- it would skew per-model quality figures with ratings that
+               -- belong to no model.
                JOIN {local_ai_course_assistant_msgs} m ON m.id = r.messageid
               WHERE m.provider = :p
                 AND m.model_name IN (:mod, :batchmod)

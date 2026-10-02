@@ -3163,3 +3163,4 @@ $string['soapbox:assign_slide_vision_help'] = 'Ka ye-sɛgɛsɛgɛli kɛ slide ja
 $string['soapbox:assign_visible'] = 'A bɛ ye kalandenw fɛ';
 $string['soapbox:assign_err_min_seconds'] = 'A dɔgɔyalen na, sekondi 1 sɛbɛn';
 $string['soapbox:assign_err_minmax'] = 'Janya dɔgɔmanba tɛ se ka tɛmɛ janya belebeleba kan';
+$string['privacy:path:email_optout'] = 'Imɛri bɔli';
