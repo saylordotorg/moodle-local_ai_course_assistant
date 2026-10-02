@@ -1,0 +1,77 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/usertesting_admin_preview
+
+    Read-only preview of the task set currently in the editor: the task set
+    title, then one block per task showing what a tester will be asked to do.
+    Rendered from JavaScript by amd/src/usertesting_admin.js and appended to
+    the page body.
+
+    This replaces a dialog the old inline script built node by node with a
+    style attribute on each one; the look now lives in styles.css. Every value
+    is escaped, as the old dialog's textContent writes were.
+
+    The task label ("Task 1 (Action + rate)") is substituted in JavaScript
+    before it gets here, because Moodle's string cache hands back the raw
+    placeholders.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Tom Caswell & David Ta / Saylor University
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "title": "SOLA Usability Test",
+        "closelabel": "Close preview",
+        "tasks": [
+            {
+                "label": "Task 1 (Action + rate)",
+                "instruction": "Ask the tutor to explain a concept from this unit.",
+                "isactionrate": true,
+                "raterange": "Rate this task (1 to 5)",
+                "hasfollowup": true,
+                "followup": "Follow-up: What made it helpful?",
+                "ismultiplechoice": false,
+                "options": [{"label": "Yes"}]
+            }
+        ]
+    }
+}}
+<div class="sola-ut-preview-overlay">
+    <div class="sola-ut-preview-panel">
+        <h4 class="sola-ut-preview-title">{{title}}</h4>
+        {{#tasks}}
+        <div class="sola-ut-preview-task">
+            <div class="sola-ut-preview-tasknum">{{label}}</div>
+            <div class="sola-ut-preview-tasktext">{{instruction}}</div>
+            {{#isactionrate}}
+            <div class="sola-ut-preview-raterange">{{raterange}}</div>
+            {{#hasfollowup}}
+            <div class="sola-ut-preview-followup">{{followup}}</div>
+            {{/hasfollowup}}
+            {{/isactionrate}}
+            {{#ismultiplechoice}}
+            {{#options}}
+            <div class="sola-ut-preview-option">{{label}}</div>
+            {{/options}}
+            {{/ismultiplechoice}}
+        </div>
+        {{/tasks}}
+        <button type="button" class="btn btn-sm btn-outline-secondary sola-ut-preview-close">{{closelabel}}</button>
+    </div>
+</div>

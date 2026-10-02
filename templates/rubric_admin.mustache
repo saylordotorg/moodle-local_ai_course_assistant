@@ -1,0 +1,140 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/rubric_admin
+
+    Practice-rubric admin page: scope picker, practice-type tab strip, the
+    optional Soapbox sample-rubric loader, the save/preview/reset action bar and
+    the empty container that amd/src/rubric_admin.js fills with criterion cards.
+
+    All strings are resolved in PHP (rubric_admin.php); there are no str helpers
+    here, and every value is escaped. The editor's own data (criteria, outcome
+    list, client-side strings) rides on the root element's data-config attribute
+    as JSON rather than as js_call_amd arguments, which have a 1 KB advisory
+    limit a rubric can exceed.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Tom Caswell & David Ta / Saylor University
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "configjson": "{}",
+        "settingsurl": "/admin/category.php?category=local_ai_course_assistant",
+        "settingslabel": "Plugin settings",
+        "analyticsurl": "/local/ai_course_assistant/analytics.php",
+        "analyticslabel": "Analytics dashboard",
+        "scopeformaction": "/local/ai_course_assistant/rubric_admin.php",
+        "type": "speech",
+        "scopelabel": "Editing rubric for:",
+        "scopeglobal": "Global default (all courses)",
+        "globalselected": true,
+        "courses": [
+            {"id": 2, "label": "Test Course 101 (TEST101)", "selected": false}
+        ],
+        "typetabs": [
+            {"url": "/local/ai_course_assistant/rubric_admin.php?type=conversation", "label": "Conversation practice", "active": false},
+            {"url": "/local/ai_course_assistant/rubric_admin.php?type=speech", "label": "Soapbox speech", "active": true}
+        ],
+        "isspeech": true,
+        "samplelabel": "Load a sample rubric",
+        "samplechoose": "Choose a sample...",
+        "samplehint": "Loads sample criteria into the editor below.",
+        "sampleoptions": [
+            {"url": "/local/ai_course_assistant/rubric_admin.php?type=speech&preset=general", "label": "General speech", "selected": false}
+        ],
+        "isinherited": true,
+        "inheritednotice": "This course has no custom rubric. Showing the global default.",
+        "formaction": "/local/ai_course_assistant/rubric_admin.php?type=speech",
+        "sesskey": "abc123",
+        "addcriterion": "+ Add criterion",
+        "savelabel": "Save rubric",
+        "previewlabel": "Preview",
+        "hasreset": true,
+        "resetlabel": "Reset to defaults"
+    }
+}}
+<div class="aica-rubric-admin" data-config="{{configjson}}">
+
+    <div class="mb-3 d-flex flex-wrap sola-rb-linkbar">
+        <a href="{{settingsurl}}" class="btn btn-sm btn-outline-secondary">&larr; {{settingslabel}}</a>
+        <a href="{{analyticsurl}}" class="btn btn-sm btn-outline-secondary">{{analyticslabel}}</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="{{scopeformaction}}" class="form-inline sola-rb-scope-form">
+                <input type="hidden" name="type" value="{{type}}">
+                <label for="aica-scope-select" class="sola-rb-scope-label">{{scopelabel}}</label>
+                <select id="aica-scope-select" name="courseid" class="form-control form-control-sm sola-rb-scope-select">
+                    <option value="0" {{#globalselected}}selected{{/globalselected}}>{{scopeglobal}}</option>
+                    {{#courses}}
+                    <option value="{{id}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                    {{/courses}}
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <div class="aica-rb-type-selector">
+        {{#typetabs}}
+        <a href="{{url}}" class="{{#active}}active{{/active}}">{{label}}</a>
+        {{/typetabs}}
+    </div>
+
+    {{#isspeech}}
+    <div class="card mb-3"><div class="card-body sola-rb-sample-row">
+        <label for="aica-rb-sample" class="sola-rb-sample-label">{{samplelabel}}</label>
+        <select id="aica-rb-sample" class="form-control form-control-sm sola-rb-sample-select">
+            <option value="">{{samplechoose}}</option>
+            {{#sampleoptions}}
+            <option value="{{url}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+            {{/sampleoptions}}
+        </select>
+        <small class="text-muted">{{samplehint}}</small>
+    </div></div>
+    {{/isspeech}}
+
+    {{#isinherited}}
+    <div class="aica-rb-inherited-badge">{{inheritednotice}}</div>
+    {{/isinherited}}
+
+    <form method="post" action="{{formaction}}" id="aica-rubric-form">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="action" value="save">
+        <input type="hidden" name="rubric_type" value="{{type}}">
+        <input type="hidden" name="criteria_json" id="aica-criteria-json" value="">
+
+        <div id="aica-criteria-container"></div>
+
+        <div class="aica-rb-add-criterion" id="aica-add-criterion-btn">{{addcriterion}}</div>
+
+        <div class="d-flex flex-wrap sola-rb-actions-row">
+            <button type="submit" class="btn btn-primary">{{savelabel}}</button>
+            <button type="button" class="btn btn-outline-secondary" id="aica-preview-btn">{{previewlabel}}</button>
+            {{#hasreset}}
+            <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">{{resetlabel}}</button>
+            {{/hasreset}}
+        </div>
+    </form>
+
+    <form method="post" action="{{formaction}}" id="aica-reset-form" class="sola-rb-hidden">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="action" value="reset">
+        <input type="hidden" name="rubric_type" value="{{type}}">
+    </form>
+</div>

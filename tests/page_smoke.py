@@ -123,6 +123,15 @@ for name, path in PAGES:
     # Prompt/report placeholder names are documented to admins as literal text.
     scan = re.sub(r'\{\{(coursename|userrole|institution|userid|courseid|messages|session_minutes|firstname)\}\}', '', scan)
     scan = re.sub(r'<script[^>]*>.*?</script>', '', scan, flags=re.S)
+    # Config that pages hand to their AMD module in a data attribute is the same
+    # kind of payload as an inline <script>: machine-readable, never shown to a
+    # user, and routinely carrying raw lang strings. #273/#278 moved several
+    # pages from inline scripts to data-config, which quietly put the shipped
+    # system prompt inside the scanned text; it contains [[tutorshort]], so both
+    # brand checks fired on every site whose prompt is still the default. The
+    # old inline-script form was stripped here, so this is the same exemption
+    # following the data to where it now lives.
+    scan = re.sub(r'data-config="[^"]*"', '', scan)
     # An inline SVG may carry an XML declaration, the only legitimate '?>'
     # in a response body.
     scan = re.sub(r'<\?xml[^>]*\?>', '', scan)

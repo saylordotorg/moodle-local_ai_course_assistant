@@ -1,0 +1,133 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/usertesting_admin
+
+    Usability-testing task admin page: scope picker, task set title, the
+    external form URL field, the save/preview/reset action bar, and the empty
+    container that amd/src/usertesting_admin.js fills with task cards.
+
+    All strings are resolved in PHP (usertesting_admin.php); there are no str
+    helpers here. Every value is escaped except externalurlhelp, which is a
+    lang string that deliberately carries <code> markup and was echoed raw
+    before this migration.
+
+    The editor's own data (the tasks and the client-side strings) rides on the
+    root element's data-config attribute as JSON rather than as js_call_amd
+    arguments, which have a 1 KB advisory limit a task set exceeds.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Tom Caswell & David Ta / Saylor University
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "configjson": "{}",
+        "settingsurl": "/admin/category.php?category=local_ai_course_assistant",
+        "settingslabel": "Plugin settings",
+        "analyticsurl": "/local/ai_course_assistant/analytics.php",
+        "analyticslabel": "Analytics dashboard",
+        "scopeformaction": "/local/ai_course_assistant/usertesting_admin.php",
+        "scopelabel": "Editing tasks for:",
+        "scopeglobal": "Global default (all courses)",
+        "globalselected": true,
+        "courses": [
+            {"id": 2, "label": "Test Course 101 (TEST101)", "selected": false}
+        ],
+        "isinherited": true,
+        "inheritednotice": "This course has no custom task set. Showing the global default.",
+        "formaction": "/local/ai_course_assistant/usertesting_admin.php?courseid=0",
+        "sesskey": "abc123",
+        "titlelabel": "Task set title",
+        "title": "SOLA Usability Test",
+        "titleplaceholder": "e.g. SOLA usability test round 1",
+        "exturllabel": "External form URL (Option C, optional)",
+        "exturl": "",
+        "exturlplaceholder": "e.g. https://forms.google.com/d/e/xxx/viewform",
+        "externalurlhelp": "Placeholders are listed here in code tags.",
+        "tasksheading": "Tasks (in-widget panel)",
+        "addtask": "+ Add task",
+        "savelabel": "Save task set",
+        "previewlabel": "Preview",
+        "hasreset": true,
+        "resetlabel": "Reset to defaults"
+    }
+}}
+<div class="aica-ut-admin" data-config="{{configjson}}">
+
+    <div class="mb-3 d-flex flex-wrap sola-ut-linkbar">
+        <a href="{{settingsurl}}" class="btn btn-sm btn-outline-secondary">&larr; {{settingslabel}}</a>
+        <a href="{{analyticsurl}}" class="btn btn-sm btn-outline-secondary">{{analyticslabel}}</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="{{scopeformaction}}" class="form-inline sola-ut-scope-form">
+                <label for="aica-ut-scope" class="sola-ut-scope-label">{{scopelabel}}</label>
+                <select id="aica-ut-scope" name="courseid" class="form-control form-control-sm sola-ut-scope-select">
+                    <option value="0" {{#globalselected}}selected{{/globalselected}}>{{scopeglobal}}</option>
+                    {{#courses}}
+                    <option value="{{id}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                    {{/courses}}
+                </select>
+            </form>
+        </div>
+    </div>
+
+    {{#isinherited}}
+    <div class="aica-ut-inherited-badge">{{inheritednotice}}</div>
+    {{/isinherited}}
+
+    <form method="post" action="{{formaction}}" id="aica-ut-form">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="action" value="save">
+        <input type="hidden" name="tasks_json" id="aica-tasks-json" value="">
+
+        <div class="aica-ut-field mb-3">
+            <label for="aica-ut-title">{{titlelabel}}</label>
+            <input type="text" id="aica-ut-title" name="taskset_title"
+                   value="{{title}}" placeholder="{{titleplaceholder}}">
+        </div>
+
+        <div class="aica-ut-field mb-3">
+            <label for="aica-ut-exturl">{{exturllabel}}</label>
+            <input type="url" id="aica-ut-exturl" name="external_url"
+                   value="{{exturl}}" placeholder="{{exturlplaceholder}}">
+            {{! Unescaped on purpose: this lang string documents the supported
+                placeholders in <code> tags and was echoed raw before the
+                migration. It is a lang string, never learner or admin input. }}
+            <small class="sola-ut-help">{{{externalurlhelp}}}</small>
+        </div>
+
+        <h5 class="sola-ut-tasks-heading">{{tasksheading}}</h5>
+        <div id="aica-tasks-container"></div>
+        <div class="aica-ut-add-task" id="aica-add-task-btn">{{addtask}}</div>
+
+        <div class="d-flex flex-wrap sola-ut-actions-row">
+            <button type="submit" class="btn btn-primary">{{savelabel}}</button>
+            <button type="button" class="btn btn-outline-secondary" id="aica-ut-preview-btn">{{previewlabel}}</button>
+            {{#hasreset}}
+            <button type="button" class="btn btn-outline-danger" id="aica-ut-reset-btn">{{resetlabel}}</button>
+            {{/hasreset}}
+        </div>
+    </form>
+
+    <form method="post" action="{{formaction}}" id="aica-ut-reset-form" class="sola-ut-hidden">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="action" value="reset">
+    </form>
+</div>

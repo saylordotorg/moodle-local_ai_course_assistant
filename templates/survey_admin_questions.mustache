@@ -1,0 +1,152 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/survey_admin_questions
+
+    The editable question cards on the end-of-course survey admin page.
+    Rendered from JavaScript by amd/src/survey_admin.js on every reorder, add,
+    delete or type change, replacing the hand-built DOM the old inline script
+    assembled element by element.
+
+    The whole list renders in one pass rather than one template call per card,
+    so the cards can never land out of order when several renders overlap.
+    Every value here is admin-authored survey text and is escaped.
+
+    The strings arrive pre-resolved on each card as str.*; the page resolves
+    them in PHP and hands them to the module in the root element's data-config.
+    The per-option aria labels are substituted in JavaScript before they get
+    here, because Moodle's string cache hands the raw placeholder back.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Tom Caswell & David Ta / Saylor University
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "questions": [
+            {
+                "idx": 0,
+                "number": 1,
+                "typelabel": "Multiple choice",
+                "text": "How often did you use the AI tutor in this course?",
+                "typeoptions": [
+                    {"value": "multiple_choice", "label": "Multiple choice", "selected": true},
+                    {"value": "long_text", "label": "Open text", "selected": false},
+                    {"value": "rating", "label": "Rating scale", "selected": false}
+                ],
+                "ismultiplechoice": true,
+                "options": [
+                    {"oi": 0, "value": "Daily", "arialabel": "Option 1"},
+                    {"oi": 1, "value": "Never", "arialabel": "Option 2"}
+                ],
+                "israting": false,
+                "min": 1,
+                "max": 5,
+                "minlabel": "Not at all",
+                "maxlabel": "Very happy",
+                "str": {
+                    "moveup": "Move up",
+                    "movedown": "Move down",
+                    "deletequestion": "Delete question",
+                    "questiontype": "Question type",
+                    "questiontext": "Question text",
+                    "options": "Options",
+                    "removeoption": "Remove option",
+                    "addoption": "+ Add option",
+                    "minvalue": "Minimum value",
+                    "minvaluearia": "Minimum value for this rating scale",
+                    "maxvalue": "Maximum value",
+                    "maxvaluearia": "Maximum value for this rating scale",
+                    "minlabel": "Low-end label",
+                    "minlabelaria": "Label for the low end of the scale",
+                    "minlabelplaceholder": "e.g. Not at all",
+                    "maxlabel": "High-end label",
+                    "maxlabelaria": "Label for the high end of the scale",
+                    "maxlabelplaceholder": "e.g. Very happy"
+                }
+            }
+        ]
+    }
+}}
+{{#questions}}
+<div class="aica-sq-card" draggable="true" data-idx="{{idx}}">
+    <div class="aica-sq-header">
+        <div class="aica-sq-num">{{number}}</div>
+        <span class="aica-sq-type">{{typelabel}}</span>
+        <div class="aica-sq-actions">
+            <button type="button" class="aica-sq-up" title="{{str.moveup}}">&#8593;</button>
+            <button type="button" class="aica-sq-down" title="{{str.movedown}}">&#8595;</button>
+            <button type="button" class="aica-sq-delete" title="{{str.deletequestion}}">&#10005;</button>
+        </div>
+    </div>
+
+    <div class="aica-sq-field">
+        <label>{{str.questiontype}}</label>
+        <select class="aica-sq-type-select" aria-label="{{str.questiontype}}">
+            {{#typeoptions}}
+            <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+            {{/typeoptions}}
+        </select>
+    </div>
+
+    <div class="aica-sq-field">
+        <label>{{str.questiontext}}</label>
+        <textarea class="aica-sq-text-input" aria-label="{{str.questiontext}}" rows="2">
+{{text}}</textarea>
+    </div>
+
+    {{#ismultiplechoice}}
+    <label class="sola-sq-options-label">{{str.options}}</label>
+    <div class="aica-sq-options-list">
+        {{#options}}
+        <div class="aica-sq-opt-row">
+            <input type="text" class="aica-sq-opt-input" data-oi="{{oi}}"
+                   aria-label="{{arialabel}}" value="{{value}}">
+            <button type="button" class="aica-sq-opt-remove" data-oi="{{oi}}"
+                    title="{{str.removeoption}}">&times;</button>
+        </div>
+        {{/options}}
+    </div>
+    <div class="aica-sq-add-opt">{{str.addoption}}</div>
+    {{/ismultiplechoice}}
+
+    {{#israting}}
+    <div class="aica-sq-rating-fields">
+        <div class="aica-sq-field">
+            <label>{{str.minvalue}}</label>
+            <input type="number" class="aica-sq-min-input" aria-label="{{str.minvaluearia}}"
+                   value="{{min}}" min="0" max="10">
+        </div>
+        <div class="aica-sq-field">
+            <label>{{str.maxvalue}}</label>
+            <input type="number" class="aica-sq-max-input" aria-label="{{str.maxvaluearia}}"
+                   value="{{max}}" min="1" max="10">
+        </div>
+        <div class="aica-sq-field">
+            <label>{{str.minlabel}}</label>
+            <input type="text" class="aica-sq-minlabel-input" aria-label="{{str.minlabelaria}}"
+                   value="{{minlabel}}" placeholder="{{str.minlabelplaceholder}}">
+        </div>
+        <div class="aica-sq-field">
+            <label>{{str.maxlabel}}</label>
+            <input type="text" class="aica-sq-maxlabel-input" aria-label="{{str.maxlabelaria}}"
+                   value="{{maxlabel}}" placeholder="{{str.maxlabelplaceholder}}">
+        </div>
+    </div>
+    {{/israting}}
+</div>
+{{/questions}}

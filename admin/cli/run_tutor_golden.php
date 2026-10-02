@@ -87,6 +87,12 @@ $limit = 0; // 0 = all prompts
 $promptsfile = ''; // empty = use tutor_prompts.json default
 $registrykey = ''; // optional local_ai_course_assistant_models.modelkey to attribute the run to
 $delay = 0.0; // seconds to sleep between calls (throttle for rate-limited free tiers)
+// Issue #265 item 5. Three repeats distinguish a three-of-three behaviour from
+// a three-of-six one; they cannot bound a rate below roughly 15 percent. The
+// harness had no repeat support at all, so "three repeats per provider" meant
+// running it three times by hand and merging CSVs, which is how the previous
+// study ended up with results nobody could pool.
+$repeats = 1;
 
 foreach ($argv as $arg) {
     if (preg_match('/^--mode=(run|judge|report|all)$/', $arg, $m)) {
@@ -109,6 +115,8 @@ foreach ($argv as $arg) {
         $promptsfile = trim($m[1]);
     } else if (preg_match('/^--delay=([\d.]+)$/', $arg, $m)) {
         $delay = (float) $m[1];
+    } else if (preg_match('/^--repeats=(\d+)$/', $arg, $m)) {
+        $repeats = max(1, (int) $m[1]);
     } else if (preg_match('/^--registry-key=(.+)$/', $arg, $m)) {
         $registrykey = strtolower(trim($m[1]));
     } else if ($arg === '--help' || $arg === '-h') {
@@ -132,6 +140,11 @@ Options:
                                 rate-limited free tiers, e.g. --delay=5 for ~15 RPM).
   --in=run.csv[,judge.csv]      Input CSV(s) for judge/report modes.
   --out=DIR                     Output directory (default: <plugin>/runs).
+  --repeats=N                   Send every prompt N times per provider (default 1).
+                                Three is the minimum that distinguishes a
+                                three-of-three behaviour from a three-of-six one.
+                                A rate below roughly 15 percent cannot be bounded
+                                at any n this harness will realistically run.
   --judge-provider=ID           Provider id for the rubric judge (default: claude).
   --judge-model=NAME            Model name for the rubric judge (default: claude-sonnet-4-6).
   --registry-key=KEY            Attribute the persisted result to this model-registry
@@ -151,7 +164,7 @@ TXT;
 $outdir = make_writable_directory($outdir);
 
 if ($mode === 'run' || $mode === 'all') {
-    $runin = local_ai_course_assistant_golden_mode_run($providersfilter, $outdir, $datetag, $limit, $promptsfile, $delay);
+    $runin = local_ai_course_assistant_golden_mode_run($providersfilter, $outdir, $datetag, $limit, $promptsfile, $delay, $repeats);
 }
 if ($mode === 'judge' || $mode === 'all') {
     if ($runin === '') {
@@ -187,9 +200,10 @@ exit(0);
  * @param int $limit Max prompts to send, 0 = all.
  * @param string $promptsfile Optional alternate path to a tutor_prompts.json-shaped file.
  * @param float $delay Seconds to sleep between calls (0 = no throttle).
+ * @param int $repeats How many times to send each prompt per provider (issue #265).
  * @return string Path to run CSV.
  */
-function local_ai_course_assistant_golden_mode_run(string $providersfilter, string $outdir, string $datetag, int $limit, string $promptsfile = '', float $delay = 0.0): string {
+function local_ai_course_assistant_golden_mode_run(string $providersfilter, string $outdir, string $datetag, int $limit, string $promptsfile = '', float $delay = 0.0, int $repeats = 1): string {
     $prompts = local_ai_course_assistant_golden_load_prompts($promptsfile);
     if ($limit > 0) {
         $prompts = array_slice($prompts, 0, $limit);
@@ -220,10 +234,28 @@ function local_ai_course_assistant_golden_mode_run(string $providersfilter, stri
 
     $outfile = "$outdir/$datetag-run.csv";
     $fh = fopen($outfile, 'w');
+    // Issue #265 item 4: record WHICH account produced each response, and a
+    // fingerprint of the system prompt it was produced under.
+    //
+    // The original study's usefulness column was unusable because nobody
+    // recorded the account, and context_builder::detect_role() serves
+    // administrators "Provide direct, comprehensive answers" where students get
+    // "Use a Socratic approach ... Never provide complete solutions". This
+    // harness does NOT use detect_role: it pins run_model_benchmark::SYSTEM_PROMPT
+    // for every call, so the role cannot vary here. The columns are recorded
+    // anyway, because a capture that cannot say what it ran as is not
+    // comparable with one that can, and the next harness may not be fixed.
+    global $USER;
+    $account = ($USER && !empty($USER->id))
+        ? ($USER->username . ' (id ' . $USER->id . ')')
+        : 'cli (no session user)';
+    $promptfingerprint = substr(sha1(run_model_benchmark::SYSTEM_PROMPT), 0, 12);
+
     fputcsv($fh, [
-        'provider_label', 'provider_id', 'model', 'prompt_id', 'category',
+        'provider_label', 'provider_id', 'model', 'prompt_id', 'category', 'repeat',
         'response_text', 'prompt_tokens', 'completion_tokens',
         'ttft_ms', 'total_latency_ms', 'cost_cents', 'error', 'timestamp',
+        'account', 'system_prompt_sha',
     ]);
 
     // The prompt under test lives on the ad-hoc task, which is the
@@ -236,6 +268,7 @@ function local_ai_course_assistant_golden_mode_run(string $providersfilter, stri
         $urltag = !empty($row['apibaseurl']) ? ' @ ' . $row['apibaseurl'] : '';
         printf("\n[provider] %s (%s)%s\n", $row['label'], $row['models'], $urltag);
         foreach ($prompts as $p) {
+            for ($rep = 1; $rep <= $repeats; $rep++) {
             $result = local_ai_course_assistant_golden_run_one_call($row, $systemprompt, $p['text']);
             fputcsv($fh, [
                 $row['label'],
@@ -243,6 +276,7 @@ function local_ai_course_assistant_golden_mode_run(string $providersfilter, stri
                 $row['models'],
                 $p['id'],
                 $p['category'],
+                $rep,
                 str_replace(["\r\n", "\r", "\n"], ' ', $result['response']),
                 $result['prompt_tokens'] ?? '',
                 $result['completion_tokens'] ?? '',
@@ -251,15 +285,19 @@ function local_ai_course_assistant_golden_mode_run(string $providersfilter, stri
                 $result['cost_cents'] ?? '',
                 $result['error'] ?? '',
                 date('c'),
+                $account,
+                $promptfingerprint,
             ]);
             printf(
-                "  %s [%s] %s\n",
+                "  %s%s [%s] %s\n",
                 $p['id'],
+                $repeats > 1 ? " r{$rep}" : '',
                 ($result['error'] ?? '') === '' ? 'ok' : 'err',
                 $result['error'] ?? sprintf('%dms', $result['total_latency_ms'] ?? 0)
             );
             if ($delay > 0) {
                 usleep((int) round($delay * 1_000_000));
+            }
             }
         }
     }

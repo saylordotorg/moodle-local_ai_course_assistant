@@ -1,0 +1,171 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/usertesting_admin_tasks
+
+    The editable task cards on the usability-testing admin page. Rendered from
+    JavaScript by amd/src/usertesting_admin.js on every reorder, add, delete or
+    type change, replacing the hand-built DOM the old inline script assembled
+    node by node.
+
+    The whole list renders in one pass rather than one template call per card,
+    so the cards can never land out of order when several renders overlap.
+    Every value here is admin-authored task text and is escaped.
+
+    The strings arrive pre-resolved on each card as str.*; the page resolves
+    them in PHP and hands them to the module in the root element's data-config.
+    The numbered-option aria labels are substituted in JavaScript before they
+    get here, because Moodle's string cache hands the raw placeholder back.
+
+    The follow-up field is one input with two sets of labels: an action-and-rate
+    task calls it a follow-up question, a free-response task calls it an
+    additional prompt. Both write the same stored field, as they did before.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Tom Caswell & David Ta / Saylor University
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "tasks": [
+            {
+                "idx": 0,
+                "number": 1,
+                "typelabel": "Action + rate",
+                "instruction": "Ask the tutor to explain a concept from this unit.",
+                "typeoptions": [
+                    {"value": "action_then_rate", "label": "Action + rate", "selected": true},
+                    {"value": "free_response", "label": "Free response", "selected": false},
+                    {"value": "multiple_choice", "label": "Multiple choice", "selected": false}
+                ],
+                "isactionrate": true,
+                "ratinglabel": "Rate this task",
+                "min": 1,
+                "max": 5,
+                "minlabel": "",
+                "maxlabel": "",
+                "followup": "",
+                "followuplabel": "Follow-up question (optional free text)",
+                "followuparia": "Follow-up question",
+                "hasfollowupfield": true,
+                "ismultiplechoice": false,
+                "options": [
+                    {"oi": 0, "value": "Yes", "arialabel": "Option 1"}
+                ],
+                "str": {
+                    "moveup": "Move up",
+                    "movedown": "Move down",
+                    "deletetask": "Delete task",
+                    "tasktype": "Task type",
+                    "instruction": "Task instruction",
+                    "ratinglabel": "Rating label",
+                    "minvalue": "Min value",
+                    "minvaluearia": "Minimum rating value",
+                    "maxvalue": "Max value",
+                    "maxvaluearia": "Maximum rating value",
+                    "minlabel": "Min label",
+                    "minlabelplaceholder": "e.g. Not helpful",
+                    "maxlabel": "Max label",
+                    "maxlabelplaceholder": "e.g. Very helpful",
+                    "options": "Options",
+                    "addoption": "+ Add option"
+                }
+            }
+        ]
+    }
+}}
+{{#tasks}}
+<div class="aica-ut-card" draggable="true" data-idx="{{idx}}">
+    <div class="aica-ut-header">
+        <div class="aica-ut-num">{{number}}</div>
+        <span class="aica-ut-type">{{typelabel}}</span>
+        <div class="aica-ut-actions">
+            <button type="button" class="aica-ut-up" title="{{str.moveup}}">&#8593;</button>
+            <button type="button" class="aica-ut-down" title="{{str.movedown}}">&#8595;</button>
+            <button type="button" class="aica-ut-delete" title="{{str.deletetask}}">&#10005;</button>
+        </div>
+    </div>
+
+    <div class="aica-ut-field">
+        <label>{{str.tasktype}}</label>
+        <select class="aica-ut-type-select" aria-label="{{str.tasktype}}">
+            {{#typeoptions}}
+            <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+            {{/typeoptions}}
+        </select>
+    </div>
+
+    <div class="aica-ut-field">
+        <label>{{str.instruction}}</label>
+        <textarea class="aica-ut-instruction-input" aria-label="{{str.instruction}}" rows="2">
+{{instruction}}</textarea>
+    </div>
+
+    {{#isactionrate}}
+    <div class="aica-ut-field">
+        <label>{{str.ratinglabel}}</label>
+        <input type="text" class="aica-ut-ratinglabel-input" aria-label="{{str.ratinglabel}}"
+               value="{{ratinglabel}}">
+    </div>
+
+    <div class="aica-ut-rating-fields">
+        <div class="aica-ut-field">
+            <label>{{str.minvalue}}</label>
+            <input type="number" class="aica-ut-min-input" aria-label="{{str.minvaluearia}}"
+                   value="{{min}}" min="0" max="10">
+        </div>
+        <div class="aica-ut-field">
+            <label>{{str.maxvalue}}</label>
+            <input type="number" class="aica-ut-max-input" aria-label="{{str.maxvaluearia}}"
+                   value="{{max}}" min="0" max="10">
+        </div>
+        <div class="aica-ut-field">
+            <label>{{str.minlabel}}</label>
+            <input type="text" class="aica-ut-minlabel-input" aria-label="{{str.minlabel}}"
+                   value="{{minlabel}}" placeholder="{{str.minlabelplaceholder}}">
+        </div>
+        <div class="aica-ut-field">
+            <label>{{str.maxlabel}}</label>
+            <input type="text" class="aica-ut-maxlabel-input" aria-label="{{str.maxlabel}}"
+                   value="{{maxlabel}}" placeholder="{{str.maxlabelplaceholder}}">
+        </div>
+    </div>
+    {{/isactionrate}}
+
+    {{#ismultiplechoice}}
+    <label class="sola-ut-options-label">{{str.options}}</label>
+    <div class="aica-ut-options-list">
+        {{#options}}
+        <div class="aica-ut-opt-row">
+            <input type="text" class="aica-ut-opt-input" data-oi="{{oi}}"
+                   aria-label="{{arialabel}}" value="{{value}}">
+            <button type="button" class="aica-ut-opt-remove" data-oi="{{oi}}">&times;</button>
+        </div>
+        {{/options}}
+    </div>
+    <div class="aica-ut-add-opt">{{str.addoption}}</div>
+    {{/ismultiplechoice}}
+
+    {{#hasfollowupfield}}
+    <div class="aica-ut-field">
+        <label>{{followuplabel}}</label>
+        <input type="text" class="aica-ut-followup-input" aria-label="{{followuparia}}"
+               value="{{followup}}">
+    </div>
+    {{/hasfollowupfield}}
+</div>
+{{/tasks}}

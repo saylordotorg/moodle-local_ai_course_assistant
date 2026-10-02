@@ -5522,6 +5522,95 @@ button.local-ai-course-assistant__path-node-head[aria-expanded="true"] {
 .aica-rb-inline-fields .aica-rb-field:first-child { flex: 1; min-width: 200px; }
 .aica-rb-inline-fields .aica-rb-score-field { flex: 0 0 auto; }
 
+/* Rubric admin page chrome, moved out of style="" attributes and out of the
+   style.cssText the inline script set on every preview node (CONTRIB-10574
+   #273/#278). Values are carried over unchanged. */
+.sola-rb-linkbar { gap: 8px; }
+.sola-rb-scope-form { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sola-rb-scope-label { font-weight: 600; white-space: nowrap; }
+.sola-rb-scope-select { max-width: 350px; }
+.sola-rb-sample-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sola-rb-sample-label { font-weight: 600; margin: 0; white-space: nowrap; }
+.sola-rb-sample-select { max-width: 280px; }
+.sola-rb-actions-row { gap: 8px; margin-top: 16px; }
+.sola-rb-hidden { display: none; }
+
+/* Rubric preview dialog. */
+.sola-rb-preview-overlay {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+}
+.sola-rb-preview-panel {
+    background: #fff; border-radius: 12px; padding: 24px; max-width: 500px; width: 90%;
+    max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+.sola-rb-preview-title { margin-bottom: 16px; }
+.sola-rb-preview-typenote { font-size: 13px; color: #64748b; margin-bottom: 16px; }
+.sola-rb-preview-criterion {
+    margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;
+}
+.sola-rb-preview-cname { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.sola-rb-preview-cdesc { font-size: 13px; color: #64748b; margin-bottom: 8px; }
+.sola-rb-preview-scale { display: flex; gap: 6px; align-items: center; }
+.sola-rb-preview-scalelabel { font-size: 12px; color: #94a3b8; margin-right: 4px; }
+.sola-rb-preview-dot {
+    width: 32px; height: 32px; border-radius: 50%; border: 2px solid #d1d5db;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 13px; color: #475569;
+}
+.sola-rb-preview-max { font-size: 11px; color: #94a3b8; margin-left: 4px; }
+.sola-rb-preview-total {
+    font-weight: 700; font-size: 14px; margin-bottom: 16px; padding: 10px;
+    background: #f1f5f9; border-radius: 6px; text-align: center;
+}
+
+/* Survey admin page chrome, moved out of style="" attributes and out of the
+   style.cssText the inline script set on every preview node (CONTRIB-10574
+   #273/#278). Values are carried over unchanged. */
+.sola-sq-linkbar { gap: 8px; }
+.sola-sq-scope-form { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sola-sq-scope-label { font-weight: 600; white-space: nowrap; }
+.sola-sq-scope-select { max-width: 350px; }
+.sola-sq-actions-row { gap: 8px; margin-top: 16px; }
+.sola-sq-hidden { display: none; }
+.sola-sq-options-label {
+    display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px;
+}
+
+/* Survey preview dialog. */
+.sola-sq-preview-overlay {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+}
+.sola-sq-preview-panel {
+    background: #fff; border-radius: 12px; padding: 24px; max-width: 500px; width: 90%;
+    max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+.sola-sq-preview-title { margin-bottom: 16px; }
+.sola-sq-preview-question {
+    margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;
+}
+.sola-sq-preview-qtext { font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+.sola-sq-preview-option {
+    display: flex; align-items: center; gap: 8px; padding: 6px 10px; margin-bottom: 4px;
+    background: #f8fafc; border-radius: 6px; font-size: 13px;
+}
+.sola-sq-preview-radio {
+    width: 16px; height: 16px; border: 2px solid #d1d5db; border-radius: 50%; flex-shrink: 0;
+}
+.sola-sq-preview-scale { display: flex; gap: 8px; align-items: center; }
+.sola-sq-preview-endlabel { font-size: 11px; color: #94a3b8; }
+.sola-sq-preview-dot {
+    width: 36px; height: 36px; border-radius: 50%; border: 2px solid #d1d5db;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 14px; color: #475569;
+}
+.sola-sq-preview-textbox {
+    width: 100%; min-height: 60px; border: 1px solid #d1d5db; border-radius: 6px;
+    background: #f8fafc; padding: 8px;
+}
+.sola-sq-preview-hint { color: #94a3b8; font-size: 13px; }
+
 /* Plugin self-update admin page (was inline in update_admin.php). */
 .sola-update-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
 .sola-update-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; background: #fff; }
@@ -5658,6 +5747,47 @@ button.local-ai-course-assistant__path-node-head[aria-expanded="true"] {
 .aica-ut-inherited-badge {
     display: inline-block; background: #fef3c7; color: #92400e; padding: 4px 10px;
     border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 12px;
+}
+
+/* Usability-testing admin page chrome, moved out of style="" attributes and
+   out of the style.cssText the inline script set on every preview node
+   (CONTRIB-10574 #273/#278). Values are carried over unchanged. */
+.sola-ut-linkbar { gap: 8px; }
+.sola-ut-scope-form { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sola-ut-scope-label { font-weight: 600; white-space: nowrap; }
+.sola-ut-scope-select { max-width: 350px; }
+.sola-ut-help { color: #94a3b8; font-size: 11px; }
+.sola-ut-tasks-heading { margin-bottom: 12px; color: #334155; }
+.sola-ut-actions-row { gap: 8px; margin-top: 16px; }
+.sola-ut-hidden { display: none; }
+.sola-ut-options-label {
+    display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px;
+}
+
+/* Task set preview dialog. */
+.sola-ut-preview-overlay {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+}
+.sola-ut-preview-panel {
+    background: #fff; border-radius: 12px; padding: 24px; max-width: 500px; width: 90%;
+    max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+.sola-ut-preview-title { margin-bottom: 16px; }
+.sola-ut-preview-task {
+    margin-bottom: 16px; padding: 14px; border: 1px solid #e2e8f0; border-radius: 10px;
+    background: #f8fafc;
+}
+.sola-ut-preview-tasknum {
+    font-size: 11px; font-weight: 700; color: #0369a1; text-transform: uppercase;
+    margin-bottom: 6px;
+}
+.sola-ut-preview-tasktext { font-size: 14px; color: #1e293b; margin-bottom: 8px; }
+.sola-ut-preview-raterange { font-size: 12px; color: #64748b; font-style: italic; }
+.sola-ut-preview-followup { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+.sola-ut-preview-option {
+    font-size: 13px; padding: 4px 10px; margin-top: 4px; background: #fff;
+    border-radius: 6px; border: 1px solid #e2e8f0;
 }
 
 /* Learning Radar citation popover (moved from inline styles in learning_radar.js, CONTRIB-10574 #94/#87). */
@@ -6069,3 +6199,35 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
 .sola-essay-score { font-family: monospace; }
 .sola-essay-subheading { margin-top: 18px; }
 .sola-essay-hidden { display: none; }
+
+/* Soapbox speech-practice page (moved from the inline style attributes in
+   soapbox.php and from the inline script it used to echo, CONTRIB-10574 #273
+   and #278). Every rule here is the style="" attribute it replaces, value for
+   value; .sola-soapbox-hidden replaces the style.display toggling the old
+   script did by hand. */
+.sola-soapbox { max-width: 880px; margin: 0 auto; }
+.sola-soapbox-select { max-width: 220px; }
+.sola-soapbox-select-wide { max-width: 280px; }
+.sola-soapbox-controls { gap: 12px; flex-wrap: wrap; }
+.sola-soapbox-timer { font-family: monospace; font-size: 18px; }
+.sola-soapbox-summary { cursor: pointer; }
+.sola-soapbox-table { width: 100%; }
+.sola-soapbox-col-criterion { width: 30%; }
+.sola-soapbox-col-score { width: 70px; font-family: monospace; }
+.sola-soapbox-live-col-score { width: 80px; }
+.sola-soapbox-score { font-family: monospace; }
+.sola-soapbox-hidden { display: none; }
+
+/* Per-course settings page chrome, moved out of the style="" attributes
+   course_settings.php used to echo (CONTRIB-10574 #273/#278). Each rule is the
+   attribute it replaces, value for value. .sola-cs-linkbar also replaces the
+   class-attribute injection the old html_writer::div() call used to smuggle a
+   gap into the link bar. */
+.sola-cs-linkbar { gap: 8px; }
+.sola-cs-linkrow { gap: 8px; }
+.sola-cs-howitworks { font-size: 14px; }
+.sola-cs-prompt-actions { gap: 8px; }
+.sola-cs-level-label { font-weight: 600; font-size: 13px; }
+.sola-cs-select-pedagogy { max-width: 280px; }
+.sola-cs-select-extres { max-width: 240px; }
+.sola-cs-select-level { max-width: 320px; }
