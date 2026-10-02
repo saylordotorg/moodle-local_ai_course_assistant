@@ -1,0 +1,93 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/soapbox_result
+
+    Rubric scores for one Soapbox run, rendered by amd/src/soapbox.js through
+    core/templates (CONTRIB-10574 #278). It replaces the innerHTML string the
+    inline script used to concatenate.
+
+    Everything here is model-supplied text, so every value is rendered through a
+    plain double-brace variable rather than a triple-brace one: Mustache escapes
+    it, which is what replaces the hand-rolled escaper the old inline script ran
+    before concatenating innerHTML. There is no triple-brace output in this
+    template.
+
+    The not-assessed branch mirrors the stored-score table in soapbox.mustache.
+    A criterion the model reported it could not judge is excluded from the total
+    by compute_overall(), so showing its raw 0 here would tell the learner one
+    thing and the saved attempt another. The caller sets `assessed` false only
+    on an explicit false, so undefined, null, 0, "0" and "" all count as
+    assessed, exactly as rubric_manager::is_assessed() counts them in PHP.
+
+    Context variables required for this template:
+    * criteria - rows, each with: name, assessed, score, feedback
+    * overall - overall comment, empty when the model returned none
+    * hastips - true when tips is non-empty
+    * tips - list of {text} coaching tips
+
+    Example context (json):
+    {
+        "criteria": [
+            {"name": "Structure", "assessed": true, "score": 4,
+             "feedback": "Clear signposting between points."},
+            {"name": "Delivery", "assessed": false, "score": 0,
+             "feedback": "No audio evidence for this criterion."}
+        ],
+        "overall": "A confident take that needs a stronger close.",
+        "hastips": true,
+        "tips": [{"text": "Land your last sentence instead of trailing off."}]
+    }
+}}
+<div class="card"><div class="card-body">
+    <h3>{{#str}}soapbox:result_heading, local_ai_course_assistant{{/str}}</h3>
+    <table class="generaltable sola-soapbox-table">
+        <thead>
+            <tr>
+                <th>{{#str}}soapbox:col_criterion, local_ai_course_assistant{{/str}}</th>
+                <th class="sola-soapbox-live-col-score">
+                    {{#str}}soapbox:col_score, local_ai_course_assistant{{/str}}
+                </th>
+                <th>{{#str}}soapbox:col_feedback, local_ai_course_assistant{{/str}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#criteria}}
+            <tr class="{{^assessed}}text-muted{{/assessed}}">
+                <td>{{name}}</td>
+                <td class="sola-soapbox-score">
+                    {{#assessed}}{{score}}{{/assessed}}
+                    {{^assessed}}<span class="badge badge-secondary">{{#str}}soapbox:not_assessed, local_ai_course_assistant{{/str}}</span><span class="accesshide"> {{#str}}soapbox:not_assessed_aria, local_ai_course_assistant{{/str}}</span>{{/assessed}}
+                </td>
+                <td>{{feedback}}</td>
+            </tr>
+            {{/criteria}}
+        </tbody>
+    </table>
+    {{#overall}}
+    <h4 class="mt-3">{{#str}}soapbox:overall_heading, local_ai_course_assistant{{/str}}</h4>
+    <p>{{overall}}</p>
+    {{/overall}}
+    {{#hastips}}
+    <h4 class="mt-2">{{#str}}soapbox:tips_heading, local_ai_course_assistant{{/str}}</h4>
+    <ol>
+        {{#tips}}
+        <li>{{text}}</li>
+        {{/tips}}
+    </ol>
+    {{/hastips}}
+</div></div>

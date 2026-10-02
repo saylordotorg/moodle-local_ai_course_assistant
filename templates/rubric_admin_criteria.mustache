@@ -1,0 +1,113 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/rubric_admin_criteria
+
+    The editable criterion cards on the practice-rubric admin page. Rendered
+    from JavaScript by amd/src/rubric_admin.js on every reorder, add or delete,
+    replacing the hand-built DOM the old inline script assembled element by
+    element.
+
+    The whole list renders in one pass rather than one template call per card,
+    so the cards can never land out of order when several renders overlap.
+    Every value here is admin-authored rubric text and is escaped.
+
+    The strings arrive pre-resolved on each card as str.*; the page resolves
+    them in PHP and hands them to the module in the root element's data-config.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Tom Caswell & David Ta / Saylor University
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "criteria": [
+            {
+                "idx": 0,
+                "number": 1,
+                "name": "Fluency and pace",
+                "description": "Speaking in connected phrases without long pauses.",
+                "maxscore": 5,
+                "hasobjectives": true,
+                "objectives": [
+                    {"id": 7, "label": "LO1 Deliver a short talk", "selected": false}
+                ],
+                "str": {
+                    "criterion": "Criterion",
+                    "moveup": "Move up",
+                    "movedown": "Move down",
+                    "deletecriterion": "Delete criterion",
+                    "name": "Criterion name",
+                    "nameplaceholder": "e.g. Grammar and accuracy",
+                    "maxscore": "Max score",
+                    "maxscorearia": "Maximum score for this criterion",
+                    "description": "Description",
+                    "descriptionaria": "Criterion description",
+                    "descplaceholder": "Describe what this criterion measures.",
+                    "mapsoutcome": "Maps to outcome (optional)",
+                    "outcomearia": "Course outcome this criterion maps to",
+                    "outcomenone": "- None -"
+                }
+            }
+        ]
+    }
+}}
+{{#criteria}}
+<div class="aica-rb-card" draggable="true" data-idx="{{idx}}">
+    <div class="aica-rb-header">
+        <div class="aica-rb-num">{{number}}</div>
+        <span class="aica-rb-type">{{str.criterion}}</span>
+        <div class="aica-rb-actions">
+            <button type="button" class="aica-rb-up" title="{{str.moveup}}">&#8593;</button>
+            <button type="button" class="aica-rb-down" title="{{str.movedown}}">&#8595;</button>
+            <button type="button" class="aica-rb-delete" title="{{str.deletecriterion}}">&#10005;</button>
+        </div>
+    </div>
+
+    <div class="aica-rb-inline-fields">
+        <div class="aica-rb-field">
+            <label>{{str.name}}</label>
+            <input type="text" class="aica-rb-name-input" aria-label="{{str.name}}"
+                   value="{{name}}" placeholder="{{str.nameplaceholder}}">
+        </div>
+        <div class="aica-rb-field aica-rb-score-field">
+            <label>{{str.maxscore}}</label>
+            <input type="number" class="aica-rb-score-input" aria-label="{{str.maxscorearia}}"
+                   value="{{maxscore}}" min="1" max="100">
+        </div>
+    </div>
+
+    <div class="aica-rb-field">
+        <label>{{str.description}}</label>
+        <textarea class="aica-rb-desc-input" aria-label="{{str.descriptionaria}}" rows="2"
+                  placeholder="{{str.descplaceholder}}">
+{{description}}</textarea>
+    </div>
+
+    {{#hasobjectives}}
+    <div class="aica-rb-field">
+        <label>{{str.mapsoutcome}}</label>
+        <select class="aica-rb-objective-select" aria-label="{{str.outcomearia}}">
+            <option value="0">{{str.outcomenone}}</option>
+            {{#objectives}}
+            <option value="{{id}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+            {{/objectives}}
+        </select>
+    </div>
+    {{/hasobjectives}}
+</div>
+{{/criteria}}

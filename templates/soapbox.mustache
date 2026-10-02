@@ -1,0 +1,178 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/soapbox
+
+    Learner-facing Soapbox speech-practice page: the speech details form, the
+    record button with its timer, the empty live-result container, and the
+    learner's own score history. Replaces the HTML that soapbox.php used to
+    echo (CONTRIB-10574 #273) and the inline <script> it used to print
+    (CONTRIB-10574 #278); the behaviour now lives in amd/src/soapbox.js and the
+    inline style attributes in styles.css.
+
+    Nothing about the page changed. This is a rendering move only: Soapbox is
+    deprecated in 7.5.2 and goes away in 8.0, so the markup, the field ids the
+    module binds to and the wording are all exactly what they were.
+
+    The module's own data (course id, transcription endpoint, sesskey and the
+    strings it sets imperatively) rides on the root element's data-config
+    attribute as JSON rather than as js_call_amd arguments, which carry a
+    1,024-character advisory limit that issue #277 showed a payload this shape
+    can exceed. data-stt-mode stays the single carrier of the speech-to-text
+    mode, as it was before the move.
+
+    Every value below is model-free, learner-supplied or admin-supplied text
+    and is rendered through an escaped double-brace variable. There is no
+    triple-brace output in this template.
+
+    Context variables required for this template:
+    * sttmode - 'server' (Whisper) or 'browser' (Web Speech API)
+    * configjson - JSON config for amd/src/soapbox.js
+    * targetoptions - list of {value, label, selected} target-time options
+    * modeoptions - list of {value, label} speech-mode options
+    * history - list of past attempts, each with: name, hastopic, topic, badge,
+      when, duration, criteria (list of {name, assessed, score, feedback}),
+      hasfeedback, feedback
+
+    Example context (json):
+    {
+        "sttmode": "server",
+        "configjson": "{}",
+        "targetoptions": [
+            {"value": 0, "label": "No target", "selected": false},
+            {"value": 180, "label": "3 minutes", "selected": true}
+        ],
+        "modeoptions": [
+            {"value": "informative", "label": "Informative"},
+            {"value": "persuasive", "label": "Persuasive"}
+        ],
+        "history": [
+            {
+                "name": "Why libraries matter",
+                "hastopic": true,
+                "topic": "Public goods",
+                "badge": "Overall 82",
+                "when": "2 Oct 2026, 09:14",
+                "duration": "3:07",
+                "criteria": [
+                    {"name": "Structure", "assessed": true, "score": 4, "feedback": "Clear signposting."},
+                    {"name": "Delivery", "assessed": false, "score": 0, "feedback": "No audio evidence."}
+                ],
+                "hasfeedback": true,
+                "feedback": "A confident take that needs a stronger close."
+            }
+        ]
+    }
+}}
+<div class="aica-soapbox sola-soapbox" data-stt-mode="{{sttmode}}" data-config="{{configjson}}">
+    <h2>&#128227; {{#str}}soapbox:title, local_ai_course_assistant{{/str}}</h2>
+    <p class="text-muted">{{#str}}soapbox:intro, local_ai_course_assistant{{/str}}</p>
+
+    <div class="card mb-3"><div class="card-body">
+        <div class="form-group">
+            <label for="sb-name">
+                <strong>{{#str}}soapbox:name_label, local_ai_course_assistant{{/str}}</strong>
+                <span class="text-muted">({{#str}}soapbox:optional, local_ai_course_assistant{{/str}})</span>
+            </label>
+            <input type="text" id="sb-name" class="form-control" maxlength="120">
+        </div>
+        <div class="form-group mt-2">
+            <label for="sb-topic">
+                <strong>{{#str}}soapbox:topic_label, local_ai_course_assistant{{/str}}</strong>
+                <span class="text-muted">({{#str}}soapbox:optional, local_ai_course_assistant{{/str}})</span>
+            </label>
+            <input type="text" id="sb-topic" class="form-control" maxlength="200">
+        </div>
+        <div class="form-group mt-2">
+            <label for="sb-target">
+                <strong>{{#str}}soapbox:time_label, local_ai_course_assistant{{/str}}</strong>
+            </label>
+            <select id="sb-target" class="form-control sola-soapbox-select">
+                {{#targetoptions}}
+                <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                {{/targetoptions}}
+            </select>
+        </div>
+        <div class="form-group mt-2">
+            <label for="sb-mode">
+                <strong>{{#str}}soapbox:mode_label, local_ai_course_assistant{{/str}}</strong>
+            </label>
+            <select id="sb-mode" class="form-control sola-soapbox-select-wide">
+                {{#modeoptions}}
+                <option value="{{value}}">{{label}}</option>
+                {{/modeoptions}}
+            </select>
+        </div>
+
+        <div class="mt-3 d-flex align-items-center sola-soapbox-controls">
+            <button type="button" id="sb-record" class="btn btn-primary">
+                &#9679; {{#str}}soapbox:record, local_ai_course_assistant{{/str}}
+            </button>
+            <span id="sb-timer" class="sola-soapbox-timer">00:00</span>
+            <span id="sb-status" class="text-muted"></span>
+        </div>
+        <p class="text-muted small mt-2" id="sb-mode-note"></p>
+    </div></div>
+
+    <div id="sb-result" class="mb-4 sola-soapbox-hidden"></div>
+
+    <h3>{{#str}}soapbox:history_heading, local_ai_course_assistant{{/str}}</h3>
+    <div id="sb-history">
+        {{^history}}
+        <p class="text-muted" id="sb-history-empty">
+            {{#str}}soapbox:history_empty, local_ai_course_assistant{{/str}}
+        </p>
+        {{/history}}
+        {{#history}}
+        <details class="card mb-2">
+            <summary class="card-header sola-soapbox-summary">
+                <strong>{{name}}</strong>
+                {{#hastopic}}<span class="text-muted"> &mdash; {{topic}}</span>{{/hastopic}}
+                <span class="badge badge-info ml-2">{{badge}}</span>
+                <span class="text-muted ml-2 small">{{when}} &middot; {{duration}}</span>
+            </summary>
+            <div class="card-body">
+                <table class="generaltable sola-soapbox-table"><tbody>
+                    {{#criteria}}
+                    {{! A criterion the model was never given evidence for is marked, not
+                        printed as a bare 0. This is the STORED-score renderer; the live
+                        table in soapbox_result.mustache consumes the same `assessed` flag
+                        from the scoring response and must stay in step with it.
+
+                        The explanation goes in a visually-hidden sibling, not a title. The
+                        badge span has its own text, so it takes its accessible name from
+                        that text and a title is never announced: the reason a criterion was
+                        dropped was mouse-only, in a self-paced course with nobody to ask.
+                        accesshide is Moodle core's class, used the same way in
+                        outcomes_report.mustache. aria-label would REPLACE the visible
+                        "Not assessed" rather than add to it. }}
+                    <tr class="{{^assessed}}text-muted{{/assessed}}">
+                        <td class="sola-soapbox-col-criterion">{{name}}</td>
+                        <td class="sola-soapbox-col-score">
+                            {{#assessed}}{{score}}{{/assessed}}
+                            {{^assessed}}<span class="badge badge-secondary">{{#str}}soapbox:not_assessed, local_ai_course_assistant{{/str}}</span><span class="accesshide"> {{#str}}soapbox:not_assessed_aria, local_ai_course_assistant{{/str}}</span>{{/assessed}}
+                        </td>
+                        <td>{{feedback}}</td>
+                    </tr>
+                    {{/criteria}}
+                </tbody></table>
+                {{#hasfeedback}}<p>{{feedback}}</p>{{/hasfeedback}}
+            </div>
+        </details>
+        {{/history}}
+    </div>
+</div>

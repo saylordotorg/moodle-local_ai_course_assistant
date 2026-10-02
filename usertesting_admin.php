@@ -157,9 +157,9 @@ $courses = $DB->get_records_sql(
     "SELECT c.id, c.fullname, c.shortname FROM {course} c WHERE c.id > 1 AND c.visible = 1 ORDER BY c.fullname ASC"
 );
 
-// Labels for the task-card editor the browser builds below. Same shape as the
-// rubric editor: one bundle handed to the inline script as JSON. The
-// multiple-choice type label is shared with the survey editor rather than
+// Labels for the task cards the browser builds. Same shape as the rubric
+// editor: one bundle handed to amd/src/usertesting_admin.js as JSON, below.
+// The multiple-choice type label is shared with the survey editor rather than
 // duplicated, since it is the same word for the same concept.
 $jsstrings = [
     'typeactionrate'      => get_string('usertesting_admin:type_action_then_rate', 'local_ai_course_assistant'),
@@ -208,341 +208,79 @@ $jsstrings = [
     'previewclose'         => get_string('rubric_admin:preview_close', 'local_ai_course_assistant'),
 ];
 
+// ---------------------------------------------------------------------
+// Rendering (CONTRIB-10574 #273 and #278)
+//
+// The page markup is templates/usertesting_admin.mustache and the editor
+// behaviour is amd/src/usertesting_admin.js, which renders its task cards and
+// its preview dialog from templates/usertesting_admin_tasks.mustache and
+// templates/usertesting_admin_preview.mustache. Nothing about the page
+// changed: the scope picker, the inherited badge and the two posted forms work
+// exactly as they did when this file echoed them.
+//
+// The editor's data travels in the root element's data-config attribute rather
+// than as js_call_amd arguments. The default task set plus the 35 translated
+// strings is 4,955 characters, well past the 1,024-character advisory limit
+// those arguments carry, and the payload grows with every task an admin adds.
+// That is the complaint issue #277 raised about the starter admin page, where
+// the same payload shape printed a warning on every page load.
+// ---------------------------------------------------------------------
+
+$courseoptions = [];
+foreach ($courses as $c) {
+    $courseoptions[] = [
+        'id' => (int) $c->id,
+        // Escaped by the template, as htmlspecialchars() did when this was echoed.
+        'label' => $c->fullname . ' (' . $c->shortname . ')',
+        'selected' => (int) $c->id === $courseid,
+    ];
+}
+
+$templatedata = [
+    'configjson' => json_encode([
+        // array_values so a task list that ever arrives with gappy keys still
+        // encodes as a JSON array; the editor iterates it as one.
+        'tasks' => array_values($tasks),
+        'strings' => $jsstrings,
+    ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT),
+    'settingsurl' => (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(false),
+    'settingslabel' => get_string('courses_admin:plugin_settings', 'local_ai_course_assistant'),
+    'analyticsurl' => (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(false),
+    'analyticslabel' => get_string('rubric_admin:analytics_link', 'local_ai_course_assistant'),
+    'scopeformaction' => $PAGE->url->out_omit_querystring(),
+    'scopelabel' => get_string('usertesting_admin:scope_label', 'local_ai_course_assistant'),
+    'scopeglobal' => get_string('rubric_admin:scope_global', 'local_ai_course_assistant'),
+    'globalselected' => $courseid === 0,
+    'courses' => $courseoptions,
+    'isinherited' => (bool) $is_inherited,
+    'inheritednotice' => get_string('usertesting_admin:inherited_notice', 'local_ai_course_assistant'),
+    'formaction' => $PAGE->url->out(false),
+    'sesskey' => sesskey(),
+    'titlelabel' => get_string('usertesting_admin:taskset_title', 'local_ai_course_assistant'),
+    'title' => $title,
+    'titleplaceholder' => \local_ai_course_assistant\branding::str('usertesting_admin:taskset_title_placeholder'),
+    'exturllabel' => get_string('usertesting_admin:external_url', 'local_ai_course_assistant'),
+    'exturl' => $externalurl,
+    // The example URL stays a literal here rather than in the template: it
+    // contains {{userid}} and {{courseid}}, which Mustache would resolve away
+    // to nothing. It is the same literal this page printed before.
+    'exturlplaceholder' => 'e.g. https://forms.google.com/d/e/xxx/viewform'
+        . '?entry.1={{userid}}&entry.2={{courseid}}',
+    // Raw in the template: this lang string documents the supported
+    // placeholders inside <code> tags and was echoed unescaped before.
+    'externalurlhelp' => get_string('usertesting_admin:external_url_help', 'local_ai_course_assistant'),
+    'tasksheading' => get_string('usertesting_admin:tasks_heading', 'local_ai_course_assistant'),
+    'addtask' => get_string('usertesting_admin:add_task', 'local_ai_course_assistant'),
+    'savelabel' => get_string('usertesting_admin:save', 'local_ai_course_assistant'),
+    'previewlabel' => get_string('rubric_admin:preview', 'local_ai_course_assistant'),
+    'hasreset' => ($courseid > 0 && !$is_inherited) || $courseid === 0,
+    'resetlabel' => $courseid > 0
+        ? get_string('rubric_admin:remove_override', 'local_ai_course_assistant')
+        : get_string('rubric_admin:reset_defaults', 'local_ai_course_assistant'),
+];
+
+$PAGE->requires->js_call_amd('local_ai_course_assistant/usertesting_admin', 'init');
+
 echo $OUTPUT->header();
-?>
-
-
-<div class="aica-ut-admin">
-
-    <div class="mb-3 d-flex flex-wrap" style="gap:8px">
-        <a href="<?php echo (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(); ?>"
-           class="btn btn-sm btn-outline-secondary">&larr; <?php echo get_string('courses_admin:plugin_settings', 'local_ai_course_assistant'); ?></a>
-        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(); ?>"
-           class="btn btn-sm btn-outline-secondary"><?php echo get_string('rubric_admin:analytics_link', 'local_ai_course_assistant'); ?></a>
-    </div>
-
-    <!-- Scope selector -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" action="<?php echo $PAGE->url->out_omit_querystring(); ?>" class="form-inline" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                <label for="aica-ut-scope" style="font-weight:600;white-space:nowrap"><?php echo get_string('usertesting_admin:scope_label', 'local_ai_course_assistant'); ?></label>
-                <select id="aica-ut-scope" name="courseid" class="form-control form-control-sm" style="max-width:350px"
-                        onchange="this.form.submit()">
-                    <option value="0" <?php echo $courseid === 0 ? 'selected' : ''; ?>><?php echo get_string('rubric_admin:scope_global', 'local_ai_course_assistant'); ?></option>
-                    <?php foreach ($courses as $c) : ?>
-                    <option value="<?php echo $c->id; ?>" <?php echo (int) $c->id === $courseid ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($c->fullname); ?> (<?php echo htmlspecialchars($c->shortname); ?>)
-                    </option>
-                    <?php endforeach; ?>
-                </select>
-            </form>
-        </div>
-    </div>
-
-    <?php if ($is_inherited) : ?>
-    <div class="aica-ut-inherited-badge">
-        <?php echo get_string('usertesting_admin:inherited_notice', 'local_ai_course_assistant'); ?>
-    </div>
-    <?php endif; ?>
-
-    <form method="post" action="<?php echo $PAGE->url->out(false); ?>" id="aica-ut-form">
-        <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
-        <input type="hidden" name="action" value="save">
-        <input type="hidden" name="tasks_json" id="aica-tasks-json" value="">
-
-        <div class="aica-ut-field mb-3">
-            <label for="aica-ut-title"><?php echo get_string('usertesting_admin:taskset_title', 'local_ai_course_assistant'); ?></label>
-            <input type="text" id="aica-ut-title" name="taskset_title"
-                   value="<?php echo htmlspecialchars($title); ?>"
-                   placeholder="<?php echo htmlspecialchars(
-                       \local_ai_course_assistant\branding::str('usertesting_admin:taskset_title_placeholder')
-                   ); ?>">
-        </div>
-
-        <div class="aica-ut-field mb-3">
-            <label for="aica-ut-exturl"><?php echo get_string('usertesting_admin:external_url', 'local_ai_course_assistant'); ?></label>
-            <input type="url" id="aica-ut-exturl" name="external_url"
-                   value="<?php echo htmlspecialchars($externalurl); ?>"
-                   placeholder="e.g. https://forms.google.com/d/e/xxx/viewform?entry.1={{userid}}&entry.2={{courseid}}">
-            <small style="color:#94a3b8;font-size:11px">
-                <?php echo get_string('usertesting_admin:external_url_help', 'local_ai_course_assistant'); ?>
-            </small>
-        </div>
-
-        <h5 style="margin-bottom:12px;color:#334155"><?php echo get_string('usertesting_admin:tasks_heading', 'local_ai_course_assistant'); ?></h5>
-        <div id="aica-tasks-container"></div>
-        <div class="aica-ut-add-task" id="aica-add-task-btn"><?php echo get_string('usertesting_admin:add_task', 'local_ai_course_assistant'); ?></div>
-
-        <div class="d-flex flex-wrap" style="gap:8px;margin-top:16px">
-            <button type="submit" class="btn btn-primary"><?php echo get_string('usertesting_admin:save', 'local_ai_course_assistant'); ?></button>
-            <button type="button" class="btn btn-outline-secondary" id="aica-ut-preview-btn"><?php echo get_string('rubric_admin:preview', 'local_ai_course_assistant'); ?></button>
-            <?php if ($courseid > 0 && !$is_inherited) : ?>
-            <button type="button" class="btn btn-outline-danger" id="aica-ut-reset-btn"><?php echo get_string('rubric_admin:remove_override', 'local_ai_course_assistant'); ?></button>
-            <?php elseif ($courseid === 0): ?>
-            <button type="button" class="btn btn-outline-danger" id="aica-ut-reset-btn"><?php echo get_string('rubric_admin:reset_defaults', 'local_ai_course_assistant'); ?></button>
-            <?php endif; ?>
-        </div>
-    </form>
-
-    <form method="post" action="<?php echo $PAGE->url->out(false); ?>" id="aica-ut-reset-form" style="display:none">
-        <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
-        <input type="hidden" name="action" value="reset">
-    </form>
-</div>
-
-<script>
-(function() {
-    var tasks = <?php echo json_encode($tasks); ?>;
-    var STR = <?php echo json_encode($jsstrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-
-    // One lookup for the task-type label, used by both the card badge and the
-    // preview, so the two never disagree about what a stored type is called.
-    function taskTypeLabel(type) {
-        if (type === 'action_then_rate') { return STR.typeactionrate; }
-        if (type === 'multiple_choice') { return STR.typemultiplechoice; }
-        return STR.typefreeresponse;
-    }
-    var container = document.getElementById('aica-tasks-container');
-    var addBtn = document.getElementById('aica-add-task-btn');
-    var resetBtn = document.getElementById('aica-ut-reset-btn');
-
-    function renderAll() {
-        container.innerHTML = '';
-        tasks.forEach(function(t, idx) { container.appendChild(buildCard(t, idx)); });
-        updateNumbers();
-    }
-
-    function updateNumbers() {
-        var cards = container.querySelectorAll('.aica-ut-card');
-        cards.forEach(function(card, i) {
-            var num = card.querySelector('.aica-ut-num');
-            if (num) num.textContent = (i + 1);
-        });
-    }
-
-    function buildCard(t, idx) {
-        var card = document.createElement('div');
-        card.className = 'aica-ut-card';
-        card.draggable = true;
-        card.dataset.idx = idx;
-
-        card.addEventListener('dragstart', function(e) { card.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', idx); });
-        card.addEventListener('dragend', function() { card.classList.remove('dragging'); });
-        card.addEventListener('dragover', function(e) { e.preventDefault(); });
-        card.addEventListener('drop', function(e) {
-            e.preventDefault();
-            var from = parseInt(e.dataTransfer.getData('text/plain'), 10);
-            var to = parseInt(card.dataset.idx, 10);
-            if (from !== to) { var moved = tasks.splice(from, 1)[0]; tasks.splice(to, 0, moved); renderAll(); }
-        });
-
-        // Header.
-        var header = document.createElement('div');
-        header.className = 'aica-ut-header';
-        var num = document.createElement('div');
-        num.className = 'aica-ut-num';
-        num.textContent = (idx + 1);
-        header.appendChild(num);
-        var typeLabel = document.createElement('span');
-        typeLabel.className = 'aica-ut-type';
-        typeLabel.textContent = taskTypeLabel(t.type);
-        header.appendChild(typeLabel);
-
-        var actions = document.createElement('div');
-        actions.className = 'aica-ut-actions';
-        var upBtn = document.createElement('button'); upBtn.type = 'button'; upBtn.innerHTML = '&#8593;'; upBtn.title = STR.moveup;
-        upBtn.addEventListener('click', function() { if (idx > 0) { var tmp = tasks[idx]; tasks[idx] = tasks[idx-1]; tasks[idx-1] = tmp; renderAll(); } });
-        actions.appendChild(upBtn);
-        var downBtn = document.createElement('button'); downBtn.type = 'button'; downBtn.innerHTML = '&#8595;'; downBtn.title = STR.movedown;
-        downBtn.addEventListener('click', function() { if (idx < tasks.length-1) { var tmp = tasks[idx]; tasks[idx] = tasks[idx+1]; tasks[idx+1] = tmp; renderAll(); } });
-        actions.appendChild(downBtn);
-        var delBtn = document.createElement('button'); delBtn.type = 'button'; delBtn.className = 'aica-ut-delete';
-        delBtn.innerHTML = '&#10005;'; delBtn.title = STR.deletetask;
-        delBtn.addEventListener('click', function() { if (confirm(STR.confirmdelete)) { tasks.splice(idx, 1); renderAll(); } });
-        actions.appendChild(delBtn);
-        header.appendChild(actions);
-        card.appendChild(header);
-
-        // Type selector.
-        var typeField = document.createElement('div'); typeField.className = 'aica-ut-field';
-        var typeLbl = document.createElement('label'); typeLbl.textContent = STR.tasktype; typeField.appendChild(typeLbl);
-        var typeSelect = document.createElement('select'); typeSelect.setAttribute('aria-label', STR.tasktype);
-        [['action_then_rate', STR.typeactionrate], ['free_response', STR.typefreeresponse], ['multiple_choice', STR.typemultiplechoice]].forEach(function(opt) {
-            var o = document.createElement('option'); o.value = opt[0]; o.textContent = opt[1];
-            if (t.type === opt[0]) o.selected = true;
-            typeSelect.appendChild(o);
-        });
-        typeSelect.addEventListener('change', function() {
-            t.type = typeSelect.value;
-            if (t.type === 'action_then_rate') { t.rating_label = t.rating_label || STR.ratinglabeldefault; t.min = t.min || 1; t.max = t.max || 5; }
-            if (t.type === 'multiple_choice' && !t.options) { t.options = [STR.optionn.replace('{n}', 1), STR.optionn.replace('{n}', 2)]; }
-            renderAll();
-        });
-        typeField.appendChild(typeSelect);
-        card.appendChild(typeField);
-
-        // Instruction text.
-        var instrField = document.createElement('div'); instrField.className = 'aica-ut-field';
-        var instrLbl = document.createElement('label'); instrLbl.textContent = STR.instruction; instrField.appendChild(instrLbl);
-        var instrInput = document.createElement('textarea'); instrInput.setAttribute('aria-label', STR.instruction); instrInput.value = t.instruction || ''; instrInput.rows = 2;
-        instrInput.addEventListener('input', function() { t.instruction = instrInput.value; });
-        instrField.appendChild(instrInput);
-        card.appendChild(instrField);
-
-        // Type-specific fields.
-        if (t.type === 'action_then_rate') {
-            // Rating label.
-            var rlField = document.createElement('div'); rlField.className = 'aica-ut-field';
-            var rlLbl = document.createElement('label'); rlLbl.textContent = STR.ratinglabel; rlField.appendChild(rlLbl);
-            var rlInp = document.createElement('input'); rlInp.type = 'text'; rlInp.setAttribute('aria-label', STR.ratinglabel); rlInp.value = t.rating_label || '';
-            rlInp.addEventListener('input', function() { t.rating_label = rlInp.value; });
-            rlField.appendChild(rlInp);
-            card.appendChild(rlField);
-
-            // Rating config.
-            var ratingFields = document.createElement('div'); ratingFields.className = 'aica-ut-rating-fields';
-            [[STR.minvalue, 'min', 1, STR.minvaluearia], [STR.maxvalue, 'max', 5, STR.maxvaluearia]].forEach(function(cfg) {
-                var f = document.createElement('div'); f.className = 'aica-ut-field';
-                var l = document.createElement('label'); l.textContent = cfg[0]; f.appendChild(l);
-                var inp = document.createElement('input'); inp.type = 'number'; inp.setAttribute('aria-label', cfg[3]); inp.value = t[cfg[1]] || cfg[2]; inp.min = 0; inp.max = 10;
-                inp.addEventListener('input', function() { t[cfg[1]] = parseInt(inp.value, 10) || cfg[2]; });
-                f.appendChild(inp); ratingFields.appendChild(f);
-            });
-            [[STR.minlabel, 'min_label', STR.minlabelplaceholder], [STR.maxlabel, 'max_label', STR.maxlabelplaceholder]].forEach(function(cfg) {
-                var f = document.createElement('div'); f.className = 'aica-ut-field';
-                var l = document.createElement('label'); l.textContent = cfg[0]; f.appendChild(l);
-                var inp = document.createElement('input'); inp.type = 'text'; inp.setAttribute('aria-label', cfg[0]); inp.value = t[cfg[1]] || ''; inp.placeholder = cfg[2];
-                inp.addEventListener('input', function() { t[cfg[1]] = inp.value; });
-                f.appendChild(inp); ratingFields.appendChild(f);
-            });
-            card.appendChild(ratingFields);
-
-            // Follow-up.
-            var fuField = document.createElement('div'); fuField.className = 'aica-ut-field';
-            var fuLbl = document.createElement('label'); fuLbl.textContent = STR.followup; fuField.appendChild(fuLbl);
-            var fuInp = document.createElement('input'); fuInp.type = 'text'; fuInp.setAttribute('aria-label', STR.followuparia); fuInp.value = t.follow_up || '';
-            fuInp.addEventListener('input', function() { t.follow_up = fuInp.value; });
-            fuField.appendChild(fuInp);
-            card.appendChild(fuField);
-        }
-
-        if (t.type === 'multiple_choice') {
-            var optLabel = document.createElement('label');
-            optLabel.textContent = STR.options;
-            optLabel.style.cssText = 'font-size:12px;font-weight:600;color:#64748b;margin-bottom:4px;display:block';
-            card.appendChild(optLabel);
-            var optList = document.createElement('div');
-            (t.options || []).forEach(function(opt, oi) {
-                var row = document.createElement('div'); row.className = 'aica-ut-opt-row';
-                var inp = document.createElement('input'); inp.type = 'text'; inp.setAttribute('aria-label', STR.optionn.replace('{n}', oi + 1)); inp.value = opt;
-                inp.addEventListener('input', function() { t.options[oi] = inp.value; });
-                row.appendChild(inp);
-                var rmBtn = document.createElement('button'); rmBtn.type = 'button'; rmBtn.innerHTML = '&times;';
-                rmBtn.addEventListener('click', function() { t.options.splice(oi, 1); renderAll(); });
-                row.appendChild(rmBtn);
-                optList.appendChild(row);
-            });
-            card.appendChild(optList);
-            var addOpt = document.createElement('div'); addOpt.className = 'aica-ut-add-opt';
-            addOpt.textContent = STR.addoption;
-            addOpt.addEventListener('click', function() { if (!t.options) t.options = []; t.options.push(STR.newoption); renderAll(); });
-            card.appendChild(addOpt);
-        }
-
-        if (t.type === 'free_response') {
-            var fuField2 = document.createElement('div'); fuField2.className = 'aica-ut-field';
-            var fuLbl2 = document.createElement('label'); fuLbl2.textContent = STR.addprompt; fuField2.appendChild(fuLbl2);
-            var fuInp2 = document.createElement('input'); fuInp2.type = 'text'; fuInp2.setAttribute('aria-label', STR.addpromptaria); fuInp2.value = t.follow_up || '';
-            fuInp2.addEventListener('input', function() { t.follow_up = fuInp2.value; });
-            fuField2.appendChild(fuInp2);
-            card.appendChild(fuField2);
-        }
-
-        return card;
-    }
-
-    addBtn.addEventListener('click', function() {
-        tasks.push({type: 'action_then_rate', instruction: '', rating_label: STR.ratinglabeldefault, min: 1, max: 5, min_label: '', max_label: '', follow_up: ''});
-        renderAll();
-        var cards = container.querySelectorAll('.aica-ut-card');
-        if (cards.length) cards[cards.length-1].scrollIntoView({behavior:'smooth',block:'center'});
-    });
-
-    document.getElementById('aica-ut-form').addEventListener('submit', function() {
-        document.getElementById('aica-tasks-json').value = JSON.stringify(tasks);
-    });
-
-    if (resetBtn) {
-        resetBtn.addEventListener('click', function() {
-            if (confirm(STR.confirmreset)) { document.getElementById('aica-ut-reset-form').submit(); }
-        });
-    }
-
-    // Preview button.
-    var previewBtn = document.getElementById('aica-ut-preview-btn');
-    if (previewBtn) {
-        previewBtn.addEventListener('click', function() {
-            var overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center';
-            overlay.addEventListener('click', function(e) { if (e.target === overlay) document.body.removeChild(overlay); });
-            var panel = document.createElement('div');
-            panel.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.2)';
-            var h = document.createElement('h4');
-            h.textContent = document.getElementById('aica-ut-title').value || STR.previewtitle;
-            h.style.marginBottom = '16px';
-            panel.appendChild(h);
-
-            tasks.forEach(function(t, idx) {
-                var tDiv = document.createElement('div');
-                tDiv.style.cssText = 'margin-bottom:16px;padding:14px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc';
-                var tNum = document.createElement('div');
-                tNum.style.cssText = 'font-size:11px;font-weight:700;color:#0369a1;text-transform:uppercase;margin-bottom:6px';
-                tNum.textContent = STR.previewtasklabel.replace('{n}', idx + 1).replace('{t}', taskTypeLabel(t.type));
-                tDiv.appendChild(tNum);
-                var tText = document.createElement('div');
-                tText.style.cssText = 'font-size:14px;color:#1e293b;margin-bottom:8px';
-                tText.textContent = t.instruction || STR.previewnoinstruction;
-                tDiv.appendChild(tText);
-
-                if (t.type === 'action_then_rate') {
-                    var rl = document.createElement('div');
-                    rl.style.cssText = 'font-size:12px;color:#64748b;font-style:italic';
-                    rl.textContent = STR.previewraterange
-                        .replace('{l}', t.rating_label || STR.previewratefallback)
-                        .replace('{min}', (t.min||1))
-                        .replace('{max}', (t.max||5));
-                    tDiv.appendChild(rl);
-                    if (t.follow_up) {
-                        var fu = document.createElement('div');
-                        fu.style.cssText = 'font-size:12px;color:#94a3b8;margin-top:4px';
-                        fu.textContent = STR.previewfollowup.replace('{t}', t.follow_up);
-                        tDiv.appendChild(fu);
-                    }
-                }
-                if (t.type === 'multiple_choice') {
-                    (t.options || []).forEach(function(opt) {
-                        var row = document.createElement('div');
-                        row.style.cssText = 'font-size:13px;padding:4px 10px;margin-top:4px;background:#fff;border-radius:6px;border:1px solid #e2e8f0';
-                        row.textContent = opt;
-                        tDiv.appendChild(row);
-                    });
-                }
-                panel.appendChild(tDiv);
-            });
-
-            var closeBtn = document.createElement('button');
-            closeBtn.textContent = STR.previewclose;
-            closeBtn.className = 'btn btn-sm btn-outline-secondary';
-            closeBtn.addEventListener('click', function() { document.body.removeChild(overlay); });
-            panel.appendChild(closeBtn);
-            overlay.appendChild(panel);
-            document.body.appendChild(overlay);
-        });
-    }
-
-    renderAll();
-})();
-</script>
-
-<?php
+echo $OUTPUT->render_from_template('local_ai_course_assistant/usertesting_admin', $templatedata);
 echo $OUTPUT->footer();

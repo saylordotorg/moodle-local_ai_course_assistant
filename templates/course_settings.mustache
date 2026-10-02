@@ -1,0 +1,695 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/course_settings
+
+    Per-course settings page: the link bar, the one big POST form and every card
+    inside it (SOLA on/off, provider override, RAG plus the pedagogy toggles,
+    supplemental courses, English lock, Voice Tab, Auto-open, starters, per-quiz
+    assistance level and the token-usage link).
+
+    Field names are load-bearing. Each input here posts under the same name the
+    handler at the top of course_settings.php reads, so renaming one silently
+    drops that setting on save.
+
+    Strings are resolved in course_settings.php; there are no str helpers here.
+    Every value is escaped except the three noted inline, which carry markup the
+    page builds itself.
+
+    The RAG card holds the pedagogy toggles, so they appear only when RAG is
+    enabled site-wide. That is how the page behaved before this template and is
+    deliberately preserved here.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Tom Caswell & David Ta / Saylor University
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "configjson": "{}",
+        "formaction": "/local/ai_course_assistant/course_settings.php?courseid=2",
+        "cancelurl": "/course/view.php?id=2",
+        "sesskey": "abc123",
+        "savelabel": "Save changes",
+        "cancellabel": "Cancel",
+        "navlinks": [
+            {"url": "/course/view.php?id=2", "label": "Back to course", "back": true}
+        ],
+        "howitworks": "How course settings work:",
+        "howitworksdesc": "Settings configured here override the global defaults for this course only.",
+        "solaenabledtitle": "Assistant enabled for this course",
+        "solaenableddesc": "Controls whether the assistant chat widget appears on this course.",
+        "solaenabledtoggle": "Show the assistant on this course",
+        "solacourseenabled": true,
+        "title": "Course AI settings",
+        "enableddesc": "When enabled, the settings below override the global AI provider configuration.",
+        "enabledlabel": "Override enabled",
+        "enabled": false,
+        "usingglobal": "Using global setting",
+        "globalsettingsurl": "/admin/category.php?category=local_ai_course_assistant",
+        "globalsettingslabel": "Global plugin settings",
+        "providerlabel": "AI provider",
+        "providerselect": {
+            "hasid": true, "id": "provider", "name": "provider", "selectclass": "form-control",
+            "options": [{"value": "", "label": "Using global setting (claude)", "selected": true}]
+        },
+        "spendcaplabel": "Monthly spend cap (USD)",
+        "spendcapvalue": "",
+        "spendcapdesc": "Leave blank to use the site-wide default per-course cap.",
+        "apikeylabel": "API key",
+        "apikeyplaceholder": "Using global setting",
+        "haskey": false,
+        "apikeyclearlabel": "Clear the stored key for this course",
+        "apikeydesc": "API key for the selected provider.",
+        "modellabel": "Model",
+        "modelvalue": "",
+        "modelplaceholder": "claude-sonnet-4-5-20250929",
+        "modeldesc": "The model to use.",
+        "apibaseurllabel": "API base URL",
+        "apibaseurlvalue": "",
+        "apibaseurlplaceholder": "",
+        "apibaseurldesc": "Base URL for the API.",
+        "temperaturelabel": "Temperature",
+        "temperaturevalue": "",
+        "temperatureplaceholder": "0.7",
+        "temperaturedesc": "Controls randomness.",
+        "systempromptlabel": "System prompt",
+        "systempromptvalue": "",
+        "systemprompthint": "Leave blank to use the global default.",
+        "resetprompttitle": "Load the global default prompt",
+        "resetpromptlabel": "Reset to global",
+        "showrag": true,
+        "ragtitle": "Course knowledge (RAG)",
+        "ragdesc": "Enable retrieval-augmented generation for this course.",
+        "ragenablelabel": "Search this course's content",
+        "ragcourseenabled": true,
+        "ragadminurl": "/local/ai_course_assistant/rag_admin.php",
+        "ragadminlabel": "RAG administration",
+        "objectivesurl": "/local/ai_course_assistant/objectives_admin.php?courseid=2",
+        "objectiveslabel": "Course outcomes",
+        "showdashboardlink": true,
+        "dashboardurl": "/local/ai_course_assistant/instructor_dashboard.php?courseid=2",
+        "dashboardlabel": "AI Tutor Dashboard",
+        "socratictitle": "Socratic mode",
+        "socratichelp": "Leads with guiding questions instead of direct answers.",
+        "socraticselect": {"hasid": true, "id": "aica-socratic-mode", "name": "socratic_mode",
+            "selectclass": "form-control form-control-sm sola-cs-select-pedagogy", "options": []},
+        "flashcardstitle": "Flashcards",
+        "flashcardshelp": "Adds a Generate-flashcards starter.",
+        "flashcardsselect": {"hasid": true, "id": "aica-flashcards-on", "name": "flashcards_on",
+            "selectclass": "form-control form-control-sm sola-cs-select-pedagogy", "options": []},
+        "showflashcardslink": false,
+        "flashcardsurl": "/local/ai_course_assistant/flashcards.php?courseid=2",
+        "flashcardslinklabel": "Flashcards",
+        "sandboxtitle": "Python sandbox",
+        "sandboxhelp": "Adds a learner-facing Python page.",
+        "sandboxselect": {"hasid": true, "id": "aica-sandbox-on", "name": "sandbox_on",
+            "selectclass": "form-control form-control-sm sola-cs-select-pedagogy", "options": []},
+        "sandboxavailable": false,
+        "sandboxurl": "/local/ai_course_assistant/sandbox.php?courseid=2",
+        "sandboxlinklabel": "Python sandbox",
+        "showsandboxwarning": false,
+        "sandboxnoruntime": "No Python runtime location is set site-wide.",
+        "essaytitle": "Essay feedback",
+        "essayhelp": "Learners get a dedicated page to paste a draft.",
+        "essayselect": {"hasid": true, "id": "aica-essay-on", "name": "essay_on",
+            "selectclass": "form-control form-control-sm sola-cs-select-pedagogy", "options": []},
+        "showessaylink": false,
+        "essayurl": "/local/ai_course_assistant/essay_feedback.php?courseid=2",
+        "essaylinklabel": "Essay feedback",
+        "soapboxtitle": "Soapbox",
+        "soapboxhelp": "Learners get a dedicated page to record a speech.",
+        "soapboxselect": {"hasid": true, "id": "aica-soapbox-on", "name": "soapbox_on",
+            "selectclass": "form-control form-control-sm sola-cs-select-pedagogy", "options": []},
+        "showsoapbox": false,
+        "soapboxlevellabel": "Course type",
+        "soapboxlevelselect": {"hasid": true, "id": "aica-soapbox-level", "name": "soapbox_level",
+            "selectclass": "form-control form-control-sm sola-cs-select-level", "options": []},
+        "soapboxlevelhelp": "Tailors the AI coaching.",
+        "soapboxurl": "/local/ai_course_assistant/soapbox.php?courseid=2",
+        "soapboxlinklabel": "Soapbox",
+        "soapboxrubricurl": "/local/ai_course_assistant/rubric_admin.php?courseid=2&type=speech",
+        "soapboxrubriclabel": "Edit speech rubric",
+        "wetitle": "Worked examples",
+        "wehelp": "Adds a worked-example starter.",
+        "weselect": {"hasid": true, "id": "aica-we-on", "name": "we_on",
+            "selectclass": "form-control form-control-sm sola-cs-select-pedagogy", "options": []},
+        "digesttitle": "Weekly digest",
+        "digesttoggle": "Email a weekly digest",
+        "digesthelp": "Mondays 09:00 server time.",
+        "digeston": false,
+        "extrestitle": "External resources",
+        "extresselect": {"hasid": true, "id": "aica-extres", "name": "external_resources",
+            "selectclass": "form-control form-control-sm sola-cs-select-extres", "options": []},
+        "extreshelp": "May include links to allowlisted open educational resources.",
+        "showsupplemental": false,
+        "supplementalheading": "Supplemental courses",
+        "supplementaldesc": "Let the assistant answer from another course as well as this one.",
+        "supplementallabel": "Course IDs",
+        "supplementalvalue": "",
+        "supplementalplaceholder": "",
+        "supplementalhelp": "Leave empty for none. No site-wide list is set.",
+        "englishlockheading": "English lock",
+        "englishlockdesc": "Force English responses for this course.",
+        "englishlocklabel": "English lock",
+        "englishlocktoggle": "Always respond in English",
+        "englishlockenabled": false,
+        "englishlockhelp": "The student's language preference will be overridden.",
+        "voicetabtitle": "Voice Tab",
+        "voicetabdesc": "Control the Voice Tab for this course. Currently <strong>enabled</strong>.",
+        "voicetabselect": {"hasid": true, "id": "voice_tab", "name": "voice_tab",
+            "selectclass": "form-control", "options": []},
+        "voicetabhelp": "Override the global Voice Tab setting for this course only.",
+        "autoopenheading": "Auto-open",
+        "autoopendesc": "Control whether the drawer opens automatically. Currently <strong>disabled</strong>.",
+        "autoopenlabel": "Auto-open",
+        "autoopenselect": {"hasid": true, "id": "auto_open", "name": "auto_open",
+            "selectclass": "form-control", "options": []},
+        "autoopenhelp": "Override the global Auto-open setting for this course only.",
+        "starterssection": "Conversation starters",
+        "startersdesc": "Enable or disable individual starters for this course.",
+        "starters": [
+            {"paramname": "starter_quiz", "name": "Practice quiz", "hasdescription": false,
+             "description": "", "enabled": true}
+        ],
+        "starteradminurl": "/local/ai_course_assistant/starter_settings.php",
+        "starteradminlabel": "Starter administration",
+        "showquizzes": false,
+        "quiztitle": "Per-quiz assistance level",
+        "quizdesc": "Choose how much help the assistant gives on each quiz.",
+        "quizcolquiz": "Quiz",
+        "quizcolgrade": "Grade",
+        "quizcollevel": "Level",
+        "quizcoleffective": "Effective",
+        "quizungraded": "Ungraded",
+        "quizrows": [],
+        "tokenusagetitle": "Token usage",
+        "tokenusagedesc": "View token usage and cost estimates for this course.",
+        "tokenusageurl": "/local/ai_course_assistant/token_analytics.php?courseid=2"
+    }
+}}
+<div class="aica-course-settings" data-config="{{configjson}}">
+
+    <div class="mb-3 d-flex flex-wrap sola-cs-linkbar">
+        {{#navlinks}}
+        <a href="{{url}}" class="btn btn-sm btn-outline-secondary">{{#back}}&larr; {{/back}}{{label}}</a>
+        {{/navlinks}}
+    </div>
+
+    <form method="post" action="{{formaction}}">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">{{savelabel}}</button>
+            <a href="{{cancelurl}}" class="btn btn-secondary ml-2">{{cancellabel}}</a>
+        </div>
+
+        <div class="alert alert-info sola-cs-howitworks">
+            <strong>{{howitworks}}</strong>
+            {{howitworksdesc}}
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{{solaenabledtitle}}</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">{{solaenableddesc}}</p>
+                <div class="form-group row mb-0">
+                    <label class="col-sm-3 col-form-label">{{solaenabledtitle}}</label>
+                    <div class="col-sm-9">
+                        <div>
+                            <input type="checkbox" role="switch"
+                                   id="aica-sola-course-enabled" name="sola_course_enabled" value="1"
+                                   {{#solacourseenabled}}checked{{/solacourseenabled}}>
+                            <label class="form-check-label" for="aica-sola-course-enabled">
+                                {{solaenabledtoggle}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{{title}}</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">{{enableddesc}}</p>
+
+                {{! Enable override. }}
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">{{enabledlabel}}</label>
+                    <div class="col-sm-9">
+                        <div>
+                            <input type="checkbox" role="switch"
+                                   id="aica-enabled" name="enabled" value="1"
+                                   {{#enabled}}checked{{/enabled}}>
+                            <label class="form-check-label" for="aica-enabled">{{enabledlabel}}</label>
+                        </div>
+                        <small class="form-text text-muted">
+                            {{usingglobal}}
+                            &mdash;
+                            <a href="{{globalsettingsurl}}">{{globalsettingslabel}}</a>
+                        </small>
+                    </div>
+                </div>
+
+                {{! Provider. }}
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="provider">{{providerlabel}}</label>
+                    <div class="col-sm-9">
+                        {{#providerselect}}
+                        {{> local_ai_course_assistant/course_settings_select}}
+                        {{/providerselect}}
+                    </div>
+                </div>
+
+                {{! Monthly spend cap. }}
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="spend_cap_monthly">{{spendcaplabel}}</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="0.01" min="0" class="form-control" id="spend_cap_monthly"
+                               name="spend_cap_monthly" value="{{spendcapvalue}}">
+                        <small class="form-text text-muted">{{spendcapdesc}}</small>
+                    </div>
+                </div>
+
+                {{!
+                    API key. The stored credential is never rendered: the field
+                    always ships empty and a blank submission keeps whatever is
+                    stored. Clearing goes through the checkbox below.
+                }}
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="apikey">{{apikeylabel}}</label>
+                    <div class="col-sm-9">
+                        <input type="password" class="form-control" id="apikey" name="apikey"
+                               value="" autocomplete="new-password"
+                               placeholder="{{apikeyplaceholder}}">
+                        {{#haskey}}
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" value="1"
+                                   id="apikey_clear" name="apikey_clear">
+                            <label class="form-check-label" for="apikey_clear">{{apikeyclearlabel}}</label>
+                        </div>
+                        {{/haskey}}
+                        <small class="form-text text-muted">{{apikeydesc}}</small>
+                    </div>
+                </div>
+
+                {{! Model. }}
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="model">{{modellabel}}</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="model" name="model"
+                               value="{{modelvalue}}" placeholder="{{modelplaceholder}}">
+                        <small class="form-text text-muted">{{modeldesc}}</small>
+                    </div>
+                </div>
+
+                {{! API base URL. }}
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="apibaseurl">{{apibaseurllabel}}</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="apibaseurl" name="apibaseurl"
+                               value="{{apibaseurlvalue}}" placeholder="{{apibaseurlplaceholder}}">
+                        <small class="form-text text-muted">{{apibaseurldesc}}</small>
+                    </div>
+                </div>
+
+                {{! Temperature. }}
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="temperature">{{temperaturelabel}}</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" id="temperature" name="temperature"
+                               min="0" max="2" step="0.1"
+                               value="{{temperaturevalue}}" placeholder="{{temperatureplaceholder}}">
+                        <small class="form-text text-muted">{{temperaturedesc}}</small>
+                    </div>
+                </div>
+
+                {{! System prompt. }}
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="systemprompt">{{systempromptlabel}}</label>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" id="systemprompt" name="systemprompt" rows="6"
+                                  placeholder="{{usingglobal}}">
+{{systempromptvalue}}</textarea>
+                        <div class="d-flex align-items-center mt-1 sola-cs-prompt-actions">
+                            <small class="form-text text-muted mb-0">{{systemprompthint}}</small>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-prompt"
+                                    title="{{resetprompttitle}}">{{resetpromptlabel}}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{#showrag}}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{{ragtitle}}</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">{{ragdesc}}</p>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="rag_course_enabled">{{ragtitle}}</label>
+                    <div class="col-sm-9">
+                        <div>
+                            <input type="checkbox" role="switch"
+                                   id="aica-rag-course-enabled" name="rag_course_enabled" value="1"
+                                   {{#ragcourseenabled}}checked{{/ragcourseenabled}}>
+                            <label class="form-check-label" for="aica-rag-course-enabled">
+                                {{ragenablelabel}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <div class="col-sm-9 offset-sm-3">
+                        <a href="{{ragadminurl}}" class="btn btn-sm btn-outline-secondary"
+                           target="_blank">{{ragadminlabel}} &rarr;</a>
+                        <a href="{{objectivesurl}}" class="btn btn-sm btn-outline-secondary ml-2"
+                           target="_blank">{{objectiveslabel}} &rarr;</a>
+                        {{#showdashboardlink}}
+                        <a href="{{dashboardurl}}" class="btn btn-sm btn-outline-secondary ml-2"
+                           target="_blank">{{dashboardlabel}} &rarr;</a>
+                        {{/showdashboardlink}}
+                    </div>
+                </div>
+
+                {{! Socratic mode. }}
+                <div class="form-group row mt-3">
+                    <label class="col-sm-3 col-form-label" for="aica-socratic-mode">{{socratictitle}}</label>
+                    <div class="col-sm-9">
+                        {{#socraticselect}}
+                        {{> local_ai_course_assistant/course_settings_select}}
+                        {{/socraticselect}}
+                        <small class="form-text text-muted">{{socratichelp}}</small>
+                    </div>
+                </div>
+
+                {{! Flashcards. }}
+                <div class="form-group row mt-2">
+                    <label class="col-sm-3 col-form-label" for="aica-flashcards-on">{{flashcardstitle}}</label>
+                    <div class="col-sm-9">
+                        {{#flashcardsselect}}
+                        {{> local_ai_course_assistant/course_settings_select}}
+                        {{/flashcardsselect}}
+                        <small class="form-text text-muted">{{flashcardshelp}}</small>
+                        {{#showflashcardslink}}
+                        <div class="mt-1">
+                            <a href="{{flashcardsurl}}" class="btn btn-sm btn-outline-secondary"
+                               target="_blank">{{flashcardslinklabel}} &rarr;</a>
+                        </div>
+                        {{/showflashcardslink}}
+                    </div>
+                </div>
+
+                {{! Python code sandbox. }}
+                <div class="form-group row mt-2">
+                    <label class="col-sm-3 col-form-label" for="aica-sandbox-on">{{sandboxtitle}}</label>
+                    <div class="col-sm-9">
+                        {{#sandboxselect}}
+                        {{> local_ai_course_assistant/course_settings_select}}
+                        {{/sandboxselect}}
+                        <small class="form-text text-muted">{{sandboxhelp}}</small>
+                        {{#sandboxavailable}}
+                        <div class="mt-1">
+                            <a href="{{sandboxurl}}" class="btn btn-sm btn-outline-secondary"
+                               target="_blank">{{sandboxlinklabel}} &rarr;</a>
+                        </div>
+                        {{/sandboxavailable}}
+                        {{#showsandboxwarning}}
+                        <div class="mt-1 text-warning">{{sandboxnoruntime}}</div>
+                        {{/showsandboxwarning}}
+                    </div>
+                </div>
+
+                {{! Essay feedback. }}
+                <div class="form-group row mt-2">
+                    <label class="col-sm-3 col-form-label" for="aica-essay-on">{{essaytitle}}</label>
+                    <div class="col-sm-9">
+                        {{#essayselect}}
+                        {{> local_ai_course_assistant/course_settings_select}}
+                        {{/essayselect}}
+                        <small class="form-text text-muted">{{essayhelp}}</small>
+                        {{#showessaylink}}
+                        <div class="mt-1">
+                            <a href="{{essayurl}}" class="btn btn-sm btn-outline-secondary"
+                               target="_blank">{{essaylinklabel}} &rarr;</a>
+                        </div>
+                        {{/showessaylink}}
+                    </div>
+                </div>
+
+                {{! Soapbox speech practice. }}
+                <div class="form-group row mt-2">
+                    <label class="col-sm-3 col-form-label" for="aica-soapbox-on">{{soapboxtitle}}</label>
+                    <div class="col-sm-9">
+                        {{#soapboxselect}}
+                        {{> local_ai_course_assistant/course_settings_select}}
+                        {{/soapboxselect}}
+                        <small class="form-text text-muted">{{soapboxhelp}}</small>
+                        {{#showsoapbox}}
+                        <div class="mt-2">
+                            <label for="aica-soapbox-level" class="sola-cs-level-label">{{soapboxlevellabel}}</label>
+                            {{#soapboxlevelselect}}
+                            {{> local_ai_course_assistant/course_settings_select}}
+                            {{/soapboxlevelselect}}
+                            <small class="form-text text-muted">{{soapboxlevelhelp}}</small>
+                        </div>
+                        <div class="mt-2 d-flex flex-wrap sola-cs-linkrow">
+                            <a href="{{soapboxurl}}" class="btn btn-sm btn-outline-secondary"
+                               target="_blank">{{soapboxlinklabel}} &rarr;</a>
+                            <a href="{{soapboxrubricurl}}" class="btn btn-sm btn-outline-secondary"
+                               target="_blank">{{soapboxrubriclabel}} &rarr;</a>
+                        </div>
+                        {{/showsoapbox}}
+                    </div>
+                </div>
+
+                {{! Worked examples. }}
+                <div class="form-group row mt-2">
+                    <label class="col-sm-3 col-form-label" for="aica-we-on">{{wetitle}}</label>
+                    <div class="col-sm-9">
+                        {{#weselect}}
+                        {{> local_ai_course_assistant/course_settings_select}}
+                        {{/weselect}}
+                        <small class="form-text text-muted">{{wehelp}}</small>
+                    </div>
+                </div>
+
+                {{! Weekly digest email. }}
+                <div class="form-group row mt-2">
+                    <label class="col-sm-3 col-form-label">{{digesttitle}}</label>
+                    <div class="col-sm-9">
+                        <div>
+                            <input type="checkbox" role="switch"
+                                   id="aica-digest-email" name="digest_email" value="1"
+                                   {{#digeston}}checked{{/digeston}}>
+                            <label class="form-check-label" for="aica-digest-email">{{digesttoggle}}</label>
+                        </div>
+                        <small class="form-text text-muted">{{digesthelp}}</small>
+                    </div>
+                </div>
+
+                {{! External resources opt-in. }}
+                <div class="form-group row mt-2">
+                    <label class="col-sm-3 col-form-label" for="aica-extres">{{extrestitle}}</label>
+                    <div class="col-sm-9">
+                        {{#extresselect}}
+                        {{> local_ai_course_assistant/course_settings_select}}
+                        {{/extresselect}}
+                        <small class="form-text text-muted">{{extreshelp}}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/showrag}}
+
+        {{#showsupplemental}}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{{supplementalheading}}</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">{{supplementaldesc}}</p>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="supplemental_courses">{{supplementallabel}}</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="supplemental_courses"
+                               name="supplemental_courses" value="{{supplementalvalue}}"
+                               placeholder="{{supplementalplaceholder}}">
+                        <small class="form-text text-muted">{{supplementalhelp}}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/showsupplemental}}
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{{englishlockheading}}</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">{{englishlockdesc}}</p>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="english_lock">{{englishlocklabel}}</label>
+                    <div class="col-sm-9">
+                        <div>
+                            <input type="checkbox" role="switch"
+                                   id="aica-english-lock" name="english_lock" value="1"
+                                   {{#englishlockenabled}}checked{{/englishlockenabled}}>
+                            <label class="form-check-label" for="aica-english-lock">{{englishlocktoggle}}</label>
+                        </div>
+                        <small class="form-text text-muted">{{englishlockhelp}}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{{voicetabtitle}}</h5>
+            </div>
+            <div class="card-body">
+                {{!
+                    voicetabdesc is built in PHP from a lang string whose {$a}
+                    placeholder is filled with a <strong>-wrapped state word, so
+                    it is markup the page assembled itself, not user input.
+                }}
+                <p class="text-muted">{{{voicetabdesc}}}</p>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="voice_tab">{{voicetabtitle}}</label>
+                    <div class="col-sm-9">
+                        {{#voicetabselect}}
+                        {{> local_ai_course_assistant/course_settings_select}}
+                        {{/voicetabselect}}
+                        <small class="form-text text-muted">{{voicetabhelp}}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{{autoopenheading}}</h5>
+            </div>
+            <div class="card-body">
+                {{!
+                    autoopendesc carries the same PHP-built <strong> state word
+                    as voicetabdesc above, so it is emitted unescaped too.
+                }}
+                <p class="text-muted">{{{autoopendesc}}}</p>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="auto_open">{{autoopenlabel}}</label>
+                    <div class="col-sm-9">
+                        {{#autoopenselect}}
+                        {{> local_ai_course_assistant/course_settings_select}}
+                        {{/autoopenselect}}
+                        <small class="form-text text-muted">{{autoopenhelp}}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{{starterssection}}</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">{{startersdesc}}</p>
+                {{#starters}}
+                <div class="form-group row mb-1">
+                    <label class="col-sm-5 col-form-label" for="{{paramname}}">
+                        {{name}}
+                        {{#hasdescription}}
+                        <small class="text-muted d-block">{{description}}</small>
+                        {{/hasdescription}}
+                    </label>
+                    <div class="col-sm-7">
+                        <div>
+                            <input type="checkbox" role="switch"
+                                   id="{{paramname}}" name="{{paramname}}" value="1"
+                                   {{#enabled}}checked{{/enabled}}>
+                            <label class="form-check-label" for="{{paramname}}"></label>
+                        </div>
+                    </div>
+                </div>
+                {{/starters}}
+                <div class="mt-2">
+                    <a href="{{starteradminurl}}" class="btn btn-sm btn-outline-secondary"
+                       target="_blank">{{starteradminlabel}} &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        {{#showquizzes}}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{{quiztitle}}</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">{{quizdesc}}</p>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>{{quizcolquiz}}</th>
+                            <th>{{quizcolgrade}}</th>
+                            <th>{{quizcollevel}}</th>
+                            <th>{{quizcoleffective}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#quizrows}}
+                        <tr>
+                            <td>{{name}}</td>
+                            <td>
+                                {{#hasgrade}}{{grade}}{{/hasgrade}}
+                                {{^hasgrade}}<span class="text-muted">{{ungraded}}</span>{{/hasgrade}}
+                            </td>
+                            <td>
+                                {{#levelselect}}
+                                {{> local_ai_course_assistant/course_settings_select}}
+                                {{/levelselect}}
+                            </td>
+                            <td><span class="badge bg-secondary">{{effective}}</span></td>
+                        </tr>
+                        {{/quizrows}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {{/showquizzes}}
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{{tokenusagetitle}}</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">{{tokenusagedesc}}</p>
+                <a href="{{tokenusageurl}}" class="btn btn-sm btn-outline-secondary"
+                   target="_blank">{{tokenusagetitle}} &rarr;</a>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">{{savelabel}}</button>
+        <a href="{{cancelurl}}" class="btn btn-secondary ml-2">{{cancellabel}}</a>
+    </form>
+</div>

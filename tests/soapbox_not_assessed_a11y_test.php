@@ -45,7 +45,8 @@ final class soapbox_not_assessed_a11y_test extends \basic_testcase {
      */
     public static function badge_renderers(): array {
         return [
-            'soapbox.php stored-score table and live table' => ['soapbox.php'],
+            'the Soapbox stored-score table' => ['templates/soapbox.mustache'],
+            'the Soapbox live score table' => ['templates/soapbox_result.mustache'],
             'the learner attempt list template' => ['templates/soapbox_present.mustache'],
         ];
     }
@@ -97,10 +98,16 @@ final class soapbox_not_assessed_a11y_test extends \basic_testcase {
      * version.php declares support for Moodle 4.5 through 5.2, which spans that
      * rename, so neither Bootstrap name is safe across the supported range.
      *
+     * The badge used to be echoed twice by soapbox.php. CONTRIB-10574 #273 and
+     * #278 moved the stored-score table into templates/soapbox.mustache and the
+     * live one into templates/soapbox_result.mustache, so this now reads both.
+     *
+     * @dataProvider badge_renderers
+     * @param string $relpath Source file, relative to the plugin root.
      * @return void
      */
-    public function test_the_hidden_class_is_the_one_core_provides(): void {
-        $src = file_get_contents(dirname(__DIR__) . '/soapbox.php');
+    public function test_the_hidden_class_is_the_one_core_provides($relpath): void {
+        $src = file_get_contents(dirname(__DIR__) . '/' . $relpath);
 
         // Matched as a CLASS, not as a phrase. An earlier version of this test
         // searched for the bare words and failed on the comment three lines
@@ -109,17 +116,17 @@ final class soapbox_not_assessed_a11y_test extends \basic_testcase {
         $this->assertDoesNotMatchRegularExpression(
             '/class\s*=\s*["\'][^"\']*\bsr-only\b/',
             $src,
-            'sr-only is Bootstrap 4 only, and this plugin supports Moodle 4.5 through 5.2'
+            "{$relpath}: sr-only is Bootstrap 4 only, and this plugin supports Moodle 4.5 through 5.2"
         );
         $this->assertDoesNotMatchRegularExpression(
             '/class\s*=\s*["\'][^"\']*\bvisually-hidden\b/',
             $src,
-            'visually-hidden is Bootstrap 5 only, and this plugin supports Moodle 4.5 through 5.2'
+            "{$relpath}: visually-hidden is Bootstrap 5 only, and this plugin supports Moodle 4.5 through 5.2"
         );
         $this->assertMatchesRegularExpression(
             '/class\s*=\s*["\'][^"\']*\baccesshide\b/',
             $src,
-            'accesshide is the class Moodle core provides across the whole supported range'
+            "{$relpath}: accesshide is the class Moodle core provides across the whole supported range"
         );
     }
 }
