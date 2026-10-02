@@ -278,7 +278,18 @@ final class support_mode_suppression_test extends \advanced_testcase {
 
         $kept = array_column(support_mode::filter_starters($starters), 'key');
 
-        $this->assertSame(['help-page', 'ai-project-coach'], $kept);
+        // Nothing course-shaped survives, and that includes the two the old
+        // allow-list let through. 'ai-project-coach' offers help with "a
+        // project or assignment for this course" when there is no course, and
+        // 'help-page' expands {page} to whatever non-course page the learner
+        // happens to be on. Support mode supplies its own starters instead.
+        $this->assertSame(
+            ['support-tech', 'support-howto', 'support-enrolment'],
+            $kept,
+            'Outside a course the learner should be offered support starters, not '
+                . 'whatever course starters happened to survive a filter.'
+        );
+        $this->assertNotContains('ai-project-coach', $kept);
     }
 
     /**

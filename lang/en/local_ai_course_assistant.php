@@ -263,6 +263,15 @@ $string['settings:support_enabled'] = 'Enable support mode outside courses';
 $string['settings:support_enabled_desc'] = 'Let learners open [[tutorshort]] on pages that are not a course, such as the dashboard or their profile, to ask about enrolment, certificates, technical problems and other support questions. Requires a support course to be set below. Learners still need the "Use the assistant outside a course" capability, which authenticated users hold by default.';
 $string['settings:support_courseid'] = 'Support course';
 $string['settings:support_courseid_desc'] = 'The ID of a visible course holding your getting started, onboarding and orientation material. Support conversations are answered from this course plus the FAQ above, and are recorded against it. Leave empty to turn support mode off. The site home (course 1) is not accepted.';
+$string['support:starter_tech'] = 'Something is not working';
+$string['support:starter_tech_desc'] = 'Trouble signing in, a page that will not load, video or audio problems.';
+$string['support:starter_tech_prompt'] = 'Something on the site is not working for me. Ask me what I am seeing, then help me fix it or tell me who to contact.';
+$string['support:starter_howto'] = 'How do I...?';
+$string['support:starter_howto_desc'] = 'Finding your way around, submitting work, checking grades.';
+$string['support:starter_howto_prompt'] = 'I am not sure how to do something on this site. Ask me what I am trying to do, then walk me through it step by step.';
+$string['support:starter_enrolment'] = 'Enrollment and certificates';
+$string['support:starter_enrolment_desc'] = 'Joining a course, access problems, exams and certificates.';
+$string['support:starter_enrolment_prompt'] = 'I have a question about enrolling, my account, or getting a certificate. Ask me which one, then answer from the help material you have.';
 $string['support:promptrole'] = 'You are answering a support question from outside any course. The learner is not asking about course material, so do not redirect them to it. Answer from the FAQ and the support material you have been given. If you cannot answer accurately, say so plainly and offer to pass the question to the support team.';
 $string['settings:faq_content'] = 'FAQ Content';
 $string['settings:faq_content_desc'] = 'Enter FAQ entries (one per line in the format: Q: question | A: answer). These will be provided to the AI to answer common support questions.';
@@ -2976,6 +2985,16 @@ $string['mobile:error_generic'] = 'Sorry, something went wrong. Please try again
 
 // --- from newstrings_e.php ---
 // settings.php — page/nav chrome and select options (i18n extraction batch E).
+$string['settingspage:operations'] = 'Resilience and operations';
+$string['settingspage:rerank'] = 'Reranking';
+$string['settingspage:extraction'] = 'Document extraction';
+$string['settingspage:feedback'] = 'Surveys and feedback';
+$string['settingspage:ai'] = 'AI provider and models';
+$string['settingspage:content'] = 'Content and retrieval';
+$string['settingspage:safety'] = 'Safety and moderation';
+$string['settingspage:engagement'] = 'Engagement';
+$string['settingspage:branding'] = 'Branding and interface';
+$string['settingspage:integrations'] = 'Integrations and delivery';
 $string['settingspage:pagetitle'] = 'Settings';
 $string['toc:providerbenchmark'] = 'Provider benchmark';
 $string['toc:playground'] = 'Prompt Playground';

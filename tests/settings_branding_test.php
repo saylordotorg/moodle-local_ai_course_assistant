@@ -52,13 +52,25 @@ final class settings_branding_test extends \advanced_testcase {
             set_config($key, $value, 'local_ai_course_assistant');
         }
 
-        $page = admin_get_root(true, true)->locate('local_ai_course_assistant_general');
-        $this->assertInstanceOf(\admin_settingpage::class, $page, 'Settings page must be reachable.');
+        // Issue #292 split the single settings page into eleven, so scanning one
+        // page now covers 11 settings instead of 343 and this guard would pass
+        // while reading almost nothing. Walk every page in the category.
+        $category = admin_get_root(true, true)->locate('local_ai_course_assistant');
+        $this->assertNotEmpty($category, 'Settings category must be reachable.');
+
+        $allsettings = [];
+        foreach ($category->children as $child) {
+            if ($child instanceof \admin_settingpage) {
+                foreach ((array) $child->settings as $setting) {
+                    $allsettings[] = $setting;
+                }
+            }
+        }
 
         $leaks = [];
         $rawtokens = [];
         $scanned = 0;
-        foreach ((array) $page->settings as $setting) {
+        foreach ($allsettings as $setting) {
             $text = (string) $setting->visiblename . ' ' . (string) $setting->description;
             $scanned++;
             if (strpos($text, 'SOLA') !== false || strpos($text, 'Saylor') !== false) {

@@ -445,18 +445,80 @@ class support_mode {
      * @return array
      */
     public static function filter_starters(array $starters): array {
-        return array_values(array_filter(
-            $starters,
-            static function ($starter): bool {
-                if (!is_array($starter)) {
-                    return false;
-                }
-                if (($starter['type'] ?? 'prompt') !== 'prompt') {
-                    return false;
-                }
-                return !in_array($starter['key'] ?? '', ['focus-next', 'study-plan'], true);
-            }
-        ));
+        // Outside a course, almost every built-in starter is incoherent.
+        //
+        // This used to keep anything of type 'prompt' except two named keys,
+        // which let 'ai-project-coach' through. Its prompt reads "help with a
+        // project or assignment FOR THIS COURSE", and there is no course, so a
+        // learner on the dashboard was offered coaching for a course they were
+        // not in. 'help-page' survived too, and expands {page} to whatever
+        // non-course page they happen to be on.
+        //
+        // The old allow-list also encoded the wrong default: it assumed course
+        // starters are fine unless named, when the truth is the opposite.
+        // Nothing course-shaped belongs here, so support mode now supplies its
+        // own starters instead of filtering someone else's.
+        //
+        // Custom starters an administrator wrote are still dropped, because
+        // they were authored for a course context and we cannot tell which are
+        // safe out of it. An administrator who wants support starters should
+        // get the ones below, which are written for this surface.
+        unset($starters);
+
+        return self::support_starters();
+    }
+
+    /**
+     * The starters a learner sees when the assistant opens outside a course.
+     *
+     * Deliberately narrow, and written for what this surface is actually for:
+     * getting unstuck on something that is not course content. The three cover
+     * the cases that bring learners to a support desk, which is where these
+     * questions went before the assistant could answer them at all.
+     *
+     * They carry no {page} or {course} tokens, because neither resolves here.
+     *
+     * @return array[] Starter definitions in the shape the widget expects.
+     */
+    public static function support_starters(): array {
+        return [
+            [
+                'key'         => 'support-tech',
+                'name'        => get_string('support:starter_tech', 'local_ai_course_assistant'),
+                'description' => get_string('support:starter_tech_desc', 'local_ai_course_assistant'),
+                'prompt'      => get_string('support:starter_tech_prompt', 'local_ai_course_assistant'),
+                'icon'        => 'wrench',
+                'type'        => 'prompt',
+                'enabled'     => true,
+                'sort_order'  => 1,
+                'builtin'     => true,
+                'conditional' => '',
+            ],
+            [
+                'key'         => 'support-howto',
+                'name'        => get_string('support:starter_howto', 'local_ai_course_assistant'),
+                'description' => get_string('support:starter_howto_desc', 'local_ai_course_assistant'),
+                'prompt'      => get_string('support:starter_howto_prompt', 'local_ai_course_assistant'),
+                'icon'        => 'question',
+                'type'        => 'prompt',
+                'enabled'     => true,
+                'sort_order'  => 2,
+                'builtin'     => true,
+                'conditional' => '',
+            ],
+            [
+                'key'         => 'support-enrolment',
+                'name'        => get_string('support:starter_enrolment', 'local_ai_course_assistant'),
+                'description' => get_string('support:starter_enrolment_desc', 'local_ai_course_assistant'),
+                'prompt'      => get_string('support:starter_enrolment_prompt', 'local_ai_course_assistant'),
+                'icon'        => 'certificate',
+                'type'        => 'prompt',
+                'enabled'     => true,
+                'sort_order'  => 3,
+                'builtin'     => true,
+                'conditional' => '',
+            ],
+        ];
     }
 
     /**
