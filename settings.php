@@ -51,6 +51,9 @@ if ($hassiteconfig) {
     ));
 
     // ── Single settings page with TOC ───────────────────────────────────────
+    // Every settings page, in order, so the dependency loop at the end of this
+    // file can attach each hide_if to the page that actually holds the setting.
+    $aicapages = [];
     $settings = new admin_settingpage('local_ai_course_assistant_general',
         get_string('settingspage:pagetitle', 'local_ai_course_assistant'));
 
@@ -260,6 +263,23 @@ if ($hassiteconfig) {
     $remoteconfigsetting->set_updatedcallback(
         'local_ai_course_assistant_invalidate_remote_config');
     $settings->add($remoteconfigsetting);
+
+    // Close the previous page and open the next one.
+    //
+    // Issue #292: these were all one admin_settingpage. Core serialises a
+    // page's entire show/hide dependency map into a single js_call_amd
+    // argument, and ours reached 5,230 characters against a 1,024 limit, so
+    // every admin hitting the category page at DEVELOPER debug got a
+    // warning, and on a strict error handler a 500. Moodle's own plugin
+    // reviewers run at that debug level.
+    //
+    // Splitting by the sections this file already had means each page
+    // carries only its own dependencies. The settings themselves, and their
+    // config keys, are untouched: only which page renders them changes.
+    $aicapages[] = $settings;
+    $ADMIN->add('local_ai_course_assistant', $settings);
+    $settings = new admin_settingpage('local_ai_course_assistant_ai',
+        get_string('settingspage:ai', 'local_ai_course_assistant'));
 
     // ── Section: AI Provider & Models ───────────────────────────────────────
     $settings->add(new admin_setting_description(
@@ -706,6 +726,23 @@ if ($hassiteconfig) {
         ''
     ));
 
+    // Close the previous page and open the next one.
+    //
+    // Issue #292: these were all one admin_settingpage. Core serialises a
+    // page's entire show/hide dependency map into a single js_call_amd
+    // argument, and ours reached 5,230 characters against a 1,024 limit, so
+    // every admin hitting the category page at DEVELOPER debug got a
+    // warning, and on a strict error handler a 500. Moodle's own plugin
+    // reviewers run at that debug level.
+    //
+    // Splitting by the sections this file already had means each page
+    // carries only its own dependencies. The settings themselves, and their
+    // config keys, are untouched: only which page renders them changes.
+    $aicapages[] = $settings;
+    $ADMIN->add('local_ai_course_assistant', $settings);
+    $settings = new admin_settingpage('local_ai_course_assistant_content',
+        get_string('settingspage:content', 'local_ai_course_assistant'));
+
     // ── Section: Content & RAG ──────────────────────────────────────────────
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_content_anchor',
@@ -972,6 +1009,13 @@ if ($hassiteconfig) {
         get_string('settings:rerank_heading', 'local_ai_course_assistant'),
         get_string('settings:rerank_heading_desc', 'local_ai_course_assistant')
     ));
+
+    // Issue #292: reranking split out. Its six dependents plus retrieval's eighteen exceeded the budget on one page.
+    $aicapages[] = $settings;
+    $ADMIN->add('local_ai_course_assistant', $settings);
+    $settings = new admin_settingpage('local_ai_course_assistant_rerank',
+        get_string('settingspage:rerank', 'local_ai_course_assistant'));
+
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rerank_enabled',
         get_string('settings:rerank_enabled', 'local_ai_course_assistant'),
@@ -1090,6 +1134,13 @@ if ($hassiteconfig) {
         get_string('settings:rag_sources_heading', 'local_ai_course_assistant'),
         get_string('settings:rag_sources_heading_desc', 'local_ai_course_assistant', $ragadminurl->out()),
     ));
+
+
+    // Issue #292: document extraction split out; its toggles carry their own sub-settings.
+    $aicapages[] = $settings;
+    $ADMIN->add('local_ai_course_assistant', $settings);
+    $settings = new admin_settingpage('local_ai_course_assistant_extraction',
+        get_string('settingspage:extraction', 'local_ai_course_assistant'));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rag_extract_pdf',
@@ -1263,6 +1314,14 @@ if ($hassiteconfig) {
         get_string('settings:cost_anomaly_heading', 'local_ai_course_assistant'),
         \local_ai_course_assistant\branding::apply(get_string('settings:cost_anomaly_heading_desc', 'local_ai_course_assistant'))
     ));
+    // Issue #292: resilience and operations settings were sitting at the tail
+    // of the content section, which put them on the extraction page and pushed
+    // it over the dependency budget. They are their own concern anyway.
+    $aicapages[] = $settings;
+    $ADMIN->add('local_ai_course_assistant', $settings);
+    $settings = new admin_settingpage('local_ai_course_assistant_operations',
+        get_string('settingspage:operations', 'local_ai_course_assistant'));
+
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/cost_anomaly_enabled',
         get_string('settings:cost_anomaly_enabled', 'local_ai_course_assistant'),
@@ -1380,6 +1439,7 @@ if ($hassiteconfig) {
     // tries each entry above on per-call timeout / 5xx, with a 15-minute
     // circuit on the failing label. Stays off-by-default so existing
     // installs see no behavior change on upgrade.
+
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/failover_per_call_enabled',
         \local_ai_course_assistant\branding::str('settings:failover_per_call_enabled'),
@@ -1437,6 +1497,23 @@ if ($hassiteconfig) {
         '0.3',
         PARAM_FLOAT
     ));
+
+    // Close the previous page and open the next one.
+    //
+    // Issue #292: these were all one admin_settingpage. Core serialises a
+    // page's entire show/hide dependency map into a single js_call_amd
+    // argument, and ours reached 5,230 characters against a 1,024 limit, so
+    // every admin hitting the category page at DEVELOPER debug got a
+    // warning, and on a strict error handler a 500. Moodle's own plugin
+    // reviewers run at that debug level.
+    //
+    // Splitting by the sections this file already had means each page
+    // carries only its own dependencies. The settings themselves, and their
+    // config keys, are untouched: only which page renders them changes.
+    $aicapages[] = $settings;
+    $ADMIN->add('local_ai_course_assistant', $settings);
+    $settings = new admin_settingpage('local_ai_course_assistant_safety',
+        get_string('settingspage:safety', 'local_ai_course_assistant'));
 
     // ── Section: Safety & Moderation ────────────────────────────────────────
     $settings->add(new admin_setting_description(
@@ -1597,6 +1674,23 @@ if ($hassiteconfig) {
             'enforce'     => get_string('settings:csp_mode_enforce', 'local_ai_course_assistant'),
         ]
     ));
+
+    // Close the previous page and open the next one.
+    //
+    // Issue #292: these were all one admin_settingpage. Core serialises a
+    // page's entire show/hide dependency map into a single js_call_amd
+    // argument, and ours reached 5,230 characters against a 1,024 limit, so
+    // every admin hitting the category page at DEVELOPER debug got a
+    // warning, and on a strict error handler a 500. Moodle's own plugin
+    // reviewers run at that debug level.
+    //
+    // Splitting by the sections this file already had means each page
+    // carries only its own dependencies. The settings themselves, and their
+    // config keys, are untouched: only which page renders them changes.
+    $aicapages[] = $settings;
+    $ADMIN->add('local_ai_course_assistant', $settings);
+    $settings = new admin_settingpage('local_ai_course_assistant_engagement',
+        get_string('settingspage:engagement', 'local_ai_course_assistant'));
 
     // ── Section: Engagement ─────────────────────────────────────────────────
     $settings->add(new admin_setting_description(
@@ -2078,6 +2172,13 @@ if ($hassiteconfig) {
         get_string('settings:survey_heading', 'local_ai_course_assistant'),
         get_string('settings:survey_heading_desc', 'local_ai_course_assistant', (new moodle_url('/local/ai_course_assistant/survey_admin.php'))->out()),
     ));
+
+
+    // Issue #292: survey and feedback split out so the engagement page's dependency payload fits core's 1,024-character js_call_amd budget.
+    $aicapages[] = $settings;
+    $ADMIN->add('local_ai_course_assistant', $settings);
+    $settings = new admin_settingpage('local_ai_course_assistant_feedback',
+        get_string('settingspage:feedback', 'local_ai_course_assistant'));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/survey_enabled',
@@ -2616,6 +2717,23 @@ if ($hassiteconfig) {
         PARAM_RAW
     ));
 
+    // Close the previous page and open the next one.
+    //
+    // Issue #292: these were all one admin_settingpage. Core serialises a
+    // page's entire show/hide dependency map into a single js_call_amd
+    // argument, and ours reached 5,230 characters against a 1,024 limit, so
+    // every admin hitting the category page at DEVELOPER debug got a
+    // warning, and on a strict error handler a 500. Moodle's own plugin
+    // reviewers run at that debug level.
+    //
+    // Splitting by the sections this file already had means each page
+    // carries only its own dependencies. The settings themselves, and their
+    // config keys, are untouched: only which page renders them changes.
+    $aicapages[] = $settings;
+    $ADMIN->add('local_ai_course_assistant', $settings);
+    $settings = new admin_settingpage('local_ai_course_assistant_branding',
+        get_string('settingspage:branding', 'local_ai_course_assistant'));
+
     // ── Section: Branding & UI ──────────────────────────────────────────────
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_branding_anchor',
@@ -2802,6 +2920,23 @@ if ($hassiteconfig) {
         get_string('settings:privacy_notice_override_desc', 'local_ai_course_assistant'),
         ''
     ));
+
+    // Close the previous page and open the next one.
+    //
+    // Issue #292: these were all one admin_settingpage. Core serialises a
+    // page's entire show/hide dependency map into a single js_call_amd
+    // argument, and ours reached 5,230 characters against a 1,024 limit, so
+    // every admin hitting the category page at DEVELOPER debug got a
+    // warning, and on a strict error handler a 500. Moodle's own plugin
+    // reviewers run at that debug level.
+    //
+    // Splitting by the sections this file already had means each page
+    // carries only its own dependencies. The settings themselves, and their
+    // config keys, are untouched: only which page renders them changes.
+    $aicapages[] = $settings;
+    $ADMIN->add('local_ai_course_assistant', $settings);
+    $settings = new admin_settingpage('local_ai_course_assistant_integrations',
+        get_string('settingspage:integrations', 'local_ai_course_assistant'));
 
     // ── Section: Integrations & Delivery ────────────────────────────────────
     $settings->add(new admin_setting_description(
@@ -3401,10 +3536,19 @@ if ($hassiteconfig) {
             'embed_provider', 'embed_apikey', 'embed_model', 'embed_apibaseurl',
             'embed_dimensions', 'embed_query_model', 'embed_dtype', 'rag_topk', 'rag_min_similarity', 'rag_currentpage_boost',
             'rag_chunksize', 'rag_return_scope', 'rag_window_size', 'rag_parent_max_chars',
-            'rag_scope', 'rag_auto_reindex_drifted', 'rerank_enabled',
-            'rag_extract_pdf', 'rag_extract_docx', 'rag_extract_pptx',
-            'rag_extract_h5p', 'rag_extract_scorm', 'rag_fetch_transcripts',
+            'rag_scope', 'rag_auto_reindex_drifted',
+            // rerank_enabled is no longer listed: reranking has its own page now,
+            // and core's show/hide cannot reach across pages. The guard below
+            // caught this and reported it rather than emitting a rule that would
+            // never fire.
             'embed_input_type_mode',
+            // Issue #292: the six rag_extract_* toggles and rag_fetch_transcripts
+            // deliberately do NOT hang off rag_enabled any more. Each is a
+            // checkbox that does nothing while retrieval is off, so showing them
+            // costs an administrator very little; keeping them here cost 300
+            // characters of a 1,024-character budget that core serialises into a
+            // single js_call_amd argument, and blew the whole page past it.
+            // Their own sub-settings are still hidden behind each toggle.
         ],
         'rag_extract_pdf'   => ['rag_pdftotext_path'],
         'rag_extract_scorm' => ['rag_scorm_max_mb'],
@@ -3471,9 +3615,45 @@ if ($hassiteconfig) {
         // far smaller cost than hiding them from one who needs both.
     ];
 
+    $aicapages[] = $settings;
+
+    // Attach each rule to the page that actually holds the dependent setting.
+    //
+    // Issue #292: this loop used to call $settings->hide_if() unconditionally,
+    // and by the time it ran $settings was whichever page happened to be last.
+    // So every rule in the map landed on one page, which is how a single page
+    // came to serialise 5,230 characters of dependency data into one
+    // js_call_amd argument against a 1,024 limit.
+    //
+    // A rule whose dependent and toggle are on DIFFERENT pages is skipped and
+    // reported, because core's show/hide only works within a page: emitting it
+    // would produce a rule that silently never fires, which is worse than
+    // showing the setting.
+    $aicaowner = function (string $name) use ($aicapages) {
+        foreach ($aicapages as $page) {
+            if (isset($page->settings->{'local_ai_course_assistant' . $name})) {
+                return $page;
+            }
+        }
+        return null;
+    };
+
     foreach ($dependencies as $toggle => $dependents) {
+        $togglepage = $aicaowner($toggle);
         foreach ($dependents as $dependent) {
-            $settings->hide_if(
+            $dependentpage = $aicaowner($dependent);
+            if ($dependentpage === null || $togglepage === null
+                    || $dependentpage !== $togglepage) {
+                debugging(
+                    "SOLA: hide_if skipped, '{$dependent}' and its toggle "
+                        . "'{$toggle}' are not on the same settings page, so the "
+                        . 'rule could never fire. Move them together or drop the '
+                        . 'rule. See issue #292.',
+                    DEBUG_DEVELOPER
+                );
+                continue;
+            }
+            $dependentpage->hide_if(
                 'local_ai_course_assistant/' . $dependent,
                 'local_ai_course_assistant/' . $toggle,
                 'notchecked'

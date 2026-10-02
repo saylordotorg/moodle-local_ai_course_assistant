@@ -36,17 +36,82 @@ final class settings_dependencies_test extends \advanced_testcase {
      * @return \admin_settingpage
      */
     private function settings_page(): \admin_settingpage {
+        $pages = $this->settings_pages();
+        return reset($pages);
+    }
+
+    /**
+     * Every settings page the plugin registers.
+     *
+     * Issue #292 split one page into eleven, because core serialises a page's
+     * whole show/hide dependency map into a single js_call_amd argument and
+     * ours reached 5,290 characters against a 1,024 limit. Anything that
+     * reasons about dependencies has to look at all of them now: before the
+     * split this helper returned the only page, and a test that kept doing that
+     * would quietly assert nothing, since the general page now carries no
+     * dependencies at all.
+     *
+     * @return \admin_settingpage[] keyed by page name.
+     */
+    private function settings_pages(): array {
         global $CFG;
         require_once($CFG->libdir . '/adminlib.php');
         $this->setAdminUser();
         $admin = admin_get_root(true, true);
-        $page = $admin->locate('local_ai_course_assistant_general');
-        $this->assertInstanceOf(
-            \admin_settingpage::class,
-            $page,
-            'The plugin settings page must be reachable, or every assertion below is vacuous.'
-        );
-        return $page;
+        $category = $admin->locate('local_ai_course_assistant');
+        $this->assertNotEmpty($category,
+            'The plugin settings category must be reachable, or every assertion below is vacuous.');
+
+        $pages = [];
+        foreach ($category->children as $child) {
+            if ($child instanceof \admin_settingpage) {
+                $pages[$child->name] = $child;
+            }
+        }
+        $this->assertNotEmpty($pages, 'no settings pages found');
+        return $pages;
+    }
+
+    /**
+     * No page may exceed core's js_call_amd argument budget.
+     *
+     * This is the regression guard for issue #292. core/showhidesettings is
+     * handed one page's entire dependency map as a single argument, and
+     * page_requirements_manager warns above 1,024 characters. At DEVELOPER
+     * debug that warning is an exception on a strict error handler, so the
+     * settings category page returned HTTP 500, and Moodle's own plugin
+     * reviewers run at that debug level.
+     *
+     * The ceiling here is deliberately below core's, because the fix left the
+     * worst page at 987 of 1,024 and a single new dependent would have put it
+     * back over with nothing to catch it until someone opened the page.
+     */
+    public function test_no_settings_page_exceeds_the_dependency_budget(): void {
+        // settings_pages() calls setAdminUser(), and phpunit fails the test with
+        // "unexpected change of $USER" unless the change is declared resettable.
+        $this->resetAfterTest();
+
+        $ceiling = 950;
+        $over = [];
+
+        foreach ($this->settings_pages() as $name => $page) {
+            if (!$page->has_dependencies()) {
+                continue;
+            }
+            $payload = json_encode(['dependencies' => $page->get_dependencies_for_javascript()]);
+            $len = strlen($payload);
+            if ($len > $ceiling) {
+                $over[] = "{$name}: {$len} chars";
+            }
+        }
+
+        $this->assertSame([], $over,
+            "These settings pages send more than {$ceiling} characters of show/hide data "
+                . "to core/showhidesettings in one js_call_amd argument:\n  "
+                . implode("\n  ", $over)
+                . "\nCore warns above 1024, and at DEVELOPER debug that warning becomes an "
+                . "exception, so the settings category page returns HTTP 500. Split the page, "
+                . "or move a toggle and its dependents onto a page of their own. See #292.");
     }
 
     /**
@@ -73,20 +138,29 @@ final class settings_dependencies_test extends \advanced_testcase {
 
     public function test_every_dependency_names_settings_that_exist(): void {
         $this->resetAfterTest();
-        $page = $this->settings_page();
+        $pages = $this->settings_pages();
 
         // admin_settingdependency::parse_name() normalises 'plugin/name' into
         // the form-element name ('s_plugin_name'), so compare against each
         // setting's own get_full_name() rather than re-deriving the transform.
+        //
+        // Issue #292 spread the settings over eleven pages, so this has to look
+        // at all of them. Reading one page would have found zero dependencies
+        // and reported the map lost, which is how the split first surfaced here.
         $onpage = [];
-        foreach ((array) $page->settings as $setting) {
-            $onpage[$setting->get_full_name()] = true;
+        $pairs = [];
+        foreach ($pages as $page) {
+            foreach ((array) $page->settings as $setting) {
+                $onpage[$setting->get_full_name()] = true;
+            }
+            foreach ($this->dependency_pairs($page) as $pair) {
+                $pairs[] = $pair;
+            }
         }
         $exists = function (string $fullname) use ($onpage): bool {
             return isset($onpage[$fullname]);
         };
 
-        $pairs = $this->dependency_pairs($page);
         $this->assertNotEmpty($pairs, 'No dependencies registered — the hide_if map has been lost.');
 
         $broken = [];

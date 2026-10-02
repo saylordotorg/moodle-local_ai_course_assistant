@@ -1,5 +1,5 @@
 {
-  "_comment": "SOLA remote config — edit this file to push config updates without a plugin release. Deploy changes by committing to main branch.",
+  "_comment": "SOLA remote config. DO NOT EDIT OR DELETE WITHOUT CHECKING PRODUCTION FIRST. Saylor production runs v7.5.7, which hardcodes this file's URL as its default and fetches it every hour, so any change here reaches learners on learn.saylor.org and degrees.saylor.org within the hour, with no deploy and no review. Prod cannot be upgraded until 2027. v7.6.0 made remote config opt-in and empty-by-default, so sites on 7.6.0+ ignore this file entirely; it exists solely for installs that have not upgraded. Deleting it would make prod fall back to each provider's own default model instead of the one below. See issue #267.",
   "model_default": "gpt-4o-mini",
   "system_prompt": "",
   "instruction_blocks": {}

@@ -1,64 +1,48 @@
-TO: Catalyst support
-SUBJECT: Request: run two read-only queries on the Learn and Degrees databases
+To: Dean (Catalyst)
+Subject: Small read-only query on Learn and Degrees: database table sizes
 
-Hi team,
+Hi Dean,
 
-We'd like to understand what's driving database size on learn.saylor.org and
-degrees.saylor.org. We can't read the production databases ourselves, so could
-you run the two read-only queries below on each site and send back the output?
+Could you run one read-only query against the Learn and Degrees databases and
+send me the output? We're looking at what's driving database storage and I'd
+rather work from the actual numbers than from what I can infer off our dev
+fleet.
 
-Both are SELECTs against information_schema and one plugin table. Neither
-writes anything, and neither reads learner content. They should each return in
-well under a second.
+  SELECT table_name,
+         ROUND((data_length + index_length) / 1024 / 1024 / 1024, 2) AS gb,
+         ROUND(data_length  / 1024 / 1024 / 1024, 2) AS data_gb,
+         ROUND(index_length / 1024 / 1024 / 1024, 2) AS index_gb,
+         table_rows
+    FROM information_schema.tables
+   WHERE table_schema = DATABASE()
+   ORDER BY (data_length + index_length) DESC
+   LIMIT 25;
 
-QUERY 1: the twenty largest tables
+It only reads information_schema, so it takes no locks and touches no site data.
+It runs in about 25 milliseconds on our dev fleet and is safe to run on a live
+site at any time of day.
 
-SELECT table_name,
-       ROUND((data_length + index_length) / 1024 / 1024, 1) AS size_mb,
-       table_rows
-  FROM information_schema.tables
- WHERE table_schema = DATABASE()
- ORDER BY (data_length + index_length) DESC
- LIMIT 20;
+Separately, and only if it's easy: does either site have the Ad-hoc database
+queries report (report_customsql) installed? If so we can run this sort of thing
+ourselves next time rather than asking you.
 
-QUERY 2: the SOLA embedding columns
+Why I'm asking
+----------------
 
-SELECT COUNT(*) AS chunks,
-       SUM(embedding IS NOT NULL) AS has_json,
-       SUM(embedding_bin IS NOT NULL) AS has_binary,
-       SUM(embedding IS NOT NULL AND embedding_bin IS NOT NULL) AS has_both,
-       SUM(embedding IS NOT NULL AND embedding_bin IS NULL) AS json_only
-  FROM mdl_local_ai_course_assistant_chunks;
+We've been working through SOLA's own storage and found that its chunk table was
+storing each embedding twice, once packed and once as JSON text. Clearing the
+redundant copy freed about 59% of that table across our five dev sites, 392 MB in
+total. We want to know whether the same is worth doing on Learn, and more
+importantly whether SOLA is even a significant part of your storage picture or a
+rounding error next to something else.
 
-(Adjust the mdl_ prefix if the sites use a different one.)
+On dev the largest tables after our cleanup are the standard log and the Outcome
+Map plugin's tables. Dev has almost no users though, so that ranking probably
+doesn't hold on Learn. The tables that grow with users rather than with content
+are the ones I expect to dominate at Learn's scale, which is exactly what the
+query will show.
 
-WHY WE'RE ASKING
-
-On our five dev sites the SOLA chunks table was the largest table on every one
-of them, because each embedding is stored twice: once packed into a binary
-column, which is what retrieval reads, and once as a JSON array of floats,
-which is about three times the size and is only a fallback. That was a
-deliberate, temporary rollback path during a format transition, and it was
-never removed.
-
-Clearing the redundant copies and running OPTIMIZE TABLE freed 392 MB across
-the dev fleet, about 59 percent. On our main dev site the table went from
-463 MB to 176 MB.
-
-We are NOT asking you to change anything yet. Query 2 is the one that decides
-whether a cleanup is safe, because of something we found the hard way: on two
-of our five dev sites, some rows had the JSON copy and no binary. For those
-rows the JSON is the only copy of the vector, so deleting it destroys the
-embedding and costs a paid re-embed to recover, with search quality quietly
-degraded until someone notices. Three of the five sites had none, which is
-exactly what makes it dangerous to generalise from one site.
-
-So: if json_only comes back as 0 on a site, a cleanup there is safe and we'll
-come back to you with an exact statement and a maintenance window. If it comes
-back non-zero, we need to backfill those rows first.
-
-No rush on this, and please tell us if you'd rather we filed it differently or
-if there's a standing cost for ad-hoc queries.
+No urgency on this. Whenever it's convenient.
 
 Thanks,
 Tom
