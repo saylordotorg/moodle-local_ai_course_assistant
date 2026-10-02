@@ -258,7 +258,26 @@ class faq_manager {
             $record->content     = $sanitized['text'];
             $record->contenthash = sha1($sanitized['text']);
             $isfloat = ($dtype === \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT);
-            $record->embedding     = $isfloat ? json_encode($vector) : null;
+            // Issue #266: the JSON copy is no longer written. This is
+            // the "later release" the transition comment promised.
+            //
+            // It duplicated embedding_bin at roughly three times the
+            // size (about 25 KB against 8 KB for a 2048-dimension
+            // vector) and retrieval never read it when the binary was
+            // present. Across the five dev sites it was 443 MB of 463.
+            // Because it was rewritten on every index, the cost grew
+            // back after any cleanup.
+            //
+            // The column is deliberately NOT dropped and existing rows
+            // are deliberately NOT cleared. On two of five dev sites,
+            // 1,054 rows had the JSON copy and no binary; for those the
+            // JSON IS the vector, and deleting it would destroy the
+            // embedding and cost a paid re-embed with retrieval quietly
+            // degraded. rag_retriever keeps its fallback for exactly
+            // those rows, and admin/cli/backfill_embedding_bin.php
+            // converts them. Dropping the column is a separate step,
+            // after a site has confirmed it holds no binary-less rows.
+            $record->embedding     = null;
             $record->embedding_bin = rag_retriever::pack_vector($vector, $dtype);
             $record->embed_model   = $modelname;
             $record->embed_dtype   = $dtype;

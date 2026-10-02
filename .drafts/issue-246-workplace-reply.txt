@@ -1,0 +1,50 @@
+POST AS A COMMENT ON ISSUE #246
+
+Thanks for asking directly, and for the clear questions. Short answers first,
+then the detail.
+
+1. No. It has never been tested on Moodle Workplace, any version.
+2. Yes, one specific and concrete risk on a multi-tenant site. Details below.
+3. Not on the roadmap, and not explicitly out of scope either. Honest position:
+   nobody here runs Workplace, so we have no way to test a claim of support.
+
+We added a Moodle Workplace section to the README because of your question, and
+it says the same thing in more detail:
+https://github.com/saylordotorg/moodle-local_ai_course_assistant#moodle-workplace
+
+WHAT WE ACTUALLY KNOW
+
+CI covers Moodle LMS only: 4.5, 5.0 and 5.1, on PHP 8.1 to 8.3, against both
+PostgreSQL and MariaDB. There is no Workplace instance in our infrastructure, so
+there is no evidence either way. That is not the same as believing it works.
+
+The plugin contains no reference to Workplace, tenants or tool_tenant anywhere.
+It was written for a single-tenant site, because that is what Saylor runs.
+
+THE SPECIFIC RISK, SO YOU CAN EVALUATE IT YOURSELF
+
+Four admin pages are gated on system context and query learner data with no
+tenant predicate: analytics.php, audit_log.php, rag_admin.php and
+prompt_metrics.php. analytics::get_overview(0) means every course on the site.
+
+On a single-tenant site that is correct behavior. On a multi-tenant Workplace
+site, a tenant administrator who holds the relevant capability at system context
+would see data across tenants. Whether that is reachable depends on how your
+roles are assigned, which is exactly the kind of thing we cannot test from here.
+
+The learner-facing side is course-scoped throughout, so the widget itself is a
+much smaller concern than those four pages.
+
+IF YOU WANT TO EVALUATE IT ANYWAY
+
+Two things would make this much less of a guess, and we would act on either:
+
+- If you can run it on a Workplace staging tenant and tell us what breaks, we
+  will fix what is fixable and document what is not. A bug report from a real
+  Workplace site is worth more than any amount of speculation from us.
+- If you tell us which Workplace features matter to you (workspaces, dynamic
+  rules, shared spaces, certifications), we can at least say which parts of the
+  plugin would obviously collide with them.
+
+We would rather say "not tested, here is the specific thing that worries us"
+than let silence read as tacit support.
