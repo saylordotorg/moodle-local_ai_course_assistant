@@ -110,6 +110,28 @@ for name, path in PAGES:
         code, html = get(BASE + path)
     except Exception as e:
         print(f'FAIL {name}: request error {e}'); fails += 1; continue
+
+    # "Section error!" is thrown by admin_externalpage_setup() when the page's
+    # admin section is not registered, which happens when Moodle skipped the
+    # plugin's settings.php because the plugin is pending upgrade. It reads like
+    # the page is broken. It is not, and bisecting against an older tag
+    # reproduces it, because the installed version is behind both tags. That
+    # cost a wrong bug report (#291) on 2026-10-02.
+    #
+    # Said here rather than as a pre-flight probe: every candidate probe was
+    # cache-timing dependent and fired inconsistently, and a warning that cries
+    # wolf is worse than none. This keys off the actual symptom.
+    if code != 200 and 'Section error' in html:
+        print(f'FAIL {name} [{path}] -> admin section not registered')
+        print('     This is almost always a pending plugin upgrade, not a broken page.')
+        print('     Moodle skips settings.php for a plugin whose installed version is')
+        print('     behind version.php, so the admin category never registers. Run:')
+        print('         php admin/cli/purge_caches.php')
+        print('         php admin/cli/upgrade.php --non-interactive')
+        print('     If upgrade.php says "No upgrade needed", clear the stale hash first:')
+        print('         php -r \'define("CLI_SCRIPT",1);require "config.php";unset_config("allversionshash");\'')
+        fails += 1
+        continue
     scan = html
     # Moodle core inlines its own JS string cache, which legitimately contains
     # {$a} and mustache-looking text; and two of our own attributes are
