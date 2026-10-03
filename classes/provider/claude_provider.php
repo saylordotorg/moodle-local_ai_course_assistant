@@ -51,7 +51,10 @@ class claude_provider extends base_provider {
     }
 
     protected function get_default_model(): string {
-        return 'claude-sonnet-4-20250514';
+        // Refreshed from the dated claude-sonnet-4-20250514 snapshot, which was
+        // two generations old and 200k context. Only reached when an admin
+        // selects this provider without naming a model.
+        return 'claude-sonnet-5-5';
     }
 
     /**
@@ -117,6 +120,49 @@ class claude_provider extends base_provider {
             }
         }
         return false;
+    }
+
+    /**
+     * Prefixes of Anthropic models that REJECT a forced tool choice.
+     *
+     * Claude Opus 5.5, Claude Sonnet 5.5, Fable 5.1 and Mythos 5.1 removed
+     * `tool_choice` of type `any` and `tool`: sending either returns HTTP 400
+     * ("tool_choice: type \"tool\" and \"any\" are not supported for this
+     * model."), on count_tokens and Batches too. Older models, including
+     * claude-opus-5 and claude-sonnet-5, still accept it.
+     *
+     * A DENY list rather than an allow list, because the denied ids are all
+     * LONGER than the ones they could be confused with: 'claude-opus-5-5' is
+     * not a prefix of 'claude-opus-5', so prefix matching is safe in this
+     * direction. The temperature list next door had to be an allow list for
+     * exactly the opposite reason.
+     *
+     * @var string[]
+     */
+    public const FORCED_TOOL_CHOICE_DENY_PREFIXES = [
+        'claude-opus-5-5',
+        'claude-sonnet-5-5',
+        'claude-fable-5-1',
+        'claude-mythos-5-1',
+    ];
+
+    /**
+     * Whether this model accepts tool_choice type 'tool' / 'any'.
+     *
+     * @param string $model
+     * @return bool
+     */
+    private static function model_supports_forced_tool_choice(string $model): bool {
+        $model = strtolower(trim($model));
+        if ($model === '') {
+            return true;
+        }
+        foreach (self::FORCED_TOOL_CHOICE_DENY_PREFIXES as $prefix) {
+            if (str_starts_with($model, $prefix)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -220,7 +266,18 @@ class claude_provider extends base_provider {
         // Adaptive thinking: Claude decides when and how much to reason.
         if (!empty($options['thinking'])) {
             $body['thinking'] = ['type' => 'adaptive'];
-            $body['temperature'] = 1;
+            // Extended thinking on the models that still take sampling
+            // parameters requires temperature exactly 1. The reasoning-class
+            // models from Opus 4.7 on removed the parameter outright and
+            // return HTTP 400 if it is sent AT ALL, so this branch has to
+            // consult the same gate as the one below rather than assume that
+            // turning thinking on makes temperature safe. Without the check,
+            // every thinking call to claude-opus-5-5 failed with a 400 while
+            // the non-thinking path worked, which reads like an intermittent
+            // provider fault rather than a request we are building wrong.
+            if (self::model_supports_temperature($this->model)) {
+                $body['temperature'] = 1;
+            }
         } else if (!self::model_supports_temperature($this->model)) {
             // v5.11.0: Opus 4.7+ (and other reasoning-class models) reject the
             // temperature parameter with HTTP 400 "temperature is deprecated
@@ -238,10 +295,32 @@ class claude_provider extends base_provider {
                 // Wrapped or bare -- see the note in openai_compatible_provider.
                 'input_schema' => $schema['schema'] ?? $schema,
             ]];
-            $body['tool_choice'] = [
-                'type' => 'tool',
-                'name' => $schema['name'] ?? 'structured_output',
-            ];
+            if (self::model_supports_forced_tool_choice($this->model)) {
+                $body['tool_choice'] = [
+                    'type' => 'tool',
+                    'name' => $schema['name'] ?? 'structured_output',
+                ];
+            } else {
+                // Opus 5.5 and its generation reject a forced tool choice.
+                // 'auto' plus strict keeps the arguments schema-valid, and the
+                // instruction appended to the system prompt is what actually
+                // steers the call. Sending the forced form here returned a 400
+                // for the whole request, so structured output was not degraded
+                // on these models, it was broken.
+                $body['tools'][0]['strict'] = true;
+                $body['tool_choice'] = ['type' => 'auto'];
+                // Appended as its OWN system block, not concatenated onto the
+                // first one: that block carries cache_control, so editing its
+                // text would invalidate the cached prefix on every call whose
+                // schema name differs. ($body['system'] is a list of content
+                // blocks here, not a string.)
+                $body['system'][] = [
+                    'type' => 'text',
+                    'text' => 'Respond by calling the '
+                        . ($schema['name'] ?? 'structured_output')
+                        . ' tool. Do not answer in prose.',
+                ];
+            }
         }
 
         if ($stream) {

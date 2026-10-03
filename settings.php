@@ -2682,15 +2682,23 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/premium_escalation_model',
         get_string('settings:premium_escalation_model', 'local_ai_course_assistant'),
         get_string('settings:premium_escalation_model_desc', 'local_ai_course_assistant'),
-        // claude-sonnet-5, not an Opus. Measured on the 50-prompt golden tutor
-        // set 2026-08-22: sonnet-5 scored 14.56/15 against opus-5's 14.22 at
-        // 0.352 cents/call against 2.224 -- higher quality for roughly a sixth
-        // of the cost, and a third of the time to first token. The escalation
-        // tier exists to buy quality on hard turns; on this evidence an Opus
-        // target bought latency and spend instead. Note the previous default
-        // was opus-4-8, which was not itself in that benchmark; the cost
-        // argument holds regardless since 4.8 and 5 share a price tier.
-        'claude-sonnet-5',
+        // claude-opus-5-5, changed from claude-sonnet-5 on 2026-10-03 at Tom's
+        // direction. Read the next paragraph before changing it back or
+        // treating this as benchmarked.
+        //
+        // This default is NOT supported by the golden-tutor benchmark. That run
+        // (2026-08-22, 50 prompts) compared sonnet-5 against opus-5 and sonnet-5
+        // won on both axes: 14.56/15 against 14.22, at 0.352 cents/call against
+        // 2.224, with a third of the time to first token. On that evidence an
+        // Opus target bought latency and spend and no quality. Opus 5.5 was not
+        // in that benchmark and did not exist when it ran. It is cheaper than
+        // the Opus 5 that lost ($4/$20 per MTok against $5/$25), which narrows
+        // the cost gap but does not close it, and says nothing about quality.
+        //
+        // So this is a deliberate, un-benchmarked choice. Re-run
+        // run_provider_benchmark against the golden tutor set with opus-5-5 in
+        // the pool before relying on it, and record the result here.
+        'claude-opus-5-5',
         // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
         PARAM_TEXT
     ));
