@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^1.0.0",
-    "rollup": "^4.63.4",
+    "rollup": "^4.63.5",
     "rollup-plugin-postcss": "^4.0.2"
   }
 }
