@@ -3152,3 +3152,6 @@ $string['settingspage:rerank'] = 'পুনঃক্রম';
 $string['settingspage:extraction'] = 'নথি নিষ্কাশন';
 $string['settingspage:feedback'] = 'জরিপ ও মতামত';
 $string['settingspage:operations'] = 'সহনশীলতা ও পরিচালনা';
+
+$string['survey_admin:err_invalid_bounds'] = 'রেটিং প্রশ্নে {$a->min} থেকে {$a->max} এর মধ্যে স্কেল ব্যবহার করতে হবে, ছোট মানটি আগে।';
+$string['survey_admin:err_no_title'] = 'জরিপের শিরোনাম লিখুন।';

@@ -3152,3 +3152,6 @@ $string['settingspage:rerank'] = '재순위화';
 $string['settingspage:extraction'] = '문서 추출';
 $string['settingspage:feedback'] = '설문 및 피드백';
 $string['settingspage:operations'] = '복원력 및 운영';
+
+$string['survey_admin:err_invalid_bounds'] = '평가 문항은 {$a->min}에서 {$a->max} 사이의 척도를 사용해야 하며, 낮은 값을 먼저 입력해야 합니다.';
+$string['survey_admin:err_no_title'] = '설문 제목을 입력하세요.';

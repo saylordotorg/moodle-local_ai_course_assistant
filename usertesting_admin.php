@@ -82,8 +82,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ?? get_string('usertesting_admin:rating_label_default', 'local_ai_course_assistant')),
                     PARAM_TEXT
                 );
-                $item['min'] = (int) ($t['min'] ?? 1);
-                $item['max'] = (int) ($t['max'] ?? 5);
+                // The same defect as issue #288, in this sibling page. Tasks
+                // are posted as one PARAM_RAW JSON blob, so the min/max
+                // attributes on the number inputs are not merely advisory,
+                // the browser never sees these values at all. min > max
+                // renders zero rating buttons and ui.js will not let the
+                // learner advance without picking one, and a crafted max
+                // builds a button and a listener per step for every learner.
+                $ratingmin = (int) ($t['min'] ?? usertesting_manager::RATING_SCALE_MIN);
+                $ratingmax = (int) ($t['max'] ?? usertesting_manager::RATING_SCALE_DEFAULT_MAX);
+                if ($ratingmin < usertesting_manager::RATING_SCALE_MIN
+                        || $ratingmax > usertesting_manager::RATING_SCALE_MAX
+                        || $ratingmin > $ratingmax) {
+                    // Borrowed from survey_admin, as this page already borrows
+                    // several of its labels; the wording is scale-generic.
+                    \core\notification::error(get_string('survey_admin:err_invalid_bounds',
+                        'local_ai_course_assistant', (object) [
+                            'min' => usertesting_manager::RATING_SCALE_MIN,
+                            'max' => usertesting_manager::RATING_SCALE_MAX,
+                        ]));
+                    redirect($PAGE->url);
+                }
+                $item['min'] = $ratingmin;
+                $item['max'] = $ratingmax;
                 $item['min_label'] = clean_param((string) ($t['min_label'] ?? ''), PARAM_TEXT);
                 $item['max_label'] = clean_param((string) ($t['max_label'] ?? ''), PARAM_TEXT);
                 $item['follow_up'] = clean_param((string) ($t['follow_up'] ?? ''), PARAM_TEXT);
@@ -112,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect($PAGE->url);
         }
 
-        $existing = usertesting_manager::get_active_taskset($courseid);
+        $existing = usertesting_manager::get_active_taskset_raw($courseid);
         if ($existing && (int) $existing->courseid === $courseid) {
             usertesting_manager::update_taskset((int) $existing->id, $title, $clean, $externalurl, true);
             \core\notification::success(get_string('usertesting_admin:saved_updated', 'local_ai_course_assistant'));
@@ -144,7 +165,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Load current task set.
 usertesting_manager::ensure_default_taskset();
-$taskset = usertesting_manager::get_active_taskset($courseid);
+// Raw, not repaired: this editor posts back whatever it is seeded with.
+$taskset = usertesting_manager::get_active_taskset_raw($courseid);
 $is_inherited = ($taskset && (int) $taskset->courseid !== $courseid && $courseid > 0);
 $tasks = $taskset ? $taskset->tasks : usertesting_manager::DEFAULT_TASKS;
 $title = $taskset

@@ -3198,3 +3198,6 @@ $string['settingspage:rerank'] = 'Muling pagraranggo';
 $string['settingspage:extraction'] = 'Pagkuha ng dokumento';
 $string['settingspage:feedback'] = 'Mga survey at feedback';
 $string['settingspage:operations'] = 'Katatagan at operasyon';
+
+$string['survey_admin:err_invalid_bounds'] = 'Ang mga tanong na may rating ay dapat gumamit ng sukat mula {$a->min} hanggang {$a->max}, mababang halaga muna.';
+$string['survey_admin:err_no_title'] = 'Maglagay ng pamagat ng survey.';

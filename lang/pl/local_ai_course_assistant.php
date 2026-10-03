@@ -3154,3 +3154,6 @@ $string['settingspage:rerank'] = 'Zmiana kolejności';
 $string['settingspage:extraction'] = 'Ekstrakcja dokumentów';
 $string['settingspage:feedback'] = 'Ankiety i opinie';
 $string['settingspage:operations'] = 'Odporność i eksploatacja';
+
+$string['survey_admin:err_invalid_bounds'] = 'Pytania oceniające muszą używać skali od {$a->min} do {$a->max}, zaczynając od niższej wartości.';
+$string['survey_admin:err_no_title'] = 'Wpisz tytuł ankiety.';

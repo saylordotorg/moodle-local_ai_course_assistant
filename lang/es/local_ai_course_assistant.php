@@ -3181,3 +3181,6 @@ $string['settingspage:rerank'] = 'Reordenación';
 $string['settingspage:extraction'] = 'Extracción de documentos';
 $string['settingspage:feedback'] = 'Encuestas y comentarios';
 $string['settingspage:operations'] = 'Resiliencia y operaciones';
+
+$string['survey_admin:err_invalid_bounds'] = 'Las preguntas de valoración deben usar una escala entre {$a->min} y {$a->max}, con el extremo bajo primero.';
+$string['survey_admin:err_no_title'] = 'Introduce un título para la encuesta.';

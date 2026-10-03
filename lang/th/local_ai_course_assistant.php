@@ -3153,3 +3153,6 @@ $string['settingspage:rerank'] = 'การจัดอันดับใหม�
 $string['settingspage:extraction'] = 'การสกัดเอกสาร';
 $string['settingspage:feedback'] = 'แบบสอบถามและข้อเสนอแนะ';
 $string['settingspage:operations'] = 'ความทนทานและการปฏิบัติการ';
+
+$string['survey_admin:err_invalid_bounds'] = 'คำถามแบบให้คะแนนต้องใช้สเกลระหว่าง {$a->min} ถึง {$a->max} โดยใส่ค่าที่น้อยกว่าก่อน';
+$string['survey_admin:err_no_title'] = 'กรอกชื่อแบบสำรวจ';

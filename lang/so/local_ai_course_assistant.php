@@ -3198,3 +3198,6 @@ $string['settingspage:rerank'] = 'Dib u kala sare marinta';
 $string['settingspage:extraction'] = 'Soo saarista dukumiintiga';
 $string['settingspage:feedback'] = 'Sahamyada iyo jawaab celinta';
 $string['settingspage:operations'] = 'Adkaysiga iyo hawlgalka';
+
+$string['survey_admin:err_invalid_bounds'] = 'Su\'aalaha qiimaynta waa inay isticmaalaan cabbir u dhexeeya {$a->min} iyo {$a->max}, tirada yar horta.';
+$string['survey_admin:err_no_title'] = 'Geli cinwaanka sahanka.';

@@ -3175,3 +3175,6 @@ $string['settingspage:rerank'] = 'Переупорядочение';
 $string['settingspage:extraction'] = 'Извлечение из документов';
 $string['settingspage:feedback'] = 'Опросы и отзывы';
 $string['settingspage:operations'] = 'Устойчивость и эксплуатация';
+
+$string['survey_admin:err_invalid_bounds'] = 'Вопросы с оценкой должны использовать шкалу от {$a->min} до {$a->max}, начиная с меньшего значения.';
+$string['survey_admin:err_no_title'] = 'Введите название опроса.';

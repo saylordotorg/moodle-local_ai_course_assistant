@@ -3175,3 +3175,6 @@ $string['settingspage:rerank'] = 'மறுதரவரிசை';
 $string['settingspage:extraction'] = 'ஆவண பிரித்தெடுத்தல்';
 $string['settingspage:feedback'] = 'கணக்கெடுப்பும் கருத்தும்';
 $string['settingspage:operations'] = 'தாங்குதிறனும் செயல்பாடும்';
+
+$string['survey_admin:err_invalid_bounds'] = 'மதிப்பீட்டு கேள்விகள் {$a->min} முதல் {$a->max} வரையிலான அளவைப் பயன்படுத்த வேண்டும், குறைந்த மதிப்பு முதலில்.';
+$string['survey_admin:err_no_title'] = 'கணக்கெடுப்பின் தலைப்பை உள்ளிடவும்.';

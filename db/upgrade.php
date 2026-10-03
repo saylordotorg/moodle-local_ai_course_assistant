@@ -2120,6 +2120,58 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100103, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026100106) {
+        // Issue #288: rating scales were stored with no range check, so rows
+        // can hold min > max (which renders a question with no buttons at all)
+        // or a scale wide enough to build one button per step for every
+        // learner who opens the survey.
+        //
+        // The save path now refuses those, and the learner-facing read path
+        // repairs them, but a repair that only happens at render time is
+        // invisible and undated. Doing it once here means the stored data
+        // matches what is shown, and the change is logged with the old and new
+        // bounds so the survey responses recorded under the old scale stay
+        // interpretable afterwards.
+        $surveys = $DB->get_recordset('local_ai_course_assistant_surveys', null, '', 'id, questions');
+        $repaired = 0;
+        foreach ($surveys as $survey) {
+            $decoded = json_decode($survey->questions, true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+
+            $fixed = \local_ai_course_assistant\survey_manager::normalize_questions($decoded);
+            if ($fixed === $decoded) {
+                continue;
+            }
+
+            foreach ($fixed as $i => $q) {
+                $was = $decoded[$i] ?? [];
+                if (($q['type'] ?? '') !== 'rating') {
+                    continue;
+                }
+                if (($was['min'] ?? null) === ($q['min'] ?? null)
+                        && ($was['max'] ?? null) === ($q['max'] ?? null)) {
+                    continue;
+                }
+                mtrace("  survey {$survey->id} question {$i}: rating scale "
+                    . json_encode($was['min'] ?? null) . '..' . json_encode($was['max'] ?? null)
+                    . " repaired to {$q['min']}..{$q['max']}");
+            }
+
+            $DB->set_field('local_ai_course_assistant_surveys', 'questions',
+                json_encode($fixed), ['id' => $survey->id]);
+            $repaired++;
+        }
+        $surveys->close();
+
+        if ($repaired > 0) {
+            mtrace("local_ai_course_assistant: repaired rating scales on {$repaired} survey(s).");
+        }
+
+        upgrade_plugin_savepoint(true, 2026100106, 'local', 'ai_course_assistant');
+    }
+
 
     return true;
 }

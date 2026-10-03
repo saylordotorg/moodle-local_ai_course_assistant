@@ -30,6 +30,15 @@ class usertesting_manager {
     /** @var string Table name for responses. */
     private const TABLE_RESPONSES = 'local_ai_course_assistant_ut_resp';
 
+    /** @var int Lowest value a rating task's scale may start at. */
+    const RATING_SCALE_MIN = 1;
+
+    /** @var int Highest value a rating task's scale may end at. */
+    const RATING_SCALE_MAX = 10;
+
+    /** @var int Scale top used when a rating task does not name one. */
+    const RATING_SCALE_DEFAULT_MAX = 5;
+
     /** @var array Default user testing tasks — useful out of the box. */
     const DEFAULT_TASKS = [
         [
@@ -108,6 +117,30 @@ class usertesting_manager {
      * @return object|null Task set record with decoded tasks, or null.
      */
     public static function get_active_taskset(int $courseid): ?object {
+        $taskset = self::get_active_taskset_raw($courseid);
+
+        if (!$taskset) {
+            return null;
+        }
+
+        if (is_array($taskset->tasks)) {
+            $taskset->tasks = self::normalize_tasks($taskset->tasks);
+        }
+
+        return $taskset;
+    }
+
+    /**
+     * Get the active task set exactly as stored, with no rating-scale repair.
+     *
+     * The admin editor must use this: it seeds its form from what it is given
+     * and posts that back on the next save, so handing it repaired tasks would
+     * turn a display fix into a silent one-way migration.
+     *
+     * @param int $courseid
+     * @return object|null Task set record with decoded tasks, or null.
+     */
+    public static function get_active_taskset_raw(int $courseid): ?object {
         global $DB;
 
         // Course-specific first.
@@ -130,6 +163,61 @@ class usertesting_manager {
 
         $taskset->tasks = json_decode($taskset->tasks, true);
         return $taskset;
+    }
+
+    /**
+     * Clamp the rating scales on task sets read back from the database.
+     *
+     * The same defect as issue #288, in the sibling admin page: the save path
+     * took any integers it was posted, so an action_then_rate task could be
+     * stored with min > max, which renders zero rating buttons while
+     * amd/src/ui.js refuses to advance until a rating is picked (a panel the
+     * learner cannot complete), or with a scale wide enough to build one
+     * button and one listener per step for every learner who opens it.
+     *
+     * Mirrors survey_manager::normalize_questions(), including sliding an
+     * out-of-window range in with its span intact rather than clamping each
+     * end, which would collapse it to a single unusable value.
+     *
+     * @param array $tasks Decoded task definitions.
+     * @return array The same tasks, with every rating scale answerable.
+     */
+    public static function normalize_tasks(array $tasks): array {
+        foreach ($tasks as $i => $task) {
+            if (!is_array($task) || ($task['type'] ?? '') !== 'action_then_rate') {
+                continue;
+            }
+
+            $min = (int) ($task['min'] ?? self::RATING_SCALE_MIN);
+            $max = (int) ($task['max'] ?? self::RATING_SCALE_DEFAULT_MAX);
+
+            if ($min > $max) {
+                [$min, $max] = [$max, $min];
+            }
+
+            // Clamp each end into the window first, which keeps a bound that
+            // was already valid exactly where the admin put it.
+            $storedspan = $max - $min;
+            $min = max(self::RATING_SCALE_MIN, min(self::RATING_SCALE_MAX, $min));
+            $max = max(self::RATING_SCALE_MIN, min(self::RATING_SCALE_MAX, $max));
+
+            // Clamping alone collapses a range stored WHOLLY outside the
+            // window to a single point: 11..12 and 20..30 both became 10..10,
+            // which renders one button, forces every respondent to the same
+            // value and yields no information at all. That is worse than the
+            // zero-button render this set out to fix. Only in that case, slide
+            // the range back inside with as much of its span as will fit.
+            if ($min === $max && $storedspan > 0) {
+                $span = min($storedspan, self::RATING_SCALE_MAX - self::RATING_SCALE_MIN);
+                $min = max(self::RATING_SCALE_MIN, min(self::RATING_SCALE_MAX - $span, $min));
+                $max = $min + $span;
+            }
+
+            $tasks[$i]['min'] = $min;
+            $tasks[$i]['max'] = $max;
+        }
+
+        return $tasks;
     }
 
     /**

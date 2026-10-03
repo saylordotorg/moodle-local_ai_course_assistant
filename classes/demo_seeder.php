@@ -28,6 +28,12 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class demo_seeder {
+
+    /** @var int Most demo students one seed run may create. */
+    public const MAX_DEMO_USERS = 100;
+
+    /** @var int Most weeks of history one seed run may span. */
+    public const MAX_DEMO_WEEKS = 52;
     /** @var string SQL LIKE pattern matching every username this seeder creates. */
     private const DEMO_USERNAME_PATTERN = 'demo_student_%';
 
@@ -181,8 +187,14 @@ class demo_seeder {
         require_once($CFG->libdir . '/enrollib.php');
 
         $course = $DB->get_record('course', ['id' => $courseid], 'id,fullname,shortname', MUST_EXIST);
-        $numusers = max(1, $numusers);
-        $numweeks = max(1, $numweeks);
+        // Both ends, not just the floor. These drive a real account-creation
+        // loop: an unbounded count allocates one username string per requested
+        // user before any DB work (a memory-limit fatal that the caller's
+        // try/catch cannot catch), and a merely large one quietly creates and
+        // enrols that many permanent accounts. An unbounded week count
+        // overflows the window arithmetic below into a float.
+        $numusers = min(self::MAX_DEMO_USERS, max(1, $numusers));
+        $numweeks = min(self::MAX_DEMO_WEEKS, max(1, $numweeks));
 
         if ($clear) {
             self::clear_demo_students();

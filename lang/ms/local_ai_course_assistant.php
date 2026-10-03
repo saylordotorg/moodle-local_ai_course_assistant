@@ -3197,3 +3197,6 @@ $string['settingspage:rerank'] = 'Penyusunan semula';
 $string['settingspage:extraction'] = 'Pengekstrakan dokumen';
 $string['settingspage:feedback'] = 'Tinjauan dan maklum balas';
 $string['settingspage:operations'] = 'Ketahanan dan operasi';
+
+$string['survey_admin:err_invalid_bounds'] = 'Soalan penilaian mesti menggunakan skala antara {$a->min} dan {$a->max}, dengan nilai terendah dahulu.';
+$string['survey_admin:err_no_title'] = 'Masukkan tajuk tinjauan.';

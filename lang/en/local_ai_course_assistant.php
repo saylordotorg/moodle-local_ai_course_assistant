@@ -2536,8 +2536,10 @@ $string['token_analytics:unknown_model'] = 'Unknown model';
 // notices, and the question-card editor the page builds in the browser.
 $string['survey_admin:title_course'] = 'Survey editor: {$a}';
 $string['survey_admin:title_global'] = 'Survey editor: global default';
+$string['survey_admin:err_invalid_bounds'] = 'Rating questions must use a scale between {$a->min} and {$a->max}, with the low end first.';
 $string['survey_admin:err_invalid_questions'] = 'Questions data is invalid or empty.';
 $string['survey_admin:err_no_questions'] = 'No valid questions after cleaning.';
+$string['survey_admin:err_no_title'] = 'Enter a survey title.';
 $string['survey_admin:saved_updated'] = 'Survey updated.';
 $string['survey_admin:saved_created'] = 'Survey created.';
 $string['survey_admin:reset_course_done'] = 'Course survey removed. The global default will be used.';

@@ -35,8 +35,11 @@ $PAGE->set_heading(get_string('demo:heading', 'local_ai_course_assistant'));
 
 $action = optional_param('action', '', PARAM_ALPHANUMEXT);
 $courseid = optional_param('courseid', 0, PARAM_INT);
-$users = optional_param('users', 15, PARAM_INT);
-$weeks = optional_param('weeks', 4, PARAM_INT);
+// The form's min/max attributes are advisory; the POST body is what counts.
+$usersraw = optional_param('users', 15, PARAM_INT);
+$weeksraw = optional_param('weeks', 4, PARAM_INT);
+$users = min(\local_ai_course_assistant\demo_seeder::MAX_DEMO_USERS, max(1, $usersraw));
+$weeks = min(\local_ai_course_assistant\demo_seeder::MAX_DEMO_WEEKS, max(1, $weeksraw));
 $clear = optional_param('clear', 0, PARAM_BOOL);
 
 $output = $PAGE->get_renderer('core');

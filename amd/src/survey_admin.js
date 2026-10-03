@@ -184,13 +184,16 @@ define(['core/templates', 'core/notification'], function(Templates, Notification
         var minInp = card.querySelector('.aica-sq-min-input');
         if (minInp) {
             minInp.addEventListener('input', function() {
-                q.min = parseInt(minInp.value, 10) || 1;
+                // Not `|| 1`: a typed 0 is falsy, so the old form silently
+                // rewrote it to 1 and the server-side bounds check never saw
+                // the value the admin actually entered.
+                q.min = Number.isNaN(parseInt(minInp.value, 10)) ? 1 : parseInt(minInp.value, 10);
             });
         }
         var maxInp = card.querySelector('.aica-sq-max-input');
         if (maxInp) {
             maxInp.addEventListener('input', function() {
-                q.max = parseInt(maxInp.value, 10) || 5;
+                q.max = Number.isNaN(parseInt(maxInp.value, 10)) ? 5 : parseInt(maxInp.value, 10);
             });
         }
         var minLblInp = card.querySelector('.aica-sq-minlabel-input');

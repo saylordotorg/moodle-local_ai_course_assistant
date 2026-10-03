@@ -3206,3 +3206,6 @@ $string['settingspage:rerank'] = 'Pemeringkatan ulang';
 $string['settingspage:extraction'] = 'Ekstraksi dokumen';
 $string['settingspage:feedback'] = 'Survei dan masukan';
 $string['settingspage:operations'] = 'Ketahanan dan operasional';
+
+$string['survey_admin:err_invalid_bounds'] = 'Pertanyaan penilaian harus menggunakan skala antara {$a->min} dan {$a->max}, dengan nilai terendah lebih dulu.';
+$string['survey_admin:err_no_title'] = 'Masukkan judul survei.';

@@ -3154,3 +3154,6 @@ $string['settingspage:rerank'] = 'Omrangering';
 $string['settingspage:extraction'] = 'Dokumentudtræk';
 $string['settingspage:feedback'] = 'Spørgeskemaer og feedback';
 $string['settingspage:operations'] = 'Robusthed og drift';
+
+$string['survey_admin:err_invalid_bounds'] = 'Vurderingsspørgsmål skal bruge en skala mellem {$a->min} og {$a->max}, med den lave ende først.';
+$string['survey_admin:err_no_title'] = 'Indtast en titel på undersøgelsen.';

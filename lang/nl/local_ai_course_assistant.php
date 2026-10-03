@@ -3177,3 +3177,6 @@ $string['settingspage:rerank'] = 'Herordening';
 $string['settingspage:extraction'] = 'Documentextractie';
 $string['settingspage:feedback'] = 'Enquêtes en feedback';
 $string['settingspage:operations'] = 'Veerkracht en beheer';
+
+$string['survey_admin:err_invalid_bounds'] = 'Beoordelingsvragen moeten een schaal tussen {$a->min} en {$a->max} gebruiken, met de laagste waarde eerst.';
+$string['survey_admin:err_no_title'] = 'Voer een titel voor de enquête in.';

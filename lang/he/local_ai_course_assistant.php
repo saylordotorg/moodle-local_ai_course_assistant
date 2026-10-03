@@ -3193,3 +3193,6 @@ $string['settingspage:rerank'] = 'דירוג מחדש';
 $string['settingspage:extraction'] = 'חילוץ ממסמכים';
 $string['settingspage:feedback'] = 'סקרים ומשוב';
 $string['settingspage:operations'] = 'עמידות ותפעול';
+
+$string['survey_admin:err_invalid_bounds'] = 'שאלות דירוג חייבות להשתמש בסולם בין {$a->min} ל-{$a->max}, כאשר הערך הנמוך מופיע ראשון.';
+$string['survey_admin:err_no_title'] = 'הזינו כותרת לסקר.';

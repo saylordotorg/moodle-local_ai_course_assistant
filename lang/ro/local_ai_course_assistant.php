@@ -3154,3 +3154,6 @@ $string['settingspage:rerank'] = 'Reordonare';
 $string['settingspage:extraction'] = 'Extragere documente';
 $string['settingspage:feedback'] = 'Sondaje și feedback';
 $string['settingspage:operations'] = 'Reziliență și operare';
+
+$string['survey_admin:err_invalid_bounds'] = 'Întrebările de evaluare trebuie să folosească o scală între {$a->min} și {$a->max}, cu valoarea mică prima.';
+$string['survey_admin:err_no_title'] = 'Introduceți un titlu pentru sondaj.';

@@ -246,7 +246,21 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-height: 0;
+}
+
+/* Bottom-align the transcript, so a short conversation sits just above the
+   composer instead of floating at the top of a tall drawer.
+
+   A zero-height spacer with an auto top margin absorbs the free space. Auto
+   margins resolve to 0 the moment the content overflows, so the top of a long
+   transcript stays reachable. justify-content: flex-end would NOT be safe
+   here: on a scrollable flex column browsers clip the overflowing top and
+   strand it above the scroll origin. */
+.local-ai-course-assistant__messages::before {
+    content: '';
+    flex: 0 0 auto;
+    margin-top: auto;
+    margin-bottom: -8px; /* cancel the 8px row gap the spacer would add */
 }
 
 .aica-debug-panel {

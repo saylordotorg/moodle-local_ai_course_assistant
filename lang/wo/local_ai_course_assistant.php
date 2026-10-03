@@ -3175,3 +3175,6 @@ $string['settingspage:rerank'] = 'Tëraleeti';
 $string['settingspage:extraction'] = 'Génne ci dokimaan yi';
 $string['settingspage:feedback'] = 'Laaj-laaj ak xalaat';
 $string['settingspage:operations'] = 'Dëgër ak dox';
+
+$string['survey_admin:err_invalid_bounds'] = 'Laaj yu natt dañuy jëfandikoo barem bu tollu ci diggante {$a->min} ak {$a->max}, bu gëna tuuti bi jiitu.';
+$string['survey_admin:err_no_title'] = 'Bindal turu enkët bi.';
