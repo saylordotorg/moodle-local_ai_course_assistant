@@ -1,0 +1,98 @@
+POST AS A COMMENT ON CONTRIB-10574
+(short follow-up to the long reply already posted)
+
+Hello Volodymyr,
+
+A short follow-up to my comment yesterday. Three more releases since then, and
+one correction to something I told you.
+
+THE CORRECTION
+
+I said I could not post here. That is clearly no longer true, since the comment
+went through, so whatever was blocking it has been resolved. I have not yet been
+able to confirm whether the same applies to uploading a new version to the
+directory. If you can see on your side which version is currently queued for
+review, that would settle it, and it is still the one thing standing between
+these fixes and your review queue.
+
+WHAT CHANGED SINCE v7.6.1
+
+v7.6.2 closed four defects we found ourselves while reviewing the work done for
+your findings. Four of them were data the plugin held that the people it
+belonged to could not reach:
+
+- An email opt-out stores a learner's address, and the only thing that writes
+  one is the unsubscribe link, which is followed by someone who is not logged
+  in, so every real opt-out stored no owner. Both discovery methods and both
+  erasure paths look the owner up by id, so the address survived a subject
+  access request, survived an erasure request, and survived deletion of the
+  account.
+- Consent and self-download are recorded outside any course and carry the
+  learner's IP address and browser. Every audit query keyed on the course, so
+  course zero matched none of them.
+- Clearing the remote configuration URL in the admin form left up to an hour of
+  cached remote values in place, including the system prompt. The upgrade step
+  purged that cache for exactly this reason; the form had no equivalent.
+- A learner's thumbs-down left the instructor review queue once their
+  conversation passed the history cap, because the cap trims messages and every
+  consumer joined through the message. The longer and more engaged the
+  conversation, the more likely the feedback was lost.
+
+v7.6.3 did the Templates and Output API work from #273 and #278 on five more
+admin pages, about 1,900 lines. Reviewing it found six defects, two of which the
+migration itself introduced and two of which were caught by Moodle's own
+Mustache Lint, a step with no local equivalent: two labels pointed at an input's
+name rather than its id, so clicking them did nothing and a screen reader
+announced an unnamed checkbox.
+
+v7.6.4 fixes two things worth your attention.
+
+ONE YOU WOULD HAVE HIT, HAD YOU TESTED AT DEVELOPER DEBUG
+
+The plugin settings category page returned HTTP 500 for an administrator running
+with debugging at DEVELOPER, which is how I assume a reviewer runs.
+
+Moodle serialises a settings page's entire show and hide dependency map into a
+single js_call_amd argument and warns above 1,024 characters. Ours was 5,290.
+
+The cause was not too many rules, which was my first assumption and was wrong.
+There are exactly two hide_if calls in the file. Every rule comes from one map
+applied in a loop at the end, and by the time that loop ran the page variable
+pointed at whichever page happened to be last, so all twenty-one groups landed
+on one page. The settings are now split across eleven pages by the sections the
+file already had, each rule attaches to the page that holds its setting, and the
+worst page is 878 characters. A test fails at 950 so the next person to add a
+rule finds out before you do.
+
+This is the same limit as #277, which you filed, so your finding there was
+pointing at a class of problem rather than a single instance.
+
+AND ONE A LEARNER WOULD HAVE SEEN
+
+Outside a course the assistant offered a starter called AI Project Coach, whose
+prompt reads "help with a project or assignment for this course" when there is
+no course.
+
+The filter deciding what survives outside a course was an allow list: keep
+anything of the right type except two named ones. The project coach was not
+named. The default was backwards, since outside a course nothing course shaped
+is coherent. The surface now supplies its own three starters, for technical
+trouble, for finding your way around, and for enrolment and certificates, all
+translated into the full locale set.
+
+The test for this asserted the bug. It expected the project coach to survive, so
+it would have passed indefinitely while the wrong thing stayed on screen.
+
+VERIFICATION
+
+2,019 tests, 0 failures, 7 skipped. Security validator corpus 36 of 36. PHP lint
+clean across 599 files. CI covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0
+and 5.1, on MariaDB and PostgreSQL, and includes Mustache Lint. All nine jobs
+green on the v7.6.4 commit.
+
+Releases, each with notes and a zip built from the tag:
+https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases
+
+Thanks again.
+
+Tom

@@ -1,0 +1,61 @@
+Version 7.6.4 (build 2026100105)
+
+Two fixes. One changes what a learner sees outside a course. The other stops the
+settings page erroring for administrators who run with debugging turned up.
+
+Outside a course the assistant offered to coach you through a course project.
+That is the one a learner would actually notice. The filter that decides which
+conversation starters survive outside a course was an allow list: it kept
+anything of the right type except two named ones, and the AI project coach was
+not named. Its prompt reads "help with a project or assignment for this course"
+and there is no course, so it was offering coaching for something that does not
+exist.
+
+The default was backwards. Nothing course shaped belongs on that surface, so
+support mode now brings its own starters rather than filtering someone else's:
+Something is not working, How do I...?, and Enrollment and certificates. Each
+asks what you are trying to do before answering, and none of them refers to a
+page or a course, because neither exists there. All three are translated into
+all 46 languages.
+
+The test for this asserted the bug. It expected the project coach to survive,
+so it would have passed indefinitely while the wrong thing stayed on screen.
+
+The settings page errored for administrators at developer debug level.
+Moodle hands a settings page's entire show and hide map to the browser as a
+single argument, and warns above 1,024 characters. Ours was 5,290, so the
+category page returned a server error on any site with debugging turned up,
+which is how Moodle's own plugin reviewers run.
+
+The cause was not too many rules. It was that every rule was applied to
+whichever page happened to be last, because they are all declared in one block
+at the end of the settings file. The settings are now split across eleven pages
+by the sections the file already had, each rule is attached to the page that
+actually holds its setting, and the worst page is 878 characters. A test fails
+at 950, so the next person to add a rule finds out before a reviewer does.
+
+Six document extraction toggles no longer hide when retrieval is off. They are
+checkboxes that do nothing while retrieval is off, and keeping them hidden cost
+300 characters of the budget.
+
+Three guards had quietly stopped guarding. Splitting the page left them
+reading only the first one, which holds 11 settings and no rules. One was
+scanning 11 settings for brand leaks instead of 343; another reported the rule
+map lost. All three now walk every page.
+
+2,019 tests, 0 failures, 7 skipped. Validators 36 of 36.
+
+UPGRADE NOTES
+
+No schema change and no upgrade step. The plugin settings are now spread over
+eleven pages under the same menu entry instead of one long page, so a bookmark
+to the old single page still works and lands on the first of them. No setting
+was renamed, removed or reset.
+
+If you use the Python sandbox, note that the six document extraction toggles are
+now always visible rather than hidden while retrieval is off. They still do
+nothing while retrieval is off.
+
+If you are upgrading from 7.5.x, read the 7.6.0 notes as well. That release made
+remote configuration opt-in and has an upgrade note about checking your Model
+setting first.
