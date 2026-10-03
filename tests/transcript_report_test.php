@@ -156,6 +156,38 @@ final class transcript_report_test extends \advanced_testcase {
     }
 
     /**
+     * Protocol markers never reach the teacher's export.
+     *
+     * Both live write paths strip before storing, so rows written since those
+     * fixes are clean. That does nothing for rows already in the table from
+     * before, and this export copied the stored text straight into the CSV, so
+     * a teacher opening it read the raw [SOLA_NEXT] / [SOURCE:...] /
+     * [SOLA_SCORE] blocks. Stripping on read as well as on write is what makes
+     * the guarantee hold for the data that actually exists.
+     */
+    public function test_protocol_markers_never_reach_the_export(): void {
+        $t = time();
+        $this->msg((int) $this->alice->id, 'assistant',
+            'Here is the answer.[SOLA_NEXT]Tell me more||Give an example[/SOLA_NEXT]', $t);
+        $this->msg((int) $this->alice->id, 'assistant',
+            'Cited from [SOURCE:chunk-42] the reading.', $t + 1);
+        $this->msg((int) $this->alice->id, 'assistant',
+            'Nice work.[SOLA_SCORE]4[/SOLA_SCORE]', $t + 2);
+
+        $rows = transcript_report::transcripts(['courseid' => (int) $this->course->id],
+            transcript_report::new_salt());
+
+        $this->assertCount(3, $rows);
+        foreach ($rows as $r) {
+            foreach (['SOLA_NEXT', 'SOURCE:', 'SOLA_SCORE'] as $marker) {
+                $this->assertStringNotContainsString($marker, $r['message'],
+                    "protocol marker {$marker} leaked into the export");
+            }
+        }
+        $this->assertStringContainsString('Here is the answer.', $rows[0]['message']);
+    }
+
+    /**
      * The date range filters on both ends.
      */
     public function test_date_range_filters_both_ends(): void {
