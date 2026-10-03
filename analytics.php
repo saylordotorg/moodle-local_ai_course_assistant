@@ -36,6 +36,15 @@ require_capability('moodle/site:config', $syscontext);
 
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $range    = optional_param('range', 30, PARAM_INT); // 7, 30, 0 = all.
+// Bound it: this reaches a one-array-per-day fill loop in
+// analytics::get_daily_usage(), and the page is a plain GET with no sesskey,
+// so an admin can be walked into an enormous value from a crafted link.
+// Clamped rather than whitelisted so existing bookmarks keep working.
+if ($range < 0) {
+    $range = 30;
+} else if ($range > 730) {
+    $range = 730;
+}
 $action   = optional_param('action', '', PARAM_ALPHA);
 $expa     = optional_param('expa', 0, PARAM_INT); // Experiment comparison course A.
 $expb     = optional_param('expb', 0, PARAM_INT); // Experiment comparison course B.
@@ -261,6 +270,10 @@ if ($courseid > 0) {
                     }
                     if ($q['type'] === 'rating') {
                         $sq['average'] = $q['average'] ?? 0;
+                        // The card used to print "/ 5" whatever the scale, so
+                        // an average over a 1..10 question read against the
+                        // wrong denominator.
+                        $sq['scale_max'] = $q['scale_max'] ?? 5;
                         $dist = [];
                         if (!empty($q['distribution'])) {
                             foreach ($q['distribution'] as $val => $cnt) {

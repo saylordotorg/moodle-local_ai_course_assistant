@@ -3194,3 +3194,6 @@ $string['settingspage:rerank'] = 'Перевпорядкування';
 $string['settingspage:extraction'] = 'Видобування з документів';
 $string['settingspage:feedback'] = 'Опитування та відгуки';
 $string['settingspage:operations'] = 'Стійкість та експлуатація';
+
+$string['survey_admin:err_invalid_bounds'] = 'Питання з оцінюванням мають використовувати шкалу від {$a->min} до {$a->max}, починаючи з меншого значення.';
+$string['survey_admin:err_no_title'] = 'Введіть назву опитування.';

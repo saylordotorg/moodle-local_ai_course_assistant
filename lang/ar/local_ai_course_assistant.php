@@ -3152,3 +3152,6 @@ $string['settingspage:rerank'] = 'إعادة الترتيب';
 $string['settingspage:extraction'] = 'استخراج المستندات';
 $string['settingspage:feedback'] = 'الاستبيانات والملاحظات';
 $string['settingspage:operations'] = 'المرونة والتشغيل';
+
+$string['survey_admin:err_invalid_bounds'] = 'يجب أن تستخدم أسئلة التقييم مقياسًا بين {$a->min} و{$a->max}، مع وضع الحد الأدنى أولاً.';
+$string['survey_admin:err_no_title'] = 'أدخل عنوان الاستبيان.';

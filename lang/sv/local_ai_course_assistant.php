@@ -3153,3 +3153,6 @@ $string['settingspage:rerank'] = 'Omrangering';
 $string['settingspage:extraction'] = 'Dokumentextrahering';
 $string['settingspage:feedback'] = 'Enkäter och återkoppling';
 $string['settingspage:operations'] = 'Robusthet och drift';
+
+$string['survey_admin:err_invalid_bounds'] = 'Betygsfrågor måste använda en skala mellan {$a->min} och {$a->max}, med det låga värdet först.';
+$string['survey_admin:err_no_title'] = 'Ange en titel för enkäten.';

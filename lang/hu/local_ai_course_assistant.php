@@ -3194,3 +3194,6 @@ $string['settingspage:rerank'] = 'Újrarendezés';
 $string['settingspage:extraction'] = 'Dokumentumkinyerés';
 $string['settingspage:feedback'] = 'Kérdőívek és visszajelzés';
 $string['settingspage:operations'] = 'Ellenállóképesség és üzemeltetés';
+
+$string['survey_admin:err_invalid_bounds'] = 'Az értékelő kérdéseknek {$a->min} és {$a->max} közötti skálát kell használniuk, az alsó értékkel kezdve.';
+$string['survey_admin:err_no_title'] = 'Adjon meg egy címet a felméréshez.';

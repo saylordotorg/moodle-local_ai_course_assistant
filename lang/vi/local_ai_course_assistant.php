@@ -3174,3 +3174,6 @@ $string['settingspage:rerank'] = 'Xếp hạng lại';
 $string['settingspage:extraction'] = 'Trích xuất tài liệu';
 $string['settingspage:feedback'] = 'Khảo sát và phản hồi';
 $string['settingspage:operations'] = 'Khả năng phục hồi và vận hành';
+
+$string['survey_admin:err_invalid_bounds'] = 'Câu hỏi đánh giá phải dùng thang điểm từ {$a->min} đến {$a->max}, giá trị nhỏ đứng trước.';
+$string['survey_admin:err_no_title'] = 'Nhập tiêu đề khảo sát.';

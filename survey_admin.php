@@ -54,7 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = required_param('action', PARAM_ALPHA);
 
     if ($action === 'save') {
-        $title = required_param('survey_title', PARAM_TEXT);
+        // Issue #289: required_param() treats an empty string as a missing
+        // parameter, so an admin who cleared the title and saved got a raw
+        // "A required parameter (survey_title) was missing" error page rather
+        // than the notification-and-redirect every other failure here uses.
+        $title = trim(optional_param('survey_title', '', PARAM_TEXT));
         // PARAM_RAW is required to receive the JSON envelope intact (it is a
         // json_encode'd array of question objects, not a scalar). Every decoded
         // field is cleaned field-by-field below: the type slug with
@@ -62,6 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $questionsraw = required_param('questions_json', PARAM_RAW);
         $questions = json_decode($questionsraw, true);
         $active = optional_param('survey_active', 0, PARAM_INT);
+
+        if ($title === '') {
+            \core\notification::error(get_string('survey_admin:err_no_title', 'local_ai_course_assistant'));
+            redirect($PAGE->url);
+        }
 
         if (!is_array($questions) || empty($questions)) {
             \core\notification::error(get_string('survey_admin:err_invalid_questions', 'local_ai_course_assistant'));
@@ -93,8 +102,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $item['options'] = $opts;
             }
             if ($qtype === 'rating') {
-                $item['min'] = (int) ($q['min'] ?? 1);
-                $item['max'] = (int) ($q['max'] ?? 5);
+                // Issue #288: the number inputs carry min/max attributes, but
+                // those are advisory and the POST body is the only thing that
+                // counts. min > max renders a question with no buttons at all,
+                // because the render loop is `for (r = min; r <= max; r++)`,
+                // and a crafted max builds one button per step for every
+                // learner who opens the survey.
+                $ratingmin = (int) ($q['min'] ?? survey_manager::RATING_SCALE_MIN);
+                $ratingmax = (int) ($q['max'] ?? survey_manager::RATING_SCALE_DEFAULT_MAX);
+                if ($ratingmin < survey_manager::RATING_SCALE_MIN
+                        || $ratingmax > survey_manager::RATING_SCALE_MAX
+                        || $ratingmin > $ratingmax) {
+                    \core\notification::error(get_string('survey_admin:err_invalid_bounds',
+                        'local_ai_course_assistant', (object) [
+                            'min' => survey_manager::RATING_SCALE_MIN,
+                            'max' => survey_manager::RATING_SCALE_MAX,
+                        ]));
+                    redirect($PAGE->url);
+                }
+                $item['min'] = $ratingmin;
+                $item['max'] = $ratingmax;
                 if (!empty($q['min_label'])) {
                     $item['min_label'] = clean_param((string) $q['min_label'], PARAM_TEXT);
                 }
@@ -111,12 +138,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Check if a survey already exists for this scope.
-        $existing = survey_manager::get_active_survey($courseid);
+        $existing = survey_manager::get_active_survey_raw($courseid);
         if ($existing && (int) $existing->courseid === $courseid) {
             survey_manager::update_survey((int) $existing->id, $title, $clean, (bool) $active);
             \core\notification::success(get_string('survey_admin:saved_updated', 'local_ai_course_assistant'));
         } else {
-            survey_manager::create_survey($courseid, $title, $clean);
+            survey_manager::create_survey($courseid, $title, $clean, (bool) $active);
             \core\notification::success(get_string('survey_admin:saved_created', 'local_ai_course_assistant'));
         }
 
@@ -145,8 +172,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Load current survey.
+//
+// Raw, not repaired: this page seeds its editor from whatever it is handed and
+// posts that back on the next save, so reading the normalised copy would turn
+// the #288 display repair into a silent one-way migration fired by an
+// unrelated edit. The admin sees what is really stored, and the save-path
+// bounds check makes them choose a valid scale on purpose.
 survey_manager::ensure_default_survey();
-$survey = survey_manager::get_active_survey($courseid);
+$survey = survey_manager::get_active_survey_raw($courseid);
 $is_inherited = ($survey && (int) $survey->courseid !== $courseid && $courseid > 0);
 $questions = $survey ? $survey->questions : survey_manager::DEFAULT_QUESTIONS;
 $title = $survey
@@ -228,7 +261,7 @@ $templatedata = [
         // array_values so a question list that ever arrives with gappy keys
         // still encodes as a JSON array; the editor iterates it as one.
         //
-        // (array) first, because survey_manager::get_active_survey() returns
+        // (array) first, because survey_manager::get_active_survey_raw() returns
         // whatever json_decode() gave it, which is null for a NULL or truncated
         // questions column. Under PHP 8 array_values(null) is a fatal TypeError
         // and the whole page becomes a white screen. The pre-migration code

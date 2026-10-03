@@ -169,6 +169,11 @@ class analytics {
     public static function get_daily_usage(int $courseid, int $days = 30): array {
         global $DB;
 
+        // Bound here as well as at the page, so no caller can hand this an
+        // unbounded count. Clamped before $since so the query window and the
+        // fill loop below can never disagree.
+        $days = max(1, min(730, $days));
+
         $since = time() - ($days * 86400);
         [$coursewhere, $params] = self::course_clause($courseid);
         $params['since'] = $since;

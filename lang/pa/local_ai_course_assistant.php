@@ -3174,3 +3174,6 @@ $string['settingspage:rerank'] = 'ਮੁੜ-ਦਰਜਾਬੰਦੀ';
 $string['settingspage:extraction'] = 'ਦਸਤਾਵੇਜ਼ ਕੱਢਣਾ';
 $string['settingspage:feedback'] = 'ਸਰਵੇਖਣ ਅਤੇ ਫੀਡਬੈਕ';
 $string['settingspage:operations'] = 'ਲਚਕ ਅਤੇ ਸੰਚਾਲਨ';
+
+$string['survey_admin:err_invalid_bounds'] = 'ਰੇਟਿੰਗ ਸਵਾਲਾਂ ਲਈ {$a->min} ਤੋਂ {$a->max} ਵਿਚਕਾਰ ਸਕੇਲ ਵਰਤੋ, ਛੋਟਾ ਮੁੱਲ ਪਹਿਲਾਂ।';
+$string['survey_admin:err_no_title'] = 'ਸਰਵੇਖਣ ਦਾ ਸਿਰਲੇਖ ਦਰਜ ਕਰੋ।';

@@ -3173,3 +3173,6 @@ $string['settingspage:rerank'] = 'पुनःक्रम';
 $string['settingspage:extraction'] = 'कागजात निकासी';
 $string['settingspage:feedback'] = 'सर्वेक्षण र प्रतिक्रिया';
 $string['settingspage:operations'] = 'लचिलोपन र सञ्चालन';
+
+$string['survey_admin:err_invalid_bounds'] = 'मूल्याङ्कन प्रश्नहरूले {$a->min} देखि {$a->max} बीचको स्केल प्रयोग गर्नुपर्छ, सानो मान पहिले।';
+$string['survey_admin:err_no_title'] = 'सर्वेक्षणको शीर्षक लेख्नुहोस्।';

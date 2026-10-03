@@ -258,7 +258,13 @@ class transcript_report {
                 'unit'         => $r->cmid !== null ? ($sectionof[(int) $r->cmid] ?? '') : '',
                 'type'         => (string) ($r->interaction_type ?? ''),
                 'when'         => userdate((int) $r->timecreated, get_string('strftimedatetimeshort', 'langconfig')),
-                'message'      => (string) $r->message,
+                // Strip on read as well as on write. Both live write paths
+                // (sse.php and external\send_message) scrub before storing, so
+                // new rows are clean, but that does not retroactively clean
+                // rows written before those fixes shipped. Those still carry
+                // literal [SOLA_NEXT], [SOURCE:...] and [SOLA_SCORE] blocks,
+                // and this CSV hands them to a teacher verbatim.
+                'message'      => \local_ai_course_assistant\protocol_markers::strip((string) $r->message),
             ];
         }
         return $out;

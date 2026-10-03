@@ -3182,3 +3182,6 @@ $string['settingspage:rerank'] = 'पुनर्क्रमण';
 $string['settingspage:extraction'] = 'दस्तावेज़ निष्कर्षण';
 $string['settingspage:feedback'] = 'सर्वेक्षण और प्रतिक्रिया';
 $string['settingspage:operations'] = 'लचीलापन और संचालन';
+
+$string['survey_admin:err_invalid_bounds'] = 'रेटिंग प्रश्नों में {$a->min} से {$a->max} के बीच का पैमाना होना चाहिए, छोटा मान पहले।';
+$string['survey_admin:err_no_title'] = 'सर्वेक्षण का शीर्षक दर्ज करें।';

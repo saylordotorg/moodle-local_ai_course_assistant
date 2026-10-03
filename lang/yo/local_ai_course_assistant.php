@@ -3175,3 +3175,6 @@ $string['settingspage:rerank'] = 'Ìtúnṣe ìtòlẹ́sẹẹsẹ';
 $string['settingspage:extraction'] = 'Ìyọrí àwọn ìwé';
 $string['settingspage:feedback'] = 'Ìwádìí àti èsì';
 $string['settingspage:operations'] = 'Ìfaradà àti iṣẹ́ ṣíṣe';
+
+$string['survey_admin:err_invalid_bounds'] = 'Àwọn ìbéèrè ìdíwọ̀n gbọ́dọ̀ lo òṣùwọ̀n láàrin {$a->min} àti {$a->max}, iye kékeré ní àkọ́kọ́.';
+$string['survey_admin:err_no_title'] = 'Tẹ àkòrí ìwádìí sí i.';

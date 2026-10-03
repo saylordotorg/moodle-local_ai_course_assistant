@@ -3186,3 +3186,6 @@ $string['settingspage:rerank'] = 'Irra deebi\'anii sadarkeessuu';
 $string['settingspage:extraction'] = 'Sanadoota irraa baasuu';
 $string['settingspage:feedback'] = 'Qorannoo fi yaada';
 $string['settingspage:operations'] = 'Jabina fi hojiirra oolmaa';
+
+$string['survey_admin:err_invalid_bounds'] = 'Gaaffiiwwan madaallii safartuu {$a->min} fi {$a->max} gidduu jiru fayyadamuu qabu, lakkoofsi xiqqaan dura.';
+$string['survey_admin:err_no_title'] = 'Mata duree qorannoo galchi.';

@@ -30,6 +30,15 @@ class survey_manager {
     /** @var string Table name for survey responses. */
     private const TABLE_RESPONSES = 'local_ai_course_assistant_survey_resp';
 
+    /** @var int Lowest value a rating question's scale may start at. */
+    const RATING_SCALE_MIN = 1;
+
+    /** @var int Highest value a rating question's scale may end at. */
+    const RATING_SCALE_MAX = 10;
+
+    /** @var int Scale top used when a rating question does not name one. */
+    const RATING_SCALE_DEFAULT_MAX = 5;
+
     /** @var array Default 5-question survey structure. */
     const DEFAULT_QUESTIONS = [
         [
@@ -60,14 +69,47 @@ class survey_manager {
     ];
 
     /**
-     * Get the active survey for a course.
+     * Get the active survey for a course, repaired for display.
      *
      * Checks for a course-level survey first, then falls back to the global default (courseid=0).
+     *
+     * The questions come back through normalize_questions(), so nothing with
+     * an unanswerable rating scale can reach a learner. Use
+     * get_active_survey_raw() anywhere the caller is going to WRITE the
+     * questions back, or the repair silently becomes a migration.
      *
      * @param int $courseid
      * @return object|null Survey record with decoded questions, or null if none found.
      */
     public static function get_active_survey(int $courseid): ?object {
+        $survey = self::get_active_survey_raw($courseid);
+
+        if (!$survey) {
+            return null;
+        }
+
+        if (is_array($survey->questions)) {
+            $survey->questions = self::normalize_questions($survey->questions);
+        }
+
+        return $survey;
+    }
+
+    /**
+     * Get the active survey exactly as stored, with no rating-scale repair.
+     *
+     * The admin editor must use this. It seeds its form from whatever it is
+     * given and posts that straight back on the next save, so handing it
+     * repaired questions turns a display-time fix into a one-way migration
+     * fired by an unrelated edit: an admin fixing a typo would silently
+     * overwrite a stored 1..20 scale and lose the 20 forever, with no notice
+     * and no way back. Reading raw means the admin sees what is really stored
+     * and the save-path check makes them choose a valid scale deliberately.
+     *
+     * @param int $courseid
+     * @return object|null Survey record with decoded questions, or null if none found.
+     */
+    public static function get_active_survey_raw(int $courseid): ?object {
         global $DB;
 
         // Try course-specific first.
@@ -93,6 +135,71 @@ class survey_manager {
     }
 
     /**
+     * Clamp the rating scales on questions read back from the database.
+     *
+     * Issue #288: the save path took whatever integers it was posted, so rows
+     * written before that was fixed can still hold min > max, which renders a
+     * question with no buttons at all because the render loop is
+     * `for (r = min; r <= max; r++)`, or an enormous max, which builds one
+     * button per step for every learner who opens the survey. Validating only
+     * on save would leave those existing rows rendering exactly as badly as
+     * before, so the read path repairs them too.
+     *
+     * Bounds in the wrong order are swapped rather than clamped, because the
+     * plausible way to get there is an admin typing them the wrong way round,
+     * and swapping gives back the scale they meant. Each end is then clamped
+     * into RATING_SCALE_MIN..RATING_SCALE_MAX, so a bound that was already
+     * valid stays exactly where the admin put it; only a range stored wholly
+     * outside the window, which clamping would collapse to a single value, is
+     * slid back inside with as much of its span as fits.
+     *
+     * This repairs what is RENDERED. It deliberately does not touch answers
+     * already recorded against the old scale: see get_survey_results(), which
+     * folds those values back into the histogram so the bars still reconcile
+     * with the response count.
+     *
+     * @param array $questions Decoded question definitions.
+     * @return array The same questions, with every rating scale answerable.
+     */
+    public static function normalize_questions(array $questions): array {
+        foreach ($questions as $i => $q) {
+            if (!is_array($q) || ($q['type'] ?? '') !== 'rating') {
+                continue;
+            }
+
+            $min = (int) ($q['min'] ?? self::RATING_SCALE_MIN);
+            $max = (int) ($q['max'] ?? self::RATING_SCALE_DEFAULT_MAX);
+
+            if ($min > $max) {
+                [$min, $max] = [$max, $min];
+            }
+
+            // Clamp each end into the window first, which keeps a bound that
+            // was already valid exactly where the admin put it.
+            $storedspan = $max - $min;
+            $min = max(self::RATING_SCALE_MIN, min(self::RATING_SCALE_MAX, $min));
+            $max = max(self::RATING_SCALE_MIN, min(self::RATING_SCALE_MAX, $max));
+
+            // Clamping alone collapses a range stored WHOLLY outside the
+            // window to a single point: 11..12 and 20..30 both became 10..10,
+            // which renders one button, forces every respondent to the same
+            // value and yields no information at all. That is worse than the
+            // zero-button render this set out to fix. Only in that case, slide
+            // the range back inside with as much of its span as will fit.
+            if ($min === $max && $storedspan > 0) {
+                $span = min($storedspan, self::RATING_SCALE_MAX - self::RATING_SCALE_MIN);
+                $min = max(self::RATING_SCALE_MIN, min(self::RATING_SCALE_MAX - $span, $min));
+                $max = $min + $span;
+            }
+
+            $questions[$i]['min'] = $min;
+            $questions[$i]['max'] = $max;
+        }
+
+        return $questions;
+    }
+
+    /**
      * Create a survey.
      *
      * Deactivates any other active survey for the same courseid first.
@@ -100,24 +207,34 @@ class survey_manager {
      * @param int $courseid 0 for global default, or a specific course ID.
      * @param string $title Survey title.
      * @param array $questions Array of question definitions.
+     * @param bool $active Whether the new survey becomes the live one for this scope.
      * @return int The new survey ID.
      */
-    public static function create_survey(int $courseid, string $title, array $questions): int {
+    public static function create_survey(int $courseid, string $title, array $questions,
+            bool $active = true): int {
         global $DB;
 
         $now = time();
 
-        // Deactivate any existing active survey for this scope.
-        $DB->set_field(self::TABLE_SURVEYS, 'active', 0, [
-            'courseid' => $courseid,
-            'active' => 1,
-        ]);
+        // Issue #289: this took no $active argument and always wrote active=1,
+        // so the first save for a scope discarded the posted flag while every
+        // later save honoured it. That is invisible today only because the form
+        // posts a hardcoded 1, which is exactly the shape of bug that surfaces
+        // the moment someone adds a real toggle to the UI.
+        //
+        // Only an activating save may stand the rest of the scope down.
+        if ($active) {
+            $DB->set_field(self::TABLE_SURVEYS, 'active', 0, [
+                'courseid' => $courseid,
+                'active' => 1,
+            ]);
+        }
 
         $record = new \stdClass();
         $record->courseid = $courseid;
         $record->title = $title;
         $record->questions = json_encode($questions);
-        $record->active = 1;
+        $record->active = $active ? 1 : 0;
         $record->timecreated = $now;
         $record->timemodified = $now;
 
@@ -316,23 +433,46 @@ class survey_manager {
                     break;
 
                 case 'rating':
-                    $numericvals = array_map('floatval', $answers);
+                    // Only numeric rows count. A blank or garbage answer would
+                    // otherwise floatval() to 0.0, drag the mean toward zero
+                    // and invent a spurious "0" bar.
+                    $numericvals = [];
+                    foreach ($answers as $a) {
+                        if (is_numeric($a)) {
+                            $numericvals[] = (float) $a;
+                        }
+                    }
                     $result['average'] = count($numericvals) > 0
                         ? round(array_sum($numericvals) / count($numericvals), 2)
                         : 0;
+
                     $distribution = [];
-                    $min = $qdef['min'] ?? 1;
-                    $max = $qdef['max'] ?? 5;
+                    $min = (int) ($qdef['min'] ?? self::RATING_SCALE_MIN);
+                    $max = (int) ($qdef['max'] ?? self::RATING_SCALE_DEFAULT_MAX);
                     for ($i = $min; $i <= $max; $i++) {
                         $distribution[$i] = 0;
                     }
+
+                    // Answers recorded under a pre-#288 scale sit outside the
+                    // repaired bounds. normalize_questions() fixes what is
+                    // RENDERED; it must not make recorded answers vanish from
+                    // what is COUNTED. Dropping them left the bars summing to
+                    // less than the response count beside them, with nothing
+                    // on screen explaining the gap. Folding them in is bounded
+                    // by the number of DISTINCT answers, so the enormous-scale
+                    // problem does not come back through this door.
                     foreach ($numericvals as $v) {
                         $iv = (int) $v;
-                        if (isset($distribution[$iv])) {
-                            $distribution[$iv]++;
+                        if (!isset($distribution[$iv])) {
+                            $distribution[$iv] = 0;
                         }
+                        $distribution[$iv]++;
                     }
+                    ksort($distribution);
+
                     $result['distribution'] = $distribution;
+                    $result['scale_min'] = $min;
+                    $result['scale_max'] = $max;
                     break;
 
                 case 'long_text':

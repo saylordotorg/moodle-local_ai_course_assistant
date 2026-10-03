@@ -3155,3 +3155,6 @@ $string['settingspage:rerank'] = 'Преподреждане';
 $string['settingspage:extraction'] = 'Извличане от документи';
 $string['settingspage:feedback'] = 'Анкети и обратна връзка';
 $string['settingspage:operations'] = 'Устойчивост и експлоатация';
+
+$string['survey_admin:err_invalid_bounds'] = 'Въпросите с оценка трябва да използват скала между {$a->min} и {$a->max}, като ниската стойност е първа.';
+$string['survey_admin:err_no_title'] = 'Въведете заглавие на анкетата.';

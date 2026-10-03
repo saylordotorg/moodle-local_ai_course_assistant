@@ -3199,3 +3199,6 @@ $string['settingspage:rerank'] = 'Ukuhlela kabusha';
 $string['settingspage:extraction'] = 'Ukukhipha emibhalweni';
 $string['settingspage:feedback'] = 'Izinhlolovo nempendulo';
 $string['settingspage:operations'] = 'Ukuqina nokusebenza';
+
+$string['survey_admin:err_invalid_bounds'] = 'Imibuzo yesilinganiso kumele isebenzise isikali esiphakathi kuka-{$a->min} no-{$a->max}, inani eliphansi kuqala.';
+$string['survey_admin:err_no_title'] = 'Faka isihloko senhlolovo.';

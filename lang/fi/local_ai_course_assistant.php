@@ -3154,3 +3154,6 @@ $string['settingspage:rerank'] = 'Uudelleenjärjestys';
 $string['settingspage:extraction'] = 'Asiakirjojen purku';
 $string['settingspage:feedback'] = 'Kyselyt ja palaute';
 $string['settingspage:operations'] = 'Vikasietoisuus ja ylläpito';
+
+$string['survey_admin:err_invalid_bounds'] = 'Arviointikysymysten asteikon on oltava väliltä {$a->min}–{$a->max}, pienempi arvo ensin.';
+$string['survey_admin:err_no_title'] = 'Anna kyselylle otsikko.';

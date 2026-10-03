@@ -3190,3 +3190,6 @@ $string['settingspage:rerank'] = '重排序';
 $string['settingspage:extraction'] = '文档提取';
 $string['settingspage:feedback'] = '问卷与反馈';
 $string['settingspage:operations'] = '韧性与运维';
+
+$string['survey_admin:err_invalid_bounds'] = '评分题的量表范围必须在 {$a->min} 到 {$a->max} 之间，且较小的值在前。';
+$string['survey_admin:err_no_title'] = '请输入问卷标题。';

@@ -3155,3 +3155,6 @@ $string['settingspage:rerank'] = 'Yeniden sıralama';
 $string['settingspage:extraction'] = 'Belge çıkarma';
 $string['settingspage:feedback'] = 'Anketler ve geri bildirim';
 $string['settingspage:operations'] = 'Dayanıklılık ve işletim';
+
+$string['survey_admin:err_invalid_bounds'] = 'Derecelendirme soruları {$a->min} ile {$a->max} arasında bir ölçek kullanmalı, düşük değer önce gelmelidir.';
+$string['survey_admin:err_no_title'] = 'Anket başlığı girin.';

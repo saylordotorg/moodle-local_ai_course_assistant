@@ -3155,3 +3155,6 @@ $string['settingspage:rerank'] = 'Reclassement';
 $string['settingspage:extraction'] = 'Extraction de documents';
 $string['settingspage:feedback'] = 'Enquêtes et retours';
 $string['settingspage:operations'] = 'Résilience et exploitation';
+
+$string['survey_admin:err_invalid_bounds'] = 'Les questions de notation doivent utiliser une échelle comprise entre {$a->min} et {$a->max}, en commençant par la valeur basse.';
+$string['survey_admin:err_no_title'] = 'Saisissez un titre pour le sondage.';
