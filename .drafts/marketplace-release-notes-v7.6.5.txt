@@ -1,0 +1,62 @@
+Version 7.6.5 (build 2026100106)
+
+Two admin pages could be configured into a rating question nobody could answer.
+The rest of the release bounds four more places that took a number from an
+administrator and trusted it, and the chat transcript now sits where you expect
+it to.
+
+A survey rating question could be saved with no answer at all. The number
+inputs on the admin form carry min and max attributes, but those are advisory
+and the posted values are the only thing that counts. Nothing checked them, so
+a scale entered as 5 to 1 stored cleanly and then rendered with no buttons,
+because the loop that draws them runs from the low end up to the high one and
+simply never starts. The learner was shown a required question with nothing to
+click. A large enough maximum drew one button, with its own click handler, for
+every step on the scale, for every learner who opened the survey.
+
+The save path now refuses a scale outside 1 to 10 or entered backwards, and
+says so rather than silently correcting it. Surveys already stored badly are
+repaired once, by an upgrade step that records the old and new bounds in the
+upgrade output, so what is on disk matches what is displayed and the change is
+dated rather than happening invisibly every time a page renders.
+
+The user-testing page had the same two unchecked lines, and was worse on both
+counts: its tasks are posted as a single JSON document, so the browser never
+sees the individual numbers, and it had no defensive repair of any kind. A task
+stored backwards gave the learner a panel with no rating buttons that the code
+would not let them move past. Both pages are fixed the same way.
+
+Survey results add up again. Repairing a scale moves the buckets the results
+histogram is built from, and answers recorded under the old scale fell outside
+them: they disappeared from the bars while still counting toward the response
+total and the average, so an instructor saw a chart that could not be
+reconciled with the number printed beside it. Out-of-range answers are now
+included, blank and non-numeric responses no longer create a spurious zero bar
+or pull the average down, and the average is shown against the question's own
+scale instead of always out of 5.
+
+Four other places accepted an administrator's number without an upper bound.
+The demo seeder would create as many accounts as it was asked for, so a large
+value quietly created and enrolled thousands of permanent users and a very
+large one exhausted memory before the page's error handling could report it.
+The analytics page's date range reached a loop that builds one entry per day,
+with no ceiling, on a plain link with no form token. Both are bounded now, at
+the page and again inside the function, so no other caller can bypass them.
+
+The teacher transcript export no longer leaks the assistant's internal markers.
+Both paths that write a message strip them before storing, so anything recorded
+since those fixes is clean, but that did nothing for rows already in the
+database, and the CSV copied the stored text straight through. It strips on
+read as well now.
+
+The chat transcript is bottom-aligned. A short conversation used to sit at the
+top of the drawer with a tall gap beneath it, so the assistant's newest reply
+was the furthest thing from the box you type in. It now sits just above the
+composer. Longer replies still begin at their first line, so a learner reads
+from the start.
+
+Tested: 2,042 automated tests with no failures, the security validator corpus
+at 36 of 36, and PHP lint clean across 600 files. Nine of the new behaviours
+were verified by planting the defect and confirming the test caught it.
+Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and
+5.1, on both MariaDB and PostgreSQL.
