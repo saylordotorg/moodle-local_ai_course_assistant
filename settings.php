@@ -2682,23 +2682,34 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/premium_escalation_model',
         get_string('settings:premium_escalation_model', 'local_ai_course_assistant'),
         get_string('settings:premium_escalation_model_desc', 'local_ai_course_assistant'),
-        // claude-opus-5-5, changed from claude-sonnet-5 on 2026-10-03 at Tom's
-        // direction. Read the next paragraph before changing it back or
-        // treating this as benchmarked.
+        // claude-sonnet-5, not an Opus, and now measured twice.
         //
-        // This default is NOT supported by the golden-tutor benchmark. That run
-        // (2026-08-22, 50 prompts) compared sonnet-5 against opus-5 and sonnet-5
-        // won on both axes: 14.56/15 against 14.22, at 0.352 cents/call against
-        // 2.224, with a third of the time to first token. On that evidence an
-        // Opus target bought latency and spend and no quality. Opus 5.5 was not
-        // in that benchmark and did not exist when it ran. It is cheaper than
-        // the Opus 5 that lost ($4/$20 per MTok against $5/$25), which narrows
-        // the cost gap but does not close it, and says nothing about quality.
+        // 2026-08-22, 50-prompt golden tutor set, judge claude-sonnet-4-6:
+        // sonnet-5 14.56/15 against opus-5 14.22, at 0.352 cents/call against
+        // 2.224.
         //
-        // So this is a deliberate, un-benchmarked choice. Re-run
-        // run_provider_benchmark against the golden tutor set with opus-5-5 in
-        // the pool before relying on it, and record the result here.
-        'claude-opus-5-5',
+        // 2026-10-03, same 50 prompts, same judge, re-run when this default
+        // was briefly moved to claude-opus-5-5 (PR #296) and benchmarked
+        // before shipping:
+        //
+        //   sonnet-5   14.46/15   0.411 c/call   P50 TTFT   650 ms
+        //   opus-5     14.38/15   2.290 c/call   P50 TTFT 5,158 ms
+        //   opus-5-5   14.00/15   1.395 c/call   P50 TTFT 2,299 ms
+        //
+        // sonnet-5 is the only model on the cost/quality Pareto frontier, and
+        // the 08-22 ranking reproduced, so the harness is stable. opus-5-5
+        // came LAST: 0.46 below sonnet-5 (past the harness's 0.3 tie rule) at
+        // 3.4x the cost and 3.5x the time to first token.
+        //
+        // The whole gap is Socratic guidance. Accuracy and tone were 4.98 to
+        // 5.00 for all three; Socratic was 4.48 / 4.42 / 4.04, and opus-5-5
+        // scored 3 or below on 14 of 50 prompts against sonnet-5's 4. Its
+        // biggest single loss was the socratic_explanation category, 13.90
+        // against 14.90. It is not less accurate, it is more willing to hand
+        // over the answer, which is the wrong failure for a tutor and exactly
+        // the turns this tier escalates. Untested: opus-5-5 above its default
+        // effort (medium), or with a prompt tuned for it.
+        'claude-sonnet-5',
         // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
         PARAM_TEXT
     ));
