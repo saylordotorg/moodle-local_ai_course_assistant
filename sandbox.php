@@ -84,179 +84,23 @@ $PAGE->set_heading($course->fullname);
 // An operator who wants 'self' back can host the runtime on this site and
 // point the setting at it.
 
+// Page markup lives in templates/sandbox.mustache and the behaviour in
+// amd/src/sandbox.js (CONTRIB-10574 #273). The runtime location reaches the
+// module on data attributes rather than being echoed into a script, so no PHP
+// value is ever interpolated into JavaScript on this page. That retires the
+// class of bug fixed in v7.6.1, where a French apostrophe in a lang string
+// closed a hand-quoted literal and stopped every script from running.
+//
+// The Pyodide loader is injected by the module, not listed as an AMD
+// dependency: it comes from the admin-configured location, outside Moodle's
+// module loader. Subresource-integrity is intentionally omitted: the bundle
+// pulls hash-stamped sub-files of its own, so SRI on the loader alone would
+// protect little and would break every self-hosted copy.
+$PAGE->requires->js_call_amd('local_ai_course_assistant/sandbox', 'init');
+
 echo $OUTPUT->header();
-?>
-<div style="max-width:980px;margin:0 auto">
-    <h2><?php echo get_string('sandbox:title', 'local_ai_course_assistant'); ?></h2>
-    <p class="text-muted"><?php echo get_string('sandbox:intro', 'local_ai_course_assistant'); ?></p>
-
-    <div id="aica-sandbox-status"
-         style="padding:10px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;margin:14px 0;font-size:13px;color:#4b5563">
-        <?php echo get_string('sandbox:loading', 'local_ai_course_assistant'); ?>
-    </div>
-
-    <label for="aica-sandbox-code" style="display:block;font-weight:600;margin-bottom:6px">
-        <?php echo get_string('sandbox:code_label', 'local_ai_course_assistant'); ?>
-    </label>
-    <textarea id="aica-sandbox-code" rows="14"
-              spellcheck="false"
-              style="width:100%;font-family:Menlo,Monaco,Consolas,monospace;font-size:13px;line-height:1.55;padding:10px;border:1px solid #d1d5db;border-radius:8px;tab-size:4"
-              placeholder="<?php echo s(get_string('sandbox:code_placeholder', 'local_ai_course_assistant')); ?>&#10;print('hello')"><?php echo s(get_string('sandbox:default_code_comment', 'local_ai_course_assistant')); ?>
-for n in range(1, 11):
-    print(n, n*n)
-</textarea>
-
-    <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
-        <button type="button" id="aica-sandbox-run" class="btn btn-primary" disabled>
-            <?php echo get_string('sandbox:run', 'local_ai_course_assistant'); ?>
-        </button>
-        <button type="button" id="aica-sandbox-clear" class="btn btn-outline-secondary">
-            <?php echo get_string('sandbox:clear', 'local_ai_course_assistant'); ?>
-        </button>
-        <span id="aica-sandbox-running" style="display:none;color:#6b7280;font-size:13px">
-            <?php echo get_string('sandbox:running', 'local_ai_course_assistant'); ?>
-        </span>
-    </div>
-
-    <h3 style="margin-top:24px;font-size:14px;text-transform:uppercase;letter-spacing:0.04em;color:#6b7280">
-        <?php echo get_string('sandbox:output_heading', 'local_ai_course_assistant'); ?>
-    </h3>
-    <pre id="aica-sandbox-stdout"
-         style="background:#0f172a;color:#e2e8f0;padding:14px;border-radius:8px;font-family:Menlo,Monaco,Consolas,monospace;font-size:13px;line-height:1.55;min-height:60px;max-height:360px;overflow:auto;margin:0"></pre>
-    <pre id="aica-sandbox-stderr"
-         style="background:#7f1d1d;color:#fee2e2;padding:14px;border-radius:8px;font-family:Menlo,Monaco,Consolas,monospace;font-size:13px;line-height:1.55;margin:8px 0 0;display:none;max-height:240px;overflow:auto"></pre>
-
-    <p style="margin-top:18px;font-size:12px;color:#6b7280">
-        <?php echo get_string('sandbox:privacy_note', 'local_ai_course_assistant'); ?>
-    </p>
-</div>
-
-<!--
-Pyodide loader. Loads ~10MB of WASM the first time. Subsequent loads hit
-the browser cache. The base URL is the code_sandbox_pyodide_baseurl admin
-setting; operators worried about supply-chain risk, or about disclosing
-learner IP addresses to a CDN, host the runtime themselves and point the
-setting at their own copy. Subresource-integrity is intentionally omitted:
-the bundle pulls hash-stamped sub-files of its own, so SRI on the loader
-script alone would protect little and would break every self-hosted copy.
--->
-<script>
-window.languagePluginUrl = <?php echo json_encode($pyodidebase, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE); ?>;
-</script>
-<script src="<?php echo s(\local_ai_course_assistant\code_sandbox::pyodide_asset_url('pyodide.js')); ?>"></script>
-
-<script>
-(function() {
-    var status = document.getElementById('aica-sandbox-status');
-    var runBtn = document.getElementById('aica-sandbox-run');
-    var clearBtn = document.getElementById('aica-sandbox-clear');
-    var runningSpan = document.getElementById('aica-sandbox-running');
-    var stdout = document.getElementById('aica-sandbox-stdout');
-    var stderr = document.getElementById('aica-sandbox-stderr');
-    var codeArea = document.getElementById('aica-sandbox-code');
-    var pyodide = null;
-    var loading = false;
-
-    async function init() {
-        if (loading || pyodide) { return; }
-        loading = true;
-        try {
-            pyodide = await window.loadPyodide({
-                indexURL: window.languagePluginUrl
-            });
-            // Capture stdout + stderr by redirecting Python sys streams
-            // to JS console batchers we read after each run().
-            pyodide.runPython(
-                'import sys, io\n' +
-                '_aica_out = io.StringIO()\n' +
-                '_aica_err = io.StringIO()\n' +
-                'sys.stdout = _aica_out\n' +
-                'sys.stderr = _aica_err\n'
-            );
-            status.textContent = <?php echo json_encode(get_string('sandbox:ready', 'local_ai_course_assistant'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE); ?>;
-            status.style.background = '#ecfdf5';
-            status.style.borderColor = '#a7f3d0';
-            status.style.color = '#065f46';
-            runBtn.disabled = false;
-        } catch (e) {
-            status.textContent = <?php echo json_encode(get_string('sandbox:load_error', 'local_ai_course_assistant'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE); ?>;
-            status.style.background = '#fef2f2';
-            status.style.borderColor = '#fecaca';
-            status.style.color = '#991b1b';
-        }
-        loading = false;
-    }
-
-    function resetBuffers() {
-        pyodide.runPython(
-            '_aica_out.seek(0); _aica_out.truncate(0)\n' +
-            '_aica_err.seek(0); _aica_err.truncate(0)\n'
-        );
-    }
-    function readBuffer(name) {
-        return pyodide.runPython(name + '.getvalue()');
-    }
-
-    runBtn.addEventListener('click', async function() {
-        if (!pyodide) { return; }
-        runBtn.disabled = true;
-        runningSpan.style.display = 'inline';
-        stdout.textContent = '';
-        stderr.textContent = '';
-        stderr.style.display = 'none';
-        var code = codeArea.value;
-        try {
-            resetBuffers();
-            await pyodide.runPythonAsync(code);
-            stdout.textContent = readBuffer('_aica_out');
-            var errOut = readBuffer('_aica_err');
-            if (errOut) {
-                stderr.textContent = errOut;
-                stderr.style.display = 'block';
-            }
-        } catch (err) {
-            // Pyodide raises a JS error wrapping the Python traceback.
-            stdout.textContent = readBuffer('_aica_out');
-            stderr.textContent = (err && err.message) ? err.message : String(err);
-            stderr.style.display = 'block';
-        } finally {
-            runBtn.disabled = false;
-            runningSpan.style.display = 'none';
-        }
-    });
-
-    clearBtn.addEventListener('click', function() {
-        stdout.textContent = '';
-        stderr.textContent = '';
-        stderr.style.display = 'none';
-    });
-
-    // Tab key inserts a tab character instead of leaving the textarea.
-    codeArea.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            var s = codeArea.selectionStart, eend = codeArea.selectionEnd;
-            codeArea.value = codeArea.value.substring(0, s) + '    ' + codeArea.value.substring(eend);
-            codeArea.selectionStart = codeArea.selectionEnd = s + 4;
-        }
-    });
-
-    if (typeof window.loadPyodide === 'function') {
-        init();
-    } else {
-        // Pyodide loader still streaming; poll briefly.
-        var attempts = 0;
-        var t = setInterval(function() {
-            if (typeof window.loadPyodide === 'function') {
-                clearInterval(t);
-                init();
-            } else if (++attempts > 60) {
-                clearInterval(t);
-                status.textContent = <?php echo json_encode(get_string('sandbox:load_error', 'local_ai_course_assistant'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE); ?>;
-            }
-        }, 250);
-    }
-})();
-</script>
-<?php
+echo $OUTPUT->render_from_template('local_ai_course_assistant/sandbox', [
+    'pyodidebase' => $pyodidebase,
+    'loaderurl' => \local_ai_course_assistant\code_sandbox::pyodide_asset_url('pyodide.js'),
+]);
 echo $OUTPUT->footer();

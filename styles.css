@@ -6245,3 +6245,76 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
 .sola-cs-select-pedagogy { max-width: 280px; }
 .sola-cs-select-extres { max-width: 240px; }
 .sola-cs-select-level { max-width: 320px; }
+
+/* Python sandbox page (moved from inline styles in sandbox.php and from the
+   inline script it used to echo, CONTRIB-10574 #273). The ten style=""
+   attributes became these classes, and the three colours the old script wrote
+   onto the status box with element.style became the --ready and --error
+   modifiers, so no colour value crosses from PHP or JS into the markup. */
+.sola-sandbox { max-width: 980px; margin: 0 auto; }
+.sola-sandbox-status {
+    padding: 10px 14px;
+    margin: 14px 0;
+    font-size: 13px;
+    color: #4b5563;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+.sola-sandbox-status--ready { color: #065f46; background: #ecfdf5; border-color: #a7f3d0; }
+.sola-sandbox-status--error { color: #991b1b; background: #fef2f2; border-color: #fecaca; }
+.sola-sandbox-label { display: block; margin-bottom: 6px; font-weight: 600; }
+.sola-sandbox-code {
+    width: 100%;
+    padding: 10px;
+    font-family: Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    tab-size: 4;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+}
+.sola-sandbox-actions { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+.sola-sandbox-running { font-size: 13px; color: #6b7280; }
+.sola-sandbox-heading {
+    margin-top: 24px;
+    font-size: 14px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.sola-sandbox-out {
+    padding: 14px;
+    font-family: Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    border-radius: 8px;
+    overflow: auto;
+}
+.sola-sandbox-stdout { min-height: 60px; max-height: 360px; margin: 0; color: #e2e8f0; background: #0f172a; }
+.sola-sandbox-stderr { max-height: 240px; margin: 8px 0 0; color: #fee2e2; background: #7f1d1d; }
+.sola-sandbox-note { margin-top: 18px; font-size: 12px; color: #6b7280; }
+/* Last, so it wins over any display a class above might set. */
+.sola-sandbox-hidden { display: none; }
+
+/* Admin settings page (moved from inline styles in settings.php,
+   CONTRIB-10574 #273). The quicklink modifiers use .sola-quicklinks a.<class>
+   so they outrank .sola-quicklinks a, and sit after its :hover rule so hover
+   keeps them, exactly as the inline styles they replace did. */
+.sola-admin-version {
+    display: inline-flex;
+    gap: .5rem;
+    align-items: center;
+    padding: .4rem .85rem;
+    margin-bottom: .75rem;
+    font-size: .85rem;
+    color: #3b5bdb;
+    background: #f0f4ff;
+    border: 1px solid #c7d4f7;
+    border-radius: 6px;
+}
+.sola-admin-version-num { color: #868e96; }
+.sola-admin-blurb { font-size: 13px; }
+.sola-quicklinks a.sola-quicklink--emergency { font-weight: 600; color: #b91c1c; }
+.sola-quicklinks a.sola-quicklink--course-ai { background: #495057; border-color: #495057; }
+.sola-quicklinks a.sola-quicklink--back { background: #6c757d; border-color: #6c757d; }

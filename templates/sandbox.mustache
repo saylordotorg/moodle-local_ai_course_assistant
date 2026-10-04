@@ -1,0 +1,80 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/sandbox
+
+    Learner-facing in-browser Python sandbox. Replaces the echoed HTML in
+    sandbox.php with a template rendered through the Output API
+    (CONTRIB-10574 #273); the three inline script blocks moved to
+    amd/src/sandbox.js and the ten inline style attributes to styles.css.
+
+    The runtime location rides on data attributes rather than being echoed
+    into a script, so no PHP value is ever interpolated into JavaScript here.
+    That retires the class of bug fixed in v7.6.1, where a French apostrophe
+    in a lang string closed a hand-quoted JS literal and killed every script
+    on the page.
+
+    The starter code inside the textarea is whitespace-sensitive: whatever
+    sits between the tags is what the learner sees, so it is deliberately not
+    indented to match the surrounding markup.
+
+    Context variables required for this template:
+    * pyodidebase - base URL of the Pyodide runtime (admin setting, never empty here)
+    * loaderurl - full URL of pyodide.js under that base
+
+    Example context (json):
+    {
+        "pyodidebase": "https://pyodide.example.org/full/",
+        "loaderurl": "https://pyodide.example.org/full/pyodide.js"
+    }
+}}
+<div class="sola-sandbox" data-region="sola-sandbox"
+     data-pyodide-base="{{pyodidebase}}" data-pyodide-loader="{{loaderurl}}">
+    <h2>{{#str}}sandbox:title, local_ai_course_assistant{{/str}}</h2>
+    <p class="text-muted">{{#str}}sandbox:intro, local_ai_course_assistant{{/str}}</p>
+
+    <div id="aica-sandbox-status" class="sola-sandbox-status" role="status">
+        {{#str}}sandbox:loading, local_ai_course_assistant{{/str}}
+    </div>
+
+    <label for="aica-sandbox-code" class="sola-sandbox-label">
+        {{#str}}sandbox:code_label, local_ai_course_assistant{{/str}}
+    </label>
+    <textarea id="aica-sandbox-code" class="sola-sandbox-code" rows="14" spellcheck="false"
+              placeholder="{{#cleanstr}}sandbox:code_placeholder, local_ai_course_assistant{{/cleanstr}}&#10;print('hello')">{{#cleanstr}}sandbox:default_code_comment, local_ai_course_assistant{{/cleanstr}}
+for n in range(1, 11):
+    print(n, n*n)
+</textarea>
+
+    <div class="sola-sandbox-actions">
+        <button type="button" id="aica-sandbox-run" class="btn btn-primary" disabled>
+            {{#str}}sandbox:run, local_ai_course_assistant{{/str}}
+        </button>
+        <button type="button" id="aica-sandbox-clear" class="btn btn-outline-secondary">
+            {{#str}}sandbox:clear, local_ai_course_assistant{{/str}}
+        </button>
+        <span id="aica-sandbox-running" class="sola-sandbox-running sola-sandbox-hidden">
+            {{#str}}sandbox:running, local_ai_course_assistant{{/str}}
+        </span>
+    </div>
+
+    <h3 class="sola-sandbox-heading">{{#str}}sandbox:output_heading, local_ai_course_assistant{{/str}}</h3>
+    <pre id="aica-sandbox-stdout" class="sola-sandbox-out sola-sandbox-stdout"></pre>
+    <pre id="aica-sandbox-stderr" class="sola-sandbox-out sola-sandbox-stderr sola-sandbox-hidden"></pre>
+
+    <p class="sola-sandbox-note">{{#str}}sandbox:privacy_note, local_ai_course_assistant{{/str}}</p>
+</div>
