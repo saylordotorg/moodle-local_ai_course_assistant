@@ -27,8 +27,8 @@ The Marketplace description is now checked automatically against the Moodle
 versions the plugin declares, 4.5 through 5.2, so the listing can't again
 promise a version the plugin doesn't claim.
 
-Tested: 2,074 automated tests with no failures, the security validator corpus at
-36 of 36, and PHP lint clean across 609 files. Seven of the new behaviors were
+Tested: 2,075 automated tests with no failures, the security validator corpus at
+36 of 36, and PHP lint clean across 609 files. Six of the new behaviors were
 checked by deliberately reintroducing the bug and confirming the test failed,
 and the sandbox and reset button were exercised in a real browser. Continuous
 integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both

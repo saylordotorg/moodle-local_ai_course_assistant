@@ -372,16 +372,20 @@ if ($hassiteconfig) {
     // back exactly by the browser, and amd/src/reset_prompt.js handles the
     // click. admin_setting_systemprompt asks for that module only when this
     // field is actually rendered, not on every page that builds the tree.
-    $defaultprompt = get_string('settings:systemprompt_default', 'local_ai_course_assistant');
+    //
+    // The button is NOT in the description. Moodle runs every setting
+    // description through markdown_to_html(), and the default prompt is full of
+    // "## " headings, "- " bullets and blank lines, so inside a description the
+    // attribute came back with <h2>, <ul> and <p> injected into it and Reset
+    // saved HTML into the prompt, in every locale. The setting class renders the
+    // button itself, after the textarea, where Markdown never runs.
     $settings->add(new \local_ai_course_assistant\admin_setting_systemprompt(
         'local_ai_course_assistant/systemprompt',
         get_string('settings:systemprompt', 'local_ai_course_assistant'),
-        get_string('settings:systemprompt_desc', 'local_ai_course_assistant')
-        . '<br><button type="button" class="btn btn-sm btn-outline-secondary mt-1" '
-        . 'data-action="sola-reset-prompt" data-target="id_s_local_ai_course_assistant_systemprompt" '
-        . 'data-default="' . s($defaultprompt) . '">'
-        . get_string('settingspage:reset_prompt_template', 'local_ai_course_assistant') . '</button>',
-        ''
+        get_string('settings:systemprompt_desc', 'local_ai_course_assistant'),
+        '',
+        get_string('settings:systemprompt_default', 'local_ai_course_assistant'),
+        get_string('settingspage:reset_prompt_template', 'local_ai_course_assistant')
     ));
 
     // v4.11.0: prompt size + debugging controls.

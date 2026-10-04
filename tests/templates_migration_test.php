@@ -74,7 +74,7 @@ final class templates_migration_test extends \advanced_testcase {
         $PAGE->set_context(\context_system::instance());
 
         $setting = new admin_setting_systemprompt('local_ai_course_assistant/systemprompt',
-            'label', 'desc', '');
+            'label', 'desc', '', 'the template', 'Reset');
         $setting->output_html('');
 
         $this->assertStringContainsString('local_ai_course_assistant/reset_prompt',
@@ -82,15 +82,44 @@ final class templates_migration_test extends \advanced_testcase {
     }
 
     /**
-     * The registered setting uses the class and carries an exact default.
+     * With nothing to reset to there is no button, and so no module either.
      */
-    public function test_the_reset_button_carries_the_default_exactly(): void {
-        global $CFG;
+    public function test_no_reset_value_means_no_button_and_no_module(): void {
+        global $PAGE;
+        $this->resetAfterTest();
+        $PAGE->set_url('/admin/settings.php');
+        $PAGE->set_context(\context_system::instance());
+
+        $setting = new admin_setting_systemprompt('local_ai_course_assistant/systemprompt',
+            'label', 'desc', '');
+        $html = $setting->output_html('');
+
+        $this->assertStringNotContainsString('sola-reset-prompt', $html);
+        $this->assertStringNotContainsString('local_ai_course_assistant/reset_prompt',
+            $PAGE->requires->get_end_code());
+    }
+
+    /**
+     * The reset button, as Moodle actually renders it, carries the default exactly.
+     *
+     * The first version of this change put the button in the setting's
+     * description and this test read $setting->description directly. It passed,
+     * and the page was broken: format_admin_setting() runs every description
+     * through markdown_to_html(), which rewrote the default prompt's "## "
+     * headings, "- " bullets and blank lines into <h2>, <ul> and <p> INSIDE the
+     * data-default attribute, so Reset saved HTML as the prompt. The PR review
+     * caught it. So this renders through output_html(), the real path, and
+     * decodes what the browser would read.
+     */
+    public function test_the_rendered_reset_button_carries_the_default_exactly(): void {
+        global $CFG, $PAGE;
         // admin_get_root() lives in adminlib, which phpunit does not load. Load it
         // here rather than relying on an earlier test having pulled it in.
         require_once($CFG->libdir . '/adminlib.php');
         $this->resetAfterTest();
         $this->setAdminUser();
+        $PAGE->set_url('/admin/settings.php');
+        $PAGE->set_context(\context_system::instance());
 
         // locate() finds pages, not settings, and the settings are split across
         // several pages (#292), so search every page this plugin registers
@@ -109,11 +138,26 @@ final class templates_migration_test extends \advanced_testcase {
             }
         }
         $this->assertInstanceOf(admin_setting_systemprompt::class, $setting);
+        $this->assertStringNotContainsString('data-default', $setting->description,
+            'the button must not be in the description, which Moodle runs through Markdown');
 
-        $this->assertSame(1, preg_match('/data-default="([^"]*)"/', $setting->description, $m));
-        $this->assertSame(get_string('settings:systemprompt_default', 'local_ai_course_assistant'),
-            html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-        $this->assertStringNotContainsString('onclick', $setting->description);
+        // Every data-default on the rendered field, not just the first: a second
+        // button smuggled in through the Markdown-processed description would
+        // otherwise hide behind a correct first one. (A mutation doing exactly
+        // that survived the first version of this assertion.)
+        $html = $setting->output_html('');
+        $this->assertSame(1, preg_match_all('/data-default="([^"]*)"/', $html, $m),
+            'the rendered field should carry exactly one reset button');
+        $default = get_string('settings:systemprompt_default', 'local_ai_course_assistant');
+        $this->assertSame($default, html_entity_decode($m[1][0], ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            'the default prompt was altered on its way into the page');
+        $this->assertStringNotContainsString('onclick', $html);
+
+        // The template stays tokenised so a reset prompt follows a rebrand
+        // (branding::apply() resolves it when the prompt is built); a literal
+        // brand here would freeze the name into whatever an admin saves.
+        $this->assertStringNotContainsString('SOLA', $default);
+        $this->assertStringNotContainsString('Saylor', $default);
     }
 
     /**
