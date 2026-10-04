@@ -329,15 +329,13 @@ abstract class base_embedding_provider {
         // which is a prompt-budget regression with no error anywhere.
         //
         // Same knobs as the chat path so an operator tunes one thing, not two.
-        $attempts = (int) get_config('local_ai_course_assistant', 'backend_retry_attempts');
-        if ($attempts < 0) {
-            $attempts = 0;
-        }
-        $rawmax = get_config('local_ai_course_assistant', 'backend_retry_max_wait');
-        $maxwait = ($rawmax === false || $rawmax === '') ? 5 : (int) $rawmax;
+        // Issue #295: the same bounds and total-wait cap as the chat path, from
+        // the shared retry_policy, so one setting cannot pin a worker on either.
+        ['attempts' => $attempts, 'maxwait' => $maxwait] = \local_ai_course_assistant\retry_policy::from_config();
 
         $backoffs = [0.5, 1.5, 3.0];
         $tries = 0;
+        $waited = 0.0;
         while (true) {
             try {
                 return $this->http_post_once($url, $headers, $body);
@@ -347,9 +345,13 @@ abstract class base_embedding_provider {
                     throw $e;
                 }
                 $wait = is_int($retryafter) ? min($retryafter, $maxwait) : ($backoffs[$tries] ?? 3.0);
+                if (!\local_ai_course_assistant\retry_policy::within_budget($waited, $wait)) {
+                    throw $e;
+                }
                 // usleep rather than sleep: sub-second waits matter when a
                 // batch of pairs is being embedded behind a web request.
                 usleep((int) round($wait * 1000000));
+                $waited += $wait;
                 $tries++;
             }
         }

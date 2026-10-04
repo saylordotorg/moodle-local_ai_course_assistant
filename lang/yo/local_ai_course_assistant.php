@@ -3178,3 +3178,5 @@ $string['settingspage:operations'] = 'Ìfaradà àti iṣẹ́ ṣíṣe';
 
 $string['survey_admin:err_invalid_bounds'] = 'Àwọn ìbéèrè ìdíwọ̀n gbọ́dọ̀ lo òṣùwọ̀n láàrin {$a->min} àti {$a->max}, iye kékeré ní àkọ́kọ́.';
 $string['survey_admin:err_no_title'] = 'Tẹ àkòrí ìwádìí sí i.';
+
+$string['settings:int_range'] = 'Tẹ nọ́mbà odidi láti {$a->min} sí {$a->max}.';

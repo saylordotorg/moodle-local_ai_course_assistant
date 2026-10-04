@@ -3185,3 +3185,5 @@ $string['settingspage:operations'] = 'लचीलापन और संचा�
 
 $string['survey_admin:err_invalid_bounds'] = 'रेटिंग प्रश्नों में {$a->min} से {$a->max} के बीच का पैमाना होना चाहिए, छोटा मान पहले।';
 $string['survey_admin:err_no_title'] = 'सर्वेक्षण का शीर्षक दर्ज करें।';
+
+$string['settings:int_range'] = '{$a->min} से {$a->max} तक की एक पूर्ण संख्या दर्ज करें।';

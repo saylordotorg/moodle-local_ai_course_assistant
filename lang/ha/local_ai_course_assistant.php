@@ -3184,3 +3184,5 @@ $string['settingspage:operations'] = 'Juriya da aiki';
 
 $string['survey_admin:err_invalid_bounds'] = 'Tambayoyin ƙima dole su yi amfani da sikelin tsakanin {$a->min} da {$a->max}, ƙaramin lamba tukuna.';
 $string['survey_admin:err_no_title'] = 'Shigar da taken binciken.';
+
+$string['settings:int_range'] = 'Shigar da cikakkiyar lamba daga {$a->min} zuwa {$a->max}.';

@@ -3155,3 +3155,5 @@ $string['settingspage:operations'] = 'সহনশীলতা ও পরিচ�
 
 $string['survey_admin:err_invalid_bounds'] = 'রেটিং প্রশ্নে {$a->min} থেকে {$a->max} এর মধ্যে স্কেল ব্যবহার করতে হবে, ছোট মানটি আগে।';
 $string['survey_admin:err_no_title'] = 'জরিপের শিরোনাম লিখুন।';
+
+$string['settings:int_range'] = '{$a->min} থেকে {$a->max} পর্যন্ত একটি পূর্ণসংখ্যা লিখুন।';

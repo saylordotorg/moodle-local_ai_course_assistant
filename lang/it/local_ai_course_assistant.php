@@ -3195,3 +3195,5 @@ $string['settingspage:operations'] = 'Resilienza e operazioni';
 
 $string['survey_admin:err_invalid_bounds'] = 'Le domande con valutazione devono usare una scala tra {$a->min} e {$a->max}, con il valore più basso per primo.';
 $string['survey_admin:err_no_title'] = 'Inserisci un titolo per il sondaggio.';
+
+$string['settings:int_range'] = 'Inserisci un numero intero da {$a->min} a {$a->max}.';

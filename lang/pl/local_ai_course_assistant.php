@@ -3157,3 +3157,5 @@ $string['settingspage:operations'] = 'Odporność i eksploatacja';
 
 $string['survey_admin:err_invalid_bounds'] = 'Pytania oceniające muszą używać skali od {$a->min} do {$a->max}, zaczynając od niższej wartości.';
 $string['survey_admin:err_no_title'] = 'Wpisz tytuł ankiety.';
+
+$string['settings:int_range'] = 'Wpisz liczbę całkowitą od {$a->min} do {$a->max}.';

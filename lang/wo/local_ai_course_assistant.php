@@ -3178,3 +3178,5 @@ $string['settingspage:operations'] = 'Dëgër ak dox';
 
 $string['survey_admin:err_invalid_bounds'] = 'Laaj yu natt dañuy jëfandikoo barem bu tollu ci diggante {$a->min} ak {$a->max}, bu gëna tuuti bi jiitu.';
 $string['survey_admin:err_no_title'] = 'Bindal turu enkët bi.';
+
+$string['settings:int_range'] = 'Bindal benn limu ñu mat ci diggante {$a->min} ak {$a->max}.';

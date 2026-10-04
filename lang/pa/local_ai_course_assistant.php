@@ -3177,3 +3177,5 @@ $string['settingspage:operations'] = 'ਲਚਕ ਅਤੇ ਸੰਚਾਲਨ';
 
 $string['survey_admin:err_invalid_bounds'] = 'ਰੇਟਿੰਗ ਸਵਾਲਾਂ ਲਈ {$a->min} ਤੋਂ {$a->max} ਵਿਚਕਾਰ ਸਕੇਲ ਵਰਤੋ, ਛੋਟਾ ਮੁੱਲ ਪਹਿਲਾਂ।';
 $string['survey_admin:err_no_title'] = 'ਸਰਵੇਖਣ ਦਾ ਸਿਰਲੇਖ ਦਰਜ ਕਰੋ।';
+
+$string['settings:int_range'] = '{$a->min} ਤੋਂ {$a->max} ਤੱਕ ਇੱਕ ਪੂਰਨ ਅੰਕ ਦਰਜ ਕਰੋ।';

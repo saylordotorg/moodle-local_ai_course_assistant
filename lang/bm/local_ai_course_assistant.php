@@ -3186,3 +3186,5 @@ $string['settingspage:operations'] = 'Barika ni baarakɛcogo';
 
 $string['survey_admin:err_invalid_bounds'] = 'Jateminɛ ɲininkaliw ka kan ka barɛmu kɛ {$a->min} ni {$a->max} cɛ, dɔgɔmannin bɛ fɔlɔ.';
 $string['survey_admin:err_no_title'] = 'Ɲininkali tɔgɔ sɛbɛn.';
+
+$string['settings:int_range'] = 'Jateden dafalen sɛbɛn ka bɔ {$a->min} la ka se {$a->max} ma.';

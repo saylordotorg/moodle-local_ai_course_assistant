@@ -3177,3 +3177,5 @@ $string['settingspage:operations'] = 'Resiliência e operações';
 
 $string['survey_admin:err_invalid_bounds'] = 'As perguntas de avaliação devem usar uma escala entre {$a->min} e {$a->max}, com o valor mais baixo primeiro.';
 $string['survey_admin:err_no_title'] = 'Informe um título para a pesquisa.';
+
+$string['settings:int_range'] = 'Informe um número inteiro de {$a->min} a {$a->max}.';

@@ -3201,3 +3201,5 @@ $string['settingspage:operations'] = 'Katatagan at operasyon';
 
 $string['survey_admin:err_invalid_bounds'] = 'Ang mga tanong na may rating ay dapat gumamit ng sukat mula {$a->min} hanggang {$a->max}, mababang halaga muna.';
 $string['survey_admin:err_no_title'] = 'Maglagay ng pamagat ng survey.';
+
+$string['settings:int_range'] = 'Maglagay ng buong numero mula {$a->min} hanggang {$a->max}.';

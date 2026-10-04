@@ -3198,3 +3198,5 @@ $string['settingspage:operations'] = 'Ανθεκτικότητα και λειτ
 
 $string['survey_admin:err_invalid_bounds'] = 'Οι ερωτήσεις βαθμολόγησης πρέπει να χρησιμοποιούν κλίμακα μεταξύ {$a->min} και {$a->max}, με τη χαμηλή τιμή πρώτη.';
 $string['survey_admin:err_no_title'] = 'Εισαγάγετε τίτλο έρευνας.';
+
+$string['settings:int_range'] = 'Εισαγάγετε έναν ακέραιο αριθμό από {$a->min} έως {$a->max}.';

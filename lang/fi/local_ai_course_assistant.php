@@ -3157,3 +3157,5 @@ $string['settingspage:operations'] = 'Vikasietoisuus ja ylläpito';
 
 $string['survey_admin:err_invalid_bounds'] = 'Arviointikysymysten asteikon on oltava väliltä {$a->min}–{$a->max}, pienempi arvo ensin.';
 $string['survey_admin:err_no_title'] = 'Anna kyselylle otsikko.';
+
+$string['settings:int_range'] = 'Anna kokonaisluku väliltä {$a->min}–{$a->max}.';

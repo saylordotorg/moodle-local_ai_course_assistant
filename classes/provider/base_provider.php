@@ -272,14 +272,12 @@ abstract class base_provider implements provider_interface {
      * @return mixed whatever $fn returns
      */
     public static function with_transient_retry(callable $fn, int $streamedtokens) {
-        $attempts = (int) get_config('local_ai_course_assistant', 'backend_retry_attempts');
-        if ($attempts < 0) {
-            $attempts = 0;
-        }
-        $rawmax = get_config('local_ai_course_assistant', 'backend_retry_max_wait');
-        $maxwait = ($rawmax === false || $rawmax === '') ? 5 : (int) $rawmax;
+        // Issue #295: bounded at both ends, and the total wait capped, by the
+        // shared retry_policy. Previously attempts had a floor but no ceiling.
+        ['attempts' => $attempts, 'maxwait' => $maxwait] = \local_ai_course_assistant\retry_policy::from_config();
 
         $tries = 0;
+        $waited = 0.0;
         $backoffs = [0.5, 1.5, 3.0];
         while (true) {
             try {
@@ -291,7 +289,11 @@ abstract class base_provider implements provider_interface {
                     throw $e;
                 }
                 $wait = $retryafter !== null ? min($retryafter, $maxwait) : ($backoffs[$tries] ?? 3.0);
+                if (!\local_ai_course_assistant\retry_policy::within_budget($waited, $wait)) {
+                    throw $e;
+                }
                 self::backoff_sleep($wait);
+                $waited += $wait;
                 $tries++;
             }
         }
