@@ -31,7 +31,7 @@ use local_ai_course_assistant\provider\base_provider;
  *    code will not honour;
  *  - read-time clamping, for values that never passed through that form;
  *  - a total-wait budget, because even the bounded maximum of ten attempts at
- *    sixty seconds each would still hold a worker for ten minutes.
+ *    thirty seconds each would still hold a worker for five minutes.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor University
@@ -117,6 +117,48 @@ final class retry_policy_test extends \advanced_testcase {
             // First call, one 25s wait, retry; a second 25s wait would make 50s.
             $this->assertSame(2, $calls, 'the total-wait budget did not stop the retries');
         }
+    }
+
+    /**
+     * Every per-wait ceiling the admin may set must fit inside the total budget.
+     *
+     * The first version of this fix allowed 60s per wait against a 30s total.
+     * Both loops check the upcoming wait against the budget before sleeping, so
+     * any accepted value above the budget could never be honoured and turned a
+     * large Retry-After into zero retries. Pinned as an invariant so the two
+     * constants cannot drift apart again.
+     */
+    public function test_the_largest_allowed_wait_fits_in_the_total_budget(): void {
+        $this->assertLessThanOrEqual(retry_policy::MAX_TOTAL_WAIT, (float) retry_policy::MAX_WAIT);
+    }
+
+    /**
+     * At the highest allowed ceiling, a long Retry-After still gets a retry.
+     *
+     * This is the case the review found: with the ceiling set as high as it
+     * goes and the provider asking for longer than that, the request must wait
+     * the ceiling and retry, not give up before trying.
+     */
+    public function test_a_long_retry_after_at_the_highest_ceiling_still_retries(): void {
+        $this->resetAfterTest();
+        set_config('backend_retry_attempts', retry_policy::MAX_ATTEMPTS, 'local_ai_course_assistant');
+        set_config('backend_retry_max_wait', retry_policy::MAX_WAIT, 'local_ai_course_assistant');
+        $calls = 0;
+        try {
+            $result = base_provider::with_transient_retry(function () use (&$calls) {
+                $calls++;
+                if ($calls === 1) {
+                    throw base_provider::transient_http_exception(429, 45);
+                }
+                return 'ok';
+            }, 0);
+        } catch (\moodle_exception $e) {
+            $this->fail("a long Retry-After at the highest ceiling was rethrown after {$calls} call(s), "
+                . 'i.e. zero retries: the per-wait ceiling exceeds the total budget');
+        }
+
+        $this->assertSame('ok', $result);
+        $this->assertSame(2, $calls);
     }
 
     /**

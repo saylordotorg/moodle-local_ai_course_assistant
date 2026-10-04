@@ -34,8 +34,8 @@ namespace local_ai_course_assistant;
  * by $CFG->forced_plugin_settings, an upgrade or a CLI set_config, none of which
  * run validate(). So both ends are clamped again here, and on top of that the
  * TOTAL time one call may spend waiting is capped, because even the bounded
- * maximum of ten attempts at sixty seconds each would still pin a worker for
- * ten minutes.
+ * maximum of ten attempts at thirty seconds each would still pin a worker for
+ * five minutes.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor University
@@ -63,8 +63,21 @@ class retry_policy {
     /** @var int Shortest Retry-After ceiling, in seconds. */
     public const MIN_WAIT = 0;
 
-    /** @var int Longest Retry-After ceiling an admin may configure, in seconds. */
-    public const MAX_WAIT = 60;
+    /**
+     * Longest Retry-After ceiling an admin may configure, in seconds.
+     *
+     * Must not exceed MAX_TOTAL_WAIT. This was 60 in the first version of the
+     * #295 fix, and the review caught that every value from 31 to 60 was
+     * accepted but could never be honoured: both loops check the upcoming wait
+     * against the total budget BEFORE sleeping, so with a provider asking for
+     * 45s, a 60s ceiling allowed a 45s wait that the 30s budget refused, and
+     * the request was rethrown with ZERO retries. The same response under a
+     * 30s ceiling waits 30s and retries once. Raising the setting made retrying
+     * strictly worse. Capping the wait to the remaining budget instead was
+     * rejected because it would retry before the provider's Retry-After, which
+     * mostly earns another 429. retry_policy_test pins this relationship.
+     */
+    public const MAX_WAIT = 30;
 
     /** @var int Retry-After ceiling when the setting is unset, in seconds. */
     public const DEFAULT_WAIT = 5;

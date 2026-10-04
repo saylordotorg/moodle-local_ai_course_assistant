@@ -13,11 +13,11 @@ provider at once could use up every process the site has. The longest-wait
 setting had the same gap.
 
 The settings page now refuses a value outside the allowed range, 0 to 10
-retries and 0 to 60 seconds, and says what the range is. A value that never
+retries and 0 to 30 seconds, and says what the range is. A value that never
 went through that page, such as one saved earlier or forced in the site config,
 is brought back into range whenever it's read. And the total time one request
 may spend waiting is capped at 30 seconds, because even the highest allowed
-settings would otherwise hold a process for ten minutes.
+settings would otherwise hold a process for five minutes.
 
 The chat and embedding paths now take these limits from one shared place, so
 they can't drift apart.
@@ -25,8 +25,8 @@ they can't drift apart.
 If your site already has an out-of-range value, it is safe from this release
 onward. The settings page will flag it the next time that page is saved.
 
-Tested: 2,065 automated tests with no failures, the security validator corpus
-at 36 of 36, and PHP lint clean across 606 files. Four of the new behaviours
+Tested: 2,067 automated tests with no failures, the security validator corpus
+at 36 of 36, and PHP lint clean across 606 files. Six of the new behaviours
 were checked by deliberately reintroducing the bug and confirming the test
 failed. Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5,
 5.0 and 5.1, on both MariaDB and PostgreSQL.
