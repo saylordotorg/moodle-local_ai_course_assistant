@@ -324,10 +324,9 @@ class claude_provider extends base_provider {
                 // called the tool 5 of 5 times and still honoured the 6..12
                 // range, since the bounds remain in the schema as guidance.
                 //
-                // 'auto' does not GUARANTEE a call. A miss falls through to the
-                // text branch of the parser, the caller's json_decode fails, and
-                // its existing error path runs. A retry-once is the documented
-                // remedy; see issue #298 for why it is not a two-line change.
+                // 'auto' does not GUARANTEE a call, so chat_completion() retries
+                // once when no tool_use comes back (issue #298), summing the
+                // token usage of both attempts.
                 $body['tool_choice'] = ['type' => 'auto'];
                 // Appended as its OWN system block, not concatenated onto the
                 // first one: that block carries cache_control, so editing its
@@ -417,22 +416,43 @@ class claude_provider extends base_provider {
         }
 
         // Capture token usage including cache metrics.
-        if (isset($data['usage'])) {
-            $this->last_token_usage = [
-                'prompt_tokens'          => (int) ($data['usage']['input_tokens'] ?? 0),
-                'completion_tokens'      => (int) ($data['usage']['output_tokens'] ?? 0),
-                'model'                  => $data['model'] ?? $this->model,
-                'cache_creation_tokens'  => (int) ($data['usage']['cache_creation_input_tokens'] ?? 0),
-                'cache_read_tokens'      => (int) ($data['usage']['cache_read_input_tokens'] ?? 0),
-                'provider'               => $this->provider_id(),
-            ];
-        }
+        $this->add_token_usage($data);
 
         // Structured output: extract tool_use input directly.
         if (!empty($options['response_schema'])) {
-            foreach ($data['content'] as $block) {
-                if (($block['type'] ?? '') === 'tool_use') {
-                    return json_encode($block['input']);
+            $input = self::find_tool_input($data);
+            if ($input !== null) {
+                return json_encode($input);
+            }
+
+            // Issue #298. Models that reject a forced tool choice get
+            // tool_choice 'auto' (see build_body), and 'auto' does not
+            // guarantee a call: the model may answer in prose, the caller's
+            // json_decode fails, and a quiz or an essay score is lost. Retry
+            // once with the same request, which is what Anthropic's guidance
+            // for these models says to do.
+            //
+            // Two things make a naive retry wrong, and both are handled here.
+            // Usage is ADDED across attempts, not replaced: callers bill from
+            // get_last_token_usage(), and an overwrite drops the first call's
+            // tokens from the bill. And the retry is strictly best-effort: a
+            // refusal, an empty body or a transport failure on the second
+            // attempt falls back to exactly what the first attempt would have
+            // returned without it, so the retry can never make a call worse.
+            if (!self::model_supports_forced_tool_choice($this->model)) {
+                try {
+                    $retry = json_decode($this->http_post($url, $this->get_headers($options), $body), true);
+                    if (is_array($retry) && !empty($retry['content'])
+                            && ($retry['stop_reason'] ?? '') !== self::STOP_REASON_REFUSAL) {
+                        $this->add_token_usage($retry);
+                        $input = self::find_tool_input($retry);
+                        if ($input !== null) {
+                            return json_encode($input);
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    debugging('Structured-output retry failed, keeping the first response: '
+                        . $e->getMessage(), DEBUG_DEVELOPER);
                 }
             }
         }
@@ -445,6 +465,53 @@ class claude_provider extends base_provider {
         }
 
         throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, 'No text in response');
+    }
+
+    /**
+     * Add one response's token usage to last_token_usage.
+     *
+     * Adds rather than replaces, so a call that made two requests (the #298
+     * structured-output retry) reports the tokens of both. The caller resets
+     * last_token_usage to null at the start of each chat_completion().
+     *
+     * @param array $data Decoded API response.
+     * @return void
+     */
+    private function add_token_usage(array $data): void {
+        if (!isset($data['usage'])) {
+            return;
+        }
+        $usage = [
+            'prompt_tokens'          => (int) ($data['usage']['input_tokens'] ?? 0),
+            'completion_tokens'      => (int) ($data['usage']['output_tokens'] ?? 0),
+            'cache_creation_tokens'  => (int) ($data['usage']['cache_creation_input_tokens'] ?? 0),
+            'cache_read_tokens'      => (int) ($data['usage']['cache_read_input_tokens'] ?? 0),
+        ];
+        if ($this->last_token_usage === null) {
+            $this->last_token_usage = $usage + [
+                'model'    => $data['model'] ?? $this->model,
+                'provider' => $this->provider_id(),
+            ];
+            return;
+        }
+        foreach ($usage as $k => $v) {
+            $this->last_token_usage[$k] = (int) ($this->last_token_usage[$k] ?? 0) + $v;
+        }
+    }
+
+    /**
+     * The input of the first tool_use block in a response, or null.
+     *
+     * @param array $data Decoded API response.
+     * @return array|null
+     */
+    private static function find_tool_input(array $data): ?array {
+        foreach ($data['content'] ?? [] as $block) {
+            if (($block['type'] ?? '') === 'tool_use') {
+                return (array) ($block['input'] ?? []);
+            }
+        }
+        return null;
     }
 
     public function chat_completion_stream(string $systemprompt, array $messages, callable $callback, array $options = []): void {
