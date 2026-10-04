@@ -1,5 +1,7 @@
-POSTED ON CONTRIB-10574 (comment 1186905, 3 October 2026)
-This is the text as it actually went out. Do not post it again.
+POSTED ON CONTRIB-10574 (comment 1186905). First posted 3 October 2026 for v7.6.4;
+the SAME comment was edited in place on 4 October to ask for v7.6.7 and to add
+v7.6.5 through v7.6.7. The live text on Jira is authoritative; this file is the
+v7.6.4 original. Do not post it again.
 
 Hi Volodymyr,
 
