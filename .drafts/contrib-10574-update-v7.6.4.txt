@@ -1,6 +1,6 @@
 POSTED ON CONTRIB-10574 (comment 1186905). First posted 3 October 2026 for v7.6.4;
 the SAME comment is edited in place each release; as of 4 October it asks for
-v7.6.8 and covers v7.6.5 through v7.6.8. The live text on Jira is authoritative; this file is the
+v7.6.9 and covers v7.6.5 through v7.6.9. The live text on Jira is authoritative; this file is the
 v7.6.4 original. Do not post it again.
 
 Hi Volodymyr,
