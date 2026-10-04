@@ -1,0 +1,54 @@
+Version 7.6.6 (build 2026100107)
+
+Claude Opus 5.5 now works with the plugin, and Opus 5.5 is billed correctly. A
+benchmark run before release also settled which Claude model should handle the
+hardest tutoring turns, and the answer did not change.
+
+Two requests made Claude Opus 5.5 unusable. Each failed the whole request with
+an HTTP 400, and the learner saw only "Sorry, something went wrong".
+
+The first was the temperature setting. Turning on extended thinking set the
+temperature to 1, an old rule for models that still accept the setting. Opus 4.7
+and later removed it, so every request with thinking turned on failed while the
+same request without thinking worked.
+
+The second was forcing the model to call a particular tool. Opus 5.5, Sonnet
+5.5, Fable 5.1 and Mythos 5.1 no longer accept a forced tool call, and
+structured output depends on one. Quiz generation, essay and speech scoring,
+flashcards, learning objectives and conversation classification all failed on
+those models. The plugin now asks the model to use the tool instead of forcing
+it. The instruction is kept in a separate block so the cached part of the
+prompt does not change between calls.
+
+Strict schema checking, which is usually paired with that approach, is left
+off on purpose. It accepts only part of JSON Schema, and the plugin's schemas
+use parts it rejects, such as asking for between 6 and 12 learning objectives.
+A live test against Claude Sonnet 5.5 confirmed it: with strict checking on,
+that request failed; with it off, the model called the tool five times out of
+five and still returned between 6 and 12 objectives.
+
+Opus 5.5 costs less than Opus 5, but the plugin had no price listed for it and
+charged it at the Opus 5 rate, 25% too high. It now has its own price. The
+default Claude model also moves from a 2025 version to a current one.
+
+The premium tier stays on Claude Sonnet 5. The premium tier handles the hardest
+tutoring turns, and this release briefly moved it to Opus 5.5. Before release,
+the 50-prompt tutoring benchmark was run on Sonnet 5, Opus 5 and Opus 5.5 with
+the same prompts and scoring as the August run.
+
+  Claude Sonnet 5    14.46 of 15   0.411 cents per call   650 ms to first word
+  Claude Opus 5      14.38 of 15   2.290 cents per call   5,158 ms
+  Claude Opus 5.5    14.00 of 15   1.395 cents per call   2,299 ms
+
+Opus 5.5 scored lowest, cost 3.4 times as much as Sonnet 5 per call, and took
+3.5 times as long to start answering. All three were equally accurate and
+equally well toned. The difference was in guiding the student: Opus 5.5 was
+quicker to hand over the answer, which is the wrong habit for a tutor and the
+main thing the premium tier is for. Sonnet 5 beat Opus 5 again, as it did in
+August, so the benchmark is giving consistent results.
+
+Tested: 2,050 automated tests with no failures, the security validator corpus
+at 36 of 36, and PHP lint clean across 600 files. Four of the new behaviours
+were checked by deliberately reintroducing the bug and confirming the test
+failed. Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5,
+5.0 and 5.1, on both MariaDB and PostgreSQL.
