@@ -3201,3 +3201,5 @@ $string['settingspage:operations'] = 'Ustahimilivu na uendeshaji';
 
 $string['survey_admin:err_invalid_bounds'] = 'Maswali ya ukadiriaji lazima yatumie kipimo kati ya {$a->min} na {$a->max}, thamani ndogo kwanza.';
 $string['survey_admin:err_no_title'] = 'Weka kichwa cha utafiti.';
+
+$string['settings:int_range'] = 'Weka nambari kamili kuanzia {$a->min} hadi {$a->max}.';

@@ -3157,3 +3157,5 @@ $string['settingspage:operations'] = 'Ausfallsicherheit und Betrieb';
 
 $string['survey_admin:err_invalid_bounds'] = 'Bewertungsfragen müssen eine Skala zwischen {$a->min} und {$a->max} verwenden, mit dem niedrigen Wert zuerst.';
 $string['survey_admin:err_no_title'] = 'Geben Sie einen Titel für die Umfrage ein.';
+
+$string['settings:int_range'] = 'Geben Sie eine ganze Zahl von {$a->min} bis {$a->max} ein.';

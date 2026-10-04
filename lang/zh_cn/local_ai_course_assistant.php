@@ -3193,3 +3193,5 @@ $string['settingspage:operations'] = '韧性与运维';
 
 $string['survey_admin:err_invalid_bounds'] = '评分题的量表范围必须在 {$a->min} 到 {$a->max} 之间，且较小的值在前。';
 $string['survey_admin:err_no_title'] = '请输入问卷标题。';
+
+$string['settings:int_range'] = '请输入 {$a->min} 到 {$a->max} 之间的整数。';

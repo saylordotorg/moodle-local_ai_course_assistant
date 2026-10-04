@@ -3155,3 +3155,5 @@ $string['settingspage:operations'] = '耐障害性と運用';
 
 $string['survey_admin:err_invalid_bounds'] = '評価の質問では、{$a->min} から {$a->max} の範囲で、小さい値を先に指定してください。';
 $string['survey_admin:err_no_title'] = 'アンケートのタイトルを入力してください。';
+
+$string['settings:int_range'] = '{$a->min} から {$a->max} までの整数を入力してください。';

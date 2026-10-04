@@ -3155,3 +3155,5 @@ $string['settingspage:operations'] = 'المرونة والتشغيل';
 
 $string['survey_admin:err_invalid_bounds'] = 'يجب أن تستخدم أسئلة التقييم مقياسًا بين {$a->min} و{$a->max}، مع وضع الحد الأدنى أولاً.';
 $string['survey_admin:err_no_title'] = 'أدخل عنوان الاستبيان.';
+
+$string['settings:int_range'] = 'أدخل عددًا صحيحًا من {$a->min} إلى {$a->max}.';

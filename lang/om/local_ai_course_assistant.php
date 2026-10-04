@@ -3189,3 +3189,5 @@ $string['settingspage:operations'] = 'Jabina fi hojiirra oolmaa';
 
 $string['survey_admin:err_invalid_bounds'] = 'Gaaffiiwwan madaallii safartuu {$a->min} fi {$a->max} gidduu jiru fayyadamuu qabu, lakkoofsi xiqqaan dura.';
 $string['survey_admin:err_no_title'] = 'Mata duree qorannoo galchi.';
+
+$string['settings:int_range'] = 'Lakkoofsa guutuu {$a->min} hanga {$a->max} galchi.';

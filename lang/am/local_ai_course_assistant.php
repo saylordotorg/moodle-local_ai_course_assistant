@@ -3184,3 +3184,5 @@ $string['settingspage:operations'] = 'ጥንካሬና ክወና';
 
 $string['survey_admin:err_invalid_bounds'] = 'የደረጃ አሰጣጥ ጥያቄዎች ከ{$a->min} እስከ {$a->max} ያለ ሚዛን መጠቀም አለባቸው፤ ዝቅተኛው ቀድሞ መሆን አለበት።';
 $string['survey_admin:err_no_title'] = 'የዳሰሳ ጥናቱን ርዕስ ያስገቡ።';
+
+$string['settings:int_range'] = 'ከ{$a->min} እስከ {$a->max} ያለ ሙሉ ቁጥር ያስገቡ።';

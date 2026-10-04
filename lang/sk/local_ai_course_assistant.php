@@ -3157,3 +3157,5 @@ $string['settingspage:operations'] = 'Odolnosť a prevádzka';
 
 $string['survey_admin:err_invalid_bounds'] = 'Hodnotiace otázky musia používať škálu od {$a->min} do {$a->max}, s nižšou hodnotou na prvom mieste.';
 $string['survey_admin:err_no_title'] = 'Zadajte názov ankety.';
+
+$string['settings:int_range'] = 'Zadajte celé číslo od {$a->min} do {$a->max}.';

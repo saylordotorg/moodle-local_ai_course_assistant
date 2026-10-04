@@ -3202,3 +3202,5 @@ $string['settingspage:operations'] = 'Ukuqina nokusebenza';
 
 $string['survey_admin:err_invalid_bounds'] = 'Imibuzo yesilinganiso kumele isebenzise isikali esiphakathi kuka-{$a->min} no-{$a->max}, inani eliphansi kuqala.';
 $string['survey_admin:err_no_title'] = 'Faka isihloko senhlolovo.';
+
+$string['settings:int_range'] = 'Faka inombolo ephelele kusukela ku-{$a->min} kuya ku-{$a->max}.';

@@ -3177,3 +3177,5 @@ $string['settingspage:operations'] = 'Khả năng phục hồi và vận hành';
 
 $string['survey_admin:err_invalid_bounds'] = 'Câu hỏi đánh giá phải dùng thang điểm từ {$a->min} đến {$a->max}, giá trị nhỏ đứng trước.';
 $string['survey_admin:err_no_title'] = 'Nhập tiêu đề khảo sát.';
+
+$string['settings:int_range'] = 'Nhập một số nguyên từ {$a->min} đến {$a->max}.';

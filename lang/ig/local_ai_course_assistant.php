@@ -3172,3 +3172,5 @@ $string['settingspage:operations'] = 'Nguzogide na ọrụ';
 
 $string['survey_admin:err_invalid_bounds'] = 'Ajụjụ ọkwa ga-eji ọnụọgụ dị n\'etiti {$a->min} na {$a->max}, nke dị ala buru ụzọ.';
 $string['survey_admin:err_no_title'] = 'Tinye isiokwu nnyocha.';
+
+$string['settings:int_range'] = 'Tinye ọnụọgụ zuru oke site na {$a->min} ruo {$a->max}.';

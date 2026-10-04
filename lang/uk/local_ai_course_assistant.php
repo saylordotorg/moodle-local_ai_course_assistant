@@ -3197,3 +3197,5 @@ $string['settingspage:operations'] = 'Стійкість та експлуата
 
 $string['survey_admin:err_invalid_bounds'] = 'Питання з оцінюванням мають використовувати шкалу від {$a->min} до {$a->max}, починаючи з меншого значення.';
 $string['survey_admin:err_no_title'] = 'Введіть назву опитування.';
+
+$string['settings:int_range'] = 'Введіть ціле число від {$a->min} до {$a->max}.';

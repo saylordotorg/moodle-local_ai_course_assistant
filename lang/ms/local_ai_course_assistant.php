@@ -3200,3 +3200,5 @@ $string['settingspage:operations'] = 'Ketahanan dan operasi';
 
 $string['survey_admin:err_invalid_bounds'] = 'Soalan penilaian mesti menggunakan skala antara {$a->min} dan {$a->max}, dengan nilai terendah dahulu.';
 $string['survey_admin:err_no_title'] = 'Masukkan tajuk tinjauan.';
+
+$string['settings:int_range'] = 'Masukkan nombor bulat dari {$a->min} hingga {$a->max}.';

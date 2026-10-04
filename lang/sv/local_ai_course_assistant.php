@@ -3156,3 +3156,5 @@ $string['settingspage:operations'] = 'Robusthet och drift';
 
 $string['survey_admin:err_invalid_bounds'] = 'Betygsfrågor måste använda en skala mellan {$a->min} och {$a->max}, med det låga värdet först.';
 $string['survey_admin:err_no_title'] = 'Ange en titel för enkäten.';
+
+$string['settings:int_range'] = 'Ange ett heltal från {$a->min} till {$a->max}.';

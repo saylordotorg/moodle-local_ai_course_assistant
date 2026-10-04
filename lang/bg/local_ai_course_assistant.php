@@ -3158,3 +3158,5 @@ $string['settingspage:operations'] = 'Устойчивост и експлоат
 
 $string['survey_admin:err_invalid_bounds'] = 'Въпросите с оценка трябва да използват скала между {$a->min} и {$a->max}, като ниската стойност е първа.';
 $string['survey_admin:err_no_title'] = 'Въведете заглавие на анкетата.';
+
+$string['settings:int_range'] = 'Въведете цяло число от {$a->min} до {$a->max}.';

@@ -1461,19 +1461,24 @@ if ($hassiteconfig) {
     // v5.10.0: bounded retry on a transient backend rejection (429/503). Aimed
     // at small self-hosted backends that reject under load. Retries only happen
     // before any response text has streamed, so output is never duplicated.
-    $settings->add(new admin_setting_configtext(
+    // Issue #295: both refuse out-of-range input. Either value, mistyped, used
+    // to be able to hold a PHP worker in usleep for hours under a provider
+    // rate limit. retry_policy clamps again at read time and caps the total.
+    $settings->add(new \local_ai_course_assistant\admin_setting_bounded_int(
         'local_ai_course_assistant/backend_retry_attempts',
         get_string('settings:backend_retry_attempts', 'local_ai_course_assistant'),
         get_string('settings:backend_retry_attempts_desc', 'local_ai_course_assistant'),
         '2',
-        PARAM_INT
+        \local_ai_course_assistant\retry_policy::MIN_ATTEMPTS,
+        \local_ai_course_assistant\retry_policy::MAX_ATTEMPTS
     ));
-    $settings->add(new admin_setting_configtext(
+    $settings->add(new \local_ai_course_assistant\admin_setting_bounded_int(
         'local_ai_course_assistant/backend_retry_max_wait',
         get_string('settings:backend_retry_max_wait', 'local_ai_course_assistant'),
         \local_ai_course_assistant\branding::apply(get_string('settings:backend_retry_max_wait_desc', 'local_ai_course_assistant')),
         '5',
-        PARAM_INT
+        \local_ai_course_assistant\retry_policy::MIN_WAIT,
+        \local_ai_course_assistant\retry_policy::MAX_WAIT
     ));
 
     $settings->add(new admin_setting_configtext(

@@ -88,17 +88,35 @@ final class embedding_rate_limit_test extends \advanced_testcase {
             $src,
             'http_post() must delegate to a single-attempt helper so it can retry it.'
         );
-        $this->assertMatchesRegularExpression(
-            '/backend_retry_attempts/',
+        // Issue #295 moved the setting read into retry_policy, so the literal
+        // key no longer appears here. The intent, one knob shared with the chat
+        // path, is now checked directly: BOTH paths must take their bounds from
+        // the same policy, which also makes the read-time clamp and the
+        // total-wait budget impossible to apply to one path and not the other.
+        $this->assertStringContainsString(
+            'retry_policy::from_config()',
             $src,
-            'Retry depth must reuse the chat path\'s setting, so an operator tunes one '
+            'Retry depth must come from the shared retry_policy, so an operator tunes one '
             . 'knob rather than two that can disagree.'
         );
-        $this->assertMatchesRegularExpression(
-            '/backend_retry_max_wait/',
+        $chatsrc = file_get_contents(__DIR__ . '/../classes/provider/base_provider.php');
+        $this->assertStringContainsString(
+            'retry_policy::from_config()',
+            $chatsrc,
+            'The chat path must read the same retry_policy as the embedding path.'
+        );
+        // The ceiling now comes from retry_policy (asserted above); what must
+        // be visible here is that it is actually APPLIED to the vendor's value.
+        $this->assertStringContainsString(
+            'min($retryafter, $maxwait)',
             $src,
             'A vendor Retry-After must be clamped, or a hostile or mistaken header '
             . 'could park a web request for minutes.'
+        );
+        $this->assertStringContainsString(
+            'retry_policy::within_budget(',
+            $src,
+            'The embedding retry must respect the same total-wait budget as chat (#295).'
         );
 
         // The retry must be bounded, never a bare while(true) with no exit.

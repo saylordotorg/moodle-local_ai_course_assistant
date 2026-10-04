@@ -3157,3 +3157,5 @@ $string['settingspage:operations'] = 'Reziliență și operare';
 
 $string['survey_admin:err_invalid_bounds'] = 'Întrebările de evaluare trebuie să folosească o scală între {$a->min} și {$a->max}, cu valoarea mică prima.';
 $string['survey_admin:err_no_title'] = 'Introduceți un titlu pentru sondaj.';
+
+$string['settings:int_range'] = 'Introduceți un număr întreg de la {$a->min} la {$a->max}.';

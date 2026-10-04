@@ -3158,3 +3158,5 @@ $string['settingspage:operations'] = 'Dayanıklılık ve işletim';
 
 $string['survey_admin:err_invalid_bounds'] = 'Derecelendirme soruları {$a->min} ile {$a->max} arasında bir ölçek kullanmalı, düşük değer önce gelmelidir.';
 $string['survey_admin:err_no_title'] = 'Anket başlığı girin.';
+
+$string['settings:int_range'] = '{$a->min} ile {$a->max} arasında bir tam sayı girin.';

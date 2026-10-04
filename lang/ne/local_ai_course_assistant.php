@@ -3176,3 +3176,5 @@ $string['settingspage:operations'] = 'लचिलोपन र सञ्चा�
 
 $string['survey_admin:err_invalid_bounds'] = 'मूल्याङ्कन प्रश्नहरूले {$a->min} देखि {$a->max} बीचको स्केल प्रयोग गर्नुपर्छ, सानो मान पहिले।';
 $string['survey_admin:err_no_title'] = 'सर्वेक्षणको शीर्षक लेख्नुहोस्।';
+
+$string['settings:int_range'] = '{$a->min} देखि {$a->max} सम्मको पूर्णाङ्क लेख्नुहोस्।';
