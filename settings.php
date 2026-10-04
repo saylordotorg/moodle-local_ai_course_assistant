@@ -33,12 +33,11 @@ if ($hassiteconfig) {
     $release    = $pluginfo ? htmlspecialchars($pluginfo->release, ENT_QUOTES) : '?';
     $versionnum = $pluginfo ? htmlspecialchars($pluginfo->versiondisk, ENT_QUOTES) : '?';
     $shortname  = htmlspecialchars(get_config('local_ai_course_assistant', 'short_name') ?: 'SOLA', ENT_QUOTES);
-    $versionbanner = '<div style="display:inline-flex;align-items:center;gap:.5rem;background:#f0f4ff;'
-        . 'border:1px solid #c7d4f7;border-radius:6px;padding:.4rem .85rem;margin-bottom:.75rem;font-size:.85rem;color:#3b5bdb;">'
+    $versionbanner = '<div class="sola-admin-version">'
         . '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
         . '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>'
         . '</svg>'
-        . '<strong>' . $shortname . '</strong>&nbsp;v' . $release . '&nbsp;<span style="color:#868e96;">(' . $versionnum . ')</span>'
+        . '<strong>' . $shortname . '</strong>&nbsp;v' . $release . '&nbsp;<span class="sola-admin-version-num">(' . $versionnum . ')</span>'
         . '</div>';
 
     // ── Create the plugin admin category ────────────────────────────────────
@@ -98,7 +97,7 @@ if ($hassiteconfig) {
             . \local_ai_course_assistant\branding::str('modelregistry:settings_link') . '</a>'
         . '<a href="' . $providerbenchurl->out() . '">'
             . get_string('toc:providerbenchmark', 'local_ai_course_assistant') . '</a>'
-        . '<a href="' . $emergencyurl->out() . '" style="color:#b91c1c;font-weight:600">'
+        . '<a href="' . $emergencyurl->out() . '" class="sola-quicklink--emergency">'
             . get_string('emergency:settings_link', 'local_ai_course_assistant') . '</a>';
 
     // "Back to last course" + "Course AI Settings" shortcuts. Pref set on course visits
@@ -126,10 +125,10 @@ if ($hassiteconfig) {
                 get_string('toc:course_ai_settings', 'local_ai_course_assistant')
             );
             $courseaiurl = '<a href="' . $coursesettingsurl->out() . '" title="'
-                . s($lastcourse->fullname) . '" style="background:#495057;border-color:#495057;">'
+                . s($lastcourse->fullname) . '" class="sola-quicklink--course-ai">'
                 . '&#9881; ' . $courseailabel . '</a>';
             $backbtn = '<a href="' . $lasturl->out() . '" title="'
-                . s($lastcourse->fullname) . '" style="background:#6c757d;border-color:#6c757d;">'
+                . s($lastcourse->fullname) . '" class="sola-quicklink--back">'
                 . $backlabel . '</a>';
             $quicklinks = $backbtn . $courseaiurl . $quicklinks;
         }
@@ -364,14 +363,24 @@ if ($hassiteconfig) {
         PARAM_FLOAT
     ));
 
+    // CONTRIB-10574 #273: the reset button used an inline onclick that set the
+    // textarea to atob('<base64 of the default prompt>'). Besides being inline
+    // script, that was wrong for 37 of the 46 locales: atob() returns a Latin-1
+    // byte string, not UTF-8, so every non-ASCII character in a translated
+    // prompt came back as mojibake. English is pure ASCII, so it was never
+    // seen. The default now rides on a data attribute, escaped by s() and read
+    // back exactly by the browser, and amd/src/reset_prompt.js handles the
+    // click. admin_setting_systemprompt asks for that module only when this
+    // field is actually rendered, not on every page that builds the tree.
     $defaultprompt = get_string('settings:systemprompt_default', 'local_ai_course_assistant');
-    $settings->add(new admin_setting_configtextarea(
+    $settings->add(new \local_ai_course_assistant\admin_setting_systemprompt(
         'local_ai_course_assistant/systemprompt',
         get_string('settings:systemprompt', 'local_ai_course_assistant'),
         get_string('settings:systemprompt_desc', 'local_ai_course_assistant')
         . '<br><button type="button" class="btn btn-sm btn-outline-secondary mt-1" '
-        . 'onclick="document.getElementById(\'id_s_local_ai_course_assistant_systemprompt\').value='
-        . 'atob(\'' . base64_encode($defaultprompt) . '\');">' . get_string('settingspage:reset_prompt_template', 'local_ai_course_assistant') . '</button>',
+        . 'data-action="sola-reset-prompt" data-target="id_s_local_ai_course_assistant_systemprompt" '
+        . 'data-default="' . s($defaultprompt) . '">'
+        . get_string('settingspage:reset_prompt_template', 'local_ai_course_assistant') . '</button>',
         ''
     ));
 
@@ -667,7 +676,7 @@ if ($hassiteconfig) {
         get_string('starters:admin_title', 'local_ai_course_assistant'),
         '<a href="' . $startersurl->out() . '" class="btn btn-sm btn-outline-primary">'
         . get_string('starters:admin_title', 'local_ai_course_assistant') . ' &rarr;</a>'
-        . '<p class="text-muted mt-1" style="font-size:13px;">'
+        . '<p class="text-muted mt-1 sola-admin-blurb">'
         . get_string('starters:admin_desc', 'local_ai_course_assistant') . '</p>'
     ));
 
@@ -678,7 +687,7 @@ if ($hassiteconfig) {
         s(get_string('settingspage:token_analytics_title', 'local_ai_course_assistant')),
         '<a href="' . $tokenanalyticsurl->out() . '" class="btn btn-sm btn-outline-secondary">'
         . s(get_string('settingspage:token_analytics_link', 'local_ai_course_assistant')) . ' &rarr;</a>'
-        . '<p class="text-muted mt-1" style="font-size:13px;">' . get_string('settingspage:token_analytics_blurb', 'local_ai_course_assistant') . '</p>'
+        . '<p class="text-muted mt-1 sola-admin-blurb">' . get_string('settingspage:token_analytics_blurb', 'local_ai_course_assistant') . '</p>'
     ));
 
     // Quick link to analytics dashboard.
@@ -688,7 +697,7 @@ if ($hassiteconfig) {
         get_string('settingspage:analytics_title', 'local_ai_course_assistant'),
         '<a href="' . $analyticsurl->out() . '" class="btn btn-sm btn-outline-secondary">'
         . s(get_string('settingspage:analytics_link', 'local_ai_course_assistant')) . ' &rarr;</a>'
-        . '<p class="text-muted mt-1" style="font-size:13px;">'
+        . '<p class="text-muted mt-1 sola-admin-blurb">'
         . get_string('settingspage:analytics_blurb', 'local_ai_course_assistant') . '</p>'
     ));
 
@@ -3341,7 +3350,7 @@ if ($hassiteconfig) {
         get_string('settings:rate_card_refresh_now', 'local_ai_course_assistant'),
         '<a href="' . $refreshurl->out(false) . '" class="btn btn-sm btn-outline-primary">'
         . get_string('settings:rate_card_refresh_now_label', 'local_ai_course_assistant') . '</a>'
-        . '<p class="text-muted mt-2 mb-0" style="font-size:13px">'
+        . '<p class="text-muted mt-2 mb-0 sola-admin-blurb">'
         . implode(' &middot; ', $statusparts) . '</p>'
     ));
 

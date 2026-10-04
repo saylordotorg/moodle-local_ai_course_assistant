@@ -73,6 +73,25 @@ final class settings_branding_test extends \advanced_testcase {
         foreach ($allsettings as $setting) {
             $text = (string) $setting->visiblename . ' ' . (string) $setting->description;
             $scanned++;
+
+            // The system prompt's reset button carries the default prompt
+            // TEMPLATE in data-default. Its [[tokens]] are deliberate: whatever
+            // the admin saves is resolved by branding::apply() when the prompt
+            // is built (context_builder::build_system_prompt), so a reset
+            // prompt keeps following the brand after a rename. They used to be
+            // hidden from this scan inside base64; #273 moved them into a
+            // readable attribute. So tokens are allowed there, but a LITERAL
+            // brand is not, which is stricter than before: the template must
+            // stay tokenised. Everything else is scanned exactly as it was.
+            if (preg_match_all('/data-default="([^"]*)"/', $text, $tpl)) {
+                foreach ($tpl[1] as $template) {
+                    $decoded = html_entity_decode($template, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    if (strpos($decoded, 'SOLA') !== false || strpos($decoded, 'Saylor') !== false) {
+                        $leaks[] = $setting->get_full_name() . ' (default prompt template)';
+                    }
+                }
+                $text = preg_replace('/data-default="[^"]*"/', '', $text);
+            }
             if (strpos($text, 'SOLA') !== false || strpos($text, 'Saylor') !== false) {
                 $leaks[] = $setting->get_full_name();
             }

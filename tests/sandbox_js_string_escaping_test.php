@@ -19,176 +19,133 @@ namespace local_ai_course_assistant;
 /**
  * A translated string must not be able to break the sandbox page's JavaScript.
  *
- * sandbox.php built three JavaScript string literals by echoing get_string()
- * straight between single quotes:
+ * History. sandbox.php used to build JavaScript string literals by echoing
+ * get_string() between single quotes. The French translation of
+ * sandbox:load_error carries two apostrophes, so the literal closed at the
+ * first one and every script on the page failed to parse: the Pyodide loader,
+ * the Run button and the output pane. The sandbox was dead on any French site,
+ * unnoticed because the plugin's own locale is English. v7.6.1 fixed it with
+ * json_encode, and this test used to pin that each such site was encoded and
+ * carried JSON_INVALID_UTF8_SUBSTITUTE.
  *
- *     status.textContent = '<?php echo get_string('sandbox:load_error', ...); ?>';
- *
- * The French translation of that key is "Impossible de charger
- * l'environnement d'exécution Python", which carries two apostrophes. Rendered
- * into the page, the literal closes at the first one and the rest is garbage,
- * so the whole inline script fails to parse. Not one message: every script on
- * the page, which is the Pyodide loader, the Run button and the output pane.
- * The sandbox was dead on any site running in French.
- *
- * It was never noticed because the plugin's own locale is English, the English
- * string has no apostrophe, and nothing tests a page's rendered JavaScript.
- *
- * The fix is json_encode, which emits the quotes itself and escapes what is
- * inside them. This test reads the source rather than rendering the page,
- * because the defect is in how the literal is constructed and that is visible
- * statically. It also asserts the real translations survive the encoder, which
- * is the part that would have caught the original.
+ * CONTRIB-10574 #273 then moved the page to a Mustache template and an AMD
+ * module. Strings now reach JavaScript through core/str and values through
+ * data attributes, so no PHP value is interpolated into JavaScript anywhere on
+ * the page. The old assertions had nothing left to check, and one of them, a
+ * sanity check that the page HAS inline script blocks, would now fail for the
+ * right reason. So this test pins the stronger invariant the migration
+ * created: there is no inline JavaScript to break. It also renders the real
+ * template, because the move introduced two risks of its own.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversNothing
+ * @covers     \local_ai_course_assistant\code_sandbox
  */
-final class sandbox_js_string_escaping_test extends \basic_testcase {
+final class sandbox_js_string_escaping_test extends \advanced_testcase {
 
     /**
-     * No quoted get_string() interpolation remains in the page.
-     */
-    public function test_no_lang_string_is_interpolated_into_a_quoted_js_literal(): void {
-        $src = file_get_contents(__DIR__ . '/../sandbox.php');
-        $this->assertNotFalse($src, 'sandbox.php must be readable');
-
-        $found = [];
-        if (preg_match_all(
-            '/[\'"]\s*<\?php\s+echo\s+get_string\(\s*[\'"]([a-z_:]+)[\'"]/i',
-            $src, $m, PREG_SET_ORDER)) {
-            foreach ($m as $hit) {
-                $found[] = $hit[1];
-            }
-        }
-
-        $this->assertSame([], $found,
-            "These lang keys are echoed inside a quoted JavaScript literal in sandbox.php:\n  "
-                . implode("\n  ", $found)
-                . "\nAny translation containing an apostrophe closes the literal early and "
-                . "breaks every script on the page. Use json_encode(get_string(...), "
-                . "JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), which "
-                . "emits its own quotes.");
-    }
-
-    /**
-     * Inside a script block, every lang string goes through the encoder.
+     * Neither the page nor its template emits any inline JavaScript.
      *
-     * Scoped to script blocks on purpose. The same page echoes a dozen lang
-     * strings into HTML, where s() and Moodle's own escaping are correct and
-     * json_encode would be wrong. The bug is specific to JavaScript context.
+     * If a script block comes back, so does the possibility of a lang string
+     * being interpolated into it, which is the original bug.
      */
-    public function test_lang_strings_inside_script_blocks_use_json_encode(): void {
-        $src = file_get_contents(__DIR__ . '/../sandbox.php');
-        $this->assertNotFalse($src);
-
-        // Collect the inline script bodies. src="..." tags carry no JS literals.
-        $scripts = [];
-        if (preg_match_all('/<script(?![^>]*\bsrc=)[^>]*>(.*?)<\/script>/s', $src, $m)) {
-            $scripts = $m[1];
-        }
-        $this->assertNotEmpty($scripts, 'sanity: sandbox.php should have inline script blocks');
-
-        $bare = [];
-        foreach ($scripts as $js) {
-            if (preg_match_all('/<\?php\s+echo\s+([^;]+);\s*\?>/', $js, $mm)) {
-                foreach ($mm[1] as $expr) {
-                    if (strpos($expr, 'get_string(') === false) {
-                        continue;
-                    }
-                    if (strpos($expr, 'json_encode(') === false) {
-                        $bare[] = trim($expr);
-                    }
-                }
-            }
-        }
-
-        $this->assertSame([], $bare,
-            "These lang strings reach JavaScript in sandbox.php without json_encode:\n  "
-                . implode("\n  ", $bare)
-                . "\nAn apostrophe in any translation then breaks the whole script block.");
-    }
-
-    /**
-     * No translation makes the encoder return false.
-     *
-     * This replaces a test that could not fail. The earlier version asserted
-     * that the encoded form of each translation carried no raw quote or angle
-     * bracket, which the HEX flags guarantee unconditionally: it never read
-     * sandbox.php, so it passed just as happily against the buggy page. Review
-     * caught that, and it was overstated in three places as "the part that
-     * would have caught the original". It would not have. What catches a new
-     * locale is the two tests above, which read the page.
-     *
-     * There is still something real to pin here, and it is the one remaining
-     * way a lang string can blank the script. json_encode returns false on
-     * invalid UTF-8, and `status.textContent = ;` is a syntax error, so a
-     * mangled customlang edit would kill the page exactly as the apostrophe
-     * did. JSON_INVALID_UTF8_SUBSTITUTE prevents that, and this asserts both
-     * halves: the flag is present at every site, and every shipped translation
-     * encodes to something non-empty.
-     */
-    public function test_no_translation_can_make_the_encoder_return_false(): void {
+    public function test_the_page_emits_no_inline_javascript(): void {
         $root = __DIR__ . '/..';
+        foreach (['sandbox.php', 'templates/sandbox.mustache'] as $file) {
+            $src = file_get_contents($root . '/' . $file);
+            $this->assertNotFalse($src, "{$file} must be readable");
+            $this->assertStringNotContainsStringIgnoringCase('<script', $src,
+                "{$file} emits an inline script again; lang strings and PHP values "
+                . 'must reach the page through core/str and data attributes, not a script block.');
+            $this->assertDoesNotMatchRegularExpression('/json_encode\s*\(\s*get_string/', $src,
+                "{$file} encodes a lang string for JavaScript again.");
+        }
+    }
 
-        $src = file_get_contents($root . '/sandbox.php');
+    /**
+     * The module fetches the two runtime strings through core/str.
+     */
+    public function test_the_module_takes_its_strings_from_core_str(): void {
+        $src = file_get_contents(__DIR__ . '/../amd/src/sandbox.js');
         $this->assertNotFalse($src);
-        // Check each site, not a count. Counting let a site lose the flag as
-        // long as some other json_encode on the page still carried it, which is
-        // exactly what the proof run showed: removing one flag SURVIVED.
-        preg_match_all('/json_encode\(\s*get_string\([^)]*\)\s*,([^;]*?)\)\s*;/s', $src, $m);
-        $this->assertNotEmpty($m[1], 'sanity: the page should encode lang strings');
-
-        $unguarded = [];
-        foreach ($m[1] as $i => $flags) {
-            if (strpos($flags, 'JSON_INVALID_UTF8_SUBSTITUTE') === false) {
-                $unguarded[] = 'site ' . ($i + 1) . ': ' . trim(preg_replace('/\s+/', ' ', $flags));
-            }
+        $this->assertStringContainsString('Str.get_strings(', $src);
+        foreach (['sandbox:ready', 'sandbox:load_error'] as $key) {
+            $this->assertStringContainsString("key: '{$key}'", $src,
+                "{$key} must come from core/str, not be baked into the page");
         }
+    }
 
-        $this->assertSame([], $unguarded,
-            "These json_encode calls on a lang string in sandbox.php lack "
-                . "JSON_INVALID_UTF8_SUBSTITUTE:\n  " . implode("\n  ", $unguarded)
-                . "\nWithout it, invalid UTF-8 from a customlang edit makes json_encode "
-                . "return false, the literal renders as nothing, and the whole script "
-                . "block dies the same way the apostrophe killed it.");
+    /**
+     * A Python error shows the learner their traceback, not the word "PythonError".
+     *
+     * The module redirects sys.stderr into _aica_err so it can capture output,
+     * and that redirect is also where Pyodide writes the formatted traceback,
+     * leaving the thrown error's message EMPTY. The handler fell back to
+     * String(err), so for as long as the sandbox has existed a failing program
+     * showed the bare word "PythonError" and never the actual error. Found by
+     * running the module in a browser during #273; there is no browser in CI, so
+     * this pins the handler reading the buffer first.
+     */
+    public function test_a_python_error_shows_the_captured_traceback(): void {
+        $src = file_get_contents(__DIR__ . '/../amd/src/sandbox.js');
+        $this->assertNotFalse($src);
 
-        $keys = ['sandbox:ready', 'sandbox:load_error'];
-        $checked = 0;
-        $problems = [];
+        $this->assertSame(1, preg_match('/\} catch \(err\) \{(.*?)\} finally \{/s', $src, $m),
+            'the run handler should have a catch block');
+        // Compare code only. The block's own comment explains the bug and names
+        // err.message before the code does, which would satisfy or defeat the
+        // ordering check for the wrong reason.
+        $catch = preg_replace('#//[^\n]*#', '', $m[1]);
+        // Reading the buffer is not enough: the first version of this test
+        // passed against a handler that read it and then ignored it. Pin what
+        // is actually SHOWN: the captured traceback comes first in the argument
+        // to showStderr, ahead of any fallback to the error object.
+        $this->assertSame(1, preg_match('/var\s+(\w+)\s*=\s*readBuffer\(\'_aica_err\'\)/', $catch, $v),
+            'the catch must capture the stderr buffer; err.message is empty under the redirect');
+        $this->assertSame(1, preg_match('/showStderr\(\s*' . preg_quote($v[1], '/') . '\s*\|\|/', $catch),
+            'showStderr must be given the captured traceback first, falling back only when it is empty');
+    }
 
-        foreach (scandir($root . '/lang') as $locale) {
-            if ($locale[0] === '.') {
-                continue;
-            }
-            $file = $root . '/lang/' . $locale . '/local_ai_course_assistant.php';
-            if (!is_file($file)) {
-                continue;
-            }
-            $contents = file_get_contents($file);
+    /**
+     * The starter code renders exactly, because the textarea is whitespace-sensitive.
+     *
+     * Everything between the textarea tags is what the learner sees and runs.
+     * Indenting the template to match the surrounding markup would shift every
+     * line of Python right and turn the starter into an IndentationError.
+     */
+    public function test_the_starter_code_renders_exactly(): void {
+        global $OUTPUT;
+        $this->resetAfterTest();
 
-            foreach ($keys as $key) {
-                if (!preg_match("/\\\$string\['" . preg_quote($key, '/') . "'\]\s*=\s*'(.*)';/", $contents, $m)) {
-                    continue;
-                }
-                $value = str_replace(["\\'", '\\\\'], ["'", '\\'], $m[1]);
-                $checked++;
+        $html = $OUTPUT->render_from_template('local_ai_course_assistant/sandbox', [
+            'pyodidebase' => 'https://pyodide.example.org/full/',
+            'loaderurl' => 'https://pyodide.example.org/full/pyodide.js',
+        ]);
 
-                $encoded = json_encode($value,
-                    JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
-                        | JSON_INVALID_UTF8_SUBSTITUTE);
+        $this->assertSame(1, preg_match('#<textarea[^>]*>(.*?)</textarea>#s', $html, $m),
+            'the code textarea must render');
+        $comment = s(get_string('sandbox:default_code_comment', 'local_ai_course_assistant'));
+        $this->assertSame($comment . "\nfor n in range(1, 11):\n    print(n, n*n)\n", $m[1]);
+    }
 
-                if ($encoded === false || $encoded === '""') {
-                    $problems[] = "{$locale}/{$key}: encodes to "
-                        . var_export($encoded, true)
-                        . ', which would render as an empty or missing JS literal';
-                }
-            }
-        }
+    /**
+     * A runtime URL carrying quotes or markup cannot break out of its attribute.
+     *
+     * The URL is an admin setting and the validator rejects most bad values, but
+     * the template is the last line and must not depend on that.
+     */
+    public function test_a_hostile_runtime_url_stays_inside_its_attribute(): void {
+        global $OUTPUT;
+        $this->resetAfterTest();
 
-        $this->assertGreaterThan(40, $checked,
-            'sanity: these keys should exist across the locale set, got ' . $checked);
-        $this->assertSame([], $problems, implode("\n", $problems));
+        $hostile = 'https://x.example/"><script>alert(1)</script>';
+        $html = $OUTPUT->render_from_template('local_ai_course_assistant/sandbox', [
+            'pyodidebase' => $hostile,
+            'loaderurl' => $hostile,
+        ]);
+
+        $this->assertStringNotContainsString('<script>alert(1)</script>', $html);
+        $this->assertStringContainsString('data-pyodide-base="https://x.example/&quot;&gt;&lt;script&gt;', $html);
     }
 }
