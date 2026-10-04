@@ -187,6 +187,43 @@ final class claude_provider_structured_retry_test extends \advanced_testcase {
         $out = $p->chat_completion('sys', [['role' => 'user', 'content' => 'grade this']], self::OPTIONS);
 
         $this->assertSame('Here is my grade: a solid B.', $out);
+        // The refused retry was still sent and still charged. Discarding its
+        // usage because its OUTPUT was unusable is the under-billing this
+        // whole change exists to prevent; the review bot caught it.
+        $this->assertSame(200, $p->get_last_token_usage()['prompt_tokens']);
+    }
+
+    /**
+     * An empty retry is billed too.
+     */
+    public function test_an_empty_retry_is_still_billed(): void {
+        $empty = ['stop_reason' => 'end_turn', 'content' => [], 'usage' => ['input_tokens' => 100, 'output_tokens' => 0]];
+        $p = $this->provider('claude-sonnet-5-5', [self::prose(100, 20), $empty]);
+
+        $out = $p->chat_completion('sys', [['role' => 'user', 'content' => 'grade this']], self::OPTIONS);
+
+        $this->assertSame('Here is my grade: a solid B.', $out);
+        $this->assertSame(200, $p->get_last_token_usage()['prompt_tokens']);
+    }
+
+    /**
+     * A refusal on the FIRST attempt is billed.
+     *
+     * Not part of the retry, but the same flaw one line up, and older than it:
+     * the usage capture sat after the refusal's early return, so every refused
+     * call reported no usage at all.
+     */
+    public function test_a_first_attempt_refusal_is_billed(): void {
+        $refusal = ['stop_reason' => 'refusal', 'content' => [], 'usage' => ['input_tokens' => 140, 'output_tokens' => 0]];
+        $p = $this->provider('claude-sonnet-5-5', [$refusal]);
+
+        $out = $p->chat_completion('sys', [['role' => 'user', 'content' => 'hello']], []);
+
+        $this->assertSame(get_string('chat:refused', 'local_ai_course_assistant'), $out);
+        $this->assertSame(1, $p->calls);
+        $usage = $p->get_last_token_usage();
+        $this->assertNotNull($usage, 'a refused call recorded no usage, so it was never billed');
+        $this->assertSame(140, $usage['prompt_tokens']);
     }
 
     /**

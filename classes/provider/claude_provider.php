@@ -402,6 +402,15 @@ class claude_provider extends base_provider {
 
         $data = json_decode($response, true);
 
+        // Record usage for ANY response that parsed, before the refusal and
+        // empty-content exits below. A refused request was still sent and still
+        // bills its input tokens, and the refusal payload carries them; the
+        // capture used to sit after the refusal's early return, so every
+        // refused call reported no usage and was never billed.
+        if (is_array($data)) {
+            $this->add_token_usage($data);
+        }
+
         // A model-level safety refusal is a WELL-FORMED response that carries
         // no content blocks, so it must be checked before the empty-content
         // guard below -- otherwise it is misreported as a transport failure
@@ -414,9 +423,6 @@ class claude_provider extends base_provider {
             throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
                 self::describe_api_error($data, $response));
         }
-
-        // Capture token usage including cache metrics.
-        $this->add_token_usage($data);
 
         // Structured output: extract tool_use input directly.
         if (!empty($options['response_schema'])) {
@@ -442,9 +448,14 @@ class claude_provider extends base_provider {
             if (!self::model_supports_forced_tool_choice($this->model)) {
                 try {
                     $retry = json_decode($this->http_post($url, $this->get_headers($options), $body), true);
+                    // Bill the retry whatever it returned. A refused or empty
+                    // retry was still sent and still charged; whether its
+                    // OUTPUT is usable is a separate question, decided below.
+                    if (is_array($retry)) {
+                        $this->add_token_usage($retry);
+                    }
                     if (is_array($retry) && !empty($retry['content'])
                             && ($retry['stop_reason'] ?? '') !== self::STOP_REASON_REFUSAL) {
-                        $this->add_token_usage($retry);
                         $input = self::find_tool_input($retry);
                         if ($input !== null) {
                             return json_encode($input);

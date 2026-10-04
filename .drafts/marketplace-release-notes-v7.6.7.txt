@@ -22,14 +22,19 @@ its real cost. The two attempts are now added together. If the retry is
 refused, comes back empty or fails to connect, the plugin returns exactly what
 the first attempt would have, so a retry never makes a request worse.
 
+Refused requests are billed now, which they never were. A request the model
+declines is still charged, but the plugin returned before recording its usage,
+so refusals were missing from the bill. Usage is now recorded for every reply,
+including a refused or empty retry.
+
 This release was also checked against the live API rather than only by
 automated tests, which is how the previous release's problem slipped through.
 The real learning objectives request went through the real provider code to
 Claude Sonnet 5.5, Opus 5.5 and Sonnet 5, and all three returned between 11 and
 12 objectives with token usage recorded.
 
-Tested: 2,058 automated tests with no failures, the security validator corpus
-at 36 of 36, and PHP lint clean across 600 files. Three of the new behaviours,
-including the billing one, were checked by deliberately reintroducing the bug
+Tested: 2,060 automated tests with no failures, the security validator corpus
+at 36 of 36, and PHP lint clean across 600 files. Five of the new behaviours,
+including all three billing ones, were checked by deliberately reintroducing the bug
 and confirming the test failed. Continuous integration covers PHP 8.1 through
 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.
