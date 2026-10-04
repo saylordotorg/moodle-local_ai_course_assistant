@@ -143,6 +143,11 @@ class token_cost_manager {
         'claude-haiku'      => ['input' => 1.00, 'output' => 5.00],
         'claude-sonnet-5'   => ['input' => 2.00, 'output' => 10.00],
         'claude-sonnet'     => ['input' => 3.00, 'output' => 15.00],
+        // Opus 5.5 undercuts Opus 5 ($4/$20 against $5/$25), so without its own
+        // row longest-prefix resolves it through 'claude-opus-5' and overprices
+        // every call by 25%. Sonnet 5.5 needs no row: it is the same $2/$10 as
+        // 'claude-sonnet-5', which already matches it.
+        'claude-opus-5-5'   => ['input' => 4.00, 'output' => 20.00],
         'claude-opus-5'     => ['input' => 5.00, 'output' => 25.00],
         'claude-opus'       => ['input' => 5.00, 'output' => 25.00],
 
