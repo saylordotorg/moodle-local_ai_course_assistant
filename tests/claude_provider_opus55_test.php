@@ -93,7 +93,7 @@ final class claude_provider_opus55_test extends \advanced_testcase {
     }
 
     /**
-     * Structured output on Opus 5.5 uses auto + strict, never a forced choice.
+     * Structured output on Opus 5.5 uses auto, never a forced choice.
      */
     public function test_structured_output_is_not_forced_on_opus_5_5(): void {
         $body = $this->body('claude-opus-5-5', [
@@ -101,7 +101,59 @@ final class claude_provider_opus55_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(['type' => 'auto'], $body['tool_choice']);
-        $this->assertTrue($body['tools'][0]['strict']);
+    }
+
+    /**
+     * Strict mode is never sent, because this provider cannot satisfy it.
+     *
+     * The first version of this fix set strict: true, and this test asserted
+     * it. Strict compiles the schema through the structured-outputs pipeline,
+     * which rejects array minItems above 1, any maxItems, numeric and length
+     * bounds, and any object without additionalProperties: false. The SDKs
+     * strip those keywords; raw HTTP does not. Measured live against
+     * claude-sonnet-5-5: the real objectives schema below returned HTTP 400.
+     *
+     * The earlier tests only ever sent ['type' => 'object'], which strict mode
+     * would ALSO reject for lacking additionalProperties: false, and still
+     * passed, because nothing here talks to the API. That is why this one uses
+     * a schema a real caller actually sends.
+     */
+    public function test_strict_mode_is_never_sent_with_a_real_caller_schema(): void {
+        $objectives = [
+            'name' => 'learning_objectives',
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'objectives' => [
+                        'type' => 'array',
+                        'minItems' => 6,
+                        'maxItems' => 12,
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'title' => ['type' => 'string'],
+                                'description' => ['type' => 'string'],
+                            ],
+                            'required' => ['title', 'description'],
+                            'additionalProperties' => false,
+                        ],
+                    ],
+                ],
+                'required' => ['objectives'],
+                'additionalProperties' => false,
+            ],
+        ];
+
+        foreach (\local_ai_course_assistant\provider\claude_provider::FORCED_TOOL_CHOICE_DENY_PREFIXES as $model) {
+            $body = $this->body($model, ['response_schema' => $objectives]);
+
+            $this->assertArrayNotHasKey('strict', $body['tools'][0],
+                "strict sent for {$model}; strict mode 400s on minItems 6 / maxItems 12");
+            $this->assertSame(['type' => 'auto'], $body['tool_choice']);
+            // The caller's bounds still travel as guidance; they are what kept
+            // the live run inside 6..12 without strict enforcing them.
+            $this->assertSame(6, $body['tools'][0]['input_schema']['properties']['objectives']['minItems']);
+        }
     }
 
     /**

@@ -302,12 +302,32 @@ class claude_provider extends base_provider {
                 ];
             } else {
                 // Opus 5.5 and its generation reject a forced tool choice.
-                // 'auto' plus strict keeps the arguments schema-valid, and the
-                // instruction appended to the system prompt is what actually
-                // steers the call. Sending the forced form here returned a 400
-                // for the whole request, so structured output was not degraded
-                // on these models, it was broken.
-                $body['tools'][0]['strict'] = true;
+                // Sending the forced form here returned a 400 for the whole
+                // request, so structured output was not degraded on these
+                // models, it was broken. 'auto' plus the steering instruction
+                // appended below is what makes the call.
+                //
+                // Deliberately NOT strict: true, although the migration guides
+                // pair it with 'auto'. Strict compiles the schema through the
+                // structured-outputs pipeline, which accepts only a subset of
+                // JSON Schema: no numeric or length bounds, array minItems of
+                // 0 or 1 only, no maxItems, and additionalProperties: false
+                // required on every object. The SDKs strip what is unsupported;
+                // this provider is raw HTTP and strips nothing. Measured live
+                // on 2026-10-03 against claude-sonnet-5-5 with the real
+                // objectives schema (minItems 6, maxItems 12): strict returned
+                // HTTP 400 "'minItems' values other than 0 or 1 are not
+                // supported", so the first version of this fix swapped one 400
+                // for another across all seven structured-output callers (quiz
+                // generation, essay and speech scoring, flashcards, objectives,
+                // conversation classification). Without strict the same request
+                // called the tool 5 of 5 times and still honoured the 6..12
+                // range, since the bounds remain in the schema as guidance.
+                //
+                // 'auto' does not GUARANTEE a call. A miss falls through to the
+                // text branch of the parser, the caller's json_decode fails, and
+                // its existing error path runs. A retry-once is the documented
+                // remedy; see issue #298 for why it is not a two-line change.
                 $body['tool_choice'] = ['type' => 'auto'];
                 // Appended as its OWN system block, not concatenated onto the
                 // first one: that block carries cache_control, so editing its
