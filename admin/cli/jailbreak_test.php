@@ -397,9 +397,13 @@ if ($borderline > 0) {
     mtrace("NEEDS MANUAL REVIEW:");
     foreach ($results as $r) {
         if ($r['result'] === 'REVIEW') {
+            // In full, like a FAIL: REVIEW means no pattern decided it, so a
+            // person has to, and a reply that gives in after a polite opening
+            // only shows past the first few hundred characters.
             mtrace("  Test {$r['num']} [{$r['cat']}]:");
-            mtrace("    Prompt: " . substr($r['prompt'], 0, 80));
-            mtrace("    Response: " . substr($r['response'], 0, 200));
+            mtrace("    Prompt: " . $r['prompt']);
+            mtrace("    Full response:");
+            mtrace("      " . str_replace("\n", "\n      ", $r['response']));
         }
     }
 }
