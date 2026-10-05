@@ -1,0 +1,31 @@
+Version 7.7.0 (build 2026100111)
+
+Every settings page now opens with its own heading, and the admin documentation
+is accurate again.
+
+When the settings were split into eleven pages, four of the page breaks landed
+one heading too late. Each heading ended up as the last thing on the page before
+it, with nothing underneath, and the next page opened straight into its settings
+with no heading. Twenty-seven settings were affected, including re-ranking, the
+content-source extractors, the cost anomaly detector and the student survey.
+Every page now opens with its own heading, and a test fails if one ever ends on
+an empty heading again.
+
+The documentation said API keys were stored encrypted. They aren't. The key
+fields hide the value in the settings form and never send it to the browser, but
+like every Moodle plugin setting they're stored as plain text in the database,
+so they appear in database backups. The documentation is corrected, and
+encrypting keys at rest is planned. Until then, treat database backups as
+containing your provider keys.
+
+The rest of the admin documentation has caught up with recent releases: the
+eleven settings pages, current default models and prices, the retry limits, and
+the Python sandbox's runtime setting. The release notes now include a walkthrough
+for sites upgrading from v7.5.7.
+
+The jailbreak test suite now shows the full response and the exact matched text
+for any failure, so a failure can be judged rather than guessed at.
+
+Tested: 2,076 automated tests with no failures, the security validator corpus at
+36 of 36, and PHP lint clean across 610 files. Continuous integration covers PHP
+8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.

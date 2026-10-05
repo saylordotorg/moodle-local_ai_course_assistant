@@ -1017,17 +1017,21 @@ if ($hassiteconfig) {
     // v5.11.0: two-stage retrieval with Voyage rerank-2.5.
     // v6.1.0: own heading — these five settings were orphaned after
     // rag_chunksize with no visual group boundary.
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/rerank_heading',
-        get_string('settings:rerank_heading', 'local_ai_course_assistant'),
-        get_string('settings:rerank_heading_desc', 'local_ai_course_assistant')
-    ));
-
+ 
     // Issue #292: reranking split out. Its six dependents plus retrieval's eighteen exceeded the budget on one page.
     $aicapages[] = $settings;
     $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_rerank',
         get_string('settingspage:rerank', 'local_ai_course_assistant'));
+
+    // The page break used to sit BELOW this heading, so it was the last thing
+    // on the previous page with nothing under it, and this page opened on its
+    // settings with no heading at all. Moved to open the page it introduces.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/rerank_heading',
+        get_string('settings:rerank_heading', 'local_ai_course_assistant'),
+        get_string('settings:rerank_heading_desc', 'local_ai_course_assistant')
+    ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rerank_enabled',
@@ -1142,18 +1146,22 @@ if ($hassiteconfig) {
 
     // Content source extractors (v3.9.6+). Each flag gates a specific module
     // type or embed fetcher. Read from within the extractor classes.
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/rag_sources_heading',
-        get_string('settings:rag_sources_heading', 'local_ai_course_assistant'),
-        get_string('settings:rag_sources_heading_desc', 'local_ai_course_assistant', $ragadminurl->out()),
-    ));
-
+ 
 
     // Issue #292: document extraction split out; its toggles carry their own sub-settings.
     $aicapages[] = $settings;
     $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_extraction',
         get_string('settingspage:extraction', 'local_ai_course_assistant'));
+
+    // The page break used to sit BELOW this heading, so it was the last thing
+    // on the previous page with nothing under it, and this page opened on its
+    // settings with no heading at all. Moved to open the page it introduces.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/rag_sources_heading',
+        get_string('settings:rag_sources_heading', 'local_ai_course_assistant'),
+        get_string('settings:rag_sources_heading_desc', 'local_ai_course_assistant', $ragadminurl->out()),
+    ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rag_extract_pdf',
@@ -1322,18 +1330,22 @@ if ($hassiteconfig) {
     ));
 
     // v6.0.0: daily cost anomaly detector (in-SOLA equivalent to the Redash query).
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/cost_anomaly_heading',
-        get_string('settings:cost_anomaly_heading', 'local_ai_course_assistant'),
-        \local_ai_course_assistant\branding::apply(get_string('settings:cost_anomaly_heading_desc', 'local_ai_course_assistant'))
-    ));
-    // Issue #292: resilience and operations settings were sitting at the tail
+     // Issue #292: resilience and operations settings were sitting at the tail
     // of the content section, which put them on the extraction page and pushed
     // it over the dependency budget. They are their own concern anyway.
     $aicapages[] = $settings;
     $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_operations',
         get_string('settingspage:operations', 'local_ai_course_assistant'));
+
+    // The page break used to sit BELOW this heading, so it was the last thing
+    // on the previous page with nothing under it, and this page opened on its
+    // settings with no heading at all. Moved to open the page it introduces.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/cost_anomaly_heading',
+        get_string('settings:cost_anomaly_heading', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:cost_anomaly_heading_desc', 'local_ai_course_assistant'))
+    ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/cost_anomaly_enabled',
@@ -2185,18 +2197,22 @@ if ($hassiteconfig) {
     ));
 
     // Student Survey.
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/survey_heading',
-        get_string('settings:survey_heading', 'local_ai_course_assistant'),
-        get_string('settings:survey_heading_desc', 'local_ai_course_assistant', (new moodle_url('/local/ai_course_assistant/survey_admin.php'))->out()),
-    ));
-
+ 
 
     // Issue #292: survey and feedback split out so the engagement page's dependency payload fits core's 1,024-character js_call_amd budget.
     $aicapages[] = $settings;
     $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_feedback',
         get_string('settingspage:feedback', 'local_ai_course_assistant'));
+
+    // The page break used to sit BELOW this heading, so it was the last thing
+    // on the previous page with nothing under it, and this page opened on its
+    // settings with no heading at all. Moved to open the page it introduces.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/survey_heading',
+        get_string('settings:survey_heading', 'local_ai_course_assistant'),
+        get_string('settings:survey_heading_desc', 'local_ai_course_assistant', (new moodle_url('/local/ai_course_assistant/survey_admin.php'))->out()),
+    ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/survey_enabled',
