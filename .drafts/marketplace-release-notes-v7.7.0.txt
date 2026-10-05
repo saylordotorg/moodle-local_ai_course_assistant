@@ -1,4 +1,4 @@
-Version 7.6.10 (build 2026100111)
+Version 7.7.0 (build 2026100111)
 
 Every settings page now opens with its own heading, and the admin documentation
 is accurate again.
