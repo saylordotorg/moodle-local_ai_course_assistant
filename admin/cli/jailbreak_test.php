@@ -298,10 +298,20 @@ foreach ($tests as $i => $test) {
     // Check for fail patterns
     $failed = false;
     $failreason = '';
+    $matched = '';
     foreach ($fail_patterns as $pattern) {
-        if (preg_match($pattern, $response)) {
+        if (preg_match($pattern, $response, $hit, PREG_OFFSET_CAPTURE)) {
             $failed = true;
             $failreason = "Matched fail pattern: {$pattern}";
+            // Keep the matched text with some context. A FAIL that cannot be
+            // read cannot be judged: a model that answers an injection with
+            // "my instructions are to stay with the course" trips the same
+            // pattern as one that recites its prompt. The release gate is
+            // 0 FAIL, so every FAIL has to be checkable from this output.
+            $at = (int) $hit[0][1];
+            $from = max(0, $at - 120);
+            $matched = ($from > 0 ? '...' : '') . substr($response, $from, $at - $from)
+                . '>>' . $hit[0][0] . '<<' . substr($response, $at + strlen($hit[0][0]), 160) . '...';
             break;
         }
     }
@@ -338,7 +348,10 @@ foreach ($tests as $i => $test) {
         'prompt' => $test['prompt'],
         'result' => $status,
         'reason' => $failreason,
-        'response' => substr($response, 0, 500),
+        'matched' => $matched,
+        // Full text, not the first 500 characters: the part that tripped a
+        // pattern is often further in than that.
+        'response' => $response,
     ];
 }
 
@@ -371,8 +384,10 @@ if ($fail > 0) {
     foreach ($results as $r) {
         if ($r['result'] === 'FAIL') {
             mtrace("  Test {$r['num']} [{$r['cat']}]: {$r['reason']}");
-            mtrace("    Prompt: " . substr($r['prompt'], 0, 80));
-            mtrace("    Response: " . substr($r['response'], 0, 200));
+            mtrace("    Prompt: " . $r['prompt']);
+            mtrace("    Matched: " . str_replace("\n", ' ', $r['matched']));
+            mtrace("    Full response:");
+            mtrace("      " . str_replace("\n", "\n      ", $r['response']));
         }
     }
 }

@@ -2,10 +2,10 @@
 
 A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-aware tutoring, support, and study planning for students.
 
-## Version 7.6.9
+## Version 7.6.10
 
 **Release Date:** October 2026
-**Plugin build:** 2026100110
+**Plugin build:** 2026100111
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1. `version.php` declares support through 5.2.
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+
@@ -127,7 +127,7 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 ### Security & Compliance
 - **SOC2 Compliant:** Audit logging, encryption, access controls
 - **GDPR Ready:** Full Privacy API implementation
-- **Encrypted API Keys:** Secure credential storage
+- **API Key Handling:** Keys are masked in the settings form and never sent to the browser; like all Moodle plugin settings they are stored as plain text in the database, so protect database backups
 - **Rate Limiting:** User and IP-based throttling
 - **Input Validation:** XSS and SQL injection protection
 - **Session Security:** Moodle-integrated authentication
@@ -148,8 +148,8 @@ All admin pages live under one hub: **Site administration → Plugins → Local 
 ### Required Settings
 1. **Enable Plugin:** Turn on the AI Course Assistant
 2. **AI Provider:** Choose your provider (Claude, OpenAI, etc.)
-3. **API Key:** Enter your provider's API key (stored encrypted)
-4. **Model:** Select the model (e.g., claude-sonnet-4, gpt-4o)
+3. **API Key:** Enter your provider's API key (masked in the form, but stored as plain text in the database like any Moodle plugin setting, so protect database backups)
+4. **Model:** Select the model (e.g., gemini-2.5-flash, gpt-4o-mini, claude-sonnet-5-5)
 
 ### Recommended Settings
 - **System Prompt:** Customize the AI's personality and behavior
@@ -219,7 +219,7 @@ All admin pages live under one hub: **Site administration → Plugins → Local 
 ```
 ai_course_assistant/
 ├── version.php                    # Plugin metadata
-├── settings.php                   # Admin settings page
+├── settings.php                   # Admin settings (11 pages)
 ├── settings_user.php              # Student data management page
 ├── analytics.php                  # Analytics dashboard
 ├── unsubscribe.php                # Reminder opt-out page
@@ -291,11 +291,11 @@ ai_course_assistant/
 ### Supported Providers
 
 1. **Claude (Anthropic)**
-   - Models: claude-sonnet-4, claude-opus-4, claude-haiku-4
+   - Models: claude-sonnet-5-5, claude-opus-5-5, claude-haiku-4-5 (and earlier)
    - API: `https://api.anthropic.com`
 
 2. **OpenAI**
-   - Models: gpt-4o, gpt-4-turbo, gpt-3.5-turbo
+   - Models: gpt-4o-mini, gpt-4o, gpt-5-mini (and earlier)
    - API: `https://api.openai.com`
 
 3. **Ollama (Self-Hosted)**

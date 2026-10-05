@@ -55,10 +55,12 @@ the file now says, and reports SURVIVED regardless of what it pins. Only
 source-reading tests (privacy_discovery_coverage_test, which parses the file
 itself) actually see such a mutation.
 
-Only --file is synced to the Moodle tree. If the TEST file in the repo is
-newer than the deployed copy, the verdict describes the deployed test, not the
-one you just wrote. rsync the plugin before proving anything you have just
-edited.
+The test file is synced too. It used not to be: only --file was copied, so a
+test edited in the repo but not yet rsynced was proved in its OLD form, and the
+verdict described code that had already been replaced. That happened on
+2026-10-04, when a tightened assertion "still errored" exactly as the version
+before it had. The test file named by --filter is now copied into the deployed
+tree before the baseline, and the run says so when it was stale.
 
 """
 import argparse
@@ -233,6 +235,23 @@ def main() -> int:
             # mutation cannot be mistaken for ours.
             with open(target, 'w', encoding='utf-8') as fh:
                 fh.write(original)
+
+            # Sync the TEST named by --filter, so the verdict is about the test
+            # as it now stands in the repo rather than an older deployed copy.
+            # Only that one file, for the same reason this script reverts only
+            # the file it mutates: a whole-tree copy would race other runs.
+            testclass = args.filter.split('::', 1)[0].split('\\')[-1]
+            testrel = os.path.join('tests', testclass + '.php')
+            reposrc = os.path.join(REPO, testrel)
+            deployed = os.path.join(DEPLOYED, testrel)
+            if re.fullmatch(r'[A-Za-z0-9_]+', testclass) and os.path.isfile(reposrc):
+                fresh = open(reposrc, encoding='utf-8').read()
+                stale = (not os.path.isfile(deployed)
+                         or open(deployed, encoding='utf-8').read() != fresh)
+                if stale:
+                    with open(deployed, 'w', encoding='utf-8') as fh:
+                        fh.write(fresh)
+                    print(f'synced {testrel}: the deployed copy was older than the repo\'s')
 
             # Baseline. Without it, a filter whose test ALREADY fails on clean
             # code reports CAUGHT for every mutation, including one on a line
