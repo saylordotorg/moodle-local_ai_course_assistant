@@ -1143,6 +1143,13 @@ a.aica-history-panel__source:hover {
     padding: 0 4px 2px;
 }
 
+/* Admins get the LLM and Model pickers in this bar, and their pill borders
+   sat 2px under the text box. Learners never see the pickers, so only the
+   bar that shows them gets the extra room. */
+.local-ai-course-assistant__composer-bar:has(> .local-ai-course-assistant__composer-left:not([hidden])) {
+    padding-top: 8px;
+}
+
 .local-ai-course-assistant__composer-left,
 .local-ai-course-assistant__composer-right {
     display: flex;
