@@ -639,7 +639,7 @@ TXT;
             return null;
         }
         $siteprovider = strtolower((string) (get_config('local_ai_course_assistant', 'provider') ?: ''));
-        $sitekey = (string) (get_config('local_ai_course_assistant', 'apikey') ?: '');
+        $sitekey = (string) (\local_ai_course_assistant\secrets::get('apikey') ?: '');
         if ($providerid === $siteprovider && $sitekey !== '') {
             return null;
         }

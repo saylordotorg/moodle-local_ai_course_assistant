@@ -287,7 +287,7 @@ $statusrows = [];
 // produces zero chunks. Show it first so a misconfiguration is obvious.
 $embedprovider = (string) (get_config('local_ai_course_assistant', 'embed_provider') ?: 'openai');
 $embedmodel    = (string) (get_config('local_ai_course_assistant', 'embed_model') ?: '');
-$embedkey      = (string) (get_config('local_ai_course_assistant', 'embed_apikey') ?: '');
+$embedkey      = (string) (\local_ai_course_assistant\secrets::get('embed_apikey') ?: '');
 $embedneedskey = ($embedprovider !== 'ollama'); // Local Ollama needs no key.
 $embedok       = $embedneedskey ? ($embedkey !== '') : true;
 if ($embedok) {

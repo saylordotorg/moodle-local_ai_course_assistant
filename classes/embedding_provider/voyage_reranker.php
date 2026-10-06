@@ -50,10 +50,10 @@ class voyage_reranker {
      * supported for split-account deployments).
      */
     public function __construct() {
-        $this->apikey = (string) (get_config('local_ai_course_assistant', 'rerank_apikey') ?: '');
+        $this->apikey = (string) (\local_ai_course_assistant\secrets::get('rerank_apikey') ?: '');
         if ($this->apikey === '') {
             // Fall back to the embed key — typical Voyage deployments share one key.
-            $this->apikey = (string) (get_config('local_ai_course_assistant', 'embed_apikey') ?: '');
+            $this->apikey = (string) (\local_ai_course_assistant\secrets::get('embed_apikey') ?: '');
         }
         $this->model = (string) (get_config('local_ai_course_assistant', 'rerank_model') ?: 'rerank-2.5');
 

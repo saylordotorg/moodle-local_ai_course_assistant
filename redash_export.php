@@ -111,7 +111,7 @@ if ($authheader !== '' && preg_match('/^Bearer\s+(.+)$/i', trim($authheader), $b
 // into a failing one. It is never stored, echoed or interpolated; the only thing
 // done with it is the constant-time comparison below.
 $apikey = $bearer !== '' ? $bearer : optional_param('apikey', '', PARAM_RAW);
-$configuredkey = get_config('local_ai_course_assistant', 'redash_api_key');
+$configuredkey = \local_ai_course_assistant\secrets::get('redash_api_key');
 
 // v7.0.5: a short-lived token for links the admin UI generates, so the raw key
 // stops travelling in query strings, browser history, access logs and Referer

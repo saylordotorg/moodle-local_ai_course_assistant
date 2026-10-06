@@ -741,7 +741,7 @@ $templatedata = $templatestrings + [
     // inside a third-party system. Redash should send it as an
     // Authorization: Bearer header, which is what the endpoint documents.
     'redash_pull_url' => (new moodle_url('/local/ai_course_assistant/redash_export.php'))->out(false),
-    'has_redash_key' => !empty(get_config('local_ai_course_assistant', 'redash_api_key')),
+    'has_redash_key' => !empty(\local_ai_course_assistant\secrets::get('redash_api_key')),
 
     // CSV export (uses the Redash endpoint with the configured API key).
     // A browser following a link cannot set a header, so this carries a

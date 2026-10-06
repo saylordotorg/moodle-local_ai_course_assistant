@@ -473,9 +473,9 @@ if ($judgemode) {
     usort($qitems, fn($a, $b) => strcmp($a['id'], $b['id']));
     $qitems = array_slice($qitems, 0, $samplesize);
 
-    $judgekey = get_config('local_ai_course_assistant', 'embed_apikey');
+    $judgekey = \local_ai_course_assistant\secrets::get('embed_apikey');
     if ($judgekey === false || $judgekey === '') {
-        $judgekey = (string) get_config('local_ai_course_assistant', 'apikey');
+        $judgekey = (string) \local_ai_course_assistant\secrets::get('apikey');
     }
     if ($openaiapikey !== '') {
         $judgekey = $openaiapikey;
@@ -581,7 +581,7 @@ if ($judgemode) {
     $origb = [
         'embed_provider'   => get_config('local_ai_course_assistant', 'embed_provider'),
         'embed_model'      => get_config('local_ai_course_assistant', 'embed_model'),
-        'embed_apikey'     => get_config('local_ai_course_assistant', 'embed_apikey'),
+        'embed_apikey'     => get_config('local_ai_course_assistant', 'embed_apikey'), // Raw on purpose: restored exactly as stored.
         'embed_dimensions' => get_config('local_ai_course_assistant', 'embed_dimensions'),
     ];
     $restoreb = function () use ($origb) {
@@ -967,7 +967,7 @@ if (!empty($abproviders)) {
     $aborigcfg = [
         'embed_provider'   => get_config('local_ai_course_assistant', 'embed_provider'),
         'embed_model'      => get_config('local_ai_course_assistant', 'embed_model'),
-        'embed_apikey'     => get_config('local_ai_course_assistant', 'embed_apikey'),
+        'embed_apikey'     => get_config('local_ai_course_assistant', 'embed_apikey'), // Raw on purpose: restored exactly as stored.
         'embed_dimensions' => get_config('local_ai_course_assistant', 'embed_dimensions'),
     ];
     $abrestore = function () use ($aborigcfg) {
@@ -1217,7 +1217,7 @@ if (!empty($abproviders)) {
 // and throws moodle_exception on a bad provider; without the hook that throw
 // left the caller's key sitting in live plugin config.
 if ($embedapikeyoverride !== '') {
-    $origkey = get_config('local_ai_course_assistant', 'embed_apikey');
+    $origkey = get_config('local_ai_course_assistant', 'embed_apikey'); // Raw on purpose: restored exactly as stored.
     $restorekey = function () use ($origkey) {
         set_config('embed_apikey', ($origkey === false) ? '' : $origkey, 'local_ai_course_assistant');
     };

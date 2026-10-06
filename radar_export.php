@@ -186,7 +186,7 @@ if ($action === 'redash_setup') {
         'base_url' => (string) (get_config('local_ai_course_assistant', 'redash_base_url') ?: ''),
         'data_source_id' => (int) (get_config('local_ai_course_assistant', 'redash_data_source_id') ?: 0),
         'pull_url' => $pullurl,
-        'has_redash_api_key' => !empty(get_config('local_ai_course_assistant', 'redash_api_key')),
+        'has_redash_api_key' => !empty(\local_ai_course_assistant\secrets::get('redash_api_key')),
     ]);
     return;
 }

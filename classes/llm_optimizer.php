@@ -349,7 +349,7 @@ class llm_optimizer {
     private static function active_provider_for(string $capability): string {
         if ($capability === 'voice') {
             $lbl = get_config('local_ai_course_assistant', 'voice_active_realtime') ?: '';
-            return (string) ($lbl ?: (get_config('local_ai_course_assistant', 'realtime_apikey') ? 'openai' : '(legacy)'));
+            return (string) ($lbl ?: (\local_ai_course_assistant\secrets::get('realtime_apikey') ? 'openai' : '(legacy)'));
         }
         if ($capability === 'rag') {
             return (string) (get_config('local_ai_course_assistant', 'embed_provider') ?: 'openai');

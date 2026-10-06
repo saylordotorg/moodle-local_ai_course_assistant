@@ -64,7 +64,7 @@ $globalsettingsurl = new moodle_url('/admin/category.php', ['category' => 'local
 // Current global defaults (shown as placeholder hints).
 $globalcfg = [
     'provider'    => get_config('local_ai_course_assistant', 'provider') ?: 'claude',
-    'apikey'      => get_config('local_ai_course_assistant', 'apikey') ?: '',
+    'apikey'      => \local_ai_course_assistant\secrets::get('apikey') ?: '',
     'model'       => get_config('local_ai_course_assistant', 'model') ?: '',
     'apibaseurl'  => get_config('local_ai_course_assistant', 'apibaseurl') ?: '',
     'systemprompt' => get_config('local_ai_course_assistant', 'systemprompt') ?: '',

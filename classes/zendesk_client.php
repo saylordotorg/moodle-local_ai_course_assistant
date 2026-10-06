@@ -35,7 +35,7 @@ class zendesk_client {
     public static function is_enabled(): bool {
         return (bool) get_config('local_ai_course_assistant', 'zendesk_enabled')
             && !empty(get_config('local_ai_course_assistant', 'zendesk_subdomain'))
-            && !empty(get_config('local_ai_course_assistant', 'zendesk_token'));
+            && !empty(\local_ai_course_assistant\secrets::get('zendesk_token'));
     }
 
     /**
@@ -214,7 +214,7 @@ class zendesk_client {
 
         $subdomain = get_config('local_ai_course_assistant', 'zendesk_subdomain');
         $email = get_config('local_ai_course_assistant', 'zendesk_email');
-        $token = get_config('local_ai_course_assistant', 'zendesk_token');
+        $token = \local_ai_course_assistant\secrets::get('zendesk_token');
 
         $user = $DB->get_record('user', ['id' => $userid], 'id, firstname, lastname, email', MUST_EXIST);
         $course = $DB->get_record('course', ['id' => $courseid], 'id, fullname', MUST_EXIST);

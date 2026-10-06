@@ -318,11 +318,10 @@ if ($hassiteconfig) {
         $providers
     ));
 
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/apikey',
         get_string('settings:apikey', 'local_ai_course_assistant'),
-        get_string('settings:apikey_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('settings:apikey_desc', 'local_ai_course_assistant')
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -732,11 +731,10 @@ if ($hassiteconfig) {
         '',
         PARAM_URL
     ));
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/xai_proxy_jwt_secret',
         get_string('settings:xai_proxy_jwt_secret', 'local_ai_course_assistant'),
-        get_string('settings:xai_proxy_jwt_secret_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('settings:xai_proxy_jwt_secret_desc', 'local_ai_course_assistant')
     ));
 
     // Close the previous page and open the next one.
@@ -828,11 +826,10 @@ if ($hassiteconfig) {
         $embeddingproviders
     ));
 
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/embed_apikey',
         get_string('settings:embed_apikey', 'local_ai_course_assistant'),
-        get_string('settings:embed_apikey_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('settings:embed_apikey_desc', 'local_ai_course_assistant')
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -1040,11 +1037,10 @@ if ($hassiteconfig) {
         0
     ));
 
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/rerank_apikey',
         get_string('settings:rerank_apikey', 'local_ai_course_assistant'),
-        get_string('settings:rerank_apikey_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('settings:rerank_apikey_desc', 'local_ai_course_assistant')
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -1137,11 +1133,10 @@ if ($hassiteconfig) {
     ));
     // Password type, not configtext: a configtext credential has every
     // historical value recorded in the clear in mdl_config_log.
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/embed_migration_target_apikey',
         get_string('settings:embed_migration_target_apikey', 'local_ai_course_assistant'),
-        get_string('settings:embed_migration_target_apikey_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('settings:embed_migration_target_apikey_desc', 'local_ai_course_assistant')
     ));
 
     // Content source extractors (v3.9.6+). Each flag gates a specific module
@@ -1764,11 +1759,10 @@ if ($hassiteconfig) {
         ''
     ));
 
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/whatsapp_api_token',
         get_string('settings:whatsapp_api_token', 'local_ai_course_assistant'),
-        get_string('settings:whatsapp_api_token_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('settings:whatsapp_api_token_desc', 'local_ai_course_assistant')
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -1814,11 +1808,10 @@ if ($hassiteconfig) {
         0
     ));
 
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/realtime_apikey',
         get_string('settings:realtime_apikey', 'local_ai_course_assistant'),
-        get_string('settings:realtime_apikey_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('settings:realtime_apikey_desc', 'local_ai_course_assistant')
     ));
 
     $realtimevoices = [
@@ -1992,11 +1985,10 @@ if ($hassiteconfig) {
         PARAM_TEXT
     ));
 
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/stt_selfhosted_apikey',
         get_string('settings:stt_selfhosted_apikey', 'local_ai_course_assistant'),
-        get_string('settings:stt_selfhosted_apikey_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('settings:stt_selfhosted_apikey_desc', 'local_ai_course_assistant')
     ));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -2182,18 +2174,16 @@ if ($hassiteconfig) {
     // configtext, every access key ID ever saved stayed readable in mdl_config_log,
     // which is never purged. Its sibling soapbox_storage_secret was already
     // declared correctly; this one was missed, the same way redash_api_key was.
-    // (configpasswordunmask takes no paramtype argument; it forces PARAM_RAW.)
-    $settings->add(new admin_setting_configpasswordunmask(
+    // (encryptedpassword takes no paramtype argument; it stores \core\encryption output.)
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/soapbox_storage_key',
         get_string('settings:soapbox_storage_key', 'local_ai_course_assistant'),
-        get_string('settings:soapbox_storage_key_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('settings:soapbox_storage_key_desc', 'local_ai_course_assistant')
     ));
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/soapbox_storage_secret',
         get_string('settings:soapbox_storage_secret', 'local_ai_course_assistant'),
-        get_string('settings:soapbox_storage_secret_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('settings:soapbox_storage_secret_desc', 'local_ai_course_assistant')
     ));
 
     // Student Survey.
@@ -2448,11 +2438,10 @@ if ($hassiteconfig) {
                 PARAM_URL
             ));
             foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
-                $settings->add(new admin_setting_configpasswordunmask(
+                $settings->add(new admin_setting_encryptedpassword(
                     'local_ai_course_assistant/' . $tap . '_api_key',
                     \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_api_key', 'local_ai_course_assistant')),
-                    \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_api_key_desc', 'local_ai_course_assistant')),
-                    ''
+                    \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_api_key_desc', 'local_ai_course_assistant'))
                 ));
                 $settings->add(new admin_setting_configtext(
                     'local_ai_course_assistant/' . $tap . '_persona_id',
@@ -2490,11 +2479,10 @@ if ($hassiteconfig) {
             // payloads from that vendor; webhook rows take precedence over
             // heartbeat rows. Empty = webhook handler off for that provider.
             foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
-                $settings->add(new admin_setting_configpasswordunmask(
+                $settings->add(new admin_setting_encryptedpassword(
                     'local_ai_course_assistant/' . $tap . '_webhook_secret',
                     \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_webhook_secret', 'local_ai_course_assistant')),
-                    \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_webhook_secret_desc', 'local_ai_course_assistant')),
-                    ''
+                    \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_webhook_secret_desc', 'local_ai_course_assistant'))
                 ));
             }
         }
@@ -3088,11 +3076,10 @@ if ($hassiteconfig) {
         ''
     ));
 
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/zendesk_token',
         get_string('settings:zendesk_token', 'local_ai_course_assistant'),
-        get_string('settings:zendesk_token_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('settings:zendesk_token_desc', 'local_ai_course_assistant')
     ));
 
     // Learning Radar Scheduled Reports — moved to a dedicated UI in v4.2.
@@ -3188,11 +3175,10 @@ if ($hassiteconfig) {
     // Confirmed on production 2026-08-03 -- a retired key was recoverable in
     // full from the log. Its siblings redash_user_api_key and github_token
     // were already declared correctly; this one was missed.
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/redash_api_key',
         get_string('redash_api_key', 'local_ai_course_assistant'),
-        get_string('redash_api_key_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('redash_api_key_desc', 'local_ai_course_assistant')
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -3229,11 +3215,10 @@ if ($hassiteconfig) {
     // Authorization: Bearer header -- there is deliberately no query-string
     // path, and no "link with the key baked in" affordance, because that is the
     // leak redash_export.php had to paper over with HMAC download tokens.
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/spend_export_key',
         get_string('settings:spend_export_key', 'local_ai_course_assistant'),
-        get_string('settings:spend_export_key_desc', 'local_ai_course_assistant'),
-        ''
+        get_string('settings:spend_export_key_desc', 'local_ai_course_assistant')
     ));
 
     // v4.3.0: Real Redash integration. Three settings together let SOLA
@@ -3248,11 +3233,10 @@ if ($hassiteconfig) {
         '',
         PARAM_URL
     ));
-    $settings->add(new admin_setting_configpasswordunmask(
+    $settings->add(new admin_setting_encryptedpassword(
         'local_ai_course_assistant/redash_user_api_key',
         get_string('settings:redash_user_api_key', 'local_ai_course_assistant'),
-        \local_ai_course_assistant\branding::apply(get_string('settings:redash_user_api_key_desc', 'local_ai_course_assistant')),
-        ''
+        \local_ai_course_assistant\branding::apply(get_string('settings:redash_user_api_key_desc', 'local_ai_course_assistant'))
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/redash_data_source_id',

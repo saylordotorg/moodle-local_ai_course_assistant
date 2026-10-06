@@ -2172,6 +2172,20 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100106, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026100114) {
+        // Issue #302: provider keys and other secrets were stored as plain text.
+        // The settings are now admin_setting_encryptedpassword; this encrypts the
+        // values already stored, site-wide and per course. Idempotent: anything
+        // already carrying \core\encryption's prefix is left alone, and a key
+        // forced in config.php is left to config.php.
+        $settings = \local_ai_course_assistant\secrets::encrypt_stored_settings();
+        $courses = \local_ai_course_assistant\secrets::encrypt_course_keys();
+        if ($settings + $courses > 0) {
+            mtrace("local_ai_course_assistant: encrypted {$settings} stored key setting(s) "
+                . "and {$courses} per-course key(s). They now depend on this site's key in dataroot.");
+        }
+        upgrade_plugin_savepoint(true, 2026100114, 'local', 'ai_course_assistant');
+    }
 
     return true;
 }
