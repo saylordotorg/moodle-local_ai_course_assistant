@@ -1,0 +1,107 @@
+LIVE TEXT OF CONTRIB-10574 comment 1186905, as edited on 6 October 2026 to ask for v7.7.3.
+The comment is edited IN PLACE each release; the live text on Jira is authoritative.
+Do not post this as a new comment.
+
+Hi Volodymyr,
+
+The following outlines recent releases to resolve all the issues you found. I still can't add a new version on Marketplace. I would like to add the latest, v7.7.3, if you can unlock it.  
+https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/tag/v7.7.3
+
+### What changed since v7.6.1
+
+**v7.6.2** closed other defects we found ourselves while reviewing the work done for your findings. Four of them were data the plugin held that the people it belonged to could not reach:
+
+* An email opt-out stores a learner's address, and the only thing that writes one is the unsubscribe link, which is followed by someone who is not logged in, so every real opt-out stored no owner. Both discovery methods and both erasure paths look the owner up by id, so the address survived a subject access request, survived an erasure request, and survived deletion of the account.
+* Consent and self-download are recorded outside any course and carry the learner's IP address and browser. Every audit query keyed on the course, so course zero matched none of them.
+* Clearing the remote configuration URL in the admin form left up to an hour of cached remote values in place, including the system prompt. The upgrade step purged that cache for exactly this reason; the form had no equivalent.
+* A learner's thumbs-down left the instructor review queue once their conversation passed the history cap, because the cap trims messages and every consumer joined through the message. The longer and more engaged the conversation, the more likely the feedback was lost.
+
+**v7.6.3** did the Templates and Output API work from #273 and #278 on five more admin pages, about 1,900 lines. Reviewing it found six defects, two of which the migration itself introduced and two of which were caught by Moodle's own Mustache Lint, a step with no local equivalent: two labels pointed at an input's name rather than its id, so clicking them did nothing and a screen reader announced an unnamed checkbox.
+
+**v7.6.4** fixes two things worth your attention.
+
+### The plugin settings category page returned HTTP 500 at DEVELOPER debug
+
+That is how I assume a reviewer runs.
+
+Moodle serializes a settings page's entire show and hide dependency map into a single js_call_amd argument and warns above 1,024 characters. Ours was 5,290.
+
+The cause was not too many rules, which was my first assumption and was wrong. There are exactly two hide_if calls in the file. Every rule comes from one map applied in a loop at the end, and by the time that loop ran the page variable pointed at whichever page happened to be last, so all twenty-one groups landed on one page. The settings are now split across eleven pages by the sections the file already had, each rule attaches to the page that holds its setting, and the worst page is 878 characters. A test fails at 950 so the next person to add a rule finds out before you do.
+
+This is the same limit as #277, which you filed, so your finding there was pointing at a class of problem rather than a single instance.
+
+### One learner-facing issue fixed in v7.6.4
+
+Outside a course the assistant offered a starter called AI Project Coach, whose prompt reads "help with a project or assignment for this course" when there is no course.
+
+The filter deciding what survives outside a course was an allow list: keep anything of the right type except two named ones. The project coach was not named. The default was backwards, since outside a course nothing course shaped is coherent. The surface now supplies its own three starters, for technical trouble, for finding your way around, and for enrolment and certificates, all translated into the full locale set.
+
+The test for this asserted the bug. It expected the project coach to survive, so it would have passed indefinitely while the wrong thing stayed on screen.
+
+### v7.6.5
+
+Two admin pages let you configure a rating question nobody could answer. The number inputs carry min and max attributes, but those are advisory and the POST body is the only thing that counts, so a scale saved as 5 to 1 stored cleanly and rendered with no buttons at all, because the render loop is `for (r = min; r <= max; r++)` and never runs. A large enough maximum built one button and one click handler per step for every learner who opened it. The user-testing page had the identical defect and posts its tasks as a single JSON blob, so the browser never saw the numbers at all.
+
+The first fix repaired the scale when reading it back, which passed its own tests, and an adversarial review then found three defects inside that fix: it made old answers vanish from the results chart, it collapsed some ranges to a single value, and because the admin editor posts back whatever it's seeded with, it was a one-way migration fired by any unrelated edit. The repair is now an explicit upgrade step that logs the old and new bounds. The same release bounds three other admin-supplied numbers that drove loops, and bottom-aligns the chat transcript.
+
+### v7.6.6 and v7.6.7
+
+These make the plugin work correctly with Anthropic's newest Claude models, which changed two request shapes. Each mistake failed the whole request with HTTP 400, and the streaming path swallows the error body, so a learner saw only "Sorry, something went wrong" with nothing in the log naming the parameter.
+
+* Extended thinking sent `temperature`, which those models removed.
+* Structured output forced a tool call, which those models also removed. That affected quiz generation, essay and speech scoring, flashcards, learning objectives and conversation classification.
+
+Two things about how this went seem worth passing on to a reviewer. The obvious replacement for a forced call is `strict` schema mode, and it passed every test here, but our own CI review flagged it and a live API call confirmed it: strict mode rejects common schema keywords such as `minItems: 6`, so it would have swapped one 400 for another across all six features. And because a non-forced call isn't guaranteed, v7.6.7 retries once, and adds both attempts' token usage together. While doing that the review found that refused requests had never been billed at all, since usage was recorded after the refusal's early return. That's fixed too.
+
+### v7.6.8
+
+A mistyped retry setting could tie up a PHP worker for hours. `backend_retry_attempts` had a floor but no ceiling, so a value of 20000 with a provider returning 429 or 503 kept one request in `usleep()` for about 17 hours. `usleep` accrues no CPU time, so `max_execution_time` never ends it, and a few learners under a provider rate limit could exhaust the worker pool.
+
+It's now fixed in three layers, because each covers a case the others can't. The admin setting refuses an out-of-range value and states the range, rather than saving a number the code would then ignore. Values that never pass through that form, such as `forced_plugin_settings` or a CLI `set_config`, are clamped when read. And the total wait per request is capped at 30 seconds, since even the bounded maximum would otherwise hold a worker for minutes. The review caught one inconsistency in the first version: a per-wait ceiling above the total cap could never be honoured and actually produced fewer retries, so the two limits are now equal and a test keeps them that way.
+
+### v7.6.9
+
+This finishes #273. Of the eight places you named, six were converted in v7.6.3; this converts the last two, the Python sandbox page and the system prompt's "reset to template" button, and a test now covers all eight so the pattern can't come back.
+
+Converting them turned up two bugs. The sandbox never showed a learner their actual Python error, only the word "PythonError", because the traceback lands in the captured stderr buffer and the handler read an always-empty message instead. And the reset button restored the default prompt with `atob()`, which decodes to Latin-1 rather than UTF-8, so in 37 of the 46 locales every accented character came back garbled.
+
+One thing a reviewer may find useful: the first version of the reset-button fix put the button in the setting's description, and it passed every check here. Our CI review pointed out that `format_admin_setting()` runs every description through `markdown_to_html()`, which would have rewritten the default prompt's headings and bullets into HTML inside the attribute. The button is now rendered by the setting class itself, outside the description, and I checked that it decodes exactly on Moodle 4.5, 5.0, 5.1 and the 5.3 RC.
+
+On #280: the README and a new test now hold the Marketplace description to the Moodle range version.php declares, 4.5 through 5.2. The listing text on moodle.org itself still says 5.3 LTS; I'll correct it there, which can't be done from the plugin repository.
+
+### v7.7.0
+
+This one makes the admin side accurate.
+
+When v7.6.4 split the settings into eleven pages, four of the page breaks landed one heading too late. Each of those pages ended on an empty heading, and the next page opened straight into its settings with no heading at all, so 27 settings across re-ranking, the content-source extractors, the cost anomaly detector and the student survey sat under the wrong section. Every page now opens with its own heading, and a test fails if a page ever ends on an empty one.
+
+The README and the admin walkthrough said API keys were stored encrypted. They aren't. The key fields hide the value in the form and never send it to the browser, but like every Moodle plugin setting they're stored as plain text, so they appear in database backups. The claim is corrected, and encrypting keys at rest was tracked as #302, which v7.7.3 delivers.
+
+The admin documentation also caught up with the v7.6 releases: eleven settings pages instead of seven, current model defaults and prices, the retry limits from v7.6.8, and the sandbox's admin-set location from v7.6.1.
+
+### v7.7.1
+
+Two small fixes. The LLM and Model pickers that admins see under the chat text box sat 2px below it and now have 10px; learners never see the pickers, so their layout is unchanged. And our jailbreak test suite now prints every result that needs a person's judgment in full, prompt and response, where it used to cut each one to 200 characters.
+
+### v7.7.2
+
+Two fixes, the first found on a phone. Boost traps focus inside an open drawer on small screens, so with Moodle's menu drawer open behind the assistant, every tap in its text box sent focus back to the drawer's close button and nothing could be typed. The assistant now closes Boost's open drawers when it opens and on any press inside it. It closes each drawer through its own instance with `focusOnOpenButton: false`, because `closeAllDrawers()` moves focus back to the menu button 300 ms later. And outside a course, where the widget renders against the support course, it no longer auto-opens; auto-open now applies to course pages only, and a test renders the real widget on both kinds of page.
+
+### v7.7.3
+
+API keys and other secrets are now encrypted at rest. The 22 secret settings are `admin_setting_encryptedpassword`, backed by `\core\encryption` and the site key in dataroot, and per-course key overrides and the keys in the voice providers table are encrypted the same way. The voice providers settings page had also been writing every stored key into the page; it now carries only the encrypted form. An upgrade step encrypts the keys already stored, idempotently, and leaves keys forced in `config.php` alone.
+
+Every read of a secret goes through one helper, and a test fails on any direct `get_config()` read of one, whether by literal name, through a class constant, or by a name built from a key suffix. Our CI review found the case the first version of that test missed: a read written across three lines, in a queued task that would have sent ciphertext as a bearer key. The scan now covers multi-line calls. Moodle 5.0's removal of `\core\encryption::METHOD_OPENSSL` also showed up only on the 5.0 and 5.1 CI legs.
+
+Before upgrading the dev fleet I fingerprinted every stored key by hash; all 32 were encrypted and decrypt to their old values. Keys typed into two free-text list settings are still plain text, and the README says so.
+
+### Verification
+
+2,085 tests, 0 failures, 7 skipped. Security validator corpus 36 of 36. PHP lint clean across 613 files. New behaviors are proved by planting the defect and confirming the test fails, and the sandbox was exercised in a browser. CI covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on MariaDB and PostgreSQL, and includes Mustache Lint. All jobs green on the v7.7.3 code.
+
+Releases, each with notes and a zip built from the tag:  
+https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases
+
+Thanks again,
+
+Tom
