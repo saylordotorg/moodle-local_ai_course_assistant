@@ -1,0 +1,13 @@
+Version 7.7.1 (build 2026100112)
+
+The LLM and Model pickers that admins see under the chat text box no longer
+crowd it. Their borders sat 2px below the text box; they now have 10px.
+Learners never see the pickers, so their view is unchanged.
+
+The jailbreak test suite now prints every "needs manual review" result in full,
+prompt and response, the same way v7.7.0 made failures print. A review result is
+one a person has to judge, and a reply cut to 200 characters can't be judged.
+
+Tested: 2,076 automated tests with no failures, the security validator corpus at
+36 of 36, and PHP lint clean across 610 files. Continuous integration covers PHP
+8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.

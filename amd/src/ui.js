@@ -1044,10 +1044,58 @@ define([
     // second-guessed.
     var inputFocusStranded = false;
 
+    // Boost's drawers (the primary navigation menu, the course index, the block
+    // drawer) trap focus while open on a small screen: Drawers.openDrawer calls
+    // FocusLock.trapFocus when isSmall(). With one of them open behind the
+    // assistant, every tap in the assistant's text box lands focus back on that
+    // drawer's close button, so on a phone the learner cannot type at all.
+    //
+    // The modules are loaded once at init so the close below can run
+    // synchronously inside pointerdown, before the browser moves focus. A theme
+    // without Boost's drawers fails the require, and then there is nothing to do.
+    let hostDrawers = null;
+    let hostIsSmall = null;
+    const loadHostDrawers = function() {
+        try {
+            require(['core/pagehelpers', 'theme_boost/drawers'], function(PageHelpers, DrawersModule) {
+                var Drawers = DrawersModule && DrawersModule.default ? DrawersModule.default : DrawersModule;
+                if (Drawers && typeof Drawers.getDrawerInstanceForNode === 'function'
+                        && PageHelpers && typeof PageHelpers.isSmall === 'function') {
+                    hostDrawers = Drawers;
+                    hostIsSmall = PageHelpers.isSmall;
+                }
+            }, function() { /* Not a Boost-based theme. */ });
+        } catch (e) { /**/ }
+    };
+    const closeHostDrawers = function() {
+        if (!hostDrawers || !hostIsSmall || !hostIsSmall()) {
+            return;
+        }
+        // Per drawer rather than Drawers.closeAllDrawers(): that one moves focus
+        // to the drawer's open button 300ms later, which would pull it straight
+        // back out of the assistant. updatePreferences: false so closing the
+        // menu here is not saved as the user's choice.
+        document.querySelectorAll('.drawer.show').forEach(function(node) {
+            if (root && root.contains(node)) {
+                return;
+            }
+            try {
+                hostDrawers.getDrawerInstanceForNode(node)
+                    .closeDrawer({focusOnOpenButton: false, updatePreferences: false});
+            } catch (e) { /**/ }
+        });
+    };
+
     const initUI = function(rootEl) {
         root = rootEl;
         avatarAnimEnabled = root.dataset.avataranim !== '0';
         drawer = root.querySelector('.local-ai-course-assistant__drawer');
+        loadHostDrawers();
+        if (drawer) {
+            // Capture phase, so it runs before the press reaches the text box
+            // and before the browser decides where focus goes.
+            drawer.addEventListener('pointerdown', closeHostDrawers, true);
+        }
 
         // The dialog can always take focus as a last resort. Set once, here,
         // rather than inside focusIntoDrawer: clicking something unfocusable
@@ -2005,6 +2053,7 @@ define([
             return false;
         }
 
+        closeHostDrawers();
         drawer.hidden = false;
         drawer.setAttribute('aria-hidden', 'false');
         toggle.setAttribute('aria-expanded', 'true');
