@@ -889,7 +889,7 @@ class hook_callbacks {
             'avatarfill'         => get_config('local_ai_course_assistant', 'avatar_fill') ?: '#ffffff',
             'displaymode'        => $displaymode,
             'drawermode'         => ($displaymode === 'drawer'),
-            'autoopen'           => self::is_autoopen_for_course($courseid),
+            'autoopen'           => self::should_autoopen($supportmode, (int) $courseid),
             'tourpending'        => self::is_usertour_pending(),
             'studentmode'        => $studentmode,
             'displayname'        => branding::display_name(),
@@ -1353,6 +1353,26 @@ class hook_callbacks {
         }
         // Inherit global setting.
         return (bool) get_config('local_ai_course_assistant', 'usertesting_enabled');
+    }
+
+    /**
+     * Whether the drawer should auto-open on this page.
+     *
+     * Never outside a course. Support mode renders the widget on the dashboard,
+     * profiles and the site home against the support course, so without this the
+     * support course's auto-open (or the global one) opened the assistant over
+     * pages the learner came to for something else, and the per-course
+     * "already opened" key meant it happened once for every browser.
+     *
+     * @param bool $supportmode true when the page is not a course page
+     * @param int $courseid the course the widget is rendering for
+     * @return bool
+     */
+    public static function should_autoopen(bool $supportmode, int $courseid): bool {
+        if ($supportmode) {
+            return false;
+        }
+        return self::is_autoopen_for_course($courseid);
     }
 
     /**
