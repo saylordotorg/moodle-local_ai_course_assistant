@@ -18,6 +18,7 @@ namespace local_ai_course_assistant\task;
 
 use local_ai_course_assistant\content_indexer;
 use local_ai_course_assistant\embedding_migration;
+use local_ai_course_assistant\secrets;
 
 /**
  * Adhoc task: re-embed ONE course against the migration target model.
@@ -83,10 +84,7 @@ class migrate_course_embeddings extends \core\task\adhoc_task {
             'model'      => $model,
             'provider'   => $provider,
             'dimensions' => $dimensions,
-            'apikey'     => trim((string) (get_config(
-                'local_ai_course_assistant',
-                embedding_migration::SETTING_APIKEY
-            ) ?: '')),
+            'apikey'     => trim(secrets::get(embedding_migration::SETTING_APIKEY)),
         ];
 
         // Built before any work, so a bad key or an unknown provider fails the

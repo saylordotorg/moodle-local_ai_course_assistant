@@ -134,8 +134,11 @@ class secrets {
      * @return bool
      */
     public static function is_encrypted(string $value): bool {
-        return (bool) preg_match('~^(' . preg_quote(\core\encryption::METHOD_SODIUM, '~') . '|'
-            . preg_quote(\core\encryption::METHOD_OPENSSL, '~') . '):~', $value);
+        // Literal prefixes, not the class constants: Moodle 5.0 removed
+        // \core\encryption::METHOD_OPENSSL, and a value written by 4.x with it
+        // must still be recognised as ciphertext (it then fails to decrypt and
+        // reads as unset) rather than passed through as if it were a key.
+        return (bool) preg_match('~^(sodium|openssl-aes-256-ctr):~', $value);
     }
 
     /**

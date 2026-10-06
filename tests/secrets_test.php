@@ -144,7 +144,7 @@ final class secrets_test extends \advanced_testcase {
      */
     public function test_a_key_from_another_site_reads_as_unset(): void {
         $this->resetAfterTest();
-        $foreign = \core\encryption::METHOD_SODIUM . ':' . base64_encode(random_bytes(80));
+        $foreign = 'sodium:' . base64_encode(random_bytes(80));
         set_config('apikey', $foreign, 'local_ai_course_assistant');
 
         $this->assertSame('', secrets::get('apikey'));
@@ -185,24 +185,35 @@ final class secrets_test extends \advanced_testcase {
             }
         }
         $this->assertArrayHasKey('SETTING_KEY', $constants, 'the constant scan must see spend_export::SETTING_KEY');
+        $this->assertArrayHasKey('SETTING_APIKEY', $constants, 'the constant scan must see embedding_migration::SETTING_APIKEY');
 
         foreach ($files as $rel => $src) {
-            foreach (explode("\n", $src) as $i => $line) {
-                if (strpos($line, 'Raw on purpose') !== false
-                        || !preg_match("~get_config\\(\\s*'local_ai_course_assistant'\\s*,\\s*([^)]*)\\)~", $line, $m)) {
+            // Over the whole file, not line by line: a call written across
+            // several lines (arguments on their own lines) is the common shape
+            // for exactly the long constant-name reads this exists to catch.
+            if (!preg_match_all("~get_config\\(\\s*'local_ai_course_assistant'\\s*,\\s*([^)]*?)\\s*\\)~s",
+                    $src, $calls, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {
+                continue;
+            }
+            foreach ($calls as $call) {
+                [$text, $offset] = $call[0];
+                $lineno = substr_count($src, "\n", 0, $offset) + 1;
+                $eol = strpos($src, "\n", $offset + strlen($text));
+                $span = substr($src, $offset, ($eol === false ? strlen($src) : $eol) - $offset);
+                if (strpos($span, 'Raw on purpose') !== false) {
                     continue;
                 }
-                $arg = trim($m[1]);
+                $arg = trim($call[1][0]);
                 $hit = null;
                 if (preg_match("~^'([a-z_]+)'$~", $arg, $lit) && in_array($lit[1], $secrets, true)) {
                     $hit = $lit[1];
                 } else if (preg_match('~::([A-Z_]+)$~', $arg, $c) && isset($constants[$c[1]])) {
                     $hit = $constants[$c[1]];
-                } else if (preg_match("~'(_api_key|_webhook_secret|_apikey|_token|_secret)'\\s*$~", $arg, $suffix)) {
+                } else if (preg_match("~'(_api_key|_webhook_secret|_apikey|_token|_secret)'$~", $arg, $suffix)) {
                     $hit = '*' . $suffix[1];
                 }
                 if ($hit !== null) {
-                    $problems[] = "{$rel}:" . ($i + 1) . " reads {$hit} with get_config()";
+                    $problems[] = "{$rel}:{$lineno} reads {$hit} with get_config()";
                 }
             }
         }
