@@ -49,6 +49,7 @@ class voice_registry {
      * Parse the voice_providers config into structured rows.
      * Stored format: provider|apikey|label|realtime_voice|tts_voice
      *
+     * @param bool $reveal decrypt each row's key (false returns the stored form, for the settings page)
      * @return array List of rows with keys: provider, apikey, label, realtime_voice, tts_voice
      */
     public static function parse_rows(bool $reveal = true): array {
