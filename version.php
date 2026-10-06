@@ -29,4 +29,4 @@ $plugin->version   = 2026100114;
 $plugin->requires = 2024100700; // Moodle 4.5+.
 $plugin->supported = [405, 502]; // CI covers 4.5, 5.0 and 5.1; 5.2 declared, untested.
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '7.8.0';
+$plugin->release = '7.7.3';
