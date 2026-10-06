@@ -86,8 +86,8 @@ class soapbox_storage {
      * @return bool
      */
     public static function is_configured(): bool {
-        return trim((string) get_config('local_ai_course_assistant', 'soapbox_storage_key')) !== ''
-            && trim((string) get_config('local_ai_course_assistant', 'soapbox_storage_secret')) !== '';
+        return trim((string) \local_ai_course_assistant\secrets::get('soapbox_storage_key')) !== ''
+            && trim((string) \local_ai_course_assistant\secrets::get('soapbox_storage_secret')) !== '';
     }
 
     /**
@@ -155,8 +155,8 @@ class soapbox_storage {
             'host'      => self::host(),
             'region'    => self::region(),
             'service'   => 's3',
-            'accesskey' => (string) get_config('local_ai_course_assistant', 'soapbox_storage_key'),
-            'secretkey' => (string) get_config('local_ai_course_assistant', 'soapbox_storage_secret'),
+            'accesskey' => (string) \local_ai_course_assistant\secrets::get('soapbox_storage_key'),
+            'secretkey' => (string) \local_ai_course_assistant\secrets::get('soapbox_storage_secret'),
             'method'    => 'PUT',
             'uri'       => self::encode_key_path($key),
             'expires'   => $expires,
@@ -193,8 +193,8 @@ class soapbox_storage {
             'host'       => self::host(),
             'region'     => self::region(),
             'service'    => 's3',
-            'accesskey'  => (string) get_config('local_ai_course_assistant', 'soapbox_storage_key'),
-            'secretkey'  => (string) get_config('local_ai_course_assistant', 'soapbox_storage_secret'),
+            'accesskey'  => (string) \local_ai_course_assistant\secrets::get('soapbox_storage_key'),
+            'secretkey'  => (string) \local_ai_course_assistant\secrets::get('soapbox_storage_secret'),
             'method'     => 'GET',
             'uri'        => self::encode_key_path($key),
             'expires'    => $expires,
@@ -219,8 +219,8 @@ class soapbox_storage {
             'host'      => self::host(),
             'region'    => self::region(),
             'service'   => 's3',
-            'accesskey' => (string) get_config('local_ai_course_assistant', 'soapbox_storage_key'),
-            'secretkey' => (string) get_config('local_ai_course_assistant', 'soapbox_storage_secret'),
+            'accesskey' => (string) \local_ai_course_assistant\secrets::get('soapbox_storage_key'),
+            'secretkey' => (string) \local_ai_course_assistant\secrets::get('soapbox_storage_secret'),
             'method'    => 'HEAD',
             'uri'       => self::encode_key_path($key),
             'expires'   => 300,
@@ -251,8 +251,8 @@ class soapbox_storage {
             'host'      => self::host(),
             'region'    => self::region(),
             'service'   => 's3',
-            'accesskey' => (string) get_config('local_ai_course_assistant', 'soapbox_storage_key'),
-            'secretkey' => (string) get_config('local_ai_course_assistant', 'soapbox_storage_secret'),
+            'accesskey' => (string) \local_ai_course_assistant\secrets::get('soapbox_storage_key'),
+            'secretkey' => (string) \local_ai_course_assistant\secrets::get('soapbox_storage_secret'),
             'method'    => 'DELETE',
             'uri'       => self::encode_key_path($key),
             'expires'   => 300,

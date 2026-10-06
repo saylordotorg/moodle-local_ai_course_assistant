@@ -72,7 +72,7 @@ abstract class base_provider implements provider_interface {
     public function __construct(array $overrides = []) {
         $rawkey = !empty($overrides['apikey'])
             ? $overrides['apikey']
-            : (get_config('local_ai_course_assistant', 'apikey') ?: '');
+            : (\local_ai_course_assistant\secrets::get('apikey') ?: '');
         // Strip any descriptive label accidentally saved before the key
         // e.g. "OpenAI API Key sk-proj-..." → "sk-proj-..."
         $rawkey = trim($rawkey);
@@ -1016,7 +1016,7 @@ abstract class base_provider implements provider_interface {
             // which is accurate and, with the error surfacing in this same
             // release, reaches the audit log.
             $siteprovider = (string) (get_config('local_ai_course_assistant', 'provider') ?: '');
-            $sitekey = (string) (get_config('local_ai_course_assistant', 'apikey') ?: '');
+            $sitekey = (string) (\local_ai_course_assistant\secrets::get('apikey') ?: '');
             if (strcasecmp($providerid, $siteprovider) === 0 && $sitekey !== '') {
                 $overrides['apikey'] = $sitekey;
             } else if (!in_array(strtolower($providerid), self::KEYLESS_PROVIDERS, true)) {
@@ -1085,7 +1085,7 @@ abstract class base_provider implements provider_interface {
     private static function resolve_auto_provider(array $overrides): string {
         $apikey = !empty($overrides['apikey'])
             ? $overrides['apikey']
-            : (get_config('local_ai_course_assistant', 'apikey') ?: '');
+            : (\local_ai_course_assistant\secrets::get('apikey') ?: '');
         if (!empty($apikey)) {
             return 'openai';
         }

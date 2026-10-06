@@ -280,7 +280,7 @@ class integrity_checker {
      * Check API key is configured.
      */
     private static function test_api_key_configured(): array {
-        $key = get_config('local_ai_course_assistant', 'apikey');
+        $key = \local_ai_course_assistant\secrets::get('apikey');
         if (empty($key)) {
             return [
                 'name' => 'API Key',

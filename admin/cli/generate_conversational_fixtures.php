@@ -121,7 +121,7 @@ $percourse = max(1, (int) $options['per-course']);
 $model = (string) $options['model'];
 $key = $options['apikey'] !== ''
     ? (string) $options['apikey']
-    : (string) get_config('local_ai_course_assistant', 'embed_apikey');
+    : (string) \local_ai_course_assistant\secrets::get('embed_apikey');
 if ($key === '') {
     cli_error('No OpenAI key: set the plugin embed_apikey or pass --apikey.');
 }

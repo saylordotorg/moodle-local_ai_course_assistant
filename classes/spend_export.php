@@ -193,7 +193,7 @@ final class spend_export {
      * @return string
      */
     public static function configured_key(): string {
-        $key = get_config('local_ai_course_assistant', self::SETTING_KEY);
+        $key = secrets::get(self::SETTING_KEY);
         return $key === false || $key === null ? '' : trim((string) $key);
     }
 

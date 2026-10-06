@@ -57,7 +57,7 @@ class course_config_manager {
             $record->id = $existing->id;
             $record->enabled = (int) ($data['enabled'] ?? 0);
             $record->provider = $data['provider'] ?? '';
-            $record->apikey = $data['apikey'] ?? '';
+            $record->apikey = secrets::conceal((string) ($data['apikey'] ?? ''));
             $record->model = $data['model'] ?? '';
             $record->apibaseurl = $data['apibaseurl'] ?? '';
             $record->systemprompt = $data['systemprompt'] ?? '';
@@ -71,7 +71,7 @@ class course_config_manager {
             $record->courseid = $courseid;
             $record->enabled = (int) ($data['enabled'] ?? 0);
             $record->provider = $data['provider'] ?? '';
-            $record->apikey = $data['apikey'] ?? '';
+            $record->apikey = secrets::conceal((string) ($data['apikey'] ?? ''));
             $record->model = $data['model'] ?? '';
             $record->apibaseurl = $data['apibaseurl'] ?? '';
             $record->systemprompt = $data['systemprompt'] ?? '';
@@ -141,7 +141,7 @@ class course_config_manager {
     public static function get_effective_config(int $courseid): array {
         $global = [
             'provider'    => get_config('local_ai_course_assistant', 'provider') ?: 'claude',
-            'apikey'      => get_config('local_ai_course_assistant', 'apikey') ?: '',
+            'apikey'      => \local_ai_course_assistant\secrets::get('apikey') ?: '',
             'model'       => get_config('local_ai_course_assistant', 'model') ?: '',
             'apibaseurl'  => get_config('local_ai_course_assistant', 'apibaseurl') ?: '',
             'systemprompt' => get_config('local_ai_course_assistant', 'systemprompt') ?: '',
@@ -157,9 +157,12 @@ class course_config_manager {
             return $global;
         }
 
+        // A per-course key that will not decrypt falls back to the site key
+        // rather than sending nothing (#302).
+        $coursekey = secrets::reveal((string) ($course->apikey ?? ''));
         return [
             'provider'    => !empty($course->provider) ? $course->provider : $global['provider'],
-            'apikey'      => !empty($course->apikey) ? $course->apikey : $global['apikey'],
+            'apikey'      => $coursekey !== '' ? $coursekey : $global['apikey'],
             'model'       => !empty($course->model) ? $course->model : $global['model'],
             'apibaseurl'  => !empty($course->apibaseurl) ? $course->apibaseurl : $global['apibaseurl'],
             'systemprompt' => !empty($course->systemprompt) ? $course->systemprompt : $global['systemprompt'],

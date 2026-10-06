@@ -733,7 +733,7 @@ class security {
      * @return string Empty string when no key is configured.
      */
     public static function redash_download_token(int $userid, int $ttl = 900): string {
-        $key = (string) get_config('local_ai_course_assistant', 'redash_api_key');
+        $key = (string) \local_ai_course_assistant\secrets::get('redash_api_key');
         if ($key === '') {
             return '';
         }
@@ -750,7 +750,7 @@ class security {
      * @return bool
      */
     public static function verify_redash_download_token(string $token, int $userid): bool {
-        $key = (string) get_config('local_ai_course_assistant', 'redash_api_key');
+        $key = (string) \local_ai_course_assistant\secrets::get('redash_api_key');
         if ($key === '' || $token === '' || $userid <= 0) {
             return false;
         }

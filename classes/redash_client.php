@@ -43,7 +43,7 @@ class redash_client {
      */
     public static function is_configured(): bool {
         $url = (string) (get_config('local_ai_course_assistant', 'redash_base_url') ?: '');
-        $key = (string) (get_config('local_ai_course_assistant', 'redash_user_api_key') ?: '');
+        $key = (string) (\local_ai_course_assistant\secrets::get('redash_user_api_key') ?: '');
         $dsid = (int) (get_config('local_ai_course_assistant', 'redash_data_source_id') ?: 0);
         return $url !== '' && $key !== '' && $dsid > 0;
     }
@@ -69,7 +69,7 @@ class redash_client {
             return ['ok' => false, 'error' => 'Redash base URL rejected by SSRF allowlist.'];
         }
 
-        $apikey = (string) get_config('local_ai_course_assistant', 'redash_user_api_key');
+        $apikey = (string) \local_ai_course_assistant\secrets::get('redash_user_api_key');
         $dsid = (int) get_config('local_ai_course_assistant', 'redash_data_source_id');
 
         // Build the Redash query body. For Redash's JSON data source, the

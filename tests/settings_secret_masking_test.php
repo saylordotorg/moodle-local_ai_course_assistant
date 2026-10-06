@@ -63,6 +63,8 @@ final class settings_secret_masking_test extends \advanced_testcase {
         'max_tokens'              => 'token budget',
         'backend_context_tokens'  => 'token budget',
         'prompt_budget_chars'     => 'budget',
+        // A description row linking to the token-usage page; it stores nothing.
+        'token_analytics_link'    => 'link to the token analytics page',
     ];
 
     public function test_every_credential_setting_is_a_password_type(): void {
@@ -73,7 +75,7 @@ final class settings_secret_masking_test extends \advanced_testcase {
         $src = file_get_contents($path);
 
         // Each declaration: the class name, then the setting name a few lines on.
-        $pattern = '/new\s+(admin_setting_config\w+)\s*\(\s*\'local_ai_course_assistant\/([a-z0-9_]+)\'/i';
+        $pattern = '/new\s+(admin_setting_\w+)\s*\(\s*\'local_ai_course_assistant\/([a-z0-9_]+)\'/i';
         $this->assertMatchesRegularExpression(
             $pattern,
             $src,
@@ -99,7 +101,9 @@ final class settings_secret_masking_test extends \advanced_testcase {
                 continue;
             }
             $checked++;
-            if (!str_contains(strtolower($class), 'password')) {
+            // Encrypted, not merely masked (#302): a masked setting is still plain
+            // text in config_plugins and in every database backup.
+            if (strtolower($class) !== 'admin_setting_encryptedpassword') {
                 $offenders[] = "{$name} (declared {$class})";
             }
         }
@@ -112,9 +116,10 @@ final class settings_secret_masking_test extends \advanced_testcase {
         $this->assertSame(
             [],
             $offenders,
-            "Credential settings must use a password type so Moodle masks them in "
-            . "mdl_config_log. Plain configtext records every historical value in "
-            . "the clear. Offenders: " . implode(', ', $offenders)
+            "Credential settings must be admin_setting_encryptedpassword and be listed in "
+            . "secrets::names(). Plain configtext records every historical value in "
+            . "mdl_config_log, and a masked password type is still plain text in the "
+            . "database. Offenders: " . implode(', ', $offenders)
         );
     }
 

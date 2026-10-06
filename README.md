@@ -8,10 +8,10 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 
 A 3-minute tour, recorded on Saylor University's live Degrees site in a hidden test course with fake demo students. The learner half is shown in student view: answers drawn only from the course's own content, Socratic guidance, Quiz Me, Study Plan, and 46 languages with automatic detection. The admin half covers mastery tracking, provider settings and guardrails, analytics, Learning Radar, and cost tracking.
 
-## Version 7.7.2
+## Version 7.8.0
 
 **Release Date:** October 2026
-**Plugin build:** 2026100113
+**Plugin build:** 2026100114
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1. `version.php` declares support through 5.2.
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+
@@ -133,7 +133,7 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 ### Security & Compliance
 - **SOC2 Compliant:** Audit logging, encryption, access controls
 - **GDPR Ready:** Full Privacy API implementation
-- **API Key Handling:** Keys are masked in the settings form and never sent to the browser; like all Moodle plugin settings they are stored as plain text in the database, so protect database backups
+- **API Key Handling:** Keys are never sent to the browser and, from v7.8.0, are encrypted at rest with Moodle's own encryption (`\core\encryption`), using a site key kept in moodledata. A database backup alone no longer reveals them. Two consequences: back up moodledata's key along with the database, and a database restored onto another site (a staging copy, say) can't decrypt them, so enter the keys again there. Keys typed into the free-text **comparison providers** and **spend guard fallback** lists are still stored as plain text
 - **Rate Limiting:** User and IP-based throttling
 - **Input Validation:** XSS and SQL injection protection
 - **Session Security:** Moodle-integrated authentication
@@ -154,7 +154,7 @@ All admin pages live under one hub: **Site administration → Plugins → Local 
 ### Required Settings
 1. **Enable Plugin:** Turn on the AI Course Assistant
 2. **AI Provider:** Choose your provider (Claude, OpenAI, etc.)
-3. **API Key:** Enter your provider's API key (masked in the form, but stored as plain text in the database like any Moodle plugin setting, so protect database backups)
+3. **API Key:** Enter your provider's API key (encrypted at rest from v7.8.0; see API Key Handling)
 4. **Model:** Select the model (e.g., gemini-2.5-flash, gpt-4o-mini, claude-sonnet-5-5)
 
 ### Recommended Settings

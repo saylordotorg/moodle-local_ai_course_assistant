@@ -224,7 +224,7 @@ class get_realtime_token extends external_api {
         // the token and opens the upstream WebSocket to api.x.ai itself.
         if ($cfg['provider'] === 'xai') {
             $proxyurl = get_config('local_ai_course_assistant', 'xai_proxy_url');
-            $jwtsecret = get_config('local_ai_course_assistant', 'xai_proxy_jwt_secret');
+            $jwtsecret = \local_ai_course_assistant\secrets::get('xai_proxy_jwt_secret');
             if (empty($proxyurl) || empty($jwtsecret)) {
                 throw new \moodle_exception(
                     'error',

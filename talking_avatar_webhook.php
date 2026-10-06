@@ -65,7 +65,7 @@ if (!in_array($provider, $known, true)) {
     exit;
 }
 
-$secret = (string) (get_config('local_ai_course_assistant', $provider . '_webhook_secret') ?: '');
+$secret = \local_ai_course_assistant\secrets::get($provider . '_webhook_secret');
 if ($secret === '') {
     // Webhook handler is opt-in — default off per provider.
     http_response_code(404);

@@ -134,7 +134,7 @@ class embedding_migration {
         $provider = trim((string) (get_config('local_ai_course_assistant', self::SETTING_PROVIDER) ?: ''));
         $rawdim = get_config('local_ai_course_assistant', self::SETTING_DIMENSIONS);
         $dimensions = ($rawdim === false || $rawdim === '') ? 0 : (int) $rawdim;
-        $apikey = trim((string) (get_config('local_ai_course_assistant', self::SETTING_APIKEY) ?: ''));
+        $apikey = trim(secrets::get(self::SETTING_APIKEY));
 
         $effectiveprovider = $provider !== '' ? $provider : $liveprovider;
 

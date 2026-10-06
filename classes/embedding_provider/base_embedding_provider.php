@@ -16,6 +16,8 @@
 
 namespace local_ai_course_assistant\embedding_provider;
 
+use local_ai_course_assistant\secrets;
+
 /**
  * Abstract base for embedding providers.
  *
@@ -72,6 +74,9 @@ abstract class base_embedding_provider {
     protected static function cfg(string $name) {
         if (array_key_exists($name, self::$configoverrides)) {
             return self::$configoverrides[$name];
+        }
+        if (secrets::is_secret($name)) {
+            return secrets::get($name);
         }
         return get_config('local_ai_course_assistant', $name);
     }

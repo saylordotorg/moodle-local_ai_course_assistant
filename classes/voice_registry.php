@@ -49,9 +49,10 @@ class voice_registry {
      * Parse the voice_providers config into structured rows.
      * Stored format: provider|apikey|label|realtime_voice|tts_voice
      *
+     * @param bool $reveal decrypt each row's key (false returns the stored form, for the settings page)
      * @return array List of rows with keys: provider, apikey, label, realtime_voice, tts_voice
      */
-    public static function parse_rows(): array {
+    public static function parse_rows(bool $reveal = true): array {
         $raw = get_config('local_ai_course_assistant', 'voice_providers') ?: '';
         $rows = [];
         foreach (explode("\n", $raw) as $line) {
@@ -66,7 +67,9 @@ class voice_registry {
             }
             $rows[] = [
                 'provider'       => $provider,
-                'apikey'         => $parts[1] ?? '',
+                // Encrypted at rest (#302). The admin form asks for the stored
+                // form so the plain key never reaches the browser.
+                'apikey'         => $reveal ? secrets::reveal($parts[1] ?? '') : ($parts[1] ?? ''),
                 'label'          => $parts[2] ?? '',
                 'realtime_voice' => $parts[3] ?? '',
                 'tts_voice'      => $parts[4] ?? '',
@@ -166,11 +169,11 @@ class voice_registry {
 
         if ($row === null) {
             // Legacy fallback: pre-v3.9.5 single-key config (realtime_apikey or main OpenAI key).
-            $legacykey = get_config('local_ai_course_assistant', 'realtime_apikey');
+            $legacykey = \local_ai_course_assistant\secrets::get('realtime_apikey');
             if (empty($legacykey)) {
                 $mainprovider = get_config('local_ai_course_assistant', 'provider');
                 if ($mainprovider === 'openai') {
-                    $legacykey = get_config('local_ai_course_assistant', 'apikey');
+                    $legacykey = \local_ai_course_assistant\secrets::get('apikey');
                 }
             }
             if (empty($legacykey)) {
@@ -271,7 +274,7 @@ class voice_registry {
         $model = trim((string) get_config('local_ai_course_assistant', 'stt_selfhosted_model'));
         return [
             'provider' => 'selfhosted',
-            'apikey'   => trim((string) get_config('local_ai_course_assistant', 'stt_selfhosted_apikey')),
+            'apikey'   => trim((string) \local_ai_course_assistant\secrets::get('stt_selfhosted_apikey')),
             'voice'    => '',
             'endpoint' => self::selfhosted_stt_endpoint($url),
             'label'    => self::SELFHOSTED_LABEL,
@@ -330,11 +333,11 @@ class voice_registry {
         if (!empty(self::parse_rows())) {
             return true;
         }
-        if (!empty(get_config('local_ai_course_assistant', 'realtime_apikey'))) {
+        if (!empty(\local_ai_course_assistant\secrets::get('realtime_apikey'))) {
             return true;
         }
         return get_config('local_ai_course_assistant', 'provider') === 'openai'
-            && !empty(get_config('local_ai_course_assistant', 'apikey'));
+            && !empty(\local_ai_course_assistant\secrets::get('apikey'));
     }
 
     /**

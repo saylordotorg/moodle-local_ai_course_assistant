@@ -291,7 +291,7 @@ class reminder_manager {
         require_once($CFG->libdir . '/filelib.php'); // For \curl.
 
         $apiurl = get_config('local_ai_course_assistant', 'whatsapp_api_url');
-        $apitoken = get_config('local_ai_course_assistant', 'whatsapp_api_token');
+        $apitoken = \local_ai_course_assistant\secrets::get('whatsapp_api_token');
         $fromnumber = get_config('local_ai_course_assistant', 'whatsapp_from_number');
 
         if (empty($apiurl) || empty($apitoken) || empty($fromnumber)) {

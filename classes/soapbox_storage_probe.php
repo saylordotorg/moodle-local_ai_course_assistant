@@ -81,8 +81,8 @@ class soapbox_storage_probe {
         //    because the settings page shows five separate fields.
         $bucket = trim((string) get_config('local_ai_course_assistant', 'soapbox_storage_bucket'));
         $region = trim((string) get_config('local_ai_course_assistant', 'soapbox_storage_region'));
-        $haskey = trim((string) get_config('local_ai_course_assistant', 'soapbox_storage_key')) !== '';
-        $hassecret = trim((string) get_config('local_ai_course_assistant', 'soapbox_storage_secret')) !== '';
+        $haskey = trim((string) \local_ai_course_assistant\secrets::get('soapbox_storage_key')) !== '';
+        $hassecret = trim((string) \local_ai_course_assistant\secrets::get('soapbox_storage_secret')) !== '';
 
         $missing = [];
         if (!$haskey) {

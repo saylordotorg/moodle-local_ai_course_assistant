@@ -16,6 +16,7 @@
 
 namespace local_ai_course_assistant\talking_avatar;
 
+use local_ai_course_assistant\secrets;
 use local_ai_course_assistant\security;
 
 defined('MOODLE_INTERNAL') || die();
@@ -44,7 +45,10 @@ abstract class base_provider implements provider_interface {
      * @return string
      */
     protected function cfg(string $key, string $default = ''): string {
-        $value = (string) (get_config('local_ai_course_assistant', $this->get_key() . '_' . $key) ?: '');
+        $name = $this->get_key() . '_' . $key;
+        $value = secrets::is_secret($name)
+            ? secrets::get($name)
+            : (string) (get_config('local_ai_course_assistant', $name) ?: '');
         return $value !== '' ? $value : $default;
     }
 
