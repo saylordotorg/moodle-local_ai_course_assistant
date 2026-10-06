@@ -64,7 +64,8 @@ final class secrets_test extends \advanced_testcase {
      * still receives the plain key.
      */
     public function test_a_saved_key_is_ciphertext_in_the_database_and_plain_to_the_provider(): void {
-        global $DB;
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/adminlib.php');
         $this->resetAfterTest();
 
         $setting = new \admin_setting_encryptedpassword('local_ai_course_assistant/apikey', 'k', 'd');
@@ -136,6 +137,43 @@ final class secrets_test extends \advanced_testcase {
         $this->assertSame('legacy-plain', secrets::get('apikey'));
 
         unset($CFG->forced_plugin_settings['local_ai_course_assistant']);
+    }
+
+    /**
+     * The voice providers table keeps a key in each row: stored encrypted,
+     * parsed to plain text, and never rendered into the settings page.
+     */
+    public function test_voice_provider_row_keys_are_encrypted_and_never_rendered(): void {
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/adminlib.php');
+        $this->resetAfterTest();
+        $setting = new admin_setting_voice_providers('local_ai_course_assistant/voice_providers', 'v', 'd');
+
+        $setting->write_setting("# a comment stays as it is\nopenai|sk-voice-plain-789|openai-prod|shimmer|alloy");
+
+        $stored = $DB->get_field('config_plugins', 'value',
+            ['plugin' => 'local_ai_course_assistant', 'name' => 'voice_providers']);
+        $this->assertStringNotContainsString('sk-voice-plain-789', $stored);
+        $this->assertStringStartsWith("# a comment stays as it is\nopenai|sodium:", $stored);
+        $this->assertStringEndsWith('|openai-prod|shimmer|alloy', $stored);
+
+        $rows = voice_registry::parse_rows();
+        $this->assertSame('sk-voice-plain-789', $rows[0]['apikey']);
+        $this->assertSame('openai-prod', $rows[0]['label']);
+
+        $html = $setting->output_html($setting->get_setting());
+        $this->assertStringNotContainsString('sk-voice-plain-789', $html);
+
+        // Saving the form untouched posts the stored form back; it must not
+        // be encrypted a second time.
+        $setting->write_setting($stored);
+        $this->assertSame('sk-voice-plain-789', voice_registry::parse_rows()[0]['apikey']);
+
+        // The upgrade path encrypts a table written before this release.
+        set_config('voice_providers', 'xai|xai-plain-key|grok', 'local_ai_course_assistant');
+        $this->assertSame(1, secrets::encrypt_stored_settings());
+        $this->assertStringNotContainsString('xai-plain-key', get_config('local_ai_course_assistant', 'voice_providers'));
+        $this->assertSame('xai-plain-key', voice_registry::parse_rows()[0]['apikey']);
     }
 
     /**

@@ -51,7 +51,7 @@ class voice_registry {
      *
      * @return array List of rows with keys: provider, apikey, label, realtime_voice, tts_voice
      */
-    public static function parse_rows(): array {
+    public static function parse_rows(bool $reveal = true): array {
         $raw = get_config('local_ai_course_assistant', 'voice_providers') ?: '';
         $rows = [];
         foreach (explode("\n", $raw) as $line) {
@@ -66,7 +66,9 @@ class voice_registry {
             }
             $rows[] = [
                 'provider'       => $provider,
-                'apikey'         => $parts[1] ?? '',
+                // Encrypted at rest (#302). The admin form asks for the stored
+                // form so the plain key never reaches the browser.
+                'apikey'         => $reveal ? secrets::reveal($parts[1] ?? '') : ($parts[1] ?? ''),
                 'label'          => $parts[2] ?? '',
                 'realtime_voice' => $parts[3] ?? '',
                 'tts_voice'      => $parts[4] ?? '',

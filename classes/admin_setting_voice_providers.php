@@ -49,7 +49,8 @@ class admin_setting_voice_providers extends \admin_setting {
         if (!is_string($data)) {
             return '';
         }
-        $this->config_write($this->name, $data);
+        // Each row's key is encrypted before it is stored (#302).
+        $this->config_write($this->name, secrets::conceal_row_keys($data));
         return '';
     }
 
@@ -59,7 +60,8 @@ class admin_setting_voice_providers extends \admin_setting {
      * @return array
      */
     private function parse_rows(): array {
-        return voice_registry::parse_rows();
+        // The stored form, never the plain key: this renders into the page.
+        return voice_registry::parse_rows(false);
     }
 
     public function output_html($data, $query = ''): string {

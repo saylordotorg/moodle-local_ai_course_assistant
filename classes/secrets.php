@@ -165,7 +165,46 @@ class secrets {
             set_config($name, self::conceal((string) $raw), 'local_ai_course_assistant');
             $done++;
         }
+        // The voice providers table keeps a key in each row.
+        if (!array_key_exists('voice_providers', $forced)) {
+            $raw = (string) ($DB->get_field('config_plugins', 'value',
+                ['plugin' => 'local_ai_course_assistant', 'name' => 'voice_providers']) ?: '');
+            $new = self::conceal_row_keys($raw);
+            if ($raw !== '' && $new !== $raw) {
+                set_config('voice_providers', $new, 'local_ai_course_assistant');
+                $done++;
+            }
+        }
         return $done;
+    }
+
+    /**
+     * Encrypt the key field of every row in a "provider|apikey|..." table.
+     *
+     * Used for voice_providers, whose rows each carry a key. Comment and blank
+     * lines are kept as they are; a key that is already ciphertext is left
+     * alone, so a form that posts the stored value back stays idempotent.
+     * Ciphertext is base64 after a "method:" prefix, so it never contains the
+     * "|" separator or a newline.
+     *
+     * @param string $raw
+     * @return string
+     */
+    public static function conceal_row_keys(string $raw): string {
+        $out = [];
+        foreach (explode("\n", str_replace("\r", '', $raw)) as $line) {
+            $trim = trim($line);
+            if ($trim === '' || $trim[0] === '#') {
+                $out[] = $line;
+                continue;
+            }
+            $parts = array_map('trim', explode('|', $trim));
+            if (isset($parts[1])) {
+                $parts[1] = self::conceal($parts[1]);
+            }
+            $out[] = implode('|', $parts);
+        }
+        return implode("\n", $out);
     }
 
     /**
@@ -177,7 +216,7 @@ class secrets {
         global $DB;
         $done = 0;
         $rows = $DB->get_recordset_select('local_ai_course_assistant_course_cfg',
-            $DB->sql_isnotempty('local_ai_course_assistant_course_cfg', 'apikey', true, false), null, '', 'id, apikey');
+            $DB->sql_isnotempty('local_ai_course_assistant_course_cfg', 'apikey', true, true), null, '', 'id, apikey');
         foreach ($rows as $row) {
             $raw = trim((string) $row->apikey);
             if ($raw === '' || self::is_encrypted($raw)) {
