@@ -1,0 +1,19 @@
+Version 7.7.3 (build 2026100114)
+
+Provider keys and other secrets are now encrypted at rest. Until now every key
+setting was masked in the form but stored as plain text in the database, so it
+appeared in every database backup. The 22 secret settings, per-course key
+overrides and the keys in the Voice providers table now use Moodle's own
+encryption, with a site key kept in moodledata. The upgrade encrypts the keys
+already stored, so nothing has to be entered again. The Voice providers
+settings page also stops writing stored keys into the page.
+
+Back up moodledata's encryption key (moodledata/secret/key/) with the database.
+A database copied onto another site, such as a staging copy of production, can't
+read the original site's keys, so enter them again there. Keys typed into the
+free-text comparison providers and spend guard fallback lists are still plain
+text.
+
+Tested: 2,085 automated tests with no failures, the security validator corpus at
+36 of 36, and PHP lint clean across 613 files. Continuous integration covers PHP
+8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.
