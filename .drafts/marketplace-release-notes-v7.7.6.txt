@@ -1,0 +1,18 @@
+Version 7.7.6 (build 2026100117)
+
+Answers from Gemini no longer stop mid-sentence. Gemini 2.5 Flash thinks before
+it answers, and that thinking used to come out of the same Max tokens allowance
+as the answer, so long thinking left the answer cut short. Thinking now has its
+own allowance. An answer that does run out of room is stored as truncated and
+tells the learner it was cut short, for Claude as well as Gemini.
+
+Gemini's thinking is now counted in spend. Google bills it as output, and the
+token analytics, spend caps, anomaly check and spend export now include it, so
+reported Gemini spend will rise to match the invoice. Check per-course spend
+caps after upgrading.
+
+Tables, block quotes, horizontal rules, strikethrough and smaller headings now
+render in the chat. Everything in them is escaped like ordinary text.
+
+Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and
+5.1, on both MariaDB and PostgreSQL.
