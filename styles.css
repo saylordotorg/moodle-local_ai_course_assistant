@@ -461,6 +461,67 @@
     text-decoration: underline;
 }
 
+.local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content h4,
+.local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content h5,
+.local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content h6 {
+    margin: 8px 0 4px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+}
+
+/* Tables: the drawer is narrow, so a wide table scrolls sideways inside the
+   bubble rather than stretching it. Borders and header shading are
+   semi-transparent so they read on any bubble background. */
+.local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content .aica-md-table {
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 8px 0;
+}
+
+.local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content table {
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+}
+
+.local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content th,
+.local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content td {
+    border: 1px solid rgba(127, 127, 127, 0.35);
+    padding: 4px 8px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content th {
+    background: rgba(127, 127, 127, 0.12);
+    font-weight: 700;
+}
+
+.local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content .aica-md-align-center {
+    text-align: center;
+}
+
+.local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content .aica-md-align-right {
+    text-align: right;
+}
+
+.local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content blockquote {
+    margin: 8px 0;
+    padding: 2px 0 2px 10px;
+    border-left: 3px solid rgba(127, 127, 127, 0.45);
+}
+
+.local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content hr {
+    border: 0;
+    border-top: 1px solid rgba(127, 127, 127, 0.35);
+    margin: 10px 0;
+}
+
+.local-ai-course-assistant.aica-high-contrast .local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content th,
+.local-ai-course-assistant.aica-high-contrast .local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content td {
+    border-color: #fff !important;
+}
+
 /* Source attribution pill shown beneath assistant replies */
 .aica-source-pill {
     display: inline-flex;
