@@ -985,6 +985,14 @@ try {
     // Capture token usage immediately after streaming — before any other operations.
     $tokenusage = $provider->get_last_token_usage();
 
+    // v7.7.6: did the answer run out of output tokens? Until now nothing read
+    // the finish reason, so an answer cut off mid-sentence was stored as
+    // 'complete', shown as finished, and lost its [SOLA_NEXT] chips with the
+    // rest of the cut-off text. Gemini 2.5 Flash made this common: its thinking
+    // spends the same max_tokens budget as the answer.
+    $streamoutcome = conversation_manager::turn_outcome((bool) connection_aborted(), $provider->get_last_finish_reason());
+    $wastruncated = ($streamoutcome === 'truncated');
+
     // Process markers in the response before saving.
     $cleanresponse = $fullresponse;
     $wasofftopic = false;
@@ -1088,7 +1096,7 @@ try {
         $pageid ?: null,
         $raglatencyms,
         $cachedtokens !== null ? (int) $cachedtokens : null,
-        connection_aborted() ? 'client_aborted' : 'complete',
+        $streamoutcome,
         $chunkcount ?? null,
         $topscore ?? null,
         // v7.4.2: thinking tokens, stored as reported and NOT summed into
@@ -1200,7 +1208,15 @@ try {
     }
 
     // Signal completion (include message ID for client-side thumbs up/down).
-    local_ai_course_assistant_sse_send(['done' => true, 'messageid' => $assistantmsgid]);
+    // A truncated answer says so: the client shows the note under the message
+    // instead of presenting the cut-off text as a finished answer. The note is
+    // shown, not stored, so it never enters the history the model reads back.
+    $doneevent = ['done' => true, 'messageid' => $assistantmsgid];
+    if ($wastruncated) {
+        $doneevent['truncated'] = true;
+        $doneevent['truncatednote'] = get_string('chat:truncated', 'local_ai_course_assistant');
+    }
+    local_ai_course_assistant_sse_send($doneevent);
 
     // Check if the student's learning profile needs updating. Runs
     // after the response is sent so it does not add latency. The

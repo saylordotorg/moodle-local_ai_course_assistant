@@ -1668,6 +1668,7 @@ $string['outcomes:navlink'] = 'Relatório de resultados';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Não posso ajudar com esse pedido. Vamos voltar ao seu curso: no que você quer trabalhar agora?';
+$string['chat:truncated'] = 'Esta resposta foi interrompida. Peça para eu continuar.';
 $string['settings:rerank_margin_threshold'] = 'Limite de ambiguidade da reordenação';
 $string['settings:rerank_margin_threshold_desc'] = 'Reordenar apenas quando a margem de cosseno entre o primeiro e o terceiro candidatos estiver abaixo deste valor, ou seja, quando a recuperação for ambígua. Medido em 1.008 consultas: com o padrão 0,086 cerca de 30 % das consultas são ignoradas sem perda mensurável de abrangência, evitando os casos em que a reordenação desloca um primeiro resultado já correto. Defina 0 para reordenar todas as consultas.';
 $string['rag_cap_blocked'] = 'A indexação não foi executada: o limite de gastos de RAG deste período foi atingido. Aumente o limite ou aguarde o próximo período. O índice existente permanece intacto.';

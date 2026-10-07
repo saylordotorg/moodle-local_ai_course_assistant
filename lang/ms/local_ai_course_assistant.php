@@ -1691,6 +1691,7 @@ $string['outcomes:navlink'] = 'Laporan hasil';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Saya tidak dapat membantu permintaan itu. Mari kembali kepada kursus anda: apakah yang anda mahu usahakan sekarang?';
+$string['chat:truncated'] = 'Jawapan ini terpotong. Minta saya untuk meneruskannya.';
 $string['settings:rerank_margin_threshold'] = 'Ambang kesamaran penyusunan semula';
 $string['settings:rerank_margin_threshold_desc'] = 'Susun semula hanya apabila jurang kosinus antara calon pertama dan ketiga berada di bawah nilai ini, iaitu apabila perolehan bersifat samar. Diukur pada 1,008 pertanyaan: pada nilai lalai 0.086 kira-kira 30% pertanyaan dilangkau tanpa kehilangan recall yang boleh diukur, dan mengelakkan keadaan di mana penyusunan semula menolak keputusan teratas yang sudah betul. Tetapkan 0 untuk menyusun semula setiap pertanyaan.';
 $string['rag_cap_blocked'] = 'Pengindeksan tidak dijalankan: had perbelanjaan RAG bagi tempoh ini telah dicapai. Naikkan had itu, atau tunggu tempoh berikutnya. Indeks yang ada dibiarkan tidak berubah.';

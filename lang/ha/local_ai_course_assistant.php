@@ -1676,6 +1676,7 @@ $string['outcomes:navlink'] = 'Rahoton sakamako';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Ba zan iya taimakawa da wannan buƙata ba. Mu koma ga darasinka: me kake son yin aiki a kansa yanzu?';
+$string['chat:truncated'] = 'An katse wannan amsar kafin ta kammala. Ka ce in ci gaba.';
 $string['settings:rerank_margin_threshold'] = 'Iyakar rashin tabbas na sake tsara matsayi';
 $string['settings:rerank_margin_threshold_desc'] = 'Ka sake tsara matsayi kawai idan bambancin cosine tsakanin ɗan takara na farko da na uku ya gaza wannan darajar, wato lokacin da neman bayanin ba shi da tabbas. An auna a kan tambayoyi 1,008: a darajar asali 0.086 ana tsallake kusan kashi 30% na tambayoyi ba tare da asarar recall da za a iya aunawa ba, kuma ana guje wa yanayin da sake tsara matsayi ke turo sakamako na farko wanda ya riga ya zama daidai. Sanya 0 don sake tsara kowace tambaya.';
 $string['rag_cap_blocked'] = 'Ba a gudanar da ƙirƙirar ƙididdiga ba: an kai iyakar kashe kuɗin RAG na wannan lokacin. Ka ɗaga iyakar, ko ka jira lokaci na gaba. Ƙididdigar da take akwai ba a taɓa ta ba.';

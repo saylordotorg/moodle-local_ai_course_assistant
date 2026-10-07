@@ -1648,6 +1648,7 @@ $string['outcomes:navlink'] = 'Kazanımlar raporu';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Bu istekte yardımcı olamam. Dersinize dönelim: şimdi ne üzerinde çalışmak istersiniz?';
+$string['chat:truncated'] = 'Bu yanıt yarıda kesildi. Devam etmemi isteyebilirsiniz.';
 $string['settings:rerank_margin_threshold'] = 'Yeniden sıralama belirsizlik eşiği';
 $string['settings:rerank_margin_threshold_desc'] = 'Yalnızca birinci ve üçüncü aday arasındaki kosinüs farkı bu değerin altındayken, yani getirme belirsizken yeniden sırala. 1.008 sorgu üzerinde ölçüldü: varsayılan 0,086 değerinde sorguların yaklaşık %30\'u ölçülebilir bir anma kaybı olmadan atlanır ve yeniden sıralamanın hâlihazırda doğru olan ilk sonucu geri ittiği durumlar önlenir. Her sorguyu yeniden sıralamak için 0 girin.';
 $string['rag_cap_blocked'] = 'Dizin oluşturma çalışmadı: bu dönem için RAG harcama sınırına ulaşıldı. Sınırı yükseltin veya bir sonraki dönemi bekleyin. Mevcut dizin olduğu gibi bırakılır.';

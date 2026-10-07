@@ -1679,6 +1679,7 @@ $string['outcomes:navlink'] = 'Gabaasa bu\'aa';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Gaaffii kanaan gargaaruu hin danda\'u. Gara barnoota keessanitti haa deebi\'nu: amma maal irratti hojjachuu barbaadduu?';
+$string['chat:truncated'] = 'Deebiin kun osoo hin xumuramin cite. Akka itti fufu na gaafadhaa.';
 $string['settings:rerank_margin_threshold'] = 'Daangaa wal-dhabbii sirreeffama sadarkaa';
 $string['settings:rerank_margin_threshold_desc'] = 'Sadarkaa irra deebi\'ii kennii yeroo garaagarummaan cosine kaadhimamaa tokkoffaa fi sadaffaa gidduu jiru gatii kana gadi ta\'e qofa, kunis yeroo argannoon ifa hin taane. Gaaffiiwwan 1,008 irratti safarame: gatii duraa 0.086 irratti dhibbeentaa 30 ol gaaffiiwwan darbatamu, kasaaraa recall safaramu malee, akkasumas haala keessatti sirreeffamni sadarkaa bu\'aa tokkoffaa duraan sirrii ture dhiibu ni hafa. Gaaffii hunda irra deebi\'anii kennuuf 0 kaa\'i.';
 $string['rag_cap_blocked'] = 'Tarreeffamni hin hojjatamne: daangaa baasii RAG yeroo kanaaf jiru gahameera. Daangaa ol kaasi, yookaan yeroo itti aanu eegi. Tarreeffamni jiru akkuma jirutti hafa.';

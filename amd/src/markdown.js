@@ -16,8 +16,10 @@
 /**
  * Lightweight markdown to HTML converter.
  *
- * Supports: bold, italic, inline code, code blocks, headers, lists, links.
- * Sanitizes output to a safe HTML subset.
+ * Supports: bold, italic, strikethrough, inline code, code blocks, headings
+ * (h1 to h6), lists, links, tables, block quotes and horizontal rules.
+ * Every piece of text is HTML-escaped before any markup is added, so the
+ * output is a safe HTML subset.
  *
  * @module     local_ai_course_assistant/markdown
  * @copyright  2025 AI Course Assistant
@@ -55,6 +57,9 @@ define([], function() {
         // Italic: *text* or _text_
         result = result.replace(/\*(.+?)\*/g, '<em>$1</em>');
         result = result.replace(/_(.+?)_/g, '<em>$1</em>');
+
+        // Strikethrough: ~~text~~
+        result = result.replace(/~~(.+?)~~/g, '<del>$1</del>');
 
         // Links: [text](url) — URL scheme is checked against a denylist so that
         // poisoned AI output or RAG content cannot emit javascript:, data:,
@@ -113,6 +118,123 @@ define([], function() {
     };
 
     /**
+     * Split one markdown table row into its cells.
+     *
+     * A leading and a trailing pipe are optional, and "\\|" is a literal pipe
+     * inside a cell. Pipes inside inline code are already safe here, because
+     * render() swaps inline code for placeholders before tables are parsed.
+     *
+     * @param {string} line
+     * @returns {string[]}
+     */
+    const splitRow = function(line) {
+        let row = line.trim();
+        if (row.startsWith('|')) {
+            row = row.slice(1);
+        }
+        if (row.endsWith('|') && !row.endsWith('\\|')) {
+            row = row.slice(0, -1);
+        }
+        // A plain loop rather than a lookbehind regex: Safari before 16.4 can't
+        // parse lookbehind at all, and a syntax error here would take the whole
+        // chat down on older iPhones, not just the table.
+        const cells = [];
+        let cell = '';
+        for (let k = 0; k < row.length; k++) {
+            const ch = row.charAt(k);
+            if (ch === '\\' && row.charAt(k + 1) === '|') {
+                cell += '|';
+                k++;
+            } else if (ch === '|') {
+                cells.push(cell.trim());
+                cell = '';
+            } else {
+                cell += ch;
+            }
+        }
+        cells.push(cell.trim());
+        return cells;
+    };
+
+    /** @type {RegExp} The line under a table's header row, e.g. "| --- | :---: |". */
+    const TABLE_DIVIDER = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
+
+    /**
+     * Whether lines[i] starts a table: a row with a pipe, then a divider line
+     * with the same number of cells.
+     *
+     * @param {string[]} lines
+     * @param {number} i
+     * @returns {boolean}
+     */
+    const startsTable = function(lines, i) {
+        if (i + 1 >= lines.length || lines[i].indexOf('|') === -1) {
+            return false;
+        }
+        const divider = lines[i + 1];
+        if (!TABLE_DIVIDER.test(divider) || divider.indexOf('-') === -1) {
+            return false;
+        }
+        // A divider with no pipe is a horizontal rule or a setext underline,
+        // unless the header is a single cell written with its own pipes.
+        if (divider.indexOf('|') === -1 && splitRow(lines[i]).length !== 1) {
+            return false;
+        }
+        return splitRow(lines[i]).length === splitRow(divider).length;
+    };
+
+    /**
+     * Render the table that starts at lines[start].
+     *
+     * Body rows run until a blank line or a line with no pipe. A row with too
+     * few cells is padded and one with too many is cut, as GitHub does, so a
+     * model's ragged table still lines up.
+     *
+     * @param {string[]} lines
+     * @param {number} start
+     * @returns {{html: string, next: number}} The HTML and the index of the first line after the table.
+     */
+    const renderTable = function(lines, start) {
+        const header = splitRow(lines[start]);
+        const aligns = splitRow(lines[start + 1]).map(function(cell) {
+            const left = cell.startsWith(':');
+            const right = cell.endsWith(':');
+            if (left && right) {
+                return 'center';
+            }
+            return right ? 'right' : (left ? 'left' : '');
+        });
+        const cellHtml = function(tag, text, col) {
+            const cls = aligns[col] ? ' class="aica-md-align-' + aligns[col] + '"' : '';
+            return '<' + tag + cls + '>' + processInline(text) + '</' + tag + '>';
+        };
+        const out = ['<div class="aica-md-table"><table>', '<thead><tr>'];
+        header.forEach(function(text, col) {
+            out.push(cellHtml('th', text, col));
+        });
+        out.push('</tr></thead>');
+
+        let i = start + 2;
+        const body = [];
+        while (i < lines.length && lines[i].trim() !== '' && lines[i].indexOf('|') !== -1 &&
+                !/^\x00CODEBLOCK\d+\x00$/.test(lines[i])) {
+            const cells = splitRow(lines[i]);
+            const row = ['<tr>'];
+            for (let col = 0; col < header.length; col++) {
+                row.push(cellHtml('td', cells[col] || '', col));
+            }
+            row.push('</tr>');
+            body.push(row.join(''));
+            i++;
+        }
+        if (body.length) {
+            out.push('<tbody>' + body.join('') + '</tbody>');
+        }
+        out.push('</table></div>');
+        return {html: out.join(''), next: i};
+    };
+
+    /**
      * Convert markdown text to HTML.
      *
      * @param {string} text Raw markdown text
@@ -148,9 +270,50 @@ define([], function() {
         const output = [];
         let inList = false;
         let listType = '';
+        const closeList = function() {
+            if (inList) {
+                output.push(listType === 'ul' ? '</ul>' : '</ol>');
+                inList = false;
+            }
+        };
 
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
+
+            // Tables (GitHub style): a header row, a divider row, then body rows.
+            if (startsTable(lines, i)) {
+                closeList();
+                const table = renderTable(lines, i);
+                output.push(table.html);
+                i = table.next - 1;
+                continue;
+            }
+
+            // Horizontal rule: ---, *** or ___ alone on a line.
+            if (/^\s*([-*_])(\s*\1){2,}\s*$/.test(line)) {
+                closeList();
+                output.push('<hr>');
+                continue;
+            }
+
+            // Block quote: consecutive lines starting with ">". The raw text is
+            // still unescaped at this point; processInline escapes each line.
+            if (/^\s*>/.test(line)) {
+                closeList();
+                const quoted = [];
+                while (i < lines.length && /^\s*>/.test(lines[i])) {
+                    quoted.push(lines[i].replace(/^\s*>\s?/, ''));
+                    i++;
+                }
+                i--;
+                const paras = quoted.join('\n').split(/\n\s*\n/).filter(function(para) {
+                    return para.trim() !== '';
+                }).map(function(para) {
+                    return '<p>' + para.split('\n').map(processInline).join('<br>') + '</p>';
+                });
+                output.push('<blockquote>' + paras.join('') + '</blockquote>');
+                continue;
+            }
 
             // Check for code block placeholder.
             const codeBlockMatch = line.match(/^\x00CODEBLOCK(\d+)\x00$/);
@@ -164,7 +327,7 @@ define([], function() {
             }
 
             // Headers.
-            const headerMatch = line.match(/^(#{1,3})\s+(.+)$/);
+            const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
             if (headerMatch) {
                 if (inList) {
                     output.push(listType === 'ul' ? '</ul>' : '</ol>');

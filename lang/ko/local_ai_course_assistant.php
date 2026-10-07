@@ -1646,6 +1646,7 @@ $string['outcomes:navlink'] = '성취목표 보고서';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = '그 요청은 도와드릴 수 없습니다. 강좌로 돌아가 볼까요? 이제 어떤 것을 해보고 싶으신가요?';
+$string['chat:truncated'] = '이 답변은 중간에 잘렸습니다. 계속해 달라고 요청해 주세요.';
 $string['settings:rerank_margin_threshold'] = '재순위 지정 모호성 임계값';
 $string['settings:rerank_margin_threshold_desc'] = '1위와 3위 후보 간 코사인 차이가 이 값보다 작을 때, 즉 검색 결과가 모호할 때만 재순위를 지정합니다. 1,008개 질의로 측정: 기본값 0.086에서는 약 30%의 질의를 건너뛰어도 재현율 손실이 측정되지 않으며, 이미 정확한 1위 결과가 재순위 지정으로 밀려나는 경우를 피할 수 있습니다. 모든 질의에 재순위를 지정하려면 0으로 설정하세요.';
 $string['rag_cap_blocked'] = '색인 작업이 실행되지 않았습니다. 이 기간의 RAG 지출 한도에 도달했습니다. 한도를 높이거나 다음 기간을 기다려 주세요. 기존 색인은 그대로 유지됩니다.';

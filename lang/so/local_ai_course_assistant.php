@@ -1692,6 +1692,7 @@ $string['outcomes:navlink'] = 'Warbixinta natiijooyinka';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Ma awoodo inaan ka caawiyo codsigaas. Aan ku noqonno koorsadaada: maxaad rabtaa inaad hadda ka shaqeyso?';
+$string['chat:truncated'] = 'Jawaabtan waa la gooyay intaanay dhammaan. I weydii inaan sii wado.';
 $string['settings:rerank_margin_threshold'] = 'Xadka madmadowga dib-u-kala-saarista';
 $string['settings:rerank_margin_threshold_desc'] = 'Dib u kala saar oo keliya marka farqiga cosine ee u dhexeeya musharaxa koowaad iyo kan saddexaad ka hooseeyo qiimahan, taas oo ah marka soo-helitaanku madmadow yahay. Waxaa lagu qiyaasay 1,008 su\'aalood: qiimaha caadiga ah 0.086 wuxuu ka boodaa qiyaastii 30% su\'aalaha iyada oo aan lumin recall la cabbiri karo, waxaanna laga hortagaa xaaladaha uu dib-u-kala-saarintu ka riixdo natiijada koowaad oo horeyba u saxnayd. U dhig 0 si aad dib u kala saarto su\'aal kasta.';
 $string['rag_cap_blocked'] = 'Dejinta tusmada ma socon: xadka kharashka RAG ee muddadan waa la gaadhay. Kor u qaad xadka, ama sug muddada xigta. Tusmada jirta lama taabtin.';

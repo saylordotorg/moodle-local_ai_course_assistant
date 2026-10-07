@@ -1700,6 +1700,7 @@ $string['outcomes:navlink'] = 'Laporan capaian';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Saya tidak dapat membantu permintaan itu. Mari kembali ke kursus Anda: apa yang ingin Anda kerjakan sekarang?';
+$string['chat:truncated'] = 'Jawaban ini terpotong. Minta saya untuk melanjutkan.';
 $string['settings:rerank_margin_threshold'] = 'Ambang ambiguitas pemeringkatan ulang';
 $string['settings:rerank_margin_threshold_desc'] = 'Lakukan pemeringkatan ulang hanya jika selisih kosinus antara kandidat pertama dan ketiga berada di bawah nilai ini, yaitu ketika pengambilan bersifat ambigu. Diukur pada 1.008 kueri: pada nilai bawaan 0,086 sekitar 30% kueri dilewati tanpa kehilangan recall yang terukur, dan menghindari kasus di mana pemeringkatan ulang menggeser hasil teratas yang sudah benar. Setel 0 untuk memeringkat ulang setiap kueri.';
 $string['rag_cap_blocked'] = 'Pengindeksan tidak dijalankan: batas belanja RAG untuk periode ini telah tercapai. Naikkan batasnya, atau tunggu periode berikutnya. Indeks yang ada dibiarkan utuh.';

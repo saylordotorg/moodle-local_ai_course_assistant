@@ -1668,6 +1668,7 @@ $string['outcomes:navlink'] = '成果报告';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = '这个请求我无法协助。我们回到课程吧：接下来你想学习什么？';
+$string['chat:truncated'] = '这个回答被截断了。请让我继续。';
 $string['settings:rerank_margin_threshold'] = '重排序歧义阈值';
 $string['settings:rerank_margin_threshold_desc'] = '仅当第一名与第三名候选之间的余弦差值低于此值时才进行重排序，也就是检索结果存在歧义时。基于 1,008 条查询测得：使用默认值 0.086 时约有 30% 的查询被跳过，召回率没有可测量的下降，同时避免了重排序把本已正确的首位结果挤下去的情况。设为 0 可对每条查询都重排序。';
 $string['rag_cap_blocked'] = '索引未执行：本周期的 RAG 支出上限已达到。请提高上限或等待下一个周期。现有索引保持不变。';

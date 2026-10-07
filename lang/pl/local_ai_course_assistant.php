@@ -1647,6 +1647,7 @@ $string['outcomes:navlink'] = 'Raport efektów kształcenia';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Nie mogę pomóc w tej sprawie. Wróćmy do Twojego kursu: nad czym chcesz teraz pracować?';
+$string['chat:truncated'] = 'Ta odpowiedź została ucięta. Poproś mnie o kontynuację.';
 $string['settings:rerank_margin_threshold'] = 'Próg niejednoznaczności ponownego rankingu';
 $string['settings:rerank_margin_threshold_desc'] = 'Ponowny ranking tylko wtedy, gdy różnica cosinusowa między pierwszym i trzecim kandydatem jest mniejsza od tej wartości, czyli gdy wyszukiwanie jest niejednoznaczne. Zmierzone na 1008 zapytaniach: przy domyślnej wartości 0,086 pomijanych jest około 30 % zapytań bez mierzalnej utraty czułości, co pozwala uniknąć sytuacji, w których ponowny ranking usuwa już poprawny pierwszy wynik. Ustaw 0, aby przetwarzać każde zapytanie.';
 $string['rag_cap_blocked'] = 'Indeksowanie nie zostało wykonane: osiągnięto limit wydatków RAG na ten okres. Zwiększ limit lub poczekaj na następny okres. Istniejący indeks pozostaje bez zmian.';

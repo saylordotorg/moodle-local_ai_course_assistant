@@ -56,4 +56,16 @@ interface provider_interface {
      *                    'model' (string), or null if not available.
      */
     public function get_last_token_usage(): ?array;
+
+    /**
+     * Why the last call stopped generating, as the vendor reported it.
+     *
+     * The raw vendor value ('stop', 'length', 'end_turn', 'max_tokens', ...),
+     * or null when the provider did not report one. Use
+     * {@see base_provider::is_truncation()} to ask whether the answer was cut
+     * off by the output-token limit rather than finished.
+     *
+     * @return string|null
+     */
+    public function get_last_finish_reason(): ?string;
 }

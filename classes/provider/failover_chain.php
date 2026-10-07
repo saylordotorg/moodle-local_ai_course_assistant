@@ -218,6 +218,17 @@ class failover_chain implements provider_interface {
     }
 
     /**
+     * Finish reason from the provider that actually served the most recent
+     * call, for the same reason usage is delegated: the chain itself never
+     * generates anything.
+     *
+     * @return string|null
+     */
+    public function get_last_finish_reason(): ?string {
+        return $this->lastused?->get_last_finish_reason();
+    }
+
+    /**
      * The provider that actually served the most recent call.
      *
      * base_provider derives this from the class name, which would report

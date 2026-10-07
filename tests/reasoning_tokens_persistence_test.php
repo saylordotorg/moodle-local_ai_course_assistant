@@ -232,6 +232,85 @@ final class reasoning_tokens_persistence_test extends \advanced_testcase {
     }
 
     /**
+     * v7.7.6: Gemini's compatibility endpoint never sends
+     * completion_tokens_details, so the thinking is read from the usage gap.
+     *
+     * Live numbers: total 839 = prompt 67 + completion 435 + 337 thinking. Before
+     * this every Gemini row stored null and the thinking was never billed, which
+     * is the spend undercount (0.35M output tokens logged, 1.78M billed).
+     */
+    public function test_gemini_thinking_is_read_from_the_total_tokens_gap(): void {
+        $p = new \local_ai_course_assistant\provider\gemini_provider(['apikey' => 'x', 'model' => 'gemini-2.5-flash']);
+
+        $shaped = $this->shape($p, ['prompt_tokens' => 67, 'completion_tokens' => 435, 'total_tokens' => 839]);
+        $this->assertSame(337, $shaped['reasoning_tokens'], 'Gemini thinking went unlogged.');
+        $this->assertSame(435, $shaped['completion_tokens'], 'Thinking must not be folded into completion_tokens.');
+
+        // Thinking off: the gap is 0, which is a measurement, not an absence.
+        $off = $this->shape($p, ['prompt_tokens' => 67, 'completion_tokens' => 435, 'total_tokens' => 502]);
+        $this->assertSame(0, $off['reasoning_tokens']);
+
+        // Counts that do not add up claim nothing.
+        $odd = $this->shape($p, ['prompt_tokens' => 67, 'completion_tokens' => 435, 'total_tokens' => 400]);
+        $this->assertNull($odd['reasoning_tokens']);
+
+        // No total at all: nothing to read.
+        $none = $this->shape($p, ['prompt_tokens' => 67, 'completion_tokens' => 435]);
+        $this->assertNull($none['reasoning_tokens']);
+
+        // An explicit count, if Google ever sends one, wins over the gap.
+        $explicit = $this->shape($p, [
+            'prompt_tokens' => 67, 'completion_tokens' => 435, 'total_tokens' => 839,
+            'completion_tokens_details' => ['reasoning_tokens' => 300],
+        ]);
+        $this->assertSame(300, $explicit['reasoning_tokens']);
+    }
+
+    /**
+     * OpenAI counts reasoning inside completion_tokens, so the gap is never read for it.
+     *
+     * Its real usage carries an explicit count and a total equal to prompt +
+     * completion. Even a usage object with a gap (a proxy that adds something
+     * to total_tokens) must not turn into extra reasoning on an OpenAI row,
+     * where token_cost_manager does not add reasoning to output anyway but
+     * analytics would report it as thinking that never happened.
+     */
+    public function test_openai_usage_is_not_double_counted(): void {
+        $p = new \local_ai_course_assistant\provider\openai_provider(['apikey' => 'x', 'model' => 'o3-mini']);
+
+        $real = $this->shape($p, [
+            'prompt_tokens' => 100, 'completion_tokens' => 500, 'total_tokens' => 600,
+            'completion_tokens_details' => ['reasoning_tokens' => 320],
+        ]);
+        $this->assertSame(320, $real['reasoning_tokens']);
+        $this->assertSame(500, $real['completion_tokens']);
+
+        $gap = $this->shape($p, ['prompt_tokens' => 100, 'completion_tokens' => 500, 'total_tokens' => 900]);
+        $this->assertNull($gap['reasoning_tokens'], 'The Gemini gap rule leaked onto OpenAI.');
+
+        // And the price of the real call is completion alone: reasoning is already inside it.
+        $this->assertNotNull(\local_ai_course_assistant\token_cost_manager::estimate_cost('o3-mini', 100, 500, 0));
+        $this->assertEquals(
+            \local_ai_course_assistant\token_cost_manager::estimate_cost('o3-mini', 100, 500, 0),
+            \local_ai_course_assistant\token_cost_manager::estimate_cost('o3-mini', 100, 500, $real['reasoning_tokens'])
+        );
+    }
+
+    /**
+     * The gap now reaches the bill: a Gemini call is priced on answer + thinking.
+     */
+    public function test_gemini_gap_is_priced_as_output(): void {
+        $p = new \local_ai_course_assistant\provider\gemini_provider(['apikey' => 'x', 'model' => 'gemini-2.5-flash']);
+        $u = $this->shape($p, ['prompt_tokens' => 1000, 'completion_tokens' => 400, 'total_tokens' => 2400], 'gemini-2.5-flash');
+
+        $cost = \local_ai_course_assistant\token_cost_manager::estimate_cost(
+            $u['model'], $u['prompt_tokens'], $u['completion_tokens'], (int) $u['reasoning_tokens']
+        );
+        // 1,000 input at 0.30/M plus (400 answer + 1,000 thinking) output at 2.50/M.
+        $this->assertEqualsWithDelta((1000 * 0.30 + 1400 * 2.50) / 1e6, $cost, 1e-12);
+    }
+
+    /**
      * Both call paths must read usage through the one shaper. Usage capture
      * lived only on the streaming path until v7.0.6, which is exactly how the
      * two drifted; a single reader is what stops it recurring.

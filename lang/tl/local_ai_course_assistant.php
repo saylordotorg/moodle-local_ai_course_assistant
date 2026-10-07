@@ -1692,6 +1692,7 @@ $string['outcomes:navlink'] = 'Ulat ng mga outcome';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Hindi ako makakatulong sa kahilingang iyon. Bumalik na tayo sa kurso mo: ano ang gusto mong gawin ngayon?';
+$string['chat:truncated'] = 'Naputol ang sagot na ito. Hilingin mong ituloy ko.';
 $string['settings:rerank_margin_threshold'] = 'Hangganan ng kalabuan sa pagre-rank muli';
 $string['settings:rerank_margin_threshold_desc'] = 'Mag-rank muli lamang kapag ang agwat na cosine sa pagitan ng una at pangatlong kandidato ay mas mababa sa halagang ito, ibig sabihin kapag malabo ang pagkuha. Sinukat sa 1,008 na tanong: sa default na 0.086, mga 30% ng mga tanong ang nilalaktawan nang walang masusukat na pagbaba ng recall, at naiiwasan ang mga pagkakataong itinatabi ng pagre-rank muli ang tamang unang resulta. Itakda sa 0 upang mag-rank muli sa bawat tanong.';
 $string['rag_cap_blocked'] = 'Hindi tumakbo ang pag-index: naabot na ang limitasyon ng gastos sa RAG para sa panahong ito. Itaas ang limitasyon, o maghintay sa susunod na panahon. Hindi ginagalaw ang kasalukuyang index.';

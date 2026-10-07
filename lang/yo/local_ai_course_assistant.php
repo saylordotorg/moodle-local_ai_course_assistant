@@ -1668,6 +1668,7 @@ $string['outcomes:navlink'] = 'Ìjábọ̀ àbájáde';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Mi ò lè ṣèrànwọ́ pẹ̀lú ìbéèrè yẹn. Ẹ jẹ́ ká padà sí ẹ̀kọ́ rẹ: kí ni o fẹ́ ṣiṣẹ́ lé lórí nísinsìnyí?';
+$string['chat:truncated'] = 'Ìdáhùn yìí dúró kí ó tó parí. Ní kí n máa bá a lọ.';
 $string['settings:rerank_margin_threshold'] = 'Ààlà àìdánilójú ti ìtúnṣe ipò';
 $string['settings:rerank_margin_threshold_desc'] = 'Tún ipò ṣe kìkì nígbà tí ìyàtọ̀ cosine láàrin olùdíje kìíní àti ẹ̀kẹta wà ní ìsàlẹ̀ iye yìí, ìyẹn nígbà tí ìwádìí kò dánilójú. A díwọ̀n rẹ̀ lórí ìbéèrè 1,008: ní iye àsàyàn 0.086, ó fi nǹkan bí ìdá 30 nínú ọgọ́rùn-ún ìbéèrè sílẹ̀ láìsí àdánù recall tí a lè díwọ̀n, ó sì yẹra fún ìgbà tí ìtúnṣe ipò ń tì àbájáde kìíní tí ó ti tọ̀nà sẹ́yìn. Fi 0 sí i láti tún gbogbo ìbéèrè ṣe.';
 $string['rag_cap_blocked'] = 'Ìṣe àtọ́ka kò ṣiṣẹ́: ààlà ìnáwó RAG fún àkókò yìí ti dé. Gbé ààlà náà sókè, tàbí dúró de àkókò tó ń bọ̀. Àtọ́ka tí ó wà kò ní yí padà.';

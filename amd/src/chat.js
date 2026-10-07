@@ -5773,6 +5773,11 @@ define([
                             msgEl.dataset.messageid = doneData.messageid;
                         }
                     }
+                    // The answer ran out of output tokens: say so rather than
+                    // presenting the cut-off text as a finished answer.
+                    if (doneData && doneData.truncated) {
+                        UI.markMessageTruncated(getLastAssistantMessageEl(), doneData.truncatednote || '');
+                    }
                     // Append clickable source pill using SSE metadata (page/course URLs + modules map).
                     // parsed.* comes from the model's [SOURCE:] marker; the
                     // fallback reads the passages it cited with [[c:N]].
@@ -5808,6 +5813,11 @@ define([
                             });
                         UI.showSuggestions(chips, handleSuggestionClick);
                     }
+                } else if (doneData && doneData.truncated && doneData.truncatednote) {
+                    // The whole budget went before any answer text arrived, so
+                    // there is no bubble to annotate. Without this the learner
+                    // saw nothing at all.
+                    addAssistantMsg(doneData.truncatednote);
                 }
                 // Study break nudge after ~30 messages in one session.
                 if (!breakNudgeShown && sessionMessageCount >= 30) {

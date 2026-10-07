@@ -1668,6 +1668,7 @@ $string['outcomes:navlink'] = 'Rapoor bu résultat';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Mënuma la dimbali ci ñaan boobu. Nu dellu ci sa kurs: lan nga bëgg a liggéey ci léegi?';
+$string['chat:truncated'] = 'Tontu bii dafa dagg balaa muy jeex. Laaj ma ma wéy ci.';
 $string['settings:rerank_margin_threshold'] = 'Dayo bu ñu tegtal ci teraanga bu ñu defaraat';
 $string['settings:rerank_margin_threshold_desc'] = 'Defaraat teraanga rekk bu wuute gu cosine ci diggante ki jëkk ak ki ñetteel gën a tuuti ci sax bii, maanaam bu gis-gis bi leerul. Ñu ko natt ci 1,008 laaj: ci sax bu ndoorte 0.086, lu tollu ci 30% ci laaj yi ñu ko tëj te recall bi jotewul benn ñàkk bu ñu mën a natt, te mu moytu jamono yi defaraat teraanga di génne njariñ bu jëkk bu doon dëgg. Def 0 ngir defaraat teraanga ci laaj bu nekk.';
 $string['rag_cap_blocked'] = 'Tëraliin bi doxul: dayo bu njëg RAG ci jamono jii ñu ko agsi. Yékkati dayo bi, walla xaar jamono ju topp. Tëralin bi am ñu bàyyi ko ni mu ne.';

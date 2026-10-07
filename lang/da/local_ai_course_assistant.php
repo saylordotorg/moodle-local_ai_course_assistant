@@ -1648,6 +1648,7 @@ $string['outcomes:navlink'] = 'Læringsmålsrapport';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Det kan jeg ikke hjælpe med. Lad os vende tilbage til dit kursus: hvad vil du arbejde med nu?';
+$string['chat:truncated'] = 'Dette svar blev afbrudt. Bed mig om at fortsætte.';
 $string['settings:rerank_margin_threshold'] = 'Tærskel for omrangeringens tvetydighed';
 $string['settings:rerank_margin_threshold_desc'] = 'Omrangér kun, når cosinusmarginen mellem den første og den tredje kandidat er under denne værdi, altså når søgningen er tvetydig. Målt over 1.008 forespørgsler: ved standardværdien 0,086 springes omkring 30 % af forespørgslerne over uden målbart tab af genkaldelse, og tilfælde undgås, hvor omrangering fortrænger et allerede korrekt topresultat. Sæt til 0 for at omrangere alle forespørgsler.';
 $string['rag_cap_blocked'] = 'Indekseringen blev ikke kørt: RAG-forbrugsgrænsen for denne periode er nået. Hæv grænsen, eller vent til næste periode. Det eksisterende indeks berøres ikke.';

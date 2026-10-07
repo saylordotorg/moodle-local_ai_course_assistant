@@ -1646,6 +1646,7 @@ $string['outcomes:navlink'] = 'アウトカムレポート';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'そのご依頼にはお応えできません。コースに戻りましょう。次は何に取り組みますか。';
+$string['chat:truncated'] = 'この回答は途中で切れました。続きを頼んでください。';
 $string['settings:rerank_margin_threshold'] = '再ランク付けの曖昧さしきい値';
 $string['settings:rerank_margin_threshold_desc'] = '1位と3位の候補のコサイン差がこの値を下回るとき、つまり検索結果が曖昧なときにのみ再ランク付けします。1,008件のクエリで測定: 既定値0.086では約30%のクエリを省略しても再現率の測定可能な低下はなく、すでに正しい1位の結果が再ランク付けによって押し下げられる事態も避けられます。すべてのクエリを再ランク付けするには0を設定します。';
 $string['rag_cap_blocked'] = 'インデックス作成は実行されませんでした。この期間のRAG支出上限に達しています。上限を引き上げるか、次の期間までお待ちください。既存のインデックスはそのまま保持されます。';

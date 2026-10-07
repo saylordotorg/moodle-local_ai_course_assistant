@@ -2747,6 +2747,35 @@ define([
     };
 
     /**
+     * Mark an assistant message as cut off by the output-token limit.
+     *
+     * v7.7.6. The server stores such a turn as 'truncated' and sends this note
+     * on the done event, because the cut-off text otherwise reads as a finished
+     * answer. The note sits between the answer and its footer and is set as
+     * text, never as HTML. Idempotent, so a repeated done event adds one note.
+     *
+     * @param {HTMLElement|null} msgEl The assistant message element.
+     * @param {string} noteText Localized note from the server.
+     * @return {HTMLElement|null} The note element, or null when nothing was added.
+     */
+    const markMessageTruncated = function(msgEl, noteText) {
+        if (!msgEl || !noteText || msgEl.querySelector('.local-ai-course-assistant__msg-truncated')) {
+            return null;
+        }
+        const note = document.createElement('p');
+        note.className = 'local-ai-course-assistant__msg-truncated';
+        note.setAttribute('role', 'note');
+        note.textContent = noteText;
+        const footer = msgEl.querySelector(':scope > .local-ai-course-assistant__msg-footer');
+        if (footer) {
+            msgEl.insertBefore(note, footer);
+        } else {
+            msgEl.appendChild(note);
+        }
+        return note;
+    };
+
+    /**
      * Finish the current streaming message.
      *
      * @param {string}        fullText  The final complete text
@@ -6608,6 +6637,7 @@ define([
         startStreaming: startStreaming,
         updateStreamContent: updateStreamContent,
         finishStreaming: finishStreaming,
+        markMessageTruncated: markMessageTruncated,
         setStreamCitations: setStreamCitations,
         renderMasteryChip: renderMasteryChip,
         hideMasteryChip: hideMasteryChip,

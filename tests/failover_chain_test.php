@@ -124,6 +124,9 @@ final class failover_chain_test extends \advanced_testcase {
             public function get_last_token_usage(): ?array {
                 return null;
             }
+            public function get_last_finish_reason(): ?string {
+                return null;
+            }
         };
     }
 
@@ -218,6 +221,9 @@ final class failover_chain_test extends \advanced_testcase {
             public function get_last_token_usage(): ?array {
                 return null;
             }
+            public function get_last_finish_reason(): ?string {
+                return null;
+            }
         };
     }
 
@@ -250,6 +256,9 @@ final class failover_chain_test extends \advanced_testcase {
                 }
             }
             public function get_last_token_usage(): ?array {
+                return null;
+            }
+            public function get_last_finish_reason(): ?string {
                 return null;
             }
         };

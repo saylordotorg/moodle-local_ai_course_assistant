@@ -1692,6 +1692,7 @@ $string['outcomes:navlink'] = 'Umbiko wemiphumela';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Angikwazi ukusiza ngalesi sicelo. Asibuyele esifundweni sakho: yini ofuna ukuyisebenza manje?';
+$string['chat:truncated'] = 'Le mpendulo inqamukile ingakapheli. Ngicele ngiqhubeke.';
 $string['settings:rerank_margin_threshold'] = 'Umkhawulo wokungacaci kokuhlela kabusha';
 $string['settings:rerank_margin_threshold_desc'] = 'Hlela kabusha kuphela lapho umehluko we-cosine phakathi komuntu wokuqala nowesithathu ungaphansi kwaleli nani, okusho lapho ukuthola kungacacile. Kulinganiswe kumibuzo engu-1,008: kunani elizenzakalelayo 0.086 cishe u-30% wemibuzo weqiwa ngaphandle kokulahleka kwe-recall okukalekayo, futhi kugwenywa izimo lapho ukuhlela kabusha kususa umphumela wokuqala osuvele ulungile. Beka u-0 ukuze uhlele kabusha wonke umbuzo.';
 $string['rag_cap_blocked'] = 'Ukwenza inkomba akusebenzanga: umkhawulo wokusetshenziswa kwemali kwe-RAG wale nkathi sewufinyelelwe. Khuphula umkhawulo, noma linda inkathi elandelayo. Inkomba ekhona ishiywa ingashintshwa.';

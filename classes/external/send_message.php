@@ -303,7 +303,8 @@ class send_message extends external_api {
             ((int) $params['pageid']) ?: null,
             $raglatencyms,
             $tokenusage['cached_tokens'] ?? null,
-            'complete',
+            // v7.7.6: 'truncated' when the reply ran out of output tokens, as sse.php records it.
+            conversation_manager::turn_outcome(false, $provider->get_last_finish_reason()),
             null,
             null,
             // v7.4.2: thinking tokens, as sse.php writes them. This path is the

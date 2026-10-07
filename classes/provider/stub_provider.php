@@ -49,6 +49,9 @@ class stub_provider extends base_provider implements batch_capable_interface {
     /** @var array<string, array> In-memory batches keyed by batch id: ['requests' => [...], 'status' => ..., 'results' => [...]]. */
     public static array $batches = [];
 
+    /** @var string|null What get_last_finish_reason() reports, so a test can play a truncated reply. */
+    public static ?string $finish_reason = null;
+
     /** @var int Monotonic id source for stub batch ids. */
     public static int $batch_seq = 0;
 
@@ -62,6 +65,7 @@ class stub_provider extends base_provider implements batch_capable_interface {
         self::$programmed = [];
         self::$calls = [];
         self::$throw_next = null;
+        self::$finish_reason = null;
         self::$batch_supported = false;
         self::$batches = [];
         self::$batch_seq = 0;
@@ -200,6 +204,10 @@ class stub_provider extends base_provider implements batch_capable_interface {
             'completion_tokens' => 50,
             'model' => 'stub-model',
         ];
+    }
+
+    public function get_last_finish_reason(): ?string {
+        return self::$finish_reason;
     }
 
     protected function get_default_model(): string {

@@ -1668,6 +1668,7 @@ $string['outcomes:navlink'] = 'Báo cáo kết quả đầu ra';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Tôi không thể giúp với yêu cầu đó. Hãy trở lại khóa học của bạn: bây giờ bạn muốn làm gì?';
+$string['chat:truncated'] = 'Câu trả lời này đã bị cắt ngang. Hãy bảo tôi tiếp tục.';
 $string['settings:rerank_margin_threshold'] = 'Ngưỡng nhập nhằng của việc xếp hạng lại';
 $string['settings:rerank_margin_threshold_desc'] = 'Chỉ xếp hạng lại khi khoảng cách cosine giữa ứng viên thứ nhất và thứ ba nhỏ hơn giá trị này, tức là khi việc truy hồi còn nhập nhằng. Đo trên 1.008 truy vấn: ở giá trị mặc định 0,086, khoảng 30% truy vấn được bỏ qua mà không mất độ bao phủ có thể đo được, đồng thời tránh những trường hợp việc xếp hạng lại đẩy một kết quả đầu vốn đã đúng xuống dưới. Đặt 0 để xếp hạng lại mọi truy vấn.';
 $string['rag_cap_blocked'] = 'Việc lập chỉ mục không chạy: đã đạt hạn mức chi tiêu RAG cho kỳ này. Hãy nâng hạn mức hoặc chờ kỳ tiếp theo. Chỉ mục hiện có được giữ nguyên.';

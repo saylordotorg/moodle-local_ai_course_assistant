@@ -85,7 +85,7 @@ class conversation_manager {
      * @param int|null $cmid Course module ID when available.
      * @param int|null $rag_latency_ms Wall-clock ms spent in rag_retriever::retrieve for this turn; only stored on assistant rows.
      * @param int|null $cachedtokens Cached prompt-token count when the provider reports one; null otherwise.
-     * @param string|null $streamoutcome How the turn ended: complete, client_aborted, provider_error.
+     * @param string|null $streamoutcome How the turn ended: complete, client_aborted, provider_error, truncated (v7.7.6: the answer hit the output-token limit).
      * @param int|null $chunkcount Passages retrieved this turn; 0 means retrieval ran and found none.
      * @param float|null $topscore Similarity of the best retrieved passage.
      * @param int|null $reasoningtokens Thinking tokens the provider reported, as reported; null when it reported none.
@@ -907,6 +907,27 @@ class conversation_manager {
             'total_messages' => $totalmessages,
             'courses' => $courses,
         ];
+    }
+
+    /**
+     * stream_outcome for an assistant turn the provider answered.
+     *
+     * v7.7.6 adds 'truncated': the provider stopped because it ran out of
+     * output tokens ('length' from OpenAI-compatible endpoints, 'max_tokens'
+     * from Anthropic). Those turns used to be stored as 'complete', so a reply
+     * cut off mid-sentence looked finished to every report. A learner who left
+     * mid-stream is still 'client_aborted' whatever the provider said, because
+     * the learner never saw the end either way.
+     *
+     * @param bool $clientaborted The learner's connection dropped before the end.
+     * @param string|null $finishreason provider_interface::get_last_finish_reason().
+     * @return string 'client_aborted', 'truncated' or 'complete'.
+     */
+    public static function turn_outcome(bool $clientaborted, ?string $finishreason): string {
+        if ($clientaborted) {
+            return 'client_aborted';
+        }
+        return provider\base_provider::is_truncation($finishreason) ? 'truncated' : 'complete';
     }
 
     /**

@@ -1647,6 +1647,7 @@ $string['outcomes:navlink'] = 'Lärandemålsrapport';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Jag kan inte hjälpa till med den förfrågan. Låt oss återgå till din kurs: vad vill du arbeta med nu?';
+$string['chat:truncated'] = 'Det här svaret blev avbrutet. Be mig fortsätta.';
 $string['settings:rerank_margin_threshold'] = 'Tröskel för omrankningens tvetydighet';
 $string['settings:rerank_margin_threshold_desc'] = 'Omranka endast när cosinusmarginalen mellan den första och den tredje kandidaten ligger under detta värde, alltså när sökningen är tvetydig. Mätt över 1 008 frågor: vid standardvärdet 0,086 hoppas cirka 30 % av frågorna över utan mätbar förlust av träffsäkerhet, och fall undviks där omrankning tränger undan ett redan korrekt toppresultat. Ange 0 för att omranka varje fråga.';
 $string['rag_cap_blocked'] = 'Indexeringen kördes inte: RAG-utgiftstaket för den här perioden har nåtts. Höj taket eller vänta till nästa period. Det befintliga indexet lämnas orört.';

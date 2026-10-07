@@ -396,6 +396,7 @@ class claude_provider extends base_provider {
         // reset unconditionally, and chat_completion_stream below has always had
         // its own reset; this was the one path that did not.
         $this->last_token_usage = null;
+        $this->last_finish_reason = null;
         $url = $this->baseurl . '/v1/messages';
         $body = $this->build_body($systemprompt, $messages, false, $options);
         $response = $this->http_post($url, $this->get_headers($options), $body);
@@ -409,6 +410,9 @@ class claude_provider extends base_provider {
         // refused call reported no usage and was never billed.
         if (is_array($data)) {
             $this->add_token_usage($data);
+            if (isset($data['stop_reason'])) {
+                $this->last_finish_reason = (string) $data['stop_reason'];
+            }
         }
 
         // A model-level safety refusal is a WELL-FORMED response that carries
@@ -531,6 +535,7 @@ class claude_provider extends base_provider {
 
         $buffer = '';
         $this->last_token_usage = null;
+        $this->last_finish_reason = null;
         // Tracks whether any text reached the learner, so a refusal notice is
         // only emitted when the stream produced nothing.
         $sentanytext = false;
@@ -590,6 +595,11 @@ class claude_provider extends base_provider {
                         'cache_read_tokens'      => (int) ($usage['cache_read_input_tokens'] ?? 0),
                         'provider'               => $this->provider_id(),
                         ];
+                    }
+
+                    // v7.7.6: 'max_tokens' here means the answer was cut off.
+                    if ($eventtype === 'message_delta' && !empty($event['delta']['stop_reason'])) {
+                        $this->last_finish_reason = (string) $event['delta']['stop_reason'];
                     }
 
                     if ($eventtype === 'message_delta' && isset($event['usage']['output_tokens'])) {

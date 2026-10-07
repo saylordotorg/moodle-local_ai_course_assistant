@@ -1648,6 +1648,7 @@ $string['outcomes:navlink'] = 'Oppimistulosraportti';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'En voi auttaa tässä pyynnössä. Palataan kurssiisi: mitä haluat tehdä seuraavaksi?';
+$string['chat:truncated'] = 'Tämä vastaus katkesi kesken. Pyydä minua jatkamaan.';
 $string['settings:rerank_margin_threshold'] = 'Uudelleenjärjestyksen monitulkintaisuuden raja';
 $string['settings:rerank_margin_threshold_desc'] = 'Järjestä uudelleen vain, kun ensimmäisen ja kolmannen ehdokkaan kosinietäisyys on tätä arvoa pienempi, eli kun haku on monitulkintainen. Mitattu 1 008 kyselyllä: oletusarvolla 0,086 noin 30 % kyselyistä ohitetaan ilman mitattavaa saantitarkkuuden menetystä, ja vältetään tapaukset, joissa uudelleenjärjestys syrjäyttää jo oikean ykköstuloksen. Aseta 0, jos haluat järjestää jokaisen kyselyn uudelleen.';
 $string['rag_cap_blocked'] = 'Indeksointia ei suoritettu: tämän jakson RAG-kustannuskatto on saavutettu. Nosta kattoa tai odota seuraavaa jaksoa. Nykyinen indeksi jää koskemattomaksi.';
