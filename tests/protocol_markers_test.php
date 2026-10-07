@@ -61,6 +61,10 @@ final class protocol_markers_test extends \basic_testcase {
             'Text [NEEDS_ESCALATION] here' => 'Text here',
             // Internal chunk reference.
             'Answer [[c:12]] text' => 'Answer text',
+            // Seen on alpha.sylr.org: a citation before the full stop left "labor ." in history.
+            'Capital is a factor [[c:0]]. Labor is too [[c:1]].' => 'Capital is a factor. Labor is too.',
+            'Land [[c:1]] [[c:2]], labor and capital' => 'Land, labor and capital',
+            "Line one [[c:3]]\nLine two" => "Line one\nLine two",
         ];
         foreach ($cases as $input => $expected) {
             $this->assertSame($expected, protocol_markers::strip($input));

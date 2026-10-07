@@ -130,7 +130,12 @@ final class protocol_markers {
         // of brackets, with or without an id.
         $text = self::replace('/\n*\[{1,3}\s*SOURCE\s*:[^\[\]]*\]{1,3}\s*/i', '', $text);
 
-        // Internal chunk reference, e.g. [[c:12]].
+        // Internal chunk reference, e.g. [[c:12]]. The model writes these after
+        // the claim and before its full stop ("labor [[c:0]]."), so one that
+        // sits before punctuation or a line end takes the spaces in front of it
+        // too; otherwise the stored copy, which is what history shows, reads
+        // "labor ." Any other is removed with the whitespace after it, as before.
+        $text = self::replace('/(?:[ \t]*\[\[c:\d+\]\])+[ \t]*(?=[.,;:!?)]|$)/im', '', $text);
         $text = self::replace('/\n*\[\[c:\d+\]\]\s*/i', '', $text);
 
         foreach (self::STANDALONE as $marker) {

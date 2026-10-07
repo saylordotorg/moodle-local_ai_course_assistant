@@ -1,0 +1,11 @@
+Version 7.7.4 (build 2026100115)
+
+Answers reloaded from chat history no longer show a stray space before full
+stops and commas. SOLA marks claims taken from course content with an inline
+citation, and the copy saved for history removed those markers but left the
+space in front of each one. New answers are saved cleanly; answers saved
+before this release keep their spaces.
+
+Tested on Moodle 5.3 as a learner, with new automated cases for the citation
+shapes seen there. Continuous integration covers PHP 8.1 through 8.3 against
+Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.
