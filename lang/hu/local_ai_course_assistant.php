@@ -1687,6 +1687,7 @@ $string['outcomes:navlink'] = 'Tanulási eredmények jelentése';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Ebben a kérésben nem tudok segíteni. Térjünk vissza a tananyaghoz: mivel szeretnél most foglalkozni?';
+$string['chat:truncated'] = 'Ez a válasz félbeszakadt. Kérd meg, hogy folytassam.';
 $string['settings:rerank_margin_threshold'] = 'Az újrarangsorolás kétértelműségi küszöbe';
 $string['settings:rerank_margin_threshold_desc'] = 'Csak akkor rangsoroljon újra, ha az első és a harmadik találat közötti koszinuszkülönbség ez alatt az érték alatt van, vagyis amikor a visszakeresés kétértelmű. 1008 lekérdezésen mérve: a 0,086 alapértéknél a lekérdezések körülbelül 30 %-a kimarad mérhető felidézésveszteség nélkül, és elkerülhetők azok az esetek, amikor az újrarangsorolás egy már helyes első találatot szorít ki. Állítsa 0-ra minden lekérdezés újrarangsorolásához.';
 $string['rag_cap_blocked'] = 'Az indexelés nem futott le: az adott időszakra vonatkozó RAG-költségkeret elfogyott. Növelje a keretet, vagy várja meg a következő időszakot. A meglévő index változatlan marad.';

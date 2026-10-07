@@ -64,6 +64,23 @@ abstract class base_provider implements provider_interface {
     protected float $temperature;
 
     /**
+     * Finish reasons that mean the model hit the output-token limit, not
+     * that it finished. 'length' is the OpenAI chat-completions value, which
+     * every OpenAI-compatible endpoint (Gemini's included) also uses;
+     * 'max_tokens' is Anthropic's stop_reason.
+     *
+     * @var string[]
+     */
+    public const TRUNCATION_REASONS = ['length', 'max_tokens'];
+
+    /**
+     * @var string|null Why the last call stopped, as the vendor reported it.
+     *      Reset at the start of every call so a reused instance never reports
+     *      the previous call's reason.
+     */
+    protected ?string $last_finish_reason = null;
+
+    /**
      * Constructor. Reads plugin config, with optional per-course overrides.
      *
      * @param array $overrides Optional config overrides from course_config_manager::get_effective_config().
@@ -576,6 +593,33 @@ abstract class base_provider implements provider_interface {
      */
     public function get_last_token_usage(): ?array {
         return null;
+    }
+
+    /**
+     * Why the last call stopped generating, as the vendor reported it.
+     *
+     * Null when the provider does not report one, which callers must read as
+     * "unknown", never as "finished".
+     *
+     * @return string|null
+     */
+    public function get_last_finish_reason(): ?string {
+        return $this->last_finish_reason;
+    }
+
+    /**
+     * Did a call that ended with this reason run out of output tokens?
+     *
+     * A truncated answer used to be indistinguishable from a finished one:
+     * nothing read the finish reason, so it was stored as a complete turn and
+     * shown as finished, and the trailing [SOLA_NEXT] block was lost with the
+     * rest of the cut-off text.
+     *
+     * @param string|null $reason Value from get_last_finish_reason().
+     * @return bool
+     */
+    public static function is_truncation(?string $reason): bool {
+        return $reason !== null && in_array(strtolower($reason), self::TRUNCATION_REASONS, true);
     }
 
     /**

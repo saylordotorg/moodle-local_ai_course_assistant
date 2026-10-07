@@ -1671,6 +1671,7 @@ $string['outcomes:navlink'] = 'Leerdoelenrapport';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Ik kan niet helpen met dat verzoek. Laten we terugkeren naar je cursus: waaraan wil je nu werken?';
+$string['chat:truncated'] = 'Dit antwoord is afgebroken. Vraag me om verder te gaan.';
 $string['settings:rerank_margin_threshold'] = 'Drempel voor herordeningsambiguïteit';
 $string['settings:rerank_margin_threshold_desc'] = 'Alleen herordenen wanneer de cosinusmarge tussen de eerste en de derde kandidaat onder deze waarde ligt, dus wanneer het ophalen onduidelijk is. Gemeten over 1.008 zoekopdrachten: bij de standaardwaarde 0,086 wordt ongeveer 30 % van de zoekopdrachten overgeslagen zonder meetbaar verlies aan recall, en worden gevallen vermeden waarin herordening een al correct topresultaat verdringt. Zet op 0 om elke zoekopdracht te herordenen.';
 $string['rag_cap_blocked'] = 'Indexeren is niet uitgevoerd: het RAG-bestedingsplafond voor deze periode is bereikt. Verhoog het plafond of wacht op de volgende periode. De bestaande index blijft ongewijzigd.';

@@ -1647,6 +1647,7 @@ $string['outcomes:navlink'] = 'Raport de rezultate';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Nu pot ajuta cu această solicitare. Să revenim la cursul tău: la ce vrei să lucrezi acum?';
+$string['chat:truncated'] = 'Acest răspuns a fost întrerupt. Cere-mi să continui.';
 $string['settings:rerank_margin_threshold'] = 'Prag de ambiguitate pentru reordonare';
 $string['settings:rerank_margin_threshold_desc'] = 'Reordonează doar când marja cosinus dintre primul și al treilea candidat este sub această valoare, adică atunci când regăsirea este ambiguă. Măsurat pe 1.008 interogări: la valoarea implicită 0,086 se omit aproximativ 30 % dintre interogări fără pierdere măsurabilă de acoperire și se evită cazurile în care reordonarea deplasează un prim rezultat deja corect. Setează 0 pentru a reordona fiecare interogare.';
 $string['rag_cap_blocked'] = 'Indexarea nu a rulat: plafonul de cheltuieli RAG pentru această perioadă a fost atins. Mărește plafonul sau așteaptă perioada următoare. Indexul existent rămâne neatins.';

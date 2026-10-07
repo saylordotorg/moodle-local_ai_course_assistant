@@ -1648,6 +1648,7 @@ $string['outcomes:navlink'] = 'Lernergebnisbericht';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Bei dieser Anfrage kann ich nicht helfen. Kehren wir zu Ihrem Kurs zurück: Woran möchten Sie als Nächstes arbeiten?';
+$string['chat:truncated'] = 'Diese Antwort wurde abgeschnitten. Bitten Sie mich, fortzufahren.';
 $string['settings:rerank_margin_threshold'] = 'Schwellenwert für Rerank-Ambiguität';
 $string['settings:rerank_margin_threshold_desc'] = 'Nur dann neu bewerten, wenn der Kosinus-Abstand zwischen dem ersten und dem dritten Kandidaten unter diesem Wert liegt, also wenn die Suche unklar ist. Gemessen über 1.008 Abfragen: beim Standardwert 0,086 werden rund 30 % der Abfragen übersprungen, ohne messbaren Verlust an Trefferquote, und Fälle vermieden, in denen das Reranking ein bereits korrektes Topergebnis verdrängt. Auf 0 setzen, um jede Abfrage neu zu bewerten.';
 $string['rag_cap_blocked'] = 'Die Indexierung wurde nicht ausgeführt: das RAG-Ausgabenlimit für diesen Zeitraum ist erreicht. Erhöhen Sie das Limit oder warten Sie auf den nächsten Zeitraum. Der bestehende Index bleibt unverändert.';

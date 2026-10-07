@@ -701,6 +701,14 @@ a.aica-source-pill:hover svg {
 }
 
 
+/* v7.7.6: note under an answer that ran out of output tokens */
+.local-ai-course-assistant__msg-truncated {
+    margin: 6px 0 0;
+    font-size: 12px;
+    font-style: italic;
+    opacity: 0.8;
+}
+
 /* Stop button slot — always visible outside scrollable messages */
 .local-ai-course-assistant__stop-slot {
     flex-shrink: 0;

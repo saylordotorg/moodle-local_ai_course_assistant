@@ -81,10 +81,32 @@ abstract class openai_compatible_provider extends base_provider implements batch
         // "this model does not report thinking" apart from "it thought zero
         // tokens this call".
         $reasoning = $usage['completion_tokens_details']['reasoning_tokens'] ?? null;
+        $prompt = (int) ($usage['prompt_tokens'] ?? 0);
+        $completion = (int) ($usage['completion_tokens'] ?? 0);
+
+        // v7.7.6: Gemini's compatibility endpoint never sends
+        // completion_tokens_details, so the line above always yielded null and
+        // every Gemini thinking token went unlogged. It does report the thinking
+        // implicitly: total_tokens exceeds prompt + completion by exactly the
+        // thinking (checked live: total 839 = prompt 67 + completion 435 + 337
+        // thinking, and the gap is 0 with thinking switched off). Read the gap
+        // ONLY for a provider that declares its completion count excludes
+        // thinking. OpenAI counts reasoning inside completion_tokens and sends
+        // it in completion_tokens_details, so a gap read there could only
+        // re-count tokens already billed; no provider reads it unless it opts in.
+        if ($reasoning === null && $this->completion_excludes_reasoning() && isset($usage['total_tokens'])) {
+            // A gap of 0 is a measurement (the call thought nothing), so it is
+            // stored as 0. A negative gap means the counts do not add up at
+            // all, and nothing is claimed.
+            $gap = (int) $usage['total_tokens'] - $prompt - $completion;
+            if ($gap >= 0) {
+                $reasoning = $gap;
+            }
+        }
 
         return [
-            'prompt_tokens'     => (int) ($usage['prompt_tokens'] ?? 0),
-            'completion_tokens' => (int) ($usage['completion_tokens'] ?? 0),
+            'prompt_tokens'     => $prompt,
+            'completion_tokens' => $completion,
             'model'             => ($model !== null && $model !== '') ? $model : $this->model,
             'cached_tokens'     => (int) ($usage['prompt_tokens_details']['cached_tokens'] ?? 0),
             'reasoning_tokens'  => $reasoning === null ? null : (int) $reasoning,
@@ -97,6 +119,35 @@ abstract class openai_compatible_provider extends base_provider implements batch
             // exactly the place a value like this must live to avoid drifting.
             'provider'          => $this->provider_id(),
         ];
+    }
+
+    /**
+     * Does this provider's completion_tokens leave thinking tokens out?
+     *
+     * When true and the response carries no explicit reasoning count,
+     * {@see shape_usage()} records total - prompt - completion as the
+     * reasoning tokens. False here, so no OpenAI-shaped provider changes
+     * behaviour; gemini_provider overrides it.
+     *
+     * @return bool
+     */
+    protected function completion_excludes_reasoning(): bool {
+        return false;
+    }
+
+    /**
+     * Last chance for a provider to adjust a request body before it is sent.
+     *
+     * The identity here. Exists so a vendor-specific field (Gemini's
+     * thinking budget) lives in that vendor's class instead of in the shared
+     * body builder every OpenAI-compatible provider runs through.
+     *
+     * @param array $body    Request body as built so far.
+     * @param array $options The caller's options.
+     * @return array
+     */
+    protected function adjust_body(array $body, array $options): array {
+        return $body;
     }
 
     /**
@@ -232,15 +283,19 @@ abstract class openai_compatible_provider extends base_provider implements batch
             $body['stream_options'] = ['include_usage' => true];
         }
 
-        return self::encode_payload($body);
+        return self::encode_payload($this->adjust_body($body, $options));
     }
 
     public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
         $url = $this->baseurl . $this->get_endpoint();
         $body = $this->build_body($systemprompt, $messages, false, $options);
+        $this->last_finish_reason = null;
         $response = $this->http_post($url, $this->get_headers(), $body);
 
         $data = json_decode($response, true);
+        if (is_array($data) && isset($data['choices'][0]['finish_reason'])) {
+            $this->last_finish_reason = (string) $data['choices'][0]['finish_reason'];
+        }
         if (!$data || !isset($data['choices'][0]['message']['content'])) {
             throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, 'Invalid API response');
         }
@@ -265,6 +320,7 @@ abstract class openai_compatible_provider extends base_provider implements batch
 
         $buffer = '';
         $this->last_token_usage = null;
+        $this->last_finish_reason = null;
 
         $this->http_post_stream($url, $this->get_headers(), $body, function ($data) use ($callback, &$buffer) {
             $buffer .= $data;
@@ -295,6 +351,15 @@ abstract class openai_compatible_provider extends base_provider implements batch
                         $event['usage'],
                         isset($event['model']) ? (string) $event['model'] : null
                     );
+                }
+
+                // v7.7.6: the finish reason arrives on the last content chunk
+                // ('stop', or 'length' when max_tokens ran out). Nothing read
+                // it, so an answer cut off mid-sentence was stored and shown
+                // as finished. Kept as the vendor sent it; base_provider::
+                // is_truncation() is the one place that interprets it.
+                if (!empty($event['choices'][0]['finish_reason'])) {
+                    $this->last_finish_reason = (string) $event['choices'][0]['finish_reason'];
                 }
 
                 $content = $event['choices'][0]['delta']['content'] ?? '';

@@ -1647,6 +1647,7 @@ $string['outcomes:navlink'] = 'Správa o výsledkoch';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'S touto požiadavkou nemôžem pomôcť. Vráťme sa k vášmu kurzu: na čom chcete pracovať teraz?';
+$string['chat:truncated'] = 'Táto odpoveď bola prerušená. Požiadajte ma o pokračovanie.';
 $string['settings:rerank_margin_threshold'] = 'Prah nejednoznačnosti preradenia';
 $string['settings:rerank_margin_threshold_desc'] = 'Preraďovať len vtedy, keď je kosínusový rozdiel medzi prvým a tretím kandidátom menší ako táto hodnota, teda keď je vyhľadávanie nejednoznačné. Merané na 1 008 dopytoch: pri predvolenej hodnote 0,086 sa preskočí približne 30 % dopytov bez merateľnej straty úplnosti a predíde sa prípadom, keď preradenie odsunie už správny prvý výsledok. Nastavte 0, ak chcete preraďovať každý dopyt.';
 $string['rag_cap_blocked'] = 'Indexovanie sa nespustilo: limit výdavkov RAG na toto obdobie je vyčerpaný. Zvýšte limit alebo počkajte na ďalšie obdobie. Existujúci index zostáva nezmenený.';

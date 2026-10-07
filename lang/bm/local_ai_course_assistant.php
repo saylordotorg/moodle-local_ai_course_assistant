@@ -1676,6 +1676,7 @@ $string['outcomes:navlink'] = 'Ɲɛtaa rapɔɔri';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'N tɛ se ka dɛmɛ don o ɲininkali la. An ka segin i ka kalan kan: i b\'a fɛ ka baara kɛ min kan sisan?';
+$string['chat:truncated'] = 'Nin jaabi tigɛra sani a ka ban. A fɔ n ye ko n ka t\'a fɛ.';
 $string['settings:rerank_margin_threshold'] = 'Sɛgɛsɛgɛli kokura ka jɛnɲɔgɔnya dan';
 $string['settings:rerank_margin_threshold_desc'] = 'Sɛgɛsɛgɛli kokura ka kɛ dɔrɔn ni cosine danfara min bɛ cɛ fɔlɔ ni sabanan cɛ ka dɔgɔ ni nin hakɛ ye, o kɔrɔ ye ko ɲininkali jaabi tɛ jɛlen. A sumanna ɲininkali 1,008 kan: hakɛ fɔlɔ 0.086 la, ɲininkali kɛmɛsarada 30 ɲɔgɔn tɛmɛ, recall bɔnɛ si tɛ min bɛ se ka sumanna, ani a bɛ kisi cogo minnu na sɛgɛsɛgɛli kokura bɛ jaabi fɔlɔ ɲuman bɔ a nɔ na. Segin ɲininkali bɛɛ kan, aw ka 0 sigi.';
 $string['rag_cap_blocked'] = 'Tɔgɔsɛbɛnni ma kɛ: RAG musaka dan min tun bɛ waati in na, o dafara. Aw ka dan in kɔrɔta, walima aw ka waati nata makɔnɔ. Tɔgɔsɛbɛn min bɛ yen, o tɛ yɛlɛma.';

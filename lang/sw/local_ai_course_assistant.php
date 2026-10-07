@@ -1692,6 +1692,7 @@ $string['outcomes:navlink'] = 'Ripoti ya matokeo';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Siwezi kusaidia na ombi hilo. Turudi kwenye kozi yako: ungependa kufanyia kazi nini sasa?';
+$string['chat:truncated'] = 'Jibu hili limekatika kabla ya kukamilika. Niombe niendelee.';
 $string['settings:rerank_margin_threshold'] = 'Kizingiti cha utata wa kupanga upya';
 $string['settings:rerank_margin_threshold_desc'] = 'Panga upya tu wakati tofauti ya cosine kati ya mgombea wa kwanza na wa tatu iko chini ya thamani hii, yaani wakati upataji ni wa utata. Ilipimwa kwa maswali 1,008: kwa thamani chaguo-msingi 0.086, takriban 30% ya maswali huachwa bila hasara inayopimika ya recall, na hali ambapo kupanga upya kunaondoa jibu bora ambalo lilikuwa sahihi huepukwa. Weka 0 ili kupanga upya kila swali.';
 $string['rag_cap_blocked'] = 'Uwekaji faharasa haukuendeshwa: kikomo cha matumizi ya RAG kwa kipindi hiki kimefikiwa. Ongeza kikomo, au subiri kipindi kijacho. Faharasa iliyopo haibadilishwi.';

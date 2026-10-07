@@ -1662,6 +1662,7 @@ $string['outcomes:navlink'] = 'Akụkọ nsonaazụ';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Enweghị m ike inye aka na arịrịọ ahụ. Ka anyị laghachi na kọọsụ gị: gịnị ka ị chọrọ ịrụ ugbu a?';
+$string['chat:truncated'] = 'Azịza a kwụsịrị tupu o zuo oke. Gwa m ka m gaa n\'ihu.';
 $string['settings:rerank_margin_threshold'] = 'Oke enweghị nkọwa doro anya maka ịhazigharị';
 $string['settings:rerank_margin_threshold_desc'] = 'Hazigharịa naanị mgbe ọdịiche cosine dị n\'etiti onye mbụ na onye nke atọ dị n\'okpuru uru a, ya bụ mgbe nchọta enweghị nkọwa doro anya. E tụrụ ya na ajụjụ 1,008: na uru ndabara 0.086, a na-agafe ihe dịka pasent 30 nke ajụjụ na-enweghị mfu recall a pụrụ ịtụ, ma na-ezere ọnọdụ ebe ịhazigharị na-ewepụ nsonaazụ mbụ nke dịzi mma. Tinye 0 iji hazigharịa ajụjụ ọ bụla.';
 $string['rag_cap_blocked'] = 'Emeghị ndeksi: eruola oke mmefu RAG maka oge a. Bulie oke ahụ, ma ọ bụ chere oge ọzọ. A na-ahapụ ndeksi dị ugbu a ka ọ dị.';

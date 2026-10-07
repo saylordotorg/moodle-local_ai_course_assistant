@@ -1649,6 +1649,7 @@ $string['outcomes:navlink'] = 'Rapport sur les acquis';
 
 // v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
 $string['chat:refused'] = 'Je ne peux pas répondre à cette demande. Revenons à votre cours : sur quoi souhaitez-vous travailler maintenant ?';
+$string['chat:truncated'] = 'Cette réponse a été coupée. Demandez-moi de continuer.';
 $string['settings:rerank_margin_threshold'] = 'Seuil d\'ambiguïté du reclassement';
 $string['settings:rerank_margin_threshold_desc'] = 'Ne reclasser que lorsque l\'écart cosinus entre les candidats 1 et 3 est inférieur à cette valeur, c\'est-à-dire lorsque la recherche est ambiguë. Mesuré sur 1 008 requêtes : avec la valeur par défaut de 0,086, environ 30 % des requêtes sont ignorées sans perte de rappel mesurable, et cela évite les cas où le reclassement écarte un premier résultat déjà correct. Mettez 0 pour reclasser toutes les requêtes.';
 $string['rag_cap_blocked'] = 'L\'indexation n\'a pas été exécutée : le plafond de dépenses RAG pour cette période est atteint. Augmentez le plafond ou attendez la période suivante. L\'index existant reste intact.';
