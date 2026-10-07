@@ -58,6 +58,15 @@ class gemini_provider extends openai_compatible_provider {
      */
     public const THINKING_BUDGET_MIN = 512;
 
+    /**
+     * Largest max_tokens Gemini 2.5 and 3 models accept (their output limit).
+     *
+     * The admin max_tokens setting is unbounded, so requested + budget is
+     * capped here: a value that worked before this change must not start
+     * failing with a 400 because the budget pushed it over.
+     */
+    public const OUTPUT_TOKEN_LIMIT = 65536;
+
     protected function get_default_model(): string {
         return 'gemini-2.5-flash';
     }
@@ -80,7 +89,8 @@ class gemini_provider extends openai_compatible_provider {
     /**
      * Does this model think by default, so a thinking budget applies?
      *
-     * gemini-2.5-* and gemini-3* chat models do. 2.0 and 1.5 do not think and
+     * gemini-2.5-* and gemini-3* chat models do, as do the -latest aliases
+     * that point at them. 2.0 and 1.5 do not think and
      * reject the field. Flash-Lite models are left alone: thinking is off by
      * default on them, and sending a budget would switch it ON, changing both
      * their answers and their cost. Non-chat variants (TTS, image, audio, live)
@@ -95,7 +105,9 @@ class gemini_provider extends openai_compatible_provider {
         if (str_starts_with($model, 'models/')) {
             $model = substr($model, strlen('models/'));
         }
-        if (!preg_match('/^gemini-(2\.5|3)/', $model)) {
+        // gemini-flash-latest and gemini-pro-latest are Google's moving
+        // aliases, and both resolve to thinking models.
+        if (!preg_match('/^gemini-(2\.5|3|flash-latest|pro-latest)/', $model)) {
             return false;
         }
         return !preg_match('/(lite|tts|image|audio|live|transcribe|embedding)/', $model);
@@ -144,7 +156,7 @@ class gemini_provider extends openai_compatible_provider {
         if ($budget === null) {
             return $body;
         }
-        $body['max_tokens'] = $requested + $budget;
+        $body['max_tokens'] = min($requested + $budget, self::OUTPUT_TOKEN_LIMIT);
         $body['extra_body'] = ['google' => ['thinking_config' => ['thinking_budget' => $budget]]];
         return $body;
     }

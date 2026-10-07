@@ -2747,12 +2747,6 @@ define([
     };
 
     /**
-     * Finish the current streaming message.
-     *
-     * @param {string}        fullText  The final complete text
-     * @param {Function|null} onSpeak   Optional TTS callback; if provided, adds speak button
-     */
-    /**
      * Mark an assistant message as cut off by the output-token limit.
      *
      * v7.7.6. The server stores such a turn as 'truncated' and sends this note
@@ -2781,6 +2775,12 @@ define([
         return note;
     };
 
+    /**
+     * Finish the current streaming message.
+     *
+     * @param {string}        fullText  The final complete text
+     * @param {Function|null} onSpeak   Optional TTS callback; if provided, adds speak button
+     */
     const finishStreaming = function(fullText, onSpeak) {
         // Remove stop button and stop typewriter animation.
         removeStopButton();

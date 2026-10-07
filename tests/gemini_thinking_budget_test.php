@@ -123,7 +123,9 @@ final class gemini_thinking_budget_test extends \advanced_testcase {
      * Every thinking Gemini model gets the budget, with or without the "models/" prefix.
      */
     public function test_every_thinking_gemini_model_gets_the_budget(): void {
-        foreach (['gemini-2.5-pro', 'models/gemini-2.5-flash', 'gemini-3.5-flash', 'gemini-3-flash-preview'] as $model) {
+        $models = ['gemini-2.5-pro', 'models/gemini-2.5-flash', 'gemini-3.5-flash', 'gemini-3-flash-preview',
+            'gemini-flash-latest', 'gemini-pro-latest'];
+        foreach ($models as $model) {
             $body = $this->body($this->gemini($model), ['max_tokens' => 1024]);
             $this->assertArrayHasKey('extra_body', $body, $model . ' thinks but got no budget.');
             $this->assertSame(3072, $body['max_tokens'], $model);
@@ -139,7 +141,8 @@ final class gemini_thinking_budget_test extends \advanced_testcase {
      * Models that do not think by default are sent exactly what they were before.
      */
     public function test_non_thinking_gemini_models_are_left_alone(): void {
-        foreach (['gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-2.5-flash-lite', 'gemini-3.5-flash-lite'] as $model) {
+        foreach (['gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-2.5-flash-lite', 'gemini-3.5-flash-lite',
+                'gemini-flash-lite-latest'] as $model) {
             $body = $this->body($this->gemini($model), ['max_tokens' => 1024]);
             $this->assertArrayNotHasKey(
                 'extra_body',
@@ -148,6 +151,18 @@ final class gemini_thinking_budget_test extends \advanced_testcase {
             );
             $this->assertSame(1024, $body['max_tokens'], $model);
         }
+    }
+
+    /**
+     * The raised max_tokens never passes the model's output limit.
+     *
+     * The admin setting is unbounded; a value near the limit that worked before
+     * must not become a 400 because the budget was added on top.
+     */
+    public function test_raised_max_tokens_stays_within_the_output_limit(): void {
+        $body = $this->body($this->gemini('gemini-2.5-flash'), ['max_tokens' => 65000]);
+        $this->assertSame(65536, $body['max_tokens']);
+        $this->assertSame(2048, $body['extra_body']['google']['thinking_config']['thinking_budget']);
     }
 
     /**
