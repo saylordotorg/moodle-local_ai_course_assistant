@@ -1,0 +1,12 @@
+Version 7.7.5 (build 2026100116)
+
+Opening the assistant no longer covers Moodle's own side drawers. On Moodle 5.3,
+which floats the course index beside the content on course pages, opening the
+assistant moved the content under the course index. On 4.5 and 5.3, the
+right-hand block drawer slid under the assistant. The assistant now lays out
+around Moodle's drawers whenever it, or a drawer, opens or closes, and puts
+everything back when it closes.
+
+Checked on Moodle 5.3 across course, activity and participant pages with and
+without the block drawer, and on Moodle 4.5. Continuous integration covers PHP
+8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.
