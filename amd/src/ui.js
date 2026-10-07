@@ -1091,6 +1091,18 @@ define([
         avatarAnimEnabled = root.dataset.avataranim !== '0';
         drawer = root.querySelector('.local-ai-course-assistant__drawer');
         loadHostDrawers();
+        // A Moodle drawer opened or closed while SOLA is pushing, or a resize,
+        // changes what has to move; re-measure after Moodle's slide.
+        ['theme_boost/drawers:shown', 'theme_boost/drawers:hidden'].forEach(function(name) {
+            document.addEventListener(name, function() {
+                setTimeout(layoutHostDrawers, 350);
+            });
+        });
+        var layoutTimer = null;
+        window.addEventListener('resize', function() {
+            clearTimeout(layoutTimer);
+            layoutTimer = setTimeout(layoutHostDrawers, 200);
+        });
         if (drawer) {
             // Capture phase, so it runs before the press reaches the text box
             // and before the browser decides where focus goes.
@@ -1912,12 +1924,93 @@ define([
         if (push) {
             page.classList.add('aica-drawer-push');
             // Read the actual drawer width (accounts for expanded state and custom resize).
-            const w = drawer ? drawer.offsetWidth : 400;
-            page.style.marginRight = w + 'px';
+            pagePushWidth = drawer ? drawer.offsetWidth : 400;
         } else {
-            page.style.marginRight = '';
+            pagePushWidth = 0;
+        }
+        layoutHostDrawers();
+        if (!push) {
             page.classList.remove('aica-drawer-push');
         }
+    };
+
+    /** @type {number} SOLA's own width while it pushes the page, 0 when not pushing. */
+    let pagePushWidth = 0;
+
+    /**
+     * Fit SOLA's push around Moodle's own drawers.
+     *
+     * SOLA makes room by setting #page's right margin. Two Moodle layouts get in
+     * the way of a plain margin:
+     *
+     * - Moodle 5.3 floats the course index and the block drawer beside centered
+     *   content on course pages (limited width, 992px and up), where 4.5 pinned
+     *   them to the window edges. When SOLA re-centers the content, a floating
+     *   drawer doesn't follow, so the course index covered the start of the
+     *   course and the block drawer slid under SOLA. A floating left drawer now
+     *   moves with the content, and a floating right drawer moves just far
+     *   enough to clear SOLA's edge.
+     * - A right drawer pinned to the window edge (4.5) already has Moodle's
+     *   margin for it. SOLA's margin replaced that one, so the drawer ended up
+     *   under SOLA. It now sits beside SOLA, and the margin covers both.
+     *
+     * Drawers pinned to the left edge are never moved.
+     */
+    const layoutHostDrawers = function() {
+        const page = document.getElementById('page');
+        if (!page) {
+            return;
+        }
+        if (window.innerWidth <= 600 || !isOpen()) {
+            // updatePagePush returns early at 600px and below, so its release never runs there.
+            pagePushWidth = 0;
+        }
+        const width = window.innerWidth;
+        // The margin Moodle itself gives #page for an open right drawer.
+        let moodleright = 0;
+        let pinnedright = 0;
+        const lefts = [];
+        document.querySelectorAll('.drawer.drawer-left, .drawer.drawer-right').forEach(function(node) {
+            if (root && root.contains(node)) {
+                return;
+            }
+            node.style.translate = '';
+            if (!node.classList.contains('show')) {
+                return;
+            }
+            if (node.classList.contains('drawer-left')) {
+                lefts.push(node);
+                return;
+            }
+            moodleright = Math.max(moodleright, node.offsetWidth);
+            if (!pagePushWidth) {
+                return;
+            }
+            const rect = node.getBoundingClientRect();
+            const solaedge = width - pagePushWidth;
+            if (rect.right >= width - 1) {
+                // Pinned to the edge: put it beside SOLA and widen the margin.
+                pinnedright = Math.max(pinnedright, rect.width);
+                node.style.translate = (-pagePushWidth) + 'px 0';
+            } else if (rect.right > solaedge) {
+                node.style.translate = (solaedge - rect.right) + 'px 0';
+            }
+        });
+        if (!pagePushWidth) {
+            page.style.marginRight = '';
+            return;
+        }
+        const margin = pagePushWidth + pinnedright;
+        page.style.marginRight = margin + 'px';
+        // Centered content moves left by half the extra margin, and a floating
+        // left drawer has to move with it. Never past the window edge.
+        const shift = Math.max(0, (margin - moodleright) / 2);
+        lefts.forEach(function(node) {
+            const left = node.getBoundingClientRect().left;
+            if (left > 0 && shift > 0) {
+                node.style.translate = (-Math.min(shift, left)) + 'px 0';
+            }
+        });
     };
 
     /**
