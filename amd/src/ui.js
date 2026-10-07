@@ -1961,6 +1961,10 @@ define([
         if (!page) {
             return;
         }
+        if (window.innerWidth <= 600 || !isOpen()) {
+            // updatePagePush returns early at 600px and below, so its release never runs there.
+            pagePushWidth = 0;
+        }
         const width = window.innerWidth;
         // The margin Moodle itself gives #page for an open right drawer.
         let moodleright = 0;
