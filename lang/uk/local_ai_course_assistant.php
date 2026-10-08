@@ -3200,3 +3200,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Питання з оцінюван
 $string['survey_admin:err_no_title'] = 'Введіть назву опитування.';
 
 $string['settings:int_range'] = 'Введіть ціле число від {$a->min} до {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Відомості про можливості моделей, отримані з відмов постачальників';
+$string['settings:reasoning_effort'] = 'Рівень міркування';
+$string['settings:reasoning_effort_desc'] = 'Наскільки глибоко мають думати моделі, які міркують перед відповіддю. Застосовується до моделей міркування OpenAI (GPT-5, GPT-6, серія o) як <code>reasoning_effort</code> і до моделей мислення Gemini як бюджет мислення. Кожна модель міркування також отримує місце для мислення понад указану вище довжину відповіді, тож мислення більше не може обірвати відповідь. Низький рівень підходить для тьютора: відповіді надходять швидше й коштують менше. Вимкнено вимикає мислення, якщо модель це дозволяє. Моделі без керування міркуванням ігнорують цей параметр.';
+$string['settings:reasoning_effort_off'] = 'Вимкнено (мінімум, який дозволяє модель)';
+$string['settings:reasoning_effort_low'] = 'Низький (рекомендовано)';
+$string['settings:reasoning_effort_medium'] = 'Середній';
+$string['settings:reasoning_effort_high'] = 'Високий';
+$string['modelregistry:learned_heading'] = 'Відомості про можливості, отримані від постачальників';
+$string['modelregistry:learned_desc'] = 'Коли постачальник відхиляє запит, бо модель більше не приймає певний параметр, [[tutorshort]] змінює лише цей параметр, повторює спробу один раз і запам\'ятовує виправлення тут, щоб наступний запит був правильним з першого разу. Забудьте відомість, щоб повернути модель до вбудованих правил.';
+$string['modelregistry:learned_none'] = 'Жоден постачальник ще не відхилив формат запиту.';
+$string['modelregistry:col_field'] = 'Можливість';
+$string['modelregistry:col_value'] = 'Отримане значення';
+$string['modelregistry:col_evidence'] = 'Що повідомив постачальник';
+$string['modelregistry:forget'] = 'Забути';
+$string['modelregistry:forget_confirm'] = 'Забути цю відомість? Наступний запит до цієї моделі знову використовуватиме вбудовані правила.';
+$string['modelregistry:forget_done'] = 'Відомість забуто. Наступний запит до цієї моделі використовуватиме вбудовані правила.';
+$string['modelregistry:forget_missing'] = 'Ця відомість більше не існує.';
+$string['event:model_capability_learned'] = 'Отримано відомість про можливість моделі від постачальника';

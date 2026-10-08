@@ -3189,3 +3189,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Jateminɛ ɲininkaliw ka kan ka ba
 $string['survey_admin:err_no_title'] = 'Ɲininkali tɔgɔ sɛbɛn.';
 
 $string['settings:int_range'] = 'Jateden dafalen sɛbɛn ka bɔ {$a->min} la ka se {$a->max} ma.';
+
+$string['cachedef_modelcaps'] = 'Modɛli sebaayaw minnu dɔnna jiralikɛlaw ka banni fɛ';
+$string['settings:reasoning_effort'] = 'Miiriya cɛsiri';
+$string['settings:reasoning_effort_desc'] = 'Modɛli minnu bɛ miiri sani u ka jaabi di, olu bɛ ɲini u ka miiri cogo min na. A bɛ baara OpenAI miiriya modɛliw kan (GPT-5, GPT-6, o-sɛri) i n\'a fɔ <code>reasoning_effort</code>, ani Gemini miiriya modɛliw kan i n\'a fɔ miiriya wari hakɛ. Miiriya modɛli bɛɛ bɛ yɔrɔ sɔrɔ a ka miiriya kama ka fara jaabi janya kan san fɛ, o la miiriya tɛ se ka jaabi tigɛ tugun. Dɔgɔman bɛnnen don karamɔgɔ ma: jaabiw bɛ na joona ani u sɔngɔ ka dɔgɔ. Datugulen bɛ miiriya bɔ yɔrɔ minnu na modɛli b\'a to. Modɛli minnu tɛ miiriya ɲɛminɛcogo sɔrɔ, olu tɛ nin labɛn jate.';
+$string['settings:reasoning_effort_off'] = 'Datugulen (a dɔgɔya bɛɛ la modɛli b\'a to cogo min na)';
+$string['settings:reasoning_effort_low'] = 'Dɔgɔman (laadilen)';
+$string['settings:reasoning_effort_medium'] = 'Cɛmancɛ';
+$string['settings:reasoning_effort_high'] = 'Kɔrɔtalen';
+$string['modelregistry:learned_heading'] = 'Sebaaya kunnafoniw minnu dɔnna jiralikɛlaw fɛ';
+$string['modelregistry:learned_desc'] = 'Ni jiralikɛla ye ɲinini ban bawo modɛli tɛ paramɛtiri dɔ minɛ tugun, [[tutorshort]] bɛ o paramɛtiri kelen dɔrɔn yɛlɛma, ka segin ka kɛ siɲɛ kelen, ka o labɛncogo mara yan walisa ɲinini nata ka ɲɛ a fɔlɔ la. Kunnafoni dɔ ɲinɛ walisa ka modɛli segin sariya donnenw ma.';
+$string['modelregistry:learned_none'] = 'Jiralikɛla si ma ɲinini cogoya ban fɔlɔ.';
+$string['modelregistry:col_field'] = 'Sebaaya';
+$string['modelregistry:col_value'] = 'Hakɛ dɔnnen';
+$string['modelregistry:col_evidence'] = 'Jiralikɛla ye min fɔ';
+$string['modelregistry:forget'] = 'Ɲinɛ';
+$string['modelregistry:forget_confirm'] = 'I b\'a fɛ ka nin kunnafoni ɲinɛ wa? Ɲinini nata min bɛ ci nin modɛli ma, o bɛna sariya donnenw kɛ tugun.';
+$string['modelregistry:forget_done'] = 'Kunnafoni ɲinɛna. Ɲinini nata min bɛ ci nin modɛli ma, o bɛ sariya donnenw kɛ.';
+$string['modelregistry:forget_missing'] = 'O kunnafoni tɛ yen tugun.';
+$string['event:model_capability_learned'] = 'Modɛli sebaaya dɔnna jiralikɛla fɛ';

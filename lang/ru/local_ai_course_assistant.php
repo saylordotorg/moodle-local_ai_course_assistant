@@ -3181,3 +3181,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Вопросы с оценкой �
 $string['survey_admin:err_no_title'] = 'Введите название опроса.';
 
 $string['settings:int_range'] = 'Введите целое число от {$a->min} до {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Сведения о возможностях моделей, полученные из отказов провайдеров';
+$string['settings:reasoning_effort'] = 'Усилие рассуждения';
+$string['settings:reasoning_effort_desc'] = 'Насколько много должны думать модели, которые рассуждают перед ответом. Применяется к рассуждающим моделям OpenAI (GPT-5, GPT-6, серия o) как <code>reasoning_effort</code> и к думающим моделям Gemini как бюджет на размышление. Каждая рассуждающая модель также получает место для размышлений сверх указанной выше длины ответа, поэтому размышления больше не могут обрезать ответ. Низкий уровень подходит для тьютора: ответы приходят быстрее и стоят дешевле. Выкл. отключает размышления, если модель это позволяет. Модели без управления рассуждением игнорируют этот параметр.';
+$string['settings:reasoning_effort_off'] = 'Выкл. (минимум, допустимый моделью)';
+$string['settings:reasoning_effort_low'] = 'Низкий (рекомендуется)';
+$string['settings:reasoning_effort_medium'] = 'Средний';
+$string['settings:reasoning_effort_high'] = 'Высокий';
+$string['modelregistry:learned_heading'] = 'Сведения о возможностях, полученные от провайдеров';
+$string['modelregistry:learned_desc'] = 'Когда провайдер отклоняет запрос, потому что модель больше не принимает какой-либо параметр, [[tutorshort]] изменяет только этот параметр, повторяет запрос один раз и запоминает исправление здесь, чтобы следующий запрос сразу был верным. Забудьте сведение, чтобы вернуть модель к стандартным правилам.';
+$string['modelregistry:learned_none'] = 'Ни один провайдер пока не отклонил формат запроса.';
+$string['modelregistry:col_field'] = 'Возможность';
+$string['modelregistry:col_value'] = 'Полученное значение';
+$string['modelregistry:col_evidence'] = 'Ответ провайдера';
+$string['modelregistry:forget'] = 'Забыть';
+$string['modelregistry:forget_confirm'] = 'Забыть это сведение? Следующий запрос к этой модели снова будет использовать стандартные правила.';
+$string['modelregistry:forget_done'] = 'Сведение забыто. Следующий запрос к этой модели будет использовать стандартные правила.';
+$string['modelregistry:forget_missing'] = 'Это сведение больше не существует.';
+$string['event:model_capability_learned'] = 'Получены сведения о возможности модели от провайдера';

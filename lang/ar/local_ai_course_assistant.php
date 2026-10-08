@@ -3158,3 +3158,22 @@ $string['survey_admin:err_invalid_bounds'] = 'يجب أن تستخدم أسئل�
 $string['survey_admin:err_no_title'] = 'أدخل عنوان الاستبيان.';
 
 $string['settings:int_range'] = 'أدخل عددًا صحيحًا من {$a->min} إلى {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'قدرات النماذج المستفادة من رفض مزودي الخدمة';
+$string['settings:reasoning_effort'] = 'جهد الاستدلال';
+$string['settings:reasoning_effort_desc'] = 'مقدار التفكير المطلوب من النماذج التي تستدل قبل الإجابة. ينطبق على نماذج الاستدلال من OpenAI (GPT-5 وGPT-6 وسلسلة o) بصيغة <code>reasoning_effort</code>، وعلى نماذج التفكير من Gemini بصيغة ميزانية تفكير. يحصل كل نموذج استدلال أيضًا على مساحة لتفكيره فوق طول الرد المحدد أعلاه، فلا يعود التفكير قادرًا على قطع الإجابة. المستوى المنخفض يناسب المعلم الخصوصي: تصل الإجابات أسرع وبتكلفة أقل. خيار الإيقاف يوقف التفكير حيث يسمح النموذج بذلك. النماذج التي لا تملك تحكمًا في الاستدلال تتجاهل هذا الإعداد.';
+$string['settings:reasoning_effort_off'] = 'إيقاف (أقل ما يسمح به النموذج)';
+$string['settings:reasoning_effort_low'] = 'منخفض (موصى به)';
+$string['settings:reasoning_effort_medium'] = 'متوسط';
+$string['settings:reasoning_effort_high'] = 'مرتفع';
+$string['modelregistry:learned_heading'] = 'القدرات المستفادة من مزودي الخدمة';
+$string['modelregistry:learned_desc'] = 'عندما يرفض مزود طلبًا لأن النموذج لم يعد يقبل معاملًا ما، يغيّر [[tutorshort]] ذلك المعامل وحده، ويعيد المحاولة مرة واحدة، ويحفظ الإصلاح هنا لكي يكون الطلب التالي صحيحًا من المرة الأولى. انسَ معلومة لإعادة النموذج إلى القواعد المضمّنة.';
+$string['modelregistry:learned_none'] = 'لم يرفض أي مزود صيغة طلب حتى الآن.';
+$string['modelregistry:col_field'] = 'القدرة';
+$string['modelregistry:col_value'] = 'القيمة المستفادة';
+$string['modelregistry:col_evidence'] = 'ما قاله المزود';
+$string['modelregistry:forget'] = 'نسيان';
+$string['modelregistry:forget_confirm'] = 'هل تريد نسيان هذه المعلومة؟ سيستخدم الطلب التالي إلى هذا النموذج القواعد المضمّنة مجددًا.';
+$string['modelregistry:forget_done'] = 'تم نسيان المعلومة. سيستخدم الطلب التالي إلى هذا النموذج القواعد المضمّنة.';
+$string['modelregistry:forget_missing'] = 'لم تعد هذه المعلومة موجودة.';
+$string['event:model_capability_learned'] = 'تم تعلّم قدرة نموذج من مزود خدمة';

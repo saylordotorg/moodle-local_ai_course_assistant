@@ -3160,3 +3160,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Arviointikysymysten asteikon on ol
 $string['survey_admin:err_no_title'] = 'Anna kyselylle otsikko.';
 
 $string['settings:int_range'] = 'Anna kokonaisluku väliltä {$a->min}–{$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Palveluntarjoajien hylkäyksistä opitut mallien ominaisuustiedot';
+$string['settings:reasoning_effort'] = 'Päättelyn määrä';
+$string['settings:reasoning_effort_desc'] = 'Kuinka paljon ennen vastaamista päätteleviä malleja pyydetään ajattelemaan. Koskee OpenAI:n päättelymalleja (GPT-5, GPT-6, o-sarja) parametrina <code>reasoning_effort</code> ja Geminin ajattelumalleja ajattelubudjettina. Jokainen päättelymalli saa lisäksi tilaa ajattelulleen yllä olevan vastauspituuden päälle, joten ajattelu ei enää voi katkaista vastausta. Matala sopii tutorille: vastaukset tulevat nopeammin ja maksavat vähemmän. Pois kytkee ajattelun pois, jos malli sallii sen. Mallit, joilla ei ole päättelyn säätöä, ohittavat tämän asetuksen.';
+$string['settings:reasoning_effort_off'] = 'Pois (niin vähän kuin malli sallii)';
+$string['settings:reasoning_effort_low'] = 'Matala (suositus)';
+$string['settings:reasoning_effort_medium'] = 'Keskitaso';
+$string['settings:reasoning_effort_high'] = 'Korkea';
+$string['modelregistry:learned_heading'] = 'Palveluntarjoajilta opitut ominaisuustiedot';
+$string['modelregistry:learned_desc'] = 'Kun palveluntarjoaja hylkää pyynnön, koska malli ei enää hyväksy jotakin parametria, [[tutorshort]] muuttaa vain sen parametrin, yrittää kerran uudelleen ja tallentaa korjauksen tähän, jotta seuraava pyyntö onnistuu heti. Unohda tieto palauttaaksesi mallin oletussääntöihin.';
+$string['modelregistry:learned_none'] = 'Yksikään palveluntarjoaja ei ole vielä hylännyt pyynnön muotoa.';
+$string['modelregistry:col_field'] = 'Ominaisuus';
+$string['modelregistry:col_value'] = 'Opittu arvo';
+$string['modelregistry:col_evidence'] = 'Palveluntarjoajan vastaus';
+$string['modelregistry:forget'] = 'Unohda';
+$string['modelregistry:forget_confirm'] = 'Unohdetaanko tämä tieto? Seuraava pyyntö tälle mallille käyttää taas oletussääntöjä.';
+$string['modelregistry:forget_done'] = 'Tieto unohdettu. Seuraava pyyntö tälle mallille käyttää oletussääntöjä.';
+$string['modelregistry:forget_missing'] = 'Tätä tietoa ei enää ole.';
+$string['event:model_capability_learned'] = 'Mallin ominaisuus opittu palveluntarjoajalta';

@@ -3161,3 +3161,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Les questions de notation doivent 
 $string['survey_admin:err_no_title'] = 'Saisissez un titre pour le sondage.';
 
 $string['settings:int_range'] = 'Saisissez un nombre entier compris entre {$a->min} et {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Données de capacités des modèles apprises des refus des fournisseurs';
+$string['settings:reasoning_effort'] = 'Effort de raisonnement';
+$string['settings:reasoning_effort_desc'] = 'Degré de réflexion demandé aux modèles qui raisonnent avant de répondre. S\'applique aux modèles de raisonnement OpenAI (GPT-5, GPT-6, série o) sous la forme <code>reasoning_effort</code> et aux modèles de réflexion Gemini sous la forme d\'un budget de réflexion. Chaque modèle de raisonnement dispose aussi d\'un espace pour sa réflexion en plus de la longueur de réponse ci-dessus, si bien que la réflexion ne peut plus tronquer une réponse. Faible convient à un tuteur : les réponses arrivent plus vite et coûtent moins cher. Désactivé coupe la réflexion lorsque le modèle le permet. Les modèles sans réglage de raisonnement ignorent ce paramètre.';
+$string['settings:reasoning_effort_off'] = 'Désactivé (le minimum autorisé par le modèle)';
+$string['settings:reasoning_effort_low'] = 'Faible (recommandé)';
+$string['settings:reasoning_effort_medium'] = 'Moyen';
+$string['settings:reasoning_effort_high'] = 'Élevé';
+$string['modelregistry:learned_heading'] = 'Capacités apprises auprès des fournisseurs';
+$string['modelregistry:learned_desc'] = 'Lorsqu\'un fournisseur refuse une requête parce qu\'un modèle n\'accepte plus un paramètre, [[tutorshort]] modifie ce seul paramètre, réessaie une fois et mémorise la correction ici pour que la requête suivante soit correcte du premier coup. Oubliez une donnée pour remettre le modèle sur les règles par défaut.';
+$string['modelregistry:learned_none'] = 'Aucun fournisseur n\'a encore refusé de format de requête.';
+$string['modelregistry:col_field'] = 'Capacité';
+$string['modelregistry:col_value'] = 'Valeur apprise';
+$string['modelregistry:col_evidence'] = 'Réponse du fournisseur';
+$string['modelregistry:forget'] = 'Oublier';
+$string['modelregistry:forget_confirm'] = 'Oublier cette donnée ? La prochaine requête vers ce modèle utilisera de nouveau les règles par défaut.';
+$string['modelregistry:forget_done'] = 'Donnée oubliée. La prochaine requête vers ce modèle utilise les règles par défaut.';
+$string['modelregistry:forget_missing'] = 'Cette donnée n\'existe plus.';
+$string['event:model_capability_learned'] = 'Capacité de modèle apprise d\'un fournisseur';

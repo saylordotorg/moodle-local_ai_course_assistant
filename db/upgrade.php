@@ -2187,5 +2187,27 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100114, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026100700) {
+        // v7.8.0: learned model capability facts. A provider that rejects a
+        // request with a 400 naming a parameter teaches SOLA the fix; the fact
+        // is kept here so the next call is built right the first time.
+        $table = new xmldb_table('local_ai_course_assistant_model_caps');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('modelkey', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('field', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('evidence', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('hits', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('provider_model_field_uq', XMLDB_INDEX_UNIQUE, ['provider', 'modelkey', 'field']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        upgrade_plugin_savepoint(true, 2026100700, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

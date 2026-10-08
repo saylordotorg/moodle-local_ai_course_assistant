@@ -3181,3 +3181,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Laaj yu natt dañuy jëfandikoo ba
 $string['survey_admin:err_no_title'] = 'Bindal turu enkët bi.';
 
 $string['settings:int_range'] = 'Bindal benn limu ñu mat ci diggante {$a->min} ak {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Xibaar ci mën-mënu modèle yi, yu ñu jàng ci gàntu yi fournisseur yi def';
+$string['settings:reasoning_effort'] = 'Dayob xalaat';
+$string['settings:reasoning_effort_desc'] = 'Naka la modèle yiy xalaat balaa ñuy tontu war a xalaate. Dafay jëm ci modèle xalaat yu OpenAI (GPT-5, GPT-6, séri o) ni <code>reasoning_effort</code>, ak ci modèle xalaat yu Gemini ni budget xalaat. Bépp modèle xalaat dina am itam bérab ngir xalaatam, ci kaw guddaayu tontu gi nekk ci kaw, kon xalaat mënatul dog tontu. Tuuti mooy gën ci jàngalekat: tontu yi dañuy gaaw a ñëw te seerul. Fey dafay fey xalaat bu modèle bi ko mayee. Modèle yi amul saytu xalaat duñu topp tànneef bii.';
+$string['settings:reasoning_effort_off'] = 'Fey (li gën a tuuti li modèle bi may)';
+$string['settings:reasoning_effort_low'] = 'Tuuti (ñu ngi ko digle)';
+$string['settings:reasoning_effort_medium'] = 'Diggdigg';
+$string['settings:reasoning_effort_high'] = 'Bu kawe';
+$string['modelregistry:learned_heading'] = 'Xibaar ci mën-mën yu ñu jàng ci fournisseur yi';
+$string['modelregistry:learned_desc'] = 'Bu fournisseur gàntoo laaj ndaxte modèle bi nangootul benn paramètre, [[tutorshort]] dafay soppi paramètre boobu rekk, jéemaat benn yoon, te fattaliku fii ni mu ko defaraa, ngir laaj bi ci topp jub ca yoon wu njëkk wa. Fatte benn xibaar ngir delloo modèle bi ci sàrt yi ñu ko joxe.';
+$string['modelregistry:learned_none'] = 'Benn fournisseur gàntoogul benn melokaanu laaj ba leegi.';
+$string['modelregistry:col_field'] = 'Mën-mën';
+$string['modelregistry:col_value'] = 'Valeur bi ñu jàng';
+$string['modelregistry:col_evidence'] = 'Li fournisseur bi wax';
+$string['modelregistry:forget'] = 'Fatte';
+$string['modelregistry:forget_confirm'] = 'Fatte xibaar bii? Laaj bi ci topp ci modèle bii dina jëfandikoowaat sàrt yi ñu ko joxe.';
+$string['modelregistry:forget_done'] = 'Xibaar bi fatte nañu ko. Laaj bi ci topp ci modèle bii dina jëfandikoo sàrt yi ñu ko joxe.';
+$string['modelregistry:forget_missing'] = 'Xibaar boobu amatul.';
+$string['event:model_capability_learned'] = 'Mën-mënu modèle bu ñu jàng ci benn fournisseur';

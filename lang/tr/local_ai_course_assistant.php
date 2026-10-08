@@ -3161,3 +3161,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Derecelendirme soruları {$a->min}
 $string['survey_admin:err_no_title'] = 'Anket başlığı girin.';
 
 $string['settings:int_range'] = '{$a->min} ile {$a->max} arasında bir tam sayı girin.';
+
+$string['cachedef_modelcaps'] = 'Sağlayıcı retlerinden öğrenilen model yeteneği bilgileri';
+$string['settings:reasoning_effort'] = 'Akıl yürütme düzeyi';
+$string['settings:reasoning_effort_desc'] = 'Yanıt vermeden önce akıl yürüten modellerden ne kadar düşünmelerinin isteneceği. OpenAI akıl yürütme modellerine (GPT-5, GPT-6, o serisi) <code>reasoning_effort</code> olarak, Gemini düşünme modellerine ise düşünme bütçesi olarak uygulanır. Her akıl yürütme modeline, yukarıdaki yanıt uzunluğuna ek olarak düşünmesi için alan da verilir, böylece düşünme artık bir yanıtı yarıda kesemez. Düşük, bir eğitmen için uygundur: yanıtlar daha çabuk gelir ve daha az maliyetlidir. Kapalı, modelin izin verdiği durumlarda düşünmeyi kapatır. Akıl yürütme denetimi olmayan modeller bu ayarı yok sayar.';
+$string['settings:reasoning_effort_off'] = 'Kapalı (modelin izin verdiği en az düzey)';
+$string['settings:reasoning_effort_low'] = 'Düşük (önerilen)';
+$string['settings:reasoning_effort_medium'] = 'Orta';
+$string['settings:reasoning_effort_high'] = 'Yüksek';
+$string['modelregistry:learned_heading'] = 'Sağlayıcılardan öğrenilen yetenek bilgileri';
+$string['modelregistry:learned_desc'] = 'Bir sağlayıcı, model artık bir parametreyi kabul etmediği için bir isteği reddettiğinde [[tutorshort]] yalnızca o parametreyi değiştirir, bir kez yeniden dener ve sonraki isteğin ilk seferde doğru olması için düzeltmeyi burada hatırlar. Modeli eklentiyle gelen kurallara döndürmek için bir bilgiyi unutun.';
+$string['modelregistry:learned_none'] = 'Henüz hiçbir sağlayıcı bir istek biçimini reddetmedi.';
+$string['modelregistry:col_field'] = 'Yetenek';
+$string['modelregistry:col_value'] = 'Öğrenilen değer';
+$string['modelregistry:col_evidence'] = 'Sağlayıcının söylediği';
+$string['modelregistry:forget'] = 'Unut';
+$string['modelregistry:forget_confirm'] = 'Bu bilgi unutulsun mu? Bu modele yapılan sonraki istek yeniden eklentiyle gelen kuralları kullanır.';
+$string['modelregistry:forget_done'] = 'Bilgi unutuldu. Bu modele yapılan sonraki istek eklentiyle gelen kuralları kullanır.';
+$string['modelregistry:forget_missing'] = 'Bu bilgi artık mevcut değil.';
+$string['event:model_capability_learned'] = 'Bir sağlayıcıdan model yeteneği öğrenildi';

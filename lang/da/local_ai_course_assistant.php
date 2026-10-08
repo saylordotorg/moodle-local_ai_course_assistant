@@ -3160,3 +3160,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Vurderingsspørgsmål skal bruge e
 $string['survey_admin:err_no_title'] = 'Indtast en titel på undersøgelsen.';
 
 $string['settings:int_range'] = 'Indtast et helt tal fra {$a->min} til {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Modelkapabiliteter lært fra udbyderes afvisninger';
+$string['settings:reasoning_effort'] = 'Ræsonneringsindsats';
+$string['settings:reasoning_effort_desc'] = 'Hvor meget modeller, der tænker før de svarer, bliver bedt om at tænke. Gælder OpenAI-ræsonneringsmodeller (GPT-5, GPT-6, o-serien) som <code>reasoning_effort</code> og Gemini-tænkemodeller som et tænkebudget. Hver ræsonneringsmodel får også plads til sin tænkning oven i svarlængden ovenfor, så tænkningen ikke længere kan afkorte et svar. Lav passer til en tutor: svar kommer hurtigere og koster mindre. Fra slår tænkning fra, hvor modellen tillader det. Modeller uden styring af ræsonnering ignorerer denne indstilling.';
+$string['settings:reasoning_effort_off'] = 'Fra (så lidt som modellen tillader)';
+$string['settings:reasoning_effort_low'] = 'Lav (anbefalet)';
+$string['settings:reasoning_effort_medium'] = 'Middel';
+$string['settings:reasoning_effort_high'] = 'Høj';
+$string['modelregistry:learned_heading'] = 'Kapabiliteter lært fra udbydere';
+$string['modelregistry:learned_desc'] = 'Når en udbyder afviser en forespørgsel, fordi en model ikke længere accepterer en parameter, ændrer [[tutorshort]] netop den parameter, prøver igen én gang og husker rettelsen her, så næste forespørgsel er rigtig første gang. Glem en oplysning for at sætte modellen tilbage til de medfølgende regler.';
+$string['modelregistry:learned_none'] = 'Ingen udbyder har endnu afvist en forespørgselsform.';
+$string['modelregistry:col_field'] = 'Kapabilitet';
+$string['modelregistry:col_value'] = 'Lært værdi';
+$string['modelregistry:col_evidence'] = 'Hvad udbyderen svarede';
+$string['modelregistry:forget'] = 'Glem';
+$string['modelregistry:forget_confirm'] = 'Glem denne oplysning? Næste forespørgsel til denne model bruger igen de medfølgende regler.';
+$string['modelregistry:forget_done'] = 'Oplysning glemt. Næste forespørgsel til denne model bruger de medfølgende regler.';
+$string['modelregistry:forget_missing'] = 'Den oplysning findes ikke længere.';
+$string['event:model_capability_learned'] = 'Modelkapabilitet lært fra en udbyder';

@@ -138,6 +138,9 @@ class model_bench {
             $value = isset($meta[$field]) ? trim((string) $meta[$field]) : '';
             $record->$field = $value === '' ? null : $value;
         }
+        if ($record->fixture_set !== null) {
+            $record->fixture_set = self::canonical_fixture($record->fixture_set);
+        }
         if ($record->registry_key !== null) {
             $record->registry_key = strtolower($record->registry_key);
         }
@@ -219,6 +222,9 @@ class model_bench {
                 $value = trim((string) $result[$field]);
                 $record->$field = $value === '' ? null : $value;
             }
+        }
+        if (isset($record->fixture_set)) {
+            $record->fixture_set = self::canonical_fixture($record->fixture_set);
         }
         if (array_key_exists('fixture_n', $result)) {
             $record->fixture_n = $result['fixture_n'] === null || $result['fixture_n'] === ''
@@ -408,6 +414,26 @@ class model_bench {
     }
 
     /**
+     * The canonical name of a fixture set.
+     *
+     * v7.8.0 moved the tutor prompt sets from tests/golden/ (excluded from the
+     * release zip) to fixtures/golden/ (shipped). A run recorded under the old
+     * path measured the same file, so both spellings name one set: without this
+     * every run before the move would sit in a different comparable group from
+     * every run after it, and the recommender would refuse to compare them.
+     *
+     * @param string $fixture
+     * @return string
+     */
+    public static function canonical_fixture(string $fixture): string {
+        $fixture = trim($fixture);
+        if (preg_match('#^(?:\./)?tests/golden/(tutor_prompts[a-z0-9_\-]*\.json)$#i', $fixture, $m)) {
+            return 'fixtures/golden/' . $m[1];
+        }
+        return $fixture;
+    }
+
+    /**
      * Nearest-rank percentile, the same definition the CLI harness uses.
      *
      * Lives here so the adhoc task and the CLI cannot drift into two different
@@ -492,7 +518,7 @@ class model_bench {
             // Rows from different groups are not each other's baseline.
             'comparable_group'    => implode('/', [
                 (string) ($row->harness ?? ''),
-                (string) ($row->fixture_set ?? ''),
+                self::canonical_fixture((string) ($row->fixture_set ?? '')),
                 (string) ($row->fixture_n ?? ''),
             ]),
         ];

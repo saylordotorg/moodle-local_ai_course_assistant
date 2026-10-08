@@ -3158,3 +3158,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Vurderingsspørsmål må bruke en 
 $string['survey_admin:err_no_title'] = 'Skriv inn en tittel på undersøkelsen.';
 
 $string['settings:int_range'] = 'Skriv inn et heltall fra {$a->min} til {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Fakta om modellkapabiliteter lært fra avvisninger hos leverandører';
+$string['settings:reasoning_effort'] = 'Resonneringsinnsats';
+$string['settings:reasoning_effort_desc'] = 'Hvor mye modeller som resonnerer før de svarer, blir bedt om å tenke. Gjelder OpenAI-resonneringsmodeller (GPT-5, GPT-6, o-serien) som <code>reasoning_effort</code> og Gemini-tenkemodeller som et tenkebudsjett. Hver resonneringsmodell får også plass til tenkingen i tillegg til svarlengden over, så tenkingen kan ikke lenger kutte et svar. Lav passer for en veileder: svarene kommer raskere og koster mindre. Av slår av tenkingen der modellen tillater det. Modeller uten resonneringskontroll ignorerer denne innstillingen.';
+$string['settings:reasoning_effort_off'] = 'Av (så lite som modellen tillater)';
+$string['settings:reasoning_effort_low'] = 'Lav (anbefalt)';
+$string['settings:reasoning_effort_medium'] = 'Middels';
+$string['settings:reasoning_effort_high'] = 'Høy';
+$string['modelregistry:learned_heading'] = 'Kapabilitetsfakta lært fra leverandører';
+$string['modelregistry:learned_desc'] = 'Når en leverandør avviser en forespørsel fordi en modell ikke lenger tar imot en parameter, endrer [[tutorshort]] bare den parameteren, prøver på nytt én gang og husker rettelsen her, slik at neste forespørsel blir riktig første gang. Glem et faktum for å sette modellen tilbake til de medfølgende reglene.';
+$string['modelregistry:learned_none'] = 'Ingen leverandør har avvist en forespørselsform ennå.';
+$string['modelregistry:col_field'] = 'Kapabilitet';
+$string['modelregistry:col_value'] = 'Lært verdi';
+$string['modelregistry:col_evidence'] = 'Hva leverandøren sa';
+$string['modelregistry:forget'] = 'Glem';
+$string['modelregistry:forget_confirm'] = 'Glemme dette faktumet? Neste forespørsel til denne modellen bruker de medfølgende reglene igjen.';
+$string['modelregistry:forget_done'] = 'Faktumet er glemt. Neste forespørsel til denne modellen bruker de medfølgende reglene.';
+$string['modelregistry:forget_missing'] = 'Det faktumet finnes ikke lenger.';
+$string['event:model_capability_learned'] = 'Modellkapabilitet lært fra en leverandør';

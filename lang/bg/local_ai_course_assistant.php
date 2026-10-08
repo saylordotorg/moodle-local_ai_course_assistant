@@ -3161,3 +3161,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Въпросите с оценка
 $string['survey_admin:err_no_title'] = 'Въведете заглавие на анкетата.';
 
 $string['settings:int_range'] = 'Въведете цяло число от {$a->min} до {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Възможности на моделите, научени от откази на доставчици';
+$string['settings:reasoning_effort'] = 'Усилие за разсъждение';
+$string['settings:reasoning_effort_desc'] = 'Колко да мислят моделите, които разсъждават преди да отговорят. Прилага се за моделите за разсъждение на OpenAI (GPT-5, GPT-6, серия o) като <code>reasoning_effort</code> и за мислещите модели на Gemini като бюджет за мислене. Всеки модел за разсъждение получава и място за мисленето си над дължината на отговора по-горе, така че мисленето вече не може да съкрати отговор. Ниско е подходящо за тютор: отговорите идват по-бързо и струват по-малко. Изключено спира мисленето, където моделът позволява. Моделите без управление на разсъждението пренебрегват тази настройка.';
+$string['settings:reasoning_effort_off'] = 'Изключено (колкото най-малко позволява моделът)';
+$string['settings:reasoning_effort_low'] = 'Ниско (препоръчително)';
+$string['settings:reasoning_effort_medium'] = 'Средно';
+$string['settings:reasoning_effort_high'] = 'Високо';
+$string['modelregistry:learned_heading'] = 'Възможности, научени от доставчици';
+$string['modelregistry:learned_desc'] = 'Когато доставчик отхвърли заявка, защото моделът вече не приема даден параметър, [[tutorshort]] променя само този параметър, опитва отново веднъж и запомня корекцията тук, за да е правилна следващата заявка от първия път. Забравете запис, за да върнете модела към вградените правила.';
+$string['modelregistry:learned_none'] = 'Все още нито един доставчик не е отхвърлил формат на заявка.';
+$string['modelregistry:col_field'] = 'Възможност';
+$string['modelregistry:col_value'] = 'Научена стойност';
+$string['modelregistry:col_evidence'] = 'Какво каза доставчикът';
+$string['modelregistry:forget'] = 'Забрави';
+$string['modelregistry:forget_confirm'] = 'Да се забрави ли този запис? Следващата заявка към този модел отново ще използва вградените правила.';
+$string['modelregistry:forget_done'] = 'Записът е забравен. Следващата заявка към този модел използва вградените правила.';
+$string['modelregistry:forget_missing'] = 'Този запис вече не съществува.';
+$string['event:model_capability_learned'] = 'Научена възможност на модел от доставчик';

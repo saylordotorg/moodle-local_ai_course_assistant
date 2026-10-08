@@ -80,6 +80,15 @@ abstract class base_provider implements provider_interface {
      */
     protected ?string $last_finish_reason = null;
 
+    /** @var array<string, string> Capability fixes the healer applied to this instance. */
+    protected array $healed = [];
+
+    /** @var bool Whether this call has already used its one healed retry. */
+    protected bool $healattempted = false;
+
+    /** @var array|null What the healer changed during the last call. */
+    protected ?array $lastheal = null;
+
     /**
      * Constructor. Reads plugin config, with optional per-course overrides.
      *
@@ -501,8 +510,18 @@ abstract class base_provider implements provider_interface {
      * @return string
      */
     public function provider_id(): string {
-        $short = (new \ReflectionClass($this))->getShortName();
-        return preg_replace('/_provider$/', '', $short);
+        // v7.8.0: a subclass from outside this namespace (a test double, an
+        // anonymous class, a diagnostic probe) reports the provider it
+        // extends. An anonymous one used to come back as
+        // "claude_provider@anonymous...", and since the capability profile is
+        // chosen by provider id, such a double was silently given another
+        // vendor's request shape.
+        $class = new \ReflectionClass($this);
+        while (($class->isAnonymous() || $class->getNamespaceName() !== __NAMESPACE__)
+                && $class->getParentClass() !== false) {
+            $class = $class->getParentClass();
+        }
+        return preg_replace('/_provider$/', '', $class->getShortName());
     }
 
     /**
@@ -564,7 +583,91 @@ abstract class base_provider implements provider_interface {
             throw new \moodle_exception('chat:error_unavailable', 'local_ai_course_assistant');
         }
 
-        throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, "HTTP {$httpcode}: {$response}");
+        // v7.8.0: the same exception as before, now carrying the status and the
+        // (redacted) body as fields, so the request healer can read why a 400
+        // happened without parsing a debug string.
+        throw new provider_http_exception(
+            $httpcode,
+            \local_ai_course_assistant\security::redact_secrets(
+                \core_text::substr($response, 0, self::ERROR_BODY_LIMIT)
+            )
+        );
+    }
+
+    /**
+     * This call's capability profile: the shared profile plus any fix the
+     * healer applied to this instance.
+     *
+     * @return array
+     */
+    protected function capability_profile(): array {
+        $profile = \local_ai_course_assistant\model_capabilities::profile($this->provider_id(), $this->model);
+        foreach ($this->healed as $field => $value) {
+            $profile = \local_ai_course_assistant\model_capabilities::apply_fact($profile, $field, $value);
+        }
+        return $profile;
+    }
+
+    /**
+     * Learn from a rejected request, if the rejection names a parameter.
+     *
+     * Returns true when the caller may retry ONCE. Never true when any byte of
+     * the answer has already reached the learner ($forwarded), when the error
+     * is not an HTTP rejection, when the 400 names nothing this plugin
+     * recognises, or when this instance has already healed once: a request that
+     * fails again after its one fix surfaces the second error instead of
+     * looping.
+     *
+     * The fix is applied to this instance first and stored second, so the
+     * retry carries it even if the database write fails.
+     *
+     * @param \Throwable $e What the send threw.
+     * @param string $sentjson The body that was rejected.
+     * @param bool $forwarded Whether any answer text has already been forwarded.
+     * @return bool
+     */
+    protected function heal_request(\Throwable $e, string $sentjson, bool $forwarded): bool {
+        if ($forwarded || $this->healattempted || !($e instanceof provider_http_exception)) {
+            return false;
+        }
+        $this->healattempted = true;
+        $sent = json_decode($sentjson, true);
+        $fix = request_healer::diagnose($e->status, $e->body, is_array($sent) ? $sent : [], $this->capability_profile());
+        if ($fix === null) {
+            return false;
+        }
+        $this->healed[$fix['field']] = $fix['value'];
+        $this->lastheal = $fix;
+        \local_ai_course_assistant\model_capabilities::learn(
+            $this->provider_id(),
+            $this->model,
+            $fix['field'],
+            $fix['value'],
+            $fix['note']
+        );
+        return true;
+    }
+
+    /**
+     * The fix the healer applied during the last call, or null.
+     *
+     * @return array{field: string, value: string, note: string}|null
+     */
+    public function get_last_heal(): ?array {
+        return $this->lastheal;
+    }
+
+    /**
+     * Start of every call: forget the previous call's heal state.
+     *
+     * Learned facts persist in the profile; what resets is the one-retry
+     * allowance and the report of what this call healed.
+     *
+     * @return void
+     */
+    protected function begin_call(): void {
+        $this->healattempted = false;
+        $this->lastheal = null;
     }
 
     /**

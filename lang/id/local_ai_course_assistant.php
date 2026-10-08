@@ -3212,3 +3212,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Pertanyaan penilaian harus menggun
 $string['survey_admin:err_no_title'] = 'Masukkan judul survei.';
 
 $string['settings:int_range'] = 'Masukkan bilangan bulat dari {$a->min} sampai {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Fakta kemampuan model yang dipelajari dari penolakan penyedia';
+$string['settings:reasoning_effort'] = 'Upaya penalaran';
+$string['settings:reasoning_effort_desc'] = 'Seberapa banyak model yang bernalar sebelum menjawab diminta berpikir. Berlaku untuk model penalaran OpenAI (GPT-5, GPT-6, seri o) sebagai <code>reasoning_effort</code> dan untuk model berpikir Gemini sebagai anggaran berpikir. Setiap model penalaran juga mendapat ruang untuk berpikir di luar panjang jawaban di atas, sehingga proses berpikir tidak lagi dapat memotong jawaban. Rendah cocok untuk tutor: jawaban datang lebih cepat dan lebih murah. Mati menonaktifkan proses berpikir jika model mengizinkannya. Model tanpa kontrol penalaran mengabaikan pengaturan ini.';
+$string['settings:reasoning_effort_off'] = 'Mati (seminimal yang diizinkan model)';
+$string['settings:reasoning_effort_low'] = 'Rendah (disarankan)';
+$string['settings:reasoning_effort_medium'] = 'Sedang';
+$string['settings:reasoning_effort_high'] = 'Tinggi';
+$string['modelregistry:learned_heading'] = 'Fakta kemampuan yang dipelajari dari penyedia';
+$string['modelregistry:learned_desc'] = 'Saat penyedia menolak permintaan karena model tidak lagi menerima suatu parameter, [[tutorshort]] mengubah parameter itu saja, mencoba ulang sekali, dan mengingat perbaikannya di sini agar permintaan berikutnya langsung benar. Lupakan fakta untuk mengembalikan model ke aturan bawaan.';
+$string['modelregistry:learned_none'] = 'Belum ada penyedia yang menolak bentuk permintaan.';
+$string['modelregistry:col_field'] = 'Kemampuan';
+$string['modelregistry:col_value'] = 'Nilai yang dipelajari';
+$string['modelregistry:col_evidence'] = 'Kata penyedia';
+$string['modelregistry:forget'] = 'Lupakan';
+$string['modelregistry:forget_confirm'] = 'Lupakan fakta ini? Permintaan berikutnya ke model ini akan kembali memakai aturan bawaan.';
+$string['modelregistry:forget_done'] = 'Fakta dilupakan. Permintaan berikutnya ke model ini memakai aturan bawaan.';
+$string['modelregistry:forget_missing'] = 'Fakta tersebut sudah tidak ada.';
+$string['event:model_capability_learned'] = 'Kemampuan model dipelajari dari penyedia';

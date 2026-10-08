@@ -3179,3 +3179,22 @@ $string['survey_admin:err_invalid_bounds'] = 'मूल्याङ्कन प
 $string['survey_admin:err_no_title'] = 'सर्वेक्षणको शीर्षक लेख्नुहोस्।';
 
 $string['settings:int_range'] = '{$a->min} देखि {$a->max} सम्मको पूर्णाङ्क लेख्नुहोस्।';
+
+$string['cachedef_modelcaps'] = 'प्रदायकको अस्वीकृतिबाट सिकिएका मोडेल क्षमता तथ्यहरू';
+$string['settings:reasoning_effort'] = 'तर्कको प्रयास';
+$string['settings:reasoning_effort_desc'] = 'जवाफ दिनुअघि तर्क गर्ने मोडेलहरूलाई कति सोच्न भनिन्छ। OpenAI का तर्क मोडेलहरू (GPT-5, GPT-6, o शृङ्खला) मा <code>reasoning_effort</code> का रूपमा र Gemini का थिङ्किङ मोडेलहरूमा थिङ्किङ बजेटका रूपमा लागू हुन्छ। हरेक तर्क मोडेलले माथिको उत्तरको लम्बाइमाथि सोच्नका लागि थप ठाउँ पनि पाउँछ, त्यसैले सोचाइले अब उत्तरलाई बीचमै काट्न सक्दैन। ट्युटरका लागि न्यून उपयुक्त हुन्छ: उत्तरहरू छिटो आउँछन् र कम खर्च लाग्छ। बन्दले मोडेलले अनुमति दिएसम्म सोचाइ बन्द गर्छ। तर्क नियन्त्रण नभएका मोडेलहरूले यो सेटिङलाई बेवास्ता गर्छन्।';
+$string['settings:reasoning_effort_off'] = 'बन्द (मोडेलले अनुमति दिएजति कम)';
+$string['settings:reasoning_effort_low'] = 'न्यून (सिफारिस गरिएको)';
+$string['settings:reasoning_effort_medium'] = 'मध्यम';
+$string['settings:reasoning_effort_high'] = 'उच्च';
+$string['modelregistry:learned_heading'] = 'प्रदायकहरूबाट सिकिएका क्षमता तथ्यहरू';
+$string['modelregistry:learned_desc'] = 'मोडेलले कुनै प्यारामिटर अब स्वीकार नगर्ने भएकाले प्रदायकले अनुरोध अस्वीकार गर्दा, [[tutorshort]] ले त्यो एउटा प्यारामिटर मात्र बदल्छ, एक पटक फेरि प्रयास गर्छ र अर्को अनुरोध पहिलो पटकमै सही होस् भनेर त्यो सुधार यहाँ सम्झिन्छ। मोडेललाई मूल नियमहरूमा फर्काउन कुनै तथ्य बिर्सनुहोस्।';
+$string['modelregistry:learned_none'] = 'अहिलेसम्म कुनै प्रदायकले अनुरोधको ढाँचा अस्वीकार गरेको छैन।';
+$string['modelregistry:col_field'] = 'क्षमता';
+$string['modelregistry:col_value'] = 'सिकिएको मान';
+$string['modelregistry:col_evidence'] = 'प्रदायकले के भन्यो';
+$string['modelregistry:forget'] = 'बिर्सनुहोस्';
+$string['modelregistry:forget_confirm'] = 'यो तथ्य बिर्सने हो? यो मोडेलमा पठाइने अर्को अनुरोधले फेरि मूल नियमहरू प्रयोग गर्छ।';
+$string['modelregistry:forget_done'] = 'तथ्य बिर्सियो। यो मोडेलमा पठाइने अर्को अनुरोधले मूल नियमहरू प्रयोग गर्छ।';
+$string['modelregistry:forget_missing'] = 'त्यो तथ्य अब अवस्थित छैन।';
+$string['event:model_capability_learned'] = 'प्रदायकबाट मोडेल क्षमता सिकियो';

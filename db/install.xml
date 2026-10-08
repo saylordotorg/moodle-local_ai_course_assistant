@@ -880,5 +880,24 @@
         <INDEX NAME="registrykey_time" UNIQUE="false" FIELDS="registry_key, timecreated"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_ai_course_assistant_model_caps" COMMENT="v7.8.0 learned model capability facts. One row per (provider, model, field) that a provider taught SOLA by rejecting a request with a 400 naming the parameter. Read by model_capabilities on top of its rules table; an admin can delete a row from the model registry page.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="provider" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Provider id that served the rejected request (openai, gemini, claude, together, ...)"/>
+        <FIELD NAME="modelkey" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Exact model id, lowercased, without a models/ prefix"/>
+        <FIELD NAME="field" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="Capability field: token_param, temperature, reasoning, reasoning_efforts, thinking_off, max_output_tokens, forced_tool_choice"/>
+        <FIELD NAME="value" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Learned value, validated against model_capabilities::LEARNABLE before it is stored or read"/>
+        <FIELD NAME="evidence" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The provider's own error text, redacted and capped at 400 characters, so an admin can judge the fact"/>
+        <FIELD NAME="hits" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="How many times the provider has taught this same fact"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="provider_model_field_uq" UNIQUE="true" FIELDS="provider, modelkey, field"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

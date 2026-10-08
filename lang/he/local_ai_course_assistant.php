@@ -3199,3 +3199,22 @@ $string['survey_admin:err_invalid_bounds'] = 'שאלות דירוג חייבות
 $string['survey_admin:err_no_title'] = 'הזינו כותרת לסקר.';
 
 $string['settings:int_range'] = 'הזינו מספר שלם בין {$a->min} ל-{$a->max}.';
+
+$string['cachedef_modelcaps'] = 'עובדות על יכולות מודלים שנלמדו מדחיות של ספקים';
+$string['settings:reasoning_effort'] = 'מאמץ חשיבה';
+$string['settings:reasoning_effort_desc'] = 'כמה מתבקשים לחשוב מודלים שחושבים לפני שהם עונים. חל על מודלי החשיבה של OpenAI (GPT-5, GPT-6, סדרת o) בתור <code>reasoning_effort</code> ועל מודלי החשיבה של Gemini בתור תקציב חשיבה. כל מודל חשיבה מקבל גם מקום לחשיבה מעבר לאורך התשובה שלמעלה, כך שהחשיבה כבר לא יכולה לקטוע תשובה. נמוך מתאים למורה פרטי: התשובות מגיעות מהר יותר ועולות פחות. כבוי מכבה את החשיבה כשהמודל מאפשר זאת. מודלים ללא בקרת חשיבה מתעלמים מהגדרה זו.';
+$string['settings:reasoning_effort_off'] = 'כבוי (המינימום שהמודל מאפשר)';
+$string['settings:reasoning_effort_low'] = 'נמוך (מומלץ)';
+$string['settings:reasoning_effort_medium'] = 'בינוני';
+$string['settings:reasoning_effort_high'] = 'גבוה';
+$string['modelregistry:learned_heading'] = 'עובדות יכולת שנלמדו מספקים';
+$string['modelregistry:learned_desc'] = 'כאשר ספק דוחה בקשה כי מודל כבר לא מקבל פרמטר מסוים, [[tutorshort]] משנה את הפרמטר הזה בלבד, מנסה שוב פעם אחת וזוכר כאן את התיקון כדי שהבקשה הבאה תהיה נכונה כבר בפעם הראשונה. שכחו עובדה כדי להחזיר את המודל לכללי ברירת המחדל.';
+$string['modelregistry:learned_none'] = 'אף ספק עדיין לא דחה מבנה של בקשה.';
+$string['modelregistry:col_field'] = 'יכולת';
+$string['modelregistry:col_value'] = 'ערך שנלמד';
+$string['modelregistry:col_evidence'] = 'מה שהספק אמר';
+$string['modelregistry:forget'] = 'שכח';
+$string['modelregistry:forget_confirm'] = 'לשכוח עובדה זו? הבקשה הבאה למודל זה תשתמש שוב בכללי ברירת המחדל.';
+$string['modelregistry:forget_done'] = 'העובדה נשכחה. הבקשה הבאה למודל זה משתמשת בכללי ברירת המחדל.';
+$string['modelregistry:forget_missing'] = 'העובדה הזו כבר לא קיימת.';
+$string['event:model_capability_learned'] = 'יכולת מודל נלמדה מספק';

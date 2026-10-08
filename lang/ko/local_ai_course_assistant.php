@@ -3158,3 +3158,22 @@ $string['survey_admin:err_invalid_bounds'] = '평가 문항은 {$a->min}에서 {
 $string['survey_admin:err_no_title'] = '설문 제목을 입력하세요.';
 
 $string['settings:int_range'] = '{$a->min}에서 {$a->max} 사이의 정수를 입력하세요.';
+
+$string['cachedef_modelcaps'] = '제공업체 거부로부터 학습한 모델 기능 정보';
+$string['settings:reasoning_effort'] = '추론 강도';
+$string['settings:reasoning_effort_desc'] = '답변 전에 추론하는 모델에게 얼마나 생각하도록 요청할지 정합니다. OpenAI 추론 모델(GPT-5, GPT-6, o 시리즈)에는 <code>reasoning_effort</code>로, Gemini 사고 모델에는 사고 예산으로 적용됩니다. 모든 추론 모델은 위의 응답 길이에 더해 사고를 위한 여유도 받으므로, 사고 때문에 답변이 잘리는 일이 더 이상 없습니다. 튜터에는 낮음이 적합합니다. 답변이 더 빨리 오고 비용도 적습니다. 끔은 모델이 허용하는 경우 사고를 끕니다. 추론 제어가 없는 모델은 이 설정을 무시합니다.';
+$string['settings:reasoning_effort_off'] = '끔(모델이 허용하는 최소한)';
+$string['settings:reasoning_effort_low'] = '낮음(권장)';
+$string['settings:reasoning_effort_medium'] = '중간';
+$string['settings:reasoning_effort_high'] = '높음';
+$string['modelregistry:learned_heading'] = '제공업체로부터 학습한 기능 정보';
+$string['modelregistry:learned_desc'] = '모델이 더 이상 어떤 매개변수를 받지 않아 제공업체가 요청을 거부하면, [[tutorshort]]는 그 매개변수 하나만 바꿔 한 번 다시 시도하고, 다음 요청이 처음부터 올바르도록 이 수정을 여기에 기억합니다. 정보를 삭제하면 해당 모델은 기본 제공 규칙으로 돌아갑니다.';
+$string['modelregistry:learned_none'] = '아직 요청 형식을 거부한 제공업체가 없습니다.';
+$string['modelregistry:col_field'] = '기능';
+$string['modelregistry:col_value'] = '학습한 값';
+$string['modelregistry:col_evidence'] = '제공업체의 응답';
+$string['modelregistry:forget'] = '삭제';
+$string['modelregistry:forget_confirm'] = '이 정보를 삭제할까요? 이 모델에 대한 다음 요청은 다시 기본 제공 규칙을 사용합니다.';
+$string['modelregistry:forget_done'] = '정보를 삭제했습니다. 이 모델에 대한 다음 요청은 기본 제공 규칙을 사용합니다.';
+$string['modelregistry:forget_missing'] = '해당 정보가 더 이상 존재하지 않습니다.';
+$string['event:model_capability_learned'] = '제공업체로부터 모델 기능을 학습함';

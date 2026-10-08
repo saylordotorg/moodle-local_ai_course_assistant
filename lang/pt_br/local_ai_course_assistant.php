@@ -3180,3 +3180,22 @@ $string['survey_admin:err_invalid_bounds'] = 'As perguntas de avaliação devem 
 $string['survey_admin:err_no_title'] = 'Informe um título para a pesquisa.';
 
 $string['settings:int_range'] = 'Informe um número inteiro de {$a->min} a {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Fatos sobre capacidades de modelos aprendidos com rejeições de provedores';
+$string['settings:reasoning_effort'] = 'Esforço de raciocínio';
+$string['settings:reasoning_effort_desc'] = 'Quanto os modelos que raciocinam antes de responder devem pensar. Aplica-se aos modelos de raciocínio da OpenAI (GPT-5, GPT-6, série o) como <code>reasoning_effort</code> e aos modelos de pensamento do Gemini como orçamento de pensamento. Todo modelo de raciocínio também recebe espaço para pensar além do tamanho de resposta acima, então o pensamento não pode mais cortar uma resposta. Baixo é adequado para um tutor: as respostas chegam mais rápido e custam menos. Desligado desativa o pensamento quando o modelo permite. Modelos sem controle de raciocínio ignoram esta configuração.';
+$string['settings:reasoning_effort_off'] = 'Desligado (o mínimo que o modelo permitir)';
+$string['settings:reasoning_effort_low'] = 'Baixo (recomendado)';
+$string['settings:reasoning_effort_medium'] = 'Médio';
+$string['settings:reasoning_effort_high'] = 'Alto';
+$string['modelregistry:learned_heading'] = 'Fatos sobre capacidades aprendidos com os provedores';
+$string['modelregistry:learned_desc'] = 'Quando um provedor rejeita uma solicitação porque um modelo não aceita mais um parâmetro, o [[tutorshort]] altera esse único parâmetro, tenta novamente uma vez e memoriza a correção aqui para que a próxima solicitação já saia correta. Esqueça um fato para que o modelo volte às regras padrão.';
+$string['modelregistry:learned_none'] = 'Nenhum provedor rejeitou um formato de solicitação até agora.';
+$string['modelregistry:col_field'] = 'Capacidade';
+$string['modelregistry:col_value'] = 'Valor aprendido';
+$string['modelregistry:col_evidence'] = 'O que o provedor disse';
+$string['modelregistry:forget'] = 'Esquecer';
+$string['modelregistry:forget_confirm'] = 'Esquecer este fato? A próxima solicitação a este modelo voltará a usar as regras padrão.';
+$string['modelregistry:forget_done'] = 'Fato esquecido. A próxima solicitação a este modelo usará as regras padrão.';
+$string['modelregistry:forget_missing'] = 'Esse fato não existe mais.';
+$string['event:model_capability_learned'] = 'Capacidade de modelo aprendida com um provedor';

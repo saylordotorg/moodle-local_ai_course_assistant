@@ -3159,3 +3159,22 @@ $string['survey_admin:err_invalid_bounds'] = 'คำถามแบบให้�
 $string['survey_admin:err_no_title'] = 'กรอกชื่อแบบสำรวจ';
 
 $string['settings:int_range'] = 'กรอกจำนวนเต็มตั้งแต่ {$a->min} ถึง {$a->max}';
+
+$string['cachedef_modelcaps'] = 'ข้อมูลความสามารถของโมเดลที่เรียนรู้จากการปฏิเสธของผู้ให้บริการ';
+$string['settings:reasoning_effort'] = 'ระดับการใช้เหตุผล';
+$string['settings:reasoning_effort_desc'] = 'กำหนดว่าโมเดลที่ใช้เหตุผลก่อนตอบจะถูกขอให้คิดมากเพียงใด ใช้กับโมเดลการใช้เหตุผลของ OpenAI (GPT-5, GPT-6, ซีรีส์ o) ในรูป <code>reasoning_effort</code> และใช้กับโมเดลการคิดของ Gemini ในรูปงบประมาณการคิด โมเดลการใช้เหตุผลทุกตัวจะได้รับพื้นที่สำหรับการคิดเพิ่มจากความยาวคำตอบด้านบน การคิดจึงไม่ทำให้คำตอบถูกตัดสั้นอีกต่อไป ระดับต่ำเหมาะกับผู้สอน: คำตอบมาเร็วขึ้นและมีค่าใช้จ่ายน้อยลง ปิดจะปิดการคิดในกรณีที่โมเดลอนุญาต โมเดลที่ไม่มีการควบคุมการใช้เหตุผลจะไม่สนใจการตั้งค่านี้';
+$string['settings:reasoning_effort_off'] = 'ปิด (น้อยที่สุดเท่าที่โมเดลอนุญาต)';
+$string['settings:reasoning_effort_low'] = 'ต่ำ (แนะนำ)';
+$string['settings:reasoning_effort_medium'] = 'ปานกลาง';
+$string['settings:reasoning_effort_high'] = 'สูง';
+$string['modelregistry:learned_heading'] = 'ข้อมูลความสามารถที่เรียนรู้จากผู้ให้บริการ';
+$string['modelregistry:learned_desc'] = 'เมื่อผู้ให้บริการปฏิเสธคำขอเพราะโมเดลไม่รับพารามิเตอร์หนึ่งอีกต่อไป [[tutorshort]] จะเปลี่ยนเฉพาะพารามิเตอร์นั้น ลองใหม่หนึ่งครั้ง และจดจำการแก้ไขไว้ที่นี่ เพื่อให้คำขอครั้งถัดไปถูกต้องตั้งแต่ครั้งแรก ลืมข้อมูลเพื่อให้โมเดลกลับไปใช้กฎที่มาพร้อมปลั๊กอิน';
+$string['modelregistry:learned_none'] = 'ยังไม่มีผู้ให้บริการรายใดปฏิเสธรูปแบบคำขอ';
+$string['modelregistry:col_field'] = 'ความสามารถ';
+$string['modelregistry:col_value'] = 'ค่าที่เรียนรู้';
+$string['modelregistry:col_evidence'] = 'สิ่งที่ผู้ให้บริการแจ้ง';
+$string['modelregistry:forget'] = 'ลืม';
+$string['modelregistry:forget_confirm'] = 'ลืมข้อมูลนี้หรือไม่ คำขอครั้งถัดไปถึงโมเดลนี้จะกลับไปใช้กฎที่มาพร้อมปลั๊กอิน';
+$string['modelregistry:forget_done'] = 'ลืมข้อมูลแล้ว คำขอครั้งถัดไปถึงโมเดลนี้จะใช้กฎที่มาพร้อมปลั๊กอิน';
+$string['modelregistry:forget_missing'] = 'ข้อมูลนั้นไม่มีอยู่แล้ว';
+$string['event:model_capability_learned'] = 'เรียนรู้ความสามารถของโมเดลจากผู้ให้บริการ';

@@ -84,6 +84,10 @@ class policy_bundle {
         'model',
         'claude_temperature_allow_prefixes',
         'temperature',
+        // v7.8.0: reasoning level for thinking models. Behaviour only, like
+        // temperature: it changes how long a model thinks, never where a
+        // request goes or what it may spend beyond the caps.
+        'reasoning_effort',
         'maxhistory',
         'prompt_verbosity',
         'failover_per_call_enabled',

@@ -84,8 +84,18 @@ class run_model_benchmark extends \core\task\adhoc_task {
      */
     public const MAX_SAMPLES = 50;
 
-    /** @var string Default fixture set, relative to the plugin root. */
-    public const DEFAULT_FIXTURE = 'tests/golden/tutor_prompts.json';
+    /**
+     * Default fixture set, relative to the plugin root.
+     *
+     * v7.8.0: moved out of tests/golden/, which the release zip excludes, so a
+     * zip-installed site could not load it and every run of this task failed
+     * with "could not be read". fixtures/ ships; the RAG fixture sets that
+     * stay in tests/golden/ do not. A run queued with the old path is mapped
+     * to this one by model_bench::canonical_fixture().
+     *
+     * @var string
+     */
+    public const DEFAULT_FIXTURE = 'fixtures/golden/tutor_prompts.json';
 
     /** @var float Maximum rubric total: three dimensions scored 1-5. */
     public const RUBRIC_MAX = 15.0;
@@ -173,7 +183,7 @@ TXT;
         // run can be changed after the last deploy.
         $samples = (int) ($data['samples'] ?? self::configured_int('bench_default_samples', self::DEFAULT_SAMPLES));
         $samples = max(1, min(self::MAX_SAMPLES, $samples));
-        $fixture = trim((string) ($data['fixture_set'] ?? self::DEFAULT_FIXTURE));
+        $fixture = model_bench::canonical_fixture(trim((string) ($data['fixture_set'] ?? self::DEFAULT_FIXTURE)));
 
         if ($key === '') {
             mtrace('run_model_benchmark: no registry_key in custom data; nothing to do.');
@@ -322,7 +332,11 @@ TXT;
                 $ttfts[] = $result['ttft_ms'];
             }
             $totals[] = $result['total_latency_ms'];
-            $answers[] = ['prompt' => (string) ($p['text'] ?? ''), 'response' => $result['response']];
+            $answers[] = [
+                'prompt' => (string) ($p['text'] ?? ''),
+                'response' => $result['response'],
+                'truncated' => !empty($result['truncated']),
+            ];
         }
 
         // Judge. A judge we cannot build is NOT a failed run: the cost and
@@ -353,7 +367,7 @@ TXT;
         }
         if ($judge !== null) {
             foreach ($answers as $a) {
-                $score = $this->score_one($judge, $a['prompt'], $a['response']);
+                $score = $this->score_one($judge, $a['prompt'], $a['response'], $a['truncated']);
                 if ($score === null) {
                     continue;
                 }
@@ -475,6 +489,9 @@ TXT;
                 'total_latency_ms' => $total,
                 'cost_cents'       => $cost,
                 'usage'            => is_array($usage) ? $usage : null,
+                'truncated'        => base_provider::is_truncation(
+                    method_exists($provider, 'get_last_finish_reason') ? $provider->get_last_finish_reason() : null
+                ),
                 'error'            => '',
             ];
         } catch (\Throwable $e) {
@@ -571,38 +588,33 @@ TXT;
     /**
      * Judge one response; null when it produced no usable score.
      *
+     * v7.8.0: through bench\judge, shared with the CLI harness: a cut-off
+     * answer is labelled as one, the reply is parsed wherever the JSON sits,
+     * and a reply with no scores gets one follow-up asking for the JSON alone.
+     *
      * @param \local_ai_course_assistant\provider\provider_interface $judge
      * @param string $prompt
      * @param string $response
+     * @param bool $truncated Whether the answer hit its output limit.
      * @return float|null Rubric total out of RUBRIC_MAX.
      */
-    private function score_one($judge, string $prompt, string $response): ?float {
+    private function score_one($judge, string $prompt, string $response, bool $truncated = false): ?float {
         if (trim($response) === '') {
             return null;
         }
-        try {
-            $out = $judge->chat_completion(self::JUDGE_PROMPT, [
-                ['role' => 'user', 'content' => "STUDENT PROMPT:\n" . $prompt . "\n\nTUTOR RESPONSE:\n" . $response],
-            ], ['temperature' => 0.0]);
-            // Read here, not in the caller's loop. The empty-response early return
-            // above skips the judge entirely, so accumulating from the caller would
-            // count the PREVIOUS response's tokens for a call that never happened --
-            // the same stale-usage defect as claude_provider's missing reset, one
-            // layer up. Judge spend appeared in no number at all before this,
-            // including model_bench's own cost_cents.
-            $this->accumulate_bench_spend('judge', $judge->get_last_token_usage());
-        } catch (\Throwable $e) {
+        // Usage is accumulated per judge call inside judge::score(), not by the
+        // caller's loop: the empty-response early return above skips the judge
+        // entirely, so accumulating outside would count the PREVIOUS response's
+        // tokens for a call that never happened.
+        $onusage = function ($usage) {
+            $this->accumulate_bench_spend('judge', is_array($usage) ? $usage : null);
+        };
+        $outcome = \local_ai_course_assistant\bench\judge::score($judge, $prompt, $response, $truncated, $onusage);
+        if ($outcome['scores'] === null) {
             return null;
         }
-        $out = preg_replace('/^```(?:json)?\s*|\s*```$/m', '', trim((string) $out));
-        $parsed = json_decode((string) $out, true);
-        if (!is_array($parsed)) {
-            return null;
-        }
-        $total = (float) ($parsed['socratic'] ?? 0) + (float) ($parsed['accuracy'] ?? 0)
-            + (float) ($parsed['tone'] ?? 0);
-        // All three dimensions missing means the judge answered something else.
-        return $total > 0 ? $total : null;
+        $scores = $outcome['scores'];
+        return (float) $scores['socratic'] + (float) $scores['accuracy'] + (float) $scores['tone'];
     }
 
     /**
@@ -719,7 +731,7 @@ TXT;
         global $CFG;
 
         $base = $CFG->dirroot . '/local/ai_course_assistant/';
-        $path = $relpath;
+        $path = model_bench::canonical_fixture($relpath);
         if ($path === '' || $path[0] !== '/') {
             $path = $base . ltrim($path, '/');
         }

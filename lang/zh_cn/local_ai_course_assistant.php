@@ -3196,3 +3196,22 @@ $string['survey_admin:err_invalid_bounds'] = '评分题的量表范围必须在 
 $string['survey_admin:err_no_title'] = '请输入问卷标题。';
 
 $string['settings:int_range'] = '请输入 {$a->min} 到 {$a->max} 之间的整数。';
+
+$string['cachedef_modelcaps'] = '从服务商拒绝中学到的模型能力信息';
+$string['settings:reasoning_effort'] = '推理强度';
+$string['settings:reasoning_effort_desc'] = '设定先推理再回答的模型需要投入多少思考。对 OpenAI 推理模型（GPT-5、GPT-6、o 系列）以 <code>reasoning_effort</code> 生效，对 Gemini 思考模型以思考预算生效。每个推理模型还会在上方回复长度之外获得额外的思考空间，因此思考不会再截断回答。低适合辅导场景：回答更快，成本更低。关闭会在模型允许时关闭思考。没有推理控制的模型会忽略此设置。';
+$string['settings:reasoning_effort_off'] = '关闭（模型允许的最低程度）';
+$string['settings:reasoning_effort_low'] = '低（推荐）';
+$string['settings:reasoning_effort_medium'] = '中';
+$string['settings:reasoning_effort_high'] = '高';
+$string['modelregistry:learned_heading'] = '从服务商学到的能力信息';
+$string['modelregistry:learned_desc'] = '当服务商因模型不再接受某个参数而拒绝请求时，[[tutorshort]] 只修改该参数，重试一次，并在此记住这一修正，使下一次请求一次成功。忘记某条信息可让该模型恢复使用内置规则。';
+$string['modelregistry:learned_none'] = '尚无服务商拒绝过任何请求格式。';
+$string['modelregistry:col_field'] = '能力';
+$string['modelregistry:col_value'] = '学到的值';
+$string['modelregistry:col_evidence'] = '服务商的说明';
+$string['modelregistry:forget'] = '忘记';
+$string['modelregistry:forget_confirm'] = '忘记这条信息？对此模型的下一次请求将重新使用内置规则。';
+$string['modelregistry:forget_done'] = '信息已忘记。对此模型的下一次请求将使用内置规则。';
+$string['modelregistry:forget_missing'] = '该信息已不存在。';
+$string['event:model_capability_learned'] = '从服务商学到了模型能力';

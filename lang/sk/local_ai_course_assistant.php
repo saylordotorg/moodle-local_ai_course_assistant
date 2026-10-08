@@ -3160,3 +3160,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Hodnotiace otázky musia používa
 $string['survey_admin:err_no_title'] = 'Zadajte názov ankety.';
 
 $string['settings:int_range'] = 'Zadajte celé číslo od {$a->min} do {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Fakty o schopnostiach modelov zistené z odmietnutí poskytovateľov';
+$string['settings:reasoning_effort'] = 'Intenzita uvažovania';
+$string['settings:reasoning_effort_desc'] = 'Koľko majú premýšľať modely, ktoré pred odpoveďou uvažujú. Platí pre uvažujúce modely OpenAI (GPT-5, GPT-6, séria o) ako <code>reasoning_effort</code> a pre premýšľajúce modely Gemini ako rozpočet na premýšľanie. Každý uvažujúci model dostane aj priestor na premýšľanie nad rámec dĺžky odpovede uvedenej vyššie, takže premýšľanie už nemôže odpoveď skrátiť. Nízka úroveň vyhovuje tútorovi: odpovede prídu skôr a stoja menej. Vypnuté vypne premýšľanie tam, kde to model dovoľuje. Modely bez ovládania uvažovania toto nastavenie ignorujú.';
+$string['settings:reasoning_effort_off'] = 'Vypnuté (tak málo, ako model dovolí)';
+$string['settings:reasoning_effort_low'] = 'Nízka (odporúčané)';
+$string['settings:reasoning_effort_medium'] = 'Stredná';
+$string['settings:reasoning_effort_high'] = 'Vysoká';
+$string['modelregistry:learned_heading'] = 'Fakty o schopnostiach zistené od poskytovateľov';
+$string['modelregistry:learned_desc'] = 'Keď poskytovateľ odmietne požiadavku, pretože model už neprijíma niektorý parameter, [[tutorshort]] zmení tento jeden parameter, raz to skúsi znova a opravu si tu zapamätá, aby bola ďalšia požiadavka správna hneď napoprvé. Zabudnite fakt, aby sa model vrátil k predvoleným pravidlám.';
+$string['modelregistry:learned_none'] = 'Žiadny poskytovateľ zatiaľ neodmietol formát požiadavky.';
+$string['modelregistry:col_field'] = 'Schopnosť';
+$string['modelregistry:col_value'] = 'Zistená hodnota';
+$string['modelregistry:col_evidence'] = 'Čo povedal poskytovateľ';
+$string['modelregistry:forget'] = 'Zabudnúť';
+$string['modelregistry:forget_confirm'] = 'Zabudnúť tento fakt? Ďalšia požiadavka na tento model opäť použije predvolené pravidlá.';
+$string['modelregistry:forget_done'] = 'Fakt bol zabudnutý. Ďalšia požiadavka na tento model použije predvolené pravidlá.';
+$string['modelregistry:forget_missing'] = 'Tento fakt už neexistuje.';
+$string['event:model_capability_learned'] = 'Schopnosť modelu zistená od poskytovateľa';

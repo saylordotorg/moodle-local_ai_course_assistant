@@ -3200,3 +3200,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Az értékelő kérdéseknek {$a->
 $string['survey_admin:err_no_title'] = 'Adjon meg egy címet a felméréshez.';
 
 $string['settings:int_range'] = 'Adjon meg egy egész számot {$a->min} és {$a->max} között.';
+
+$string['cachedef_modelcaps'] = 'A szolgáltatói elutasításokból tanult modellképesség-adatok';
+$string['settings:reasoning_effort'] = 'Gondolkodási ráfordítás';
+$string['settings:reasoning_effort_desc'] = 'Mennyit gondolkodjanak a válasz előtt gondolkodó modellek. Az OpenAI gondolkodó modelljeinél (GPT-5, GPT-6, o-sorozat) <code>reasoning_effort</code> paraméterként, a Gemini gondolkodó modelljeinél gondolkodási keretként érvényesül. Minden gondolkodó modell a fenti válaszhosszon felül is kap helyet a gondolkodásra, így a gondolkodás már nem vághatja le a választ. Az Alacsony egy oktatóhoz illik: a válaszok hamarabb érkeznek és kevesebbe kerülnek. A Ki kikapcsolja a gondolkodást, ahol a modell engedi. A gondolkodásvezérlő nélküli modellek figyelmen kívül hagyják ezt a beállítást.';
+$string['settings:reasoning_effort_off'] = 'Ki (a modell által engedett minimum)';
+$string['settings:reasoning_effort_low'] = 'Alacsony (ajánlott)';
+$string['settings:reasoning_effort_medium'] = 'Közepes';
+$string['settings:reasoning_effort_high'] = 'Magas';
+$string['modelregistry:learned_heading'] = 'Szolgáltatóktól tanult képességadatok';
+$string['modelregistry:learned_desc'] = 'Ha egy szolgáltató elutasít egy kérést, mert egy modell már nem fogad el egy paramétert, a(z) [[tutorshort]] csak azt az egy paramétert módosítja, egyszer újrapróbálja, és itt megjegyzi a javítást, hogy a következő kérés elsőre helyes legyen. Egy adat elfelejtésével a modell visszakerül az alapértelmezett szabályokra.';
+$string['modelregistry:learned_none'] = 'Még egy szolgáltató sem utasított el kérésformátumot.';
+$string['modelregistry:col_field'] = 'Képesség';
+$string['modelregistry:col_value'] = 'Tanult érték';
+$string['modelregistry:col_evidence'] = 'A szolgáltató válasza';
+$string['modelregistry:forget'] = 'Elfelejtés';
+$string['modelregistry:forget_confirm'] = 'Elfelejti ezt az adatot? A modellhez intézett következő kérés ismét az alapértelmezett szabályokat használja.';
+$string['modelregistry:forget_done'] = 'Az adat elfelejtve. A modellhez intézett következő kérés az alapértelmezett szabályokat használja.';
+$string['modelregistry:forget_missing'] = 'Ez az adat már nem létezik.';
+$string['event:model_capability_learned'] = 'Szolgáltatótól tanult modellképesség';

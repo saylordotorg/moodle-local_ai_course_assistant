@@ -3159,3 +3159,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Betygsfrågor måste använda en s
 $string['survey_admin:err_no_title'] = 'Ange en titel för enkäten.';
 
 $string['settings:int_range'] = 'Ange ett heltal från {$a->min} till {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Fakta om modellers förmågor som lärts in från leverantörers avvisningar';
+$string['settings:reasoning_effort'] = 'Resonemangsnivå';
+$string['settings:reasoning_effort_desc'] = 'Hur mycket modeller som resonerar innan de svarar ombeds tänka. Gäller OpenAI:s resonemangsmodeller (GPT-5, GPT-6, o-serien) som <code>reasoning_effort</code> och Geminis tänkande modeller som en tankebudget. Varje resonemangsmodell får också utrymme för tänkandet utöver svarslängden ovan, så tänkandet kan inte längre korta av ett svar. Låg passar en handledare: svaren kommer snabbare och kostar mindre. Av stänger av tänkandet där modellen tillåter det. Modeller utan resonemangskontroll ignorerar den här inställningen.';
+$string['settings:reasoning_effort_off'] = 'Av (så lite som modellen tillåter)';
+$string['settings:reasoning_effort_low'] = 'Låg (rekommenderas)';
+$string['settings:reasoning_effort_medium'] = 'Medel';
+$string['settings:reasoning_effort_high'] = 'Hög';
+$string['modelregistry:learned_heading'] = 'Fakta om förmågor som lärts in från leverantörer';
+$string['modelregistry:learned_desc'] = 'När en leverantör avvisar en begäran för att en modell inte längre tar emot en parameter ändrar [[tutorshort]] just den parametern, försöker igen en gång och minns korrigeringen här så att nästa begäran blir rätt direkt. Glöm ett faktum för att återföra modellen till standardreglerna.';
+$string['modelregistry:learned_none'] = 'Ingen leverantör har avvisat ett begärandeformat ännu.';
+$string['modelregistry:col_field'] = 'Förmåga';
+$string['modelregistry:col_value'] = 'Inlärt värde';
+$string['modelregistry:col_evidence'] = 'Vad leverantören sa';
+$string['modelregistry:forget'] = 'Glöm';
+$string['modelregistry:forget_confirm'] = 'Glömma detta faktum? Nästa begäran till den här modellen använder standardreglerna igen.';
+$string['modelregistry:forget_done'] = 'Faktum glömt. Nästa begäran till den här modellen använder standardreglerna.';
+$string['modelregistry:forget_missing'] = 'Det faktumet finns inte längre.';
+$string['event:model_capability_learned'] = 'Modellförmåga inlärd från en leverantör';

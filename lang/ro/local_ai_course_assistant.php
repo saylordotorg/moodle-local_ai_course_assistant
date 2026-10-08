@@ -3160,3 +3160,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Întrebările de evaluare trebuie 
 $string['survey_admin:err_no_title'] = 'Introduceți un titlu pentru sondaj.';
 
 $string['settings:int_range'] = 'Introduceți un număr întreg de la {$a->min} la {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Informații despre capabilitățile modelelor învățate din respingerile furnizorilor';
+$string['settings:reasoning_effort'] = 'Efort de raționament';
+$string['settings:reasoning_effort_desc'] = 'Cât de mult sunt rugate să gândească modelele care raționează înainte de a răspunde. Se aplică modelelor de raționament OpenAI (GPT-5, GPT-6, seria o) ca <code>reasoning_effort</code> și modelelor de gândire Gemini ca buget de gândire. Fiecare model de raționament primește și spațiu pentru gândire peste lungimea răspunsului de mai sus, astfel încât gândirea nu mai poate scurta un răspuns. Scăzut se potrivește unui tutore: răspunsurile sosesc mai repede și costă mai puțin. Dezactivat oprește gândirea acolo unde modelul permite. Modelele fără control al raționamentului ignoră această setare.';
+$string['settings:reasoning_effort_off'] = 'Dezactivat (cât de puțin permite modelul)';
+$string['settings:reasoning_effort_low'] = 'Scăzut (recomandat)';
+$string['settings:reasoning_effort_medium'] = 'Mediu';
+$string['settings:reasoning_effort_high'] = 'Ridicat';
+$string['modelregistry:learned_heading'] = 'Informații despre capabilități învățate de la furnizori';
+$string['modelregistry:learned_desc'] = 'Când un furnizor respinge o cerere deoarece un model nu mai acceptă un parametru, [[tutorshort]] modifică acel singur parametru, reîncearcă o dată și memorează aici corecția, astfel încât următoarea cerere să fie corectă din prima. Uitați o informație pentru a readuce modelul la regulile implicite.';
+$string['modelregistry:learned_none'] = 'Niciun furnizor nu a respins încă un format de cerere.';
+$string['modelregistry:col_field'] = 'Capabilitate';
+$string['modelregistry:col_value'] = 'Valoare învățată';
+$string['modelregistry:col_evidence'] = 'Ce a spus furnizorul';
+$string['modelregistry:forget'] = 'Uită';
+$string['modelregistry:forget_confirm'] = 'Uitați această informație? Următoarea cerere către acest model va folosi din nou regulile implicite.';
+$string['modelregistry:forget_done'] = 'Informație uitată. Următoarea cerere către acest model va folosi regulile implicite.';
+$string['modelregistry:forget_missing'] = 'Această informație nu mai există.';
+$string['event:model_capability_learned'] = 'Capabilitate de model învățată de la un furnizor';

@@ -3181,3 +3181,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Àwọn ìbéèrè ìdíwọ̀n gb
 $string['survey_admin:err_no_title'] = 'Tẹ àkòrí ìwádìí sí i.';
 
 $string['settings:int_range'] = 'Tẹ nọ́mbà odidi láti {$a->min} sí {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Àwọn òtítọ́ nípa agbára awoṣe tí a kọ́ láti inú ìkọ̀sílẹ̀ olùpèsè';
+$string['settings:reasoning_effort'] = 'Ìpele ìrònú';
+$string['settings:reasoning_effort_desc'] = 'Iye ìrònú tí a ní kí àwọn awoṣe tí ń ronú kí wọ́n tó dáhùn ṣe. Ó kan àwọn awoṣe ìrònú OpenAI (GPT-5, GPT-6, ẹ̀ka o) gẹ́gẹ́ bí <code>reasoning_effort</code>, àti àwọn awoṣe ìrònú Gemini gẹ́gẹ́ bí ìnáwó ìrònú. Gbogbo awoṣe ìrònú tún ń gba àyè fún ìrònú rẹ̀ lórí ìgùn ìdáhùn tí ó wà lókè, nítorí náà ìrònú kò lè gé ìdáhùn kúrú mọ́. Kékeré bá olùkọ́ mu: àwọn ìdáhùn ń dé kíákíá, wọn kò sì wọ́n tó bẹ́ẹ̀. Pa á ń pa ìrònú níbi tí awoṣe bá gbà á láàyè. Àwọn awoṣe tí kò ní ìṣàkóso ìrònú kò ní ka ètò yìí sí.';
+$string['settings:reasoning_effort_off'] = 'Pa á (díẹ̀ jùlọ tí awoṣe gbà láàyè)';
+$string['settings:reasoning_effort_low'] = 'Kékeré (a dámọ̀ràn)';
+$string['settings:reasoning_effort_medium'] = 'Àárín';
+$string['settings:reasoning_effort_high'] = 'Gíga';
+$string['modelregistry:learned_heading'] = 'Àwọn òtítọ́ agbára tí a kọ́ láti ọ̀dọ̀ àwọn olùpèsè';
+$string['modelregistry:learned_desc'] = 'Nígbà tí olùpèsè kan bá kọ ìbéèrè kan nítorí pé awoṣe kò gba paramita kan mọ́, [[tutorshort]] á yí paramita yẹn nìkan padà, á tún gbìyànjú lẹ́ẹ̀kan, á sì rántí àtúnṣe náà níbí kí ìbéèrè tó kàn lè tọ̀nà láti ìgbà àkọ́kọ́. Gbàgbé òtítọ́ kan láti dá awoṣe padà sí àwọn òfin tí ó wá pẹ̀lú ohun èlò náà.';
+$string['modelregistry:learned_none'] = 'Kò sí olùpèsè tí ó tíì kọ ìrísí ìbéèrè kan.';
+$string['modelregistry:col_field'] = 'Agbára';
+$string['modelregistry:col_value'] = 'Iye tí a kọ́';
+$string['modelregistry:col_evidence'] = 'Ohun tí olùpèsè sọ';
+$string['modelregistry:forget'] = 'Gbàgbé';
+$string['modelregistry:forget_confirm'] = 'Ṣé kí a gbàgbé òtítọ́ yìí? Ìbéèrè tó kàn sí awoṣe yìí yóò tún lo àwọn òfin tí ó wá pẹ̀lú ohun èlò náà.';
+$string['modelregistry:forget_done'] = 'A ti gbàgbé òtítọ́ náà. Ìbéèrè tó kàn sí awoṣe yìí yóò lo àwọn òfin tí ó wá pẹ̀lú ohun èlò náà.';
+$string['modelregistry:forget_missing'] = 'Òtítọ́ yẹn kò sí mọ́.';
+$string['event:model_capability_learned'] = 'A kọ́ agbára awoṣe láti ọ̀dọ̀ olùpèsè kan';

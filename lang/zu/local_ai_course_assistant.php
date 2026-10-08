@@ -3205,3 +3205,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Imibuzo yesilinganiso kumele isebe
 $string['survey_admin:err_no_title'] = 'Faka isihloko senhlolovo.';
 
 $string['settings:int_range'] = 'Faka inombolo ephelele kusukela ku-{$a->min} kuya ku-{$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Amaqiniso amandla emodeli afundwe ekwenqabeni kwabahlinzeki';
+$string['settings:reasoning_effort'] = 'Izinga lokucabanga';
+$string['settings:reasoning_effort_desc'] = 'Ukuthi amamodeli acabanga ngaphambi kokuphendula acelwa ukuthi acabange kangakanani. Kusebenza kumamodeli okucabanga e-OpenAI (GPT-5, GPT-6, uchungechunge lwe-o) njenge-<code>reasoning_effort</code> nakumamodeli okucabanga e-Gemini njengesabelo sokucabanga. Yonke imodeli yokucabanga ithola nendawo yokucabanga ngaphezu kobude bempendulo obungenhla, ngakho ukucabanga akusakwazi ukunqamula impendulo. Okuphansi kufanele uthisha: izimpendulo zifika ngokushesha futhi zibiza kancane. Kuvaliwe kuvala ukucabanga lapho imodeli ivuma khona. Amamodeli angenakho ukulawula ukucabanga ayasishaya indiva lesi silungiselelo.';
+$string['settings:reasoning_effort_off'] = 'Kuvaliwe (okuncane kakhulu imodeli ekuvumelayo)';
+$string['settings:reasoning_effort_low'] = 'Okuphansi (kunconyiwe)';
+$string['settings:reasoning_effort_medium'] = 'Okuphakathi';
+$string['settings:reasoning_effort_high'] = 'Okuphezulu';
+$string['modelregistry:learned_heading'] = 'Amaqiniso amandla afundwe kubahlinzeki';
+$string['modelregistry:learned_desc'] = 'Uma umhlinzeki enqaba isicelo ngoba imodeli ayisayamukeli ipharamitha ethile, [[tutorshort]] ishintsha leyo pharamitha kuphela, iphinde izame kanye, futhi ikhumbule ukulungisa lapha ukuze isicelo esilandelayo silunge kwasekuqaleni. Khohlwa iqiniso ukuze ubuyisele imodeli emithethweni efika ne-plugin.';
+$string['modelregistry:learned_none'] = 'Akekho umhlinzeki osenqabe uhlobo lwesicelo okwamanje.';
+$string['modelregistry:col_field'] = 'Amandla';
+$string['modelregistry:col_value'] = 'Inani elifundiwe';
+$string['modelregistry:col_evidence'] = 'Okushiwo umhlinzeki';
+$string['modelregistry:forget'] = 'Khohlwa';
+$string['modelregistry:forget_confirm'] = 'Khohlwa leli qiniso? Isicelo esilandelayo kule modeli sizophinde sisebenzise imithetho efika ne-plugin.';
+$string['modelregistry:forget_done'] = 'Iqiniso likhohliwe. Isicelo esilandelayo kule modeli sizosebenzisa imithetho efika ne-plugin.';
+$string['modelregistry:forget_missing'] = 'Lelo qiniso alisekho.';
+$string['event:model_capability_learned'] = 'Amandla emodeli afundwe kumhlinzeki';

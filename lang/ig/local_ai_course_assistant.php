@@ -3175,3 +3175,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Ajụjụ ọkwa ga-eji ọnụọ
 $string['survey_admin:err_no_title'] = 'Tinye isiokwu nnyocha.';
 
 $string['settings:int_range'] = 'Tinye ọnụọgụ zuru oke site na {$a->min} ruo {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Eziokwu gbasara ikike model a mụtara site n\'ịjụ ndị na-enye ọrụ';
+$string['settings:reasoning_effort'] = 'Mgbalị echiche';
+$string['settings:reasoning_effort_desc'] = 'Ole a na-arịọ model ndị na-eche echiche tupu ha azaa ka ha chee. Ọ na-emetụta model echiche OpenAI (GPT-5, GPT-6, usoro o) dị ka <code>reasoning_effort</code> na model echiche Gemini dị ka mmefu echiche. Model echiche ọ bụla na-enwekwa ohere maka echiche ya karịa ogologo azịza dị n\'elu, ya mere echiche enweghịzi ike ịkwụsị azịza n\'etiti. Ala dabara maka onye nkuzi: azịza na-abịa ngwa ngwa ma na-efu obere. Gbanyụọ na-agbanyụ echiche ebe model kwere. Model ndị na-enweghị njikwa echiche na-eleghara ntọala a anya.';
+$string['settings:reasoning_effort_off'] = 'Gbanyụọ (obere dịka model kwere)';
+$string['settings:reasoning_effort_low'] = 'Ala (a na-atụ aro ya)';
+$string['settings:reasoning_effort_medium'] = 'Etiti';
+$string['settings:reasoning_effort_high'] = 'Elu';
+$string['modelregistry:learned_heading'] = 'Eziokwu ikike a mụtara n\'aka ndị na-enye ọrụ';
+$string['modelregistry:learned_desc'] = 'Mgbe onye na-enye ọrụ jụrụ arịrịọ n\'ihi na model anaghịzi anabata otu paramita, [[tutorshort]] na-agbanwe naanị paramita ahụ, na-anwa ọzọ otu ugboro, ma na-echeta ndozi ahụ ebe a ka arịrịọ na-esote wee zie ezi na mbụ. Chefuo eziokwu ka i weghachi model ahụ na iwu ndabara.';
+$string['modelregistry:learned_none'] = 'Ọ dịbeghị onye na-enye ọrụ jụrụ ụdị arịrịọ.';
+$string['modelregistry:col_field'] = 'Ikike';
+$string['modelregistry:col_value'] = 'Uru a mụtara';
+$string['modelregistry:col_evidence'] = 'Ihe onye na-enye ọrụ kwuru';
+$string['modelregistry:forget'] = 'Chefuo';
+$string['modelregistry:forget_confirm'] = 'Chefuo eziokwu a? Arịrịọ na-esote na model a ga-eji iwu ndabara ọzọ.';
+$string['modelregistry:forget_done'] = 'Echefuola eziokwu ahụ. Arịrịọ na-esote na model a na-eji iwu ndabara.';
+$string['modelregistry:forget_missing'] = 'Eziokwu ahụ adịghịzi.';
+$string['event:model_capability_learned'] = 'A mụtara ikike model n\'aka onye na-enye ọrụ';

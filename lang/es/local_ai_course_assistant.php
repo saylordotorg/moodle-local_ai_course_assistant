@@ -3187,3 +3187,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Las preguntas de valoración deben
 $string['survey_admin:err_no_title'] = 'Introduce un título para la encuesta.';
 
 $string['settings:int_range'] = 'Introduce un número entero entre {$a->min} y {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Datos de capacidades de modelos aprendidos de los rechazos de proveedores';
+$string['settings:reasoning_effort'] = 'Esfuerzo de razonamiento';
+$string['settings:reasoning_effort_desc'] = 'Cuánto se pide pensar a los modelos que razonan antes de responder. Se aplica a los modelos de razonamiento de OpenAI (GPT-5, GPT-6, serie o) como <code>reasoning_effort</code> y a los modelos de pensamiento de Gemini como presupuesto de pensamiento. Cada modelo de razonamiento también recibe espacio para pensar además de la longitud de respuesta indicada arriba, por lo que el pensamiento ya no puede cortar una respuesta. Bajo es adecuado para un tutor: las respuestas llegan antes y cuestan menos. Desactivado apaga el pensamiento cuando el modelo lo permite. Los modelos sin control de razonamiento ignoran este ajuste.';
+$string['settings:reasoning_effort_off'] = 'Desactivado (lo mínimo que permita el modelo)';
+$string['settings:reasoning_effort_low'] = 'Bajo (recomendado)';
+$string['settings:reasoning_effort_medium'] = 'Medio';
+$string['settings:reasoning_effort_high'] = 'Alto';
+$string['modelregistry:learned_heading'] = 'Datos de capacidades aprendidos de los proveedores';
+$string['modelregistry:learned_desc'] = 'Cuando un proveedor rechaza una solicitud porque un modelo ya no acepta un parámetro, [[tutorshort]] cambia solo ese parámetro, reintenta una vez y guarda la corrección aquí para que la siguiente solicitud sea correcta desde el principio. Olvide un dato para que el modelo vuelva a las reglas predeterminadas.';
+$string['modelregistry:learned_none'] = 'Ningún proveedor ha rechazado todavía el formato de una solicitud.';
+$string['modelregistry:col_field'] = 'Capacidad';
+$string['modelregistry:col_value'] = 'Valor aprendido';
+$string['modelregistry:col_evidence'] = 'Lo que dijo el proveedor';
+$string['modelregistry:forget'] = 'Olvidar';
+$string['modelregistry:forget_confirm'] = '¿Olvidar este dato? La siguiente solicitud a este modelo volverá a usar las reglas predeterminadas.';
+$string['modelregistry:forget_done'] = 'Dato olvidado. La siguiente solicitud a este modelo usa las reglas predeterminadas.';
+$string['modelregistry:forget_missing'] = 'Ese dato ya no existe.';
+$string['event:model_capability_learned'] = 'Capacidad de modelo aprendida de un proveedor';

@@ -3183,3 +3183,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Beoordelingsvragen moeten een scha
 $string['survey_admin:err_no_title'] = 'Voer een titel voor de enquête in.';
 
 $string['settings:int_range'] = 'Voer een geheel getal in van {$a->min} tot {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Feiten over modelmogelijkheden geleerd uit afwijzingen door providers';
+$string['settings:reasoning_effort'] = 'Redeneerinspanning';
+$string['settings:reasoning_effort_desc'] = 'Hoeveel modellen die redeneren voordat ze antwoorden, wordt gevraagd na te denken. Geldt voor OpenAI-redeneermodellen (GPT-5, GPT-6, o-serie) als <code>reasoning_effort</code> en voor Gemini-denkmodellen als denkbudget. Elk redeneermodel krijgt bovendien ruimte voor het denken bovenop de antwoordlengte hierboven, zodat het denken een antwoord niet meer kan afkappen. Laag past bij een tutor: antwoorden komen sneller en kosten minder. Uit schakelt het denken uit waar het model dat toestaat. Modellen zonder redeneerinstelling negeren deze instelling.';
+$string['settings:reasoning_effort_off'] = 'Uit (zo weinig als het model toestaat)';
+$string['settings:reasoning_effort_low'] = 'Laag (aanbevolen)';
+$string['settings:reasoning_effort_medium'] = 'Gemiddeld';
+$string['settings:reasoning_effort_high'] = 'Hoog';
+$string['modelregistry:learned_heading'] = 'Feiten over mogelijkheden geleerd van providers';
+$string['modelregistry:learned_desc'] = 'Wanneer een provider een verzoek afwijst omdat een model een parameter niet meer accepteert, past [[tutorshort]] alleen die parameter aan, probeert het één keer opnieuw en onthoudt de oplossing hier, zodat het volgende verzoek meteen goed is. Vergeet een feit om het model terug te zetten naar de meegeleverde regels.';
+$string['modelregistry:learned_none'] = 'Nog geen enkele provider heeft een verzoekvorm afgewezen.';
+$string['modelregistry:col_field'] = 'Mogelijkheid';
+$string['modelregistry:col_value'] = 'Geleerde waarde';
+$string['modelregistry:col_evidence'] = 'Wat de provider zei';
+$string['modelregistry:forget'] = 'Vergeten';
+$string['modelregistry:forget_confirm'] = 'Dit feit vergeten? Het volgende verzoek aan dit model gebruikt weer de meegeleverde regels.';
+$string['modelregistry:forget_done'] = 'Feit vergeten. Het volgende verzoek aan dit model gebruikt de meegeleverde regels.';
+$string['modelregistry:forget_missing'] = 'Dat feit bestaat niet meer.';
+$string['event:model_capability_learned'] = 'Modelmogelijkheid geleerd van een provider';

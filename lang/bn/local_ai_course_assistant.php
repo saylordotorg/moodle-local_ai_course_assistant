@@ -3158,3 +3158,22 @@ $string['survey_admin:err_invalid_bounds'] = 'রেটিং প্রশ্ন
 $string['survey_admin:err_no_title'] = 'জরিপের শিরোনাম লিখুন।';
 
 $string['settings:int_range'] = '{$a->min} থেকে {$a->max} পর্যন্ত একটি পূর্ণসংখ্যা লিখুন।';
+
+$string['cachedef_modelcaps'] = 'প্রদানকারীর প্রত্যাখ্যান থেকে শেখা মডেলের সক্ষমতা';
+$string['settings:reasoning_effort'] = 'যুক্তির প্রচেষ্টা';
+$string['settings:reasoning_effort_desc'] = 'উত্তর দেওয়ার আগে যুক্তি করে এমন মডেলগুলোকে কতটা ভাবতে বলা হবে। OpenAI যুক্তি মডেলে (GPT-5, GPT-6, o-সিরিজ) এটি <code>reasoning_effort</code> হিসেবে এবং Gemini চিন্তন মডেলে চিন্তার বাজেট হিসেবে প্রযোজ্য। প্রতিটি যুক্তি মডেল উপরের উত্তরের দৈর্ঘ্যের অতিরিক্ত তার চিন্তার জন্য জায়গা পায়, তাই চিন্তা আর কোনো উত্তর ছোট করে দিতে পারে না। নিম্ন একজন টিউটরের জন্য উপযুক্ত: উত্তর দ্রুত আসে এবং খরচ কম হয়। বন্ধ বিকল্পটি মডেল অনুমতি দিলে চিন্তা বন্ধ করে। যুক্তি নিয়ন্ত্রণ নেই এমন মডেল এই সেটিং উপেক্ষা করে।';
+$string['settings:reasoning_effort_off'] = 'বন্ধ (মডেল যতটা কম অনুমতি দেয়)';
+$string['settings:reasoning_effort_low'] = 'নিম্ন (প্রস্তাবিত)';
+$string['settings:reasoning_effort_medium'] = 'মাঝারি';
+$string['settings:reasoning_effort_high'] = 'উচ্চ';
+$string['modelregistry:learned_heading'] = 'প্রদানকারীদের কাছ থেকে শেখা সক্ষমতার তথ্য';
+$string['modelregistry:learned_desc'] = 'কোনো মডেল আর একটি প্যারামিটার গ্রহণ করে না বলে প্রদানকারী অনুরোধ প্রত্যাখ্যান করলে, [[tutorshort]] শুধু সেই প্যারামিটারটি বদলায়, একবার আবার চেষ্টা করে, এবং সংশোধনটি এখানে মনে রাখে যাতে পরের অনুরোধ প্রথমবারেই সঠিক হয়। মডেলকে অন্তর্নির্মিত নিয়মে ফিরিয়ে নিতে একটি তথ্য ভুলে যান।';
+$string['modelregistry:learned_none'] = 'এখনও কোনো প্রদানকারী কোনো অনুরোধের গঠন প্রত্যাখ্যান করেনি।';
+$string['modelregistry:col_field'] = 'সক্ষমতা';
+$string['modelregistry:col_value'] = 'শেখা মান';
+$string['modelregistry:col_evidence'] = 'প্রদানকারী যা বলেছে';
+$string['modelregistry:forget'] = 'ভুলে যান';
+$string['modelregistry:forget_confirm'] = 'এই তথ্যটি ভুলে যাবেন? এই মডেলের পরের অনুরোধ আবার অন্তর্নির্মিত নিয়ম ব্যবহার করবে।';
+$string['modelregistry:forget_done'] = 'তথ্যটি ভুলে যাওয়া হয়েছে। এই মডেলের পরের অনুরোধ অন্তর্নির্মিত নিয়ম ব্যবহার করবে।';
+$string['modelregistry:forget_missing'] = 'সেই তথ্যটি আর নেই।';
+$string['event:model_capability_learned'] = 'প্রদানকারীর কাছ থেকে মডেলের সক্ষমতা শেখা হয়েছে';

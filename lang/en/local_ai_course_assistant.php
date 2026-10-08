@@ -39,6 +39,7 @@ $string['cachedef_systemprompt'] = 'Assembled AI system prompt (per course)';
 $string['cachedef_remoteconfig'] = 'Remote configuration fetched from the update channel';
 $string['cachedef_spend'] = 'Per-period AI spend totals for the spend guard';
 $string['cachedef_failover_circuit'] = 'Provider failover circuit-breaker state';
+$string['cachedef_modelcaps'] = 'Model capability facts learned from provider rejections';
 // v5.3.19: error strings caught missing by lang_completeness_test.
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Stores AI tutor chat conversations per user and course.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'The ID of the user who owns the conversation.';
@@ -2072,6 +2073,12 @@ $string['settings:claude_temperature_allow_prefixes'] = 'Claude models accepting
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'One model-name prefix per line. Anthropic models whose name starts with one of these still accept the <code>temperature</code> sampling parameter. Any Claude model NOT matching a prefix has temperature omitted (reasoning-class models since Opus 4.7 reject it with an HTTP 400). Leave blank to use the shipped default.';
 $string['settings:max_tokens'] = 'Max Response Length (tokens)';
 $string['settings:max_tokens_desc'] = 'Maximum number of tokens per AI response. Lower values produce shorter, faster responses. 512 = ~2-3 sentences, 1024 = ~1-2 paragraphs, 2048 = longer explanations. Set to 0 for no limit (provider default).';
+$string['settings:reasoning_effort'] = 'Reasoning effort';
+$string['settings:reasoning_effort_desc'] = 'How much models that reason before answering are asked to think. Applies to OpenAI reasoning models (GPT-5, GPT-6, o-series) as <code>reasoning_effort</code> and to Gemini thinking models as a thinking budget. Every reasoning model also gets room for its thinking on top of the response length above, so thinking can no longer cut an answer short. Low suits a tutor: answers arrive sooner and cost less. Off turns thinking off where the model allows it. Models without a reasoning control ignore this setting.';
+$string['settings:reasoning_effort_off'] = 'Off (as little as the model allows)';
+$string['settings:reasoning_effort_low'] = 'Low (recommended)';
+$string['settings:reasoning_effort_medium'] = 'Medium';
+$string['settings:reasoning_effort_high'] = 'High';
 $string['settings:profile_update_interval'] = 'Student Profile Update Interval';
 $string['settings:profile_update_interval_desc'] = 'After this many student messages in a course, the assistant generates (or refreshes) a learning profile summarizing the student\'s strengths, weaknesses, learning style, and interests. The profile is injected into the system prompt for personalized responses. Set to 0 to disable. Default: 10.';
 $string['settings:enable_thinking'] = 'Extended Thinking (Claude only)';
@@ -3297,6 +3304,17 @@ $string['modelregistry:queue_submit'] = 'Queue this benchmark';
 $string['modelregistry:queue_err_nokey'] = 'Choose a registry key to benchmark.';
 $string['modelregistry:queue_err_function'] = 'Choose which function this benchmark stands for.';
 $string['modelregistry:queue_noeligible'] = 'Add a model to the registry first; a benchmark is filed against a registry key.';
+$string['modelregistry:learned_heading'] = 'Capability facts learned from providers';
+$string['modelregistry:learned_desc'] = 'When a provider rejects a request because a model no longer takes a parameter, [[tutorshort]] changes that one parameter, retries once, and remembers the fix here so the next request is right the first time. Forget a fact to put the model back on the shipped rules.';
+$string['modelregistry:learned_none'] = 'No provider has rejected a request shape yet.';
+$string['modelregistry:col_field'] = 'Capability';
+$string['modelregistry:col_value'] = 'Learned value';
+$string['modelregistry:col_evidence'] = 'What the provider said';
+$string['modelregistry:forget'] = 'Forget';
+$string['modelregistry:forget_confirm'] = 'Forget this fact? The next request to this model uses the shipped rules again.';
+$string['modelregistry:forget_done'] = 'Fact forgotten. The next request to this model uses the shipped rules.';
+$string['modelregistry:forget_missing'] = 'That fact no longer exists.';
+$string['event:model_capability_learned'] = 'Model capability learned from a provider';
 
 // Benchmark result rendering (specified by the benchmark stage's manifest).
 $string['bench:heading'] = 'Benchmark results';

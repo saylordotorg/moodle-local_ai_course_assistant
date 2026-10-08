@@ -3158,3 +3158,22 @@ $string['survey_admin:err_invalid_bounds'] = '評価の質問では、{$a->min} 
 $string['survey_admin:err_no_title'] = 'アンケートのタイトルを入力してください。';
 
 $string['settings:int_range'] = '{$a->min} から {$a->max} までの整数を入力してください。';
+
+$string['cachedef_modelcaps'] = 'プロバイダーの拒否から学習したモデル機能情報';
+$string['settings:reasoning_effort'] = '推論の強度';
+$string['settings:reasoning_effort_desc'] = '回答前に推論するモデルに、どの程度考えさせるかを指定します。OpenAI の推論モデル（GPT-5、GPT-6、o シリーズ）には <code>reasoning_effort</code> として、Gemini の思考モデルには思考予算として適用されます。すべての推論モデルには、上記の応答長に加えて思考用の余裕も与えられるため、思考によって回答が途中で切れることはなくなります。チューターには「低」が適しています。回答が早く届き、コストも抑えられます。「オフ」は、モデルが許す範囲で思考をオフにします。推論の制御がないモデルはこの設定を無視します。';
+$string['settings:reasoning_effort_off'] = 'オフ（モデルが許す最小限）';
+$string['settings:reasoning_effort_low'] = '低（推奨）';
+$string['settings:reasoning_effort_medium'] = '中';
+$string['settings:reasoning_effort_high'] = '高';
+$string['modelregistry:learned_heading'] = 'プロバイダーから学習した機能情報';
+$string['modelregistry:learned_desc'] = 'モデルがあるパラメーターを受け付けなくなったためにプロバイダーがリクエストを拒否した場合、[[tutorshort]] はそのパラメーターだけを変更して一度だけ再試行し、その修正をここに記録します。これにより、次のリクエストは最初から正しく送信されます。情報を削除すると、そのモデルは同梱のルールに戻ります。';
+$string['modelregistry:learned_none'] = 'リクエストの形式を拒否したプロバイダーはまだありません。';
+$string['modelregistry:col_field'] = '機能';
+$string['modelregistry:col_value'] = '学習した値';
+$string['modelregistry:col_evidence'] = 'プロバイダーの応答';
+$string['modelregistry:forget'] = '削除';
+$string['modelregistry:forget_confirm'] = 'この情報を削除しますか？このモデルへの次のリクエストでは、再び同梱のルールが使われます。';
+$string['modelregistry:forget_done'] = '情報を削除しました。このモデルへの次のリクエストでは同梱のルールが使われます。';
+$string['modelregistry:forget_missing'] = 'その情報はもう存在しません。';
+$string['event:model_capability_learned'] = 'プロバイダーからモデル機能を学習しました';

@@ -3160,3 +3160,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Pytania oceniające muszą używa�
 $string['survey_admin:err_no_title'] = 'Wpisz tytuł ankiety.';
 
 $string['settings:int_range'] = 'Wpisz liczbę całkowitą od {$a->min} do {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Fakty o możliwościach modeli poznane z odrzuceń dostawców';
+$string['settings:reasoning_effort'] = 'Intensywność rozumowania';
+$string['settings:reasoning_effort_desc'] = 'Określa, jak dużo mają myśleć modele, które rozumują przed udzieleniem odpowiedzi. Dotyczy modeli rozumujących OpenAI (GPT-5, GPT-6, seria o) jako <code>reasoning_effort</code> oraz modeli myślących Gemini jako budżet na myślenie. Każdy model rozumujący dostaje też miejsce na myślenie ponad powyższą długość odpowiedzi, więc myślenie nie może już skrócić odpowiedzi. Niski poziom pasuje do tutora: odpowiedzi przychodzą szybciej i kosztują mniej. Wyłączone wyłącza myślenie tam, gdzie model na to pozwala. Modele bez kontroli rozumowania ignorują to ustawienie.';
+$string['settings:reasoning_effort_off'] = 'Wyłączone (tak mało, jak pozwala model)';
+$string['settings:reasoning_effort_low'] = 'Niska (zalecane)';
+$string['settings:reasoning_effort_medium'] = 'Średnia';
+$string['settings:reasoning_effort_high'] = 'Wysoka';
+$string['modelregistry:learned_heading'] = 'Fakty o możliwościach poznane od dostawców';
+$string['modelregistry:learned_desc'] = 'Gdy dostawca odrzuca żądanie, bo model nie przyjmuje już danego parametru, [[tutorshort]] zmienia ten jeden parametr, ponawia próbę raz i zapamiętuje tu poprawkę, aby następne żądanie było poprawne od razu. Zapomnij fakt, aby model wrócił do domyślnych reguł.';
+$string['modelregistry:learned_none'] = 'Żaden dostawca nie odrzucił jeszcze formatu żądania.';
+$string['modelregistry:col_field'] = 'Możliwość';
+$string['modelregistry:col_value'] = 'Poznana wartość';
+$string['modelregistry:col_evidence'] = 'Co odpowiedział dostawca';
+$string['modelregistry:forget'] = 'Zapomnij';
+$string['modelregistry:forget_confirm'] = 'Zapomnieć ten fakt? Następne żądanie do tego modelu znów użyje domyślnych reguł.';
+$string['modelregistry:forget_done'] = 'Fakt zapomniany. Następne żądanie do tego modelu użyje domyślnych reguł.';
+$string['modelregistry:forget_missing'] = 'Ten fakt już nie istnieje.';
+$string['event:model_capability_learned'] = 'Poznano możliwość modelu od dostawcy';

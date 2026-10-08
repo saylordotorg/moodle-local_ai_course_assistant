@@ -3160,3 +3160,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Bewertungsfragen müssen eine Skal
 $string['survey_admin:err_no_title'] = 'Geben Sie einen Titel für die Umfrage ein.';
 
 $string['settings:int_range'] = 'Geben Sie eine ganze Zahl von {$a->min} bis {$a->max} ein.';
+
+$string['cachedef_modelcaps'] = 'Von Anbietern bei Ablehnungen gelernte Modellfähigkeiten';
+$string['settings:reasoning_effort'] = 'Denkaufwand';
+$string['settings:reasoning_effort_desc'] = 'Wie stark Modelle, die vor der Antwort nachdenken, zum Nachdenken angehalten werden. Gilt für OpenAI-Reasoning-Modelle (GPT-5, GPT-6, o-Serie) als <code>reasoning_effort</code> und für Gemini-Thinking-Modelle als Denkbudget. Jedes Reasoning-Modell erhält zusätzlich zur oben festgelegten Antwortlänge Raum für sein Nachdenken, sodass das Nachdenken eine Antwort nicht mehr abschneiden kann. Niedrig passt zu einem Tutor: Antworten kommen schneller und kosten weniger. Aus schaltet das Nachdenken ab, wo das Modell es zulässt. Modelle ohne Steuerung des Denkaufwands ignorieren diese Einstellung.';
+$string['settings:reasoning_effort_off'] = 'Aus (so wenig, wie das Modell zulässt)';
+$string['settings:reasoning_effort_low'] = 'Niedrig (empfohlen)';
+$string['settings:reasoning_effort_medium'] = 'Mittel';
+$string['settings:reasoning_effort_high'] = 'Hoch';
+$string['modelregistry:learned_heading'] = 'Von Anbietern gelernte Fähigkeiten';
+$string['modelregistry:learned_desc'] = 'Wenn ein Anbieter eine Anfrage ablehnt, weil ein Modell einen Parameter nicht mehr akzeptiert, ändert [[tutorshort]] genau diesen Parameter, versucht es einmal erneut und speichert die Korrektur hier, damit die nächste Anfrage sofort richtig ist. Vergessen Sie einen Eintrag, um das Modell wieder auf die mitgelieferten Regeln zurückzusetzen.';
+$string['modelregistry:learned_none'] = 'Bisher hat kein Anbieter eine Anfrageform abgelehnt.';
+$string['modelregistry:col_field'] = 'Fähigkeit';
+$string['modelregistry:col_value'] = 'Gelernter Wert';
+$string['modelregistry:col_evidence'] = 'Antwort des Anbieters';
+$string['modelregistry:forget'] = 'Vergessen';
+$string['modelregistry:forget_confirm'] = 'Diesen Eintrag vergessen? Die nächste Anfrage an dieses Modell verwendet wieder die mitgelieferten Regeln.';
+$string['modelregistry:forget_done'] = 'Eintrag vergessen. Die nächste Anfrage an dieses Modell verwendet die mitgelieferten Regeln.';
+$string['modelregistry:forget_missing'] = 'Dieser Eintrag existiert nicht mehr.';
+$string['event:model_capability_learned'] = 'Modellfähigkeit von einem Anbieter gelernt';

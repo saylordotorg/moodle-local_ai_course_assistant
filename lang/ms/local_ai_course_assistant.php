@@ -3203,3 +3203,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Soalan penilaian mesti menggunakan
 $string['survey_admin:err_no_title'] = 'Masukkan tajuk tinjauan.';
 
 $string['settings:int_range'] = 'Masukkan nombor bulat dari {$a->min} hingga {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Fakta keupayaan model yang dipelajari daripada penolakan penyedia';
+$string['settings:reasoning_effort'] = 'Usaha penaakulan';
+$string['settings:reasoning_effort_desc'] = 'Berapa banyak model yang menaakul sebelum menjawab diminta berfikir. Digunakan pada model penaakulan OpenAI (GPT-5, GPT-6, siri o) sebagai <code>reasoning_effort</code> dan pada model pemikiran Gemini sebagai bajet pemikiran. Setiap model penaakulan juga diberi ruang untuk berfikir di atas panjang jawapan di atas, jadi pemikiran tidak lagi boleh memotong jawapan. Rendah sesuai untuk tutor: jawapan tiba lebih cepat dan kosnya lebih rendah. Mati mematikan pemikiran jika model membenarkannya. Model tanpa kawalan penaakulan mengabaikan tetapan ini.';
+$string['settings:reasoning_effort_off'] = 'Mati (sesedikit yang dibenarkan model)';
+$string['settings:reasoning_effort_low'] = 'Rendah (disyorkan)';
+$string['settings:reasoning_effort_medium'] = 'Sederhana';
+$string['settings:reasoning_effort_high'] = 'Tinggi';
+$string['modelregistry:learned_heading'] = 'Fakta keupayaan yang dipelajari daripada penyedia';
+$string['modelregistry:learned_desc'] = 'Apabila penyedia menolak permintaan kerana model tidak lagi menerima sesuatu parameter, [[tutorshort]] mengubah parameter itu sahaja, mencuba semula sekali dan mengingati pembetulan itu di sini supaya permintaan seterusnya betul pada kali pertama. Lupakan fakta untuk mengembalikan model kepada peraturan asal.';
+$string['modelregistry:learned_none'] = 'Belum ada penyedia yang menolak bentuk permintaan.';
+$string['modelregistry:col_field'] = 'Keupayaan';
+$string['modelregistry:col_value'] = 'Nilai yang dipelajari';
+$string['modelregistry:col_evidence'] = 'Kata penyedia';
+$string['modelregistry:forget'] = 'Lupakan';
+$string['modelregistry:forget_confirm'] = 'Lupakan fakta ini? Permintaan seterusnya kepada model ini akan menggunakan peraturan asal semula.';
+$string['modelregistry:forget_done'] = 'Fakta telah dilupakan. Permintaan seterusnya kepada model ini menggunakan peraturan asal.';
+$string['modelregistry:forget_missing'] = 'Fakta itu tidak wujud lagi.';
+$string['event:model_capability_learned'] = 'Keupayaan model dipelajari daripada penyedia';

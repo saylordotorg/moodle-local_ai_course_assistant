@@ -3180,3 +3180,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Câu hỏi đánh giá phải dùn
 $string['survey_admin:err_no_title'] = 'Nhập tiêu đề khảo sát.';
 
 $string['settings:int_range'] = 'Nhập một số nguyên từ {$a->min} đến {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Thông tin về khả năng của mô hình học được từ các lần nhà cung cấp từ chối';
+$string['settings:reasoning_effort'] = 'Mức độ suy luận';
+$string['settings:reasoning_effort_desc'] = 'Mức độ suy nghĩ mà các mô hình suy luận trước khi trả lời được yêu cầu thực hiện. Áp dụng cho các mô hình suy luận của OpenAI (GPT-5, GPT-6, dòng o) dưới dạng <code>reasoning_effort</code> và cho các mô hình tư duy của Gemini dưới dạng ngân sách tư duy. Mỗi mô hình suy luận cũng được cấp thêm dung lượng cho phần suy nghĩ ngoài độ dài câu trả lời ở trên, nên việc suy nghĩ không còn làm câu trả lời bị cắt ngắn. Thấp phù hợp với gia sư: câu trả lời đến nhanh hơn và tốn ít chi phí hơn. Tắt sẽ tắt việc suy nghĩ khi mô hình cho phép. Các mô hình không có tùy chọn điều khiển suy luận sẽ bỏ qua thiết lập này.';
+$string['settings:reasoning_effort_off'] = 'Tắt (mức thấp nhất mô hình cho phép)';
+$string['settings:reasoning_effort_low'] = 'Thấp (khuyến nghị)';
+$string['settings:reasoning_effort_medium'] = 'Trung bình';
+$string['settings:reasoning_effort_high'] = 'Cao';
+$string['modelregistry:learned_heading'] = 'Thông tin khả năng học được từ nhà cung cấp';
+$string['modelregistry:learned_desc'] = 'Khi nhà cung cấp từ chối một yêu cầu vì mô hình không còn nhận một tham số, [[tutorshort]] chỉ thay đổi tham số đó, thử lại một lần và ghi nhớ cách sửa tại đây để yêu cầu tiếp theo đúng ngay từ lần đầu. Hãy quên một thông tin để đưa mô hình trở lại các quy tắc mặc định đi kèm.';
+$string['modelregistry:learned_none'] = 'Chưa có nhà cung cấp nào từ chối một dạng yêu cầu.';
+$string['modelregistry:col_field'] = 'Khả năng';
+$string['modelregistry:col_value'] = 'Giá trị đã học';
+$string['modelregistry:col_evidence'] = 'Nhà cung cấp đã cho biết';
+$string['modelregistry:forget'] = 'Quên';
+$string['modelregistry:forget_confirm'] = 'Quên thông tin này? Yêu cầu tiếp theo tới mô hình này sẽ dùng lại các quy tắc mặc định đi kèm.';
+$string['modelregistry:forget_done'] = 'Đã quên thông tin. Yêu cầu tiếp theo tới mô hình này sẽ dùng các quy tắc mặc định đi kèm.';
+$string['modelregistry:forget_missing'] = 'Thông tin đó không còn tồn tại.';
+$string['event:model_capability_learned'] = 'Đã học được khả năng của mô hình từ nhà cung cấp';

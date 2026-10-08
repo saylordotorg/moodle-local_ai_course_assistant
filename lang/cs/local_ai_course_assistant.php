@@ -3161,3 +3161,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Hodnoticí otázky musí používa
 $string['survey_admin:err_no_title'] = 'Zadejte název ankety.';
 
 $string['settings:int_range'] = 'Zadejte celé číslo od {$a->min} do {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Schopnosti modelů zjištěné z odmítnutí poskytovatelů';
+$string['settings:reasoning_effort'] = 'Úsilí uvažování';
+$string['settings:reasoning_effort_desc'] = 'Jak moc mají modely, které před odpovědí uvažují, přemýšlet. Platí pro modely OpenAI s uvažováním (GPT-5, GPT-6, řada o) jako <code>reasoning_effort</code> a pro modely Gemini s přemýšlením jako rozpočet na přemýšlení. Každý model s uvažováním dostane navíc k výše nastavené délce odpovědi prostor pro své přemýšlení, takže přemýšlení už nemůže odpověď zkrátit. Nízké se hodí pro tutora: odpovědi přicházejí rychleji a stojí méně. Vypnuto vypne přemýšlení tam, kde to model dovolí. Modely bez ovládání uvažování toto nastavení ignorují.';
+$string['settings:reasoning_effort_off'] = 'Vypnuto (tak málo, jak model dovolí)';
+$string['settings:reasoning_effort_low'] = 'Nízké (doporučeno)';
+$string['settings:reasoning_effort_medium'] = 'Střední';
+$string['settings:reasoning_effort_high'] = 'Vysoké';
+$string['modelregistry:learned_heading'] = 'Schopnosti zjištěné od poskytovatelů';
+$string['modelregistry:learned_desc'] = 'Když poskytovatel odmítne požadavek, protože model už nepřijímá některý parametr, [[tutorshort]] změní právě tento parametr, jednou to zkusí znovu a opravu si zde zapamatuje, aby další požadavek byl hned správný. Zapomeňte záznam, chcete-li model vrátit k dodaným pravidlům.';
+$string['modelregistry:learned_none'] = 'Žádný poskytovatel zatím neodmítl tvar požadavku.';
+$string['modelregistry:col_field'] = 'Schopnost';
+$string['modelregistry:col_value'] = 'Zjištěná hodnota';
+$string['modelregistry:col_evidence'] = 'Co uvedl poskytovatel';
+$string['modelregistry:forget'] = 'Zapomenout';
+$string['modelregistry:forget_confirm'] = 'Zapomenout tento záznam? Další požadavek na tento model znovu použije dodaná pravidla.';
+$string['modelregistry:forget_done'] = 'Záznam zapomenut. Další požadavek na tento model použije dodaná pravidla.';
+$string['modelregistry:forget_missing'] = 'Tento záznam již neexistuje.';
+$string['event:model_capability_learned'] = 'Schopnost modelu zjištěna od poskytovatele';

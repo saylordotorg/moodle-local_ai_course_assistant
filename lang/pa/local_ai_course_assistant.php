@@ -3180,3 +3180,22 @@ $string['survey_admin:err_invalid_bounds'] = 'ਰੇਟਿੰਗ ਸਵਾਲਾ
 $string['survey_admin:err_no_title'] = 'ਸਰਵੇਖਣ ਦਾ ਸਿਰਲੇਖ ਦਰਜ ਕਰੋ।';
 
 $string['settings:int_range'] = '{$a->min} ਤੋਂ {$a->max} ਤੱਕ ਇੱਕ ਪੂਰਨ ਅੰਕ ਦਰਜ ਕਰੋ।';
+
+$string['cachedef_modelcaps'] = 'ਪ੍ਰਦਾਤਾ ਦੇ ਇਨਕਾਰਾਂ ਤੋਂ ਸਿੱਖੇ ਮਾਡਲ ਸਮਰੱਥਾ ਤੱਥ';
+$string['settings:reasoning_effort'] = 'ਤਰਕ ਦੀ ਕੋਸ਼ਿਸ਼';
+$string['settings:reasoning_effort_desc'] = 'ਜਵਾਬ ਦੇਣ ਤੋਂ ਪਹਿਲਾਂ ਤਰਕ ਕਰਨ ਵਾਲੇ ਮਾਡਲਾਂ ਨੂੰ ਕਿੰਨਾ ਸੋਚਣ ਲਈ ਕਿਹਾ ਜਾਂਦਾ ਹੈ। ਇਹ OpenAI ਦੇ ਤਰਕ ਮਾਡਲਾਂ (GPT-5, GPT-6, o ਲੜੀ) ਉੱਤੇ <code>reasoning_effort</code> ਵਜੋਂ ਅਤੇ Gemini ਦੇ ਸੋਚਣ ਵਾਲੇ ਮਾਡਲਾਂ ਉੱਤੇ ਸੋਚਣ ਦੇ ਬਜਟ ਵਜੋਂ ਲਾਗੂ ਹੁੰਦਾ ਹੈ। ਹਰ ਤਰਕ ਮਾਡਲ ਨੂੰ ਉੱਪਰ ਦਿੱਤੀ ਜਵਾਬ ਦੀ ਲੰਬਾਈ ਤੋਂ ਇਲਾਵਾ ਸੋਚਣ ਲਈ ਵਾਧੂ ਥਾਂ ਵੀ ਮਿਲਦੀ ਹੈ, ਇਸ ਲਈ ਸੋਚ ਹੁਣ ਜਵਾਬ ਨੂੰ ਅਧੂਰਾ ਨਹੀਂ ਕੱਟ ਸਕਦੀ। ਟਿਊਟਰ ਲਈ ਘੱਟ ਢੁਕਵਾਂ ਹੈ: ਜਵਾਬ ਜਲਦੀ ਆਉਂਦੇ ਹਨ ਅਤੇ ਖ਼ਰਚਾ ਘੱਟ ਹੁੰਦਾ ਹੈ। ਬੰਦ, ਜਿੱਥੇ ਮਾਡਲ ਇਜਾਜ਼ਤ ਦੇਵੇ, ਉੱਥੇ ਸੋਚ ਬੰਦ ਕਰ ਦਿੰਦਾ ਹੈ। ਤਰਕ ਨਿਯੰਤਰਣ ਤੋਂ ਬਿਨਾਂ ਮਾਡਲ ਇਸ ਸੈਟਿੰਗ ਨੂੰ ਅਣਡਿੱਠਾ ਕਰਦੇ ਹਨ।';
+$string['settings:reasoning_effort_off'] = 'ਬੰਦ (ਜਿੰਨਾ ਘੱਟ ਮਾਡਲ ਇਜਾਜ਼ਤ ਦੇਵੇ)';
+$string['settings:reasoning_effort_low'] = 'ਘੱਟ (ਸਿਫ਼ਾਰਸ਼ੀ)';
+$string['settings:reasoning_effort_medium'] = 'ਦਰਮਿਆਨਾ';
+$string['settings:reasoning_effort_high'] = 'ਉੱਚਾ';
+$string['modelregistry:learned_heading'] = 'ਪ੍ਰਦਾਤਾਵਾਂ ਤੋਂ ਸਿੱਖੇ ਸਮਰੱਥਾ ਤੱਥ';
+$string['modelregistry:learned_desc'] = 'ਜਦੋਂ ਕੋਈ ਪ੍ਰਦਾਤਾ ਇਸ ਲਈ ਬੇਨਤੀ ਰੱਦ ਕਰਦਾ ਹੈ ਕਿ ਮਾਡਲ ਹੁਣ ਕੋਈ ਪੈਰਾਮੀਟਰ ਸਵੀਕਾਰ ਨਹੀਂ ਕਰਦਾ, ਤਾਂ [[tutorshort]] ਸਿਰਫ਼ ਉਹੀ ਪੈਰਾਮੀਟਰ ਬਦਲਦਾ ਹੈ, ਇੱਕ ਵਾਰ ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰਦਾ ਹੈ ਅਤੇ ਇਹ ਸੁਧਾਰ ਇੱਥੇ ਯਾਦ ਰੱਖਦਾ ਹੈ ਤਾਂ ਜੋ ਅਗਲੀ ਬੇਨਤੀ ਪਹਿਲੀ ਵਾਰ ਵਿੱਚ ਹੀ ਸਹੀ ਹੋਵੇ। ਮਾਡਲ ਨੂੰ ਮੂਲ ਨਿਯਮਾਂ ਉੱਤੇ ਵਾਪਸ ਲਿਆਉਣ ਲਈ ਕੋਈ ਤੱਥ ਭੁਲਾਓ।';
+$string['modelregistry:learned_none'] = 'ਹਾਲੇ ਤੱਕ ਕਿਸੇ ਪ੍ਰਦਾਤਾ ਨੇ ਬੇਨਤੀ ਦਾ ਢਾਂਚਾ ਰੱਦ ਨਹੀਂ ਕੀਤਾ।';
+$string['modelregistry:col_field'] = 'ਸਮਰੱਥਾ';
+$string['modelregistry:col_value'] = 'ਸਿੱਖਿਆ ਮੁੱਲ';
+$string['modelregistry:col_evidence'] = 'ਪ੍ਰਦਾਤਾ ਨੇ ਕੀ ਕਿਹਾ';
+$string['modelregistry:forget'] = 'ਭੁਲਾਓ';
+$string['modelregistry:forget_confirm'] = 'ਕੀ ਇਹ ਤੱਥ ਭੁਲਾਉਣਾ ਹੈ? ਇਸ ਮਾਡਲ ਨੂੰ ਅਗਲੀ ਬੇਨਤੀ ਮੁੜ ਮੂਲ ਨਿਯਮ ਵਰਤੇਗੀ।';
+$string['modelregistry:forget_done'] = 'ਤੱਥ ਭੁਲਾ ਦਿੱਤਾ ਗਿਆ। ਇਸ ਮਾਡਲ ਨੂੰ ਅਗਲੀ ਬੇਨਤੀ ਮੂਲ ਨਿਯਮ ਵਰਤੇਗੀ।';
+$string['modelregistry:forget_missing'] = 'ਉਹ ਤੱਥ ਹੁਣ ਮੌਜੂਦ ਨਹੀਂ ਹੈ।';
+$string['event:model_capability_learned'] = 'ਪ੍ਰਦਾਤਾ ਤੋਂ ਮਾਡਲ ਸਮਰੱਥਾ ਸਿੱਖੀ ਗਈ';

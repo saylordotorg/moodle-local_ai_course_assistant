@@ -3204,3 +3204,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Su\'aalaha qiimaynta waa inay isti
 $string['survey_admin:err_no_title'] = 'Geli cinwaanka sahanka.';
 
 $string['settings:int_range'] = 'Geli tiro dhan oo u dhaxaysa {$a->min} ilaa {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Xaqiiqooyinka awoodda moodeelka laga bartay diidmooyinka bixiyeyaasha';
+$string['settings:reasoning_effort'] = 'Dadaalka fekerka';
+$string['settings:reasoning_effort_desc'] = 'Inta ay moodeellada fekera ka hor jawaabta loo sheegayo inay fekeraan. Waxay khusaysaa moodeellada fekerka ee OpenAI (GPT-5, GPT-6, taxanaha o) sida <code>reasoning_effort</code> iyo moodeellada fekerka ee Gemini sida miisaaniyad fekereed. Moodeel kasta oo fekera wuxuu sidoo kale helayaa meel uu ku fekero oo ka baxsan dhererka jawaabta kor ku xusan, sidaas darteed fekerku mar dambe ma gaabin karo jawaab. Hoose ayaa ku habboon macallin: jawaabuhu way dhaqso badan yihiin, kharash yarna way leeyihiin. Dansan wuxuu demiyaa fekerka halka moodeelku u oggolaado. Moodeellada aan lahayn xakameyn fekereed way iska indhatiraan dejintan.';
+$string['settings:reasoning_effort_off'] = 'Dansan (inta ugu yar ee moodeelku oggol yahay)';
+$string['settings:reasoning_effort_low'] = 'Hoose (lagu taliyay)';
+$string['settings:reasoning_effort_medium'] = 'Dhexdhexaad';
+$string['settings:reasoning_effort_high'] = 'Sare';
+$string['modelregistry:learned_heading'] = 'Xaqiiqooyinka awoodda laga bartay bixiyeyaasha';
+$string['modelregistry:learned_desc'] = 'Marka bixiye uu diido codsi sababtoo ah moodeel uusan mar dambe aqbalin halbeeg, [[tutorshort]] wuxuu beddelaa halbeeggaas keliya, hal mar ayuu isku dayaa, oo halkan ayuu ku xasuustaa saxitaanka si codsiga xiga uu markiisa hore sax u noqdo. Iska illow xaqiiqo si moodeelka loogu celiyo xeerarka caadiga ah.';
+$string['modelregistry:learned_none'] = 'Weli bixiye kama diidin qaab codsi.';
+$string['modelregistry:col_field'] = 'Awood';
+$string['modelregistry:col_value'] = 'Qiimaha la bartay';
+$string['modelregistry:col_evidence'] = 'Waxa bixiyuhu yiri';
+$string['modelregistry:forget'] = 'Iska illow';
+$string['modelregistry:forget_confirm'] = 'Ma iska illoobaysaa xaqiiqadan? Codsiga xiga ee moodeelkan wuxuu mar kale isticmaalayaa xeerarka caadiga ah.';
+$string['modelregistry:forget_done'] = 'Xaqiiqada waa la illoobay. Codsiga xiga ee moodeelkan wuxuu isticmaalayaa xeerarka caadiga ah.';
+$string['modelregistry:forget_missing'] = 'Xaqiiqadaas mar dambe ma jirto.';
+$string['event:model_capability_learned'] = 'Awoodda moodeelka ayaa laga bartay bixiye';

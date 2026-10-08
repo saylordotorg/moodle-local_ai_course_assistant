@@ -3187,3 +3187,22 @@ $string['survey_admin:err_invalid_bounds'] = 'የደረጃ አሰጣጥ ጥያ�
 $string['survey_admin:err_no_title'] = 'የዳሰሳ ጥናቱን ርዕስ ያስገቡ።';
 
 $string['settings:int_range'] = 'ከ{$a->min} እስከ {$a->max} ያለ ሙሉ ቁጥር ያስገቡ።';
+
+$string['cachedef_modelcaps'] = 'ከአቅራቢዎች ውድቅ ምላሾች የተማሩ የሞዴል ችሎታዎች';
+$string['settings:reasoning_effort'] = 'የምክንያት ጥረት';
+$string['settings:reasoning_effort_desc'] = 'ከመመለሳቸው በፊት የሚያስቡ ሞዴሎች ምን ያህል እንዲያስቡ እንደሚጠየቁ። ለOpenAI የምክንያት ሞዴሎች (GPT-5፣ GPT-6፣ o ተከታታይ) እንደ <code>reasoning_effort</code>፣ ለGemini የማሰቢያ ሞዴሎች ደግሞ እንደ የማሰቢያ በጀት ይተገበራል። እያንዳንዱ የምክንያት ሞዴል ከላይ ካለው የመልስ ርዝመት በተጨማሪ ለማሰቢያው ቦታ ያገኛል፣ ስለዚህ ማሰብ ከአሁን በኋላ መልስን ማሳጠር አይችልም። ዝቅተኛ ለአስጠኚ ተስማሚ ነው፡ መልሶች ቶሎ ይደርሳሉ፣ ዋጋቸውም ያነሰ ነው። ጠፍቷል ሞዴሉ በሚፈቅድበት ቦታ ማሰብን ያጠፋል። የምክንያት መቆጣጠሪያ የሌላቸው ሞዴሎች ይህን ቅንብር ችላ ይላሉ።';
+$string['settings:reasoning_effort_off'] = 'ጠፍቷል (ሞዴሉ የሚፈቅደውን ያህል ትንሽ)';
+$string['settings:reasoning_effort_low'] = 'ዝቅተኛ (የሚመከር)';
+$string['settings:reasoning_effort_medium'] = 'መካከለኛ';
+$string['settings:reasoning_effort_high'] = 'ከፍተኛ';
+$string['modelregistry:learned_heading'] = 'ከአቅራቢዎች የተማሩ የችሎታ እውነታዎች';
+$string['modelregistry:learned_desc'] = 'አንድ አቅራቢ ሞዴሉ አንድን ግቤት ከአሁን በኋላ ስለማይቀበል ጥያቄን ውድቅ ሲያደርግ፣ [[tutorshort]] ያንን ግቤት ብቻ ይቀይራል፣ አንድ ጊዜ እንደገና ይሞክራል፣ እና ቀጣዩ ጥያቄ ከመጀመሪያው ትክክል እንዲሆን ማስተካከያውን እዚህ ያስታውሳል። ሞዴሉን ወደ አብሮ የመጡ ደንቦች ለመመለስ እውነታውን ይርሱ።';
+$string['modelregistry:learned_none'] = 'እስካሁን ምንም አቅራቢ የጥያቄ ቅርጽን ውድቅ አላደረገም።';
+$string['modelregistry:col_field'] = 'ችሎታ';
+$string['modelregistry:col_value'] = 'የተማረ እሴት';
+$string['modelregistry:col_evidence'] = 'አቅራቢው ያለው';
+$string['modelregistry:forget'] = 'እርሳ';
+$string['modelregistry:forget_confirm'] = 'ይህን እውነታ ይርሱት? ወደዚህ ሞዴል የሚላከው ቀጣይ ጥያቄ እንደገና አብሮ የመጡ ደንቦችን ይጠቀማል።';
+$string['modelregistry:forget_done'] = 'እውነታው ተረስቷል። ወደዚህ ሞዴል የሚላከው ቀጣይ ጥያቄ አብሮ የመጡ ደንቦችን ይጠቀማል።';
+$string['modelregistry:forget_missing'] = 'ያ እውነታ ከአሁን በኋላ የለም።';
+$string['event:model_capability_learned'] = 'የሞዴል ችሎታ ከአቅራቢ ተምሯል';

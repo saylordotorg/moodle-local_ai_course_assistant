@@ -3204,3 +3204,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Ang mga tanong na may rating ay da
 $string['survey_admin:err_no_title'] = 'Maglagay ng pamagat ng survey.';
 
 $string['settings:int_range'] = 'Maglagay ng buong numero mula {$a->min} hanggang {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Mga natutunang katotohanan tungkol sa kakayahan ng modelo mula sa mga pagtanggi ng provider';
+$string['settings:reasoning_effort'] = 'Antas ng pangangatwiran';
+$string['settings:reasoning_effort_desc'] = 'Gaano kalaking pag-iisip ang hinihingi sa mga modelong nangangatwiran bago sumagot. Nalalapat sa mga reasoning model ng OpenAI (GPT-5, GPT-6, o-series) bilang <code>reasoning_effort</code> at sa mga thinking model ng Gemini bilang budget sa pag-iisip. Binibigyan din ang bawat reasoning model ng puwang para sa pag-iisip nito bukod sa haba ng sagot sa itaas, kaya hindi na mapuputol ng pag-iisip ang isang sagot. Bagay ang Mababa sa isang tutor: mas mabilis dumating ang mga sagot at mas mura. Pinapatay ng Naka-off ang pag-iisip kung pinapayagan ng modelo. Binabalewala ng mga modelong walang kontrol sa pangangatwiran ang setting na ito.';
+$string['settings:reasoning_effort_off'] = 'Naka-off (pinakamaliit na pinapayagan ng modelo)';
+$string['settings:reasoning_effort_low'] = 'Mababa (inirerekomenda)';
+$string['settings:reasoning_effort_medium'] = 'Katamtaman';
+$string['settings:reasoning_effort_high'] = 'Mataas';
+$string['modelregistry:learned_heading'] = 'Mga katotohanan tungkol sa kakayahan na natutunan mula sa mga provider';
+$string['modelregistry:learned_desc'] = 'Kapag tinanggihan ng provider ang isang request dahil hindi na tumatanggap ang modelo ng isang parameter, binabago ng [[tutorshort]] ang parameter na iyon lamang, sumusubok muli nang isang beses, at tinatandaan dito ang ayos para tama na ang susunod na request sa unang subok. Kalimutan ang isang katotohanan para ibalik ang modelo sa mga kasamang patakaran.';
+$string['modelregistry:learned_none'] = 'Wala pang provider na tumanggi sa anyo ng isang request.';
+$string['modelregistry:col_field'] = 'Kakayahan';
+$string['modelregistry:col_value'] = 'Natutunang halaga';
+$string['modelregistry:col_evidence'] = 'Ang sinabi ng provider';
+$string['modelregistry:forget'] = 'Kalimutan';
+$string['modelregistry:forget_confirm'] = 'Kalimutan ang katotohanang ito? Gagamitin muli ng susunod na request sa modelong ito ang mga kasamang patakaran.';
+$string['modelregistry:forget_done'] = 'Nakalimutan na ang katotohanan. Gagamitin ng susunod na request sa modelong ito ang mga kasamang patakaran.';
+$string['modelregistry:forget_missing'] = 'Wala na ang katotohanang iyon.';
+$string['event:model_capability_learned'] = 'Natutunan ang kakayahan ng modelo mula sa isang provider';

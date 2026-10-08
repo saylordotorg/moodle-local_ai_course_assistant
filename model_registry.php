@@ -111,6 +111,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
     } else if ($action === 'deletesource') {
         $result = model_registry_page::delete_source(optional_param('sourceid', 0, PARAM_INT));
+    } else if ($action === 'forgetcap') {
+        $result = model_registry_page::forget_capability(optional_param('capid', 0, PARAM_INT));
     } else if ($action === 'driftnow') {
         $result = model_registry_page::run_drift();
     } else if ($action === 'queuebench') {
@@ -214,6 +216,7 @@ $sources = model_registry_page::source_rows();
 $drift = model_registry_page::drift_block();
 $bench = model_registry_page::bench_block();
 $queuemodels = model_registry_page::queue_options();
+$learned = model_registry_page::learned_block();
 
 // Every visible string is resolved here and passed as data. Brand-bearing
 // strings go through branding::str so a rebranded institution never sees
@@ -355,6 +358,15 @@ $labels = [
     'queuefieldsamples'  => get_string('modelregistry:queue_field_samples', 'local_ai_course_assistant'),
     'queuesubmit'        => get_string('modelregistry:queue_submit', 'local_ai_course_assistant'),
     'queuenoeligible'    => get_string('modelregistry:queue_noeligible', 'local_ai_course_assistant'),
+    // Learned capability facts (v7.8.0).
+    'learnedheading'     => get_string('modelregistry:learned_heading', 'local_ai_course_assistant'),
+    'learneddesc'        => branding::str('modelregistry:learned_desc'),
+    'learnednone'        => get_string('modelregistry:learned_none', 'local_ai_course_assistant'),
+    'colfield'           => get_string('modelregistry:col_field', 'local_ai_course_assistant'),
+    'colvalue'           => get_string('modelregistry:col_value', 'local_ai_course_assistant'),
+    'colevidence'        => get_string('modelregistry:col_evidence', 'local_ai_course_assistant'),
+    'forget'             => get_string('modelregistry:forget', 'local_ai_course_assistant'),
+    'forgetconfirm'      => get_string('modelregistry:forget_confirm', 'local_ai_course_assistant'),
 ];
 
 $defaultsamples = (int) (get_config('local_ai_course_assistant', 'bench_default_samples')
@@ -374,6 +386,7 @@ $templatedata = [
     'sourceform' => $sourceform,
     'drift'     => $drift,
     'bench'     => $bench,
+    'learned'   => $learned,
     'queue'     => [
         'models'    => $queuemodels,
         'hasmodels' => !empty($queuemodels),

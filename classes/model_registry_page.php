@@ -1624,6 +1624,43 @@ class model_registry_page {
     }
 
     /**
+     * The learned capability facts block (v7.8.0).
+     *
+     * Every fact here changed how requests to a model are built, so it is
+     * shown with the provider's own words that taught it, and can be removed.
+     *
+     * @return array{has: bool, rows: array}
+     */
+    public static function learned_block(): array {
+        $rows = [];
+        foreach (model_capabilities::learned_rows() as $row) {
+            $rows[] = [
+                'id' => $row['id'],
+                'provider' => $row['provider'],
+                'model' => $row['model'],
+                'field' => $row['field'],
+                'value' => $row['value'],
+                'evidence' => $row['evidence'],
+                'updated' => self::date($row['timemodified']),
+            ];
+        }
+        return ['has' => !empty($rows), 'rows' => $rows];
+    }
+
+    /**
+     * Forget one learned capability fact.
+     *
+     * @param int $id
+     * @return array ['level' => string, 'message' => string]
+     */
+    public static function forget_capability(int $id): array {
+        if (!model_capabilities::forget($id)) {
+            return self::result(self::ERROR, get_string('modelregistry:forget_missing', 'local_ai_course_assistant'));
+        }
+        return self::result(self::OK, get_string('modelregistry:forget_done', 'local_ai_course_assistant'));
+    }
+
+    /**
      * Uniform action result.
      *
      * @param string $level

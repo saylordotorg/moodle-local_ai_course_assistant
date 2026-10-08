@@ -3204,3 +3204,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Maswali ya ukadiriaji lazima yatum
 $string['survey_admin:err_no_title'] = 'Weka kichwa cha utafiti.';
 
 $string['settings:int_range'] = 'Weka nambari kamili kuanzia {$a->min} hadi {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Ukweli kuhusu uwezo wa modeli uliojifunzwa kutokana na makatao ya watoa huduma';
+$string['settings:reasoning_effort'] = 'Kiwango cha kufikiri';
+$string['settings:reasoning_effort_desc'] = 'Kiasi ambacho modeli zinazofikiri kabla ya kujibu zinaombwa kufikiri. Kinatumika kwa modeli za kufikiri za OpenAI (GPT-5, GPT-6, mfululizo wa o) kama <code>reasoning_effort</code> na kwa modeli za kufikiri za Gemini kama bajeti ya kufikiri. Kila modeli ya kufikiri pia hupata nafasi ya kufikiri juu ya urefu wa jibu ulio hapo juu, kwa hivyo kufikiri hakuwezi tena kukatisha jibu. Chini kinamfaa mkufunzi: majibu hufika mapema na hugharimu kidogo. Kimezimwa huzima kufikiri pale modeli inaporuhusu. Modeli zisizo na udhibiti wa kufikiri hupuuza mpangilio huu.';
+$string['settings:reasoning_effort_off'] = 'Kimezimwa (kidogo kadiri modeli inavyoruhusu)';
+$string['settings:reasoning_effort_low'] = 'Chini (kinapendekezwa)';
+$string['settings:reasoning_effort_medium'] = 'Wastani';
+$string['settings:reasoning_effort_high'] = 'Juu';
+$string['modelregistry:learned_heading'] = 'Ukweli kuhusu uwezo uliojifunzwa kutoka kwa watoa huduma';
+$string['modelregistry:learned_desc'] = 'Mtoa huduma anapokataa ombi kwa sababu modeli haipokei tena kigezo fulani, [[tutorshort]] hubadilisha kigezo hicho kimoja tu, hujaribu tena mara moja, na hukumbuka marekebisho hapa ili ombi linalofuata liwe sahihi mara ya kwanza. Sahau ukweli ili kurudisha modeli kwenye kanuni za kawaida.';
+$string['modelregistry:learned_none'] = 'Hakuna mtoa huduma aliyekataa muundo wa ombi bado.';
+$string['modelregistry:col_field'] = 'Uwezo';
+$string['modelregistry:col_value'] = 'Thamani iliyojifunzwa';
+$string['modelregistry:col_evidence'] = 'Alichosema mtoa huduma';
+$string['modelregistry:forget'] = 'Sahau';
+$string['modelregistry:forget_confirm'] = 'Sahau ukweli huu? Ombi linalofuata kwa modeli hii litatumia tena kanuni za kawaida.';
+$string['modelregistry:forget_done'] = 'Ukweli umesahaulika. Ombi linalofuata kwa modeli hii litatumia kanuni za kawaida.';
+$string['modelregistry:forget_missing'] = 'Ukweli huo haupo tena.';
+$string['event:model_capability_learned'] = 'Uwezo wa modeli umejifunzwa kutoka kwa mtoa huduma';

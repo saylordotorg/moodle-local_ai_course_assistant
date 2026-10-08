@@ -3188,3 +3188,22 @@ $string['survey_admin:err_invalid_bounds'] = 'रेटिंग प्रश्
 $string['survey_admin:err_no_title'] = 'सर्वेक्षण का शीर्षक दर्ज करें।';
 
 $string['settings:int_range'] = '{$a->min} से {$a->max} तक की एक पूर्ण संख्या दर्ज करें।';
+
+$string['cachedef_modelcaps'] = 'प्रदाताओं की अस्वीकृतियों से सीखे गए मॉडल क्षमता तथ्य';
+$string['settings:reasoning_effort'] = 'तर्क प्रयास';
+$string['settings:reasoning_effort_desc'] = 'उत्तर देने से पहले तर्क करने वाले मॉडलों से कितना सोचने को कहा जाए। यह OpenAI के तर्क मॉडलों (GPT-5, GPT-6, o-श्रृंखला) पर <code>reasoning_effort</code> के रूप में और Gemini के थिंकिंग मॉडलों पर सोचने के बजट के रूप में लागू होता है। हर तर्क मॉडल को ऊपर दी गई उत्तर लंबाई के अलावा सोचने के लिए अतिरिक्त जगह भी मिलती है, इसलिए सोचना अब किसी उत्तर को अधूरा नहीं छोड़ सकता। ट्यूटर के लिए निम्न उपयुक्त है: उत्तर जल्दी आते हैं और लागत कम होती है। बंद, जहाँ मॉडल अनुमति देता है, सोचना बंद कर देता है। जिन मॉडलों में तर्क नियंत्रण नहीं है, वे इस सेटिंग को अनदेखा करते हैं।';
+$string['settings:reasoning_effort_off'] = 'बंद (जितना कम मॉडल अनुमति दे)';
+$string['settings:reasoning_effort_low'] = 'निम्न (अनुशंसित)';
+$string['settings:reasoning_effort_medium'] = 'मध्यम';
+$string['settings:reasoning_effort_high'] = 'उच्च';
+$string['modelregistry:learned_heading'] = 'प्रदाताओं से सीखे गए क्षमता तथ्य';
+$string['modelregistry:learned_desc'] = 'जब कोई प्रदाता किसी अनुरोध को इसलिए अस्वीकार करता है कि मॉडल अब कोई पैरामीटर स्वीकार नहीं करता, तो [[tutorshort]] केवल उसी पैरामीटर को बदलता है, एक बार फिर प्रयास करता है और सुधार को यहाँ याद रखता है ताकि अगला अनुरोध पहली बार में ही सही हो। मॉडल को डिफ़ॉल्ट नियमों पर वापस लाने के लिए कोई तथ्य भूल जाएँ।';
+$string['modelregistry:learned_none'] = 'अभी तक किसी प्रदाता ने किसी अनुरोध के प्रारूप को अस्वीकार नहीं किया है।';
+$string['modelregistry:col_field'] = 'क्षमता';
+$string['modelregistry:col_value'] = 'सीखा गया मान';
+$string['modelregistry:col_evidence'] = 'प्रदाता ने क्या कहा';
+$string['modelregistry:forget'] = 'भूलें';
+$string['modelregistry:forget_confirm'] = 'क्या यह तथ्य भूलना है? इस मॉडल को अगला अनुरोध फिर से डिफ़ॉल्ट नियमों का उपयोग करेगा।';
+$string['modelregistry:forget_done'] = 'तथ्य भुला दिया गया। इस मॉडल को अगला अनुरोध डिफ़ॉल्ट नियमों का उपयोग करता है।';
+$string['modelregistry:forget_missing'] = 'वह तथ्य अब मौजूद नहीं है।';
+$string['event:model_capability_learned'] = 'प्रदाता से मॉडल क्षमता सीखी गई';

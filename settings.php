@@ -610,6 +610,23 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // v7.8.0: how much reasoning models think before answering. Applied
+    // through the model capability profiles: reasoning_effort on OpenAI
+    // reasoning models (gpt-5, gpt-6, o-series), a thinking budget on Gemini,
+    // and ignored by models with no reasoning control.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/reasoning_effort',
+        get_string('settings:reasoning_effort', 'local_ai_course_assistant'),
+        get_string('settings:reasoning_effort_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\model_capabilities::DEFAULT_LEVEL,
+        [
+            'off'    => get_string('settings:reasoning_effort_off', 'local_ai_course_assistant'),
+            'low'    => get_string('settings:reasoning_effort_low', 'local_ai_course_assistant'),
+            'medium' => get_string('settings:reasoning_effort_medium', 'local_ai_course_assistant'),
+            'high'   => get_string('settings:reasoning_effort_high', 'local_ai_course_assistant'),
+        ]
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/maxhistory',
         get_string('settings:maxhistory', 'local_ai_course_assistant'),

@@ -3187,3 +3187,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Tambayoyin ƙima dole su yi amfani
 $string['survey_admin:err_no_title'] = 'Shigar da taken binciken.';
 
 $string['settings:int_range'] = 'Shigar da cikakkiyar lamba daga {$a->min} zuwa {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Bayanan iyawar samfura da aka koya daga ƙin masu samarwa';
+$string['settings:reasoning_effort'] = 'Ƙoƙarin tunani';
+$string['settings:reasoning_effort_desc'] = 'Yawan tunanin da ake neman samfuran da ke tunani kafin amsa su yi. Yana aiki ga samfuran tunani na OpenAI (GPT-5, GPT-6, jerin o) a matsayin <code>reasoning_effort</code> da kuma samfuran tunani na Gemini a matsayin kasafin tunani. Kowane samfurin tunani yana kuma samun sarari don tunaninsa bayan tsawon amsar da ke sama, don haka tunani ba zai iya katse amsa ba kuma. Ƙasa ya dace da malami: amsoshi suna zuwa da wuri kuma kuɗinsu ya ragu. A kashe yana kashe tunani inda samfurin ya yarda. Samfuran da ba su da ikon sarrafa tunani suna watsi da wannan saiti.';
+$string['settings:reasoning_effort_off'] = 'A kashe (mafi ƙanƙanta da samfurin ya yarda)';
+$string['settings:reasoning_effort_low'] = 'Ƙasa (an ba da shawara)';
+$string['settings:reasoning_effort_medium'] = 'Matsakaici';
+$string['settings:reasoning_effort_high'] = 'Babba';
+$string['modelregistry:learned_heading'] = 'Bayanan iyawa da aka koya daga masu samarwa';
+$string['modelregistry:learned_desc'] = 'Idan mai samarwa ya ƙi buƙata saboda samfuri ba ya karɓar wani siga, [[tutorshort]] yana canza wannan siga ɗaya kawai, ya sake gwadawa sau ɗaya, kuma ya tuna gyaran a nan don buƙata ta gaba ta yi daidai tun farko. Manta da bayani don mayar da samfurin kan ƙa\'idodin asali.';
+$string['modelregistry:learned_none'] = 'Babu mai samarwa da ya ƙi tsarin buƙata tukuna.';
+$string['modelregistry:col_field'] = 'Iyawa';
+$string['modelregistry:col_value'] = 'Ƙimar da aka koya';
+$string['modelregistry:col_evidence'] = 'Abin da mai samarwa ya ce';
+$string['modelregistry:forget'] = 'Manta';
+$string['modelregistry:forget_confirm'] = 'A manta da wannan bayani? Buƙata ta gaba zuwa wannan samfuri za ta sake amfani da ƙa\'idodin asali.';
+$string['modelregistry:forget_done'] = 'An manta da bayanin. Buƙata ta gaba zuwa wannan samfuri tana amfani da ƙa\'idodin asali.';
+$string['modelregistry:forget_missing'] = 'Wannan bayani ba ya nan kuma.';
+$string['event:model_capability_learned'] = 'An koyi iyawar samfuri daga mai samarwa';

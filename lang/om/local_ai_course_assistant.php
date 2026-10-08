@@ -3192,3 +3192,22 @@ $string['survey_admin:err_invalid_bounds'] = 'Gaaffiiwwan madaallii safartuu {$a
 $string['survey_admin:err_no_title'] = 'Mata duree qorannoo galchi.';
 
 $string['settings:int_range'] = 'Lakkoofsa guutuu {$a->min} hanga {$a->max} galchi.';
+
+$string['cachedef_modelcaps'] = 'Dhugaa dandeettii moodeelaa kan dhiyeessitoota irraa qoqqabamuun baratame';
+$string['settings:reasoning_effort'] = 'Carraaqqii yaadaa';
+$string['settings:reasoning_effort_desc'] = 'Moodeelonni deebii kennuu dura yaadan hammam akka yaadan gaafatamu. Moodeelota yaadaa OpenAI (GPT-5, GPT-6, gosa o) irratti akka <code>reasoning_effort</code>tti, moodeelota yaadaa Gemini irratti immoo akka baajata yaadaatti hojiirra oola. Moodeelli yaadaa hundi dheerina deebii armaan olii irratti dabalee bakka yaadaaf ni argata, kanaafuu yaadni deebii gidduutti kutuu hin danda\'u. Gadi aanaan barsiisaa gargaaraaf ni mijata: deebiin dafee dhufa, baasiin isaas xiqqaa dha. Cufaan bakka moodeelli hayyamutti yaada ni cufa. Moodeelonni to\'annoo yaadaa hin qabne qindaa\'ina kana ni dagatu.';
+$string['settings:reasoning_effort_off'] = 'Cufaa (hamma moodeelli hayyamu xiqqaa)';
+$string['settings:reasoning_effort_low'] = 'Gadi aanaa (ni gorfama)';
+$string['settings:reasoning_effort_medium'] = 'Giddugaleessa';
+$string['settings:reasoning_effort_high'] = 'Ol\'aanaa';
+$string['modelregistry:learned_heading'] = 'Dhugaa dandeettii dhiyeessitoota irraa baratame';
+$string['modelregistry:learned_desc'] = 'Yeroo dhiyeessaan tokko sababa moodeelli paaraameetira tokko kana booda hin fudhanneef gaaffii tokko didu, [[tutorshort]] paaraameetira sana qofa jijjiira, al tokko irra deebi\'ee yaala, akka gaaffiin itti aanu yeroo jalqabaatti sirrii ta\'uuf sirreeffama sana asitti yaadata. Moodeela gara seerota dhufanitti deebisuuf dhugaa tokko haqi.';
+$string['modelregistry:learned_none'] = 'Hanga ammaatti dhiyeessaan tokkollee bifa gaaffii hin dide.';
+$string['modelregistry:col_field'] = 'Dandeettii';
+$string['modelregistry:col_value'] = 'Gatii baratame';
+$string['modelregistry:col_evidence'] = 'Wanta dhiyeessaan jedhe';
+$string['modelregistry:forget'] = 'Haqi';
+$string['modelregistry:forget_confirm'] = 'Dhugaa kana haquu? Gaaffiin itti aanu moodeela kanaaf seerota dhufan irra deebi\'ee fayyadama.';
+$string['modelregistry:forget_done'] = 'Dhugaan haqameera. Gaaffiin itti aanu moodeela kanaaf seerota dhufan fayyadama.';
+$string['modelregistry:forget_missing'] = 'Dhugaan sun kana booda hin jiru.';
+$string['event:model_capability_learned'] = 'Dandeettii moodeelaa dhiyeessaa irraa baratame';

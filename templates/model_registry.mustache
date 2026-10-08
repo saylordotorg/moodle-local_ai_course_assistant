@@ -61,6 +61,8 @@
       tunables}.
     * queue - {models[{value, label}], hasmodels, functions[{value, label}],
       samples, maxsamples}.
+    * learned - {has, rows[{id, provider, model, field, value, evidence,
+      updated}]}: capability facts providers taught SOLA (v7.8.0).
 
     Example context (json):
     {
@@ -119,8 +121,16 @@
             "queueheading": "Run a benchmark", "queuedesc": "Queues a run on the next cron pass.",
             "queuefieldmodel": "Registry key", "queuefieldfunction": "Function",
             "queuefieldsamples": "Prompts", "queuesubmit": "Queue this benchmark",
-            "queuenoeligible": "Add a model to the registry first."
+            "queuenoeligible": "Add a model to the registry first.",
+            "learnedheading": "Capability facts learned from providers",
+            "learneddesc": "A provider rejected a request and said why.",
+            "learnednone": "No provider has rejected a request shape yet.",
+            "colfield": "Capability", "colvalue": "Learned value", "colevidence": "Provider said",
+            "forget": "Forget", "forgetconfirm": "Forget this fact?"
         },
+        "learned": {"has": true, "rows": [{"id": 1, "provider": "openai", "model": "gpt-6-luna",
+            "field": "token_param", "value": "max_completion_tokens",
+            "evidence": "Unsupported parameter: max_tokens", "updated": "7/10/26, 23:40"}]},
         "unpriced": {"has": true, "count": 1, "days": 30, "rows": [{
             "modelkey": "gemini-2.5-flash", "model": "gemini-2.5-flash", "provider": "gemini",
             "calls": "18,204", "tokens": "9,100,000", "lastseen": "8/09/26, 11:02",
@@ -603,6 +613,55 @@
             <p class="text-muted small">{{l.drifttruncated}}</p>
         {{/drift.truncated}}
     {{/drift.has}}
+
+    {{! ---------------------------------------------------------------
+        5b. Capability facts SOLA learned from provider rejections (v7.8.0).
+        Each one changed how requests to that model are built; deleting a
+        row puts the model back on the shipped rules.
+    --------------------------------------------------------------- }}
+    <h4 id="sola-learnedcaps">{{l.learnedheading}}</h4>
+    <p class="text-muted">{{l.learneddesc}}</p>
+    {{^learned.has}}
+        <p class="text-muted"><em>{{l.learnednone}}</em></p>
+    {{/learned.has}}
+    {{#learned.has}}
+        <div class="table-responsive mb-3">
+            <table class="table table-sm generaltable">
+                <thead>
+                    <tr>
+                        <th>{{l.colprovider}}</th>
+                        <th>{{l.colmodel}}</th>
+                        <th>{{l.colfield}}</th>
+                        <th>{{l.colvalue}}</th>
+                        <th>{{l.colevidence}}</th>
+                        <th>{{l.colupdated}}</th>
+                        <th>{{l.colactions}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#learned.rows}}
+                        <tr>
+                            <td>{{provider}}</td>
+                            <td><code>{{model}}</code></td>
+                            <td>{{field}}</td>
+                            <td><code>{{value}}</code></td>
+                            <td class="small text-muted">{{evidence}}</td>
+                            <td>{{updated}}</td>
+                            <td>
+                                <form method="post" action="{{posturl}}" class="d-inline"
+                                      data-confirm="{{l.forgetconfirm}}">
+                                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                    <input type="hidden" name="action" value="forgetcap">
+                                    <input type="hidden" name="capid" value="{{id}}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">{{l.forget}}</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {{/learned.rows}}
+                </tbody>
+            </table>
+        </div>
+    {{/learned.has}}
 
     {{! ---------------------------------------------------------------
         6. Benchmarks and recommendations, per SOLA function. A refusal is

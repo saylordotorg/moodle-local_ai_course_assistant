@@ -3181,3 +3181,22 @@ $string['survey_admin:err_invalid_bounds'] = 'மதிப்பீட்டு 
 $string['survey_admin:err_no_title'] = 'கணக்கெடுப்பின் தலைப்பை உள்ளிடவும்.';
 
 $string['settings:int_range'] = '{$a->min} முதல் {$a->max} வரையிலான முழு எண்ணை உள்ளிடவும்.';
+
+$string['cachedef_modelcaps'] = 'வழங்குநர் நிராகரிப்புகளிலிருந்து கற்ற மாதிரித் திறன் தகவல்கள்';
+$string['settings:reasoning_effort'] = 'சிந்தனை முயற்சி';
+$string['settings:reasoning_effort_desc'] = 'பதிலளிப்பதற்கு முன் சிந்திக்கும் மாதிரிகள் எவ்வளவு சிந்திக்க வேண்டும் என்பது. OpenAI சிந்தனை மாதிரிகளுக்கு (GPT-5, GPT-6, o வரிசை) <code>reasoning_effort</code> ஆகவும், Gemini சிந்தனை மாதிரிகளுக்குச் சிந்தனை வரம்பாகவும் பொருந்தும். ஒவ்வொரு சிந்தனை மாதிரிக்கும் மேலே உள்ள பதில் நீளத்துக்கு மேல் சிந்திக்க இடம் கிடைக்கிறது, எனவே சிந்தனை இனி பதிலைக் குறைக்க முடியாது. குறைவு ஒரு பயிற்றுநருக்கு ஏற்றது: பதில்கள் விரைவாக வரும், செலவும் குறைவு. அணை என்பது மாதிரி அனுமதிக்கும் இடங்களில் சிந்தனையை நிறுத்தும். சிந்தனைக் கட்டுப்பாடு இல்லாத மாதிரிகள் இந்த அமைப்பைப் புறக்கணிக்கும்.';
+$string['settings:reasoning_effort_off'] = 'அணை (மாதிரி அனுமதிக்கும் குறைந்தபட்சம்)';
+$string['settings:reasoning_effort_low'] = 'குறைவு (பரிந்துரைக்கப்படுகிறது)';
+$string['settings:reasoning_effort_medium'] = 'நடுத்தரம்';
+$string['settings:reasoning_effort_high'] = 'அதிகம்';
+$string['modelregistry:learned_heading'] = 'வழங்குநர்களிடமிருந்து கற்ற திறன் தகவல்கள்';
+$string['modelregistry:learned_desc'] = 'ஒரு மாதிரி இனி ஓர் அளவுருவை ஏற்காததால் வழங்குநர் கோரிக்கையை நிராகரிக்கும்போது, [[tutorshort]] அந்த ஒரு அளவுருவை மட்டும் மாற்றி, ஒருமுறை மீண்டும் முயன்று, அடுத்த கோரிக்கை முதல் முறையிலேயே சரியாக இருக்க அந்தத் திருத்தத்தை இங்கே நினைவில் வைக்கிறது. மாதிரியை இயல்பு விதிகளுக்குத் திருப்ப ஒரு தகவலை மறக்கவும்.';
+$string['modelregistry:learned_none'] = 'இதுவரை எந்த வழங்குநரும் கோரிக்கை வடிவத்தை நிராகரிக்கவில்லை.';
+$string['modelregistry:col_field'] = 'திறன்';
+$string['modelregistry:col_value'] = 'கற்ற மதிப்பு';
+$string['modelregistry:col_evidence'] = 'வழங்குநர் சொன்னது';
+$string['modelregistry:forget'] = 'மற';
+$string['modelregistry:forget_confirm'] = 'இந்தத் தகவலை மறக்கவா? இந்த மாதிரிக்கான அடுத்த கோரிக்கை மீண்டும் இயல்பு விதிகளைப் பயன்படுத்தும்.';
+$string['modelregistry:forget_done'] = 'தகவல் மறக்கப்பட்டது. இந்த மாதிரிக்கான அடுத்த கோரிக்கை இயல்பு விதிகளைப் பயன்படுத்தும்.';
+$string['modelregistry:forget_missing'] = 'அந்தத் தகவல் இனி இல்லை.';
+$string['event:model_capability_learned'] = 'வழங்குநரிடமிருந்து மாதிரித் திறன் கற்கப்பட்டது';
