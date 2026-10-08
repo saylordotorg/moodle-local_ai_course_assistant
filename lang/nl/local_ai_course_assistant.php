@@ -3202,3 +3202,144 @@ $string['modelregistry:forget_confirm'] = 'Dit feit vergeten? Het volgende verzo
 $string['modelregistry:forget_done'] = 'Feit vergeten. Het volgende verzoek aan dit model gebruikt de meegeleverde regels.';
 $string['modelregistry:forget_missing'] = 'Dat feit bestaat niet meer.';
 $string['event:model_capability_learned'] = 'Modelmogelijkheid geleerd van een provider';
+
+$string['autoupgrade:title'] = 'Modelupgrades';
+$string['autoupgrade:navtitle'] = 'Modelupgrades van [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] zoekt naar nieuwere modellen van de providers die het al gebruikt, test elke kandidaat tegen het model dat hij zou vervangen (dezelfde prompts, hetzelfde antwoordbudget, dezelfde beoordelaar, in dezelfde run) en wisselt alleen als de kandidaat per antwoord even duur of goedkoper is, even goed, even veilig en even betrouwbaar, twee keer achter elkaar. Elke wissel wordt 48 uur gevolgd op echt verkeer en teruggedraaid als het slechter wordt.';
+$string['autoupgrade:l_statusheading'] = 'Stand van zaken';
+$string['autoupgrade:l_mode'] = 'Modus';
+$string['autoupgrade:l_budget'] = 'Testbudget';
+$string['autoupgrade:l_changemode'] = 'Wijzigen';
+$string['autoupgrade:l_discover'] = 'Nu modellen zoeken';
+$string['autoupgrade:l_rolesheading'] = 'Rollen';
+$string['autoupgrade:l_current'] = 'Huidig model';
+$string['autoupgrade:l_profile'] = 'Capaciteitsprofiel';
+$string['autoupgrade:l_policy'] = 'Upgradebeleid';
+$string['autoupgrade:l_nocandidates'] = 'Geen kandidaten. Het zoeken markeert modellen van dezelfde provider met een vergelijkbare prijs.';
+$string['autoupgrade:l_colpasses'] = 'Geslaagd';
+$string['autoupgrade:l_collast'] = 'Laatste beoordeling';
+$string['autoupgrade:l_evaluate'] = 'Nu beoordelen';
+$string['autoupgrade:l_evaluating'] = 'In de wachtrij of bezig';
+$string['autoupgrade:l_switch'] = 'Wisselen';
+$string['autoupgrade:l_switchconfirm'] = 'Deze rol nu naar de kandidaat wisselen? De wijziging wordt 48 uur gevolgd en kan worden teruggedraaid.';
+$string['autoupgrade:l_evalsheading'] = 'Beoordelingen';
+$string['autoupgrade:l_noevals'] = 'Nog geen beoordelingen.';
+$string['autoupgrade:l_colwhen'] = 'Wanneer';
+$string['autoupgrade:l_colrole'] = 'Rol';
+$string['autoupgrade:l_colcandidate'] = 'Kandidaat';
+$string['autoupgrade:l_colincumbent'] = 'Huidig model';
+$string['autoupgrade:l_colcost'] = 'Besteed / schatting';
+$string['autoupgrade:l_colgate'] = 'Drempelcontroles';
+$string['autoupgrade:l_switchesheading'] = 'Wissels en terugdraaiingen';
+$string['autoupgrade:l_noswitches'] = 'Nog geen wissels.';
+$string['autoupgrade:l_colfrom'] = 'Van';
+$string['autoupgrade:l_colto'] = 'Naar';
+$string['autoupgrade:l_colmode'] = 'Hoe';
+$string['autoupgrade:l_colreason'] = 'Reden';
+$string['autoupgrade:l_coluntil'] = 'Gevolgd tot';
+$string['autoupgrade:l_rollback'] = 'Terugdraaien';
+$string['autoupgrade:l_rollbackconfirm'] = 'Het vorige model nu terugzetten?';
+$string['autoupgrade:l_manage'] = 'Geleerde gegevens bekijken of vergeten op de pagina van het modelregister';
+$string['autoupgrade:l_notinuse'] = 'niet in gebruik';
+$string['autoupgrade:mode_off'] = 'Uit: niets automatisch';
+$string['autoupgrade:mode_recommend'] = 'Aanbevelen: kandidaten testen en een aanbeveling e-mailen';
+$string['autoupgrade:mode_auto'] = 'Automatisch: kandidaten testen en wisselen als er een slaagt';
+$string['autoupgrade:budget_line'] = '${$a->spent} van ${$a->limit} besteed deze maand (${$a->left} over)';
+$string['autoupgrade:last_discovery'] = 'Laatste zoekactie: {$a}.';
+$string['autoupgrade:never_discovered'] = 'Er is nog niet gezocht.';
+$string['autoupgrade:role_chat'] = 'Chat (hoofdmodel)';
+$string['autoupgrade:role_premium'] = 'Premiumniveau';
+$string['autoupgrade:role_failover'] = 'Uitwijkmodel';
+$string['autoupgrade:role_quiz'] = 'Quizgeneratie';
+$string['autoupgrade:role_classifier'] = 'Beheersingsclassificatie';
+$string['autoupgrade:role_safety'] = 'Veiligheidsreferentie';
+$string['autoupgrade:role_soapbox'] = 'Soapbox-beoordeling';
+$string['autoupgrade:not_configured'] = 'Niet ingesteld (neemt het chatmodel over)';
+$string['autoupgrade:policy_auto'] = 'Beoordeeld en automatisch gewisseld in de modus Automatisch';
+$string['autoupgrade:policy_recommend'] = 'Beoordeeld en aanbevolen; een beheerder wisselt het';
+$string['autoupgrade:policy_none'] = 'Alleen kandidaten vermeld: geen benchmark meet de taak van deze rol';
+$string['autoupgrade:cand_candidate'] = 'Kandidaat';
+$string['autoupgrade:cand_passed'] = 'Eén keer geslaagd';
+$string['autoupgrade:cand_eligible'] = 'Komt in aanmerking';
+$string['autoupgrade:cand_failed'] = 'Niet geslaagd';
+$string['autoupgrade:cand_switched'] = 'In gebruik';
+$string['autoupgrade:cand_rolledback'] = 'Teruggedraaid';
+$string['autoupgrade:cand_retired'] = 'Niet meer vermeld';
+$string['autoupgrade:eval_queued'] = 'In de wachtrij';
+$string['autoupgrade:eval_running'] = 'Bezig';
+$string['autoupgrade:eval_complete'] = 'Voltooid';
+$string['autoupgrade:eval_failed'] = 'Mislukt';
+$string['autoupgrade:eval_skipped'] = 'Niet uitgevoerd';
+$string['autoupgrade:gate_pass'] = 'Geslaagd:';
+$string['autoupgrade:gate_fail'] = 'Niet geslaagd:';
+$string['autoupgrade:how_auto'] = 'Automatisch';
+$string['autoupgrade:how_manual'] = 'Door een beheerder';
+$string['autoupgrade:switch_watching'] = 'Wordt gevolgd';
+$string['autoupgrade:switch_kept'] = 'Behouden';
+$string['autoupgrade:switch_rolledback'] = 'Teruggedraaid';
+$string['autoupgrade:switch_superseded'] = 'Sindsdien gewijzigd door een beheerder';
+$string['autoupgrade:block_role'] = 'Deze rol kan hier niet worden gewisseld.';
+$string['autoupgrade:block_emergency'] = 'Er is een noodschakelaar actief, dus er wordt geen model gewisseld tot die is hersteld.';
+$string['autoupgrade:block_allowlist'] = 'De instelling {$a} mag niet zonder een persoon door een wissel worden gewijzigd, dus deze rol wordt handmatig gewisseld.';
+$string['autoupgrade:block_bundle'] = 'De instelling {$a} wordt beheerd door het ondertekende beleidspakket. Wijzig het model in het pakket.';
+$string['autoupgrade:block_watching'] = 'Een wissel van deze rol wordt nog gevolgd. Wacht tot die is behouden of teruggedraaid.';
+$string['autoupgrade:block_noeval'] = 'Deze kandidaat heeft geen voltooide beoordeling.';
+$string['autoupgrade:block_gate'] = 'De laatste beoordeling van deze kandidaat haalde de drempel niet.';
+$string['autoupgrade:block_changed'] = 'Het model van de rol is na de beoordeling gewijzigd, dus die vergelijkt niet meer het juiste paar. Beoordeel opnieuw.';
+$string['autoupgrade:switched'] = '{$a->role} gewisseld naar {$a->model}. Dit wordt 48 uur gevolgd.';
+$string['autoupgrade:rolledback'] = 'Wissel {$a} teruggedraaid.';
+$string['autoupgrade:rollback_missing'] = 'Die wissel kan niet worden teruggedraaid.';
+$string['autoupgrade:rollback_superseded'] = 'De instellingen zijn na de wissel gewijzigd, dus er is niets teruggedraaid.';
+$string['autoupgrade:rollback_by_admin'] = 'Teruggedraaid door een beheerder.';
+$string['autoupgrade:queued'] = 'Beoordeling in de wachtrij. Die draait bij de volgende cronronde en duurt enkele minuten.';
+$string['autoupgrade:discovered'] = 'Het zoeken vermeldde {$a->providers} provider(s), registreerde {$a->registered} model(len) en markeerde {$a->candidates} kandidaat/kandidaten. Providers die niet konden worden opgevraagd: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Deze rol wordt niet automatisch gewisseld.';
+$string['autoupgrade:why_recommend_mode'] = 'Automatische modelupgrades staan in de modus Aanbevelen.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} gewisseld naar {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] heeft de rol {$a->role} gewisseld van {$a->from} naar {$a->to}.
+
+Het slaagde voor elke controle tegen het huidige model, gemeten in dezelfde run, twee keer achter elkaar:
+{$a->gate}
+
+Het nieuwe model wordt {$a->hours} uur gevolgd op echt verkeer en automatisch teruggedraaid als fouten, afgebroken antwoorden, weigeringen of kosten per antwoord verslechteren. Je kunt het op elk moment zelf terugdraaien:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} teruggedraaid naar {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] heeft de rol {$a->role} teruggezet van {$a->to} naar {$a->from}.
+
+Reden: {$a->reason}
+
+De kandidaat wordt 30 dagen niet opnieuw geprobeerd. Details:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Wissel van {$a->role} naar {$a->to} behouden';
+$string['autoupgrade:mail_kept_body'] = 'De wissel van de rol {$a->role} van {$a->from} naar {$a->to} hield {$a->hours} uur stand over {$a->turns} echte antwoorden en wordt behouden.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'De wissel van de rol {$a->role} van {$a->from} naar {$a->to} wordt na {$a->hours} uur behouden, maar er zijn maar {$a->turns} echte antwoorden gezien, te weinig om te beoordelen. Houd het in de gaten.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Aanbevolen: {$a->role} op {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} slaagde voor elke controle tegen {$a->current} voor de rol {$a->role}, twee keer achter elkaar, en is niet automatisch gewisseld: {$a->why}
+
+{$a->gate}
+
+Wissel het, of laat het zo, hier:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Je ontvangt dit omdat je adres een ontvanger is van uitgavenwaarschuwingen van [[tutorshort]].';
+$string['event:model_switched'] = 'Model gewisseld';
+$string['event:model_switch_rolled_back'] = 'Modelwissel teruggedraaid';
+$string['task:discover_models'] = 'Nieuwe AI-modellen zoeken en beoordelingen in de wachtrij zetten';
+$string['task:evaluate_model_candidate'] = 'Een kandidaat-AI-model beoordelen';
+$string['task:watch_model_switches'] = 'Recente wissels van AI-modellen volgen';
+$string['settings:autoupgrade_heading'] = 'Automatische modelupgrades';
+$string['settings:autoupgrade_heading_desc'] = 'Elke dag vermeldt [[tutorshort]] de modellen die je providers aanbieden en markeert kandidaten voor elke rol: dezelfde provider, een vergelijkbare catalogusprijs en een bekende prijs. Het test ze tegen het huidige model op de tutorprompts, de jailbreaksuite en kosten zoals bij echt gebruik, en wisselt de standaard van de site alleen als een kandidaat per antwoord even duur of goedkoper is, even goed, even veilig en even betrouwbaar, twee keer achter elkaar. Cursussen met een eigen model houden dat. Elke wissel wordt gemaild naar de ontvangers van uitgavenwaarschuwingen en 48 uur gevolgd.';
+$string['settings:autoupgrade_mode'] = 'Modus';
+$string['settings:autoupgrade_mode_desc'] = 'Automatisch wisselt als een kandidaat slaagt. Aanbevelen test kandidaten en mailt in plaats daarvan een aanbeveling. Uit doet niets automatisch.';
+$string['settings:autoupgrade_budget_usd'] = 'Maandelijks testbudget (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Het maximum dat automatische beoordelingen in een kalendermaand mogen besteden, beoordelaar inbegrepen. Een beoordeling die de maand hierboven kan brengen, start niet.';
+$string['settings:autoupgrade_eval_courseid'] = 'Cursus-ID voor beoordelingen';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Beoordelingen antwoorden met de systeemprompt die deze cursus echt gebruikt, opgebouwd voor de gastidentiteit zodat er geen gegevens van studenten worden verzonden. 0 kiest de cursus met de meeste chatantwoorden in de afgelopen 30 dagen.';
+$string['privacy:metadata:model_eval'] = 'Automatische modelbeoordelingen: welk kandidaatmodel met welk huidig model is vergeleken, en het gemeten resultaat. Het enige persoonsgegeven is de identificatie van de beheerder die om de beoordeling vroeg. Deze rijen zijn siteconfiguratie en geen persoonsgegevens over een student, dus ze worden niet opgenomen in een gegevensexport en niet verwijderd wanneer een gebruiker om wissing vraagt.';
+$string['privacy:metadata:model_eval:createdby'] = 'De sitebeheerder die om deze beoordeling vroeg. Leeg als het zoeken hem in de wachtrij zette.';
+$string['privacy:metadata:model_switch'] = 'Modelwissels en terugdraaiingen: van welk naar welk model een rol ging, en waarom. Het enige persoonsgegeven is de identificatie van de beheerder die de wissel uitvoerde of terugdraaide. Deze rijen zijn siteconfiguratie en geen persoonsgegevens over een student, dus ze worden niet opgenomen in een gegevensexport en niet verwijderd wanneer een gebruiker om wissing vraagt.';
+$string['privacy:metadata:model_switch:createdby'] = 'De sitebeheerder die deze wissel uitvoerde. Leeg als die automatisch was.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'De sitebeheerder die deze wissel terugdraaide. Leeg als de bewaking het deed, of als die niet is teruggedraaid.';

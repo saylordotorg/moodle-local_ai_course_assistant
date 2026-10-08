@@ -3215,3 +3215,144 @@ $string['modelregistry:forget_confirm'] = '忘记这条信息？对此模型的�
 $string['modelregistry:forget_done'] = '信息已忘记。对此模型的下一次请求将使用内置规则。';
 $string['modelregistry:forget_missing'] = '该信息已不存在。';
 $string['event:model_capability_learned'] = '从服务商学到了模型能力';
+
+$string['autoupgrade:title'] = '模型升级';
+$string['autoupgrade:navtitle'] = '[[tutorshort]] 模型升级';
+$string['autoupgrade:intro'] = '[[tutorshort]] 会从已在使用的提供商处查找更新的模型，将每个候选模型与其将替换的模型进行对比测试（相同的提示词、相同的回答预算、相同的评审模型，在同一次运行中），并且只有当候选模型每次回答的价格相同或更低、质量相当、安全性相当且可靠性相当，并连续两次达标时才会切换。每次切换都会在真实流量上监控 48 小时，如果表现变差则会回滚。';
+$string['autoupgrade:l_statusheading'] = '状态';
+$string['autoupgrade:l_mode'] = '模式';
+$string['autoupgrade:l_budget'] = '测试预算';
+$string['autoupgrade:l_changemode'] = '更改';
+$string['autoupgrade:l_discover'] = '立即发现模型';
+$string['autoupgrade:l_rolesheading'] = '角色';
+$string['autoupgrade:l_current'] = '当前模型';
+$string['autoupgrade:l_profile'] = '能力概况';
+$string['autoupgrade:l_policy'] = '升级';
+$string['autoupgrade:l_nocandidates'] = '没有候选模型。发现过程会标记同一提供商中价格相近的模型。';
+$string['autoupgrade:l_colpasses'] = '通过次数';
+$string['autoupgrade:l_collast'] = '最近一次评估';
+$string['autoupgrade:l_evaluate'] = '立即评估';
+$string['autoupgrade:l_evaluating'] = '排队中或运行中';
+$string['autoupgrade:l_switch'] = '切换';
+$string['autoupgrade:l_switchconfirm'] = '现在将此角色切换到候选模型吗？此更改将被监控 48 小时，并可回滚。';
+$string['autoupgrade:l_evalsheading'] = '评估';
+$string['autoupgrade:l_noevals'] = '暂无评估。';
+$string['autoupgrade:l_colwhen'] = '时间';
+$string['autoupgrade:l_colrole'] = '角色';
+$string['autoupgrade:l_colcandidate'] = '候选模型';
+$string['autoupgrade:l_colincumbent'] = '当前模型';
+$string['autoupgrade:l_colcost'] = '已花费 / 预估';
+$string['autoupgrade:l_colgate'] = '门槛检查';
+$string['autoupgrade:l_switchesheading'] = '切换与回滚';
+$string['autoupgrade:l_noswitches'] = '暂无切换。';
+$string['autoupgrade:l_colfrom'] = '原模型';
+$string['autoupgrade:l_colto'] = '新模型';
+$string['autoupgrade:l_colmode'] = '方式';
+$string['autoupgrade:l_colreason'] = '原因';
+$string['autoupgrade:l_coluntil'] = '监控截止';
+$string['autoupgrade:l_rollback'] = '回滚';
+$string['autoupgrade:l_rollbackconfirm'] = '现在恢复之前的模型吗？';
+$string['autoupgrade:l_manage'] = '在模型注册表页面查看或删除已学习的信息';
+$string['autoupgrade:l_notinuse'] = '未使用';
+$string['autoupgrade:mode_off'] = '关闭：不进行任何自动操作';
+$string['autoupgrade:mode_recommend'] = '推荐：测试候选模型并通过电子邮件发送推荐';
+$string['autoupgrade:mode_auto'] = '自动：测试候选模型，并在有模型通过时切换';
+$string['autoupgrade:budget_line'] = '本月已花费 ${$a->spent}，上限 ${$a->limit}（剩余 ${$a->left}）';
+$string['autoupgrade:last_discovery'] = '上次运行发现的时间：{$a}。';
+$string['autoupgrade:never_discovered'] = '发现尚未运行。';
+$string['autoupgrade:role_chat'] = '聊天（主模型）';
+$string['autoupgrade:role_premium'] = '高级层级';
+$string['autoupgrade:role_failover'] = '故障切换';
+$string['autoupgrade:role_quiz'] = '测验生成';
+$string['autoupgrade:role_classifier'] = '掌握程度分类器';
+$string['autoupgrade:role_safety'] = '安全参考';
+$string['autoupgrade:role_soapbox'] = 'Soapbox 评分';
+$string['autoupgrade:not_configured'] = '未配置（沿用聊天模型）';
+$string['autoupgrade:policy_auto'] = '会被评估，并在自动模式下自动切换';
+$string['autoupgrade:policy_recommend'] = '会被评估并推荐；由管理员进行切换';
+$string['autoupgrade:policy_none'] = '仅列出候选模型：没有基准可衡量此角色的任务';
+$string['autoupgrade:cand_candidate'] = '候选';
+$string['autoupgrade:cand_passed'] = '已通过一次';
+$string['autoupgrade:cand_eligible'] = '符合条件';
+$string['autoupgrade:cand_failed'] = '未通过';
+$string['autoupgrade:cand_switched'] = '使用中';
+$string['autoupgrade:cand_rolledback'] = '已回滚';
+$string['autoupgrade:cand_retired'] = '已不再列出';
+$string['autoupgrade:eval_queued'] = '排队中';
+$string['autoupgrade:eval_running'] = '运行中';
+$string['autoupgrade:eval_complete'] = '已完成';
+$string['autoupgrade:eval_failed'] = '失败';
+$string['autoupgrade:eval_skipped'] = '未运行';
+$string['autoupgrade:gate_pass'] = '通过：';
+$string['autoupgrade:gate_fail'] = '未通过：';
+$string['autoupgrade:how_auto'] = '自动';
+$string['autoupgrade:how_manual'] = '由管理员操作';
+$string['autoupgrade:switch_watching'] = '监控中';
+$string['autoupgrade:switch_kept'] = '已保留';
+$string['autoupgrade:switch_rolledback'] = '已回滚';
+$string['autoupgrade:switch_superseded'] = '此后已被管理员更改';
+$string['autoupgrade:block_role'] = '无法在此处切换此角色。';
+$string['autoupgrade:block_emergency'] = '紧急控制已启用，在其恢复之前不会切换任何模型。';
+$string['autoupgrade:block_allowlist'] = '设置 {$a} 不属于可在无人参与时由切换更改的设置，因此此角色需手动切换。';
+$string['autoupgrade:block_bundle'] = '设置 {$a} 由已签名的策略包管理。请改为在策略包中更改模型。';
+$string['autoupgrade:block_watching'] = '此角色的一次切换仍在监控中。请等待其被保留或回滚。';
+$string['autoupgrade:block_noeval'] = '此候选模型没有已完成的评估。';
+$string['autoupgrade:block_gate'] = '此候选模型的最近一次评估未通过门槛。';
+$string['autoupgrade:block_changed'] = '评估之后该角色的模型已更改，因此评估不再比较正确的模型对。请重新评估。';
+$string['autoupgrade:switched'] = '已将 {$a->role} 切换到 {$a->model}。将监控 48 小时。';
+$string['autoupgrade:rolledback'] = '已回滚 {$a} 的切换。';
+$string['autoupgrade:rollback_missing'] = '该切换无法回滚。';
+$string['autoupgrade:rollback_superseded'] = '切换之后设置已被更改，因此未回滚任何内容。';
+$string['autoupgrade:rollback_by_admin'] = '由管理员回滚。';
+$string['autoupgrade:queued'] = '评估已加入队列。它将在下一次 cron 运行时执行，需要几分钟。';
+$string['autoupgrade:discovered'] = '发现过程列出了 {$a->providers} 个提供商，登记了 {$a->registered} 个模型，并标记了 {$a->candidates} 个候选模型。无法列出的提供商：{$a->errors}。';
+$string['autoupgrade:why_manual_role'] = '此角色不会自动切换。';
+$string['autoupgrade:why_recommend_mode'] = '自动模型升级处于推荐模式。';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} 已切换到 {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] 已将 {$a->role} 角色从 {$a->from} 切换到 {$a->to}。
+
+它在同一次运行中与当前模型对比，连续两次通过了所有检查：
+{$a->gate}
+
+新模型将在真实流量上监控 {$a->hours} 小时，如果错误、被截断的回答、拒绝回答或每次回答的成本变差，将自动回滚。您也可以随时自行回滚：
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} 已回滚到 {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] 已将 {$a->role} 角色从 {$a->to} 恢复为 {$a->from}。
+
+原因：{$a->reason}
+
+该候选模型在 30 天内不会再次尝试。详情：
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] {$a->role} 切换到 {$a->to} 已保留';
+$string['autoupgrade:mail_kept_body'] = '{$a->role} 角色从 {$a->from} 到 {$a->to} 的切换在 {$a->hours} 小时内经受住了 {$a->turns} 次真实回答的检验，现已保留。
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = '{$a->role} 角色从 {$a->from} 到 {$a->to} 的切换在 {$a->hours} 小时后已保留，但仅观察到 {$a->turns} 次真实回答，数量太少，无法判断。请继续关注。
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] 推荐：{$a->role} 使用 {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} 在 {$a->role} 角色上与 {$a->current} 对比，连续两次通过了所有检查，但未自动切换：{$a->why}
+
+{$a->gate}
+
+在此处切换或保持不变：
+{$a->url}';
+$string['autoupgrade:mail_reason'] = '您收到此邮件，是因为您的地址是 [[tutorshort]] 支出提醒的收件人。';
+$string['event:model_switched'] = '模型已切换';
+$string['event:model_switch_rolled_back'] = '模型切换已回滚';
+$string['task:discover_models'] = '发现新的 AI 模型并将评估加入队列';
+$string['task:evaluate_model_candidate'] = '评估候选 AI 模型';
+$string['task:watch_model_switches'] = '监控近期的 AI 模型切换';
+$string['settings:autoupgrade_heading'] = '自动模型升级';
+$string['settings:autoupgrade_heading_desc'] = '[[tutorshort]] 每天列出您的提供商所提供的模型，并为每个角色标记候选模型：同一提供商、标价相近且价格已知。它会使用导师提示词、越狱测试套件以及贴近真实使用的成本，将候选模型与当前模型进行对比测试，并且只有当候选模型每次回答的价格相同或更低、质量相当、安全性相当且可靠性相当，并连续两次达标时，才会切换站点默认模型。拥有自己模型的课程会保留其模型。每次切换都会通过电子邮件通知支出提醒收件人，并监控 48 小时。';
+$string['settings:autoupgrade_mode'] = '模式';
+$string['settings:autoupgrade_mode_desc'] = '自动：候选模型通过时进行切换。推荐：测试候选模型，并改为通过电子邮件发送推荐。关闭：不进行任何自动操作。';
+$string['settings:autoupgrade_budget_usd'] = '每月测试预算（USD）';
+$string['settings:autoupgrade_budget_usd_desc'] = '自动评估在一个日历月内最多可花费的金额，包括评审模型。可能使当月花费超出此金额的评估不会启动。';
+$string['settings:autoupgrade_eval_courseid'] = '评估课程 ID';
+$string['settings:autoupgrade_eval_courseid_desc'] = '评估会使用此课程实际使用的系统提示词作答，该提示词以访客身份构建，因此不会发送任何学习者的数据。0 表示选择过去 30 天内聊天回答最多的课程。';
+$string['privacy:metadata:model_eval'] = '自动模型评估：哪个候选模型与哪个当前模型进行了比较，以及测得的结果。唯一的个人数据是请求评估的管理员的标识符。这些记录属于站点配置，而非关于学习者的个人数据，因此不包含在数据导出中，用户请求删除数据时也不会被删除。';
+$string['privacy:metadata:model_eval:createdby'] = '请求此评估的站点管理员。由发现过程加入队列时为空。';
+$string['privacy:metadata:model_switch'] = '模型切换与回滚：某个角色从哪个模型切换到哪个模型，以及原因。唯一的个人数据是执行或撤销切换的管理员的标识符。这些记录属于站点配置，而非关于学习者的个人数据，因此不包含在数据导出中，用户请求删除数据时也不会被删除。';
+$string['privacy:metadata:model_switch:createdby'] = '执行此切换的站点管理员。自动切换时为空。';
+$string['privacy:metadata:model_switch:rolledbackby'] = '回滚此切换的站点管理员。由监控程序回滚或未回滚时为空。';

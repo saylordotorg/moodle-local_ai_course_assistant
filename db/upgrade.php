@@ -2209,5 +2209,92 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100700, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026100701) {
+        // v7.8.0: automatic model upgrades. Candidates per role, evaluations
+        // with their gate verdict and spend, and switches with their rollback
+        // data. Site configuration and aggregates only.
+        $table = new xmldb_table('local_ai_course_assistant_model_cand');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('role', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'candidate');
+        $table->add_field('passes', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('lastevalid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('reason', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('role_provider_model_variant_uq', XMLDB_INDEX_UNIQUE, ['role', 'provider', 'model', 'variant']);
+        $table->add_index('status', XMLDB_INDEX_NOTUNIQUE, ['status']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('local_ai_course_assistant_model_eval');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('candidateid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('role', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('inc_provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('inc_model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('inc_variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'queued');
+        $table->add_field('est_cost_usd', XMLDB_TYPE_NUMBER, '12, 6', null, null, null, null);
+        $table->add_field('actual_cost_usd', XMLDB_TYPE_NUMBER, '12, 6', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('cand_runid', XMLDB_TYPE_CHAR, '40', null, null, null, null);
+        $table->add_field('inc_runid', XMLDB_TYPE_CHAR, '40', null, null, null, null);
+        $table->add_field('metrics', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('gate_passed', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        $table->add_field('gate_detail', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('message', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('createdby', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecompleted', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('createdby_fk_eval', XMLDB_KEY_FOREIGN, ['createdby'], 'user', ['id']);
+        $table->add_index('candidate_status', XMLDB_INDEX_NOTUNIQUE, ['candidateid', 'status']);
+        $table->add_index('timecreated', XMLDB_INDEX_NOTUNIQUE, ['timecreated']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('local_ai_course_assistant_model_switch');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('role', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('from_provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('from_model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('from_variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('to_provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('to_model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('to_variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('candidateid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('evalid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('mode', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, 'auto');
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'watching');
+        $table->add_field('prevconfig', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('newconfig', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('baseline', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('livemetrics', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('watchuntil', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('reason', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('createdby', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('rolledbackby', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timeresolved', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('createdby_fk_switch', XMLDB_KEY_FOREIGN, ['createdby'], 'user', ['id']);
+        $table->add_key('rolledbackby_fk_switch', XMLDB_KEY_FOREIGN, ['rolledbackby'], 'user', ['id']);
+        $table->add_index('role_status', XMLDB_INDEX_NOTUNIQUE, ['role', 'status']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026100701, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

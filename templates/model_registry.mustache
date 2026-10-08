@@ -126,8 +126,9 @@
             "learneddesc": "A provider rejected a request and said why.",
             "learnednone": "No provider has rejected a request shape yet.",
             "colfield": "Capability", "colvalue": "Learned value", "colevidence": "Provider said",
-            "forget": "Forget", "forgetconfirm": "Forget this fact?"
+            "forget": "Forget", "forgetconfirm": "Forget this fact?", "upgradeslink": "Model upgrades"
         },
+        "upgradesurl": "https://example.org/local/ai_course_assistant/model_upgrades.php",
         "learned": {"has": true, "rows": [{"id": 1, "provider": "openai", "model": "gpt-6-luna",
             "field": "token_param", "value": "max_completion_tokens",
             "evidence": "Unsupported parameter: max_tokens", "updated": "7/10/26, 23:40"}]},
@@ -193,6 +194,7 @@
     </div>
 
     <p class="text-muted">{{l.intro}}</p>
+    {{#upgradesurl}}<p><a href="{{upgradesurl}}" class="btn btn-sm btn-outline-primary">{{l.upgradeslink}}</a></p>{{/upgradesurl}}
 
     {{! ---------------------------------------------------------------
         1. Unpriced models. An alert rather than a table section: this is

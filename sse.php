@@ -260,6 +260,9 @@ ob_implicit_flush(true);
  * @param string $learnertext What the learner was shown at the time. Persisted
  *        verbatim when present, so a refusal replays as the notice they saw
  *        rather than as an internal identifier.
+ * @param object|null $provider The provider that failed, when one was built.
+ *        v7.8.0: its id and model are recorded on the row, so the watcher of a
+ *        model switch can count a model's failures; they were stored blank.
  * @return void
  */
 function local_ai_course_assistant_record_failed_turn(
@@ -270,8 +273,22 @@ function local_ai_course_assistant_record_failed_turn(
     string $errclass,
     ?int $pageid,
     string $interactiontype,
-    string $learnertext = ''
+    string $learnertext = '',
+    $provider = null
 ): void {
+    $providerid = '';
+    $modelname = null;
+    try {
+        if (is_object($provider) && method_exists($provider, 'provider_id')) {
+            $providerid = (string) $provider->provider_id();
+        }
+        if (is_object($provider) && method_exists($provider, 'model_id')) {
+            $modelname = (string) $provider->model_id() ?: null;
+        }
+    } catch (\Throwable $ignore) {
+        $providerid = '';
+        $modelname = null;
+    }
     try {
         if (empty($conv->id) || empty($userid)) {
             return;
@@ -288,10 +305,10 @@ function local_ai_course_assistant_record_failed_turn(
             // stream and was never stored. $errclass stays for the audit row.
             \local_ai_course_assistant\conversation_manager::failed_turn_text($partial, $learnertext),
             0,
-            '',
+            $providerid,
             null,
             null,
-            null,
+            $modelname,
             $interactiontype,
             $pageid ?: null,
             null,
@@ -1307,7 +1324,7 @@ try {
     local_ai_course_assistant_record_failed_turn(
         $conv ?? null, (int)($USER->id ?? 0), (int)($courseid ?? 0),
         $fullresponse ?? '', get_class($e), $pageid ?? null, $interactiontype ?? 'chat',
-        $learnernotice ?? ''
+        $learnernotice ?? '', $provider ?? null
     );
     local_ai_course_assistant_sse_send(['error' => $errmsg]);
 } catch (\Throwable $e) {
@@ -1327,7 +1344,7 @@ try {
     local_ai_course_assistant_record_failed_turn(
         $conv ?? null, (int)($USER->id ?? 0), (int)($courseid ?? 0),
         $fullresponse ?? '', get_class($e), $pageid ?? null, $interactiontype ?? 'chat',
-        $learnernotice ?? ''
+        $learnernotice ?? '', $provider ?? null
     );
     try {
         // moodle_exception::$debuginfo carries the provider's own error text —

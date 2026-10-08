@@ -3199,3 +3199,144 @@ $string['modelregistry:forget_confirm'] = 'Quên thông tin này? Yêu cầu ti�
 $string['modelregistry:forget_done'] = 'Đã quên thông tin. Yêu cầu tiếp theo tới mô hình này sẽ dùng các quy tắc mặc định đi kèm.';
 $string['modelregistry:forget_missing'] = 'Thông tin đó không còn tồn tại.';
 $string['event:model_capability_learned'] = 'Đã học được khả năng của mô hình từ nhà cung cấp';
+
+$string['autoupgrade:title'] = 'Nâng cấp mô hình';
+$string['autoupgrade:navtitle'] = 'Nâng cấp mô hình của [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] tìm các mô hình mới hơn từ những nhà cung cấp đang dùng, thử nghiệm từng ứng viên so với mô hình mà nó sẽ thay thế (cùng prompt, cùng ngân sách câu trả lời, cùng bộ chấm, trong cùng một lượt chạy), và chỉ chuyển đổi khi ứng viên có giá mỗi câu trả lời bằng hoặc rẻ hơn, tốt bằng, an toàn bằng và đáng tin cậy bằng, hai lần liên tiếp. Mỗi lần chuyển đổi được theo dõi trong 48 giờ trên lưu lượng thực và sẽ được hoàn tác nếu kém đi.';
+$string['autoupgrade:l_statusheading'] = 'Trạng thái';
+$string['autoupgrade:l_mode'] = 'Chế độ';
+$string['autoupgrade:l_budget'] = 'Ngân sách thử nghiệm';
+$string['autoupgrade:l_changemode'] = 'Thay đổi';
+$string['autoupgrade:l_discover'] = 'Tìm mô hình ngay';
+$string['autoupgrade:l_rolesheading'] = 'Vai trò';
+$string['autoupgrade:l_current'] = 'Mô hình hiện tại';
+$string['autoupgrade:l_profile'] = 'Hồ sơ năng lực';
+$string['autoupgrade:l_policy'] = 'Nâng cấp';
+$string['autoupgrade:l_nocandidates'] = 'Không có ứng viên. Quá trình tìm kiếm đánh dấu các mô hình cùng nhà cung cấp có mức giá tương đương.';
+$string['autoupgrade:l_colpasses'] = 'Số lần đạt';
+$string['autoupgrade:l_collast'] = 'Lần đánh giá gần nhất';
+$string['autoupgrade:l_evaluate'] = 'Đánh giá ngay';
+$string['autoupgrade:l_evaluating'] = 'Đang chờ hoặc đang chạy';
+$string['autoupgrade:l_switch'] = 'Chuyển đổi';
+$string['autoupgrade:l_switchconfirm'] = 'Chuyển vai trò này sang ứng viên ngay bây giờ? Thay đổi sẽ được theo dõi trong 48 giờ và có thể hoàn tác.';
+$string['autoupgrade:l_evalsheading'] = 'Các lần đánh giá';
+$string['autoupgrade:l_noevals'] = 'Chưa có lần đánh giá nào.';
+$string['autoupgrade:l_colwhen'] = 'Thời điểm';
+$string['autoupgrade:l_colrole'] = 'Vai trò';
+$string['autoupgrade:l_colcandidate'] = 'Ứng viên';
+$string['autoupgrade:l_colincumbent'] = 'Mô hình hiện tại';
+$string['autoupgrade:l_colcost'] = 'Đã chi / ước tính';
+$string['autoupgrade:l_colgate'] = 'Kiểm tra ngưỡng';
+$string['autoupgrade:l_switchesheading'] = 'Chuyển đổi và hoàn tác';
+$string['autoupgrade:l_noswitches'] = 'Chưa có lần chuyển đổi nào.';
+$string['autoupgrade:l_colfrom'] = 'Từ';
+$string['autoupgrade:l_colto'] = 'Sang';
+$string['autoupgrade:l_colmode'] = 'Cách thức';
+$string['autoupgrade:l_colreason'] = 'Lý do';
+$string['autoupgrade:l_coluntil'] = 'Theo dõi đến';
+$string['autoupgrade:l_rollback'] = 'Hoàn tác';
+$string['autoupgrade:l_rollbackconfirm'] = 'Khôi phục mô hình trước đó ngay bây giờ?';
+$string['autoupgrade:l_manage'] = 'Xem lại hoặc xóa các thông tin đã học trên trang registry mô hình';
+$string['autoupgrade:l_notinuse'] = 'không được sử dụng';
+$string['autoupgrade:mode_off'] = 'Tắt: không có gì tự động';
+$string['autoupgrade:mode_recommend'] = 'Đề xuất: thử nghiệm ứng viên và gửi email đề xuất';
+$string['autoupgrade:mode_auto'] = 'Tự động: thử nghiệm ứng viên và chuyển đổi khi có ứng viên đạt';
+$string['autoupgrade:budget_line'] = 'Đã chi ${$a->spent} trên ${$a->limit} trong tháng này (còn ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Lần tìm kiếm gần nhất chạy lúc {$a}.';
+$string['autoupgrade:never_discovered'] = 'Chưa chạy tìm kiếm lần nào.';
+$string['autoupgrade:role_chat'] = 'Trò chuyện (mô hình chính)';
+$string['autoupgrade:role_premium'] = 'Gói cao cấp';
+$string['autoupgrade:role_failover'] = 'Mô hình dự phòng';
+$string['autoupgrade:role_quiz'] = 'Tạo bài kiểm tra';
+$string['autoupgrade:role_classifier'] = 'Bộ phân loại mức độ thành thạo';
+$string['autoupgrade:role_safety'] = 'Tham chiếu an toàn';
+$string['autoupgrade:role_soapbox'] = 'Chấm điểm Soapbox';
+$string['autoupgrade:not_configured'] = 'Chưa cấu hình (kế thừa mô hình trò chuyện)';
+$string['autoupgrade:policy_auto'] = 'Được đánh giá và tự động chuyển đổi ở chế độ Tự động';
+$string['autoupgrade:policy_recommend'] = 'Được đánh giá và đề xuất; quản trị viên sẽ chuyển đổi';
+$string['autoupgrade:policy_none'] = 'Chỉ liệt kê ứng viên: không có bộ đo chuẩn nào đo tác vụ của vai trò này';
+$string['autoupgrade:cand_candidate'] = 'Ứng viên';
+$string['autoupgrade:cand_passed'] = 'Đạt một lần';
+$string['autoupgrade:cand_eligible'] = 'Đủ điều kiện';
+$string['autoupgrade:cand_failed'] = 'Không đạt';
+$string['autoupgrade:cand_switched'] = 'Đang sử dụng';
+$string['autoupgrade:cand_rolledback'] = 'Đã hoàn tác';
+$string['autoupgrade:cand_retired'] = 'Không còn được liệt kê';
+$string['autoupgrade:eval_queued'] = 'Đang chờ';
+$string['autoupgrade:eval_running'] = 'Đang chạy';
+$string['autoupgrade:eval_complete'] = 'Hoàn tất';
+$string['autoupgrade:eval_failed'] = 'Thất bại';
+$string['autoupgrade:eval_skipped'] = 'Không chạy';
+$string['autoupgrade:gate_pass'] = 'Đạt:';
+$string['autoupgrade:gate_fail'] = 'Không đạt:';
+$string['autoupgrade:how_auto'] = 'Tự động';
+$string['autoupgrade:how_manual'] = 'Bởi quản trị viên';
+$string['autoupgrade:switch_watching'] = 'Đang theo dõi';
+$string['autoupgrade:switch_kept'] = 'Giữ lại';
+$string['autoupgrade:switch_rolledback'] = 'Đã hoàn tác';
+$string['autoupgrade:switch_superseded'] = 'Đã được quản trị viên thay đổi sau đó';
+$string['autoupgrade:block_role'] = 'Không thể chuyển đổi vai trò này từ đây.';
+$string['autoupgrade:block_emergency'] = 'Một cơ chế kiểm soát khẩn cấp đang bật, nên sẽ không chuyển đổi mô hình nào cho đến khi khôi phục.';
+$string['autoupgrade:block_allowlist'] = 'Cài đặt {$a} không thuộc nhóm mà một lần chuyển đổi được phép thay đổi khi không có người duyệt, nên vai trò này phải chuyển đổi thủ công.';
+$string['autoupgrade:block_bundle'] = 'Cài đặt {$a} do gói chính sách đã ký quản lý. Hãy thay đổi mô hình trong gói đó.';
+$string['autoupgrade:block_watching'] = 'Một lần chuyển đổi của vai trò này vẫn đang được theo dõi. Hãy chờ đến khi nó được giữ lại hoặc hoàn tác.';
+$string['autoupgrade:block_noeval'] = 'Ứng viên này chưa có lần đánh giá nào hoàn tất.';
+$string['autoupgrade:block_gate'] = 'Lần đánh giá gần nhất của ứng viên này không vượt qua ngưỡng.';
+$string['autoupgrade:block_changed'] = 'Mô hình của vai trò đã thay đổi sau lần đánh giá, nên không còn so sánh đúng cặp. Hãy đánh giá lại.';
+$string['autoupgrade:switched'] = 'Đã chuyển {$a->role} sang {$a->model}. Sẽ được theo dõi trong 48 giờ.';
+$string['autoupgrade:rolledback'] = 'Đã hoàn tác lần chuyển đổi {$a}.';
+$string['autoupgrade:rollback_missing'] = 'Không thể hoàn tác lần chuyển đổi đó.';
+$string['autoupgrade:rollback_superseded'] = 'Cài đặt đã thay đổi sau lần chuyển đổi, nên không có gì được hoàn tác.';
+$string['autoupgrade:rollback_by_admin'] = 'Được quản trị viên hoàn tác.';
+$string['autoupgrade:queued'] = 'Đã đưa đánh giá vào hàng chờ. Nó sẽ chạy ở lượt cron tiếp theo và mất vài phút.';
+$string['autoupgrade:discovered'] = 'Quá trình tìm kiếm đã liệt kê {$a->providers} nhà cung cấp, đăng ký {$a->registered} mô hình và đánh dấu {$a->candidates} ứng viên. Các nhà cung cấp không thể liệt kê: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Vai trò này không được chuyển đổi tự động.';
+$string['autoupgrade:why_recommend_mode'] = 'Nâng cấp mô hình tự động đang ở chế độ Đề xuất.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] Đã chuyển {$a->role} sang {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] đã chuyển vai trò {$a->role} từ {$a->from} sang {$a->to}.
+
+Mô hình này đã đạt mọi tiêu chí kiểm tra so với mô hình hiện tại, đo trong cùng một lượt chạy, hai lần liên tiếp:
+{$a->gate}
+
+Mô hình mới được theo dõi trên lưu lượng thực trong {$a->hours} giờ và sẽ tự động được hoàn tác nếu lỗi, câu trả lời bị cắt, từ chối hoặc chi phí mỗi câu trả lời kém đi. Bạn có thể tự hoàn tác bất cứ lúc nào:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] Đã hoàn tác {$a->role} về {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] đã đưa vai trò {$a->role} từ {$a->to} trở về {$a->from}.
+
+Lý do: {$a->reason}
+
+Ứng viên sẽ không được thử lại trong 30 ngày. Chi tiết:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Giữ lại việc chuyển {$a->role} sang {$a->to}';
+$string['autoupgrade:mail_kept_body'] = 'Việc chuyển vai trò {$a->role} từ {$a->from} sang {$a->to} đã hoạt động ổn định trong {$a->hours} giờ trên {$a->turns} câu trả lời thực và được giữ lại.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Việc chuyển vai trò {$a->role} từ {$a->from} sang {$a->to} được giữ lại sau {$a->hours} giờ, nhưng chỉ ghi nhận {$a->turns} câu trả lời thực, quá ít để đánh giá. Hãy tiếp tục theo dõi.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Đề xuất: {$a->role} dùng {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} đã đạt mọi tiêu chí kiểm tra so với {$a->current} cho vai trò {$a->role}, hai lần liên tiếp, nhưng không được chuyển đổi tự động: {$a->why}
+
+{$a->gate}
+
+Chuyển đổi, hoặc giữ nguyên, tại đây:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Bạn nhận được email này vì địa chỉ của bạn là người nhận cảnh báo chi tiêu của [[tutorshort]].';
+$string['event:model_switched'] = 'Đã chuyển đổi mô hình';
+$string['event:model_switch_rolled_back'] = 'Đã hoàn tác chuyển đổi mô hình';
+$string['task:discover_models'] = 'Tìm mô hình AI mới và đưa các lần đánh giá vào hàng chờ';
+$string['task:evaluate_model_candidate'] = 'Đánh giá một mô hình AI ứng viên';
+$string['task:watch_model_switches'] = 'Theo dõi các lần chuyển đổi mô hình AI gần đây';
+$string['settings:autoupgrade_heading'] = 'Nâng cấp mô hình tự động';
+$string['settings:autoupgrade_heading_desc'] = 'Mỗi ngày [[tutorshort]] liệt kê các mô hình mà nhà cung cấp của bạn cung cấp và đánh dấu ứng viên cho từng vai trò: cùng nhà cung cấp, giá niêm yết tương đương và giá đã biết. Nó thử nghiệm các ứng viên so với mô hình hiện tại bằng prompt của gia sư, bộ kiểm thử jailbreak và chi phí mô phỏng thực tế, và chỉ chuyển mặc định của trang khi ứng viên có giá mỗi câu trả lời bằng hoặc rẻ hơn, tốt bằng, an toàn bằng và đáng tin cậy bằng, hai lần liên tiếp. Các khóa học có mô hình riêng sẽ giữ mô hình đó. Mỗi lần chuyển đổi được gửi email đến người nhận cảnh báo chi tiêu và được theo dõi trong 48 giờ.';
+$string['settings:autoupgrade_mode'] = 'Chế độ';
+$string['settings:autoupgrade_mode_desc'] = 'Tự động sẽ chuyển đổi khi một ứng viên đạt. Đề xuất sẽ thử nghiệm ứng viên và thay vào đó gửi email đề xuất. Tắt sẽ không làm gì tự động.';
+$string['settings:autoupgrade_budget_usd'] = 'Ngân sách thử nghiệm hằng tháng (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Số tiền tối đa mà các lần đánh giá tự động được chi trong một tháng dương lịch, bao gồm cả bộ chấm. Lần đánh giá nào có thể khiến tháng vượt mức này sẽ không bắt đầu.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID khóa học để đánh giá';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Các lần đánh giá trả lời theo system prompt mà khóa học này thực sự dùng, được tạo cho danh tính khách nên không gửi dữ liệu của bất kỳ học viên nào. 0 chọn khóa học có nhiều câu trả lời trò chuyện nhất trong 30 ngày qua.';
+$string['privacy:metadata:model_eval'] = 'Đánh giá mô hình tự động: mô hình ứng viên nào được so sánh với mô hình hiện tại nào, và kết quả đo được. Dữ liệu cá nhân duy nhất là mã định danh của quản trị viên đã yêu cầu đánh giá. Các hàng này là cấu hình trang chứ không phải dữ liệu cá nhân về học viên, nên không có trong bản xuất dữ liệu và không bị xóa khi người dùng yêu cầu xóa dữ liệu.';
+$string['privacy:metadata:model_eval:createdby'] = 'Quản trị viên trang đã yêu cầu lần đánh giá này. Để trống khi quá trình tìm kiếm đưa nó vào hàng chờ.';
+$string['privacy:metadata:model_switch'] = 'Chuyển đổi và hoàn tác mô hình: một vai trò đã chuyển từ mô hình nào sang mô hình nào, và lý do. Dữ liệu cá nhân duy nhất là mã định danh của quản trị viên đã thực hiện hoặc đảo ngược việc chuyển đổi. Các hàng này là cấu hình trang chứ không phải dữ liệu cá nhân về học viên, nên không có trong bản xuất dữ liệu và không bị xóa khi người dùng yêu cầu xóa dữ liệu.';
+$string['privacy:metadata:model_switch:createdby'] = 'Quản trị viên trang đã thực hiện lần chuyển đổi này. Để trống khi chuyển đổi là tự động.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Quản trị viên trang đã hoàn tác lần chuyển đổi này. Để trống khi bộ giám sát hoàn tác, hoặc khi nó không bị hoàn tác.';

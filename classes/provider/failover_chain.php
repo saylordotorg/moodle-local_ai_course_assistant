@@ -248,6 +248,20 @@ class failover_chain implements provider_interface {
     }
 
     /**
+     * The model of the provider that served (or last tried) the call.
+     *
+     * v7.8.0: a failed turn records the provider and model it failed on, so
+     * the watcher of a model switch can count that model's failures. The
+     * chain answers for its member, as provider_id() does.
+     *
+     * @return string
+     */
+    public function model_id(): string {
+        $member = $this->lastused ?? $this->primary;
+        return method_exists($member, 'model_id') ? (string) $member->model_id() : '';
+    }
+
+    /**
      * Build the full chain ordered (primary first, then fallbacks).
      *
      * @return array<int, array{provider: provider_interface, label: string}>

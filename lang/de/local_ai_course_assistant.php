@@ -3179,3 +3179,144 @@ $string['modelregistry:forget_confirm'] = 'Diesen Eintrag vergessen? Die nächst
 $string['modelregistry:forget_done'] = 'Eintrag vergessen. Die nächste Anfrage an dieses Modell verwendet die mitgelieferten Regeln.';
 $string['modelregistry:forget_missing'] = 'Dieser Eintrag existiert nicht mehr.';
 $string['event:model_capability_learned'] = 'Modellfähigkeit von einem Anbieter gelernt';
+
+$string['autoupgrade:title'] = 'Modell-Upgrades';
+$string['autoupgrade:navtitle'] = '[[tutorshort]] Modell-Upgrades';
+$string['autoupgrade:intro'] = '[[tutorshort]] sucht nach neueren Modellen der bereits genutzten Anbieter, testet jeden Kandidaten gegen das Modell, das er ersetzen würde (gleiche Prompts, gleiches Antwortbudget, gleicher Bewerter, im selben Lauf), und wechselt nur, wenn der Kandidat pro Antwort gleich teuer oder günstiger, ebenso gut, ebenso sicher und ebenso zuverlässig ist, und das zweimal hintereinander. Jeder Wechsel wird 48 Stunden lang im Live-Betrieb überwacht und zurückgesetzt, wenn er sich verschlechtert.';
+$string['autoupgrade:l_statusheading'] = 'Statusübersicht';
+$string['autoupgrade:l_mode'] = 'Modus';
+$string['autoupgrade:l_budget'] = 'Testbudget';
+$string['autoupgrade:l_changemode'] = 'Ändern';
+$string['autoupgrade:l_discover'] = 'Modelle jetzt suchen';
+$string['autoupgrade:l_rolesheading'] = 'Rollen';
+$string['autoupgrade:l_current'] = 'Aktuelles Modell';
+$string['autoupgrade:l_profile'] = 'Fähigkeitsprofil';
+$string['autoupgrade:l_policy'] = 'Aktualisierungen';
+$string['autoupgrade:l_nocandidates'] = 'Keine Kandidaten. Die Suche markiert Modelle desselben Anbieters mit vergleichbarem Preis.';
+$string['autoupgrade:l_colpasses'] = 'Bestanden';
+$string['autoupgrade:l_collast'] = 'Letzte Bewertung';
+$string['autoupgrade:l_evaluate'] = 'Jetzt bewerten';
+$string['autoupgrade:l_evaluating'] = 'In Warteschlange oder läuft';
+$string['autoupgrade:l_switch'] = 'Wechseln';
+$string['autoupgrade:l_switchconfirm'] = 'Diese Rolle jetzt auf den Kandidaten umstellen? Die Änderung wird 48 Stunden lang überwacht und kann zurückgesetzt werden.';
+$string['autoupgrade:l_evalsheading'] = 'Bewertungen';
+$string['autoupgrade:l_noevals'] = 'Noch keine Bewertungen.';
+$string['autoupgrade:l_colwhen'] = 'Wann';
+$string['autoupgrade:l_colrole'] = 'Rolle';
+$string['autoupgrade:l_colcandidate'] = 'Kandidat';
+$string['autoupgrade:l_colincumbent'] = 'Aktuelles Modell';
+$string['autoupgrade:l_colcost'] = 'Ausgegeben / Schätzung';
+$string['autoupgrade:l_colgate'] = 'Prüfkriterien';
+$string['autoupgrade:l_switchesheading'] = 'Wechsel und Rücksetzungen';
+$string['autoupgrade:l_noswitches'] = 'Noch keine Wechsel.';
+$string['autoupgrade:l_colfrom'] = 'Von';
+$string['autoupgrade:l_colto'] = 'Nach';
+$string['autoupgrade:l_colmode'] = 'Wie';
+$string['autoupgrade:l_colreason'] = 'Grund';
+$string['autoupgrade:l_coluntil'] = 'Überwacht bis';
+$string['autoupgrade:l_rollback'] = 'Zurücksetzen';
+$string['autoupgrade:l_rollbackconfirm'] = 'Das vorherige Modell jetzt wiederherstellen?';
+$string['autoupgrade:l_manage'] = 'Gelernte Fakten auf der Seite der Modellregistrierung prüfen oder verwerfen';
+$string['autoupgrade:l_notinuse'] = 'nicht in Verwendung';
+$string['autoupgrade:mode_off'] = 'Aus: nichts automatisch';
+$string['autoupgrade:mode_recommend'] = 'Empfehlen: Kandidaten testen und eine Empfehlung per E-Mail senden';
+$string['autoupgrade:mode_auto'] = 'Automatisch: Kandidaten testen und wechseln, sobald einer besteht';
+$string['autoupgrade:budget_line'] = '${$a->spent} von ${$a->limit} in diesem Monat ausgegeben (${$a->left} übrig)';
+$string['autoupgrade:last_discovery'] = 'Die Suche lief zuletzt {$a}.';
+$string['autoupgrade:never_discovered'] = 'Die Suche ist noch nicht gelaufen.';
+$string['autoupgrade:role_chat'] = 'Chat (Hauptmodell)';
+$string['autoupgrade:role_premium'] = 'Premium-Stufe';
+$string['autoupgrade:role_failover'] = 'Ausweichmodell';
+$string['autoupgrade:role_quiz'] = 'Quiz-Erstellung';
+$string['autoupgrade:role_classifier'] = 'Beherrschungsklassifikator';
+$string['autoupgrade:role_safety'] = 'Sicherheitsreferenz';
+$string['autoupgrade:role_soapbox'] = 'Soapbox-Bewertung';
+$string['autoupgrade:not_configured'] = 'Nicht konfiguriert (übernimmt das Chat-Modell)';
+$string['autoupgrade:policy_auto'] = 'Bewertet und im automatischen Modus automatisch gewechselt';
+$string['autoupgrade:policy_recommend'] = 'Bewertet und empfohlen; eine Administratorin oder ein Administrator wechselt';
+$string['autoupgrade:policy_none'] = 'Kandidaten nur aufgelistet: kein Benchmark misst die Aufgabe dieser Rolle';
+$string['autoupgrade:cand_candidate'] = 'Kandidat';
+$string['autoupgrade:cand_passed'] = 'Einmal bestanden';
+$string['autoupgrade:cand_eligible'] = 'Geeignet';
+$string['autoupgrade:cand_failed'] = 'Nicht bestanden';
+$string['autoupgrade:cand_switched'] = 'In Verwendung';
+$string['autoupgrade:cand_rolledback'] = 'Zurückgesetzt';
+$string['autoupgrade:cand_retired'] = 'Nicht mehr gelistet';
+$string['autoupgrade:eval_queued'] = 'In Warteschlange';
+$string['autoupgrade:eval_running'] = 'Läuft';
+$string['autoupgrade:eval_complete'] = 'Abgeschlossen';
+$string['autoupgrade:eval_failed'] = 'Fehlgeschlagen';
+$string['autoupgrade:eval_skipped'] = 'Nicht ausgeführt';
+$string['autoupgrade:gate_pass'] = 'Bestanden:';
+$string['autoupgrade:gate_fail'] = 'Nicht bestanden:';
+$string['autoupgrade:how_auto'] = 'Automatisch';
+$string['autoupgrade:how_manual'] = 'Durch die Administration';
+$string['autoupgrade:switch_watching'] = 'Wird überwacht';
+$string['autoupgrade:switch_kept'] = 'Beibehalten';
+$string['autoupgrade:switch_rolledback'] = 'Zurückgesetzt';
+$string['autoupgrade:switch_superseded'] = 'Seitdem von der Administration geändert';
+$string['autoupgrade:block_role'] = 'Diese Rolle kann hier nicht gewechselt werden.';
+$string['autoupgrade:block_emergency'] = 'Eine Notfallsteuerung ist aktiv, daher wird kein Modell gewechselt, bis sie aufgehoben ist.';
+$string['autoupgrade:block_allowlist'] = 'Die Einstellung {$a} darf ein Wechsel nicht ohne einen Menschen ändern, daher wird diese Rolle manuell gewechselt.';
+$string['autoupgrade:block_bundle'] = 'Die Einstellung {$a} wird vom signierten Richtlinienpaket verwaltet. Ändern Sie das Modell stattdessen im Paket.';
+$string['autoupgrade:block_watching'] = 'Ein Wechsel dieser Rolle wird noch überwacht. Warten Sie, bis er beibehalten oder zurückgesetzt wird.';
+$string['autoupgrade:block_noeval'] = 'Für diesen Kandidaten liegt keine abgeschlossene Bewertung vor.';
+$string['autoupgrade:block_gate'] = 'Die letzte Bewertung dieses Kandidaten hat die Prüfung nicht bestanden.';
+$string['autoupgrade:block_changed'] = 'Das Modell der Rolle hat sich nach der Bewertung geändert, daher vergleicht sie nicht mehr das richtige Paar. Bewerten Sie erneut.';
+$string['autoupgrade:switched'] = '{$a->role} auf {$a->model} gewechselt. Der Wechsel wird 48 Stunden lang überwacht.';
+$string['autoupgrade:rolledback'] = 'Der Wechsel für {$a} wurde zurückgesetzt.';
+$string['autoupgrade:rollback_missing'] = 'Dieser Wechsel kann nicht zurückgesetzt werden.';
+$string['autoupgrade:rollback_superseded'] = 'Die Einstellungen wurden nach dem Wechsel geändert, daher wurde nichts zurückgesetzt.';
+$string['autoupgrade:rollback_by_admin'] = 'Von der Administration zurückgesetzt.';
+$string['autoupgrade:queued'] = 'Bewertung in Warteschlange. Sie läuft beim nächsten Cron-Durchlauf und dauert einige Minuten.';
+$string['autoupgrade:discovered'] = 'Die Suche hat {$a->providers} Anbieter abgefragt, {$a->registered} Modell(e) registriert und {$a->candidates} Kandidat(en) markiert. Anbieter, die nicht abgefragt werden konnten: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Diese Rolle wird nicht automatisch gewechselt.';
+$string['autoupgrade:why_recommend_mode'] = 'Automatische Modell-Upgrades sind im Empfehlungsmodus.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} auf {$a->to} gewechselt';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] hat die Rolle {$a->role} von {$a->from} auf {$a->to} umgestellt.
+
+Das Modell hat jede Prüfung gegen das aktuelle Modell bestanden, gemessen im selben Lauf, zweimal hintereinander:
+{$a->gate}
+
+Das neue Modell wird {$a->hours} Stunden lang im Live-Betrieb überwacht und automatisch zurückgesetzt, wenn Fehler, abgebrochene Antworten, Verweigerungen oder Kosten pro Antwort zunehmen. Sie können es jederzeit selbst zurücksetzen:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} auf {$a->from} zurückgesetzt';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] hat die Rolle {$a->role} von {$a->to} auf {$a->from} zurückgesetzt.
+
+Grund: {$a->reason}
+
+Der Kandidat wird 30 Tage lang nicht erneut getestet. Details:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Wechsel von {$a->role} auf {$a->to} beibehalten';
+$string['autoupgrade:mail_kept_body'] = 'Der Wechsel der Rolle {$a->role} von {$a->from} auf {$a->to} hat sich {$a->hours} Stunden lang bei {$a->turns} Live-Antworten bewährt und wird beibehalten.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Der Wechsel der Rolle {$a->role} von {$a->from} auf {$a->to} wird nach {$a->hours} Stunden beibehalten, aber es gab nur {$a->turns} Live-Antworten, zu wenige für eine Beurteilung. Behalten Sie ihn im Auge.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Empfohlen: {$a->role} mit {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} hat jede Prüfung gegen {$a->current} für die Rolle {$a->role} zweimal hintereinander bestanden und wurde nicht automatisch gewechselt: {$a->why}
+
+{$a->gate}
+
+Hier wechseln oder belassen:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Sie erhalten diese Nachricht, weil Ihre Adresse als Empfänger für [[tutorshort]] Ausgabenwarnungen eingetragen ist.';
+$string['event:model_switched'] = 'Modell gewechselt';
+$string['event:model_switch_rolled_back'] = 'Modellwechsel zurückgesetzt';
+$string['task:discover_models'] = 'Neue KI-Modelle suchen und Bewertungen einplanen';
+$string['task:evaluate_model_candidate'] = 'Einen KI-Modellkandidaten bewerten';
+$string['task:watch_model_switches'] = 'Kürzliche KI-Modellwechsel überwachen';
+$string['settings:autoupgrade_heading'] = 'Automatische Modell-Upgrades';
+$string['settings:autoupgrade_heading_desc'] = 'Täglich listet [[tutorshort]] die Modelle Ihrer Anbieter auf und markiert Kandidaten für jede Rolle: gleicher Anbieter, vergleichbarer Listenpreis und ein bekannter Preis. Es testet sie gegen das aktuelle Modell mit den Tutor-Prompts, der Jailbreak-Testreihe und realitätsnahen Kosten und ändert den Standard der Website nur, wenn ein Kandidat pro Antwort gleich teuer oder günstiger, ebenso gut, ebenso sicher und ebenso zuverlässig ist, und das zweimal hintereinander. Kurse mit eigenem Modell behalten es. Jeder Wechsel wird per E-Mail an die Empfänger der Ausgabenwarnungen gemeldet und 48 Stunden lang überwacht.';
+$string['settings:autoupgrade_mode'] = 'Betriebsmodus';
+$string['settings:autoupgrade_mode_desc'] = 'Automatisch wechselt, wenn ein Kandidat besteht. Empfehlen testet Kandidaten und sendet stattdessen eine Empfehlung per E-Mail. Aus macht nichts automatisch.';
+$string['settings:autoupgrade_budget_usd'] = 'Monatliches Testbudget (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Der Höchstbetrag, den automatische Bewertungen in einem Kalendermonat ausgeben dürfen, einschließlich Bewerter. Eine Bewertung, die den Monat darüber bringen könnte, startet nicht.';
+$string['settings:autoupgrade_eval_courseid'] = 'Kurs-ID für Bewertungen';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Bewertungen antworten mit dem Systemprompt, den dieser Kurs tatsächlich verwendet, erstellt für die Gastidentität, sodass keine Daten von Lernenden gesendet werden. 0 wählt den Kurs mit den meisten Chat-Antworten der letzten 30 Tage.';
+$string['privacy:metadata:model_eval'] = 'Automatische Modellbewertungen: welches Kandidatenmodell mit welchem aktuellen Modell verglichen wurde und das gemessene Ergebnis. Die einzigen personenbezogenen Daten sind die Kennung der Administratorin oder des Administrators, die oder der die Bewertung angefordert hat. Diese Zeilen sind Website-Konfiguration und keine personenbezogenen Daten über Lernende, daher werden sie weder in einen Datenexport aufgenommen noch bei einem Löschantrag entfernt.';
+$string['privacy:metadata:model_eval:createdby'] = 'Die Website-Administration, die diese Bewertung angefordert hat. Leer, wenn die Suche sie eingeplant hat.';
+$string['privacy:metadata:model_switch'] = 'Modellwechsel und Rücksetzungen: von welchem zu welchem Modell eine Rolle gewechselt hat und warum. Die einzigen personenbezogenen Daten sind die Kennung der Administratorin oder des Administrators, die oder der den Wechsel vorgenommen oder rückgängig gemacht hat. Diese Zeilen sind Website-Konfiguration und keine personenbezogenen Daten über Lernende, daher werden sie weder in einen Datenexport aufgenommen noch bei einem Löschantrag entfernt.';
+$string['privacy:metadata:model_switch:createdby'] = 'Die Website-Administration, die diesen Wechsel vorgenommen hat. Leer, wenn er automatisch erfolgte.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Die Website-Administration, die diesen Wechsel zurückgesetzt hat. Leer, wenn die Überwachung dies tat oder er nicht zurückgesetzt wurde.';

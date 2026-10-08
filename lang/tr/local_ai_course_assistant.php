@@ -3180,3 +3180,144 @@ $string['modelregistry:forget_confirm'] = 'Bu bilgi unutulsun mu? Bu modele yap�
 $string['modelregistry:forget_done'] = 'Bilgi unutuldu. Bu modele yapılan sonraki istek eklentiyle gelen kuralları kullanır.';
 $string['modelregistry:forget_missing'] = 'Bu bilgi artık mevcut değil.';
 $string['event:model_capability_learned'] = 'Bir sağlayıcıdan model yeteneği öğrenildi';
+
+$string['autoupgrade:title'] = 'Model yükseltmeleri';
+$string['autoupgrade:navtitle'] = '[[tutorshort]] model yükseltmeleri';
+$string['autoupgrade:intro'] = '[[tutorshort]], zaten kullandığı sağlayıcılardan daha yeni modeller arar, her adayı yerine geçeceği modelle karşılaştırarak test eder (aynı istemler, aynı yanıt bütçesi, aynı değerlendirici, aynı çalıştırmada) ve yalnızca aday yanıt başına aynı fiyatta veya daha ucuz, aynı derecede iyi, güvenli ve güvenilir olduğunda, üst üste iki kez, geçiş yapar. Her geçiş canlı trafikte 48 saat izlenir ve kötüleşirse geri alınır.';
+$string['autoupgrade:l_statusheading'] = 'Durum';
+$string['autoupgrade:l_mode'] = 'Kip';
+$string['autoupgrade:l_budget'] = 'Test bütçesi';
+$string['autoupgrade:l_changemode'] = 'Değiştir';
+$string['autoupgrade:l_discover'] = 'Modelleri şimdi keşfet';
+$string['autoupgrade:l_rolesheading'] = 'Görevler';
+$string['autoupgrade:l_current'] = 'Geçerli model';
+$string['autoupgrade:l_profile'] = 'Yetenek profili';
+$string['autoupgrade:l_policy'] = 'Yükseltmeler';
+$string['autoupgrade:l_nocandidates'] = 'Aday yok. Keşif, aynı sağlayıcıdan benzer fiyattaki modelleri işaretler.';
+$string['autoupgrade:l_colpasses'] = 'Geçişler';
+$string['autoupgrade:l_collast'] = 'Son değerlendirme';
+$string['autoupgrade:l_evaluate'] = 'Şimdi değerlendir';
+$string['autoupgrade:l_evaluating'] = 'Kuyrukta veya çalışıyor';
+$string['autoupgrade:l_switch'] = 'Geçiş yap';
+$string['autoupgrade:l_switchconfirm'] = 'Bu görev şimdi adaya geçirilsin mi? Değişiklik 48 saat izlenir ve geri alınabilir.';
+$string['autoupgrade:l_evalsheading'] = 'Değerlendirmeler';
+$string['autoupgrade:l_noevals'] = 'Henüz değerlendirme yok.';
+$string['autoupgrade:l_colwhen'] = 'Ne zaman';
+$string['autoupgrade:l_colrole'] = 'Görev';
+$string['autoupgrade:l_colcandidate'] = 'Aday';
+$string['autoupgrade:l_colincumbent'] = 'Geçerli model';
+$string['autoupgrade:l_colcost'] = 'Harcanan / tahmin';
+$string['autoupgrade:l_colgate'] = 'Eşik denetimleri';
+$string['autoupgrade:l_switchesheading'] = 'Geçişler ve geri almalar';
+$string['autoupgrade:l_noswitches'] = 'Henüz geçiş yok.';
+$string['autoupgrade:l_colfrom'] = 'Önceki';
+$string['autoupgrade:l_colto'] = 'Yeni';
+$string['autoupgrade:l_colmode'] = 'Nasıl';
+$string['autoupgrade:l_colreason'] = 'Neden';
+$string['autoupgrade:l_coluntil'] = 'İzleme bitişi';
+$string['autoupgrade:l_rollback'] = 'Geri al';
+$string['autoupgrade:l_rollbackconfirm'] = 'Önceki model şimdi geri getirilsin mi?';
+$string['autoupgrade:l_manage'] = 'Öğrenilen bilgileri model kaydı sayfasında inceleyin veya unutun';
+$string['autoupgrade:l_notinuse'] = 'kullanımda değil';
+$string['autoupgrade:mode_off'] = 'Kapalı: otomatik hiçbir şey yok';
+$string['autoupgrade:mode_recommend'] = 'Öner: adayları test et ve öneriyi e-postayla gönder';
+$string['autoupgrade:mode_auto'] = 'Otomatik: adayları test et ve biri geçtiğinde geçiş yap';
+$string['autoupgrade:budget_line'] = 'Bu ay ${$a->limit} bütçenin ${$a->spent} kadarı harcandı (${$a->left} kaldı)';
+$string['autoupgrade:last_discovery'] = 'Keşif en son {$a} çalıştı.';
+$string['autoupgrade:never_discovered'] = 'Keşif henüz çalışmadı.';
+$string['autoupgrade:role_chat'] = 'Sohbet (birincil model)';
+$string['autoupgrade:role_premium'] = 'Premium katman';
+$string['autoupgrade:role_failover'] = 'Yedek model';
+$string['autoupgrade:role_quiz'] = 'Sınav oluşturma';
+$string['autoupgrade:role_classifier'] = 'Ustalık sınıflandırıcısı';
+$string['autoupgrade:role_safety'] = 'Güvenlik referansı';
+$string['autoupgrade:role_soapbox'] = 'Soapbox puanlaması';
+$string['autoupgrade:not_configured'] = 'Yapılandırılmadı (sohbet modelini devralır)';
+$string['autoupgrade:policy_auto'] = 'Değerlendirilir ve Otomatik kipte otomatik olarak geçiş yapılır';
+$string['autoupgrade:policy_recommend'] = 'Değerlendirilir ve önerilir; geçişi bir yönetici yapar';
+$string['autoupgrade:policy_none'] = 'Yalnızca adaylar listelenir: bu görevin işini ölçen bir kıyaslama yok';
+$string['autoupgrade:cand_candidate'] = 'Aday';
+$string['autoupgrade:cand_passed'] = 'Bir kez geçti';
+$string['autoupgrade:cand_eligible'] = 'Uygun';
+$string['autoupgrade:cand_failed'] = 'Başarısız';
+$string['autoupgrade:cand_switched'] = 'Kullanımda';
+$string['autoupgrade:cand_rolledback'] = 'Geri alındı';
+$string['autoupgrade:cand_retired'] = 'Artık listelenmiyor';
+$string['autoupgrade:eval_queued'] = 'Kuyrukta';
+$string['autoupgrade:eval_running'] = 'Çalışıyor';
+$string['autoupgrade:eval_complete'] = 'Tamamlandı';
+$string['autoupgrade:eval_failed'] = 'Başarısız';
+$string['autoupgrade:eval_skipped'] = 'Çalıştırılmadı';
+$string['autoupgrade:gate_pass'] = 'Geçti:';
+$string['autoupgrade:gate_fail'] = 'Geçemedi:';
+$string['autoupgrade:how_auto'] = 'Otomatik';
+$string['autoupgrade:how_manual'] = 'Bir yönetici tarafından';
+$string['autoupgrade:switch_watching'] = 'İzleniyor';
+$string['autoupgrade:switch_kept'] = 'Korundu';
+$string['autoupgrade:switch_rolledback'] = 'Geri alındı';
+$string['autoupgrade:switch_superseded'] = 'Sonradan bir yönetici tarafından değiştirildi';
+$string['autoupgrade:block_role'] = 'Bu görev buradan değiştirilemez.';
+$string['autoupgrade:block_emergency'] = 'Bir acil durum denetimi etkin, bu nedenle geri yüklenene kadar hiçbir model değiştirilmez.';
+$string['autoupgrade:block_allowlist'] = '{$a} ayarı, bir geçişin insan olmadan değiştirebileceği bir ayar değil, bu nedenle bu görev elle değiştirilir.';
+$string['autoupgrade:block_bundle'] = '{$a} ayarı imzalı ilke paketi tarafından yönetilir. Modeli bunun yerine pakette değiştirin.';
+$string['autoupgrade:block_watching'] = 'Bu görevin bir geçişi hâlâ izleniyor. Korunana veya geri alınana kadar bekleyin.';
+$string['autoupgrade:block_noeval'] = 'Bu adayın tamamlanmış bir değerlendirmesi yok.';
+$string['autoupgrade:block_gate'] = 'Bu adayın son değerlendirmesi eşiği geçemedi.';
+$string['autoupgrade:block_changed'] = 'Görevin modeli değerlendirmeden sonra değişti, bu yüzden artık doğru çifti karşılaştırmıyor. Yeniden değerlendirin.';
+$string['autoupgrade:switched'] = '{$a->role}, {$a->model} modeline geçirildi. 48 saat izlenecek.';
+$string['autoupgrade:rolledback'] = '{$a} geçişi geri alındı.';
+$string['autoupgrade:rollback_missing'] = 'Bu geçiş geri alınamaz.';
+$string['autoupgrade:rollback_superseded'] = 'Ayarlar geçişten sonra değiştirildi, bu nedenle hiçbir şey geri alınmadı.';
+$string['autoupgrade:rollback_by_admin'] = 'Bir yönetici tarafından geri alındı.';
+$string['autoupgrade:queued'] = 'Değerlendirme kuyruğa alındı. Bir sonraki cron çalışmasında yürütülür ve birkaç dakika sürer.';
+$string['autoupgrade:discovered'] = 'Keşif {$a->providers} sağlayıcıyı listeledi, {$a->registered} modeli kaydetti ve {$a->candidates} adayı işaretledi. Listelenemeyen sağlayıcılar: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Bu görev otomatik olarak değiştirilmez.';
+$string['autoupgrade:why_recommend_mode'] = 'Otomatik model yükseltmeleri Öner kipinde.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role}, {$a->to} modeline geçirildi';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]], {$a->role} görevini {$a->from} modelinden {$a->to} modeline geçirdi.
+
+Aynı çalıştırmada ölçülen her denetimi geçerli modele karşı üst üste iki kez geçti:
+{$a->gate}
+
+Yeni model canlı trafikte {$a->hours} saat izlenir ve hatalar, kesik yanıtlar, retler veya yanıt başına maliyet kötüleşirse otomatik olarak geri alınır. İstediğiniz zaman kendiniz de geri alabilirsiniz:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role}, {$a->from} modeline geri alındı';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]], {$a->role} görevini {$a->to} modelinden {$a->from} modeline geri aldı.
+
+Neden: {$a->reason}
+
+Aday 30 gün boyunca yeniden denenmeyecek. Ayrıntılar:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] {$a->role} için {$a->to} geçişi korundu';
+$string['autoupgrade:mail_kept_body'] = '{$a->role} görevinin {$a->from} modelinden {$a->to} modeline geçişi {$a->hours} saat boyunca {$a->turns} canlı yanıtta sorunsuz kaldı ve korundu.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = '{$a->role} görevinin {$a->from} modelinden {$a->to} modeline geçişi {$a->hours} saatin ardından korundu, ancak yalnızca {$a->turns} canlı yanıt görüldü; bu, değerlendirmek için çok az. Takip etmeye devam edin.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Öneri: {$a->role} için {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model}, {$a->role} görevi için {$a->current} modeline karşı her denetimi üst üste iki kez geçti ve otomatik olarak geçiş yapılmadı: {$a->why}
+
+{$a->gate}
+
+Geçiş yapın veya olduğu gibi bırakın:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Bu e-postayı, adresiniz bir [[tutorshort]] harcama uyarısı alıcısı olduğu için alıyorsunuz.';
+$string['event:model_switched'] = 'Model değiştirildi';
+$string['event:model_switch_rolled_back'] = 'Model geçişi geri alındı';
+$string['task:discover_models'] = 'Yeni AI modellerini keşfet ve değerlendirmeleri kuyruğa al';
+$string['task:evaluate_model_candidate'] = 'Aday bir AI modelini değerlendir';
+$string['task:watch_model_switches'] = 'Son AI model geçişlerini izle';
+$string['settings:autoupgrade_heading'] = 'Otomatik model yükseltmeleri';
+$string['settings:autoupgrade_heading_desc'] = '[[tutorshort]] her gün sağlayıcılarınızın sunduğu modelleri listeler ve her görev için adayları işaretler: aynı sağlayıcı, benzer liste fiyatı ve bilinen bir fiyat. Bunları eğitmen istemleri, jailbreak test paketi ve canlı kullanıma benzer maliyetle geçerli modele karşı test eder ve site varsayılanını yalnızca aday yanıt başına aynı fiyatta veya daha ucuz, aynı derecede iyi, güvenli ve güvenilir olduğunda, üst üste iki kez, değiştirir. Kendi modeli olan dersler onu korur. Her geçiş harcama uyarısı alıcılarına e-postayla bildirilir ve 48 saat izlenir.';
+$string['settings:autoupgrade_mode'] = 'Kip';
+$string['settings:autoupgrade_mode_desc'] = 'Otomatik, bir aday geçtiğinde geçiş yapar. Öner, adayları test eder ve bunun yerine öneriyi e-postayla gönderir. Kapalı, otomatik hiçbir şey yapmaz.';
+$string['settings:autoupgrade_budget_usd'] = 'Aylık test bütçesi (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Otomatik değerlendirmelerin bir takvim ayında harcayabileceği en yüksek tutar, değerlendirici dahil. Ayın toplamını bu tutarın üstüne çıkarabilecek bir değerlendirme başlamaz.';
+$string['settings:autoupgrade_eval_courseid'] = 'Değerlendirme dersi kimliği';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Değerlendirmeler, bu dersin gerçekten kullandığı sistem istemiyle yanıt verir; istem misafir kimliği için oluşturulur, böylece hiçbir öğrencinin verisi gönderilmez. 0, son 30 günde en çok sohbet yanıtı olan dersi seçer.';
+$string['privacy:metadata:model_eval'] = 'Otomatik model değerlendirmeleri: hangi aday modelin hangi geçerli modelle karşılaştırıldığı ve ölçülen sonuç. Tek kişisel veri, değerlendirmeyi isteyen yöneticinin kimliğidir. Bu satırlar bir öğrenciye ait kişisel veri değil, site yapılandırmasıdır; bu nedenle veri dışa aktarımına dahil edilmez ve bir kullanıcı silme talep ettiğinde kaldırılmaz.';
+$string['privacy:metadata:model_eval:createdby'] = 'Bu değerlendirmeyi isteyen site yöneticisi. Keşif kuyruğa aldıysa boştur.';
+$string['privacy:metadata:model_switch'] = 'Model geçişleri ve geri almalar: bir görevin hangi modelden hangi modele geçtiği ve nedeni. Tek kişisel veri, geçişi yapan veya geri çeviren yöneticinin kimliğidir. Bu satırlar bir öğrenciye ait kişisel veri değil, site yapılandırmasıdır; bu nedenle veri dışa aktarımına dahil edilmez ve bir kullanıcı silme talep ettiğinde kaldırılmaz.';
+$string['privacy:metadata:model_switch:createdby'] = 'Bu geçişi yapan site yöneticisi. Geçiş otomatikse boştur.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Bu geçişi geri alan site yöneticisi. İzleyici geri aldıysa veya geri alınmadıysa boştur.';

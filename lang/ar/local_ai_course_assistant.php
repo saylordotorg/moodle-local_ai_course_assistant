@@ -3177,3 +3177,144 @@ $string['modelregistry:forget_confirm'] = 'هل تريد نسيان هذه ال�
 $string['modelregistry:forget_done'] = 'تم نسيان المعلومة. سيستخدم الطلب التالي إلى هذا النموذج القواعد المضمّنة.';
 $string['modelregistry:forget_missing'] = 'لم تعد هذه المعلومة موجودة.';
 $string['event:model_capability_learned'] = 'تم تعلّم قدرة نموذج من مزود خدمة';
+
+$string['autoupgrade:title'] = 'ترقيات النماذج';
+$string['autoupgrade:navtitle'] = 'ترقيات نماذج [[tutorshort]]';
+$string['autoupgrade:intro'] = 'يبحث [[tutorshort]] عن نماذج أحدث لدى المزوّدين الذين يستخدمهم بالفعل، ويختبر كل نموذج مرشح مقابل النموذج الذي سيحل محله (الموجّهات نفسها، وميزانية الإجابة نفسها، والمُقيّم نفسه، في التشغيل نفسه)، ولا يبدّل إلا إذا كان المرشح بالسعر نفسه أو أرخص لكل إجابة، وبالجودة والأمان والموثوقية نفسها، مرتين متتاليتين. تُراقَب كل عملية تبديل لمدة 48 ساعة على الحركة الفعلية ويُعاد النموذج السابق إذا ساء الأداء.';
+$string['autoupgrade:l_statusheading'] = 'الحالة';
+$string['autoupgrade:l_mode'] = 'الوضع';
+$string['autoupgrade:l_budget'] = 'ميزانية الاختبار';
+$string['autoupgrade:l_changemode'] = 'تغيير';
+$string['autoupgrade:l_discover'] = 'اكتشاف النماذج الآن';
+$string['autoupgrade:l_rolesheading'] = 'الأدوار';
+$string['autoupgrade:l_current'] = 'النموذج الحالي';
+$string['autoupgrade:l_profile'] = 'ملف القدرات';
+$string['autoupgrade:l_policy'] = 'الترقيات';
+$string['autoupgrade:l_nocandidates'] = 'لا توجد نماذج مرشحة. يحدّد الاكتشاف نماذج من المزوّد نفسه بسعر مماثل.';
+$string['autoupgrade:l_colpasses'] = 'مرات النجاح';
+$string['autoupgrade:l_collast'] = 'آخر تقييم';
+$string['autoupgrade:l_evaluate'] = 'التقييم الآن';
+$string['autoupgrade:l_evaluating'] = 'في قائمة الانتظار أو قيد التشغيل';
+$string['autoupgrade:l_switch'] = 'تبديل';
+$string['autoupgrade:l_switchconfirm'] = 'هل تريد تبديل هذا الدور إلى النموذج المرشح الآن؟ يُراقَب التغيير لمدة 48 ساعة ويمكن التراجع عنه.';
+$string['autoupgrade:l_evalsheading'] = 'التقييمات';
+$string['autoupgrade:l_noevals'] = 'لا توجد تقييمات بعد.';
+$string['autoupgrade:l_colwhen'] = 'الوقت';
+$string['autoupgrade:l_colrole'] = 'الدور';
+$string['autoupgrade:l_colcandidate'] = 'المرشح';
+$string['autoupgrade:l_colincumbent'] = 'النموذج الحالي';
+$string['autoupgrade:l_colcost'] = 'المُنفَق / التقدير';
+$string['autoupgrade:l_colgate'] = 'فحوص البوابة';
+$string['autoupgrade:l_switchesheading'] = 'عمليات التبديل والتراجع';
+$string['autoupgrade:l_noswitches'] = 'لا توجد عمليات تبديل بعد.';
+$string['autoupgrade:l_colfrom'] = 'من';
+$string['autoupgrade:l_colto'] = 'إلى';
+$string['autoupgrade:l_colmode'] = 'الطريقة';
+$string['autoupgrade:l_colreason'] = 'السبب';
+$string['autoupgrade:l_coluntil'] = 'تحت المراقبة حتى';
+$string['autoupgrade:l_rollback'] = 'تراجع';
+$string['autoupgrade:l_rollbackconfirm'] = 'هل تريد إعادة النموذج السابق الآن؟';
+$string['autoupgrade:l_manage'] = 'راجع الحقائق المكتسبة أو احذفها في صفحة سجل النماذج';
+$string['autoupgrade:l_notinuse'] = 'غير مستخدم';
+$string['autoupgrade:mode_off'] = 'إيقاف: لا شيء تلقائي';
+$string['autoupgrade:mode_recommend'] = 'توصية: اختبار المرشحين وإرسال توصية بالبريد الإلكتروني';
+$string['autoupgrade:mode_auto'] = 'تلقائي: اختبار المرشحين والتبديل عند نجاح أحدهم';
+$string['autoupgrade:budget_line'] = 'أُنفق ${$a->spent} من ${$a->limit} هذا الشهر (المتبقي ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'آخر تشغيل للاكتشاف: {$a}.';
+$string['autoupgrade:never_discovered'] = 'لم يُشغَّل الاكتشاف بعد.';
+$string['autoupgrade:role_chat'] = 'المحادثة (النموذج الأساسي)';
+$string['autoupgrade:role_premium'] = 'الفئة المميزة';
+$string['autoupgrade:role_failover'] = 'النموذج الاحتياطي';
+$string['autoupgrade:role_quiz'] = 'إنشاء الاختبارات';
+$string['autoupgrade:role_classifier'] = 'مصنّف الإتقان';
+$string['autoupgrade:role_safety'] = 'مرجع الأمان';
+$string['autoupgrade:role_soapbox'] = 'تقييم Soapbox';
+$string['autoupgrade:not_configured'] = 'غير مُعَدّ (يرث نموذج المحادثة)';
+$string['autoupgrade:policy_auto'] = 'يُقيَّم، ويُبدَّل تلقائيًا في الوضع التلقائي';
+$string['autoupgrade:policy_recommend'] = 'يُقيَّم ويُوصى به؛ ويبدّله المسؤول';
+$string['autoupgrade:policy_none'] = 'تُعرض المرشحات فقط: لا يوجد معيار يقيس مهمة هذا الدور';
+$string['autoupgrade:cand_candidate'] = 'مرشح';
+$string['autoupgrade:cand_passed'] = 'نجح مرة واحدة';
+$string['autoupgrade:cand_eligible'] = 'مؤهل';
+$string['autoupgrade:cand_failed'] = 'أخفق';
+$string['autoupgrade:cand_switched'] = 'قيد الاستخدام';
+$string['autoupgrade:cand_rolledback'] = 'تم التراجع';
+$string['autoupgrade:cand_retired'] = 'لم يعد مدرجًا';
+$string['autoupgrade:eval_queued'] = 'في قائمة الانتظار';
+$string['autoupgrade:eval_running'] = 'قيد التشغيل';
+$string['autoupgrade:eval_complete'] = 'مكتمل';
+$string['autoupgrade:eval_failed'] = 'أخفق';
+$string['autoupgrade:eval_skipped'] = 'لم يُشغَّل';
+$string['autoupgrade:gate_pass'] = 'نجح:';
+$string['autoupgrade:gate_fail'] = 'لم ينجح:';
+$string['autoupgrade:how_auto'] = 'تلقائي';
+$string['autoupgrade:how_manual'] = 'بواسطة مسؤول';
+$string['autoupgrade:switch_watching'] = 'تحت المراقبة';
+$string['autoupgrade:switch_kept'] = 'أُبقي عليه';
+$string['autoupgrade:switch_rolledback'] = 'تم التراجع';
+$string['autoupgrade:switch_superseded'] = 'غيّره مسؤول منذ ذلك الحين';
+$string['autoupgrade:block_role'] = 'لا يمكن تبديل هذا الدور من هنا.';
+$string['autoupgrade:block_emergency'] = 'تم تفعيل عنصر تحكم طارئ، لذا لن يُبدَّل أي نموذج حتى تتم استعادته.';
+$string['autoupgrade:block_allowlist'] = 'الإعداد {$a} ليس من الإعدادات التي يمكن للتبديل تغييرها دون تدخل شخص، لذا يُبدَّل هذا الدور يدويًا.';
+$string['autoupgrade:block_bundle'] = 'الإعداد {$a} تديره حزمة السياسات الموقّعة. غيّر النموذج في الحزمة بدلًا من ذلك.';
+$string['autoupgrade:block_watching'] = 'لا يزال تبديل هذا الدور تحت المراقبة. انتظر حتى يُبقى عليه أو يتم التراجع عنه.';
+$string['autoupgrade:block_noeval'] = 'لا يوجد تقييم مكتمل لهذا المرشح.';
+$string['autoupgrade:block_gate'] = 'لم يجتز آخر تقييم لهذا المرشح البوابة.';
+$string['autoupgrade:block_changed'] = 'تغيّر نموذج الدور بعد التقييم، لذا لم يعد يقارن الزوج الصحيح. قيّم مرة أخرى.';
+$string['autoupgrade:switched'] = 'تم تبديل {$a->role} إلى {$a->model}. سيُراقَب لمدة 48 ساعة.';
+$string['autoupgrade:rolledback'] = 'تم التراجع عن تبديل {$a}.';
+$string['autoupgrade:rollback_missing'] = 'لا يمكن التراجع عن هذا التبديل.';
+$string['autoupgrade:rollback_superseded'] = 'تغيّرت الإعدادات بعد التبديل، لذا لم يتم التراجع عن أي شيء.';
+$string['autoupgrade:rollback_by_admin'] = 'تراجع عنه أحد المسؤولين.';
+$string['autoupgrade:queued'] = 'أُضيف التقييم إلى قائمة الانتظار. يُشغَّل في دورة cron التالية ويستغرق عدة دقائق.';
+$string['autoupgrade:discovered'] = 'عرض الاكتشاف {$a->providers} مزوّدًا، وسجّل {$a->registered} نموذجًا، وحدّد {$a->candidates} مرشحًا. المزوّدون الذين تعذّر عرضهم: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'لا يُبدَّل هذا الدور تلقائيًا.';
+$string['autoupgrade:why_recommend_mode'] = 'ترقيات النماذج التلقائية في وضع التوصية.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] تم تبديل {$a->role} إلى {$a->to}';
+$string['autoupgrade:mail_switched_body'] = 'بدّل [[tutorshort]] دور {$a->role} من {$a->from} إلى {$a->to}.
+
+اجتاز كل فحص مقابل النموذج الحالي، مقيسًا في التشغيل نفسه، مرتين متتاليتين:
+{$a->gate}
+
+يُراقَب النموذج الجديد على الحركة الفعلية لمدة {$a->hours} ساعة، ويُتراجَع عنه تلقائيًا إذا ساءت الأخطاء أو الإجابات المقطوعة أو حالات الرفض أو التكلفة لكل إجابة. يمكنك التراجع عنه بنفسك في أي وقت:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] تم التراجع في {$a->role} إلى {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = 'أعاد [[tutorshort]] دور {$a->role} من {$a->to} إلى {$a->from}.
+
+السبب: {$a->reason}
+
+لن تتم تجربة المرشح مرة أخرى لمدة 30 يومًا. التفاصيل:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] أُبقي على تبديل {$a->role} إلى {$a->to}';
+$string['autoupgrade:mail_kept_body'] = 'صمد تبديل دور {$a->role} من {$a->from} إلى {$a->to} لمدة {$a->hours} ساعة على {$a->turns} إجابة فعلية، وتم الإبقاء عليه.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'أُبقي على تبديل دور {$a->role} من {$a->from} إلى {$a->to} بعد {$a->hours} ساعة، لكن لم تُرصد سوى {$a->turns} إجابة فعلية، وهو عدد أقل من أن يُحكم به. تابعه عن كثب.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] موصى به: {$a->role} على {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = 'اجتاز {$a->model} كل فحص مقابل {$a->current} لدور {$a->role}، مرتين متتاليتين، ولم يُبدَّل تلقائيًا: {$a->why}
+
+{$a->gate}
+
+بدّله أو اتركه من هنا:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'تصلك هذه الرسالة لأن عنوانك مُدرج ضمن مستلمي تنبيهات الإنفاق في [[tutorshort]].';
+$string['event:model_switched'] = 'تم تبديل النموذج';
+$string['event:model_switch_rolled_back'] = 'تم التراجع عن تبديل النموذج';
+$string['task:discover_models'] = 'اكتشاف نماذج ذكاء اصطناعي جديدة وإضافة التقييمات إلى قائمة الانتظار';
+$string['task:evaluate_model_candidate'] = 'تقييم نموذج ذكاء اصطناعي مرشح';
+$string['task:watch_model_switches'] = 'مراقبة عمليات تبديل نماذج الذكاء الاصطناعي الأخيرة';
+$string['settings:autoupgrade_heading'] = 'ترقيات النماذج التلقائية';
+$string['settings:autoupgrade_heading_desc'] = 'يعرض [[tutorshort]] يوميًا النماذج التي يقدّمها مزوّدوك ويحدّد المرشحين لكل دور: المزوّد نفسه، وسعر قائمة مماثل، وسعر معروف. ويختبرهم مقابل النموذج الحالي على موجّهات المعلّم ومجموعة اختبارات كسر الحماية وتكلفة مماثلة للاستخدام الفعلي، ولا يبدّل النموذج الافتراضي للموقع إلا إذا كان المرشح بالسعر نفسه أو أرخص لكل إجابة، وبالجودة والأمان والموثوقية نفسها، مرتين متتاليتين. تحتفظ المقررات التي لها نموذج خاص بنموذجها. يُرسَل بريد إلكتروني بكل تبديل إلى مستلمي تنبيهات الإنفاق ويُراقَب لمدة 48 ساعة.';
+$string['settings:autoupgrade_mode'] = 'الوضع';
+$string['settings:autoupgrade_mode_desc'] = 'الوضع التلقائي يبدّل عند نجاح مرشح. وضع التوصية يختبر المرشحين ويرسل توصية بالبريد الإلكتروني بدلًا من ذلك. وضع الإيقاف لا يفعل شيئًا تلقائيًا.';
+$string['settings:autoupgrade_budget_usd'] = 'ميزانية الاختبار الشهرية (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'الحد الأقصى الذي يمكن أن تنفقه التقييمات التلقائية في الشهر الميلادي، بما في ذلك المُقيّم. لا يبدأ أي تقييم قد يتجاوز بالشهر هذا الحد.';
+$string['settings:autoupgrade_eval_courseid'] = 'معرّف مقرر التقييم';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'تجيب التقييمات وفق موجّه النظام الذي يستخدمه هذا المقرر فعليًا، مبنيًا لهوية الضيف حتى لا تُرسَل بيانات أي متعلّم. القيمة 0 تختار المقرر الذي سجّل أكبر عدد من إجابات المحادثة في آخر 30 يومًا.';
+$string['privacy:metadata:model_eval'] = 'تقييمات النماذج التلقائية: أي نموذج مرشح قورن بأي نموذج حالي، والنتيجة المقيسة. البيانات الشخصية الوحيدة هي معرّف المسؤول الذي طلب التقييم. هذه السجلات من إعدادات الموقع وليست بيانات شخصية عن متعلّم، لذا لا تُضمَّن في تصدير البيانات ولا تُحذف عندما يطلب مستخدم المحو.';
+$string['privacy:metadata:model_eval:createdby'] = 'مسؤول الموقع الذي طلب هذا التقييم. يكون فارغًا عندما أضافه الاكتشاف إلى قائمة الانتظار.';
+$string['privacy:metadata:model_switch'] = 'عمليات تبديل النماذج والتراجع عنها: من أي نموذج انتقل الدور وإلى أي نموذج، ولماذا. البيانات الشخصية الوحيدة هي معرّف المسؤول الذي أجرى التبديل أو ألغاه. هذه السجلات من إعدادات الموقع وليست بيانات شخصية عن متعلّم، لذا لا تُضمَّن في تصدير البيانات ولا تُحذف عندما يطلب مستخدم المحو.';
+$string['privacy:metadata:model_switch:createdby'] = 'مسؤول الموقع الذي أجرى هذا التبديل. يكون فارغًا عندما كان التبديل تلقائيًا.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'مسؤول الموقع الذي تراجع عن هذا التبديل. يكون فارغًا عندما تراجع عنه المراقب، أو لم يتم التراجع عنه.';

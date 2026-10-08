@@ -3469,3 +3469,145 @@ $string['sandbox:noruntimeurl'] = 'The Python sandbox is on for this course, but
 $string['privacy:metadata:code_sandbox_runtime'] = 'When the Python sandbox is enabled, the learner\'s browser downloads the Python runtime from the location the site administrator configured, which may belong to a third party. Code written in the sandbox and its output stay on the device and are never sent anywhere.';
 $string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'The learner IP address, disclosed to whoever serves the runtime by the act of requesting it.';
 $string['privacy:metadata:code_sandbox_runtime:useragent'] = 'The learner browser and operating system, sent as the user agent of that request.';
+
+// v7.8.0: automatic model upgrades.
+$string['autoupgrade:title'] = 'Model upgrades';
+$string['autoupgrade:navtitle'] = '[[tutorshort]] model upgrades';
+$string['autoupgrade:intro'] = '[[tutorshort]] looks for newer models from the providers it already uses, tests each candidate against the model it would replace (same prompts, same answer budget, same judge, in the same run), and switches only when the candidate is the same price or cheaper per answer, as good, as safe and as reliable, twice in a row. Every switch is watched for 48 hours on live traffic and rolled back if it gets worse.';
+$string['autoupgrade:l_statusheading'] = 'Status';
+$string['autoupgrade:l_mode'] = 'Mode';
+$string['autoupgrade:l_budget'] = 'Testing budget';
+$string['autoupgrade:l_changemode'] = 'Change';
+$string['autoupgrade:l_discover'] = 'Discover models now';
+$string['autoupgrade:l_rolesheading'] = 'Roles';
+$string['autoupgrade:l_current'] = 'Current model';
+$string['autoupgrade:l_profile'] = 'Capability profile';
+$string['autoupgrade:l_policy'] = 'Upgrades';
+$string['autoupgrade:l_nocandidates'] = 'No candidates. Discovery marks models from the same provider at a comparable price.';
+$string['autoupgrade:l_colpasses'] = 'Passes';
+$string['autoupgrade:l_collast'] = 'Last evaluation';
+$string['autoupgrade:l_evaluate'] = 'Evaluate now';
+$string['autoupgrade:l_evaluating'] = 'Queued or running';
+$string['autoupgrade:l_switch'] = 'Switch';
+$string['autoupgrade:l_switchconfirm'] = 'Switch this role to the candidate now? The change is watched for 48 hours and can be rolled back.';
+$string['autoupgrade:l_evalsheading'] = 'Evaluations';
+$string['autoupgrade:l_noevals'] = 'No evaluations yet.';
+$string['autoupgrade:l_colwhen'] = 'When';
+$string['autoupgrade:l_colrole'] = 'Role';
+$string['autoupgrade:l_colcandidate'] = 'Candidate';
+$string['autoupgrade:l_colincumbent'] = 'Current model';
+$string['autoupgrade:l_colcost'] = 'Spent / estimate';
+$string['autoupgrade:l_colgate'] = 'Gate checks';
+$string['autoupgrade:l_switchesheading'] = 'Switches and rollbacks';
+$string['autoupgrade:l_noswitches'] = 'No switches yet.';
+$string['autoupgrade:l_colfrom'] = 'From';
+$string['autoupgrade:l_colto'] = 'To';
+$string['autoupgrade:l_colmode'] = 'How';
+$string['autoupgrade:l_colreason'] = 'Reason';
+$string['autoupgrade:l_coluntil'] = 'Watched until';
+$string['autoupgrade:l_rollback'] = 'Roll back';
+$string['autoupgrade:l_rollbackconfirm'] = 'Put the previous model back now?';
+$string['autoupgrade:l_manage'] = 'Review or forget learned facts on the model registry page';
+$string['autoupgrade:l_notinuse'] = 'not in use';
+$string['autoupgrade:mode_off'] = 'Off: nothing automatic';
+$string['autoupgrade:mode_recommend'] = 'Recommend: test candidates and email a recommendation';
+$string['autoupgrade:mode_auto'] = 'Automatic: test candidates and switch when one passes';
+$string['autoupgrade:budget_line'] = '${$a->spent} of ${$a->limit} spent this month (${$a->left} left)';
+$string['autoupgrade:last_discovery'] = 'Discovery last ran {$a}.';
+$string['autoupgrade:never_discovered'] = 'Discovery has not run yet.';
+$string['autoupgrade:role_chat'] = 'Chat (primary model)';
+$string['autoupgrade:role_premium'] = 'Premium tier';
+$string['autoupgrade:role_failover'] = 'Failover';
+$string['autoupgrade:role_quiz'] = 'Quiz generation';
+$string['autoupgrade:role_classifier'] = 'Mastery classifier';
+$string['autoupgrade:role_safety'] = 'Safety reference';
+$string['autoupgrade:role_soapbox'] = 'Soapbox scoring';
+$string['autoupgrade:not_configured'] = 'Not configured (inherits the chat model)';
+$string['autoupgrade:policy_auto'] = 'Evaluated, and switched automatically in Automatic mode';
+$string['autoupgrade:policy_recommend'] = 'Evaluated and recommended; an administrator switches it';
+$string['autoupgrade:policy_none'] = 'Candidates listed only: no benchmark measures this role\'s task';
+$string['autoupgrade:cand_candidate'] = 'Candidate';
+$string['autoupgrade:cand_passed'] = 'Passed once';
+$string['autoupgrade:cand_eligible'] = 'Eligible';
+$string['autoupgrade:cand_failed'] = 'Failed';
+$string['autoupgrade:cand_switched'] = 'In use';
+$string['autoupgrade:cand_rolledback'] = 'Rolled back';
+$string['autoupgrade:cand_retired'] = 'No longer listed';
+$string['autoupgrade:eval_queued'] = 'Queued';
+$string['autoupgrade:eval_running'] = 'Running';
+$string['autoupgrade:eval_complete'] = 'Complete';
+$string['autoupgrade:eval_failed'] = 'Failed';
+$string['autoupgrade:eval_skipped'] = 'Not run';
+$string['autoupgrade:gate_pass'] = 'Passed:';
+$string['autoupgrade:gate_fail'] = 'Did not pass:';
+$string['autoupgrade:how_auto'] = 'Automatic';
+$string['autoupgrade:how_manual'] = 'By an administrator';
+$string['autoupgrade:switch_watching'] = 'Watching';
+$string['autoupgrade:switch_kept'] = 'Kept';
+$string['autoupgrade:switch_rolledback'] = 'Rolled back';
+$string['autoupgrade:switch_superseded'] = 'Changed since by an administrator';
+$string['autoupgrade:block_role'] = 'This role cannot be switched from here.';
+$string['autoupgrade:block_emergency'] = 'An emergency control is engaged, so no model is switched until it is restored.';
+$string['autoupgrade:block_allowlist'] = 'The setting {$a} is not one a switch may change without a person, so this role is switched by hand.';
+$string['autoupgrade:block_bundle'] = 'The setting {$a} is managed by the signed policy bundle. Change the model in the bundle instead.';
+$string['autoupgrade:block_watching'] = 'A switch of this role is still being watched. Wait until it is kept or rolled back.';
+$string['autoupgrade:block_noeval'] = 'This candidate has no completed evaluation.';
+$string['autoupgrade:block_gate'] = 'This candidate\'s last evaluation did not pass the gate.';
+$string['autoupgrade:block_changed'] = 'The role\'s model changed after the evaluation, so it no longer compares the right pair. Evaluate again.';
+$string['autoupgrade:switched'] = 'Switched {$a->role} to {$a->model}. It is watched for 48 hours.';
+$string['autoupgrade:rolledback'] = 'Rolled back the {$a} switch.';
+$string['autoupgrade:rollback_missing'] = 'That switch cannot be rolled back.';
+$string['autoupgrade:rollback_superseded'] = 'The settings were changed after the switch, so nothing was rolled back.';
+$string['autoupgrade:rollback_by_admin'] = 'Rolled back by an administrator.';
+$string['autoupgrade:queued'] = 'Evaluation queued. It runs on the next cron pass and takes several minutes.';
+$string['autoupgrade:discovered'] = 'Discovery listed {$a->providers} provider(s), registered {$a->registered} model(s) and marked {$a->candidates} candidate(s). Providers that could not be listed: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'This role is not switched automatically.';
+$string['autoupgrade:why_recommend_mode'] = 'Automatic model upgrades are in Recommend mode.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} switched to {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] switched the {$a->role} role from {$a->from} to {$a->to}.
+
+It passed every check against the current model, measured in the same run, twice in a row:
+{$a->gate}
+
+The new model is watched on live traffic for {$a->hours} hours and rolled back automatically if errors, cut-off answers, refusals or cost per answer get worse. You can roll it back yourself at any time:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} rolled back to {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] put the {$a->role} role back from {$a->to} to {$a->from}.
+
+Why: {$a->reason}
+
+The candidate will not be tried again for 30 days. Details:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] {$a->role} switch to {$a->to} kept';
+$string['autoupgrade:mail_kept_body'] = 'The switch of the {$a->role} role from {$a->from} to {$a->to} held up for {$a->hours} hours on {$a->turns} live answers and is kept.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'The switch of the {$a->role} role from {$a->from} to {$a->to} is kept after {$a->hours} hours, but only {$a->turns} live answers were seen, too few to judge. Keep an eye on it.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Recommended: {$a->role} on {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} passed every check against {$a->current} for the {$a->role} role, twice in a row, and was not switched automatically: {$a->why}
+
+{$a->gate}
+
+Switch it, or leave it, here:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'You receive this because your address is a [[tutorshort]] spend alert recipient.';
+$string['event:model_switched'] = 'Model switched';
+$string['event:model_switch_rolled_back'] = 'Model switch rolled back';
+$string['task:discover_models'] = 'Discover new AI models and queue evaluations';
+$string['task:evaluate_model_candidate'] = 'Evaluate a candidate AI model';
+$string['task:watch_model_switches'] = 'Watch recent AI model switches';
+$string['settings:autoupgrade_heading'] = 'Automatic model upgrades';
+$string['settings:autoupgrade_heading_desc'] = 'Every day [[tutorshort]] lists the models your providers offer and marks candidates for each role: same provider, a comparable list price, and a known price. It tests them against the current model on the tutor prompts, the jailbreak suite and live-shaped cost, and switches the site default only when a candidate is the same price or cheaper per answer, as good, as safe and as reliable, twice in a row. Courses with their own model keep it. Every switch is emailed to the spend alert recipients and watched for 48 hours.';
+$string['settings:autoupgrade_mode'] = 'Mode';
+$string['settings:autoupgrade_mode_desc'] = 'Automatic switches when a candidate passes. Recommend tests candidates and emails a recommendation instead. Off does nothing automatic.';
+$string['settings:autoupgrade_budget_usd'] = 'Monthly testing budget (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'The most automatic evaluations may spend in a calendar month, judge included. An evaluation that might take the month over this does not start.';
+$string['settings:autoupgrade_eval_courseid'] = 'Evaluation course ID';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Evaluations answer under the system prompt this course really uses, built for the guest identity so no learner\'s data is sent. 0 picks the course with the most chat answers in the last 30 days.';
+$string['privacy:metadata:model_eval'] = 'Automatic model evaluations: which candidate model was compared with which current model, and the measured result. The only personal data is the identifier of the administrator who asked for the evaluation. These rows are site configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure.';
+$string['privacy:metadata:model_eval:createdby'] = 'The site administrator who asked for this evaluation. Empty when discovery queued it.';
+$string['privacy:metadata:model_switch'] = 'Model switches and rollbacks: which model a role moved from and to, and why. The only personal data is the identifier of the administrator who made or reversed the switch. These rows are site configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure.';
+$string['privacy:metadata:model_switch:createdby'] = 'The site administrator who made this switch. Empty when it was automatic.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'The site administrator who rolled this switch back. Empty when the watcher did, or it was not rolled back.';

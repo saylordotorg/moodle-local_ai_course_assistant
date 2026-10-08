@@ -3179,3 +3179,144 @@ $string['modelregistry:forget_confirm'] = 'Unohdetaanko tämä tieto? Seuraava p
 $string['modelregistry:forget_done'] = 'Tieto unohdettu. Seuraava pyyntö tälle mallille käyttää oletussääntöjä.';
 $string['modelregistry:forget_missing'] = 'Tätä tietoa ei enää ole.';
 $string['event:model_capability_learned'] = 'Mallin ominaisuus opittu palveluntarjoajalta';
+
+$string['autoupgrade:title'] = 'Mallien päivitykset';
+$string['autoupgrade:navtitle'] = '[[tutorshort]]-mallien päivitykset';
+$string['autoupgrade:intro'] = '[[tutorshort]] etsii uudempia malleja palveluntarjoajilta, joita se jo käyttää, testaa jokaista ehdokasta mallia vastaan, jonka se korvaisi (samat kehotteet, sama vastausbudjetti, sama arvioija, samassa ajossa), ja vaihtaa vain, kun ehdokas on vastausta kohden yhtä edullinen tai edullisempi sekä yhtä hyvä, turvallinen ja luotettava kahdesti peräkkäin. Jokaista vaihtoa seurataan 48 tuntia oikealla liikenteellä, ja se perutaan, jos tulokset heikkenevät.';
+$string['autoupgrade:l_statusheading'] = 'Tila';
+$string['autoupgrade:l_mode'] = 'Toimintatila';
+$string['autoupgrade:l_budget'] = 'Testausbudjetti';
+$string['autoupgrade:l_changemode'] = 'Muuta';
+$string['autoupgrade:l_discover'] = 'Etsi malleja nyt';
+$string['autoupgrade:l_rolesheading'] = 'Roolit';
+$string['autoupgrade:l_current'] = 'Nykyinen malli';
+$string['autoupgrade:l_profile'] = 'Kyvykkyysprofiili';
+$string['autoupgrade:l_policy'] = 'Päivitykset';
+$string['autoupgrade:l_nocandidates'] = 'Ei ehdokkaita. Haku merkitsee saman palveluntarjoajan malleja, joiden hinta on vertailukelpoinen.';
+$string['autoupgrade:l_colpasses'] = 'Läpäisyt';
+$string['autoupgrade:l_collast'] = 'Viimeisin arviointi';
+$string['autoupgrade:l_evaluate'] = 'Arvioi nyt';
+$string['autoupgrade:l_evaluating'] = 'Jonossa tai käynnissä';
+$string['autoupgrade:l_switch'] = 'Vaihda';
+$string['autoupgrade:l_switchconfirm'] = 'Vaihdetaanko tämän roolin malli ehdokkaaseen nyt? Muutosta seurataan 48 tuntia, ja sen voi perua.';
+$string['autoupgrade:l_evalsheading'] = 'Arvioinnit';
+$string['autoupgrade:l_noevals'] = 'Ei vielä arviointeja.';
+$string['autoupgrade:l_colwhen'] = 'Milloin';
+$string['autoupgrade:l_colrole'] = 'Rooli';
+$string['autoupgrade:l_colcandidate'] = 'Ehdokas';
+$string['autoupgrade:l_colincumbent'] = 'Nykyinen malli';
+$string['autoupgrade:l_colcost'] = 'Käytetty / arvio';
+$string['autoupgrade:l_colgate'] = 'Hyväksyntätarkistukset';
+$string['autoupgrade:l_switchesheading'] = 'Vaihdot ja peruutukset';
+$string['autoupgrade:l_noswitches'] = 'Ei vielä vaihtoja.';
+$string['autoupgrade:l_colfrom'] = 'Mistä';
+$string['autoupgrade:l_colto'] = 'Mihin';
+$string['autoupgrade:l_colmode'] = 'Miten';
+$string['autoupgrade:l_colreason'] = 'Syy';
+$string['autoupgrade:l_coluntil'] = 'Seurataan asti';
+$string['autoupgrade:l_rollback'] = 'Peru';
+$string['autoupgrade:l_rollbackconfirm'] = 'Palautetaanko edellinen malli nyt?';
+$string['autoupgrade:l_manage'] = 'Tarkista tai unohda opitut tiedot mallirekisterin sivulla';
+$string['autoupgrade:l_notinuse'] = 'ei käytössä';
+$string['autoupgrade:mode_off'] = 'Pois: ei mitään automaattista';
+$string['autoupgrade:mode_recommend'] = 'Suosittele: testaa ehdokkaat ja lähetä suositus sähköpostitse';
+$string['autoupgrade:mode_auto'] = 'Automaattinen: testaa ehdokkaat ja vaihda, kun jokin läpäisee';
+$string['autoupgrade:budget_line'] = '${$a->spent} / ${$a->limit} käytetty tässä kuussa (jäljellä ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Haku ajettiin viimeksi {$a}.';
+$string['autoupgrade:never_discovered'] = 'Hakua ei ole vielä ajettu.';
+$string['autoupgrade:role_chat'] = 'Keskustelu (ensisijainen malli)';
+$string['autoupgrade:role_premium'] = 'Premium-taso';
+$string['autoupgrade:role_failover'] = 'Varamalli';
+$string['autoupgrade:role_quiz'] = 'Tietovisojen luonti';
+$string['autoupgrade:role_classifier'] = 'Osaamisen luokittelija';
+$string['autoupgrade:role_safety'] = 'Turvallisuusvertailu';
+$string['autoupgrade:role_soapbox'] = 'Soapbox-pisteytys';
+$string['autoupgrade:not_configured'] = 'Ei määritetty (perii keskustelumallin)';
+$string['autoupgrade:policy_auto'] = 'Arvioidaan, ja vaihdetaan automaattisesti Automaattinen-tilassa';
+$string['autoupgrade:policy_recommend'] = 'Arvioidaan ja suositellaan; ylläpitäjä tekee vaihdon';
+$string['autoupgrade:policy_none'] = 'Ehdokkaat vain listataan: mikään vertailutesti ei mittaa tämän roolin tehtävää';
+$string['autoupgrade:cand_candidate'] = 'Ehdokas';
+$string['autoupgrade:cand_passed'] = 'Läpäissyt kerran';
+$string['autoupgrade:cand_eligible'] = 'Kelpoinen';
+$string['autoupgrade:cand_failed'] = 'Hylätty';
+$string['autoupgrade:cand_switched'] = 'Käytössä';
+$string['autoupgrade:cand_rolledback'] = 'Peruttu';
+$string['autoupgrade:cand_retired'] = 'Ei enää listalla';
+$string['autoupgrade:eval_queued'] = 'Jonossa';
+$string['autoupgrade:eval_running'] = 'Käynnissä';
+$string['autoupgrade:eval_complete'] = 'Valmis';
+$string['autoupgrade:eval_failed'] = 'Epäonnistui';
+$string['autoupgrade:eval_skipped'] = 'Ei ajettu';
+$string['autoupgrade:gate_pass'] = 'Läpäisi:';
+$string['autoupgrade:gate_fail'] = 'Ei läpäissyt:';
+$string['autoupgrade:how_auto'] = 'Automaattisesti';
+$string['autoupgrade:how_manual'] = 'Ylläpitäjän tekemä';
+$string['autoupgrade:switch_watching'] = 'Seurannassa';
+$string['autoupgrade:switch_kept'] = 'Pidetty';
+$string['autoupgrade:switch_rolledback'] = 'Peruttu';
+$string['autoupgrade:switch_superseded'] = 'Ylläpitäjä on muuttanut sen jälkeenpäin';
+$string['autoupgrade:block_role'] = 'Tämän roolin mallia ei voi vaihtaa täältä.';
+$string['autoupgrade:block_emergency'] = 'Hätäohjaus on käytössä, joten mallia ei vaihdeta ennen kuin se palautetaan.';
+$string['autoupgrade:block_allowlist'] = 'Asetusta {$a} ei saa muuttaa vaihdolla ilman ihmistä, joten tämän roolin malli vaihdetaan käsin.';
+$string['autoupgrade:block_bundle'] = 'Asetusta {$a} hallitaan allekirjoitetulla käytäntöpaketilla. Vaihda malli sen sijaan paketissa.';
+$string['autoupgrade:block_watching'] = 'Tämän roolin vaihtoa seurataan vielä. Odota, kunnes se pidetään tai perutaan.';
+$string['autoupgrade:block_noeval'] = 'Tällä ehdokkaalla ei ole valmista arviointia.';
+$string['autoupgrade:block_gate'] = 'Tämän ehdokkaan viimeisin arviointi ei läpäissyt tarkistuksia.';
+$string['autoupgrade:block_changed'] = 'Roolin malli muuttui arvioinnin jälkeen, joten arviointi ei enää vertaa oikeaa paria. Arvioi uudelleen.';
+$string['autoupgrade:switched'] = '{$a->role} vaihdettiin malliin {$a->model}. Sitä seurataan 48 tuntia.';
+$string['autoupgrade:rolledback'] = 'Vaihto {$a} peruttiin.';
+$string['autoupgrade:rollback_missing'] = 'Tätä vaihtoa ei voi perua.';
+$string['autoupgrade:rollback_superseded'] = 'Asetuksia muutettiin vaihdon jälkeen, joten mitään ei peruttu.';
+$string['autoupgrade:rollback_by_admin'] = 'Ylläpitäjä perui vaihdon.';
+$string['autoupgrade:queued'] = 'Arviointi lisättiin jonoon. Se ajetaan seuraavalla cron-kierroksella ja kestää useita minuutteja.';
+$string['autoupgrade:discovered'] = 'Haku listasi {$a->providers} palveluntarjoajaa, rekisteröi {$a->registered} mallia ja merkitsi {$a->candidates} ehdokasta. Palveluntarjoajat, joita ei voitu listata: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Tämän roolin mallia ei vaihdeta automaattisesti.';
+$string['autoupgrade:why_recommend_mode'] = 'Automaattiset mallipäivitykset ovat Suosittele-tilassa.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} vaihdettu malliin {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] vaihtoi roolin {$a->role} mallista {$a->from} malliin {$a->to}.
+
+Se läpäisi kaikki tarkistukset nykyistä mallia vastaan samassa ajossa mitattuna kahdesti peräkkäin:
+{$a->gate}
+
+Uutta mallia seurataan oikealla liikenteellä {$a->hours} tuntia, ja vaihto perutaan automaattisesti, jos virheet, katkenneet vastaukset, kieltäytymiset tai vastauskohtainen hinta pahenevat. Voit perua sen itse milloin tahansa:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} palautettu malliin {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] palautti roolin {$a->role} mallista {$a->to} malliin {$a->from}.
+
+Syy: {$a->reason}
+
+Ehdokasta ei kokeilla uudelleen 30 päivään. Lisätiedot:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] {$a->role}: vaihto malliin {$a->to} pidetään';
+$string['autoupgrade:mail_kept_body'] = 'Roolin {$a->role} vaihto mallista {$a->from} malliin {$a->to} toimi {$a->hours} tuntia {$a->turns} oikealla vastauksella ja pidetään.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Roolin {$a->role} vaihto mallista {$a->from} malliin {$a->to} pidetään {$a->hours} tunnin jälkeen, mutta oikeita vastauksia nähtiin vain {$a->turns}, mikä on liian vähän arviointiin. Pidä sitä silmällä.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Suositus: {$a->role} mallilla {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} läpäisi kaikki tarkistukset mallia {$a->current} vastaan roolissa {$a->role} kahdesti peräkkäin, eikä sitä vaihdettu automaattisesti: {$a->why}
+
+{$a->gate}
+
+Vaihda se tai jätä ennalleen täällä:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Saat tämän viestin, koska osoitteesi on [[tutorshort]]-kulujen hälytysten vastaanottaja.';
+$string['event:model_switched'] = 'Malli vaihdettu';
+$string['event:model_switch_rolled_back'] = 'Mallin vaihto peruttu';
+$string['task:discover_models'] = 'Etsi uusia tekoälymalleja ja lisää arvioinnit jonoon';
+$string['task:evaluate_model_candidate'] = 'Arvioi ehdokkaana oleva tekoälymalli';
+$string['task:watch_model_switches'] = 'Seuraa viimeaikaisia tekoälymallien vaihtoja';
+$string['settings:autoupgrade_heading'] = 'Automaattiset mallipäivitykset';
+$string['settings:autoupgrade_heading_desc'] = 'Joka päivä [[tutorshort]] listaa palveluntarjoajiesi mallit ja merkitsee jokaiselle roolille ehdokkaat: sama palveluntarjoaja, vertailukelpoinen listahinta ja tunnettu hinta. Se testaa ne nykyistä mallia vastaan tutorin kehotteilla, jailbreak-testisarjalla ja todellista vastaavalla kustannuksella ja vaihtaa sivuston oletusmallin vain, kun ehdokas on vastausta kohden yhtä edullinen tai edullisempi sekä yhtä hyvä, turvallinen ja luotettava kahdesti peräkkäin. Kurssit, joilla on oma malli, pitävät sen. Jokaisesta vaihdosta lähetetään sähköposti kulujen hälytysten vastaanottajille, ja sitä seurataan 48 tuntia.';
+$string['settings:autoupgrade_mode'] = 'Toimintatila';
+$string['settings:autoupgrade_mode_desc'] = 'Automaattinen vaihtaa, kun ehdokas läpäisee. Suosittele testaa ehdokkaat ja lähettää sen sijaan suosituksen sähköpostitse. Pois ei tee mitään automaattisesti.';
+$string['settings:autoupgrade_budget_usd'] = 'Kuukausittainen testausbudjetti (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Enimmäismäärä, jonka automaattiset arvioinnit saavat käyttää kalenterikuukaudessa arvioija mukaan lukien. Arviointia, joka voisi ylittää kuukauden rajan, ei aloiteta.';
+$string['settings:autoupgrade_eval_courseid'] = 'Arviointikurssin tunnus';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Arvioinnit vastaavat sillä järjestelmäkehotteella, jota tämä kurssi todella käyttää, vierasidentiteetille muodostettuna, jotta yhdenkään oppijan tietoja ei lähetetä. 0 valitsee kurssin, jolla on eniten keskusteluvastauksia viimeisten 30 päivän ajalta.';
+$string['privacy:metadata:model_eval'] = 'Automaattiset mallien arvioinnit: mitä ehdokasmallia verrattiin mihinkin nykyiseen malliin, ja mitattu tulos. Ainoa henkilötieto on arviointia pyytäneen ylläpitäjän tunniste. Nämä rivit ovat sivuston asetuksia eivätkä oppijaa koskevia henkilötietoja, joten niitä ei sisällytetä tietojen vientiin eikä poisteta, kun käyttäjä pyytää tietojensa poistamista.';
+$string['privacy:metadata:model_eval:createdby'] = 'Sivuston ylläpitäjä, joka pyysi tätä arviointia. Tyhjä, kun haku lisäsi sen jonoon.';
+$string['privacy:metadata:model_switch'] = 'Mallien vaihdot ja peruutukset: mistä mallista mihin malliin rooli siirtyi ja miksi. Ainoa henkilötieto on vaihdon tehneen tai perineen ylläpitäjän tunniste. Nämä rivit ovat sivuston asetuksia eivätkä oppijaa koskevia henkilötietoja, joten niitä ei sisällytetä tietojen vientiin eikä poisteta, kun käyttäjä pyytää tietojensa poistamista.';
+$string['privacy:metadata:model_switch:createdby'] = 'Sivuston ylläpitäjä, joka teki tämän vaihdon. Tyhjä, kun vaihto oli automaattinen.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Sivuston ylläpitäjä, joka perui tämän vaihdon. Tyhjä, kun seurantaprosessi perui sen tai sitä ei peruttu.';

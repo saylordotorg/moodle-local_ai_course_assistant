@@ -3179,3 +3179,144 @@ $string['modelregistry:forget_confirm'] = 'Uitați această informație? Următo
 $string['modelregistry:forget_done'] = 'Informație uitată. Următoarea cerere către acest model va folosi regulile implicite.';
 $string['modelregistry:forget_missing'] = 'Această informație nu mai există.';
 $string['event:model_capability_learned'] = 'Capabilitate de model învățată de la un furnizor';
+
+$string['autoupgrade:title'] = 'Actualizări de modele';
+$string['autoupgrade:navtitle'] = 'Actualizări de modele [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] caută modele mai noi de la furnizorii pe care îi folosește deja, testează fiecare candidat față de modelul pe care l-ar înlocui (aceleași prompturi, același buget de răspuns, același evaluator, în aceeași rulare) și schimbă doar când candidatul are același preț sau este mai ieftin pe răspuns și este la fel de bun, de sigur și de fiabil, de două ori la rând. Fiecare schimbare este urmărită 48 de ore pe traficul real și anulată dacă rezultatele se înrăutățesc.';
+$string['autoupgrade:l_statusheading'] = 'Stare';
+$string['autoupgrade:l_mode'] = 'Mod';
+$string['autoupgrade:l_budget'] = 'Buget de testare';
+$string['autoupgrade:l_changemode'] = 'Modifică';
+$string['autoupgrade:l_discover'] = 'Descoperă modele acum';
+$string['autoupgrade:l_rolesheading'] = 'Roluri';
+$string['autoupgrade:l_current'] = 'Model actual';
+$string['autoupgrade:l_profile'] = 'Profil de capabilități';
+$string['autoupgrade:l_policy'] = 'Actualizări';
+$string['autoupgrade:l_nocandidates'] = 'Niciun candidat. Descoperirea marchează modele de la același furnizor la un preț comparabil.';
+$string['autoupgrade:l_colpasses'] = 'Treceri';
+$string['autoupgrade:l_collast'] = 'Ultima evaluare';
+$string['autoupgrade:l_evaluate'] = 'Evaluează acum';
+$string['autoupgrade:l_evaluating'] = 'În coadă sau în curs';
+$string['autoupgrade:l_switch'] = 'Schimbă';
+$string['autoupgrade:l_switchconfirm'] = 'Schimbi acum acest rol pe candidat? Schimbarea este urmărită 48 de ore și poate fi anulată.';
+$string['autoupgrade:l_evalsheading'] = 'Evaluări';
+$string['autoupgrade:l_noevals'] = 'Nicio evaluare încă.';
+$string['autoupgrade:l_colwhen'] = 'Când';
+$string['autoupgrade:l_colrole'] = 'Rol';
+$string['autoupgrade:l_colcandidate'] = 'Candidat';
+$string['autoupgrade:l_colincumbent'] = 'Model actual';
+$string['autoupgrade:l_colcost'] = 'Cheltuit / estimare';
+$string['autoupgrade:l_colgate'] = 'Verificări de prag';
+$string['autoupgrade:l_switchesheading'] = 'Schimbări și reveniri';
+$string['autoupgrade:l_noswitches'] = 'Nicio schimbare încă.';
+$string['autoupgrade:l_colfrom'] = 'De la';
+$string['autoupgrade:l_colto'] = 'La';
+$string['autoupgrade:l_colmode'] = 'Cum';
+$string['autoupgrade:l_colreason'] = 'Motiv';
+$string['autoupgrade:l_coluntil'] = 'Urmărit până la';
+$string['autoupgrade:l_rollback'] = 'Revino';
+$string['autoupgrade:l_rollbackconfirm'] = 'Repui acum modelul anterior?';
+$string['autoupgrade:l_manage'] = 'Revizuiește sau uită faptele învățate pe pagina registrului de modele';
+$string['autoupgrade:l_notinuse'] = 'nefolosit';
+$string['autoupgrade:mode_off'] = 'Oprit: nimic automat';
+$string['autoupgrade:mode_recommend'] = 'Recomandare: testează candidații și trimite o recomandare prin e-mail';
+$string['autoupgrade:mode_auto'] = 'Automat: testează candidații și schimbă când unul trece';
+$string['autoupgrade:budget_line'] = '${$a->spent} din ${$a->limit} cheltuiți luna aceasta (rămân ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Descoperirea a rulat ultima dată {$a}.';
+$string['autoupgrade:never_discovered'] = 'Descoperirea nu a rulat încă.';
+$string['autoupgrade:role_chat'] = 'Chat (model principal)';
+$string['autoupgrade:role_premium'] = 'Nivel premium';
+$string['autoupgrade:role_failover'] = 'Rezervă';
+$string['autoupgrade:role_quiz'] = 'Generare de teste';
+$string['autoupgrade:role_classifier'] = 'Clasificator de stăpânire';
+$string['autoupgrade:role_safety'] = 'Referință de siguranță';
+$string['autoupgrade:role_soapbox'] = 'Punctare Soapbox';
+$string['autoupgrade:not_configured'] = 'Neconfigurat (moștenește modelul de chat)';
+$string['autoupgrade:policy_auto'] = 'Evaluat și schimbat automat în modul Automat';
+$string['autoupgrade:policy_recommend'] = 'Evaluat și recomandat; un administrator face schimbarea';
+$string['autoupgrade:policy_none'] = 'Doar listă de candidați: niciun benchmark nu măsoară sarcina acestui rol';
+$string['autoupgrade:cand_candidate'] = 'Candidat';
+$string['autoupgrade:cand_passed'] = 'A trecut o dată';
+$string['autoupgrade:cand_eligible'] = 'Eligibil';
+$string['autoupgrade:cand_failed'] = 'Respins';
+$string['autoupgrade:cand_switched'] = 'În uz';
+$string['autoupgrade:cand_rolledback'] = 'Revenit';
+$string['autoupgrade:cand_retired'] = 'Nu mai este listat';
+$string['autoupgrade:eval_queued'] = 'În coadă';
+$string['autoupgrade:eval_running'] = 'În curs';
+$string['autoupgrade:eval_complete'] = 'Finalizată';
+$string['autoupgrade:eval_failed'] = 'Eșuată';
+$string['autoupgrade:eval_skipped'] = 'Nerulată';
+$string['autoupgrade:gate_pass'] = 'Trecut:';
+$string['autoupgrade:gate_fail'] = 'Nu a trecut:';
+$string['autoupgrade:how_auto'] = 'Automat';
+$string['autoupgrade:how_manual'] = 'De un administrator';
+$string['autoupgrade:switch_watching'] = 'În urmărire';
+$string['autoupgrade:switch_kept'] = 'Păstrată';
+$string['autoupgrade:switch_rolledback'] = 'Anulată';
+$string['autoupgrade:switch_superseded'] = 'Modificată ulterior de un administrator';
+$string['autoupgrade:block_role'] = 'Acest rol nu poate fi schimbat de aici.';
+$string['autoupgrade:block_emergency'] = 'Un control de urgență este activ, așa că niciun model nu este schimbat până când nu este dezactivat.';
+$string['autoupgrade:block_allowlist'] = 'Setarea {$a} nu poate fi modificată de o schimbare fără o persoană, așa că acest rol se schimbă manual.';
+$string['autoupgrade:block_bundle'] = 'Setarea {$a} este gestionată de pachetul de politici semnat. Schimbă modelul în pachet.';
+$string['autoupgrade:block_watching'] = 'O schimbare a acestui rol este încă urmărită. Așteaptă până când este păstrată sau anulată.';
+$string['autoupgrade:block_noeval'] = 'Acest candidat nu are nicio evaluare finalizată.';
+$string['autoupgrade:block_gate'] = 'Ultima evaluare a acestui candidat nu a trecut pragul.';
+$string['autoupgrade:block_changed'] = 'Modelul rolului s-a schimbat după evaluare, așa că aceasta nu mai compară perechea corectă. Evaluează din nou.';
+$string['autoupgrade:switched'] = '{$a->role} a fost schimbat pe {$a->model}. Este urmărit 48 de ore.';
+$string['autoupgrade:rolledback'] = 'Schimbarea {$a} a fost anulată.';
+$string['autoupgrade:rollback_missing'] = 'Această schimbare nu poate fi anulată.';
+$string['autoupgrade:rollback_superseded'] = 'Setările au fost modificate după schimbare, așa că nu s-a anulat nimic.';
+$string['autoupgrade:rollback_by_admin'] = 'Anulată de un administrator.';
+$string['autoupgrade:queued'] = 'Evaluare pusă în coadă. Rulează la următoarea trecere cron și durează câteva minute.';
+$string['autoupgrade:discovered'] = 'Descoperirea a listat {$a->providers} furnizor(i), a înregistrat {$a->registered} model(e) și a marcat {$a->candidates} candidat(i). Furnizori care nu au putut fi listați: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Acest rol nu este schimbat automat.';
+$string['autoupgrade:why_recommend_mode'] = 'Actualizările automate de modele sunt în modul Recomandare.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} schimbat pe {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] a schimbat rolul {$a->role} de la {$a->from} la {$a->to}.
+
+A trecut fiecare verificare față de modelul actual, măsurată în aceeași rulare, de două ori la rând:
+{$a->gate}
+
+Noul model este urmărit pe traficul real timp de {$a->hours} ore și anulat automat dacă erorile, răspunsurile trunchiate, refuzurile sau costul pe răspuns se înrăutățesc. Îl poți anula oricând:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} readus la {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] a readus rolul {$a->role} de la {$a->to} la {$a->from}.
+
+Motiv: {$a->reason}
+
+Candidatul nu va mai fi încercat timp de 30 de zile. Detalii:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Schimbarea {$a->role} pe {$a->to} păstrată';
+$string['autoupgrade:mail_kept_body'] = 'Schimbarea rolului {$a->role} de la {$a->from} la {$a->to} a rezistat {$a->hours} ore pe {$a->turns} răspunsuri reale și este păstrată.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Schimbarea rolului {$a->role} de la {$a->from} la {$a->to} este păstrată după {$a->hours} ore, dar s-au văzut doar {$a->turns} răspunsuri reale, prea puține pentru o concluzie. Urmărește-o.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Recomandat: {$a->role} pe {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} a trecut fiecare verificare față de {$a->current} pentru rolul {$a->role}, de două ori la rând, și nu a fost schimbat automat: {$a->why}
+
+{$a->gate}
+
+Schimbă-l sau lasă-l așa, aici:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Primești acest mesaj deoarece adresa ta este destinatar al alertelor de cheltuieli [[tutorshort]].';
+$string['event:model_switched'] = 'Model schimbat';
+$string['event:model_switch_rolled_back'] = 'Schimbare de model anulată';
+$string['task:discover_models'] = 'Descoperă modele AI noi și pune evaluări în coadă';
+$string['task:evaluate_model_candidate'] = 'Evaluează un model AI candidat';
+$string['task:watch_model_switches'] = 'Urmărește schimbările recente de modele AI';
+$string['settings:autoupgrade_heading'] = 'Actualizări automate de modele';
+$string['settings:autoupgrade_heading_desc'] = 'În fiecare zi [[tutorshort]] listează modelele oferite de furnizorii tăi și marchează candidați pentru fiecare rol: același furnizor, un preț de listă comparabil și un preț cunoscut. Îi testează față de modelul actual pe prompturile tutorelui, setul de teste jailbreak și un cost apropiat de cel real și schimbă modelul implicit al site-ului doar când un candidat are același preț sau este mai ieftin pe răspuns și este la fel de bun, de sigur și de fiabil, de două ori la rând. Cursurile cu propriul model îl păstrează. Fiecare schimbare este trimisă prin e-mail destinatarilor alertelor de cheltuieli și urmărită 48 de ore.';
+$string['settings:autoupgrade_mode'] = 'Mod';
+$string['settings:autoupgrade_mode_desc'] = 'Automat schimbă când un candidat trece. Recomandare testează candidații și trimite în schimb o recomandare prin e-mail. Oprit nu face nimic automat.';
+$string['settings:autoupgrade_budget_usd'] = 'Buget lunar de testare (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Suma maximă pe care evaluările automate o pot cheltui într-o lună calendaristică, inclusiv evaluatorul. O evaluare care ar putea depăși această sumă în luna respectivă nu pornește.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID-ul cursului de evaluare';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Evaluările răspund cu promptul de sistem pe care acest curs îl folosește efectiv, construit pentru identitatea de vizitator, așa că nu se trimit datele niciunui cursant. 0 alege cursul cu cele mai multe răspunsuri de chat din ultimele 30 de zile.';
+$string['privacy:metadata:model_eval'] = 'Evaluări automate de modele: ce model candidat a fost comparat cu ce model actual și rezultatul măsurat. Singura dată personală este identificatorul administratorului care a cerut evaluarea. Aceste rânduri sunt configurație a site-ului, nu date personale despre un cursant, așa că nu sunt incluse într-un export de date și nu sunt șterse când un utilizator cere ștergerea.';
+$string['privacy:metadata:model_eval:createdby'] = 'Administratorul site-ului care a cerut această evaluare. Gol când a fost pusă în coadă de descoperire.';
+$string['privacy:metadata:model_switch'] = 'Schimbări și reveniri de modele: de la ce model la ce model a trecut un rol și de ce. Singura dată personală este identificatorul administratorului care a făcut sau a anulat schimbarea. Aceste rânduri sunt configurație a site-ului, nu date personale despre un cursant, așa că nu sunt incluse într-un export de date și nu sunt șterse când un utilizator cere ștergerea.';
+$string['privacy:metadata:model_switch:createdby'] = 'Administratorul site-ului care a făcut această schimbare. Gol când a fost automată.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Administratorul site-ului care a anulat această schimbare. Gol când a anulat-o monitorul sau nu a fost anulată.';

@@ -3217,3 +3217,144 @@ $string['modelregistry:forget_confirm'] = 'Dimenticare questo dato? La prossima 
 $string['modelregistry:forget_done'] = 'Dato dimenticato. La prossima richiesta a questo modello userà le regole predefinite.';
 $string['modelregistry:forget_missing'] = 'Questo dato non esiste più.';
 $string['event:model_capability_learned'] = 'Capacità del modello appresa da un provider';
+
+$string['autoupgrade:title'] = 'Aggiornamenti dei modelli';
+$string['autoupgrade:navtitle'] = 'Aggiornamenti dei modelli di [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] cerca modelli più recenti dei provider che già usa, mette alla prova ogni candidato contro il modello che sostituirebbe (stessi prompt, stesso budget di risposta, stesso giudice, nella stessa esecuzione) e cambia solo quando il candidato costa uguale o meno per risposta ed è altrettanto valido, sicuro e affidabile, due volte di seguito. Ogni cambio viene monitorato per 48 ore sul traffico reale e annullato se peggiora.';
+$string['autoupgrade:l_statusheading'] = 'Stato';
+$string['autoupgrade:l_mode'] = 'Modalità';
+$string['autoupgrade:l_budget'] = 'Budget per i test';
+$string['autoupgrade:l_changemode'] = 'Modifica';
+$string['autoupgrade:l_discover'] = 'Cerca modelli ora';
+$string['autoupgrade:l_rolesheading'] = 'Ruoli';
+$string['autoupgrade:l_current'] = 'Modello attuale';
+$string['autoupgrade:l_profile'] = 'Profilo di capacità';
+$string['autoupgrade:l_policy'] = 'Aggiornamenti';
+$string['autoupgrade:l_nocandidates'] = 'Nessun candidato. La ricerca segnala i modelli dello stesso provider con un prezzo comparabile.';
+$string['autoupgrade:l_colpasses'] = 'Superamenti';
+$string['autoupgrade:l_collast'] = 'Ultima valutazione';
+$string['autoupgrade:l_evaluate'] = 'Valuta ora';
+$string['autoupgrade:l_evaluating'] = 'In coda o in esecuzione';
+$string['autoupgrade:l_switch'] = 'Cambia';
+$string['autoupgrade:l_switchconfirm'] = 'Passare ora questo ruolo al candidato? Il cambio viene monitorato per 48 ore e può essere annullato.';
+$string['autoupgrade:l_evalsheading'] = 'Valutazioni';
+$string['autoupgrade:l_noevals'] = 'Ancora nessuna valutazione.';
+$string['autoupgrade:l_colwhen'] = 'Quando';
+$string['autoupgrade:l_colrole'] = 'Ruolo';
+$string['autoupgrade:l_colcandidate'] = 'Candidato';
+$string['autoupgrade:l_colincumbent'] = 'Modello attuale';
+$string['autoupgrade:l_colcost'] = 'Speso / stima';
+$string['autoupgrade:l_colgate'] = 'Controlli di soglia';
+$string['autoupgrade:l_switchesheading'] = 'Cambi e ripristini';
+$string['autoupgrade:l_noswitches'] = 'Ancora nessun cambio.';
+$string['autoupgrade:l_colfrom'] = 'Da';
+$string['autoupgrade:l_colto'] = 'A';
+$string['autoupgrade:l_colmode'] = 'Come';
+$string['autoupgrade:l_colreason'] = 'Motivo';
+$string['autoupgrade:l_coluntil'] = 'Monitorato fino al';
+$string['autoupgrade:l_rollback'] = 'Ripristina';
+$string['autoupgrade:l_rollbackconfirm'] = 'Rimettere ora il modello precedente?';
+$string['autoupgrade:l_manage'] = 'Rivedi o dimentica i dati appresi nella pagina del registro dei modelli';
+$string['autoupgrade:l_notinuse'] = 'non in uso';
+$string['autoupgrade:mode_off'] = 'Disattivata: nulla di automatico';
+$string['autoupgrade:mode_recommend'] = 'Consiglio: testa i candidati e invia un consiglio via email';
+$string['autoupgrade:mode_auto'] = 'Automatica: testa i candidati e cambia quando uno supera i controlli';
+$string['autoupgrade:budget_line'] = '${$a->spent} di ${$a->limit} spesi questo mese (${$a->left} rimanenti)';
+$string['autoupgrade:last_discovery'] = 'Ultima ricerca: {$a}.';
+$string['autoupgrade:never_discovered'] = 'La ricerca non è ancora stata eseguita.';
+$string['autoupgrade:role_chat'] = 'Chat (modello principale)';
+$string['autoupgrade:role_premium'] = 'Livello premium';
+$string['autoupgrade:role_failover'] = 'Modello di riserva';
+$string['autoupgrade:role_quiz'] = 'Generazione dei quiz';
+$string['autoupgrade:role_classifier'] = 'Classificatore di padronanza';
+$string['autoupgrade:role_safety'] = 'Riferimento di sicurezza';
+$string['autoupgrade:role_soapbox'] = 'Punteggio Soapbox';
+$string['autoupgrade:not_configured'] = 'Non configurato (eredita il modello della chat)';
+$string['autoupgrade:policy_auto'] = 'Valutato e cambiato automaticamente in modalità Automatica';
+$string['autoupgrade:policy_recommend'] = 'Valutato e consigliato; il cambio lo fa un amministratore';
+$string['autoupgrade:policy_none'] = 'Solo elenco dei candidati: nessun benchmark misura il compito di questo ruolo';
+$string['autoupgrade:cand_candidate'] = 'Candidato';
+$string['autoupgrade:cand_passed'] = 'Superato una volta';
+$string['autoupgrade:cand_eligible'] = 'Idoneo';
+$string['autoupgrade:cand_failed'] = 'Non superato';
+$string['autoupgrade:cand_switched'] = 'In uso';
+$string['autoupgrade:cand_rolledback'] = 'Ripristinato';
+$string['autoupgrade:cand_retired'] = 'Non più elencato';
+$string['autoupgrade:eval_queued'] = 'In coda';
+$string['autoupgrade:eval_running'] = 'In esecuzione';
+$string['autoupgrade:eval_complete'] = 'Completata';
+$string['autoupgrade:eval_failed'] = 'Non riuscita';
+$string['autoupgrade:eval_skipped'] = 'Non eseguita';
+$string['autoupgrade:gate_pass'] = 'Superati:';
+$string['autoupgrade:gate_fail'] = 'Non superati:';
+$string['autoupgrade:how_auto'] = 'Automatico';
+$string['autoupgrade:how_manual'] = 'Da un amministratore';
+$string['autoupgrade:switch_watching'] = 'In monitoraggio';
+$string['autoupgrade:switch_kept'] = 'Mantenuto';
+$string['autoupgrade:switch_rolledback'] = 'Ripristinato';
+$string['autoupgrade:switch_superseded'] = 'Modificato in seguito da un amministratore';
+$string['autoupgrade:block_role'] = 'Questo ruolo non può essere cambiato da qui.';
+$string['autoupgrade:block_emergency'] = 'È attivo un controllo di emergenza, quindi nessun modello viene cambiato finché non viene ripristinato.';
+$string['autoupgrade:block_allowlist'] = 'L\'impostazione {$a} non può essere modificata da un cambio senza una persona, quindi questo ruolo si cambia a mano.';
+$string['autoupgrade:block_bundle'] = 'L\'impostazione {$a} è gestita dal pacchetto di criteri firmato. Cambia il modello nel pacchetto.';
+$string['autoupgrade:block_watching'] = 'Un cambio di questo ruolo è ancora in monitoraggio. Attendi che venga mantenuto o ripristinato.';
+$string['autoupgrade:block_noeval'] = 'Questo candidato non ha una valutazione completata.';
+$string['autoupgrade:block_gate'] = 'L\'ultima valutazione di questo candidato non ha superato la soglia.';
+$string['autoupgrade:block_changed'] = 'Il modello del ruolo è cambiato dopo la valutazione, che quindi non confronta più la coppia giusta. Valuta di nuovo.';
+$string['autoupgrade:switched'] = '{$a->role} passato a {$a->model}. Viene monitorato per 48 ore.';
+$string['autoupgrade:rolledback'] = 'Cambio {$a} ripristinato.';
+$string['autoupgrade:rollback_missing'] = 'Quel cambio non può essere ripristinato.';
+$string['autoupgrade:rollback_superseded'] = 'Le impostazioni sono state modificate dopo il cambio, quindi non è stato ripristinato nulla.';
+$string['autoupgrade:rollback_by_admin'] = 'Ripristinato da un amministratore.';
+$string['autoupgrade:queued'] = 'Valutazione in coda. Parte al prossimo passaggio del cron e richiede alcuni minuti.';
+$string['autoupgrade:discovered'] = 'La ricerca ha elencato {$a->providers} provider, registrato {$a->registered} modelli e segnalato {$a->candidates} candidati. Provider non elencabili: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Questo ruolo non viene cambiato automaticamente.';
+$string['autoupgrade:why_recommend_mode'] = 'Gli aggiornamenti automatici dei modelli sono in modalità Consiglio.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} passato a {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] ha passato il ruolo {$a->role} da {$a->from} a {$a->to}.
+
+Ha superato ogni controllo rispetto al modello attuale, misurato nella stessa esecuzione, due volte di seguito:
+{$a->gate}
+
+Il nuovo modello viene monitorato sul traffico reale per {$a->hours} ore e ripristinato automaticamente se errori, risposte troncate, rifiuti o costo per risposta peggiorano. Puoi ripristinarlo tu in qualsiasi momento:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} ripristinato a {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] ha riportato il ruolo {$a->role} da {$a->to} a {$a->from}.
+
+Motivo: {$a->reason}
+
+Il candidato non verrà riprovato per 30 giorni. Dettagli:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Cambio di {$a->role} a {$a->to} mantenuto';
+$string['autoupgrade:mail_kept_body'] = 'Il cambio del ruolo {$a->role} da {$a->from} a {$a->to} ha retto per {$a->hours} ore su {$a->turns} risposte reali e viene mantenuto.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Il cambio del ruolo {$a->role} da {$a->from} a {$a->to} viene mantenuto dopo {$a->hours} ore, ma sono state viste solo {$a->turns} risposte reali, troppo poche per giudicare. Tienilo d\'occhio.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Consigliato: {$a->role} su {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} ha superato ogni controllo rispetto a {$a->current} per il ruolo {$a->role}, due volte di seguito, e non è stato cambiato automaticamente: {$a->why}
+
+{$a->gate}
+
+Cambialo, o lascialo com\'è, qui:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Ricevi questo messaggio perché il tuo indirizzo è tra i destinatari degli avvisi di spesa di [[tutorshort]].';
+$string['event:model_switched'] = 'Modello cambiato';
+$string['event:model_switch_rolled_back'] = 'Cambio di modello ripristinato';
+$string['task:discover_models'] = 'Cerca nuovi modelli AI e metti in coda le valutazioni';
+$string['task:evaluate_model_candidate'] = 'Valuta un modello AI candidato';
+$string['task:watch_model_switches'] = 'Monitora i cambi recenti di modelli AI';
+$string['settings:autoupgrade_heading'] = 'Aggiornamenti automatici dei modelli';
+$string['settings:autoupgrade_heading_desc'] = 'Ogni giorno [[tutorshort]] elenca i modelli offerti dai tuoi provider e segnala i candidati per ogni ruolo: stesso provider, prezzo di listino comparabile e prezzo noto. Li mette alla prova contro il modello attuale sui prompt del tutor, sulla suite di jailbreak e sul costo in condizioni reali, e cambia il modello predefinito del sito solo quando un candidato costa uguale o meno per risposta ed è altrettanto valido, sicuro e affidabile, due volte di seguito. I corsi con un proprio modello lo mantengono. Ogni cambio viene comunicato via email ai destinatari degli avvisi di spesa e monitorato per 48 ore.';
+$string['settings:autoupgrade_mode'] = 'Modalità';
+$string['settings:autoupgrade_mode_desc'] = 'Automatica cambia quando un candidato supera i controlli. Consiglio testa i candidati e invia invece un consiglio via email. Disattivata non fa nulla di automatico.';
+$string['settings:autoupgrade_budget_usd'] = 'Budget mensile per i test (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Il massimo che le valutazioni automatiche possono spendere in un mese di calendario, giudice incluso. Una valutazione che potrebbe superarlo non viene avviata.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID del corso di valutazione';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Le valutazioni rispondono con il prompt di sistema realmente usato da questo corso, costruito per l\'identità ospite, così non vengono inviati dati di alcuno studente. 0 sceglie il corso con più risposte in chat negli ultimi 30 giorni.';
+$string['privacy:metadata:model_eval'] = 'Valutazioni automatiche dei modelli: quale modello candidato è stato confrontato con quale modello attuale e il risultato misurato. L\'unico dato personale è l\'identificativo dell\'amministratore che ha richiesto la valutazione. Queste righe sono configurazione del sito e non dati personali di uno studente, quindi non sono incluse in un\'esportazione dei dati e non vengono rimosse quando un utente chiede la cancellazione.';
+$string['privacy:metadata:model_eval:createdby'] = 'L\'amministratore del sito che ha richiesto questa valutazione. Vuoto quando l\'ha messa in coda la ricerca.';
+$string['privacy:metadata:model_switch'] = 'Cambi e ripristini di modello: da quale a quale modello è passato un ruolo e perché. L\'unico dato personale è l\'identificativo dell\'amministratore che ha fatto o annullato il cambio. Queste righe sono configurazione del sito e non dati personali di uno studente, quindi non sono incluse in un\'esportazione dei dati e non vengono rimosse quando un utente chiede la cancellazione.';
+$string['privacy:metadata:model_switch:createdby'] = 'L\'amministratore del sito che ha fatto questo cambio. Vuoto quando è stato automatico.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'L\'amministratore del sito che ha ripristinato questo cambio. Vuoto quando lo ha fatto il monitoraggio o se non è stato ripristinato.';

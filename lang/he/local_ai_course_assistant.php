@@ -3218,3 +3218,144 @@ $string['modelregistry:forget_confirm'] = 'לשכוח עובדה זו? הבקש�
 $string['modelregistry:forget_done'] = 'העובדה נשכחה. הבקשה הבאה למודל זה משתמשת בכללי ברירת המחדל.';
 $string['modelregistry:forget_missing'] = 'העובדה הזו כבר לא קיימת.';
 $string['event:model_capability_learned'] = 'יכולת מודל נלמדה מספק';
+
+$string['autoupgrade:title'] = 'שדרוגי מודלים';
+$string['autoupgrade:navtitle'] = 'שדרוגי מודלים של [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] מחפש מודלים חדשים יותר אצל הספקים שהוא כבר משתמש בהם, בודק כל מועמד מול המודל שהוא יחליף (אותן הנחיות, אותו תקציב תשובה, אותו שופט, באותה הרצה), ומחליף רק כשהמועמד עולה אותו דבר או פחות לכל תשובה, טוב באותה מידה, בטוח באותה מידה ואמין באותה מידה, פעמיים ברציפות. כל החלפה נמצאת במעקב במשך 48 שעות על תעבורה חיה ומבוטלת אם המצב מחמיר.';
+$string['autoupgrade:l_statusheading'] = 'מצב';
+$string['autoupgrade:l_mode'] = 'אופן פעולה';
+$string['autoupgrade:l_budget'] = 'תקציב בדיקות';
+$string['autoupgrade:l_changemode'] = 'שינוי';
+$string['autoupgrade:l_discover'] = 'גילוי מודלים עכשיו';
+$string['autoupgrade:l_rolesheading'] = 'תפקידים';
+$string['autoupgrade:l_current'] = 'המודל הנוכחי';
+$string['autoupgrade:l_profile'] = 'פרופיל יכולות';
+$string['autoupgrade:l_policy'] = 'שדרוגים';
+$string['autoupgrade:l_nocandidates'] = 'אין מועמדים. הגילוי מסמן מודלים מאותו ספק במחיר דומה.';
+$string['autoupgrade:l_colpasses'] = 'מעברים';
+$string['autoupgrade:l_collast'] = 'הערכה אחרונה';
+$string['autoupgrade:l_evaluate'] = 'הערכה עכשיו';
+$string['autoupgrade:l_evaluating'] = 'בתור או בהרצה';
+$string['autoupgrade:l_switch'] = 'החלפה';
+$string['autoupgrade:l_switchconfirm'] = 'להחליף עכשיו את התפקיד הזה למועמד? השינוי יהיה במעקב במשך 48 שעות וניתן לבטל אותו.';
+$string['autoupgrade:l_evalsheading'] = 'הערכות';
+$string['autoupgrade:l_noevals'] = 'אין עדיין הערכות.';
+$string['autoupgrade:l_colwhen'] = 'מתי';
+$string['autoupgrade:l_colrole'] = 'תפקיד';
+$string['autoupgrade:l_colcandidate'] = 'מועמד';
+$string['autoupgrade:l_colincumbent'] = 'המודל הנוכחי';
+$string['autoupgrade:l_colcost'] = 'הוצאה / הערכה';
+$string['autoupgrade:l_colgate'] = 'בדיקות סף';
+$string['autoupgrade:l_switchesheading'] = 'החלפות וביטולים';
+$string['autoupgrade:l_noswitches'] = 'אין עדיין החלפות.';
+$string['autoupgrade:l_colfrom'] = 'מ';
+$string['autoupgrade:l_colto'] = 'אל';
+$string['autoupgrade:l_colmode'] = 'איך';
+$string['autoupgrade:l_colreason'] = 'סיבה';
+$string['autoupgrade:l_coluntil'] = 'במעקב עד';
+$string['autoupgrade:l_rollback'] = 'ביטול החלפה';
+$string['autoupgrade:l_rollbackconfirm'] = 'להחזיר עכשיו את המודל הקודם?';
+$string['autoupgrade:l_manage'] = 'סקירה או מחיקה של עובדות שנלמדו בדף מרשם המודלים';
+$string['autoupgrade:l_notinuse'] = 'לא בשימוש';
+$string['autoupgrade:mode_off'] = 'כבוי: שום דבר אוטומטי';
+$string['autoupgrade:mode_recommend'] = 'המלצה: בדיקת מועמדים ושליחת המלצה בדוא״ל';
+$string['autoupgrade:mode_auto'] = 'אוטומטי: בדיקת מועמדים והחלפה כשאחד עובר';
+$string['autoupgrade:budget_line'] = '${$a->spent} מתוך ${$a->limit} הוצאו החודש (נותרו ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'הגילוי רץ לאחרונה {$a}.';
+$string['autoupgrade:never_discovered'] = 'הגילוי עדיין לא רץ.';
+$string['autoupgrade:role_chat'] = 'צ׳אט (המודל הראשי)';
+$string['autoupgrade:role_premium'] = 'רמת פרימיום';
+$string['autoupgrade:role_failover'] = 'גיבוי';
+$string['autoupgrade:role_quiz'] = 'יצירת בחנים';
+$string['autoupgrade:role_classifier'] = 'מסווג שליטה';
+$string['autoupgrade:role_safety'] = 'מודל ייחוס לבטיחות';
+$string['autoupgrade:role_soapbox'] = 'ניקוד Soapbox';
+$string['autoupgrade:not_configured'] = 'לא הוגדר (יורש את מודל הצ׳אט)';
+$string['autoupgrade:policy_auto'] = 'מוערך, ומוחלף אוטומטית במצב אוטומטי';
+$string['autoupgrade:policy_recommend'] = 'מוערך ומומלץ; מנהל מערכת מבצע את ההחלפה';
+$string['autoupgrade:policy_none'] = 'המועמדים רק מוצגים: אף מבחן ביצועים לא מודד את המשימה של התפקיד הזה';
+$string['autoupgrade:cand_candidate'] = 'מועמד';
+$string['autoupgrade:cand_passed'] = 'עבר פעם אחת';
+$string['autoupgrade:cand_eligible'] = 'כשיר';
+$string['autoupgrade:cand_failed'] = 'נכשל';
+$string['autoupgrade:cand_switched'] = 'בשימוש';
+$string['autoupgrade:cand_rolledback'] = 'בוטל';
+$string['autoupgrade:cand_retired'] = 'כבר לא ברשימה';
+$string['autoupgrade:eval_queued'] = 'בתור';
+$string['autoupgrade:eval_running'] = 'בהרצה';
+$string['autoupgrade:eval_complete'] = 'הושלמה';
+$string['autoupgrade:eval_failed'] = 'נכשלה';
+$string['autoupgrade:eval_skipped'] = 'לא הורצה';
+$string['autoupgrade:gate_pass'] = 'עבר:';
+$string['autoupgrade:gate_fail'] = 'לא עבר:';
+$string['autoupgrade:how_auto'] = 'אוטומטית';
+$string['autoupgrade:how_manual'] = 'על ידי מנהל מערכת';
+$string['autoupgrade:switch_watching'] = 'במעקב';
+$string['autoupgrade:switch_kept'] = 'נשמר';
+$string['autoupgrade:switch_rolledback'] = 'בוטל';
+$string['autoupgrade:switch_superseded'] = 'שונה מאז על ידי מנהל מערכת';
+$string['autoupgrade:block_role'] = 'לא ניתן להחליף את התפקיד הזה מכאן.';
+$string['autoupgrade:block_emergency'] = 'בקרת חירום פעילה, ולכן אף מודל לא יוחלף עד שתשוחזר.';
+$string['autoupgrade:block_allowlist'] = 'ההגדרה {$a} אינה הגדרה שהחלפה רשאית לשנות ללא אדם, ולכן התפקיד הזה מוחלף ידנית.';
+$string['autoupgrade:block_bundle'] = 'ההגדרה {$a} מנוהלת על ידי חבילת המדיניות החתומה. יש לשנות את המודל בחבילה.';
+$string['autoupgrade:block_watching'] = 'החלפה של התפקיד הזה עדיין במעקב. יש להמתין עד שתישמר או תבוטל.';
+$string['autoupgrade:block_noeval'] = 'למועמד הזה אין הערכה שהושלמה.';
+$string['autoupgrade:block_gate'] = 'ההערכה האחרונה של המועמד הזה לא עברה את בדיקות הסף.';
+$string['autoupgrade:block_changed'] = 'המודל של התפקיד השתנה אחרי ההערכה, ולכן היא כבר לא משווה את הזוג הנכון. יש להעריך שוב.';
+$string['autoupgrade:switched'] = '{$a->role} הוחלף אל {$a->model}. הוא יהיה במעקב במשך 48 שעות.';
+$string['autoupgrade:rolledback'] = 'ההחלפה {$a} בוטלה.';
+$string['autoupgrade:rollback_missing'] = 'לא ניתן לבטל את ההחלפה הזו.';
+$string['autoupgrade:rollback_superseded'] = 'ההגדרות שונו אחרי ההחלפה, ולכן שום דבר לא בוטל.';
+$string['autoupgrade:rollback_by_admin'] = 'בוטל על ידי מנהל מערכת.';
+$string['autoupgrade:queued'] = 'ההערכה נכנסה לתור. היא תרוץ במעבר הבא של cron ותימשך כמה דקות.';
+$string['autoupgrade:discovered'] = 'הגילוי הציג {$a->providers} ספקים, רשם {$a->registered} מודלים וסימן {$a->candidates} מועמדים. ספקים שלא ניתן היה להציג: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'התפקיד הזה אינו מוחלף אוטומטית.';
+$string['autoupgrade:why_recommend_mode'] = 'שדרוגי המודלים האוטומטיים נמצאים במצב המלצה.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} הוחלף אל {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] החליף את התפקיד {$a->role} מ־{$a->from} אל {$a->to}.
+
+הוא עבר את כל הבדיקות מול המודל הנוכחי, שנמדדו באותה הרצה, פעמיים ברציפות:
+{$a->gate}
+
+המודל החדש במעקב על תעבורה חיה במשך {$a->hours} שעות ויבוטל אוטומטית אם השגיאות, התשובות הקטועות, הסירובים או העלות לתשובה יחמירו. אפשר לבטל אותו בעצמך בכל עת:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} הוחזר אל {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] החזיר את התפקיד {$a->role} מ־{$a->to} אל {$a->from}.
+
+הסיבה: {$a->reason}
+
+המועמד לא ינוסה שוב במשך 30 יום. פרטים:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] ההחלפה של {$a->role} אל {$a->to} נשמרת';
+$string['autoupgrade:mail_kept_body'] = 'ההחלפה של התפקיד {$a->role} מ־{$a->from} אל {$a->to} החזיקה מעמד במשך {$a->hours} שעות על {$a->turns} תשובות חיות ונשמרת.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'ההחלפה של התפקיד {$a->role} מ־{$a->from} אל {$a->to} נשמרת אחרי {$a->hours} שעות, אבל נצפו רק {$a->turns} תשובות חיות, מעט מדי כדי לשפוט. כדאי להמשיך לעקוב.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] מומלץ: {$a->role} עם {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} עבר את כל הבדיקות מול {$a->current} עבור התפקיד {$a->role}, פעמיים ברציפות, ולא הוחלף אוטומטית: {$a->why}
+
+{$a->gate}
+
+אפשר להחליף אותו, או להשאיר, כאן:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'הודעה זו נשלחה אליך כי הכתובת שלך רשומה כנמען של התראות ההוצאות של [[tutorshort]].';
+$string['event:model_switched'] = 'המודל הוחלף';
+$string['event:model_switch_rolled_back'] = 'החלפת המודל בוטלה';
+$string['task:discover_models'] = 'גילוי מודלים חדשים של בינה מלאכותית והכנסת הערכות לתור';
+$string['task:evaluate_model_candidate'] = 'הערכת מודל בינה מלאכותית מועמד';
+$string['task:watch_model_switches'] = 'מעקב אחר החלפות אחרונות של מודלי בינה מלאכותית';
+$string['settings:autoupgrade_heading'] = 'שדרוגי מודלים אוטומטיים';
+$string['settings:autoupgrade_heading_desc'] = 'בכל יום [[tutorshort]] מציג את המודלים שהספקים שלך מציעים ומסמן מועמדים לכל תפקיד: אותו ספק, מחיר מחירון דומה ומחיר ידוע. הוא בודק אותם מול המודל הנוכחי על הנחיות המורה, על סדרת בדיקות הפריצה ועל עלות דומה לשימוש אמיתי, ומחליף את ברירת המחדל של האתר רק כשמועמד עולה אותו דבר או פחות לכל תשובה, טוב באותה מידה, בטוח באותה מידה ואמין באותה מידה, פעמיים ברציפות. קורסים עם מודל משלהם שומרים עליו. על כל החלפה נשלח דוא״ל לנמעני התראות ההוצאות, והיא במעקב במשך 48 שעות.';
+$string['settings:autoupgrade_mode'] = 'אופן פעולה';
+$string['settings:autoupgrade_mode_desc'] = 'אוטומטי מחליף כשמועמד עובר. המלצה בודק מועמדים ושולח במקום זאת המלצה בדוא״ל. כבוי לא עושה שום דבר אוטומטית.';
+$string['settings:autoupgrade_budget_usd'] = 'תקציב בדיקות חודשי (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'הסכום המרבי שהערכות אוטומטיות רשאיות להוציא בחודש קלנדרי, כולל השופט. הערכה שעלולה לחרוג מהסכום הזה בחודש לא תתחיל.';
+$string['settings:autoupgrade_eval_courseid'] = 'מזהה קורס ההערכה';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'ההערכות עונות לפי הנחיית המערכת שהקורס הזה באמת משתמש בה, הבנויה עבור זהות אורח כך שלא נשלחים נתונים של אף לומד. 0 בוחר את הקורס עם הכי הרבה תשובות צ׳אט ב־30 הימים האחרונים.';
+$string['privacy:metadata:model_eval'] = 'הערכות מודלים אוטומטיות: איזה מודל מועמד הושווה לאיזה מודל נוכחי, והתוצאה שנמדדה. המידע האישי היחיד הוא המזהה של מנהל המערכת שביקש את ההערכה. שורות אלה הן הגדרות אתר ולא מידע אישי על לומד, ולכן הן אינן נכללות בייצוא נתונים ואינן נמחקות כשמשתמש מבקש מחיקה.';
+$string['privacy:metadata:model_eval:createdby'] = 'מנהל האתר שביקש את ההערכה הזו. ריק כשהגילוי הכניס אותה לתור.';
+$string['privacy:metadata:model_switch'] = 'החלפות מודלים וביטולים: מאיזה מודל לאיזה מודל עבר תפקיד, ולמה. המידע האישי היחיד הוא המזהה של מנהל המערכת שביצע את ההחלפה או ביטל אותה. שורות אלה הן הגדרות אתר ולא מידע אישי על לומד, ולכן הן אינן נכללות בייצוא נתונים ואינן נמחקות כשמשתמש מבקש מחיקה.';
+$string['privacy:metadata:model_switch:createdby'] = 'מנהל האתר שביצע את ההחלפה הזו. ריק כשהיא הייתה אוטומטית.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'מנהל האתר שביטל את ההחלפה הזו. ריק כשהמנגנון המנטר ביטל אותה, או כשהיא לא בוטלה.';

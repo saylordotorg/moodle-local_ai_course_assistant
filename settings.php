@@ -3495,6 +3495,51 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // v7.8.0: automatic model upgrades. Not on the policy bundle allowlist on
+    // purpose: the mode and the budget decide whether the site spends money
+    // testing models, and a bundle must not be able to start that.
+    $autoupgradedesc = \local_ai_course_assistant\branding::apply(
+        get_string('settings:autoupgrade_heading_desc', 'local_ai_course_assistant')
+    ) . '<br>' . html_writer::link(
+        new moodle_url('/local/ai_course_assistant/model_upgrades.php'),
+        \local_ai_course_assistant\branding::str('autoupgrade:navtitle'),
+        ['class' => 'btn btn-secondary btn-sm mt-2']
+    );
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/autoupgrade_heading',
+        get_string('settings:autoupgrade_heading', 'local_ai_course_assistant'),
+        $autoupgradedesc
+    ));
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/autoupgrade_mode',
+        get_string('settings:autoupgrade_mode', 'local_ai_course_assistant'),
+        get_string('settings:autoupgrade_mode_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\autoupgrade\switcher::MODE_AUTO,
+        [
+            'off' => get_string('autoupgrade:mode_off', 'local_ai_course_assistant'),
+            'recommend' => get_string('autoupgrade:mode_recommend', 'local_ai_course_assistant'),
+            'auto' => get_string('autoupgrade:mode_auto', 'local_ai_course_assistant'),
+        ]
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/autoupgrade_budget_usd',
+        get_string('settings:autoupgrade_budget_usd', 'local_ai_course_assistant'),
+        get_string('settings:autoupgrade_budget_usd_desc', 'local_ai_course_assistant'),
+        // Round-trips through clean_param(PARAM_FLOAT) unchanged, as install-time
+        // default validation requires: '10' cleans to 10.
+        '10',
+        PARAM_FLOAT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/autoupgrade_eval_courseid',
+        get_string('settings:autoupgrade_eval_courseid', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(
+            get_string('settings:autoupgrade_eval_courseid_desc', 'local_ai_course_assistant')
+        ),
+        '0',
+        PARAM_INT
+    ));
+
     // ── v5.3.0: Empathetic communications + carryover memory ───────────────
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/empathy_heading',
@@ -3759,6 +3804,14 @@ if ($hassiteconfig) {
         'local_ai_course_assistant_modelregistry',
         \local_ai_course_assistant\branding::str('modelregistry:navtitle'),
         new moodle_url('/local/ai_course_assistant/model_registry.php'),
+        'moodle/site:config'
+    ));
+
+    // v7.8.0: automatic model upgrades: candidates, evaluations, switches.
+    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
+        'local_ai_course_assistant_modelupgrades',
+        \local_ai_course_assistant\branding::str('autoupgrade:navtitle'),
+        new moodle_url('/local/ai_course_assistant/model_upgrades.php'),
         'moodle/site:config'
     ));
 

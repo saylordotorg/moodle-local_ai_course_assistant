@@ -3200,3 +3200,144 @@ $string['modelregistry:forget_confirm'] = 'இந்தத் தகவலை �
 $string['modelregistry:forget_done'] = 'தகவல் மறக்கப்பட்டது. இந்த மாதிரிக்கான அடுத்த கோரிக்கை இயல்பு விதிகளைப் பயன்படுத்தும்.';
 $string['modelregistry:forget_missing'] = 'அந்தத் தகவல் இனி இல்லை.';
 $string['event:model_capability_learned'] = 'வழங்குநரிடமிருந்து மாதிரித் திறன் கற்கப்பட்டது';
+
+$string['autoupgrade:title'] = 'மாதிரி மேம்படுத்தல்கள்';
+$string['autoupgrade:navtitle'] = '[[tutorshort]] மாதிரி மேம்படுத்தல்கள்';
+$string['autoupgrade:intro'] = '[[tutorshort]] ஏற்கனவே பயன்படுத்தும் வழங்குநர்களிடமிருந்து புதிய மாதிரிகளைத் தேடுகிறது, ஒவ்வொரு வேட்பாளரையும் அது மாற்றக்கூடிய மாதிரிக்கு எதிராகச் சோதிக்கிறது (அதே தூண்டுகோள்கள், அதே பதில் வரம்பு, அதே மதிப்பீட்டாளர், அதே ஓட்டத்தில்), மேலும் வேட்பாளர் ஒரு பதிலுக்கு அதே விலை அல்லது குறைவான விலையில், அதே அளவு நல்லதாக, பாதுகாப்பானதாக, நம்பகமானதாக தொடர்ந்து இரண்டு முறை இருந்தால் மட்டுமே மாற்றுகிறது. ஒவ்வொரு மாற்றமும் உண்மையான பயன்பாட்டில் 48 மணி நேரம் கண்காணிக்கப்பட்டு, மோசமானால் திரும்பப் பெறப்படும்.';
+$string['autoupgrade:l_statusheading'] = 'நிலை';
+$string['autoupgrade:l_mode'] = 'முறை';
+$string['autoupgrade:l_budget'] = 'சோதனை வரவுசெலவு';
+$string['autoupgrade:l_changemode'] = 'மாற்று';
+$string['autoupgrade:l_discover'] = 'இப்போது மாதிரிகளைக் கண்டறி';
+$string['autoupgrade:l_rolesheading'] = 'பணிகள்';
+$string['autoupgrade:l_current'] = 'தற்போதைய மாதிரி';
+$string['autoupgrade:l_profile'] = 'திறன் விவரம்';
+$string['autoupgrade:l_policy'] = 'மேம்படுத்தல்கள்';
+$string['autoupgrade:l_nocandidates'] = 'வேட்பாளர்கள் இல்லை. கண்டறிதல் அதே வழங்குநரின் ஒப்பிடக்கூடிய விலையுள்ள மாதிரிகளைக் குறிக்கிறது.';
+$string['autoupgrade:l_colpasses'] = 'தேர்ச்சிகள்';
+$string['autoupgrade:l_collast'] = 'கடைசி மதிப்பீடு';
+$string['autoupgrade:l_evaluate'] = 'இப்போது மதிப்பிடு';
+$string['autoupgrade:l_evaluating'] = 'வரிசையில் அல்லது இயங்குகிறது';
+$string['autoupgrade:l_switch'] = 'மாற்று';
+$string['autoupgrade:l_switchconfirm'] = 'இந்தப் பணியை இப்போது வேட்பாளருக்கு மாற்றவா? மாற்றம் 48 மணி நேரம் கண்காணிக்கப்படும், திரும்பப் பெறலாம்.';
+$string['autoupgrade:l_evalsheading'] = 'மதிப்பீடுகள்';
+$string['autoupgrade:l_noevals'] = 'இன்னும் மதிப்பீடுகள் இல்லை.';
+$string['autoupgrade:l_colwhen'] = 'எப்போது';
+$string['autoupgrade:l_colrole'] = 'பணி';
+$string['autoupgrade:l_colcandidate'] = 'வேட்பாளர்';
+$string['autoupgrade:l_colincumbent'] = 'தற்போதைய மாதிரி';
+$string['autoupgrade:l_colcost'] = 'செலவானது / மதிப்பீடு';
+$string['autoupgrade:l_colgate'] = 'வரம்புச் சோதனைகள்';
+$string['autoupgrade:l_switchesheading'] = 'மாற்றங்களும் திரும்பப் பெறுதல்களும்';
+$string['autoupgrade:l_noswitches'] = 'இன்னும் மாற்றங்கள் இல்லை.';
+$string['autoupgrade:l_colfrom'] = 'இருந்து';
+$string['autoupgrade:l_colto'] = 'வரை';
+$string['autoupgrade:l_colmode'] = 'எப்படி';
+$string['autoupgrade:l_colreason'] = 'காரணம்';
+$string['autoupgrade:l_coluntil'] = 'கண்காணிப்பு முடிவு';
+$string['autoupgrade:l_rollback'] = 'திரும்பப் பெறு';
+$string['autoupgrade:l_rollbackconfirm'] = 'முந்தைய மாதிரியை இப்போது மீண்டும் வைக்கவா?';
+$string['autoupgrade:l_manage'] = 'கற்ற உண்மைகளை மாதிரிப் பதிவேட்டுப் பக்கத்தில் மதிப்பாய்வு செய்யவும் அல்லது மறக்கவும்';
+$string['autoupgrade:l_notinuse'] = 'பயன்பாட்டில் இல்லை';
+$string['autoupgrade:mode_off'] = 'முடக்கம்: எதுவும் தானியங்கியாக இல்லை';
+$string['autoupgrade:mode_recommend'] = 'பரிந்துரை: வேட்பாளர்களைச் சோதித்து மின்னஞ்சலில் பரிந்துரை அனுப்பு';
+$string['autoupgrade:mode_auto'] = 'தானியங்கி: வேட்பாளர்களைச் சோதித்து ஒன்று தேறும்போது மாற்று';
+$string['autoupgrade:budget_line'] = 'இந்த மாதம் ${$a->limit} இல் ${$a->spent} செலவானது (${$a->left} மீதம்)';
+$string['autoupgrade:last_discovery'] = 'கண்டறிதல் கடைசியாக {$a} அன்று இயங்கியது.';
+$string['autoupgrade:never_discovered'] = 'கண்டறிதல் இன்னும் இயங்கவில்லை.';
+$string['autoupgrade:role_chat'] = 'அரட்டை (முதன்மை மாதிரி)';
+$string['autoupgrade:role_premium'] = 'பிரீமியம் நிலை';
+$string['autoupgrade:role_failover'] = 'மாற்று இருப்பு மாதிரி';
+$string['autoupgrade:role_quiz'] = 'வினாடி வினா உருவாக்கம்';
+$string['autoupgrade:role_classifier'] = 'தேர்ச்சி வகைப்படுத்தி';
+$string['autoupgrade:role_safety'] = 'பாதுகாப்புக் குறிப்பு';
+$string['autoupgrade:role_soapbox'] = 'Soapbox மதிப்பெண்';
+$string['autoupgrade:not_configured'] = 'அமைக்கப்படவில்லை (அரட்டை மாதிரியைப் பின்பற்றுகிறது)';
+$string['autoupgrade:policy_auto'] = 'மதிப்பிடப்பட்டு, தானியங்கி முறையில் தானாக மாற்றப்படும்';
+$string['autoupgrade:policy_recommend'] = 'மதிப்பிடப்பட்டு பரிந்துரைக்கப்படும்; நிர்வாகி மாற்றுவார்';
+$string['autoupgrade:policy_none'] = 'வேட்பாளர் பட்டியல் மட்டும்: இந்தப் பணியை எந்த அளவுகோல் சோதனையும் அளக்கவில்லை';
+$string['autoupgrade:cand_candidate'] = 'வேட்பாளர்';
+$string['autoupgrade:cand_passed'] = 'ஒருமுறை தேறியது';
+$string['autoupgrade:cand_eligible'] = 'தகுதியானது';
+$string['autoupgrade:cand_failed'] = 'தோல்வி';
+$string['autoupgrade:cand_switched'] = 'பயன்பாட்டில்';
+$string['autoupgrade:cand_rolledback'] = 'திரும்பப் பெறப்பட்டது';
+$string['autoupgrade:cand_retired'] = 'இனி பட்டியலில் இல்லை';
+$string['autoupgrade:eval_queued'] = 'வரிசையில்';
+$string['autoupgrade:eval_running'] = 'இயங்குகிறது';
+$string['autoupgrade:eval_complete'] = 'முடிந்தது';
+$string['autoupgrade:eval_failed'] = 'தோல்வியடைந்தது';
+$string['autoupgrade:eval_skipped'] = 'இயக்கப்படவில்லை';
+$string['autoupgrade:gate_pass'] = 'தேறியவை:';
+$string['autoupgrade:gate_fail'] = 'தேறாதவை:';
+$string['autoupgrade:how_auto'] = 'தானியங்கி';
+$string['autoupgrade:how_manual'] = 'நிர்வாகியால்';
+$string['autoupgrade:switch_watching'] = 'கண்காணிப்பில்';
+$string['autoupgrade:switch_kept'] = 'தக்கவைக்கப்பட்டது';
+$string['autoupgrade:switch_rolledback'] = 'திரும்பப் பெறப்பட்டது';
+$string['autoupgrade:switch_superseded'] = 'பின்னர் நிர்வாகியால் மாற்றப்பட்டது';
+$string['autoupgrade:block_role'] = 'இந்தப் பணியை இங்கிருந்து மாற்ற முடியாது.';
+$string['autoupgrade:block_emergency'] = 'அவசரக் கட்டுப்பாடு இயக்கத்தில் உள்ளது, அது மீட்கப்படும் வரை எந்த மாதிரியும் மாற்றப்படாது.';
+$string['autoupgrade:block_allowlist'] = '{$a} அமைப்பை ஒரு நபர் இல்லாமல் மாற்றம் மாற்ற முடியாது, எனவே இந்தப் பணி கையால் மாற்றப்படும்.';
+$string['autoupgrade:block_bundle'] = '{$a} அமைப்பு கையொப்பமிடப்பட்ட கொள்கைத் தொகுப்பால் நிர்வகிக்கப்படுகிறது. அதற்குப் பதிலாக தொகுப்பில் மாதிரியை மாற்றவும்.';
+$string['autoupgrade:block_watching'] = 'இந்தப் பணியின் ஒரு மாற்றம் இன்னும் கண்காணிப்பில் உள்ளது. அது தக்கவைக்கப்படும் வரை அல்லது திரும்பப் பெறப்படும் வரை காத்திருக்கவும்.';
+$string['autoupgrade:block_noeval'] = 'இந்த வேட்பாளருக்கு முடிந்த மதிப்பீடு இல்லை.';
+$string['autoupgrade:block_gate'] = 'இந்த வேட்பாளரின் கடைசி மதிப்பீடு வரம்பைத் தாண்டவில்லை.';
+$string['autoupgrade:block_changed'] = 'மதிப்பீட்டிற்குப் பிறகு பணியின் மாதிரி மாறியதால், அது இனி சரியான இணையை ஒப்பிடவில்லை. மீண்டும் மதிப்பிடவும்.';
+$string['autoupgrade:switched'] = '{$a->role} பணி {$a->model} க்கு மாற்றப்பட்டது. இது 48 மணி நேரம் கண்காணிக்கப்படும்.';
+$string['autoupgrade:rolledback'] = '{$a} மாற்றம் திரும்பப் பெறப்பட்டது.';
+$string['autoupgrade:rollback_missing'] = 'அந்த மாற்றத்தைத் திரும்பப் பெற முடியாது.';
+$string['autoupgrade:rollback_superseded'] = 'மாற்றத்திற்குப் பிறகு அமைப்புகள் மாற்றப்பட்டதால், எதுவும் திரும்பப் பெறப்படவில்லை.';
+$string['autoupgrade:rollback_by_admin'] = 'நிர்வாகியால் திரும்பப் பெறப்பட்டது.';
+$string['autoupgrade:queued'] = 'மதிப்பீடு வரிசையில் சேர்க்கப்பட்டது. அடுத்த கிரான் ஓட்டத்தில் இயங்கும், சில நிமிடங்கள் ஆகும்.';
+$string['autoupgrade:discovered'] = 'கண்டறிதல் {$a->providers} வழங்குநர்களைப் பட்டியலிட்டது, {$a->registered} மாதிரிகளைப் பதிவுசெய்தது, {$a->candidates} வேட்பாளர்களைக் குறித்தது. பட்டியலிட முடியாத வழங்குநர்கள்: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'இந்தப் பணி தானாக மாற்றப்படுவதில்லை.';
+$string['autoupgrade:why_recommend_mode'] = 'தானியங்கி மாதிரி மேம்படுத்தல்கள் பரிந்துரை முறையில் உள்ளன.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} {$a->to} க்கு மாற்றப்பட்டது';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] {$a->role} பணியை {$a->from} இலிருந்து {$a->to} க்கு மாற்றியது.
+
+அதே ஓட்டத்தில் அளக்கப்பட்ட, தற்போதைய மாதிரிக்கு எதிரான ஒவ்வொரு சோதனையிலும் தொடர்ந்து இரண்டு முறை தேறியது:
+{$a->gate}
+
+புதிய மாதிரி உண்மையான பயன்பாட்டில் {$a->hours} மணி நேரம் கண்காணிக்கப்படும், பிழைகள், துண்டிக்கப்பட்ட பதில்கள், மறுப்புகள் அல்லது ஒரு பதிலுக்கான செலவு மோசமானால் தானாகத் திரும்பப் பெறப்படும். நீங்களே எப்போது வேண்டுமானாலும் திரும்பப் பெறலாம்:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} மீண்டும் {$a->from} க்குத் திரும்பியது';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] {$a->role} பணியை {$a->to} இலிருந்து மீண்டும் {$a->from} க்கு மாற்றியது.
+
+காரணம்: {$a->reason}
+
+இந்த வேட்பாளர் 30 நாட்களுக்கு மீண்டும் சோதிக்கப்படமாட்டார். விவரங்கள்:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] {$a->role} பணியின் {$a->to} மாற்றம் தக்கவைக்கப்பட்டது';
+$string['autoupgrade:mail_kept_body'] = '{$a->role} பணியின் {$a->from} இலிருந்து {$a->to} க்கான மாற்றம் {$a->turns} உண்மையான பதில்களில் {$a->hours} மணி நேரம் நிலைத்தது, தக்கவைக்கப்பட்டது.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = '{$a->role} பணியின் {$a->from} இலிருந்து {$a->to} க்கான மாற்றம் {$a->hours} மணி நேரத்திற்குப் பிறகு தக்கவைக்கப்பட்டது, ஆனால் {$a->turns} உண்மையான பதில்கள் மட்டுமே காணப்பட்டன, முடிவெடுக்கப் போதாது. கவனித்து வரவும்.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] பரிந்துரை: {$a->role} பணிக்கு {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->role} பணிக்கு {$a->current} க்கு எதிரான ஒவ்வொரு சோதனையிலும் {$a->model} தொடர்ந்து இரண்டு முறை தேறியது, ஆனால் தானாக மாற்றப்படவில்லை: {$a->why}
+
+{$a->gate}
+
+இங்கே மாற்றவும் அல்லது அப்படியே விடவும்:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'உங்கள் முகவரி [[tutorshort]] செலவு எச்சரிக்கைப் பெறுநராக இருப்பதால் இதைப் பெறுகிறீர்கள்.';
+$string['event:model_switched'] = 'மாதிரி மாற்றப்பட்டது';
+$string['event:model_switch_rolled_back'] = 'மாதிரி மாற்றம் திரும்பப் பெறப்பட்டது';
+$string['task:discover_models'] = 'புதிய செயற்கை நுண்ணறிவு மாதிரிகளைக் கண்டறிந்து மதிப்பீடுகளை வரிசைப்படுத்து';
+$string['task:evaluate_model_candidate'] = 'வேட்பாளர் செயற்கை நுண்ணறிவு மாதிரியை மதிப்பிடு';
+$string['task:watch_model_switches'] = 'சமீபத்திய செயற்கை நுண்ணறிவு மாதிரி மாற்றங்களைக் கண்காணி';
+$string['settings:autoupgrade_heading'] = 'தானியங்கி மாதிரி மேம்படுத்தல்கள்';
+$string['settings:autoupgrade_heading_desc'] = 'ஒவ்வொரு நாளும் [[tutorshort]] உங்கள் வழங்குநர்கள் வழங்கும் மாதிரிகளைப் பட்டியலிட்டு, ஒவ்வொரு பணிக்கும் வேட்பாளர்களைக் குறிக்கிறது: அதே வழங்குநர், ஒப்பிடக்கூடிய பட்டியல் விலை, தெரிந்த விலை. ஆசிரியர் தூண்டுகோள்கள், ஜெயில்பிரேக் சோதனைத் தொகுப்பு, உண்மைக்கு ஒத்த செலவு ஆகியவற்றில் தற்போதைய மாதிரிக்கு எதிராக அவற்றைச் சோதிக்கிறது, மேலும் ஒரு வேட்பாளர் ஒரு பதிலுக்கு அதே விலை அல்லது குறைவான விலையில், அதே அளவு நல்லதாக, பாதுகாப்பானதாக, நம்பகமானதாக தொடர்ந்து இரண்டு முறை இருந்தால் மட்டுமே தளத்தின் இயல்புநிலையை மாற்றுகிறது. சொந்த மாதிரி உள்ள பாடநெறிகள் அதையே வைத்திருக்கும். ஒவ்வொரு மாற்றமும் செலவு எச்சரிக்கைப் பெறுநர்களுக்கு மின்னஞ்சலில் அனுப்பப்பட்டு 48 மணி நேரம் கண்காணிக்கப்படும்.';
+$string['settings:autoupgrade_mode'] = 'முறை';
+$string['settings:autoupgrade_mode_desc'] = 'தானியங்கி: ஒரு வேட்பாளர் தேறும்போது மாற்றும். பரிந்துரை: வேட்பாளர்களைச் சோதித்து அதற்குப் பதிலாக மின்னஞ்சலில் பரிந்துரை அனுப்பும். முடக்கம்: எதையும் தானாகச் செய்யாது.';
+$string['settings:autoupgrade_budget_usd'] = 'மாதாந்திர சோதனை வரவுசெலவு (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'ஒரு நாட்காட்டி மாதத்தில் தானியங்கி மதிப்பீடுகள் செலவிடக்கூடிய அதிகபட்சத் தொகை, மதிப்பீட்டாளர் உட்பட. அந்த மாதத்தில் இந்தத் தொகையைத் தாண்டக்கூடிய மதிப்பீடு தொடங்காது.';
+$string['settings:autoupgrade_eval_courseid'] = 'மதிப்பீட்டுப் பாடநெறி அடையாள எண்';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'மதிப்பீடுகள் இந்தப் பாடநெறி உண்மையில் பயன்படுத்தும் அமைப்புத் தூண்டுகோளுடன் பதிலளிக்கின்றன, அது விருந்தினர் அடையாளத்திற்காக உருவாக்கப்படுவதால் எந்தக் கற்பவரின் தரவும் அனுப்பப்படாது. 0 என்றால் கடந்த 30 நாட்களில் அதிக அரட்டைப் பதில்கள் உள்ள பாடநெறி தேர்ந்தெடுக்கப்படும்.';
+$string['privacy:metadata:model_eval'] = 'தானியங்கி மாதிரி மதிப்பீடுகள்: எந்த வேட்பாளர் மாதிரி எந்தத் தற்போதைய மாதிரியுடன் ஒப்பிடப்பட்டது, அளக்கப்பட்ட முடிவு. மதிப்பீட்டைக் கோரிய நிர்வாகியின் அடையாளம் மட்டுமே தனிப்பட்ட தரவு. இந்த வரிசைகள் தள அமைப்பு, கற்பவரைப் பற்றிய தனிப்பட்ட தரவு அல்ல, எனவே தரவு ஏற்றுமதியில் சேர்க்கப்படாது, பயனர் அழிப்பைக் கோரும்போது நீக்கப்படாது.';
+$string['privacy:metadata:model_eval:createdby'] = 'இந்த மதிப்பீட்டைக் கோரிய தள நிர்வாகி. கண்டறிதல் அதை வரிசைப்படுத்தியிருந்தால் காலியாக இருக்கும்.';
+$string['privacy:metadata:model_switch'] = 'மாதிரி மாற்றங்களும் திரும்பப் பெறுதல்களும்: ஒரு பணி எந்த மாதிரியிலிருந்து எந்த மாதிரிக்கு மாறியது, ஏன். மாற்றத்தைச் செய்த அல்லது திரும்பப் பெற்ற நிர்வாகியின் அடையாளம் மட்டுமே தனிப்பட்ட தரவு. இந்த வரிசைகள் தள அமைப்பு, கற்பவரைப் பற்றிய தனிப்பட்ட தரவு அல்ல, எனவே தரவு ஏற்றுமதியில் சேர்க்கப்படாது, பயனர் அழிப்பைக் கோரும்போது நீக்கப்படாது.';
+$string['privacy:metadata:model_switch:createdby'] = 'இந்த மாற்றத்தைச் செய்த தள நிர்வாகி. அது தானியங்கியாக இருந்தால் காலியாக இருக்கும்.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'இந்த மாற்றத்தைத் திரும்பப் பெற்ற தள நிர்வாகி. கண்காணிப்பான் திரும்பப் பெற்றிருந்தால் அல்லது திரும்பப் பெறப்படாவிட்டால் காலியாக இருக்கும்.';

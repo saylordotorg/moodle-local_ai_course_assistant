@@ -3219,3 +3219,144 @@ $string['modelregistry:forget_confirm'] = 'Забути цю відомість?
 $string['modelregistry:forget_done'] = 'Відомість забуто. Наступний запит до цієї моделі використовуватиме вбудовані правила.';
 $string['modelregistry:forget_missing'] = 'Ця відомість більше не існує.';
 $string['event:model_capability_learned'] = 'Отримано відомість про можливість моделі від постачальника';
+
+$string['autoupgrade:title'] = 'Оновлення моделей';
+$string['autoupgrade:navtitle'] = 'Оновлення моделей [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] шукає новіші моделі від постачальників, якими вже користується, тестує кожного кандидата проти моделі, яку він замінив би (ті самі промпти, той самий бюджет відповіді, той самий суддя, в одному запуску), і перемикає лише тоді, коли кандидат має таку саму або нижчу ціну за відповідь, такий самий рівень якості, безпеки й надійності, двічі поспіль. Кожне перемикання відстежується 48 годин на реальному трафіку й скасовується, якщо стає гірше.';
+$string['autoupgrade:l_statusheading'] = 'Стан';
+$string['autoupgrade:l_mode'] = 'Режим';
+$string['autoupgrade:l_budget'] = 'Бюджет на тестування';
+$string['autoupgrade:l_changemode'] = 'Змінити';
+$string['autoupgrade:l_discover'] = 'Знайти моделі зараз';
+$string['autoupgrade:l_rolesheading'] = 'Ролі';
+$string['autoupgrade:l_current'] = 'Поточна модель';
+$string['autoupgrade:l_profile'] = 'Профіль можливостей';
+$string['autoupgrade:l_policy'] = 'Оновлення';
+$string['autoupgrade:l_nocandidates'] = 'Кандидатів немає. Пошук позначає моделі того самого постачальника зі співмірною ціною.';
+$string['autoupgrade:l_colpasses'] = 'Проходження';
+$string['autoupgrade:l_collast'] = 'Остання оцінка';
+$string['autoupgrade:l_evaluate'] = 'Оцінити зараз';
+$string['autoupgrade:l_evaluating'] = 'У черзі або виконується';
+$string['autoupgrade:l_switch'] = 'Перемкнути';
+$string['autoupgrade:l_switchconfirm'] = 'Перемкнути цю роль на кандидата зараз? Зміна відстежуватиметься 48 годин, і її можна скасувати.';
+$string['autoupgrade:l_evalsheading'] = 'Оцінки';
+$string['autoupgrade:l_noevals'] = 'Оцінок ще немає.';
+$string['autoupgrade:l_colwhen'] = 'Коли';
+$string['autoupgrade:l_colrole'] = 'Роль';
+$string['autoupgrade:l_colcandidate'] = 'Кандидат';
+$string['autoupgrade:l_colincumbent'] = 'Поточна модель';
+$string['autoupgrade:l_colcost'] = 'Витрачено / оцінка';
+$string['autoupgrade:l_colgate'] = 'Порогові перевірки';
+$string['autoupgrade:l_switchesheading'] = 'Перемикання та відкати';
+$string['autoupgrade:l_noswitches'] = 'Перемикань ще немає.';
+$string['autoupgrade:l_colfrom'] = 'З';
+$string['autoupgrade:l_colto'] = 'На';
+$string['autoupgrade:l_colmode'] = 'Як';
+$string['autoupgrade:l_colreason'] = 'Причина';
+$string['autoupgrade:l_coluntil'] = 'Відстежується до';
+$string['autoupgrade:l_rollback'] = 'Відкотити';
+$string['autoupgrade:l_rollbackconfirm'] = 'Повернути попередню модель зараз?';
+$string['autoupgrade:l_manage'] = 'Перегляньте або забудьте засвоєні факти на сторінці реєстру моделей';
+$string['autoupgrade:l_notinuse'] = 'не використовується';
+$string['autoupgrade:mode_off'] = 'Вимкнено: нічого автоматичного';
+$string['autoupgrade:mode_recommend'] = 'Рекомендувати: тестувати кандидатів і надсилати рекомендацію електронною поштою';
+$string['autoupgrade:mode_auto'] = 'Автоматично: тестувати кандидатів і перемикати, коли хтось пройде';
+$string['autoupgrade:budget_line'] = 'Цього місяця витрачено ${$a->spent} з ${$a->limit} (залишилося ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Пошук востаннє запускався {$a}.';
+$string['autoupgrade:never_discovered'] = 'Пошук ще не запускався.';
+$string['autoupgrade:role_chat'] = 'Чат (основна модель)';
+$string['autoupgrade:role_premium'] = 'Преміум-рівень';
+$string['autoupgrade:role_failover'] = 'Резервна модель';
+$string['autoupgrade:role_quiz'] = 'Створення тестів';
+$string['autoupgrade:role_classifier'] = 'Класифікатор опанування';
+$string['autoupgrade:role_safety'] = 'Еталон безпеки';
+$string['autoupgrade:role_soapbox'] = 'Оцінювання Soapbox';
+$string['autoupgrade:not_configured'] = 'Не налаштовано (успадковує модель чату)';
+$string['autoupgrade:policy_auto'] = 'Оцінюється й автоматично перемикається в режимі Автоматично';
+$string['autoupgrade:policy_recommend'] = 'Оцінюється й рекомендується; перемикає адміністратор';
+$string['autoupgrade:policy_none'] = 'Лише перелік кандидатів: жоден бенчмарк не вимірює завдання цієї ролі';
+$string['autoupgrade:cand_candidate'] = 'Кандидат';
+$string['autoupgrade:cand_passed'] = 'Пройшов один раз';
+$string['autoupgrade:cand_eligible'] = 'Придатний';
+$string['autoupgrade:cand_failed'] = 'Не пройшов';
+$string['autoupgrade:cand_switched'] = 'Використовується';
+$string['autoupgrade:cand_rolledback'] = 'Відкочено';
+$string['autoupgrade:cand_retired'] = 'Більше не в переліку';
+$string['autoupgrade:eval_queued'] = 'У черзі';
+$string['autoupgrade:eval_running'] = 'Виконується';
+$string['autoupgrade:eval_complete'] = 'Завершено';
+$string['autoupgrade:eval_failed'] = 'Помилка';
+$string['autoupgrade:eval_skipped'] = 'Не запускалося';
+$string['autoupgrade:gate_pass'] = 'Пройдено:';
+$string['autoupgrade:gate_fail'] = 'Не пройдено:';
+$string['autoupgrade:how_auto'] = 'Автоматично';
+$string['autoupgrade:how_manual'] = 'Адміністратором';
+$string['autoupgrade:switch_watching'] = 'Відстежується';
+$string['autoupgrade:switch_kept'] = 'Збережено';
+$string['autoupgrade:switch_rolledback'] = 'Відкочено';
+$string['autoupgrade:switch_superseded'] = 'Згодом змінено адміністратором';
+$string['autoupgrade:block_role'] = 'Цю роль не можна перемкнути звідси.';
+$string['autoupgrade:block_emergency'] = 'Увімкнено аварійне керування, тому жодну модель не буде перемкнуто, доки його не буде знято.';
+$string['autoupgrade:block_allowlist'] = 'Параметр {$a} не належить до тих, які перемикання може змінити без участі людини, тому цю роль перемикають вручну.';
+$string['autoupgrade:block_bundle'] = 'Параметром {$a} керує підписаний пакет політик. Змініть модель у пакеті.';
+$string['autoupgrade:block_watching'] = 'Перемикання цієї ролі ще відстежується. Зачекайте, доки його буде збережено або відкочено.';
+$string['autoupgrade:block_noeval'] = 'Цей кандидат не має завершеної оцінки.';
+$string['autoupgrade:block_gate'] = 'Остання оцінка цього кандидата не пройшла поріг.';
+$string['autoupgrade:block_changed'] = 'Модель ролі змінилася після оцінки, тож оцінка більше не порівнює правильну пару. Оцініть знову.';
+$string['autoupgrade:switched'] = 'Роль {$a->role} перемкнуто на {$a->model}. Вона відстежуватиметься 48 годин.';
+$string['autoupgrade:rolledback'] = 'Перемикання {$a} відкочено.';
+$string['autoupgrade:rollback_missing'] = 'Це перемикання не можна відкотити.';
+$string['autoupgrade:rollback_superseded'] = 'Параметри змінено після перемикання, тому нічого не відкочено.';
+$string['autoupgrade:rollback_by_admin'] = 'Відкочено адміністратором.';
+$string['autoupgrade:queued'] = 'Оцінку поставлено в чергу. Вона запуститься під час наступного проходу cron і триватиме кілька хвилин.';
+$string['autoupgrade:discovered'] = 'Пошук отримав перелік від постачальників: {$a->providers}, зареєстрував моделей: {$a->registered} і позначив кандидатів: {$a->candidates}. Постачальники, перелік яких отримати не вдалося: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Ця роль не перемикається автоматично.';
+$string['autoupgrade:why_recommend_mode'] = 'Автоматичні оновлення моделей працюють у режимі Рекомендувати.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} перемкнуто на {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] перемкнув роль {$a->role} з {$a->from} на {$a->to}.
+
+Модель пройшла кожну перевірку проти поточної моделі, виміряну в тому самому запуску, двічі поспіль:
+{$a->gate}
+
+Нова модель відстежуватиметься на реальному трафіку {$a->hours} год. і буде автоматично відкочена, якщо погіршаться помилки, обірвані відповіді, відмови або вартість відповіді. Ви можете відкотити її самостійно будь-коли:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} відкочено до {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] повернув роль {$a->role} з {$a->to} назад на {$a->from}.
+
+Причина: {$a->reason}
+
+Кандидата не пробуватимуть знову протягом 30 днів. Подробиці:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Перемикання {$a->role} на {$a->to} збережено';
+$string['autoupgrade:mail_kept_body'] = 'Перемикання ролі {$a->role} з {$a->from} на {$a->to} протрималося {$a->hours} год. на {$a->turns} реальних відповідях і зберігається.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Перемикання ролі {$a->role} з {$a->from} на {$a->to} збережено через {$a->hours} год., але зафіксовано лише {$a->turns} реальних відповідей, а цього замало для висновків. Стежте за ним.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Рекомендовано: {$a->role} на {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} пройшла кожну перевірку проти {$a->current} для ролі {$a->role} двічі поспіль, але не була перемкнута автоматично: {$a->why}
+
+{$a->gate}
+
+Перемкніть або залиште як є тут:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Ви отримали цей лист, бо ваша адреса входить до одержувачів сповіщень про витрати [[tutorshort]].';
+$string['event:model_switched'] = 'Модель перемкнуто';
+$string['event:model_switch_rolled_back'] = 'Перемикання моделі відкочено';
+$string['task:discover_models'] = 'Знайти нові моделі ШІ і поставити оцінки в чергу';
+$string['task:evaluate_model_candidate'] = 'Оцінити модель ШІ, що є кандидатом';
+$string['task:watch_model_switches'] = 'Відстежувати нещодавні перемикання моделей ШІ';
+$string['settings:autoupgrade_heading'] = 'Автоматичні оновлення моделей';
+$string['settings:autoupgrade_heading_desc'] = 'Щодня [[tutorshort]] отримує перелік моделей, які пропонують ваші постачальники, і позначає кандидатів для кожної ролі: той самий постачальник, співмірна прейскурантна ціна й відома ціна. Він тестує їх проти поточної моделі на промптах тьютора, наборі тестів на джейлбрейк і вартості, наближеній до реальної, і змінює типову модель сайту лише тоді, коли кандидат має таку саму або нижчу ціну за відповідь, такий самий рівень якості, безпеки й надійності, двічі поспіль. Курси з власною моделлю зберігають її. Про кожне перемикання надсилається лист одержувачам сповіщень про витрати, і воно відстежується 48 годин.';
+$string['settings:autoupgrade_mode'] = 'Режим';
+$string['settings:autoupgrade_mode_desc'] = 'Автоматично перемикає, коли кандидат проходить. Рекомендувати тестує кандидатів і натомість надсилає рекомендацію електронною поштою. Вимкнено не робить нічого автоматично.';
+$string['settings:autoupgrade_budget_usd'] = 'Місячний бюджет на тестування (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Максимальна сума, яку автоматичні оцінки можуть витратити за календарний місяць, включно із суддею. Оцінка, яка може вивести місяць за цю суму, не запускається.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID курсу для оцінки';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Оцінки відповідають із системним промптом, який справді використовує цей курс, створеним для гостьової особи, тож дані жодного учня не надсилаються. 0 вибирає курс із найбільшою кількістю відповідей у чаті за останні 30 днів.';
+$string['privacy:metadata:model_eval'] = 'Автоматичні оцінки моделей: яку модель-кандидата порівнювали з якою поточною моделлю, і виміряний результат. Єдині персональні дані: ідентифікатор адміністратора, який запросив оцінку. Ці рядки є конфігурацією сайту, а не персональними даними про учня, тому вони не входять до експорту даних і не видаляються, коли користувач просить про видалення.';
+$string['privacy:metadata:model_eval:createdby'] = 'Адміністратор сайту, який запросив цю оцінку. Порожньо, якщо її поставив у чергу пошук.';
+$string['privacy:metadata:model_switch'] = 'Перемикання та відкати моделей: з якої моделі на яку перейшла роль і чому. Єдині персональні дані: ідентифікатор адміністратора, який виконав або скасував перемикання. Ці рядки є конфігурацією сайту, а не персональними даними про учня, тому вони не входять до експорту даних і не видаляються, коли користувач просить про видалення.';
+$string['privacy:metadata:model_switch:createdby'] = 'Адміністратор сайту, який виконав це перемикання. Порожньо, якщо воно було автоматичним.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Адміністратор сайту, який відкотив це перемикання. Порожньо, якщо це зробив наглядач або якщо його не було відкочено.';

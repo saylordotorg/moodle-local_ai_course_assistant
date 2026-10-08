@@ -174,6 +174,32 @@ class emergency_control {
     }
 
     /**
+     * Is any emergency control engaged right now?
+     *
+     * v7.8.0, for the automatic model switcher, which must never change a
+     * model while an operator is mid-incident. True when the chat or voice
+     * kill flag is set, or when any setting is
+     * stashed for restore (which is exactly the state disable() leaves behind
+     * for every flag, including RAG and outreach).
+     *
+     * @return bool
+     */
+    public static function any_active(): bool {
+        global $DB;
+        // 'enabled' = 0 alone is not an emergency (the plugin ships disabled);
+        // the master kill is recognised by the enabled_emergency_backup it
+        // stashes, which the query below finds.
+        $chat = get_config('local_ai_course_assistant', 'emergency_chat_disabled');
+        $voice = get_config('local_ai_course_assistant', 'emergency_voice_disabled');
+        if ($chat || $voice) {
+            return true;
+        }
+        $where = 'plugin = :plugin AND ' . $DB->sql_like('name', ':suffix');
+        $params = ['plugin' => 'local_ai_course_assistant', 'suffix' => '%' . $DB->sql_like_escape('_emergency_backup')];
+        return $DB->record_exists_select('config_plugins', $where, $params);
+    }
+
+    /**
      * Stash a setting's current value so restore() can put it back exactly.
      *
      * Presence of the backup key is the "was stashed" signal, NOT whether the

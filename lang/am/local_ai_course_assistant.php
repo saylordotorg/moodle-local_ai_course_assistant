@@ -3206,3 +3206,144 @@ $string['modelregistry:forget_confirm'] = 'ይህን እውነታ ይርሱት? 
 $string['modelregistry:forget_done'] = 'እውነታው ተረስቷል። ወደዚህ ሞዴል የሚላከው ቀጣይ ጥያቄ አብሮ የመጡ ደንቦችን ይጠቀማል።';
 $string['modelregistry:forget_missing'] = 'ያ እውነታ ከአሁን በኋላ የለም።';
 $string['event:model_capability_learned'] = 'የሞዴል ችሎታ ከአቅራቢ ተምሯል';
+
+$string['autoupgrade:title'] = 'የሞዴል ማሻሻያዎች';
+$string['autoupgrade:navtitle'] = 'የ[[tutorshort]] ሞዴል ማሻሻያዎች';
+$string['autoupgrade:intro'] = '[[tutorshort]] አስቀድሞ ከሚጠቀማቸው አቅራቢዎች አዳዲስ ሞዴሎችን ይፈልጋል፣ እያንዳንዱን እጩ ከሚተካው ሞዴል ጋር ይፈትናል (ተመሳሳይ ጥያቄዎች፣ ተመሳሳይ የመልስ በጀት፣ ተመሳሳይ ዳኛ፣ በአንድ ዙር ውስጥ)፣ እና የሚቀይረው እጩው በአንድ መልስ ተመሳሳይ ዋጋ ወይም ርካሽ፣ እኩል ጥሩ፣ እኩል ደህንነቱ የተጠበቀ እና አስተማማኝ ሆኖ ሁለት ጊዜ በተከታታይ ሲገኝ ብቻ ነው። እያንዳንዱ ለውጥ በቀጥታ ትራፊክ ላይ ለ48 ሰዓታት ይከታተላል፣ ከተባባሰም ወደ ቀድሞው ይመለሳል።';
+$string['autoupgrade:l_statusheading'] = 'ሁኔታ';
+$string['autoupgrade:l_mode'] = 'ሁነታ';
+$string['autoupgrade:l_budget'] = 'የሙከራ በጀት';
+$string['autoupgrade:l_changemode'] = 'ቀይር';
+$string['autoupgrade:l_discover'] = 'ሞዴሎችን አሁን ፈልግ';
+$string['autoupgrade:l_rolesheading'] = 'ሚናዎች';
+$string['autoupgrade:l_current'] = 'የአሁኑ ሞዴል';
+$string['autoupgrade:l_profile'] = 'የችሎታ መገለጫ';
+$string['autoupgrade:l_policy'] = 'ማሻሻያዎች';
+$string['autoupgrade:l_nocandidates'] = 'እጩዎች የሉም። ፍለጋው ከተመሳሳይ አቅራቢ ተመጣጣኝ ዋጋ ያላቸውን ሞዴሎች ይለያል።';
+$string['autoupgrade:l_colpasses'] = 'ያለፉ';
+$string['autoupgrade:l_collast'] = 'የመጨረሻ ግምገማ';
+$string['autoupgrade:l_evaluate'] = 'አሁን ገምግም';
+$string['autoupgrade:l_evaluating'] = 'በወረፋ ላይ ወይም በሂደት ላይ';
+$string['autoupgrade:l_switch'] = 'ቀይር';
+$string['autoupgrade:l_switchconfirm'] = 'ይህን ሚና አሁን ወደ እጩው ይቀይሩ? ለውጡ ለ48 ሰዓታት ይከታተላል እና ወደ ቀድሞው ሊመለስ ይችላል።';
+$string['autoupgrade:l_evalsheading'] = 'ግምገማዎች';
+$string['autoupgrade:l_noevals'] = 'እስካሁን ምንም ግምገማ የለም።';
+$string['autoupgrade:l_colwhen'] = 'መቼ';
+$string['autoupgrade:l_colrole'] = 'ሚና';
+$string['autoupgrade:l_colcandidate'] = 'እጩ';
+$string['autoupgrade:l_colincumbent'] = 'የአሁኑ ሞዴል';
+$string['autoupgrade:l_colcost'] = 'ወጪ / ግምት';
+$string['autoupgrade:l_colgate'] = 'የበር ፍተሻዎች';
+$string['autoupgrade:l_switchesheading'] = 'ለውጦች እና መመለሻዎች';
+$string['autoupgrade:l_noswitches'] = 'እስካሁን ምንም ለውጥ የለም።';
+$string['autoupgrade:l_colfrom'] = 'ከ';
+$string['autoupgrade:l_colto'] = 'ወደ';
+$string['autoupgrade:l_colmode'] = 'እንዴት';
+$string['autoupgrade:l_colreason'] = 'ምክንያት';
+$string['autoupgrade:l_coluntil'] = 'እስከ ይከታተላል';
+$string['autoupgrade:l_rollback'] = 'ወደ ቀድሞው መልስ';
+$string['autoupgrade:l_rollbackconfirm'] = 'የቀድሞውን ሞዴል አሁን ይመልሱ?';
+$string['autoupgrade:l_manage'] = 'የተማሩ እውነታዎችን በሞዴል መዝገብ ገጹ ላይ ይገምግሙ ወይም ይርሱ';
+$string['autoupgrade:l_notinuse'] = 'በጥቅም ላይ አይደለም';
+$string['autoupgrade:mode_off'] = 'ጠፍቷል: ምንም ራስ-ሰር ነገር የለም';
+$string['autoupgrade:mode_recommend'] = 'ጠቁም: እጩዎችን ፈትን እና ጥቆማ በኢሜይል ላክ';
+$string['autoupgrade:mode_auto'] = 'ራስ-ሰር: እጩዎችን ፈትን እና አንዱ ሲያልፍ ቀይር';
+$string['autoupgrade:budget_line'] = 'በዚህ ወር ከ${$a->limit} ውስጥ ${$a->spent} ወጥቷል (${$a->left} ቀርቷል)';
+$string['autoupgrade:last_discovery'] = 'ፍለጋው ለመጨረሻ ጊዜ የሄደው {$a} ነው።';
+$string['autoupgrade:never_discovered'] = 'ፍለጋው እስካሁን አልሄደም።';
+$string['autoupgrade:role_chat'] = 'ውይይት (ዋና ሞዴል)';
+$string['autoupgrade:role_premium'] = 'ፕሪሚየም ደረጃ';
+$string['autoupgrade:role_failover'] = 'ተተኪ';
+$string['autoupgrade:role_quiz'] = 'የፈተና ጥያቄ ማመንጨት';
+$string['autoupgrade:role_classifier'] = 'የብቃት መለያ';
+$string['autoupgrade:role_safety'] = 'የደህንነት ማጣቀሻ';
+$string['autoupgrade:role_soapbox'] = 'የSoapbox ነጥብ አሰጣጥ';
+$string['autoupgrade:not_configured'] = 'አልተዋቀረም (የውይይት ሞዴሉን ይወርሳል)';
+$string['autoupgrade:policy_auto'] = 'ይገመገማል፣ በራስ-ሰር ሁነታ ደግሞ በራሱ ይቀየራል';
+$string['autoupgrade:policy_recommend'] = 'ይገመገማል እና ይጠቆማል፤ አስተዳዳሪ ይቀይረዋል';
+$string['autoupgrade:policy_none'] = 'እጩዎች ብቻ ይዘረዘራሉ: የዚህን ሚና ተግባር የሚለካ መለኪያ የለም';
+$string['autoupgrade:cand_candidate'] = 'እጩ';
+$string['autoupgrade:cand_passed'] = 'አንድ ጊዜ አልፏል';
+$string['autoupgrade:cand_eligible'] = 'ብቁ';
+$string['autoupgrade:cand_failed'] = 'ወድቋል';
+$string['autoupgrade:cand_switched'] = 'በጥቅም ላይ';
+$string['autoupgrade:cand_rolledback'] = 'ወደ ቀድሞው ተመልሷል';
+$string['autoupgrade:cand_retired'] = 'ከእንግዲህ አልተዘረዘረም';
+$string['autoupgrade:eval_queued'] = 'በወረፋ ላይ';
+$string['autoupgrade:eval_running'] = 'በሂደት ላይ';
+$string['autoupgrade:eval_complete'] = 'ተጠናቋል';
+$string['autoupgrade:eval_failed'] = 'አልተሳካም';
+$string['autoupgrade:eval_skipped'] = 'አልሄደም';
+$string['autoupgrade:gate_pass'] = 'አልፏል:';
+$string['autoupgrade:gate_fail'] = 'አላለፈም:';
+$string['autoupgrade:how_auto'] = 'ራስ-ሰር';
+$string['autoupgrade:how_manual'] = 'በአስተዳዳሪ';
+$string['autoupgrade:switch_watching'] = 'በክትትል ላይ';
+$string['autoupgrade:switch_kept'] = 'ተይዟል';
+$string['autoupgrade:switch_rolledback'] = 'ወደ ቀድሞው ተመልሷል';
+$string['autoupgrade:switch_superseded'] = 'ከዚያ በኋላ በአስተዳዳሪ ተቀይሯል';
+$string['autoupgrade:block_role'] = 'ይህ ሚና ከዚህ ሊቀየር አይችልም።';
+$string['autoupgrade:block_emergency'] = 'የአደጋ ጊዜ መቆጣጠሪያ በሥራ ላይ ስለሆነ እስኪመለስ ድረስ ምንም ሞዴል አይቀየርም።';
+$string['autoupgrade:block_allowlist'] = 'ቅንብሩ {$a} ያለ ሰው ለውጥ ሊቀይረው የሚችል ስላልሆነ ይህ ሚና በእጅ ይቀየራል።';
+$string['autoupgrade:block_bundle'] = 'ቅንብሩ {$a} በተፈረመው የፖሊሲ ጥቅል ይተዳደራል። በምትኩ ሞዴሉን በጥቅሉ ውስጥ ይቀይሩ።';
+$string['autoupgrade:block_watching'] = 'የዚህ ሚና አንድ ለውጥ አሁንም በክትትል ላይ ነው። እስኪያዝ ወይም ወደ ቀድሞው እስኪመለስ ይጠብቁ።';
+$string['autoupgrade:block_noeval'] = 'ይህ እጩ የተጠናቀቀ ግምገማ የለውም።';
+$string['autoupgrade:block_gate'] = 'የዚህ እጩ የመጨረሻ ግምገማ በሩን አላለፈም።';
+$string['autoupgrade:block_changed'] = 'ከግምገማው በኋላ የሚናው ሞዴል ስለተቀየረ ትክክለኛውን ጥንድ አያነጻጽርም። እንደገና ይገምግሙ።';
+$string['autoupgrade:switched'] = '{$a->role} ወደ {$a->model} ተቀይሯል። ለ48 ሰዓታት ይከታተላል።';
+$string['autoupgrade:rolledback'] = 'የ{$a} ለውጥ ወደ ቀድሞው ተመልሷል።';
+$string['autoupgrade:rollback_missing'] = 'ያ ለውጥ ወደ ቀድሞው ሊመለስ አይችልም።';
+$string['autoupgrade:rollback_superseded'] = 'ከለውጡ በኋላ ቅንብሮቹ ስለተቀየሩ ምንም ወደ ቀድሞው አልተመለሰም።';
+$string['autoupgrade:rollback_by_admin'] = 'በአስተዳዳሪ ወደ ቀድሞው ተመልሷል።';
+$string['autoupgrade:queued'] = 'ግምገማው ወረፋ ውስጥ ገብቷል። በሚቀጥለው የcron ዙር ይሄዳል እና ብዙ ደቂቃዎች ይወስዳል።';
+$string['autoupgrade:discovered'] = 'ፍለጋው {$a->providers} አቅራቢ(ዎች) ዘርዝሯል፣ {$a->registered} ሞዴል(ዎች) መዝግቧል እና {$a->candidates} እጩ(ዎች) ለይቷል። ሊዘረዘሩ ያልቻሉ አቅራቢዎች: {$a->errors}።';
+$string['autoupgrade:why_manual_role'] = 'ይህ ሚና በራስ-ሰር አይቀየርም።';
+$string['autoupgrade:why_recommend_mode'] = 'ራስ-ሰር የሞዴል ማሻሻያዎች በጠቁም ሁነታ ላይ ናቸው።';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} ወደ {$a->to} ተቀይሯል';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] የ{$a->role} ሚናን ከ{$a->from} ወደ {$a->to} ቀይሯል።
+
+ከአሁኑ ሞዴል ጋር በአንድ ዙር ተለክቶ እያንዳንዱን ፍተሻ ሁለት ጊዜ በተከታታይ አልፏል:
+{$a->gate}
+
+አዲሱ ሞዴል በቀጥታ ትራፊክ ላይ ለ{$a->hours} ሰዓታት ይከታተላል፣ ስህተቶች፣ የተቆራረጡ መልሶች፣ እምቢታዎች ወይም በአንድ መልስ ወጪ ከተባባሱ በራስ-ሰር ወደ ቀድሞው ይመለሳል። በማንኛውም ጊዜ እርስዎ ራስዎ ወደ ቀድሞው መመለስ ይችላሉ:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} ወደ {$a->from} ተመልሷል';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] የ{$a->role} ሚናን ከ{$a->to} ወደ {$a->from} መልሷል።
+
+ምክንያት: {$a->reason}
+
+እጩው ለ30 ቀናት እንደገና አይሞከርም። ዝርዝሮች:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] የ{$a->role} ወደ {$a->to} ለውጥ ተይዟል';
+$string['autoupgrade:mail_kept_body'] = 'የ{$a->role} ሚና ከ{$a->from} ወደ {$a->to} የተደረገው ለውጥ ለ{$a->hours} ሰዓታት በ{$a->turns} የቀጥታ መልሶች ላይ ጸንቷል እና ተይዟል።
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'የ{$a->role} ሚና ከ{$a->from} ወደ {$a->to} የተደረገው ለውጥ ከ{$a->hours} ሰዓታት በኋላ ተይዟል፣ ነገር ግን የታዩት {$a->turns} የቀጥታ መልሶች ብቻ ናቸው፣ ለመፍረድ በጣም ጥቂት ናቸው። ይከታተሉት።
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] የተጠቆመ: {$a->role} በ{$a->model} ላይ';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} ለ{$a->role} ሚና ከ{$a->current} ጋር እያንዳንዱን ፍተሻ ሁለት ጊዜ በተከታታይ አልፏል፣ ነገር ግን በራስ-ሰር አልተቀየረም: {$a->why}
+
+{$a->gate}
+
+እዚህ ይቀይሩት ወይም ይተዉት:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'ይህን የሚቀበሉት አድራሻዎ የ[[tutorshort]] የወጪ ማንቂያ ተቀባይ ስለሆነ ነው።';
+$string['event:model_switched'] = 'ሞዴል ተቀይሯል';
+$string['event:model_switch_rolled_back'] = 'የሞዴል ለውጥ ወደ ቀድሞው ተመልሷል';
+$string['task:discover_models'] = 'አዳዲስ የAI ሞዴሎችን ፈልግ እና ግምገማዎችን ወረፋ ውስጥ አስገባ';
+$string['task:evaluate_model_candidate'] = 'እጩ የAI ሞዴልን ገምግም';
+$string['task:watch_model_switches'] = 'የቅርብ ጊዜ የAI ሞዴል ለውጦችን ተከታተል';
+$string['settings:autoupgrade_heading'] = 'ራስ-ሰር የሞዴል ማሻሻያዎች';
+$string['settings:autoupgrade_heading_desc'] = 'በየቀኑ [[tutorshort]] አቅራቢዎችዎ የሚያቀርቧቸውን ሞዴሎች ይዘረዝራል እና ለእያንዳንዱ ሚና እጩዎችን ይለያል: ተመሳሳይ አቅራቢ፣ ተመጣጣኝ የዝርዝር ዋጋ እና የታወቀ ዋጋ። በአስጠኚው ጥያቄዎች፣ በjailbreak ፈተናዎች እና በቀጥታ መሰል ወጪ ላይ ከአሁኑ ሞዴል ጋር ይፈትናቸዋል፣ እና የጣቢያውን ነባሪ የሚቀይረው እጩው በአንድ መልስ ተመሳሳይ ዋጋ ወይም ርካሽ፣ እኩል ጥሩ፣ እኩል ደህንነቱ የተጠበቀ እና አስተማማኝ ሆኖ ሁለት ጊዜ በተከታታይ ሲገኝ ብቻ ነው። የራሳቸው ሞዴል ያላቸው ኮርሶች ያንኑ ይይዛሉ። እያንዳንዱ ለውጥ ለወጪ ማንቂያ ተቀባዮች በኢሜይል ይላካል እና ለ48 ሰዓታት ይከታተላል።';
+$string['settings:autoupgrade_mode'] = 'ሁነታ';
+$string['settings:autoupgrade_mode_desc'] = 'ራስ-ሰር እጩ ሲያልፍ ይቀይራል። ጠቁም እጩዎችን ይፈትናል እና በምትኩ ጥቆማ በኢሜይል ይልካል። ጠፍቷል ምንም ራስ-ሰር ነገር አያደርግም።';
+$string['settings:autoupgrade_budget_usd'] = 'ወርሃዊ የሙከራ በጀት (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'ራስ-ሰር ግምገማዎች በአንድ የቀን መቁጠሪያ ወር ውስጥ ሊያወጡ የሚችሉት ከፍተኛ መጠን፣ ዳኛውን ጨምሮ። ወሩን ከዚህ በላይ ሊያስወጣ የሚችል ግምገማ አይጀምርም።';
+$string['settings:autoupgrade_eval_courseid'] = 'የግምገማ ኮርስ መታወቂያ';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'ግምገማዎች ይህ ኮርስ በእውነት በሚጠቀምበት የስርዓት ጥያቄ ስር ይመልሳሉ፣ ለእንግዳ ማንነት የተገነባ ስለሆነ የማንኛውም ተማሪ ውሂብ አይላክም። 0 ባለፉት 30 ቀናት ብዙ የውይይት መልሶች ያሉትን ኮርስ ይመርጣል።';
+$string['privacy:metadata:model_eval'] = 'ራስ-ሰር የሞዴል ግምገማዎች: የትኛው እጩ ሞዴል ከየትኛው የአሁኑ ሞዴል ጋር እንደተነጻጸረ እና የተለካው ውጤት። ብቸኛው የግል ውሂብ ግምገማውን የጠየቀው አስተዳዳሪ መለያ ነው። እነዚህ ረድፎች ስለ ተማሪ የግል ውሂብ ሳይሆኑ የጣቢያ ውቅር ስለሆኑ በውሂብ ወደ ውጭ መላክ ውስጥ አይካተቱም፣ ተጠቃሚ መሰረዝን ሲጠይቅም አይወገዱም።';
+$string['privacy:metadata:model_eval:createdby'] = 'ይህን ግምገማ የጠየቀው የጣቢያ አስተዳዳሪ። ፍለጋው ወረፋ ውስጥ ሲያስገባው ባዶ ነው።';
+$string['privacy:metadata:model_switch'] = 'የሞዴል ለውጦች እና መመለሻዎች: አንድ ሚና ከየትኛው ሞዴል ወደ የትኛው እንደተዛወረ እና ለምን። ብቸኛው የግል ውሂብ ለውጡን ያደረገው ወይም የቀለበሰው አስተዳዳሪ መለያ ነው። እነዚህ ረድፎች ስለ ተማሪ የግል ውሂብ ሳይሆኑ የጣቢያ ውቅር ስለሆኑ በውሂብ ወደ ውጭ መላክ ውስጥ አይካተቱም፣ ተጠቃሚ መሰረዝን ሲጠይቅም አይወገዱም።';
+$string['privacy:metadata:model_switch:createdby'] = 'ይህን ለውጥ ያደረገው የጣቢያ አስተዳዳሪ። ራስ-ሰር ሲሆን ባዶ ነው።';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'ይህን ለውጥ ወደ ቀድሞው የመለሰው የጣቢያ አስተዳዳሪ። ተከታታዩ ሲመልሰው ወይም ካልተመለሰ ባዶ ነው።';

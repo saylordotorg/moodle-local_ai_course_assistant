@@ -3180,3 +3180,144 @@ $string['modelregistry:forget_confirm'] = 'Да се забрави ли тоз�
 $string['modelregistry:forget_done'] = 'Записът е забравен. Следващата заявка към този модел използва вградените правила.';
 $string['modelregistry:forget_missing'] = 'Този запис вече не съществува.';
 $string['event:model_capability_learned'] = 'Научена възможност на модел от доставчик';
+
+$string['autoupgrade:title'] = 'Надграждане на модели';
+$string['autoupgrade:navtitle'] = 'Надграждане на модели в [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] търси по-нови модели от доставчиците, които вече използва, тества всеки кандидат спрямо модела, който би заменил (същите подкани, същият бюджет за отговор, същият оценител, в едно и също изпълнение), и превключва само когато кандидатът е на същата или по-ниска цена на отговор, също толкова добър, безопасен и надежден, два пъти подред. Всяко превключване се наблюдава 48 часа при реален трафик и се връща обратно, ако резултатите се влошат.';
+$string['autoupgrade:l_statusheading'] = 'Състояние';
+$string['autoupgrade:l_mode'] = 'Режим';
+$string['autoupgrade:l_budget'] = 'Бюджет за тестване';
+$string['autoupgrade:l_changemode'] = 'Промяна';
+$string['autoupgrade:l_discover'] = 'Открий модели сега';
+$string['autoupgrade:l_rolesheading'] = 'Роли';
+$string['autoupgrade:l_current'] = 'Текущ модел';
+$string['autoupgrade:l_profile'] = 'Профил на възможностите';
+$string['autoupgrade:l_policy'] = 'Надграждания';
+$string['autoupgrade:l_nocandidates'] = 'Няма кандидати. Откриването отбелязва модели от същия доставчик на сравнима цена.';
+$string['autoupgrade:l_colpasses'] = 'Успешни проверки';
+$string['autoupgrade:l_collast'] = 'Последна оценка';
+$string['autoupgrade:l_evaluate'] = 'Оцени сега';
+$string['autoupgrade:l_evaluating'] = 'В опашка или в изпълнение';
+$string['autoupgrade:l_switch'] = 'Превключи';
+$string['autoupgrade:l_switchconfirm'] = 'Да се превключи ли тази роля към кандидата сега? Промяната се наблюдава 48 часа и може да бъде върната.';
+$string['autoupgrade:l_evalsheading'] = 'Оценки';
+$string['autoupgrade:l_noevals'] = 'Все още няма оценки.';
+$string['autoupgrade:l_colwhen'] = 'Кога';
+$string['autoupgrade:l_colrole'] = 'Роля';
+$string['autoupgrade:l_colcandidate'] = 'Кандидат';
+$string['autoupgrade:l_colincumbent'] = 'Текущ модел';
+$string['autoupgrade:l_colcost'] = 'Изразходвано / прогноза';
+$string['autoupgrade:l_colgate'] = 'Проверки на прага';
+$string['autoupgrade:l_switchesheading'] = 'Превключвания и връщания';
+$string['autoupgrade:l_noswitches'] = 'Все още няма превключвания.';
+$string['autoupgrade:l_colfrom'] = 'От';
+$string['autoupgrade:l_colto'] = 'Към';
+$string['autoupgrade:l_colmode'] = 'Как';
+$string['autoupgrade:l_colreason'] = 'Причина';
+$string['autoupgrade:l_coluntil'] = 'Наблюдава се до';
+$string['autoupgrade:l_rollback'] = 'Върни обратно';
+$string['autoupgrade:l_rollbackconfirm'] = 'Да се върне ли предишният модел сега?';
+$string['autoupgrade:l_manage'] = 'Прегледайте или забравете научените факти на страницата на регистъра на моделите';
+$string['autoupgrade:l_notinuse'] = 'не се използва';
+$string['autoupgrade:mode_off'] = 'Изключено: нищо автоматично';
+$string['autoupgrade:mode_recommend'] = 'Препоръка: тества кандидати и изпраща препоръка по имейл';
+$string['autoupgrade:mode_auto'] = 'Автоматично: тества кандидати и превключва, когато някой премине';
+$string['autoupgrade:budget_line'] = 'Изразходвани ${$a->spent} от ${$a->limit} този месец (остават ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Последно откриване: {$a}.';
+$string['autoupgrade:never_discovered'] = 'Откриването все още не е изпълнявано.';
+$string['autoupgrade:role_chat'] = 'Чат (основен модел)';
+$string['autoupgrade:role_premium'] = 'Премиум ниво';
+$string['autoupgrade:role_failover'] = 'Резервен модел';
+$string['autoupgrade:role_quiz'] = 'Генериране на тестове';
+$string['autoupgrade:role_classifier'] = 'Класификатор на усвояването';
+$string['autoupgrade:role_safety'] = 'Еталон за безопасност';
+$string['autoupgrade:role_soapbox'] = 'Оценяване в Soapbox';
+$string['autoupgrade:not_configured'] = 'Не е конфигуриран (наследява модела за чат)';
+$string['autoupgrade:policy_auto'] = 'Оценява се и се превключва автоматично в режим Автоматично';
+$string['autoupgrade:policy_recommend'] = 'Оценява се и се препоръчва; администратор го превключва';
+$string['autoupgrade:policy_none'] = 'Само списък с кандидати: няма тест, който измерва задачата на тази роля';
+$string['autoupgrade:cand_candidate'] = 'Кандидат';
+$string['autoupgrade:cand_passed'] = 'Преминал веднъж';
+$string['autoupgrade:cand_eligible'] = 'Допустим';
+$string['autoupgrade:cand_failed'] = 'Неуспешен';
+$string['autoupgrade:cand_switched'] = 'В употреба';
+$string['autoupgrade:cand_rolledback'] = 'Върнат обратно';
+$string['autoupgrade:cand_retired'] = 'Вече не е в списъка';
+$string['autoupgrade:eval_queued'] = 'В опашка';
+$string['autoupgrade:eval_running'] = 'В изпълнение';
+$string['autoupgrade:eval_complete'] = 'Завършена';
+$string['autoupgrade:eval_failed'] = 'Неуспешна';
+$string['autoupgrade:eval_skipped'] = 'Не е изпълнена';
+$string['autoupgrade:gate_pass'] = 'Преминати:';
+$string['autoupgrade:gate_fail'] = 'Непреминати:';
+$string['autoupgrade:how_auto'] = 'Автоматично';
+$string['autoupgrade:how_manual'] = 'От администратор';
+$string['autoupgrade:switch_watching'] = 'Наблюдава се';
+$string['autoupgrade:switch_kept'] = 'Запазено';
+$string['autoupgrade:switch_rolledback'] = 'Върнато обратно';
+$string['autoupgrade:switch_superseded'] = 'Променено впоследствие от администратор';
+$string['autoupgrade:block_role'] = 'Тази роля не може да бъде превключена оттук.';
+$string['autoupgrade:block_emergency'] = 'Активиран е аварийен контрол, затова никой модел не се превключва, докато не бъде възстановен.';
+$string['autoupgrade:block_allowlist'] = 'Настройката {$a} не може да се променя от превключване без участието на човек, затова тази роля се превключва ръчно.';
+$string['autoupgrade:block_bundle'] = 'Настройката {$a} се управлява от подписания пакет с политики. Вместо това сменете модела в пакета.';
+$string['autoupgrade:block_watching'] = 'Превключване на тази роля все още се наблюдава. Изчакайте, докато бъде запазено или върнато.';
+$string['autoupgrade:block_noeval'] = 'Този кандидат няма завършена оценка.';
+$string['autoupgrade:block_gate'] = 'Последната оценка на този кандидат не е преминала прага.';
+$string['autoupgrade:block_changed'] = 'Моделът на ролята е сменен след оценката, затова тя вече не сравнява правилната двойка. Оценете отново.';
+$string['autoupgrade:switched'] = 'Ролята {$a->role} е превключена към {$a->model}. Ще се наблюдава 48 часа.';
+$string['autoupgrade:rolledback'] = 'Превключването на {$a} е върнато обратно.';
+$string['autoupgrade:rollback_missing'] = 'Това превключване не може да бъде върнато.';
+$string['autoupgrade:rollback_superseded'] = 'Настройките са променени след превключването, затова нищо не е върнато.';
+$string['autoupgrade:rollback_by_admin'] = 'Върнато обратно от администратор.';
+$string['autoupgrade:queued'] = 'Оценката е в опашка. Тя се изпълнява при следващото пускане на cron и отнема няколко минути.';
+$string['autoupgrade:discovered'] = 'Откриването обходи {$a->providers} доставчик(а), регистрира {$a->registered} модел(а) и отбеляза {$a->candidates} кандидат(а). Доставчици, чиито модели не можаха да бъдат изброени: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Тази роля не се превключва автоматично.';
+$string['autoupgrade:why_recommend_mode'] = 'Автоматичното надграждане на модели е в режим Препоръка.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} е превключена към {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] превключи ролята {$a->role} от {$a->from} към {$a->to}.
+
+Кандидатът премина всяка проверка спрямо текущия модел, измерена в едно и също изпълнение, два пъти подред:
+{$a->gate}
+
+Новият модел се наблюдава при реален трафик в продължение на {$a->hours} часа и се връща автоматично, ако грешките, прекъснатите отговори, отказите или цената на отговор се влошат. Можете да го върнете и сами по всяко време:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} е върната към {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] върна ролята {$a->role} от {$a->to} обратно към {$a->from}.
+
+Причина: {$a->reason}
+
+Кандидатът няма да бъде пробван отново в продължение на 30 дни. Подробности:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Превключването на {$a->role} към {$a->to} е запазено';
+$string['autoupgrade:mail_kept_body'] = 'Превключването на ролята {$a->role} от {$a->from} към {$a->to} издържа {$a->hours} часа при {$a->turns} реални отговора и се запазва.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Превключването на ролята {$a->role} от {$a->from} към {$a->to} се запазва след {$a->hours} часа, но бяха наблюдавани само {$a->turns} реални отговора, твърде малко за преценка. Следете го.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Препоръка: {$a->role} с {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} премина всяка проверка спрямо {$a->current} за ролята {$a->role}, два пъти подред, но не беше превключен автоматично: {$a->why}
+
+{$a->gate}
+
+Превключете го или го оставете тук:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Получавате това, защото адресът ви е сред получателите на сигнали за разходите на [[tutorshort]].';
+$string['event:model_switched'] = 'Моделът е превключен';
+$string['event:model_switch_rolled_back'] = 'Превключването на модела е върнато';
+$string['task:discover_models'] = 'Откриване на нови AI модели и поставяне на оценки в опашка';
+$string['task:evaluate_model_candidate'] = 'Оценяване на кандидат AI модел';
+$string['task:watch_model_switches'] = 'Наблюдение на последните превключвания на AI модели';
+$string['settings:autoupgrade_heading'] = 'Автоматично надграждане на модели';
+$string['settings:autoupgrade_heading_desc'] = 'Всеки ден [[tutorshort]] изброява моделите, които предлагат вашите доставчици, и отбелязва кандидати за всяка роля: същият доставчик, сравнима списъчна цена и известна цена. Тества ги спрямо текущия модел с подканите на тютора, набора от тестове за jailbreak и цена, близка до реалната, и сменя модела по подразбиране за сайта само когато кандидатът е на същата или по-ниска цена на отговор, също толкова добър, безопасен и надежден, два пъти подред. Курсовете със собствен модел го запазват. Всяко превключване се изпраща по имейл до получателите на сигнали за разходите и се наблюдава 48 часа.';
+$string['settings:autoupgrade_mode'] = 'Режим';
+$string['settings:autoupgrade_mode_desc'] = 'Автоматично превключва, когато кандидат премине. Препоръка тества кандидатите и вместо това изпраща препоръка по имейл. Изключено не прави нищо автоматично.';
+$string['settings:autoupgrade_budget_usd'] = 'Месечен бюджет за тестване (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Максималната сума, която автоматичните оценки могат да изразходват за един календарен месец, включително оценителя. Оценка, която може да надхвърли тази сума за месеца, не се стартира.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID на курса за оценка';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Оценките отговарят със системната подкана, която този курс действително използва, изградена за самоличността на гост, така че не се изпращат данни на обучаеми. 0 избира курса с най-много отговори в чата през последните 30 дни.';
+$string['privacy:metadata:model_eval'] = 'Автоматични оценки на модели: кой кандидат модел е сравнен с кой текущ модел и измереният резултат. Единствените лични данни са идентификаторът на администратора, който е поискал оценката. Тези записи са конфигурация на сайта, а не лични данни за обучаем, затова не се включват в износ на данни и не се изтриват, когато потребител поиска изтриване.';
+$string['privacy:metadata:model_eval:createdby'] = 'Администраторът на сайта, който е поискал тази оценка. Празно, когато е поставена в опашка от откриването.';
+$string['privacy:metadata:model_switch'] = 'Превключвания и връщания на модели: от кой към кой модел е преминала дадена роля и защо. Единствените лични данни са идентификаторът на администратора, който е направил или отменил превключването. Тези записи са конфигурация на сайта, а не лични данни за обучаем, затова не се включват в износ на данни и не се изтриват, когато потребител поиска изтриване.';
+$string['privacy:metadata:model_switch:createdby'] = 'Администраторът на сайта, който е направил това превключване. Празно, когато е било автоматично.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Администраторът на сайта, който е върнал това превключване. Празно, когато го е върнал наблюдаващият процес или не е било върнато.';

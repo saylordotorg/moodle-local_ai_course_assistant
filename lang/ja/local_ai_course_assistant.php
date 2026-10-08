@@ -3177,3 +3177,144 @@ $string['modelregistry:forget_confirm'] = 'この情報を削除しますか？�
 $string['modelregistry:forget_done'] = '情報を削除しました。このモデルへの次のリクエストでは同梱のルールが使われます。';
 $string['modelregistry:forget_missing'] = 'その情報はもう存在しません。';
 $string['event:model_capability_learned'] = 'プロバイダーからモデル機能を学習しました';
+
+$string['autoupgrade:title'] = 'モデルのアップグレード';
+$string['autoupgrade:navtitle'] = '[[tutorshort]] のモデルのアップグレード';
+$string['autoupgrade:intro'] = '[[tutorshort]] は、すでに利用しているプロバイダーの新しいモデルを探し、各候補を置き換え対象のモデルと比較テストします (同じプロンプト、同じ回答予算、同じ評価者、同じ実行内)。候補が回答あたり同額以下で、品質、安全性、信頼性も同等であることが 2 回連続で確認された場合にのみ切り替えます。切り替えはすべて実際のトラフィックで 48 時間監視され、悪化した場合はロールバックされます。';
+$string['autoupgrade:l_statusheading'] = 'ステータス';
+$string['autoupgrade:l_mode'] = 'モード';
+$string['autoupgrade:l_budget'] = 'テスト予算';
+$string['autoupgrade:l_changemode'] = '変更';
+$string['autoupgrade:l_discover'] = '今すぐモデルを検出';
+$string['autoupgrade:l_rolesheading'] = 'ロール';
+$string['autoupgrade:l_current'] = '現在のモデル';
+$string['autoupgrade:l_profile'] = '能力プロファイル';
+$string['autoupgrade:l_policy'] = 'アップグレード';
+$string['autoupgrade:l_nocandidates'] = '候補はありません。検出では、同じプロバイダーで同程度の価格のモデルが候補になります。';
+$string['autoupgrade:l_colpasses'] = '合格回数';
+$string['autoupgrade:l_collast'] = '前回の評価';
+$string['autoupgrade:l_evaluate'] = '今すぐ評価';
+$string['autoupgrade:l_evaluating'] = 'キュー登録済みまたは実行中';
+$string['autoupgrade:l_switch'] = '切り替え';
+$string['autoupgrade:l_switchconfirm'] = 'このロールを今すぐ候補に切り替えますか? 変更は 48 時間監視され、ロールバックできます。';
+$string['autoupgrade:l_evalsheading'] = '評価';
+$string['autoupgrade:l_noevals'] = '評価はまだありません。';
+$string['autoupgrade:l_colwhen'] = '日時';
+$string['autoupgrade:l_colrole'] = 'ロール';
+$string['autoupgrade:l_colcandidate'] = '候補';
+$string['autoupgrade:l_colincumbent'] = '現在のモデル';
+$string['autoupgrade:l_colcost'] = '使用額 / 見積もり';
+$string['autoupgrade:l_colgate'] = 'ゲートチェック';
+$string['autoupgrade:l_switchesheading'] = '切り替えとロールバック';
+$string['autoupgrade:l_noswitches'] = '切り替えはまだありません。';
+$string['autoupgrade:l_colfrom'] = '変更前';
+$string['autoupgrade:l_colto'] = '変更後';
+$string['autoupgrade:l_colmode'] = '方法';
+$string['autoupgrade:l_colreason'] = '理由';
+$string['autoupgrade:l_coluntil'] = '監視期限';
+$string['autoupgrade:l_rollback'] = 'ロールバック';
+$string['autoupgrade:l_rollbackconfirm'] = '今すぐ以前のモデルに戻しますか?';
+$string['autoupgrade:l_manage'] = '学習した情報はモデルレジストリのページで確認または削除できます';
+$string['autoupgrade:l_notinuse'] = '未使用';
+$string['autoupgrade:mode_off'] = 'オフ: 自動では何もしない';
+$string['autoupgrade:mode_recommend'] = '推奨: 候補をテストし、推奨をメールで送信';
+$string['autoupgrade:mode_auto'] = '自動: 候補をテストし、合格したら切り替え';
+$string['autoupgrade:budget_line'] = '今月の使用額 ${$a->spent} / ${$a->limit} (残り ${$a->left})';
+$string['autoupgrade:last_discovery'] = '前回の検出: {$a}。';
+$string['autoupgrade:never_discovered'] = '検出はまだ実行されていません。';
+$string['autoupgrade:role_chat'] = 'チャット (メインモデル)';
+$string['autoupgrade:role_premium'] = 'プレミアム層';
+$string['autoupgrade:role_failover'] = 'フェイルオーバー';
+$string['autoupgrade:role_quiz'] = 'クイズ生成';
+$string['autoupgrade:role_classifier'] = '習熟度分類';
+$string['autoupgrade:role_safety'] = '安全性リファレンス';
+$string['autoupgrade:role_soapbox'] = 'Soapbox の採点';
+$string['autoupgrade:not_configured'] = '未設定 (チャットモデルを継承)';
+$string['autoupgrade:policy_auto'] = '評価され、自動モードでは自動的に切り替え';
+$string['autoupgrade:policy_recommend'] = '評価して推奨。切り替えは管理者が行う';
+$string['autoupgrade:policy_none'] = '候補の一覧のみ: このロールのタスクを測るベンチマークがありません';
+$string['autoupgrade:cand_candidate'] = '候補';
+$string['autoupgrade:cand_passed'] = '1 回合格';
+$string['autoupgrade:cand_eligible'] = '適格';
+$string['autoupgrade:cand_failed'] = '不合格';
+$string['autoupgrade:cand_switched'] = '使用中';
+$string['autoupgrade:cand_rolledback'] = 'ロールバック済み';
+$string['autoupgrade:cand_retired'] = '一覧から削除済み';
+$string['autoupgrade:eval_queued'] = 'キュー登録済み';
+$string['autoupgrade:eval_running'] = '実行中';
+$string['autoupgrade:eval_complete'] = '完了';
+$string['autoupgrade:eval_failed'] = '失敗';
+$string['autoupgrade:eval_skipped'] = '未実行';
+$string['autoupgrade:gate_pass'] = '合格:';
+$string['autoupgrade:gate_fail'] = '不合格:';
+$string['autoupgrade:how_auto'] = '自動';
+$string['autoupgrade:how_manual'] = '管理者による';
+$string['autoupgrade:switch_watching'] = '監視中';
+$string['autoupgrade:switch_kept'] = '維持';
+$string['autoupgrade:switch_rolledback'] = 'ロールバック済み';
+$string['autoupgrade:switch_superseded'] = 'その後管理者が変更';
+$string['autoupgrade:block_role'] = 'このロールはここから切り替えられません。';
+$string['autoupgrade:block_emergency'] = '緊急制御が有効なため、復旧するまでモデルは切り替えられません。';
+$string['autoupgrade:block_allowlist'] = '設定 {$a} は人の判断なしに切り替えで変更できないため、このロールは手動で切り替えます。';
+$string['autoupgrade:block_bundle'] = '設定 {$a} は署名済みポリシーバンドルで管理されています。バンドル側でモデルを変更してください。';
+$string['autoupgrade:block_watching'] = 'このロールの切り替えはまだ監視中です。維持またはロールバックされるまでお待ちください。';
+$string['autoupgrade:block_noeval'] = 'この候補には完了した評価がありません。';
+$string['autoupgrade:block_gate'] = 'この候補の前回の評価はゲートを通過しませんでした。';
+$string['autoupgrade:block_changed'] = '評価後にロールのモデルが変更されたため、正しい組み合わせを比較できていません。もう一度評価してください。';
+$string['autoupgrade:switched'] = '{$a->role} を {$a->model} に切り替えました。48 時間監視されます。';
+$string['autoupgrade:rolledback'] = '{$a} の切り替えをロールバックしました。';
+$string['autoupgrade:rollback_missing'] = 'その切り替えはロールバックできません。';
+$string['autoupgrade:rollback_superseded'] = '切り替え後に設定が変更されたため、何もロールバックされませんでした。';
+$string['autoupgrade:rollback_by_admin'] = '管理者がロールバックしました。';
+$string['autoupgrade:queued'] = '評価をキューに登録しました。次回の cron で実行され、数分かかります。';
+$string['autoupgrade:discovered'] = '検出結果: プロバイダー {$a->providers} 件を一覧化し、モデル {$a->registered} 件を登録、候補 {$a->candidates} 件をマークしました。一覧化できなかったプロバイダー: {$a->errors}。';
+$string['autoupgrade:why_manual_role'] = 'このロールは自動では切り替えられません。';
+$string['autoupgrade:why_recommend_mode'] = '自動モデルアップグレードは推奨モードです。';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} を {$a->to} に切り替えました';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] が {$a->role} ロールを {$a->from} から {$a->to} に切り替えました。
+
+同じ実行内で測定した現在のモデルとの比較で、すべてのチェックに 2 回連続で合格しました:
+{$a->gate}
+
+新しいモデルは実際のトラフィックで {$a->hours} 時間監視され、エラー、途中で切れた回答、拒否、回答あたりのコストが悪化した場合は自動的にロールバックされます。いつでも手動でロールバックできます:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} を {$a->from} にロールバックしました';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] が {$a->role} ロールを {$a->to} から {$a->from} に戻しました。
+
+理由: {$a->reason}
+
+この候補は 30 日間再試行されません。詳細:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] {$a->role} の {$a->to} への切り替えを維持';
+$string['autoupgrade:mail_kept_body'] = '{$a->role} ロールの {$a->from} から {$a->to} への切り替えは、{$a->hours} 時間、実際の回答 {$a->turns} 件で問題がなかったため維持されます。
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = '{$a->role} ロールの {$a->from} から {$a->to} への切り替えは {$a->hours} 時間後に維持されますが、実際の回答は {$a->turns} 件のみで、判断には少なすぎます。引き続き注意してください。
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] 推奨: {$a->role} を {$a->model} に';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} は {$a->role} ロールで {$a->current} との比較のすべてのチェックに 2 回連続で合格しましたが、自動では切り替えられませんでした: {$a->why}
+
+{$a->gate}
+
+切り替えるか、そのままにするかはこちらで選べます:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'このメールは、あなたのアドレスが [[tutorshort]] の支出アラートの受信者であるため送信されています。';
+$string['event:model_switched'] = 'モデルを切り替えました';
+$string['event:model_switch_rolled_back'] = 'モデルの切り替えをロールバックしました';
+$string['task:discover_models'] = '新しい AI モデルを検出して評価をキューに登録';
+$string['task:evaluate_model_candidate'] = '候補の AI モデルを評価';
+$string['task:watch_model_switches'] = '最近の AI モデルの切り替えを監視';
+$string['settings:autoupgrade_heading'] = '自動モデルアップグレード';
+$string['settings:autoupgrade_heading_desc'] = '[[tutorshort]] は毎日、プロバイダーが提供するモデルを一覧化し、各ロールの候補をマークします (同じプロバイダー、同程度の定価、価格が判明していること)。チューターのプロンプト、ジェイルブレイクテスト一式、実運用に近いコストで現在のモデルと比較し、候補が回答あたり同額以下で、品質、安全性、信頼性も同等であることが 2 回連続で確認された場合にのみサイトの既定モデルを切り替えます。独自のモデルを持つコースはそのモデルを維持します。切り替えはすべて支出アラートの受信者にメールで通知され、48 時間監視されます。';
+$string['settings:autoupgrade_mode'] = 'モード';
+$string['settings:autoupgrade_mode_desc'] = '自動は候補が合格すると切り替えます。推奨は候補をテストし、代わりに推奨をメールで送信します。オフは自動では何もしません。';
+$string['settings:autoupgrade_budget_usd'] = '毎月のテスト予算 (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = '自動評価が 1 暦月に使える上限額 (評価者を含む)。この上限を超えるおそれのある評価は開始されません。';
+$string['settings:autoupgrade_eval_courseid'] = '評価用コース ID';
+$string['settings:autoupgrade_eval_courseid_desc'] = '評価は、このコースで実際に使われるシステムプロンプトをゲストの ID で構築して回答するため、学習者のデータは送信されません。0 の場合は、過去 30 日間でチャットの回答が最も多いコースを選びます。';
+$string['privacy:metadata:model_eval'] = '自動モデル評価: どの候補モデルをどの現在のモデルと比較したか、およびその測定結果。個人データは評価を依頼した管理者の識別子のみです。これらの行は学習者の個人データではなくサイト設定であるため、データのエクスポートには含まれず、ユーザーが消去を求めても削除されません。';
+$string['privacy:metadata:model_eval:createdby'] = 'この評価を依頼したサイト管理者。検出によってキューに登録された場合は空です。';
+$string['privacy:metadata:model_switch'] = 'モデルの切り替えとロールバック: ロールがどのモデルからどのモデルに移ったか、およびその理由。個人データは切り替えを行った、または取り消した管理者の識別子のみです。これらの行は学習者の個人データではなくサイト設定であるため、データのエクスポートには含まれず、ユーザーが消去を求めても削除されません。';
+$string['privacy:metadata:model_switch:createdby'] = 'この切り替えを行ったサイト管理者。自動の場合は空です。';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'この切り替えをロールバックしたサイト管理者。監視機能がロールバックした場合、またはロールバックされていない場合は空です。';

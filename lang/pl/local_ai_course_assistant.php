@@ -3179,3 +3179,144 @@ $string['modelregistry:forget_confirm'] = 'Zapomnieć ten fakt? Następne żąda
 $string['modelregistry:forget_done'] = 'Fakt zapomniany. Następne żądanie do tego modelu użyje domyślnych reguł.';
 $string['modelregistry:forget_missing'] = 'Ten fakt już nie istnieje.';
 $string['event:model_capability_learned'] = 'Poznano możliwość modelu od dostawcy';
+
+$string['autoupgrade:title'] = 'Aktualizacje modeli';
+$string['autoupgrade:navtitle'] = 'Aktualizacje modeli [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] szuka nowszych modeli u dostawców, z których już korzysta, testuje każdego kandydata względem modelu, który miałby zastąpić (te same prompty, ten sam budżet na odpowiedź, ten sam sędzia, w tym samym przebiegu), i przełącza tylko wtedy, gdy kandydat jest w tej samej cenie lub tańszy za odpowiedź, równie dobry, równie bezpieczny i równie niezawodny, dwa razy z rzędu. Każde przełączenie jest obserwowane przez 48 godzin na rzeczywistym ruchu i cofane, jeśli wyniki się pogorszą.';
+$string['autoupgrade:l_statusheading'] = 'Stan';
+$string['autoupgrade:l_mode'] = 'Tryb';
+$string['autoupgrade:l_budget'] = 'Budżet na testy';
+$string['autoupgrade:l_changemode'] = 'Zmień';
+$string['autoupgrade:l_discover'] = 'Wykryj modele teraz';
+$string['autoupgrade:l_rolesheading'] = 'Role';
+$string['autoupgrade:l_current'] = 'Obecny model';
+$string['autoupgrade:l_profile'] = 'Profil możliwości';
+$string['autoupgrade:l_policy'] = 'Aktualizacje';
+$string['autoupgrade:l_nocandidates'] = 'Brak kandydatów. Wykrywanie oznacza modele tego samego dostawcy w porównywalnej cenie.';
+$string['autoupgrade:l_colpasses'] = 'Zaliczenia';
+$string['autoupgrade:l_collast'] = 'Ostatnia ocena';
+$string['autoupgrade:l_evaluate'] = 'Oceń teraz';
+$string['autoupgrade:l_evaluating'] = 'W kolejce lub w toku';
+$string['autoupgrade:l_switch'] = 'Przełącz';
+$string['autoupgrade:l_switchconfirm'] = 'Przełączyć tę rolę na kandydata teraz? Zmiana jest obserwowana przez 48 godzin i można ją cofnąć.';
+$string['autoupgrade:l_evalsheading'] = 'Oceny';
+$string['autoupgrade:l_noevals'] = 'Brak ocen.';
+$string['autoupgrade:l_colwhen'] = 'Kiedy';
+$string['autoupgrade:l_colrole'] = 'Rola';
+$string['autoupgrade:l_colcandidate'] = 'Kandydat';
+$string['autoupgrade:l_colincumbent'] = 'Obecny model';
+$string['autoupgrade:l_colcost'] = 'Wydano / szacunek';
+$string['autoupgrade:l_colgate'] = 'Kontrole progu';
+$string['autoupgrade:l_switchesheading'] = 'Przełączenia i wycofania';
+$string['autoupgrade:l_noswitches'] = 'Brak przełączeń.';
+$string['autoupgrade:l_colfrom'] = 'Z';
+$string['autoupgrade:l_colto'] = 'Na';
+$string['autoupgrade:l_colmode'] = 'Sposób';
+$string['autoupgrade:l_colreason'] = 'Powód';
+$string['autoupgrade:l_coluntil'] = 'Obserwowane do';
+$string['autoupgrade:l_rollback'] = 'Cofnij';
+$string['autoupgrade:l_rollbackconfirm'] = 'Przywrócić teraz poprzedni model?';
+$string['autoupgrade:l_manage'] = 'Przejrzyj lub zapomnij poznane fakty na stronie rejestru modeli';
+$string['autoupgrade:l_notinuse'] = 'nieużywany';
+$string['autoupgrade:mode_off'] = 'Wyłączony: nic automatycznie';
+$string['autoupgrade:mode_recommend'] = 'Rekomendacja: testuj kandydatów i wysyłaj rekomendację e-mailem';
+$string['autoupgrade:mode_auto'] = 'Automatyczny: testuj kandydatów i przełączaj, gdy któryś zaliczy';
+$string['autoupgrade:budget_line'] = 'Wydano ${$a->spent} z ${$a->limit} w tym miesiącu (pozostało ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Ostatnie wykrywanie: {$a}.';
+$string['autoupgrade:never_discovered'] = 'Wykrywanie jeszcze nie działało.';
+$string['autoupgrade:role_chat'] = 'Czat (model główny)';
+$string['autoupgrade:role_premium'] = 'Poziom premium';
+$string['autoupgrade:role_failover'] = 'Model zapasowy';
+$string['autoupgrade:role_quiz'] = 'Generowanie quizów';
+$string['autoupgrade:role_classifier'] = 'Klasyfikator opanowania';
+$string['autoupgrade:role_safety'] = 'Odniesienie bezpieczeństwa';
+$string['autoupgrade:role_soapbox'] = 'Ocenianie Soapbox';
+$string['autoupgrade:not_configured'] = 'Nieskonfigurowane (dziedziczy model czatu)';
+$string['autoupgrade:policy_auto'] = 'Oceniany i przełączany automatycznie w trybie automatycznym';
+$string['autoupgrade:policy_recommend'] = 'Oceniany i rekomendowany; przełącza administrator';
+$string['autoupgrade:policy_none'] = 'Tylko lista kandydatów: żaden test porównawczy nie mierzy zadania tej roli';
+$string['autoupgrade:cand_candidate'] = 'Kandydat';
+$string['autoupgrade:cand_passed'] = 'Zaliczony raz';
+$string['autoupgrade:cand_eligible'] = 'Kwalifikuje się';
+$string['autoupgrade:cand_failed'] = 'Niezaliczony';
+$string['autoupgrade:cand_switched'] = 'W użyciu';
+$string['autoupgrade:cand_rolledback'] = 'Wycofany';
+$string['autoupgrade:cand_retired'] = 'Już niedostępny';
+$string['autoupgrade:eval_queued'] = 'W kolejce';
+$string['autoupgrade:eval_running'] = 'W toku';
+$string['autoupgrade:eval_complete'] = 'Zakończona';
+$string['autoupgrade:eval_failed'] = 'Nieudana';
+$string['autoupgrade:eval_skipped'] = 'Nie uruchomiono';
+$string['autoupgrade:gate_pass'] = 'Zaliczone:';
+$string['autoupgrade:gate_fail'] = 'Niezaliczone:';
+$string['autoupgrade:how_auto'] = 'Automatycznie';
+$string['autoupgrade:how_manual'] = 'Przez administratora';
+$string['autoupgrade:switch_watching'] = 'Obserwowane';
+$string['autoupgrade:switch_kept'] = 'Zachowane';
+$string['autoupgrade:switch_rolledback'] = 'Wycofane';
+$string['autoupgrade:switch_superseded'] = 'Później zmienione przez administratora';
+$string['autoupgrade:block_role'] = 'Tej roli nie można przełączyć stąd.';
+$string['autoupgrade:block_emergency'] = 'Włączono kontrolę awaryjną, więc żaden model nie zostanie przełączony do czasu jej wyłączenia.';
+$string['autoupgrade:block_allowlist'] = 'Ustawienia {$a} przełączenie nie może zmienić bez udziału człowieka, więc tę rolę przełącza się ręcznie.';
+$string['autoupgrade:block_bundle'] = 'Ustawieniem {$a} zarządza podpisany pakiet zasad. Zmień model w pakiecie.';
+$string['autoupgrade:block_watching'] = 'Przełączenie tej roli jest nadal obserwowane. Poczekaj, aż zostanie zachowane lub cofnięte.';
+$string['autoupgrade:block_noeval'] = 'Ten kandydat nie ma zakończonej oceny.';
+$string['autoupgrade:block_gate'] = 'Ostatnia ocena tego kandydata nie przekroczyła progu.';
+$string['autoupgrade:block_changed'] = 'Model tej roli zmienił się po ocenie, więc nie porównuje ona już właściwej pary. Oceń ponownie.';
+$string['autoupgrade:switched'] = 'Przełączono {$a->role} na {$a->model}. Zmiana jest obserwowana przez 48 godzin.';
+$string['autoupgrade:rolledback'] = 'Cofnięto przełączenie {$a}.';
+$string['autoupgrade:rollback_missing'] = 'Tego przełączenia nie można cofnąć.';
+$string['autoupgrade:rollback_superseded'] = 'Ustawienia zmieniono po przełączeniu, więc niczego nie cofnięto.';
+$string['autoupgrade:rollback_by_admin'] = 'Cofnięte przez administratora.';
+$string['autoupgrade:queued'] = 'Ocena w kolejce. Uruchomi się przy następnym przebiegu crona i potrwa kilka minut.';
+$string['autoupgrade:discovered'] = 'Wykrywanie objęło {$a->providers} dostawców, zarejestrowało {$a->registered} modeli i oznaczyło {$a->candidates} kandydatów. Dostawcy, których nie udało się odpytać: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Ta rola nie jest przełączana automatycznie.';
+$string['autoupgrade:why_recommend_mode'] = 'Automatyczne aktualizacje modeli działają w trybie rekomendacji.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role}: przełączono na {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] przełączył rolę {$a->role} z {$a->from} na {$a->to}.
+
+Model przeszedł każdą kontrolę względem obecnego modelu, mierzoną w tym samym przebiegu, dwa razy z rzędu:
+{$a->gate}
+
+Nowy model jest obserwowany na rzeczywistym ruchu przez {$a->hours} godz. i zostanie cofnięty automatycznie, jeśli pogorszą się błędy, ucięte odpowiedzi, odmowy lub koszt odpowiedzi. Możesz go cofnąć samodzielnie w dowolnej chwili:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role}: przywrócono {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] przywrócił w roli {$a->role} model {$a->from} zamiast {$a->to}.
+
+Powód: {$a->reason}
+
+Kandydat nie będzie ponownie testowany przez 30 dni. Szczegóły:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] {$a->role}: przełączenie na {$a->to} zachowane';
+$string['autoupgrade:mail_kept_body'] = 'Przełączenie roli {$a->role} z {$a->from} na {$a->to} sprawdziło się przez {$a->hours} godz. na {$a->turns} rzeczywistych odpowiedziach i zostaje zachowane.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Przełączenie roli {$a->role} z {$a->from} na {$a->to} zostaje zachowane po {$a->hours} godz., ale zarejestrowano tylko {$a->turns} rzeczywistych odpowiedzi, za mało do oceny. Miej je na oku.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Rekomendacja: {$a->role} na {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} przeszedł każdą kontrolę względem {$a->current} w roli {$a->role}, dwa razy z rzędu, i nie został przełączony automatycznie: {$a->why}
+
+{$a->gate}
+
+Przełącz go lub zostaw tutaj:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Otrzymujesz tę wiadomość, ponieważ Twój adres jest odbiorcą alertów o wydatkach [[tutorshort]].';
+$string['event:model_switched'] = 'Przełączono model';
+$string['event:model_switch_rolled_back'] = 'Cofnięto przełączenie modelu';
+$string['task:discover_models'] = 'Wykryj nowe modele AI i dodaj oceny do kolejki';
+$string['task:evaluate_model_candidate'] = 'Oceń kandydujący model AI';
+$string['task:watch_model_switches'] = 'Obserwuj ostatnie przełączenia modeli AI';
+$string['settings:autoupgrade_heading'] = 'Automatyczne aktualizacje modeli';
+$string['settings:autoupgrade_heading_desc'] = 'Codziennie [[tutorshort]] pobiera listę modeli oferowanych przez Twoich dostawców i oznacza kandydatów dla każdej roli: ten sam dostawca, porównywalna cena katalogowa i znana cena. Testuje ich względem obecnego modelu na promptach tutora, zestawie testów jailbreak i koszcie zbliżonym do rzeczywistego, a domyślny model witryny przełącza tylko wtedy, gdy kandydat jest w tej samej cenie lub tańszy za odpowiedź, równie dobry, równie bezpieczny i równie niezawodny, dwa razy z rzędu. Kursy z własnym modelem go zachowują. Każde przełączenie jest wysyłane e-mailem do odbiorców alertów o wydatkach i obserwowane przez 48 godzin.';
+$string['settings:autoupgrade_mode'] = 'Tryb';
+$string['settings:autoupgrade_mode_desc'] = 'Automatyczny przełącza, gdy kandydat zaliczy testy. Rekomendacja testuje kandydatów i zamiast tego wysyła rekomendację e-mailem. Wyłączony nie robi nic automatycznie.';
+$string['settings:autoupgrade_budget_usd'] = 'Miesięczny budżet na testy (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Maksymalna kwota, jaką automatyczne oceny mogą wydać w miesiącu kalendarzowym, łącznie z sędzią. Ocena, która mogłaby przekroczyć ten limit w danym miesiącu, nie zostanie uruchomiona.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID kursu do ocen';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Oceny odpowiadają z użyciem promptu systemowego, którego ten kurs faktycznie używa, zbudowanego dla tożsamości gościa, więc nie są wysyłane dane żadnego uczącego się. 0 wybiera kurs z największą liczbą odpowiedzi czatu w ostatnich 30 dniach.';
+$string['privacy:metadata:model_eval'] = 'Automatyczne oceny modeli: który kandydujący model porównano z którym obecnym modelem oraz zmierzony wynik. Jedyną daną osobową jest identyfikator administratora, który zlecił ocenę. Te wiersze są konfiguracją witryny, a nie danymi osobowymi uczącego się, więc nie są uwzględniane w eksporcie danych ani usuwane, gdy użytkownik żąda usunięcia danych.';
+$string['privacy:metadata:model_eval:createdby'] = 'Administrator witryny, który zlecił tę ocenę. Puste, gdy dodało ją do kolejki wykrywanie.';
+$string['privacy:metadata:model_switch'] = 'Przełączenia i wycofania modeli: z którego na który model przeszła rola i dlaczego. Jedyną daną osobową jest identyfikator administratora, który wykonał lub cofnął przełączenie. Te wiersze są konfiguracją witryny, a nie danymi osobowymi uczącego się, więc nie są uwzględniane w eksporcie danych ani usuwane, gdy użytkownik żąda usunięcia danych.';
+$string['privacy:metadata:model_switch:createdby'] = 'Administrator witryny, który wykonał to przełączenie. Puste, gdy było automatyczne.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Administrator witryny, który cofnął to przełączenie. Puste, gdy zrobił to mechanizm obserwacji lub przełączenia nie cofnięto.';
