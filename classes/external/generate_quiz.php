@@ -25,6 +25,7 @@ use local_ai_course_assistant\branding;
 use local_ai_course_assistant\context_builder;
 use local_ai_course_assistant\objective_manager;
 use local_ai_course_assistant\provider\base_provider;
+use local_ai_course_assistant\quiz_choice_balancer;
 use local_ai_course_assistant\quiz_lock;
 
 /**
@@ -330,6 +331,12 @@ class generate_quiz extends external_api {
             ];
         }
 
+        // v7.8.2: even out the answer key. A key that stands out by length gets
+        // its distractors rewritten (one extra call for the whole quiz), then
+        // every question's key moves to a random letter. See
+        // quiz_choice_balancer for why these are two separate steps.
+        $questions = self::balance_questions($provider, $questions, $courseid, $topic, $cmid);
+
         // v7.0.6: record the call. Until now generate_quiz made a real, billed
         // provider call and persisted nothing, so quiz spend was invisible to
         // spend_guard (which totals prompt_tokens/completion_tokens from the
@@ -377,6 +384,120 @@ class generate_quiz extends external_api {
     }
 
     /**
+     * Rewrite distractors where the key stands out by length, then shuffle every key.
+     *
+     * Never fails the quiz: any problem with the repair call leaves the
+     * original distractors in place, and the shuffle runs regardless.
+     *
+     * @param mixed $provider Provider the quiz was generated through.
+     * @param array $questions Normalised questions.
+     * @param int $courseid
+     * @param string $topic
+     * @param int $cmid
+     * @return array The balanced questions.
+     */
+    private static function balance_questions($provider, array $questions, int $courseid, string $topic, int $cmid): array {
+        try {
+            $flagged = quiz_choice_balancer::flag_long_keys($questions);
+            if ($flagged) {
+                $questions = self::repair_long_keys($provider, $questions, $flagged, $courseid, $topic, $cmid);
+            }
+        } catch (\Throwable $e) {
+            debugging('generate_quiz: distractor repair skipped: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        }
+        return array_map(static fn(array $q): array => quiz_choice_balancer::shuffle($q), $questions);
+    }
+
+    /**
+     * Ask the model for replacement distractors on the flagged questions, keeping the key.
+     *
+     * @param mixed $provider
+     * @param array $questions
+     * @param int[] $flagged Keys into $questions.
+     * @param int $courseid
+     * @param string $topic
+     * @param int $cmid
+     * @return array Questions with accepted replacements applied.
+     */
+    private static function repair_long_keys($provider, array $questions, array $flagged, int $courseid, string $topic, int $cmid): array {
+        $items = [];
+        foreach ($flagged as $i) {
+            $q = $questions[$i];
+            $k = strpos('ABCD', strtoupper(substr(trim($q['correct']), 0, 1)));
+            $distractors = [];
+            foreach ($q['choices'] as $n => $choice) {
+                if ($n !== $k) {
+                    $distractors[] = quiz_choice_balancer::strip_label((string) $choice);
+                }
+            }
+            $items[] = [
+                'id' => $i,
+                'question' => $q['question'],
+                'correct_answer' => quiz_choice_balancer::strip_label((string) $q['choices'][$k]),
+                'current_distractors' => $distractors,
+            ];
+        }
+        $system = "You rewrite the wrong answer choices (distractors) of multiple-choice questions.\n"
+            . "For each item, return the same number of new distractors as current_distractors.\n"
+            . "Rules:\n"
+            . "- Do not change the question or the correct answer.\n"
+            . "- Each new distractor must be within 10% of the correct answer's length in characters, "
+            . "so the correct answer does not stand out by being longer.\n"
+            . "- Each must be a plausible misconception, common mistake or near-miss, and clearly wrong.\n"
+            . "- Same grammatical form as the correct answer; no \"all of the above\" or \"none of the above\".\n"
+            . "- No absolute words (always, never, only, exclusively, obviously, certainly).\n"
+            . "- Never equal to the correct answer or to each other.\n"
+            . "Return JSON only.";
+        $schema = [
+            'name' => 'rewrite_distractors',
+            'description' => 'New distractors for the listed quiz questions',
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'items' => [
+                        'type' => 'array',
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'id' => ['type' => 'integer'],
+                                'distractors' => ['type' => 'array', 'items' => ['type' => 'string']],
+                            ],
+                            'required' => ['id', 'distractors'],
+                            'additionalProperties' => false,
+                        ],
+                    ],
+                ],
+                'required' => ['items'],
+                'additionalProperties' => false,
+            ],
+        ];
+        try {
+            $response = $provider->chat_completion(
+                $system,
+                [['role' => 'user', 'content' => json_encode($items, JSON_UNESCAPED_UNICODE)]],
+                ['response_schema' => $schema]
+            );
+        } finally {
+            // Billed whether or not it parses.
+            self::record_quiz_usage($provider, $courseid, count($flagged), $topic, $cmid, ' (distractor rewrite)');
+        }
+        $decoded = json_decode((string) $response, true);
+        foreach ((array) ($decoded['items'] ?? []) as $item) {
+            $i = (int) ($item['id'] ?? -1);
+            if (!in_array($i, $flagged, true) || !is_array($item['distractors'] ?? null)) {
+                continue;
+            }
+            $q = $questions[$i];
+            $key = quiz_choice_balancer::strip_label((string) $q['choices'][strpos('ABCD', strtoupper(substr(trim($q['correct']), 0, 1)))]);
+            $new = array_values(array_map('strval', $item['distractors']));
+            if (count($new) === count($q['choices']) - 1 && quiz_choice_balancer::distractors_acceptable($key, $new)) {
+                $questions[$i] = quiz_choice_balancer::with_distractors($q, $new);
+            }
+        }
+        return $questions;
+    }
+
+    /**
      * Persist a telemetry row for one quiz-generation call.
      *
      * Never throws: a failure to record must not fail the learner's quiz.
@@ -386,9 +507,10 @@ class generate_quiz extends external_api {
      * @param int    $count    Number of questions requested.
      * @param string $topic    Resolved topic.
      * @param int    $cmid     Course module the learner was on, 0 if none.
+     * @param string $note     Appended to the marker, e.g. for the distractor rewrite call.
      * @return void
      */
-    private static function record_quiz_usage($provider, int $courseid, int $count, string $topic, int $cmid): void {
+    private static function record_quiz_usage($provider, int $courseid, int $count, string $topic, int $cmid, string $note = ''): void {
         global $USER;
 
         try {
@@ -416,6 +538,7 @@ class generate_quiz extends external_api {
             if ($topic !== '') {
                 $marker .= ' on ' . $topic;
             }
+            $marker .= $note;
 
             \local_ai_course_assistant\conversation_manager::record_quiz_usage(
                 (int) $USER->id,
@@ -545,7 +668,7 @@ Schema:
       "question": "Question text?",
       "choices": ["A) ...", "B) ...", "C) ...", "D) ..."],
       "correct": "A",
-      "explanation": "Why A is correct."
+      "explanation": "Why this answer is correct."
     }
   ]
 }
@@ -563,6 +686,7 @@ Quality rules (strict — apply to every question):
 - Do NOT include the choices "All of the above", "None of the above", or "Both A and B" as either correct answers or distractors.
 - Do NOT use absolute clue words ("always", "never", "exclusively", "obviously", "certainly", "the only") in either the question stem or the answer choices, since these telegraph correctness or wrongness.
 - Do NOT include the correct answer's exact phrasing inside the question stem.
+- In "explanation", never refer to a choice by its letter (no "option B", "(C)" or "A is correct"); describe the answer in words, because the choices are shuffled after you write them.
 
 {$diffline}
 INSTRUCTIONS;
