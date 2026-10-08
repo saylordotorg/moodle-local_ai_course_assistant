@@ -3192,3 +3192,166 @@ $string['survey_admin:err_invalid_bounds'] = 'Gaaffiiwwan madaallii safartuu {$a
 $string['survey_admin:err_no_title'] = 'Mata duree qorannoo galchi.';
 
 $string['settings:int_range'] = 'Lakkoofsa guutuu {$a->min} hanga {$a->max} galchi.';
+
+$string['cachedef_modelcaps'] = 'Dhugaa dandeettii moodeelaa kan dhiyeessitoota irraa qoqqabamuun baratame';
+$string['settings:reasoning_effort'] = 'Carraaqqii yaadaa';
+$string['settings:reasoning_effort_desc'] = 'Moodeelonni deebii kennuu dura yaadan hammam akka yaadan gaafatamu. Moodeelota yaadaa OpenAI (GPT-5, GPT-6, gosa o) irratti akka <code>reasoning_effort</code>tti, moodeelota yaadaa Gemini irratti immoo akka baajata yaadaatti hojiirra oola. Moodeelli yaadaa hundi dheerina deebii armaan olii irratti dabalee bakka yaadaaf ni argata, kanaafuu yaadni deebii gidduutti kutuu hin danda\'u. Gadi aanaan barsiisaa gargaaraaf ni mijata: deebiin dafee dhufa, baasiin isaas xiqqaa dha. Cufaan bakka moodeelli hayyamutti yaada ni cufa. Moodeelonni to\'annoo yaadaa hin qabne qindaa\'ina kana ni dagatu.';
+$string['settings:reasoning_effort_off'] = 'Cufaa (hamma moodeelli hayyamu xiqqaa)';
+$string['settings:reasoning_effort_low'] = 'Gadi aanaa (ni gorfama)';
+$string['settings:reasoning_effort_medium'] = 'Giddugaleessa';
+$string['settings:reasoning_effort_high'] = 'Ol\'aanaa';
+$string['modelregistry:learned_heading'] = 'Dhugaa dandeettii dhiyeessitoota irraa baratame';
+$string['modelregistry:learned_desc'] = 'Yeroo dhiyeessaan tokko sababa moodeelli paaraameetira tokko kana booda hin fudhanneef gaaffii tokko didu, [[tutorshort]] paaraameetira sana qofa jijjiira, al tokko irra deebi\'ee yaala, akka gaaffiin itti aanu yeroo jalqabaatti sirrii ta\'uuf sirreeffama sana asitti yaadata. Moodeela gara seerota dhufanitti deebisuuf dhugaa tokko haqi.';
+$string['modelregistry:learned_none'] = 'Hanga ammaatti dhiyeessaan tokkollee bifa gaaffii hin dide.';
+$string['modelregistry:col_field'] = 'Dandeettii';
+$string['modelregistry:col_value'] = 'Gatii baratame';
+$string['modelregistry:col_evidence'] = 'Wanta dhiyeessaan jedhe';
+$string['modelregistry:forget'] = 'Haqi';
+$string['modelregistry:forget_confirm'] = 'Dhugaa kana haquu? Gaaffiin itti aanu moodeela kanaaf seerota dhufan irra deebi\'ee fayyadama.';
+$string['modelregistry:forget_done'] = 'Dhugaan haqameera. Gaaffiin itti aanu moodeela kanaaf seerota dhufan fayyadama.';
+$string['modelregistry:forget_missing'] = 'Dhugaan sun kana booda hin jiru.';
+$string['event:model_capability_learned'] = 'Dandeettii moodeelaa dhiyeessaa irraa baratame';
+
+$string['autoupgrade:title'] = 'Fooyya\'iinsa moodeelaa';
+$string['autoupgrade:navtitle'] = 'Fooyya\'iinsa moodeelaa [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] dhiyeessitoota duraan itti fayyadamu irraa moodeelota haaraa barbaada, kaadhimamaa tokkoon tokkoon moodeela bakka bu\'uuf jedhu wajjin qorata (ajajawwan walfakkaatoo, baajata deebii walfakkaataa, madaalaa walfakkaataa, hojii tokko keessatti), fi kan jijjiiru yoo kaadhimamaan deebii tokkoof gatii walqixa ykn rakasaa ta\'e, akkasuma gaarii, nageenya qabeessa fi amansiisaa ta\'e yeroo lama walitti aansuun qofa. Jijjiiramni hundi daldala dhugaa irratti sa\'aatii 48 hordofama, yoo hammaate immoo deebifama.';
+$string['autoupgrade:l_statusheading'] = 'Haala';
+$string['autoupgrade:l_mode'] = 'Akaakuu';
+$string['autoupgrade:l_budget'] = 'Baajata qormaataa';
+$string['autoupgrade:l_changemode'] = 'Jijjiiri';
+$string['autoupgrade:l_discover'] = 'Amma moodeelota barbaadi';
+$string['autoupgrade:l_rolesheading'] = 'Gaheewwan';
+$string['autoupgrade:l_current'] = 'Moodeela ammaa';
+$string['autoupgrade:l_profile'] = 'Piroofaayila dandeettii';
+$string['autoupgrade:l_policy'] = 'Fooyya\'iinsota';
+$string['autoupgrade:l_nocandidates'] = 'Kaadhimamaan hin jiru. Barbaacha keessatti moodeelonni dhiyeessaa walfakkaataa fi gatii walmadaalu qaban ni mallatteeffamu.';
+$string['autoupgrade:l_colpasses'] = 'Darbiinsa';
+$string['autoupgrade:l_collast'] = 'Madaallii dhumaa';
+$string['autoupgrade:l_evaluate'] = 'Amma madaali';
+$string['autoupgrade:l_evaluating'] = 'Tarree keessa ykn hojjechaa jira';
+$string['autoupgrade:l_switch'] = 'Jijjiiri moodeela';
+$string['autoupgrade:l_switchconfirm'] = 'Gahee kana amma gara kaadhimamaatti jijjiiruu? Jijjiiramni sa\'aatii 48 hordofama, deebisuunis ni danda\'ama.';
+$string['autoupgrade:l_evalsheading'] = 'Madaalliiwwan';
+$string['autoupgrade:l_noevals'] = 'Hanga ammaatti madaalliin hin jiru.';
+$string['autoupgrade:l_colwhen'] = 'Yoom';
+$string['autoupgrade:l_colrole'] = 'Gahee';
+$string['autoupgrade:l_colcandidate'] = 'Kaadhimamaa';
+$string['autoupgrade:l_colincumbent'] = 'Moodeela ammaa';
+$string['autoupgrade:l_colcost'] = 'Baasii / tilmaama';
+$string['autoupgrade:l_colgate'] = 'Sakatta\'iinsa daangaa';
+$string['autoupgrade:l_switchesheading'] = 'Jijjiiramootaa fi deebisuu';
+$string['autoupgrade:l_noswitches'] = 'Hanga ammaatti jijjiiramni hin jiru.';
+$string['autoupgrade:l_colfrom'] = 'Irraa';
+$string['autoupgrade:l_colto'] = 'Gara';
+$string['autoupgrade:l_colmode'] = 'Akkamitti';
+$string['autoupgrade:l_colreason'] = 'Sababa';
+$string['autoupgrade:l_coluntil'] = 'Hanga yoomiitti hordofama';
+$string['autoupgrade:l_rollback'] = 'Deebisi';
+$string['autoupgrade:l_rollbackconfirm'] = 'Moodeela duraanii amma deebisuu?';
+$string['autoupgrade:l_manage'] = 'Odeeffannoo baratame fuula galmee moodeelaa irratti ilaali ykn haqi';
+$string['autoupgrade:l_notinuse'] = 'hojii irra hin jiru';
+$string['autoupgrade:mode_off'] = 'Cufaa: wanti ofumaan hojjetamu hin jiru';
+$string['autoupgrade:mode_recommend'] = 'Gorsa: kaadhimamtoota qoradhu fi gorsa imeeliin ergi';
+$string['autoupgrade:mode_auto'] = 'Ofumaan: kaadhimamtoota qoradhu fi yoo tokko darbe jijjiiri';
+$string['autoupgrade:budget_line'] = 'Ji\'a kana ${$a->limit} keessaa ${$a->spent} bahe (${$a->left} hafe)';
+$string['autoupgrade:last_discovery'] = 'Barbaachi dhumarratti {$a} hojjete.';
+$string['autoupgrade:never_discovered'] = 'Barbaachi hanga ammaatti hin hojjenne.';
+$string['autoupgrade:role_chat'] = 'Haasawa (moodeela ijoo)';
+$string['autoupgrade:role_premium'] = 'Sadarkaa piriimiyemii';
+$string['autoupgrade:role_failover'] = 'Moodeela bakka bu\'aa';
+$string['autoupgrade:role_quiz'] = 'Uumama qormaata gabaabaa';
+$string['autoupgrade:role_classifier'] = 'Ramaddii dandeettii';
+$string['autoupgrade:role_safety'] = 'Wabii nageenyaa';
+$string['autoupgrade:role_soapbox'] = 'Qabxii Soapbox';
+$string['autoupgrade:not_configured'] = 'Hin qindoofne (moodeela haasawaa dhaala)';
+$string['autoupgrade:policy_auto'] = 'Ni madaalama, akaakuu Ofumaan keessatti immoo ofumaan jijjiirama';
+$string['autoupgrade:policy_recommend'] = 'Ni madaalama, ni gorfama; bulchaan jijjiira';
+$string['autoupgrade:policy_none'] = 'Kaadhimamtoota qofa tarreessa: madaallii hojii gahee kanaa safaru hin jiru';
+$string['autoupgrade:cand_candidate'] = 'Kaadhimamaa';
+$string['autoupgrade:cand_passed'] = 'Yeroo tokko darbe';
+$string['autoupgrade:cand_eligible'] = 'Ulaagaa guuta';
+$string['autoupgrade:cand_failed'] = 'Hin dabarre';
+$string['autoupgrade:cand_switched'] = 'Hojii irra jira';
+$string['autoupgrade:cand_rolledback'] = 'Deebifame';
+$string['autoupgrade:cand_retired'] = 'Amma tarree keessa hin jiru';
+$string['autoupgrade:eval_queued'] = 'Tarree keessa';
+$string['autoupgrade:eval_running'] = 'Hojjechaa jira';
+$string['autoupgrade:eval_complete'] = 'Xumurame';
+$string['autoupgrade:eval_failed'] = 'Hin milkoofne';
+$string['autoupgrade:eval_skipped'] = 'Hin hojjenne';
+$string['autoupgrade:gate_pass'] = 'Darbe:';
+$string['autoupgrade:gate_fail'] = 'Hin dabarre:';
+$string['autoupgrade:how_auto'] = 'Ofumaan';
+$string['autoupgrade:how_manual'] = 'Bulchaa tokkoon';
+$string['autoupgrade:switch_watching'] = 'Hordofamaa jira';
+$string['autoupgrade:switch_kept'] = 'Eegame';
+$string['autoupgrade:switch_rolledback'] = 'Deebifame';
+$string['autoupgrade:switch_superseded'] = 'Booda bulchaa tokkoon jijjiirame';
+$string['autoupgrade:block_role'] = 'Gaheen kun asii jijjiiramuu hin danda\'u.';
+$string['autoupgrade:block_emergency'] = 'To\'annoon ariifachiisaa hojii irra jira, kanaafuu hanga deebi\'utti moodeelli tokkollee hin jijjiiramu.';
+$string['autoupgrade:block_allowlist'] = 'Qindaa\'inni {$a} nama malee jijjiiramaan jijjiiramuu hin danda\'u, kanaafuu gaheen kun harkaan jijjiirama.';
+$string['autoupgrade:block_bundle'] = 'Qindaa\'inni {$a} paakeejii imaammataa mallattaa\'een bulfama. Moodeela paakeejii keessatti jijjiiri.';
+$string['autoupgrade:block_watching'] = 'Jijjiiramni gahee kanaa ammallee hordofamaa jira. Hanga eegamu ykn deebifamutti eegi.';
+$string['autoupgrade:block_noeval'] = 'Kaadhimamaan kun madaallii xumurame hin qabu.';
+$string['autoupgrade:block_gate'] = 'Madaalliin dhumaa kaadhimamaa kanaa daangaa hin dabarre.';
+$string['autoupgrade:block_changed'] = 'Moodeelli gahee kanaa madaallii booda jijjiirame, kanaafuu lamaan sirrii hin wal bira qabu. Irra deebi\'ii madaali.';
+$string['autoupgrade:switched'] = '{$a->role} gara {$a->model}tti jijjiirame. Sa\'aatii 48 hordofama.';
+$string['autoupgrade:rolledback'] = 'Jijjiiramni {$a} deebifame.';
+$string['autoupgrade:rollback_missing'] = 'Jijjiiramni sun deebifamuu hin danda\'u.';
+$string['autoupgrade:rollback_superseded'] = 'Qindaa\'inni jijjiiramaan booda jijjiirame, kanaafuu wanti deebifame hin jiru.';
+$string['autoupgrade:rollback_by_admin'] = 'Bulchaa tokkoon deebifame.';
+$string['autoupgrade:queued'] = 'Madaalliin tarree keessa galeera. Marsaa cron itti aanu irratti hojjeta, daqiiqaa muraasa fudhata.';
+$string['autoupgrade:discovered'] = 'Barbaachi dhiyeessitoota {$a->providers} tarreesse, moodeelota {$a->registered} galmeesse, kaadhimamtoota {$a->candidates} mallatteesse. Dhiyeessitoota tarreeffamuu hin dandeenye: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Gaheen kun ofumaan hin jijjiiramu.';
+$string['autoupgrade:why_recommend_mode'] = 'Fooyya\'iinsi moodeelaa ofumaan akaakuu Gorsa keessa jira.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} gara {$a->to}tti jijjiirame';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] gahee {$a->role} {$a->from} irraa gara {$a->to}tti jijjiire.
+
+Sakatta\'iinsa hunda moodeela ammaa wajjin, hojii tokko keessatti safarame, yeroo lama walitti aansuun dabarse:
+{$a->gate}
+
+Moodeelli haaraan daldala dhugaa irratti sa\'aatii {$a->hours} hordofama, yoo dogoggorri, deebiin cite, didiinsi ykn baasiin deebii tokkoo hammaate ofumaan deebifama. Yeroo barbaaddanitti ofii keessaniin deebisuu dandeessu:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} gara {$a->from}tti deebifame';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] gahee {$a->role} {$a->to} irraa gara {$a->from}tti deebise.
+
+Sababa: {$a->reason}
+
+Kaadhimamaan kun guyyaa 30f irra deebi\'ee hin yaalamu. Bal\'ina:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Jijjiiramni {$a->role} gara {$a->to} eegame';
+$string['autoupgrade:mail_kept_body'] = 'Jijjiiramni gahee {$a->role} {$a->from} irraa gara {$a->to} sa\'aatii {$a->hours} deebii dhugaa {$a->turns} irratti tasgabbaa\'ee jira, ni eegama.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Jijjiiramni gahee {$a->role} {$a->from} irraa gara {$a->to} sa\'aatii {$a->hours} booda eegama, garuu deebiin dhugaa {$a->turns} qofatu mul\'ate, murteessuuf baay\'ee xiqqaa. Hordofuu itti fufaa.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Gorfame: {$a->role} irratti {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} gahee {$a->role}f sakatta\'iinsa hunda {$a->current} wajjin yeroo lama walitti aansuun dabarse, garuu ofumaan hin jijjiiramne: {$a->why}
+
+{$a->gate}
+
+Asitti jijjiiri, ykn akkuma jirutti dhiisi:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Teessoon keessan fudhataa akeekkachiisa baasii [[tutorshort]] waan ta\'eef kana argattu.';
+$string['event:model_switched'] = 'Moodeelli jijjiirame';
+$string['event:model_switch_rolled_back'] = 'Jijjiiramni moodeelaa deebifame';
+$string['task:discover_models'] = 'Moodeelota AI haaraa barbaadi fi madaalliiwwan tarree keessa galchi';
+$string['task:evaluate_model_candidate'] = 'Moodeela AI kaadhimamaa madaali';
+$string['task:watch_model_switches'] = 'Jijjiiramoota moodeela AI dhihoo hordofi';
+$string['settings:autoupgrade_heading'] = 'Fooyya\'iinsa moodeelaa ofumaan';
+$string['settings:autoupgrade_heading_desc'] = 'Guyyaa guyyaan [[tutorshort]] moodeelota dhiyeessitoonni keessan dhiyeessan tarreessa, gahee tokkoon tokkoof kaadhimamtoota mallattessa: dhiyeessaa walfakkaataa, gatii tarree walmadaalu, fi gatii beekamu. Isaan moodeela ammaa wajjin ajajawwan barsiisaa, qormaata jailbreak fi baasii fayyadama dhugaa fakkaatu irratti qorata, kan durtii saayitii jijjiiru yoo kaadhimamaan deebii tokkoof gatii walqixa ykn rakasaa ta\'e, akkasuma gaarii, nageenya qabeessa fi amansiisaa ta\'e yeroo lama walitti aansuun qofa. Koorsiiwwan moodeela mataa isaanii qaban sanuma eeggatu. Jijjiiramni hundi fudhattoota akeekkachiisa baasiitiif imeeliin ergama, sa\'aatii 48 hordofama.';
+$string['settings:autoupgrade_mode'] = 'Akaakuu';
+$string['settings:autoupgrade_mode_desc'] = 'Ofumaan yoo kaadhimamaan darbe jijjiira. Gorsi kaadhimamtoota qorata, bakka sanaa gorsa imeeliin erga. Cufaan wanta tokkollee ofumaan hin hojjetu.';
+$string['settings:autoupgrade_budget_usd'] = 'Baajata qormaataa ji\'aa (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Baay\'ina madaalliiwwan ofumaan ji\'a kaalaandarii tokko keessatti baasuu danda\'an, madaalaa dabalatee. Madaalliin ji\'icha daangaa kana ol baasuu danda\'u hin jalqabu.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID koorsii madaallii';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Madaalliiwwan ajaja sirnaa koorsiin kun dhugaan itti fayyadamu jalatti deebisu, eenyummaa keessummaatiif ijaarame, kanaafuu odeeffannoon barataa kamiyyuu hin ergamu. 0 koorsii guyyoota 30 darban keessatti deebii haasawaa baay\'ee qabu fila.';
+$string['privacy:metadata:model_eval'] = 'Madaallii moodeelaa ofumaan: moodeelli kaadhimamaa kam moodeela ammaa kam wajjin akka wal bira qabame, fi bu\'aa safarame. Odeeffannoon dhuunfaa qofti eenyummeessaa bulchaa madaallii gaafatee ti. Tarreewwan kun qindaa\'ina saayitii malee odeeffannoo dhuunfaa barataa waa\'ee hin taane, kanaafuu baasii odeeffannoo keessatti hin hammataman, yeroo fayyadamaan haquu gaafatus hin haqaman.';
+$string['privacy:metadata:model_eval:createdby'] = 'Bulchaa saayitii madaallii kana gaafate. Yoo barbaachi tarree keessa galche duwwaa dha.';
+$string['privacy:metadata:model_switch'] = 'Jijjiiramootaa fi deebisuu moodeelaa: gaheen tokko moodeela kam irraa gara kamitti akka darbe, fi maaliif. Odeeffannoon dhuunfaa qofti eenyummeessaa bulchaa jijjiirama raawwatee ykn deebisee ti. Tarreewwan kun qindaa\'ina saayitii malee odeeffannoo dhuunfaa barataa waa\'ee hin taane, kanaafuu baasii odeeffannoo keessatti hin hammataman, yeroo fayyadamaan haquu gaafatus hin haqaman.';
+$string['privacy:metadata:model_switch:createdby'] = 'Bulchaa saayitii jijjiirama kana raawwate. Yoo ofumaan ta\'e duwwaa dha.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Bulchaa saayitii jijjiirama kana deebise. Yoo hordofaan deebise, ykn hin deebifamne duwwaa dha.';
+
+$string['autoupgrade:block_reasoning'] = 'Carraaqqiin yaadaa qindaa\'ina tokko marsariitii guutuuf ta\'e dha, akkasumas gaheen {$a} moodeela yaadu sadarkaa haaraa irratti hin qoratamne hojjechiisa. Kana yoo barbaadde harkaan jijjiiri.';
+$string['autoupgrade:block_reasoning_course'] = 'Carraaqqiin yaadaa qindaa\'ina tokko marsariitii guutuuf, koorsiin tokko moodeela yaadaa ofii isaa ({$a}) sadarkaa haaraatti hin qoramne fayyadama. Yoo kana barbaaddan harkaan jijjiiraa.';

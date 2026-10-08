@@ -3189,3 +3189,166 @@ $string['survey_admin:err_invalid_bounds'] = 'Jateminɛ ɲininkaliw ka kan ka ba
 $string['survey_admin:err_no_title'] = 'Ɲininkali tɔgɔ sɛbɛn.';
 
 $string['settings:int_range'] = 'Jateden dafalen sɛbɛn ka bɔ {$a->min} la ka se {$a->max} ma.';
+
+$string['cachedef_modelcaps'] = 'Modɛli sebaayaw minnu dɔnna jiralikɛlaw ka banni fɛ';
+$string['settings:reasoning_effort'] = 'Miiriya cɛsiri';
+$string['settings:reasoning_effort_desc'] = 'Modɛli minnu bɛ miiri sani u ka jaabi di, olu bɛ ɲini u ka miiri cogo min na. A bɛ baara OpenAI miiriya modɛliw kan (GPT-5, GPT-6, o-sɛri) i n\'a fɔ <code>reasoning_effort</code>, ani Gemini miiriya modɛliw kan i n\'a fɔ miiriya wari hakɛ. Miiriya modɛli bɛɛ bɛ yɔrɔ sɔrɔ a ka miiriya kama ka fara jaabi janya kan san fɛ, o la miiriya tɛ se ka jaabi tigɛ tugun. Dɔgɔman bɛnnen don karamɔgɔ ma: jaabiw bɛ na joona ani u sɔngɔ ka dɔgɔ. Datugulen bɛ miiriya bɔ yɔrɔ minnu na modɛli b\'a to. Modɛli minnu tɛ miiriya ɲɛminɛcogo sɔrɔ, olu tɛ nin labɛn jate.';
+$string['settings:reasoning_effort_off'] = 'Datugulen (a dɔgɔya bɛɛ la modɛli b\'a to cogo min na)';
+$string['settings:reasoning_effort_low'] = 'Dɔgɔman (laadilen)';
+$string['settings:reasoning_effort_medium'] = 'Cɛmancɛ';
+$string['settings:reasoning_effort_high'] = 'Kɔrɔtalen';
+$string['modelregistry:learned_heading'] = 'Sebaaya kunnafoniw minnu dɔnna jiralikɛlaw fɛ';
+$string['modelregistry:learned_desc'] = 'Ni jiralikɛla ye ɲinini ban bawo modɛli tɛ paramɛtiri dɔ minɛ tugun, [[tutorshort]] bɛ o paramɛtiri kelen dɔrɔn yɛlɛma, ka segin ka kɛ siɲɛ kelen, ka o labɛncogo mara yan walisa ɲinini nata ka ɲɛ a fɔlɔ la. Kunnafoni dɔ ɲinɛ walisa ka modɛli segin sariya donnenw ma.';
+$string['modelregistry:learned_none'] = 'Jiralikɛla si ma ɲinini cogoya ban fɔlɔ.';
+$string['modelregistry:col_field'] = 'Sebaaya';
+$string['modelregistry:col_value'] = 'Hakɛ dɔnnen';
+$string['modelregistry:col_evidence'] = 'Jiralikɛla ye min fɔ';
+$string['modelregistry:forget'] = 'Ɲinɛ';
+$string['modelregistry:forget_confirm'] = 'I b\'a fɛ ka nin kunnafoni ɲinɛ wa? Ɲinini nata min bɛ ci nin modɛli ma, o bɛna sariya donnenw kɛ tugun.';
+$string['modelregistry:forget_done'] = 'Kunnafoni ɲinɛna. Ɲinini nata min bɛ ci nin modɛli ma, o bɛ sariya donnenw kɛ.';
+$string['modelregistry:forget_missing'] = 'O kunnafoni tɛ yen tugun.';
+$string['event:model_capability_learned'] = 'Modɛli sebaaya dɔnna jiralikɛla fɛ';
+
+$string['autoupgrade:title'] = 'Modeliw yiriwali';
+$string['autoupgrade:navtitle'] = '[[tutorshort]] modeliw yiriwali';
+$string['autoupgrade:intro'] = '[[tutorshort]] bɛ modeli kuraw ɲini a bɛ baara kɛ ni baarakɛla minnu ye, a bɛ sugandita kelen-kelen bɛɛ lajɛ ni modeli ye min nɔ na a bɛna don (ɲininkali kelenw, jaabi musaka kelen, kiritigɛla kelen, baara kelen kɔnɔ), a tɛ yɛlɛma kɛ fo sugandita sɔngɔ ka kan walima a ka nɔgɔn jaabi kelen-kelen na, a ka ɲi, a lakananen don ani a bɛ se ka da a kan, siɲɛ fila tugunni. Yɛlɛma bɛɛ bɛ lajɛ lɛrɛ 48 kɔnɔ baara yɛrɛ kan ani a bɛ kɔsegin ni a jugura.';
+$string['autoupgrade:l_statusheading'] = 'Cogoya';
+$string['autoupgrade:l_mode'] = 'Baarakɛcogo';
+$string['autoupgrade:l_budget'] = 'Kɔrɔbɔli musaka';
+$string['autoupgrade:l_changemode'] = 'A yɛlɛma';
+$string['autoupgrade:l_discover'] = 'Modeliw ɲini sisan';
+$string['autoupgrade:l_rolesheading'] = 'Baaraw';
+$string['autoupgrade:l_current'] = 'Modeli min bɛ baara la';
+$string['autoupgrade:l_profile'] = 'Se cogoya';
+$string['autoupgrade:l_policy'] = 'Yiriwaliw';
+$string['autoupgrade:l_nocandidates'] = 'Sugandita si tɛ yen. Ɲinini bɛ baarakɛla kelen ka modeliw taamasiyɛn minnu sɔngɔ bɛ bɛn.';
+$string['autoupgrade:l_colpasses'] = 'Tɛmɛniw';
+$string['autoupgrade:l_collast'] = 'Lajɛli laban';
+$string['autoupgrade:l_evaluate'] = 'A lajɛ sisan';
+$string['autoupgrade:l_evaluating'] = 'A bɛ makɔnɔni na walima a bɛ taa';
+$string['autoupgrade:l_switch'] = 'Yɛlɛma';
+$string['autoupgrade:l_switchconfirm'] = 'Nin baara modeli yɛlɛma ka kɛ sugandita ye sisan wa? Yɛlɛma bɛ lajɛ lɛrɛ 48 kɔnɔ ani a bɛ se ka kɔsegin.';
+$string['autoupgrade:l_evalsheading'] = 'Lajɛliw';
+$string['autoupgrade:l_noevals'] = 'Lajɛli si ma kɛ fɔlɔ.';
+$string['autoupgrade:l_colwhen'] = 'Waati';
+$string['autoupgrade:l_colrole'] = 'Baara';
+$string['autoupgrade:l_colcandidate'] = 'Sugandita';
+$string['autoupgrade:l_colincumbent'] = 'Modeli min bɛ baara la';
+$string['autoupgrade:l_colcost'] = 'Musaka kɛlen / jateminɛ';
+$string['autoupgrade:l_colgate'] = 'Sɛgɛsɛgɛliw';
+$string['autoupgrade:l_switchesheading'] = 'Yɛlɛmaw ani kɔseginw';
+$string['autoupgrade:l_noswitches'] = 'Yɛlɛma si ma kɛ fɔlɔ.';
+$string['autoupgrade:l_colfrom'] = 'Ka bɔ';
+$string['autoupgrade:l_colto'] = 'Ka taa';
+$string['autoupgrade:l_colmode'] = 'Cogo';
+$string['autoupgrade:l_colreason'] = 'Kun';
+$string['autoupgrade:l_coluntil'] = 'Lajɛli bɛ ban';
+$string['autoupgrade:l_rollback'] = 'Kɔsegin';
+$string['autoupgrade:l_rollbackconfirm'] = 'Modeli kɔrɔ segin a nɔ na sisan wa?';
+$string['autoupgrade:l_manage'] = 'Ko dɔnnenw lajɛ walima u jɔsi modeliw sɛbɛn ɲɛ kan';
+$string['autoupgrade:l_notinuse'] = 'a tɛ baara la';
+$string['autoupgrade:mode_off'] = 'A datugulen: foyi tɛ kɛ a yɛrɛ ma';
+$string['autoupgrade:mode_recommend'] = 'Laadili: sugandita kɔrɔbɔ ani laadili ci email fɛ';
+$string['autoupgrade:mode_auto'] = 'A yɛrɛ ma: sugandita kɔrɔbɔ ani yɛlɛma kɛ ni kelen tɛmɛna';
+$string['autoupgrade:budget_line'] = '${$a->spent} musaka kɛra ${$a->limit} la nin kalo in na (${$a->left} tolen)';
+$string['autoupgrade:last_discovery'] = 'Ɲinini laban kɛra {$a}.';
+$string['autoupgrade:never_discovered'] = 'Ɲinini ma kɛ fɔlɔ.';
+$string['autoupgrade:role_chat'] = 'Baro (modeli fɔlɔ)';
+$string['autoupgrade:role_premium'] = 'Hakɛ ɲuman';
+$string['autoupgrade:role_failover'] = 'Nɔnabila';
+$string['autoupgrade:role_quiz'] = 'Ɲininkaliw dilanni';
+$string['autoupgrade:role_classifier'] = 'Dɔnniya hakɛ sugandibaga';
+$string['autoupgrade:role_safety'] = 'Lakana sumanikɛlan';
+$string['autoupgrade:role_soapbox'] = 'Soapbox jatebɔ';
+$string['autoupgrade:not_configured'] = 'A ma labɛn (a bɛ baro modeli ta)';
+$string['autoupgrade:policy_auto'] = 'A lajɛra, ani a bɛ yɛlɛma a yɛrɛ ma A yɛrɛ ma cogo la';
+$string['autoupgrade:policy_recommend'] = 'A lajɛra ani a laadira; ɲɛmɔgɔ de bɛ a yɛlɛma';
+$string['autoupgrade:policy_none'] = 'Sugandita dɔrɔn de sɛbɛnna: kɔrɔbɔli si tɛ nin baara sumanni kɛ';
+$string['autoupgrade:cand_candidate'] = 'Sugandita';
+$string['autoupgrade:cand_passed'] = 'A tɛmɛna siɲɛ kelen';
+$string['autoupgrade:cand_eligible'] = 'A bɛnnen don';
+$string['autoupgrade:cand_failed'] = 'A ma tɛmɛ';
+$string['autoupgrade:cand_switched'] = 'A bɛ baara la';
+$string['autoupgrade:cand_rolledback'] = 'A kɔseginna';
+$string['autoupgrade:cand_retired'] = 'A tɛ sɛbɛnni kɔnɔ tun';
+$string['autoupgrade:eval_queued'] = 'A bɛ makɔnɔni na';
+$string['autoupgrade:eval_running'] = 'A bɛ taa';
+$string['autoupgrade:eval_complete'] = 'A banna';
+$string['autoupgrade:eval_failed'] = 'A ma ɲɛ';
+$string['autoupgrade:eval_skipped'] = 'A ma kɛ';
+$string['autoupgrade:gate_pass'] = 'A tɛmɛna:';
+$string['autoupgrade:gate_fail'] = 'A ma tɛmɛ:';
+$string['autoupgrade:how_auto'] = 'A yɛrɛ ma';
+$string['autoupgrade:how_manual'] = 'Ɲɛmɔgɔ fɛ';
+$string['autoupgrade:switch_watching'] = 'A bɛ lajɛ';
+$string['autoupgrade:switch_kept'] = 'A marala';
+$string['autoupgrade:switch_rolledback'] = 'A kɔseginna';
+$string['autoupgrade:switch_superseded'] = 'Ɲɛmɔgɔ y\'a yɛlɛma kɔfɛ';
+$string['autoupgrade:block_role'] = 'Nin baara tɛ se ka yɛlɛma ka bɔ yan.';
+$string['autoupgrade:block_emergency'] = 'Kɔnɔnafili kunnafoni bɛ baara la, o la modeli si tɛ yɛlɛma fo a ka segin.';
+$string['autoupgrade:block_allowlist'] = 'Labɛnni {$a} tɛ yɛlɛma min bɛ se ka kɛ mɔgɔ kɔ, o la nin baara bɛ yɛlɛma bolo la.';
+$string['autoupgrade:block_bundle'] = 'Labɛnni {$a} bɛ ɲɛminɛ sariya kulu bolonɔnlen fɛ. Modeli yɛlɛma kulu kɔnɔ o nɔ na.';
+$string['autoupgrade:block_watching'] = 'Nin baara yɛlɛma dɔ bɛ lajɛ hali bi. A makɔnɔ fo a ka mara walima a ka kɔsegin.';
+$string['autoupgrade:block_noeval'] = 'Nin sugandita lajɛli si ma ban.';
+$string['autoupgrade:block_gate'] = 'Nin sugandita lajɛli laban ma sɛgɛsɛgɛli tɛmɛ.';
+$string['autoupgrade:block_changed'] = 'Baara modeli yɛlɛmana lajɛli kɔfɛ, o la a tɛ fila ɲumanw sanga tun. A lajɛ kokura.';
+$string['autoupgrade:switched'] = '{$a->role} yɛlɛmana ka kɛ {$a->model} ye. A bɛ lajɛ lɛrɛ 48 kɔnɔ.';
+$string['autoupgrade:rolledback'] = '{$a} yɛlɛma kɔseginna.';
+$string['autoupgrade:rollback_missing'] = 'O yɛlɛma tɛ se ka kɔsegin.';
+$string['autoupgrade:rollback_superseded'] = 'Labɛnniw yɛlɛmana yɛlɛma kɔfɛ, o la foyi ma kɔsegin.';
+$string['autoupgrade:rollback_by_admin'] = 'Ɲɛmɔgɔ y\'a kɔsegin.';
+$string['autoupgrade:queued'] = 'Lajɛli bilara makɔnɔni na. A bɛna kɛ cron taama nata la ani a bɛ miniti caman ta.';
+$string['autoupgrade:discovered'] = 'Ɲinini ye baarakɛla {$a->providers} sɛbɛn, ka modeli {$a->registered} sɛbɛn ani ka sugandita {$a->candidates} taamasiyɛn. Baarakɛla minnu ma se ka sɛbɛn: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Nin baara tɛ yɛlɛma a yɛrɛ ma.';
+$string['autoupgrade:why_recommend_mode'] = 'Modeliw yiriwali a yɛrɛ ma bɛ Laadili cogo la.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} yɛlɛmana ka kɛ {$a->to} ye';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] ye {$a->role} baara yɛlɛma ka bɔ {$a->from} la ka taa {$a->to} la.
+
+A ye sɛgɛsɛgɛli bɛɛ tɛmɛ ni modeli ye min bɛ baara la, baara kelen kɔnɔ, siɲɛ fila tugunni:
+{$a->gate}
+
+Modeli kura bɛ lajɛ baara yɛrɛ kan lɛrɛ {$a->hours} kɔnɔ ani a bɛ kɔsegin a yɛrɛ ma ni filiw, jaabi tigɛlenw, banniw walima jaabi musaka jugura. I yɛrɛ bɛ se k\'a kɔsegin waati o waati:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} kɔseginna {$a->from} ma';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] ye {$a->role} baara kɔsegin ka bɔ {$a->to} la ka segin {$a->from} ma.
+
+Mun na: {$a->reason}
+
+Sugandita tɛna kɔrɔbɔ tugun tile 30 kɔnɔ. Kunnafoni wɛrɛw:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] {$a->role} yɛlɛma ka taa {$a->to} la marala';
+$string['autoupgrade:mail_kept_body'] = '{$a->role} baara yɛlɛma ka bɔ {$a->from} la ka taa {$a->to} la jɔra lɛrɛ {$a->hours} kɔnɔ jaabi yɛrɛ {$a->turns} kan ani a marala.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = '{$a->role} baara yɛlɛma ka bɔ {$a->from} la ka taa {$a->to} la marala lɛrɛ {$a->hours} kɔfɛ, nka jaabi yɛrɛ {$a->turns} dɔrɔn de yera, u ma ca kosɛbɛ ka kiri tigɛ. I ɲɛ to a kan.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Laadili: {$a->role} {$a->model} kan';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} ye sɛgɛsɛgɛli bɛɛ tɛmɛ ni {$a->current} ye {$a->role} baara kama, siɲɛ fila tugunni, ani a ma yɛlɛma a yɛrɛ ma: {$a->why}
+
+{$a->gate}
+
+A yɛlɛma, walima a to, yan:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'I bɛ nin sɔrɔ bawo i ka adɛrɛsi ye [[tutorshort]] musaka lasɔmini sɔrɔbaga dɔ ye.';
+$string['event:model_switched'] = 'Modeli yɛlɛmana';
+$string['event:model_switch_rolled_back'] = 'Modeli yɛlɛma kɔseginna';
+$string['task:discover_models'] = 'AI modeli kuraw ɲini ani lajɛliw bila makɔnɔni na';
+$string['task:evaluate_model_candidate'] = 'AI modeli sugandita dɔ lajɛ';
+$string['task:watch_model_switches'] = 'AI modeli yɛlɛma kuraw lajɛ';
+$string['settings:autoupgrade_heading'] = 'Modeliw yiriwali a yɛrɛ ma';
+$string['settings:autoupgrade_heading_desc'] = 'Don o don [[tutorshort]] bɛ i ka baarakɛlaw ka modeliw sɛbɛn ani ka sugandita taamasiyɛn baara kelen-kelen bɛɛ kama: baarakɛla kelen, sɔngɔ bɛnnen, ani sɔngɔ dɔnnen. A bɛ u kɔrɔbɔ ni modeli ye min bɛ baara la karamɔgɔ ɲininkaliw kan, jailbreak kɔrɔbɔliw kan ani musaka min bɛ i ko baara yɛrɛ, ani a tɛ siti modeli yɛlɛma fo sugandita sɔngɔ ka kan walima a ka nɔgɔn jaabi kelen-kelen na, a ka ɲi, a lakananen don ani a bɛ se ka da a kan, siɲɛ fila tugunni. Kalan minnu ni u yɛrɛ ka modeli ye, olu b\'a mara. Yɛlɛma bɛɛ bɛ ci email fɛ musaka lasɔmini sɔrɔbagaw ma ani a bɛ lajɛ lɛrɛ 48 kɔnɔ.';
+$string['settings:autoupgrade_mode'] = 'Baarakɛcogo';
+$string['settings:autoupgrade_mode_desc'] = 'A yɛrɛ ma bɛ yɛlɛma kɛ ni sugandita tɛmɛna. Laadili bɛ sugandita kɔrɔbɔ ani ka laadili ci email fɛ o nɔ na. A datugulen tɛ foyi kɛ a yɛrɛ ma.';
+$string['settings:autoupgrade_budget_usd'] = 'Kalo kɔrɔbɔli musaka (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Wari hakɛ min ka bon ni lajɛli a yɛrɛ ma bɛ se k\'a musaka kalo kelen kɔnɔ, kiritigɛla fana. Lajɛli min bɛ se ka kalo musaka tɛmɛ nin kan, o tɛ daminɛ.';
+$string['settings:autoupgrade_eval_courseid'] = 'Lajɛli kalan ID';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Lajɛliw bɛ jaabi di ni sisitɛmu ɲininkali ye nin kalan bɛ baara kɛ ni min ye tiɲɛ na, a dilannen don dunan tɔgɔ kama walisa kalanden si ka kunnafoniw kana ci. 0 bɛ kalan sugandi min ye baro jaabi caman sɔrɔ tile 30 laban kɔnɔ.';
+$string['privacy:metadata:model_eval'] = 'Modeliw lajɛli a yɛrɛ ma: sugandita modeli min sanga ni modeli ye min bɛ baara la, ani jaabi sumanen. Mɔgɔ yɛrɛ kunnafoni kelen min bɛ yen, o ye ɲɛmɔgɔ taamasiyɛn ye min ye lajɛli ɲini. Nin layiniw ye siti labɛnni ye, u tɛ kalanden ka kunnafoni yɛrɛw ye, o la u tɛ don kunnafoniw labɔli la ani u tɛ jɔsi ni baarakɛla ye a ɲini ko a ka kunnafoniw ka jɔsi.';
+$string['privacy:metadata:model_eval:createdby'] = 'Siti ɲɛmɔgɔ min ye nin lajɛli ɲini. A lankolon don ni ɲinini de y\'a bila makɔnɔni na.';
+$string['privacy:metadata:model_switch'] = 'Modeli yɛlɛmaw ani kɔseginw: baara bɔra modeli min na ani a taara min na, ani mun na. Mɔgɔ yɛrɛ kunnafoni kelen min bɛ yen, o ye ɲɛmɔgɔ taamasiyɛn ye min ye yɛlɛma kɛ walima k\'a kɔsegin. Nin layiniw ye siti labɛnni ye, u tɛ kalanden ka kunnafoni yɛrɛw ye, o la u tɛ don kunnafoniw labɔli la ani u tɛ jɔsi ni baarakɛla ye a ɲini ko a ka kunnafoniw ka jɔsi.';
+$string['privacy:metadata:model_switch:createdby'] = 'Siti ɲɛmɔgɔ min ye nin yɛlɛma kɛ. A lankolon don ni a kɛra a yɛrɛ ma.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Siti ɲɛmɔgɔ min ye nin yɛlɛma kɔsegin. A lankolon don ni lajɛbaga de y\'a kɛ, walima ni a ma kɔsegin.';
+
+$string['autoupgrade:block_reasoning'] = 'Miiriya cɛsiri ye labɛn kelen ye siti bɛɛ ye, ani {$a} jɔyɔrɔ fana bɛ miiri modɛli dɔ baara, o ma kɔrɔbɔ dakun kura la. A falen i yɛrɛ ma ni o ye i sago ye.';
+$string['autoupgrade:block_reasoning_course'] = 'Hakilijakabɔ sabali ye labɛn kelen ye siti bɛɛ kama, kalan dɔ bɛ a yɛrɛ ka miiri modɛli ({$a}) baara min ma kɔrɔbɔ dakun kura la. A falen i yɛrɛ bolo ni o ye i sago ye.';

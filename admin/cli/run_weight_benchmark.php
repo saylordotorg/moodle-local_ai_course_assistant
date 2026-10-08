@@ -84,7 +84,7 @@ $candidates = [
     'balanced_20_20_30_30'         => ['safety_identity' => 20, 'course_structure' => 20, 'course_content' => 30, 'current_page' => 30],
 ];
 
-$promptsfile = __DIR__ . '/../../tests/golden/tutor_prompts.json';
+$promptsfile = __DIR__ . '/../../fixtures/golden/tutor_prompts.json';
 $raw = file_get_contents($promptsfile);
 if ($raw === false) {
     fwrite(STDERR, "ERROR: cannot read $promptsfile\n");

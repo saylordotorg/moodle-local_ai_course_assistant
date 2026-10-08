@@ -3188,3 +3188,166 @@ $string['survey_admin:err_invalid_bounds'] = 'रेटिंग प्रश्
 $string['survey_admin:err_no_title'] = 'सर्वेक्षण का शीर्षक दर्ज करें।';
 
 $string['settings:int_range'] = '{$a->min} से {$a->max} तक की एक पूर्ण संख्या दर्ज करें।';
+
+$string['cachedef_modelcaps'] = 'प्रदाताओं की अस्वीकृतियों से सीखे गए मॉडल क्षमता तथ्य';
+$string['settings:reasoning_effort'] = 'तर्क प्रयास';
+$string['settings:reasoning_effort_desc'] = 'उत्तर देने से पहले तर्क करने वाले मॉडलों से कितना सोचने को कहा जाए। यह OpenAI के तर्क मॉडलों (GPT-5, GPT-6, o-श्रृंखला) पर <code>reasoning_effort</code> के रूप में और Gemini के थिंकिंग मॉडलों पर सोचने के बजट के रूप में लागू होता है। हर तर्क मॉडल को ऊपर दी गई उत्तर लंबाई के अलावा सोचने के लिए अतिरिक्त जगह भी मिलती है, इसलिए सोचना अब किसी उत्तर को अधूरा नहीं छोड़ सकता। ट्यूटर के लिए निम्न उपयुक्त है: उत्तर जल्दी आते हैं और लागत कम होती है। बंद, जहाँ मॉडल अनुमति देता है, सोचना बंद कर देता है। जिन मॉडलों में तर्क नियंत्रण नहीं है, वे इस सेटिंग को अनदेखा करते हैं।';
+$string['settings:reasoning_effort_off'] = 'बंद (जितना कम मॉडल अनुमति दे)';
+$string['settings:reasoning_effort_low'] = 'निम्न (अनुशंसित)';
+$string['settings:reasoning_effort_medium'] = 'मध्यम';
+$string['settings:reasoning_effort_high'] = 'उच्च';
+$string['modelregistry:learned_heading'] = 'प्रदाताओं से सीखे गए क्षमता तथ्य';
+$string['modelregistry:learned_desc'] = 'जब कोई प्रदाता किसी अनुरोध को इसलिए अस्वीकार करता है कि मॉडल अब कोई पैरामीटर स्वीकार नहीं करता, तो [[tutorshort]] केवल उसी पैरामीटर को बदलता है, एक बार फिर प्रयास करता है और सुधार को यहाँ याद रखता है ताकि अगला अनुरोध पहली बार में ही सही हो। मॉडल को डिफ़ॉल्ट नियमों पर वापस लाने के लिए कोई तथ्य भूल जाएँ।';
+$string['modelregistry:learned_none'] = 'अभी तक किसी प्रदाता ने किसी अनुरोध के प्रारूप को अस्वीकार नहीं किया है।';
+$string['modelregistry:col_field'] = 'क्षमता';
+$string['modelregistry:col_value'] = 'सीखा गया मान';
+$string['modelregistry:col_evidence'] = 'प्रदाता ने क्या कहा';
+$string['modelregistry:forget'] = 'भूलें';
+$string['modelregistry:forget_confirm'] = 'क्या यह तथ्य भूलना है? इस मॉडल को अगला अनुरोध फिर से डिफ़ॉल्ट नियमों का उपयोग करेगा।';
+$string['modelregistry:forget_done'] = 'तथ्य भुला दिया गया। इस मॉडल को अगला अनुरोध डिफ़ॉल्ट नियमों का उपयोग करता है।';
+$string['modelregistry:forget_missing'] = 'वह तथ्य अब मौजूद नहीं है।';
+$string['event:model_capability_learned'] = 'प्रदाता से मॉडल क्षमता सीखी गई';
+
+$string['autoupgrade:title'] = 'मॉडल अपग्रेड';
+$string['autoupgrade:navtitle'] = '[[tutorshort]] मॉडल अपग्रेड';
+$string['autoupgrade:intro'] = '[[tutorshort]] उन्हीं प्रदाताओं के नए मॉडल खोजता है जिनका वह पहले से उपयोग करता है, हर उम्मीदवार को उस मॉडल से परखता है जिसकी जगह वह लेगा (वही प्रॉम्प्ट, वही उत्तर बजट, वही मूल्यांकनकर्ता, एक ही रन में), और तभी बदलता है जब उम्मीदवार प्रति उत्तर उतना ही या कम महँगा हो, और उतना ही अच्छा, सुरक्षित और भरोसेमंद हो, लगातार दो बार। हर बदलाव पर लाइव ट्रैफ़िक में 48 घंटे नज़र रखी जाती है और स्थिति बिगड़ने पर उसे वापस ले लिया जाता है।';
+$string['autoupgrade:l_statusheading'] = 'स्थिति';
+$string['autoupgrade:l_mode'] = 'मोड';
+$string['autoupgrade:l_budget'] = 'परीक्षण बजट';
+$string['autoupgrade:l_changemode'] = 'बदलें';
+$string['autoupgrade:l_discover'] = 'अभी मॉडल खोजें';
+$string['autoupgrade:l_rolesheading'] = 'भूमिकाएँ';
+$string['autoupgrade:l_current'] = 'वर्तमान मॉडल';
+$string['autoupgrade:l_profile'] = 'क्षमता प्रोफ़ाइल';
+$string['autoupgrade:l_policy'] = 'अपग्रेड';
+$string['autoupgrade:l_nocandidates'] = 'कोई उम्मीदवार नहीं। खोज उसी प्रदाता के तुलनीय कीमत वाले मॉडलों को चिह्नित करती है।';
+$string['autoupgrade:l_colpasses'] = 'सफलताएँ';
+$string['autoupgrade:l_collast'] = 'अंतिम मूल्यांकन';
+$string['autoupgrade:l_evaluate'] = 'अभी मूल्यांकन करें';
+$string['autoupgrade:l_evaluating'] = 'कतार में या चल रहा है';
+$string['autoupgrade:l_switch'] = 'बदलें';
+$string['autoupgrade:l_switchconfirm'] = 'क्या इस भूमिका को अभी उम्मीदवार पर बदलें? बदलाव पर 48 घंटे नज़र रखी जाती है और इसे वापस लिया जा सकता है।';
+$string['autoupgrade:l_evalsheading'] = 'मूल्यांकन';
+$string['autoupgrade:l_noevals'] = 'अभी कोई मूल्यांकन नहीं।';
+$string['autoupgrade:l_colwhen'] = 'कब';
+$string['autoupgrade:l_colrole'] = 'भूमिका';
+$string['autoupgrade:l_colcandidate'] = 'उम्मीदवार';
+$string['autoupgrade:l_colincumbent'] = 'वर्तमान मॉडल';
+$string['autoupgrade:l_colcost'] = 'खर्च / अनुमान';
+$string['autoupgrade:l_colgate'] = 'पास होने की जाँचें';
+$string['autoupgrade:l_switchesheading'] = 'बदलाव और वापसी';
+$string['autoupgrade:l_noswitches'] = 'अभी कोई बदलाव नहीं।';
+$string['autoupgrade:l_colfrom'] = 'से';
+$string['autoupgrade:l_colto'] = 'तक';
+$string['autoupgrade:l_colmode'] = 'कैसे';
+$string['autoupgrade:l_colreason'] = 'कारण';
+$string['autoupgrade:l_coluntil'] = 'नज़र रखी जाएगी तब तक';
+$string['autoupgrade:l_rollback'] = 'वापस लें';
+$string['autoupgrade:l_rollbackconfirm'] = 'क्या पिछला मॉडल अभी वापस लगाएँ?';
+$string['autoupgrade:l_manage'] = 'मॉडल रजिस्ट्री पृष्ठ पर सीखे गए तथ्यों की समीक्षा करें या उन्हें भुला दें';
+$string['autoupgrade:l_notinuse'] = 'उपयोग में नहीं';
+$string['autoupgrade:mode_off'] = 'बंद: कुछ भी स्वचालित नहीं';
+$string['autoupgrade:mode_recommend'] = 'सुझाव: उम्मीदवारों का परीक्षण करें और सुझाव ईमेल करें';
+$string['autoupgrade:mode_auto'] = 'स्वचालित: उम्मीदवारों का परीक्षण करें और किसी के पास होने पर बदलें';
+$string['autoupgrade:budget_line'] = 'इस महीने ${$a->limit} में से ${$a->spent} खर्च (${$a->left} शेष)';
+$string['autoupgrade:last_discovery'] = 'खोज पिछली बार {$a} चली।';
+$string['autoupgrade:never_discovered'] = 'खोज अभी तक नहीं चली है।';
+$string['autoupgrade:role_chat'] = 'चैट (मुख्य मॉडल)';
+$string['autoupgrade:role_premium'] = 'प्रीमियम स्तर';
+$string['autoupgrade:role_failover'] = 'बैकअप मॉडल';
+$string['autoupgrade:role_quiz'] = 'क्विज़ निर्माण';
+$string['autoupgrade:role_classifier'] = 'दक्षता वर्गीकारक';
+$string['autoupgrade:role_safety'] = 'सुरक्षा संदर्भ';
+$string['autoupgrade:role_soapbox'] = 'Soapbox स्कोरिंग';
+$string['autoupgrade:not_configured'] = 'कॉन्फ़िगर नहीं (चैट मॉडल अपनाता है)';
+$string['autoupgrade:policy_auto'] = 'मूल्यांकन होता है, और स्वचालित मोड में अपने आप बदला जाता है';
+$string['autoupgrade:policy_recommend'] = 'मूल्यांकन और सुझाव होता है; व्यवस्थापक इसे बदलता है';
+$string['autoupgrade:policy_none'] = 'उम्मीदवार केवल सूचीबद्ध हैं: कोई बेंचमार्क इस भूमिका के काम को नहीं मापता';
+$string['autoupgrade:cand_candidate'] = 'उम्मीदवार';
+$string['autoupgrade:cand_passed'] = 'एक बार पास';
+$string['autoupgrade:cand_eligible'] = 'योग्य';
+$string['autoupgrade:cand_failed'] = 'असफल';
+$string['autoupgrade:cand_switched'] = 'उपयोग में';
+$string['autoupgrade:cand_rolledback'] = 'वापस लिया गया';
+$string['autoupgrade:cand_retired'] = 'अब सूची में नहीं';
+$string['autoupgrade:eval_queued'] = 'कतार में';
+$string['autoupgrade:eval_running'] = 'चल रहा है';
+$string['autoupgrade:eval_complete'] = 'पूर्ण';
+$string['autoupgrade:eval_failed'] = 'विफल';
+$string['autoupgrade:eval_skipped'] = 'नहीं चला';
+$string['autoupgrade:gate_pass'] = 'पास:';
+$string['autoupgrade:gate_fail'] = 'पास नहीं:';
+$string['autoupgrade:how_auto'] = 'स्वचालित';
+$string['autoupgrade:how_manual'] = 'व्यवस्थापक द्वारा';
+$string['autoupgrade:switch_watching'] = 'निगरानी में';
+$string['autoupgrade:switch_kept'] = 'बनाए रखा गया';
+$string['autoupgrade:switch_rolledback'] = 'वापस लिया गया';
+$string['autoupgrade:switch_superseded'] = 'बाद में व्यवस्थापक ने बदला';
+$string['autoupgrade:block_role'] = 'इस भूमिका को यहाँ से नहीं बदला जा सकता।';
+$string['autoupgrade:block_emergency'] = 'एक आपातकालीन नियंत्रण चालू है, इसलिए उसके बहाल होने तक कोई मॉडल नहीं बदला जाएगा।';
+$string['autoupgrade:block_allowlist'] = 'सेटिंग {$a} ऐसी नहीं है जिसे कोई बदलाव किसी व्यक्ति के बिना बदल सके, इसलिए यह भूमिका हाथ से बदली जाती है।';
+$string['autoupgrade:block_bundle'] = 'सेटिंग {$a} हस्ताक्षरित नीति बंडल द्वारा प्रबंधित है। मॉडल को बंडल में ही बदलें।';
+$string['autoupgrade:block_watching'] = 'इस भूमिका के एक बदलाव पर अभी भी नज़र रखी जा रही है। उसके बनाए रखे जाने या वापस लिए जाने तक प्रतीक्षा करें।';
+$string['autoupgrade:block_noeval'] = 'इस उम्मीदवार का कोई पूरा मूल्यांकन नहीं है।';
+$string['autoupgrade:block_gate'] = 'इस उम्मीदवार का अंतिम मूल्यांकन जाँच में पास नहीं हुआ।';
+$string['autoupgrade:block_changed'] = 'मूल्यांकन के बाद भूमिका का मॉडल बदल गया, इसलिए वह अब सही जोड़ी की तुलना नहीं करता। फिर से मूल्यांकन करें।';
+$string['autoupgrade:switched'] = '{$a->role} को {$a->model} पर बदला गया। इस पर 48 घंटे नज़र रखी जाएगी।';
+$string['autoupgrade:rolledback'] = '{$a} बदलाव वापस लिया गया।';
+$string['autoupgrade:rollback_missing'] = 'उस बदलाव को वापस नहीं लिया जा सकता।';
+$string['autoupgrade:rollback_superseded'] = 'बदलाव के बाद सेटिंग्स बदली गईं, इसलिए कुछ भी वापस नहीं लिया गया।';
+$string['autoupgrade:rollback_by_admin'] = 'व्यवस्थापक द्वारा वापस लिया गया।';
+$string['autoupgrade:queued'] = 'मूल्यांकन कतार में है। यह अगले cron रन पर चलेगा और कई मिनट लेगा।';
+$string['autoupgrade:discovered'] = 'खोज ने {$a->providers} प्रदाता सूचीबद्ध किए, {$a->registered} मॉडल पंजीकृत किए और {$a->candidates} उम्मीदवार चिह्नित किए। जिन प्रदाताओं को सूचीबद्ध नहीं किया जा सका: {$a->errors}।';
+$string['autoupgrade:why_manual_role'] = 'यह भूमिका अपने आप नहीं बदली जाती।';
+$string['autoupgrade:why_recommend_mode'] = 'स्वचालित मॉडल अपग्रेड सुझाव मोड में हैं।';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} को {$a->to} पर बदला गया';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] ने {$a->role} भूमिका को {$a->from} से {$a->to} पर बदल दिया।
+
+यह वर्तमान मॉडल के मुकाबले हर जाँच में पास हुआ, एक ही रन में मापा गया, लगातार दो बार:
+{$a->gate}
+
+नए मॉडल पर लाइव ट्रैफ़िक में {$a->hours} घंटे नज़र रखी जाती है और यदि त्रुटियाँ, अधूरे उत्तर, इनकार या प्रति उत्तर लागत बिगड़ती है तो इसे अपने आप वापस ले लिया जाता है। आप इसे कभी भी स्वयं वापस ले सकते हैं:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} को {$a->from} पर वापस लाया गया';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] ने {$a->role} भूमिका को {$a->to} से वापस {$a->from} पर लगा दिया।
+
+कारण: {$a->reason}
+
+इस उम्मीदवार को 30 दिनों तक फिर से नहीं आज़माया जाएगा। विवरण:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] {$a->role} का {$a->to} पर बदलाव बनाए रखा गया';
+$string['autoupgrade:mail_kept_body'] = '{$a->role} भूमिका का {$a->from} से {$a->to} पर बदलाव {$a->hours} घंटों तक {$a->turns} लाइव उत्तरों पर ठीक रहा और इसे बनाए रखा गया है।
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = '{$a->role} भूमिका का {$a->from} से {$a->to} पर बदलाव {$a->hours} घंटों के बाद बनाए रखा गया है, लेकिन केवल {$a->turns} लाइव उत्तर देखे गए, जो आँकने के लिए बहुत कम हैं। इस पर नज़र रखें।
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] सुझाव: {$a->role} के लिए {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} {$a->role} भूमिका के लिए {$a->current} के मुकाबले हर जाँच में लगातार दो बार पास हुआ, और इसे अपने आप नहीं बदला गया: {$a->why}
+
+{$a->gate}
+
+इसे बदलें, या ऐसे ही छोड़ दें, यहाँ:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'आपको यह इसलिए मिला क्योंकि आपका पता [[tutorshort]] खर्च अलर्ट का प्राप्तकर्ता है।';
+$string['event:model_switched'] = 'मॉडल बदला गया';
+$string['event:model_switch_rolled_back'] = 'मॉडल बदलाव वापस लिया गया';
+$string['task:discover_models'] = 'नए एआई मॉडल खोजें और मूल्यांकन कतार में डालें';
+$string['task:evaluate_model_candidate'] = 'एक उम्मीदवार एआई मॉडल का मूल्यांकन करें';
+$string['task:watch_model_switches'] = 'हाल के एआई मॉडल बदलावों पर नज़र रखें';
+$string['settings:autoupgrade_heading'] = 'स्वचालित मॉडल अपग्रेड';
+$string['settings:autoupgrade_heading_desc'] = 'हर दिन [[tutorshort]] आपके प्रदाताओं द्वारा दिए गए मॉडलों की सूची बनाता है और हर भूमिका के लिए उम्मीदवार चिह्नित करता है: वही प्रदाता, तुलनीय सूची मूल्य और ज्ञात मूल्य। यह उन्हें ट्यूटर प्रॉम्प्ट, जेलब्रेक परीक्षण संग्रह और वास्तविक जैसी लागत पर वर्तमान मॉडल के मुकाबले परखता है, और साइट का डिफ़ॉल्ट तभी बदलता है जब कोई उम्मीदवार प्रति उत्तर उतना ही या कम महँगा हो, और उतना ही अच्छा, सुरक्षित और भरोसेमंद हो, लगातार दो बार। जिन पाठ्यक्रमों का अपना मॉडल है, वे उसे बनाए रखते हैं। हर बदलाव की सूचना खर्च अलर्ट प्राप्तकर्ताओं को ईमेल की जाती है और उस पर 48 घंटे नज़र रखी जाती है।';
+$string['settings:autoupgrade_mode'] = 'मोड';
+$string['settings:autoupgrade_mode_desc'] = 'स्वचालित किसी उम्मीदवार के पास होने पर बदल देता है। सुझाव उम्मीदवारों का परीक्षण करता है और इसके बजाय सुझाव ईमेल करता है। बंद कुछ भी अपने आप नहीं करता।';
+$string['settings:autoupgrade_budget_usd'] = 'मासिक परीक्षण बजट (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'किसी कैलेंडर महीने में स्वचालित मूल्यांकन अधिकतम इतना खर्च कर सकते हैं, मूल्यांकनकर्ता सहित। जो मूल्यांकन महीने को इस सीमा से ऊपर ले जा सकता है, वह शुरू नहीं होता।';
+$string['settings:autoupgrade_eval_courseid'] = 'मूल्यांकन पाठ्यक्रम आईडी';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'मूल्यांकन उसी सिस्टम प्रॉम्प्ट के तहत उत्तर देते हैं जिसका यह पाठ्यक्रम वास्तव में उपयोग करता है, अतिथि पहचान के लिए बनाया गया ताकि किसी शिक्षार्थी का डेटा न भेजा जाए। 0 पिछले 30 दिनों में सबसे अधिक चैट उत्तरों वाला पाठ्यक्रम चुनता है।';
+$string['privacy:metadata:model_eval'] = 'स्वचालित मॉडल मूल्यांकन: किस उम्मीदवार मॉडल की तुलना किस वर्तमान मॉडल से की गई, और मापा गया परिणाम। एकमात्र व्यक्तिगत डेटा उस व्यवस्थापक का पहचानकर्ता है जिसने मूल्यांकन का अनुरोध किया। ये पंक्तियाँ किसी शिक्षार्थी के व्यक्तिगत डेटा के बजाय साइट कॉन्फ़िगरेशन हैं, इसलिए इन्हें डेटा निर्यात में शामिल नहीं किया जाता और उपयोगकर्ता के मिटाने का अनुरोध करने पर हटाया नहीं जाता।';
+$string['privacy:metadata:model_eval:createdby'] = 'वह साइट व्यवस्थापक जिसने इस मूल्यांकन का अनुरोध किया। खोज ने इसे कतार में डाला हो तो खाली।';
+$string['privacy:metadata:model_switch'] = 'मॉडल बदलाव और वापसी: किसी भूमिका ने किस मॉडल से किस मॉडल पर बदलाव किया, और क्यों। एकमात्र व्यक्तिगत डेटा उस व्यवस्थापक का पहचानकर्ता है जिसने बदलाव किया या उसे पलटा। ये पंक्तियाँ किसी शिक्षार्थी के व्यक्तिगत डेटा के बजाय साइट कॉन्फ़िगरेशन हैं, इसलिए इन्हें डेटा निर्यात में शामिल नहीं किया जाता और उपयोगकर्ता के मिटाने का अनुरोध करने पर हटाया नहीं जाता।';
+$string['privacy:metadata:model_switch:createdby'] = 'वह साइट व्यवस्थापक जिसने यह बदलाव किया। स्वचालित होने पर खाली।';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'वह साइट व्यवस्थापक जिसने यह बदलाव वापस लिया। निगरानी प्रक्रिया ने वापस लिया हो, या वापस न लिया गया हो, तो खाली।';
+
+$string['autoupgrade:block_reasoning'] = 'तर्क प्रयास पूरी साइट के लिए एक ही सेटिंग है, और {$a} भूमिका भी एक सोचने वाला मॉडल चलाती है जिसका नए स्तर पर परीक्षण नहीं हुआ है। यदि आप यही चाहते हैं तो हाथ से बदलें।';
+$string['autoupgrade:block_reasoning_course'] = 'तर्क प्रयास पूरी साइट के लिए एक ही सेटिंग है, और एक कोर्स अपना सोचने वाला मॉडल ({$a}) उपयोग करता है जिसे नए स्तर पर परखा नहीं गया। यदि आप यही चाहते हैं तो हाथ से बदलें।';

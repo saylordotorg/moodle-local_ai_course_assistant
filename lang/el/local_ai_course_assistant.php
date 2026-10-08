@@ -3201,3 +3201,166 @@ $string['survey_admin:err_invalid_bounds'] = 'Οι ερωτήσεις βαθμο
 $string['survey_admin:err_no_title'] = 'Εισαγάγετε τίτλο έρευνας.';
 
 $string['settings:int_range'] = 'Εισαγάγετε έναν ακέραιο αριθμό από {$a->min} έως {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Δυνατότητες μοντέλων που μαθεύτηκαν από απορρίψεις παρόχων';
+$string['settings:reasoning_effort'] = 'Προσπάθεια συλλογισμού';
+$string['settings:reasoning_effort_desc'] = 'Πόσο ζητείται να σκεφτούν τα μοντέλα που συλλογίζονται πριν απαντήσουν. Ισχύει για τα μοντέλα συλλογισμού της OpenAI (GPT-5, GPT-6, σειρά o) ως <code>reasoning_effort</code> και για τα μοντέλα σκέψης Gemini ως προϋπολογισμός σκέψης. Κάθε μοντέλο συλλογισμού παίρνει επίσης χώρο για τη σκέψη του πέρα από το μήκος απάντησης παραπάνω, ώστε η σκέψη να μην μπορεί πλέον να κόψει μια απάντηση. Το Χαμηλό ταιριάζει σε έναν εκπαιδευτικό βοηθό: οι απαντήσεις έρχονται νωρίτερα και κοστίζουν λιγότερο. Το Ανενεργό απενεργοποιεί τη σκέψη όπου το επιτρέπει το μοντέλο. Τα μοντέλα χωρίς έλεγχο συλλογισμού αγνοούν αυτή τη ρύθμιση.';
+$string['settings:reasoning_effort_off'] = 'Ανενεργό (όσο λιγότερο επιτρέπει το μοντέλο)';
+$string['settings:reasoning_effort_low'] = 'Χαμηλό (συνιστάται)';
+$string['settings:reasoning_effort_medium'] = 'Μεσαίο';
+$string['settings:reasoning_effort_high'] = 'Υψηλό';
+$string['modelregistry:learned_heading'] = 'Δυνατότητες που μαθεύτηκαν από παρόχους';
+$string['modelregistry:learned_desc'] = 'Όταν ένας πάροχος απορρίπτει ένα αίτημα επειδή ένα μοντέλο δεν δέχεται πλέον μια παράμετρο, το [[tutorshort]] αλλάζει μόνο αυτή την παράμετρο, ξαναδοκιμάζει μία φορά και θυμάται τη διόρθωση εδώ, ώστε το επόμενο αίτημα να είναι σωστό με την πρώτη. Ξεχάστε μια καταχώριση για να επαναφέρετε το μοντέλο στους ενσωματωμένους κανόνες.';
+$string['modelregistry:learned_none'] = 'Κανένας πάροχος δεν έχει απορρίψει ακόμη μορφή αιτήματος.';
+$string['modelregistry:col_field'] = 'Δυνατότητα';
+$string['modelregistry:col_value'] = 'Τιμή που μαθεύτηκε';
+$string['modelregistry:col_evidence'] = 'Τι είπε ο πάροχος';
+$string['modelregistry:forget'] = 'Ξέχασε';
+$string['modelregistry:forget_confirm'] = 'Να ξεχαστεί αυτή η καταχώριση; Το επόμενο αίτημα σε αυτό το μοντέλο θα χρησιμοποιεί ξανά τους ενσωματωμένους κανόνες.';
+$string['modelregistry:forget_done'] = 'Η καταχώριση ξεχάστηκε. Το επόμενο αίτημα σε αυτό το μοντέλο χρησιμοποιεί τους ενσωματωμένους κανόνες.';
+$string['modelregistry:forget_missing'] = 'Αυτή η καταχώριση δεν υπάρχει πλέον.';
+$string['event:model_capability_learned'] = 'Δυνατότητα μοντέλου μαθεύτηκε από πάροχο';
+
+$string['autoupgrade:title'] = 'Αναβαθμίσεις μοντέλων';
+$string['autoupgrade:navtitle'] = 'Αναβαθμίσεις μοντέλων [[tutorshort]]';
+$string['autoupgrade:intro'] = 'Το [[tutorshort]] αναζητά νεότερα μοντέλα από τους παρόχους που ήδη χρησιμοποιεί, δοκιμάζει κάθε υποψήφιο απέναντι στο μοντέλο που θα αντικαθιστούσε (ίδιες προτροπές, ίδιο όριο απάντησης, ίδιος κριτής, στην ίδια εκτέλεση) και κάνει αλλαγή μόνο όταν ο υποψήφιος έχει ίδιο ή χαμηλότερο κόστος ανά απάντηση και είναι εξίσου καλός, ασφαλής και αξιόπιστος, δύο φορές στη σειρά. Κάθε αλλαγή παρακολουθείται για 48 ώρες σε πραγματική κίνηση και αναιρείται αν τα αποτελέσματα χειροτερέψουν.';
+$string['autoupgrade:l_statusheading'] = 'Κατάσταση';
+$string['autoupgrade:l_mode'] = 'Λειτουργία';
+$string['autoupgrade:l_budget'] = 'Προϋπολογισμός δοκιμών';
+$string['autoupgrade:l_changemode'] = 'Αλλαγή';
+$string['autoupgrade:l_discover'] = 'Εντοπισμός μοντέλων τώρα';
+$string['autoupgrade:l_rolesheading'] = 'Ρόλοι';
+$string['autoupgrade:l_current'] = 'Τρέχον μοντέλο';
+$string['autoupgrade:l_profile'] = 'Προφίλ δυνατοτήτων';
+$string['autoupgrade:l_policy'] = 'Αναβαθμίσεις';
+$string['autoupgrade:l_nocandidates'] = 'Δεν υπάρχουν υποψήφιοι. Ο εντοπισμός επισημαίνει μοντέλα του ίδιου παρόχου με συγκρίσιμη τιμή.';
+$string['autoupgrade:l_colpasses'] = 'Επιτυχίες';
+$string['autoupgrade:l_collast'] = 'Τελευταία αξιολόγηση';
+$string['autoupgrade:l_evaluate'] = 'Αξιολόγηση τώρα';
+$string['autoupgrade:l_evaluating'] = 'Σε αναμονή ή σε εξέλιξη';
+$string['autoupgrade:l_switch'] = 'Αλλαγή μοντέλου';
+$string['autoupgrade:l_switchconfirm'] = 'Να γίνει τώρα αλλαγή αυτού του ρόλου στον υποψήφιο; Η αλλαγή παρακολουθείται για 48 ώρες και μπορεί να αναιρεθεί.';
+$string['autoupgrade:l_evalsheading'] = 'Αξιολογήσεις';
+$string['autoupgrade:l_noevals'] = 'Δεν υπάρχουν ακόμη αξιολογήσεις.';
+$string['autoupgrade:l_colwhen'] = 'Πότε';
+$string['autoupgrade:l_colrole'] = 'Ρόλος';
+$string['autoupgrade:l_colcandidate'] = 'Υποψήφιος';
+$string['autoupgrade:l_colincumbent'] = 'Τρέχον μοντέλο';
+$string['autoupgrade:l_colcost'] = 'Δαπάνη / εκτίμηση';
+$string['autoupgrade:l_colgate'] = 'Έλεγχοι πύλης';
+$string['autoupgrade:l_switchesheading'] = 'Αλλαγές και αναιρέσεις';
+$string['autoupgrade:l_noswitches'] = 'Δεν υπάρχουν ακόμη αλλαγές.';
+$string['autoupgrade:l_colfrom'] = 'Από';
+$string['autoupgrade:l_colto'] = 'Προς';
+$string['autoupgrade:l_colmode'] = 'Τρόπος';
+$string['autoupgrade:l_colreason'] = 'Αιτία';
+$string['autoupgrade:l_coluntil'] = 'Παρακολούθηση έως';
+$string['autoupgrade:l_rollback'] = 'Αναίρεση';
+$string['autoupgrade:l_rollbackconfirm'] = 'Να επανέλθει τώρα το προηγούμενο μοντέλο;';
+$string['autoupgrade:l_manage'] = 'Ελέγξτε ή διαγράψτε τα γεγονότα που έχουν μαθευτεί στη σελίδα μητρώου μοντέλων';
+$string['autoupgrade:l_notinuse'] = 'δεν χρησιμοποιείται';
+$string['autoupgrade:mode_off'] = 'Ανενεργό: τίποτα αυτόματο';
+$string['autoupgrade:mode_recommend'] = 'Σύσταση: δοκιμή υποψηφίων και αποστολή σύστασης με email';
+$string['autoupgrade:mode_auto'] = 'Αυτόματο: δοκιμή υποψηφίων και αλλαγή όταν κάποιος περάσει';
+$string['autoupgrade:budget_line'] = 'Δαπανήθηκαν ${$a->spent} από ${$a->limit} αυτόν τον μήνα (απομένουν ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Ο εντοπισμός εκτελέστηκε τελευταία φορά {$a}.';
+$string['autoupgrade:never_discovered'] = 'Ο εντοπισμός δεν έχει εκτελεστεί ακόμη.';
+$string['autoupgrade:role_chat'] = 'Συνομιλία (κύριο μοντέλο)';
+$string['autoupgrade:role_premium'] = 'Επίπεδο premium';
+$string['autoupgrade:role_failover'] = 'Εφεδρεία';
+$string['autoupgrade:role_quiz'] = 'Δημιουργία κουίζ';
+$string['autoupgrade:role_classifier'] = 'Ταξινομητής κατάκτησης';
+$string['autoupgrade:role_safety'] = 'Αναφορά ασφάλειας';
+$string['autoupgrade:role_soapbox'] = 'Βαθμολόγηση Soapbox';
+$string['autoupgrade:not_configured'] = 'Δεν έχει ρυθμιστεί (κληρονομεί το μοντέλο συνομιλίας)';
+$string['autoupgrade:policy_auto'] = 'Αξιολογείται και αλλάζει αυτόματα στην Αυτόματη λειτουργία';
+$string['autoupgrade:policy_recommend'] = 'Αξιολογείται και προτείνεται· την αλλαγή κάνει ένας διαχειριστής';
+$string['autoupgrade:policy_none'] = 'Μόνο λίστα υποψηφίων: κανένα benchmark δεν μετρά την εργασία αυτού του ρόλου';
+$string['autoupgrade:cand_candidate'] = 'Υποψήφιος';
+$string['autoupgrade:cand_passed'] = 'Πέρασε μία φορά';
+$string['autoupgrade:cand_eligible'] = 'Επιλέξιμος';
+$string['autoupgrade:cand_failed'] = 'Απέτυχε';
+$string['autoupgrade:cand_switched'] = 'Σε χρήση';
+$string['autoupgrade:cand_rolledback'] = 'Αναιρέθηκε';
+$string['autoupgrade:cand_retired'] = 'Δεν παρατίθεται πλέον';
+$string['autoupgrade:eval_queued'] = 'Σε αναμονή';
+$string['autoupgrade:eval_running'] = 'Σε εξέλιξη';
+$string['autoupgrade:eval_complete'] = 'Ολοκληρώθηκε';
+$string['autoupgrade:eval_failed'] = 'Απέτυχε';
+$string['autoupgrade:eval_skipped'] = 'Δεν εκτελέστηκε';
+$string['autoupgrade:gate_pass'] = 'Πέρασε:';
+$string['autoupgrade:gate_fail'] = 'Δεν πέρασε:';
+$string['autoupgrade:how_auto'] = 'Αυτόματα';
+$string['autoupgrade:how_manual'] = 'Από διαχειριστή';
+$string['autoupgrade:switch_watching'] = 'Υπό παρακολούθηση';
+$string['autoupgrade:switch_kept'] = 'Διατηρήθηκε';
+$string['autoupgrade:switch_rolledback'] = 'Αναιρέθηκε';
+$string['autoupgrade:switch_superseded'] = 'Άλλαξε στο μεταξύ από διαχειριστή';
+$string['autoupgrade:block_role'] = 'Αυτός ο ρόλος δεν μπορεί να αλλάξει από εδώ.';
+$string['autoupgrade:block_emergency'] = 'Ένας έλεγχος έκτακτης ανάγκης είναι ενεργός, οπότε κανένα μοντέλο δεν αλλάζει μέχρι να αποκατασταθεί.';
+$string['autoupgrade:block_allowlist'] = 'Η ρύθμιση {$a} δεν είναι από αυτές που μπορεί να αλλάξει μια αυτόματη αλλαγή χωρίς άνθρωπο, οπότε αυτός ο ρόλος αλλάζει χειροκίνητα.';
+$string['autoupgrade:block_bundle'] = 'Τη ρύθμιση {$a} τη διαχειρίζεται το υπογεγραμμένο πακέτο πολιτικής. Αλλάξτε το μοντέλο στο πακέτο.';
+$string['autoupgrade:block_watching'] = 'Μια αλλαγή αυτού του ρόλου είναι ακόμη υπό παρακολούθηση. Περιμένετε μέχρι να διατηρηθεί ή να αναιρεθεί.';
+$string['autoupgrade:block_noeval'] = 'Αυτός ο υποψήφιος δεν έχει ολοκληρωμένη αξιολόγηση.';
+$string['autoupgrade:block_gate'] = 'Η τελευταία αξιολόγηση αυτού του υποψηφίου δεν πέρασε την πύλη.';
+$string['autoupgrade:block_changed'] = 'Το μοντέλο του ρόλου άλλαξε μετά την αξιολόγηση, οπότε δεν συγκρίνει πλέον το σωστό ζεύγος. Αξιολογήστε ξανά.';
+$string['autoupgrade:switched'] = 'Ο ρόλος {$a->role} άλλαξε σε {$a->model}. Παρακολουθείται για 48 ώρες.';
+$string['autoupgrade:rolledback'] = 'Η αλλαγή {$a} αναιρέθηκε.';
+$string['autoupgrade:rollback_missing'] = 'Αυτή η αλλαγή δεν μπορεί να αναιρεθεί.';
+$string['autoupgrade:rollback_superseded'] = 'Οι ρυθμίσεις άλλαξαν μετά την αλλαγή, οπότε δεν αναιρέθηκε τίποτα.';
+$string['autoupgrade:rollback_by_admin'] = 'Αναιρέθηκε από διαχειριστή.';
+$string['autoupgrade:queued'] = 'Η αξιολόγηση μπήκε σε αναμονή. Εκτελείται στην επόμενη εκτέλεση του cron και διαρκεί αρκετά λεπτά.';
+$string['autoupgrade:discovered'] = 'Ο εντοπισμός βρήκε {$a->providers} πάροχο(-ους), κατέγραψε {$a->registered} μοντέλο(-α) και επισήμανε {$a->candidates} υποψήφιο(-ους). Πάροχοι που δεν ήταν δυνατό να καταγραφούν: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Αυτός ο ρόλος δεν αλλάζει αυτόματα.';
+$string['autoupgrade:why_recommend_mode'] = 'Οι αυτόματες αναβαθμίσεις μοντέλων είναι σε λειτουργία Σύστασης.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] Ο ρόλος {$a->role} άλλαξε σε {$a->to}';
+$string['autoupgrade:mail_switched_body'] = 'Το [[tutorshort]] άλλαξε τον ρόλο {$a->role} από {$a->from} σε {$a->to}.
+
+Πέρασε κάθε έλεγχο απέναντι στο τρέχον μοντέλο, με μέτρηση στην ίδια εκτέλεση, δύο φορές στη σειρά:
+{$a->gate}
+
+Το νέο μοντέλο παρακολουθείται σε πραγματική κίνηση για {$a->hours} ώρες και αναιρείται αυτόματα αν χειροτερέψουν τα σφάλματα, οι κομμένες απαντήσεις, οι αρνήσεις ή το κόστος ανά απάντηση. Μπορείτε να το αναιρέσετε κι εσείς οποιαδήποτε στιγμή:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] Ο ρόλος {$a->role} επανήλθε σε {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = 'Το [[tutorshort]] επανέφερε τον ρόλο {$a->role} από {$a->to} σε {$a->from}.
+
+Αιτία: {$a->reason}
+
+Ο υποψήφιος δεν θα δοκιμαστεί ξανά για 30 ημέρες. Λεπτομέρειες:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Η αλλαγή του ρόλου {$a->role} σε {$a->to} διατηρήθηκε';
+$string['autoupgrade:mail_kept_body'] = 'Η αλλαγή του ρόλου {$a->role} από {$a->from} σε {$a->to} άντεξε για {$a->hours} ώρες σε {$a->turns} πραγματικές απαντήσεις και διατηρείται.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Η αλλαγή του ρόλου {$a->role} από {$a->from} σε {$a->to} διατηρείται μετά από {$a->hours} ώρες, αλλά καταγράφηκαν μόνο {$a->turns} πραγματικές απαντήσεις, πολύ λίγες για ασφαλή κρίση. Παρακολουθήστε την.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Σύσταση: {$a->role} με {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = 'Το {$a->model} πέρασε κάθε έλεγχο απέναντι στο {$a->current} για τον ρόλο {$a->role}, δύο φορές στη σειρά, και δεν άλλαξε αυτόματα: {$a->why}
+
+{$a->gate}
+
+Κάντε την αλλαγή ή αφήστε το ως έχει, εδώ:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Λαμβάνετε αυτό το μήνυμα επειδή η διεύθυνσή σας είναι παραλήπτης ειδοποιήσεων δαπανών του [[tutorshort]].';
+$string['event:model_switched'] = 'Το μοντέλο άλλαξε';
+$string['event:model_switch_rolled_back'] = 'Η αλλαγή μοντέλου αναιρέθηκε';
+$string['task:discover_models'] = 'Εντοπισμός νέων μοντέλων AI και προγραμματισμός αξιολογήσεων';
+$string['task:evaluate_model_candidate'] = 'Αξιολόγηση υποψήφιου μοντέλου AI';
+$string['task:watch_model_switches'] = 'Παρακολούθηση πρόσφατων αλλαγών μοντέλων AI';
+$string['settings:autoupgrade_heading'] = 'Αυτόματες αναβαθμίσεις μοντέλων';
+$string['settings:autoupgrade_heading_desc'] = 'Κάθε μέρα το [[tutorshort]] καταγράφει τα μοντέλα που προσφέρουν οι πάροχοί σας και επισημαίνει υποψηφίους για κάθε ρόλο: ίδιος πάροχος, συγκρίσιμη τιμή καταλόγου και γνωστή τιμή. Τους δοκιμάζει απέναντι στο τρέχον μοντέλο με τις προτροπές του tutor, τη σουίτα jailbreak και κόστος που προσομοιάζει την πραγματική χρήση, και αλλάζει την προεπιλογή του ιστότοπου μόνο όταν ένας υποψήφιος έχει ίδιο ή χαμηλότερο κόστος ανά απάντηση και είναι εξίσου καλός, ασφαλής και αξιόπιστος, δύο φορές στη σειρά. Τα μαθήματα με δικό τους μοντέλο το διατηρούν. Κάθε αλλαγή στέλνεται με email στους παραλήπτες ειδοποιήσεων δαπανών και παρακολουθείται για 48 ώρες.';
+$string['settings:autoupgrade_mode'] = 'Λειτουργία';
+$string['settings:autoupgrade_mode_desc'] = 'Η Αυτόματη κάνει αλλαγή όταν ένας υποψήφιος περάσει. Η Σύσταση δοκιμάζει υποψηφίους και στέλνει σύσταση με email. Η Ανενεργή δεν κάνει τίποτα αυτόματα.';
+$string['settings:autoupgrade_budget_usd'] = 'Μηνιαίος προϋπολογισμός δοκιμών (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Το μέγιστο ποσό που μπορούν να δαπανήσουν οι αυτόματες αξιολογήσεις σε έναν ημερολογιακό μήνα, μαζί με τον κριτή. Μια αξιολόγηση που μπορεί να ξεπεράσει αυτό το όριο για τον μήνα δεν ξεκινά.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID μαθήματος αξιολόγησης';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Οι αξιολογήσεις απαντούν με την προτροπή συστήματος που χρησιμοποιεί πραγματικά αυτό το μάθημα, φτιαγμένη για την ταυτότητα επισκέπτη ώστε να μην αποστέλλονται δεδομένα κανενός εκπαιδευόμενου. Το 0 επιλέγει το μάθημα με τις περισσότερες απαντήσεις συνομιλίας τις τελευταίες 30 ημέρες.';
+$string['privacy:metadata:model_eval'] = 'Αυτόματες αξιολογήσεις μοντέλων: ποιο υποψήφιο μοντέλο συγκρίθηκε με ποιο τρέχον μοντέλο και το μετρημένο αποτέλεσμα. Τα μόνα προσωπικά δεδομένα είναι το αναγνωριστικό του διαχειριστή που ζήτησε την αξιολόγηση. Αυτές οι εγγραφές είναι ρυθμίσεις του ιστότοπου και όχι προσωπικά δεδομένα για κάποιον εκπαιδευόμενο, οπότε δεν περιλαμβάνονται σε εξαγωγή δεδομένων και δεν διαγράφονται όταν ένας χρήστης ζητά διαγραφή.';
+$string['privacy:metadata:model_eval:createdby'] = 'Ο διαχειριστής του ιστότοπου που ζήτησε αυτή την αξιολόγηση. Κενό όταν την έβαλε σε αναμονή ο εντοπισμός.';
+$string['privacy:metadata:model_switch'] = 'Αλλαγές και αναιρέσεις μοντέλων: από ποιο μοντέλο και προς ποιο μετακινήθηκε ένας ρόλος, και γιατί. Τα μόνα προσωπικά δεδομένα είναι το αναγνωριστικό του διαχειριστή που έκανε ή αναίρεσε την αλλαγή. Αυτές οι εγγραφές είναι ρυθμίσεις του ιστότοπου και όχι προσωπικά δεδομένα για κάποιον εκπαιδευόμενο, οπότε δεν περιλαμβάνονται σε εξαγωγή δεδομένων και δεν διαγράφονται όταν ένας χρήστης ζητά διαγραφή.';
+$string['privacy:metadata:model_switch:createdby'] = 'Ο διαχειριστής του ιστότοπου που έκανε αυτή την αλλαγή. Κενό όταν ήταν αυτόματη.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Ο διαχειριστής του ιστότοπου που αναίρεσε αυτή την αλλαγή. Κενό όταν την αναίρεσε η παρακολούθηση ή όταν δεν αναιρέθηκε.';
+
+$string['autoupgrade:block_reasoning'] = 'Η Προσπάθεια συλλογισμού είναι μία ρύθμιση για όλο τον ιστότοπο, και ο ρόλος {$a} εκτελεί επίσης ένα μοντέλο σκέψης που δεν δοκιμάστηκε στο νέο επίπεδο. Αλλάξτε το χειροκίνητα αν αυτό θέλετε.';
+$string['autoupgrade:block_reasoning_course'] = 'Η προσπάθεια συλλογισμού είναι μία ρύθμιση για όλο τον ιστότοπο, και ένα μάθημα χρησιμοποιεί δικό του μοντέλο σκέψης ({$a}) που δεν δοκιμάστηκε στο νέο επίπεδο. Αλλάξτε το χειροκίνητα αν αυτό θέλετε.';

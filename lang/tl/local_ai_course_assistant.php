@@ -3204,3 +3204,166 @@ $string['survey_admin:err_invalid_bounds'] = 'Ang mga tanong na may rating ay da
 $string['survey_admin:err_no_title'] = 'Maglagay ng pamagat ng survey.';
 
 $string['settings:int_range'] = 'Maglagay ng buong numero mula {$a->min} hanggang {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Mga natutunang katotohanan tungkol sa kakayahan ng modelo mula sa mga pagtanggi ng provider';
+$string['settings:reasoning_effort'] = 'Antas ng pangangatwiran';
+$string['settings:reasoning_effort_desc'] = 'Gaano kalaking pag-iisip ang hinihingi sa mga modelong nangangatwiran bago sumagot. Nalalapat sa mga reasoning model ng OpenAI (GPT-5, GPT-6, o-series) bilang <code>reasoning_effort</code> at sa mga thinking model ng Gemini bilang budget sa pag-iisip. Binibigyan din ang bawat reasoning model ng puwang para sa pag-iisip nito bukod sa haba ng sagot sa itaas, kaya hindi na mapuputol ng pag-iisip ang isang sagot. Bagay ang Mababa sa isang tutor: mas mabilis dumating ang mga sagot at mas mura. Pinapatay ng Naka-off ang pag-iisip kung pinapayagan ng modelo. Binabalewala ng mga modelong walang kontrol sa pangangatwiran ang setting na ito.';
+$string['settings:reasoning_effort_off'] = 'Naka-off (pinakamaliit na pinapayagan ng modelo)';
+$string['settings:reasoning_effort_low'] = 'Mababa (inirerekomenda)';
+$string['settings:reasoning_effort_medium'] = 'Katamtaman';
+$string['settings:reasoning_effort_high'] = 'Mataas';
+$string['modelregistry:learned_heading'] = 'Mga katotohanan tungkol sa kakayahan na natutunan mula sa mga provider';
+$string['modelregistry:learned_desc'] = 'Kapag tinanggihan ng provider ang isang request dahil hindi na tumatanggap ang modelo ng isang parameter, binabago ng [[tutorshort]] ang parameter na iyon lamang, sumusubok muli nang isang beses, at tinatandaan dito ang ayos para tama na ang susunod na request sa unang subok. Kalimutan ang isang katotohanan para ibalik ang modelo sa mga kasamang patakaran.';
+$string['modelregistry:learned_none'] = 'Wala pang provider na tumanggi sa anyo ng isang request.';
+$string['modelregistry:col_field'] = 'Kakayahan';
+$string['modelregistry:col_value'] = 'Natutunang halaga';
+$string['modelregistry:col_evidence'] = 'Ang sinabi ng provider';
+$string['modelregistry:forget'] = 'Kalimutan';
+$string['modelregistry:forget_confirm'] = 'Kalimutan ang katotohanang ito? Gagamitin muli ng susunod na request sa modelong ito ang mga kasamang patakaran.';
+$string['modelregistry:forget_done'] = 'Nakalimutan na ang katotohanan. Gagamitin ng susunod na request sa modelong ito ang mga kasamang patakaran.';
+$string['modelregistry:forget_missing'] = 'Wala na ang katotohanang iyon.';
+$string['event:model_capability_learned'] = 'Natutunan ang kakayahan ng modelo mula sa isang provider';
+
+$string['autoupgrade:title'] = 'Mga pag-upgrade ng modelo';
+$string['autoupgrade:navtitle'] = 'Mga pag-upgrade ng modelo ng [[tutorshort]]';
+$string['autoupgrade:intro'] = 'Naghahanap ang [[tutorshort]] ng mas bagong mga modelo mula sa mga provider na ginagamit na nito, sinusubok ang bawat kandidato laban sa modelong papalitan nito (parehong mga prompt, parehong budget sa sagot, parehong hukom, sa iisang takbo), at lumilipat lamang kapag ang kandidato ay pareho ang presyo o mas mura bawat sagot, kasinghusay, kasing-ligtas at kasing-maaasahan, nang dalawang beses na magkasunod. Binabantayan ang bawat paglipat nang 48 oras sa totoong trapiko at ibinabalik kapag lumala.';
+$string['autoupgrade:l_statusheading'] = 'Katayuan';
+$string['autoupgrade:l_mode'] = 'Moda';
+$string['autoupgrade:l_budget'] = 'Budget sa pagsubok';
+$string['autoupgrade:l_changemode'] = 'Baguhin';
+$string['autoupgrade:l_discover'] = 'Maghanap ng mga modelo ngayon';
+$string['autoupgrade:l_rolesheading'] = 'Mga tungkulin';
+$string['autoupgrade:l_current'] = 'Kasalukuyang modelo';
+$string['autoupgrade:l_profile'] = 'Profile ng kakayahan';
+$string['autoupgrade:l_policy'] = 'Mga pag-upgrade';
+$string['autoupgrade:l_nocandidates'] = 'Walang kandidato. Minamarkahan ng paghahanap ang mga modelo mula sa parehong provider na may katulad na presyo.';
+$string['autoupgrade:l_colpasses'] = 'Mga pagpasa';
+$string['autoupgrade:l_collast'] = 'Huling pagsusuri';
+$string['autoupgrade:l_evaluate'] = 'Suriin ngayon';
+$string['autoupgrade:l_evaluating'] = 'Nakapila o tumatakbo';
+$string['autoupgrade:l_switch'] = 'Ilipat';
+$string['autoupgrade:l_switchconfirm'] = 'Ilipat na ngayon ang tungkuling ito sa kandidato? Babantayan ang pagbabago nang 48 oras at maaaring ibalik.';
+$string['autoupgrade:l_evalsheading'] = 'Mga pagsusuri';
+$string['autoupgrade:l_noevals'] = 'Wala pang pagsusuri.';
+$string['autoupgrade:l_colwhen'] = 'Kailan';
+$string['autoupgrade:l_colrole'] = 'Tungkulin';
+$string['autoupgrade:l_colcandidate'] = 'Kandidato';
+$string['autoupgrade:l_colincumbent'] = 'Kasalukuyang modelo';
+$string['autoupgrade:l_colcost'] = 'Nagastos / tantiya';
+$string['autoupgrade:l_colgate'] = 'Mga pagsusuri sa gate';
+$string['autoupgrade:l_switchesheading'] = 'Mga paglipat at pagbabalik';
+$string['autoupgrade:l_noswitches'] = 'Wala pang paglipat.';
+$string['autoupgrade:l_colfrom'] = 'Mula';
+$string['autoupgrade:l_colto'] = 'Patungo';
+$string['autoupgrade:l_colmode'] = 'Paano';
+$string['autoupgrade:l_colreason'] = 'Dahilan';
+$string['autoupgrade:l_coluntil'] = 'Binabantayan hanggang';
+$string['autoupgrade:l_rollback'] = 'Ibalik';
+$string['autoupgrade:l_rollbackconfirm'] = 'Ibalik na ngayon ang dating modelo?';
+$string['autoupgrade:l_manage'] = 'Suriin o kalimutan ang mga natutunang impormasyon sa pahina ng model registry';
+$string['autoupgrade:l_notinuse'] = 'hindi ginagamit';
+$string['autoupgrade:mode_off'] = 'Naka-off: walang awtomatiko';
+$string['autoupgrade:mode_recommend'] = 'Magrekomenda: subukin ang mga kandidato at mag-email ng rekomendasyon';
+$string['autoupgrade:mode_auto'] = 'Awtomatiko: subukin ang mga kandidato at lumipat kapag may pumasa';
+$string['autoupgrade:budget_line'] = '${$a->spent} sa ${$a->limit} ang nagastos ngayong buwan (${$a->left} ang natitira)';
+$string['autoupgrade:last_discovery'] = 'Huling tumakbo ang paghahanap {$a}.';
+$string['autoupgrade:never_discovered'] = 'Hindi pa tumatakbo ang paghahanap.';
+$string['autoupgrade:role_chat'] = 'Chat (pangunahing modelo)';
+$string['autoupgrade:role_premium'] = 'Premium na antas';
+$string['autoupgrade:role_failover'] = 'Reserbang modelo';
+$string['autoupgrade:role_quiz'] = 'Paggawa ng pagsusulit';
+$string['autoupgrade:role_classifier'] = 'Classifier ng kahusayan';
+$string['autoupgrade:role_safety'] = 'Sanggunian sa kaligtasan';
+$string['autoupgrade:role_soapbox'] = 'Pagmamarka ng Soapbox';
+$string['autoupgrade:not_configured'] = 'Hindi naka-configure (minamana ang chat model)';
+$string['autoupgrade:policy_auto'] = 'Sinusuri, at awtomatikong inililipat sa Awtomatikong moda';
+$string['autoupgrade:policy_recommend'] = 'Sinusuri at inirerekomenda; isang administrator ang naglilipat nito';
+$string['autoupgrade:policy_none'] = 'Nakalista lamang ang mga kandidato: walang benchmark na sumusukat sa gawain ng tungkuling ito';
+$string['autoupgrade:cand_candidate'] = 'Kandidato';
+$string['autoupgrade:cand_passed'] = 'Pumasa nang isang beses';
+$string['autoupgrade:cand_eligible'] = 'Kwalipikado';
+$string['autoupgrade:cand_failed'] = 'Bumagsak';
+$string['autoupgrade:cand_switched'] = 'Ginagamit';
+$string['autoupgrade:cand_rolledback'] = 'Ibinalik';
+$string['autoupgrade:cand_retired'] = 'Hindi na nakalista';
+$string['autoupgrade:eval_queued'] = 'Nakapila';
+$string['autoupgrade:eval_running'] = 'Tumatakbo';
+$string['autoupgrade:eval_complete'] = 'Kumpleto';
+$string['autoupgrade:eval_failed'] = 'Nabigo';
+$string['autoupgrade:eval_skipped'] = 'Hindi pinatakbo';
+$string['autoupgrade:gate_pass'] = 'Pumasa:';
+$string['autoupgrade:gate_fail'] = 'Hindi pumasa:';
+$string['autoupgrade:how_auto'] = 'Awtomatiko';
+$string['autoupgrade:how_manual'] = 'Ng isang administrator';
+$string['autoupgrade:switch_watching'] = 'Binabantayan';
+$string['autoupgrade:switch_kept'] = 'Pinanatili';
+$string['autoupgrade:switch_rolledback'] = 'Ibinalik';
+$string['autoupgrade:switch_superseded'] = 'Binago na ng isang administrator';
+$string['autoupgrade:block_role'] = 'Hindi maililipat ang tungkuling ito mula rito.';
+$string['autoupgrade:block_emergency'] = 'May nakaaktibong emergency control, kaya walang modelong ililipat hangga\'t hindi ito naibabalik.';
+$string['autoupgrade:block_allowlist'] = 'Ang setting na {$a} ay hindi maaaring baguhin ng isang paglipat nang walang tao, kaya mano-manong inililipat ang tungkuling ito.';
+$string['autoupgrade:block_bundle'] = 'Ang setting na {$a} ay pinamamahalaan ng nilagdaang policy bundle. Sa bundle na lang baguhin ang modelo.';
+$string['autoupgrade:block_watching'] = 'Binabantayan pa ang isang paglipat ng tungkuling ito. Hintaying mapanatili o maibalik ito.';
+$string['autoupgrade:block_noeval'] = 'Walang natapos na pagsusuri ang kandidatong ito.';
+$string['autoupgrade:block_gate'] = 'Hindi pumasa sa gate ang huling pagsusuri ng kandidatong ito.';
+$string['autoupgrade:block_changed'] = 'Nagbago ang modelo ng tungkulin pagkatapos ng pagsusuri, kaya hindi na nito pinaghahambing ang tamang pares. Suriin muli.';
+$string['autoupgrade:switched'] = 'Inilipat ang {$a->role} sa {$a->model}. Babantayan ito nang 48 oras.';
+$string['autoupgrade:rolledback'] = 'Ibinalik ang paglipat ng {$a}.';
+$string['autoupgrade:rollback_missing'] = 'Hindi maibabalik ang paglipat na iyon.';
+$string['autoupgrade:rollback_superseded'] = 'Binago ang mga setting pagkatapos ng paglipat, kaya walang ibinalik.';
+$string['autoupgrade:rollback_by_admin'] = 'Ibinalik ng isang administrator.';
+$string['autoupgrade:queued'] = 'Nakapila na ang pagsusuri. Tatakbo ito sa susunod na cron at aabutin nang ilang minuto.';
+$string['autoupgrade:discovered'] = 'Naglista ang paghahanap ng {$a->providers} provider, nagrehistro ng {$a->registered} modelo at nagmarka ng {$a->candidates} kandidato. Mga provider na hindi nailista: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Hindi awtomatikong inililipat ang tungkuling ito.';
+$string['autoupgrade:why_recommend_mode'] = 'Nasa Magrekomendang moda ang awtomatikong pag-upgrade ng modelo.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] Inilipat ang {$a->role} sa {$a->to}';
+$string['autoupgrade:mail_switched_body'] = 'Inilipat ng [[tutorshort]] ang tungkuling {$a->role} mula {$a->from} patungong {$a->to}.
+
+Pumasa ito sa bawat pagsusuri laban sa kasalukuyang modelo, sinukat sa iisang takbo, nang dalawang beses na magkasunod:
+{$a->gate}
+
+Babantayan ang bagong modelo sa totoong trapiko nang {$a->hours} oras at awtomatikong ibabalik kapag lumala ang mga error, naputol na sagot, pagtanggi o gastos bawat sagot. Maaari mo itong ibalik nang ikaw mismo anumang oras:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] Ibinalik ang {$a->role} sa {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = 'Ibinalik ng [[tutorshort]] ang tungkuling {$a->role} mula {$a->to} pabalik sa {$a->from}.
+
+Dahilan: {$a->reason}
+
+Hindi na susubukin muli ang kandidato sa loob ng 30 araw. Mga detalye:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Pinanatili ang paglipat ng {$a->role} sa {$a->to}';
+$string['autoupgrade:mail_kept_body'] = 'Ang paglipat ng tungkuling {$a->role} mula {$a->from} patungong {$a->to} ay tumagal nang maayos sa loob ng {$a->hours} oras sa {$a->turns} totoong sagot at pinanatili.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Pinanatili ang paglipat ng tungkuling {$a->role} mula {$a->from} patungong {$a->to} pagkalipas ng {$a->hours} oras, pero {$a->turns} totoong sagot lamang ang nakita, masyadong kaunti para mahusgahan. Bantayan ito.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Inirerekomenda: {$a->role} sa {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = 'Pumasa ang {$a->model} sa bawat pagsusuri laban sa {$a->current} para sa tungkuling {$a->role}, nang dalawang beses na magkasunod, at hindi awtomatikong inilipat: {$a->why}
+
+{$a->gate}
+
+Ilipat ito, o hayaan, dito:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Natanggap mo ito dahil ang iyong address ay tatanggap ng alerto sa gastos ng [[tutorshort]].';
+$string['event:model_switched'] = 'Inilipat ang modelo';
+$string['event:model_switch_rolled_back'] = 'Ibinalik ang paglipat ng modelo';
+$string['task:discover_models'] = 'Maghanap ng mga bagong AI model at ipila ang mga pagsusuri';
+$string['task:evaluate_model_candidate'] = 'Suriin ang isang kandidatong AI model';
+$string['task:watch_model_switches'] = 'Bantayan ang mga kamakailang paglipat ng AI model';
+$string['settings:autoupgrade_heading'] = 'Awtomatikong pag-upgrade ng modelo';
+$string['settings:autoupgrade_heading_desc'] = 'Araw-araw, inililista ng [[tutorshort]] ang mga modelong iniaalok ng iyong mga provider at minamarkahan ang mga kandidato para sa bawat tungkulin: parehong provider, katulad na listahang presyo, at alam na presyo. Sinusubok nito ang mga ito laban sa kasalukuyang modelo gamit ang mga prompt ng tutor, ang jailbreak suite at gastos na hinulma sa totoong paggamit, at inililipat lamang ang default ng site kapag ang kandidato ay pareho ang presyo o mas mura bawat sagot, kasinghusay, kasing-ligtas at kasing-maaasahan, nang dalawang beses na magkasunod. Pinapanatili ng mga kursong may sariling modelo ang kanilang modelo. Ini-email ang bawat paglipat sa mga tatanggap ng alerto sa gastos at binabantayan nang 48 oras.';
+$string['settings:autoupgrade_mode'] = 'Moda';
+$string['settings:autoupgrade_mode_desc'] = 'Ang Awtomatiko ay lumilipat kapag may pumasang kandidato. Ang Magrekomenda ay sinusubok ang mga kandidato at nag-e-email ng rekomendasyon sa halip. Ang Naka-off ay walang ginagawang awtomatiko.';
+$string['settings:autoupgrade_budget_usd'] = 'Buwanang budget sa pagsubok (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Ang pinakamalaking halagang magagastos ng mga awtomatikong pagsusuri sa isang buwan ng kalendaryo, kasama ang hukom. Hindi magsisimula ang pagsusuring maaaring magpalampas sa buwan sa halagang ito.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID ng kurso para sa pagsusuri';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Sumasagot ang mga pagsusuri sa ilalim ng system prompt na talagang ginagamit ng kursong ito, na binuo para sa guest na pagkakakilanlan kaya walang datos ng mag-aaral na ipinapadala. Ang 0 ay pumipili ng kursong may pinakamaraming sagot sa chat sa nakaraang 30 araw.';
+$string['privacy:metadata:model_eval'] = 'Mga awtomatikong pagsusuri ng modelo: aling kandidatong modelo ang inihambing sa aling kasalukuyang modelo, at ang nasukat na resulta. Ang tanging personal na datos ay ang identifier ng administrator na humiling ng pagsusuri. Ang mga hilerang ito ay configuration ng site at hindi personal na datos tungkol sa isang mag-aaral, kaya hindi kasama ang mga ito sa pag-export ng datos at hindi binubura kapag humiling ang user ng pagbura.';
+$string['privacy:metadata:model_eval:createdby'] = 'Ang administrator ng site na humiling ng pagsusuring ito. Walang laman kapag ang paghahanap ang nagpila nito.';
+$string['privacy:metadata:model_switch'] = 'Mga paglipat at pagbabalik ng modelo: mula at patungo sa aling modelo lumipat ang isang tungkulin, at kung bakit. Ang tanging personal na datos ay ang identifier ng administrator na gumawa o nagbaligtad ng paglipat. Ang mga hilerang ito ay configuration ng site at hindi personal na datos tungkol sa isang mag-aaral, kaya hindi kasama ang mga ito sa pag-export ng datos at hindi binubura kapag humiling ang user ng pagbura.';
+$string['privacy:metadata:model_switch:createdby'] = 'Ang administrator ng site na gumawa ng paglipat na ito. Walang laman kapag awtomatiko ito.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Ang administrator ng site na nagbalik ng paglipat na ito. Walang laman kapag ang tagabantay ang nagbalik nito, o kapag hindi ito ibinalik.';
+
+$string['autoupgrade:block_reasoning'] = 'Ang antas ng pangangatwiran ay iisang setting para sa buong site, at ang tungkuling {$a} ay gumagamit din ng modelong nag-iisip na hindi pa nasubok sa bagong antas. Manu-manong lumipat kung iyon ang gusto mo.';
+$string['autoupgrade:block_reasoning_course'] = 'Ang pagsisikap sa pangangatwiran ay iisang setting para sa buong site, at may kursong gumagamit ng sarili nitong thinking model ({$a}) na hindi pa nasubok sa bagong antas. Manwal na palitan kung iyon ang gusto mo.';

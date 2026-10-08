@@ -815,7 +815,7 @@ class model_recommender {
     private static function group_of(array $r): string {
         return implode('/', [
             (string) ($r['harness'] ?? ''),
-            (string) ($r['fixture_set'] ?? ''),
+            model_bench::canonical_fixture((string) ($r['fixture_set'] ?? '')),
             (string) ($r['fixture_n'] ?? ''),
         ]);
     }

@@ -16,6 +16,8 @@
 
 namespace local_ai_course_assistant\provider;
 
+use local_ai_course_assistant\model_capabilities;
+
 /**
  * Claude (Anthropic) provider.
  *
@@ -60,91 +62,41 @@ class claude_provider extends base_provider {
     /**
      * Prefixes of Anthropic models known to ACCEPT sampling parameters.
      *
-     * Used as the default when the `claude_temperature_allow_prefixes` setting
-     * is empty. Deliberately an allow-list, not a deny-list: see
-     * {@see model_supports_temperature()} for why.
+     * v7.8.0: the list lives in model_capabilities, which every request shape
+     * now comes from; this name stays because settings.php and older callers
+     * read it here. Still an ALLOW-list and still overridable by the
+     * `claude_temperature_allow_prefixes` setting.
      *
      * @var string[]
      */
-    public const DEFAULT_TEMPERATURE_ALLOW_PREFIXES = [
-        // Aliases.
-        'claude-opus-4-6', 'claude-opus-4-5', 'claude-opus-4-1', 'claude-opus-4-0',
-        'claude-sonnet-4-6', 'claude-sonnet-4-5', 'claude-sonnet-4-0',
-        'claude-haiku-4-5', 'claude-haiku-3-5', 'claude-haiku-3',
-        // Dated full IDs for the 4.0 generation, whose alias form does not
-        // prefix-match them: e.g. claude-sonnet-4-20250514 (this provider's
-        // own get_default_model()) and claude-opus-4-20250514. We cannot use a
-        // bare 'claude-opus-4' prefix here because it would also match the
-        // denied claude-opus-4-7 / 4-8.
-        'claude-opus-4-2025', 'claude-sonnet-4-2025',
-        // Claude 3.x and 2.x, all of which accept sampling parameters.
-        'claude-3', 'claude-2',
-    ];
+    public const DEFAULT_TEMPERATURE_ALLOW_PREFIXES = model_capabilities::CLAUDE_TEMPERATURE_ALLOW_PREFIXES;
+
+    /**
+     * Models that REJECT a forced tool choice. v7.8.0: one list, in
+     * model_capabilities; this name is kept for the callers that read it here.
+     *
+     * @var string[]
+     */
+    public const FORCED_TOOL_CHOICE_DENY_PREFIXES = model_capabilities::CLAUDE_FORCED_TOOL_CHOICE_DENY;
 
     /**
      * Whether the given Anthropic model accepts a `temperature` parameter.
      *
-     * This is an ALLOW-list: a model we do not recognise is assumed NOT to
-     * accept sampling parameters, and temperature is omitted.
-     *
-     * The reason is that the two failure modes are asymmetric:
-     *   - Omitting temperature from a model that accepts it: the model uses
-     *     its own default. Harmless.
-     *   - Sending temperature to a model that rejects it: HTTP 400 on EVERY
-     *     call, surfacing as the generic "something went wrong" error.
-     *
-     * Anthropic has removed sampling parameters from every reasoning-class
-     * model since Opus 4.7 (Opus 4.7/4.8, and the whole Claude 5 family), so
-     * an unrecognized model is now more likely to reject them than accept
-     * them. Defaulting to "omit" means a newly released model works on day
-     * one instead of failing every request until the plugin is updated.
-     *
-     * The list is read from the `claude_temperature_allow_prefixes` setting so
-     * it can be corrected without a plugin release — by an admin, or pushed
-     * fleet-wide via a signed policy bundle (the key is on
-     * {@see \local_ai_course_assistant\policy_bundle::ALLOWED_KEYS}). This
-     * mirrors how `rate_card_overrides` keeps per-model pricing current
-     * without a redeploy.
+     * v7.8.0: a capability-profile lookup. The answer still comes from the
+     * allow-list setting first (a model we do not recognise is assumed NOT to
+     * accept sampling parameters, because omitting temperature is harmless and
+     * sending it to a model that rejects it is a 400 on every call), and a
+     * learned fact can now correct it after a single rejection.
      *
      * @param string $model
      * @return bool
      */
     private static function model_supports_temperature(string $model): bool {
-        $model = strtolower(trim($model));
-        if ($model === '') {
+        if (trim($model) === '') {
             return false;
         }
-        foreach (self::temperature_allow_prefixes() as $prefix) {
-            if (str_starts_with($model, $prefix)) {
-                return true;
-            }
-        }
-        return false;
+        return model_capabilities::profile('claude', $model)['temperature'] === model_capabilities::TEMP_ANY;
     }
-
-    /**
-     * Prefixes of Anthropic models that REJECT a forced tool choice.
-     *
-     * Claude Opus 5.5, Claude Sonnet 5.5, Fable 5.1 and Mythos 5.1 removed
-     * `tool_choice` of type `any` and `tool`: sending either returns HTTP 400
-     * ("tool_choice: type \"tool\" and \"any\" are not supported for this
-     * model."), on count_tokens and Batches too. Older models, including
-     * claude-opus-5 and claude-sonnet-5, still accept it.
-     *
-     * A DENY list rather than an allow list, because the denied ids are all
-     * LONGER than the ones they could be confused with: 'claude-opus-5-5' is
-     * not a prefix of 'claude-opus-5', so prefix matching is safe in this
-     * direction. The temperature list next door had to be an allow list for
-     * exactly the opposite reason.
-     *
-     * @var string[]
-     */
-    public const FORCED_TOOL_CHOICE_DENY_PREFIXES = [
-        'claude-opus-5-5',
-        'claude-sonnet-5-5',
-        'claude-fable-5-1',
-        'claude-mythos-5-1',
-    ];
 
     /**
      * Whether this model accepts tool_choice type 'tool' / 'any'.
@@ -153,34 +105,7 @@ class claude_provider extends base_provider {
      * @return bool
      */
     private static function model_supports_forced_tool_choice(string $model): bool {
-        $model = strtolower(trim($model));
-        if ($model === '') {
-            return true;
-        }
-        foreach (self::FORCED_TOOL_CHOICE_DENY_PREFIXES as $prefix) {
-            if (str_starts_with($model, $prefix)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * The effective allow-list: the admin/policy-bundle setting when set and
-     * parseable, otherwise the shipped default.
-     *
-     * @return string[]
-     */
-    private static function temperature_allow_prefixes(): array {
-        $raw = (string) get_config('local_ai_course_assistant', 'claude_temperature_allow_prefixes');
-        $out = [];
-        foreach (preg_split('/[\r\n,]+/', $raw) as $line) {
-            $line = strtolower(trim($line));
-            if ($line !== '' && $line[0] !== '#') {
-                $out[] = $line;
-            }
-        }
-        return $out ?: self::DEFAULT_TEMPERATURE_ALLOW_PREFIXES;
+        return (bool) model_capabilities::profile('claude', $model)['forced_tool_choice'];
     }
 
     protected function get_default_base_url(): string {
@@ -250,9 +175,20 @@ class claude_provider extends base_provider {
             }
         }
 
+        $profile = $this->capability_profile();
+        $maxtokens = (int) ($options['max_tokens'] ?? 4096);
+        $limit = $profile['max_output_tokens'] ?? null;
+        if ($limit !== null && (int) $limit > 0) {
+            // A limit is only ever known here because Anthropic named it in a
+            // 400; asking for more again would fail the same way.
+            $maxtokens = min($maxtokens, (int) $limit);
+        }
+        $acceptstemperature = $profile['temperature'] === model_capabilities::TEMP_ANY;
+        $forcedtoolchoice = (bool) $profile['forced_tool_choice'];
+
         $body = [
             'model' => $this->model,
-            'max_tokens' => $options['max_tokens'] ?? 4096,
+            'max_tokens' => $maxtokens,
             'system' => [
                 [
                     'type' => 'text',
@@ -264,7 +200,7 @@ class claude_provider extends base_provider {
         ];
 
         // Adaptive thinking: Claude decides when and how much to reason.
-        if (!empty($options['thinking'])) {
+        if (!empty($options['thinking']) && $profile['reasoning'] === model_capabilities::REASONING_CLAUDE) {
             $body['thinking'] = ['type' => 'adaptive'];
             // Extended thinking on the models that still take sampling
             // parameters requires temperature exactly 1. The reasoning-class
@@ -275,10 +211,10 @@ class claude_provider extends base_provider {
             // every thinking call to claude-opus-5-5 failed with a 400 while
             // the non-thinking path worked, which reads like an intermittent
             // provider fault rather than a request we are building wrong.
-            if (self::model_supports_temperature($this->model)) {
+            if ($acceptstemperature) {
                 $body['temperature'] = 1;
             }
-        } else if (!self::model_supports_temperature($this->model)) {
+        } else if (!$acceptstemperature) {
             // v5.11.0: Opus 4.7+ (and other reasoning-class models) reject the
             // temperature parameter with HTTP 400 "temperature is deprecated
             // for this model." Sending no temperature lets the model pick.
@@ -295,7 +231,7 @@ class claude_provider extends base_provider {
                 // Wrapped or bare -- see the note in openai_compatible_provider.
                 'input_schema' => $schema['schema'] ?? $schema,
             ]];
-            if (self::model_supports_forced_tool_choice($this->model)) {
+            if ($forcedtoolchoice) {
                 $body['tool_choice'] = [
                     'type' => 'tool',
                     'name' => $schema['name'] ?? 'structured_output',
@@ -397,9 +333,22 @@ class claude_provider extends base_provider {
         // its own reset; this was the one path that did not.
         $this->last_token_usage = null;
         $this->last_finish_reason = null;
+        $this->begin_call();
         $url = $this->baseurl . '/v1/messages';
         $body = $this->build_body($systemprompt, $messages, false, $options);
-        $response = $this->http_post($url, $this->get_headers($options), $body);
+        try {
+            $response = $this->http_post($url, $this->get_headers($options), $body);
+        } catch (\Throwable $e) {
+            // v7.8.0: a 400 naming a parameter this model no longer takes
+            // (temperature, thinking, a forced tool choice, an output limit)
+            // is fixed and retried ONCE.
+            if (!$this->heal_request($e, $body, false)) {
+                throw $e;
+            }
+            $body = $this->build_body($systemprompt, $messages, false, $options);
+            $response = $this->http_post($url, $this->get_headers($options), $body);
+            $this->commit_heal();
+        }
 
         $data = json_decode($response, true);
 
@@ -449,7 +398,7 @@ class claude_provider extends base_provider {
             // refusal, an empty body or a transport failure on the second
             // attempt falls back to exactly what the first attempt would have
             // returned without it, so the retry can never make a call worse.
-            if (!self::model_supports_forced_tool_choice($this->model)) {
+            if (!(bool) $this->capability_profile()['forced_tool_choice']) {
                 try {
                     $retry = json_decode($this->http_post($url, $this->get_headers($options), $body), true);
                     // Bill the retry whatever it returned. A refused or empty
@@ -531,8 +480,36 @@ class claude_provider extends base_provider {
 
     public function chat_completion_stream(string $systemprompt, array $messages, callable $callback, array $options = []): void {
         $url = $this->baseurl . '/v1/messages';
+        $this->begin_call();
         $body = $this->build_body($systemprompt, $messages, true, $options);
+        // A healed retry is only made while nothing has reached the learner.
+        $forwarded = false;
+        $counting = function (string $text) use ($callback, &$forwarded) {
+            $forwarded = true;
+            $callback($text);
+        };
+        try {
+            $this->stream_once($url, $body, $counting, $options);
+        } catch (\Throwable $e) {
+            if (!$this->heal_request($e, $body, $forwarded)) {
+                throw $e;
+            }
+            $body = $this->build_body($systemprompt, $messages, true, $options);
+            $this->stream_once($url, $body, $counting, $options);
+            $this->commit_heal();
+        }
+    }
 
+    /**
+     * One streamed Messages request.
+     *
+     * @param string $url
+     * @param string $body
+     * @param callable $callback Receives each piece of text for the learner.
+     * @param array $options
+     * @return void
+     */
+    private function stream_once(string $url, string $body, callable $callback, array $options): void {
         $buffer = '';
         $this->last_token_usage = null;
         $this->last_finish_reason = null;

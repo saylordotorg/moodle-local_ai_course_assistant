@@ -73,6 +73,9 @@ class failover_chain implements provider_interface {
     /** Audit event name emitted when a circuit opens. */
     public const AUDIT_EVENT_CIRCUIT_OPEN = 'failover_circuit_open';
 
+    /** @var string v7.8.0: one row per turn a fallback answered after the primary failed. */
+    public const AUDIT_EVENT_RESCUED = 'failover_rescued';
+
     /**
      * @param provider_interface $primary
      * @param string $primarylabel Label of the primary, used for circuit-state lookups.
@@ -110,7 +113,8 @@ class failover_chain implements provider_interface {
         // a correct setting and hiding which provider actually broke.
         $firsterr = null;
         $attempts = [];
-        foreach ($chain as $entry) {
+        $primaryfailed = false;
+        foreach ($chain as $i => $entry) {
             if ($this->is_circuit_open($entry['label'])) {
                 continue;
             }
@@ -119,10 +123,14 @@ class failover_chain implements provider_interface {
                 $result = $entry['provider']->chat_completion($systemprompt, $messages, $options);
                 $this->record_success($entry['label']);
                 $this->lastused = $entry['provider'];
+                if ($primaryfailed) {
+                    $this->audit_rescued($entry);
+                }
                 return $result;
             } catch (\Throwable $e) {
                 $this->open_circuit($entry['label'], $e);
                 $this->audit_fallthrough($entry, (string) $e->getMessage(), microtime(true) - $start);
+                $primaryfailed = $primaryfailed || $i === 0;
                 $firsterr = $firsterr ?? $e;
                 $attempts[] = $entry['label'] . ': ' . $e->getMessage();
             }
@@ -159,7 +167,8 @@ class failover_chain implements provider_interface {
         // a correct setting and hiding which provider actually broke.
         $firsterr = null;
         $attempts = [];
-        foreach ($chain as $entry) {
+        $primaryfailed = false;
+        foreach ($chain as $i => $entry) {
             if ($this->is_circuit_open($entry['label'])) {
                 continue;
             }
@@ -181,6 +190,9 @@ class failover_chain implements provider_interface {
                 }
                 $this->record_success($entry['label']);
                 $this->lastused = $entry['provider'];
+                if ($primaryfailed) {
+                    $this->audit_rescued($entry);
+                }
                 return;
             } catch (\Throwable $e) {
                 if ($firsttokenreceived) {
@@ -191,6 +203,7 @@ class failover_chain implements provider_interface {
                 }
                 $this->open_circuit($entry['label'], $e);
                 $this->audit_fallthrough($entry, (string) $e->getMessage(), microtime(true) - $start);
+                $primaryfailed = $primaryfailed || $i === 0;
                 $firsterr = $firsterr ?? $e;
                 $attempts[] = $entry['label'] . ': ' . $e->getMessage();
             }
@@ -245,6 +258,20 @@ class failover_chain implements provider_interface {
         }
         $chain = $this->build_chain();
         return $chain ? reset($chain)->provider_id() : 'unknown';
+    }
+
+    /**
+     * The model of the provider that served (or last tried) the call.
+     *
+     * v7.8.0: a failed turn records the provider and model it failed on, so
+     * the watcher of a model switch can count that model's failures. The
+     * chain answers for its member, as provider_id() does.
+     *
+     * @return string
+     */
+    public function model_id(): string {
+        $member = $this->lastused ?? $this->primary;
+        return method_exists($member, 'model_id') ? (string) $member->model_id() : '';
     }
 
     /**
@@ -324,6 +351,37 @@ class failover_chain implements provider_interface {
     }
 
     /**
+     * Record that a fallback answered a turn the primary failed on. One row
+     * per turn, written only once the turn was answered, so the watcher of a
+     * model switch can count the primary's failures the learner never saw
+     * without counting a turn twice when the whole chain fails (that turn is
+     * already a failed-turn row naming the primary).
+     *
+     * @param array $answered The chain entry that answered.
+     */
+    private function audit_rescued(array $answered): void {
+        if (empty($this->options['audit'])) {
+            return;
+        }
+        try {
+            audit_logger::log(
+                self::AUDIT_EVENT_RESCUED,
+                (int) $this->options['userid'],
+                (int) $this->options['courseid'],
+                [
+                    'failed_model' => method_exists($this->primary, 'model_id')
+                        ? (string) $this->primary->model_id() : '',
+                    'primary' => $this->primarylabel,
+                    'answered_label' => $answered['label'],
+                ]
+            );
+        } catch (\Throwable $ignore) {
+            // Audit must never break the chain.
+            unset($ignore);
+        }
+    }
+
+    /**
      * Emit the audit row for a fall-through event.
      *
      * @param array $failed The failed chain entry: ['provider' => provider_interface, 'label' => string].
@@ -341,6 +399,11 @@ class failover_chain implements provider_interface {
                 (int) $this->options['courseid'],
                 [
                     'failed_label' => $failed['label'],
+                    // v7.8.0: the model that failed, so the watcher of a model
+                    // switch counts a failure the chain rescued; the learner's
+                    // answer row names the fallback model, not this one.
+                    'failed_model' => method_exists($failed['provider'], 'model_id')
+                        ? (string) $failed['provider']->model_id() : '',
                     'primary'      => $this->primarylabel,
                     'reason'       => mb_substr($reason, 0, 500),
                     'latency_ms'   => (int) round($elapsedseconds * 1000),

@@ -84,6 +84,10 @@ class policy_bundle {
         'model',
         'claude_temperature_allow_prefixes',
         'temperature',
+        // v7.8.0: reasoning level for thinking models. Behaviour only, like
+        // temperature: it changes how long a model thinks, never where a
+        // request goes or what it may spend beyond the caps.
+        'reasoning_effort',
         'maxhistory',
         'prompt_verbosity',
         'failover_per_call_enabled',
@@ -235,6 +239,12 @@ class policy_bundle {
         }
 
         $version = (int) $payload['version'];
+        // v7.8.0: remember which settings the fleet operator's bundle owns, for
+        // every VERIFIED bundle, applied or not newer. The automatic model
+        // switcher reads this so it never changes a setting the next bundle
+        // would change back.
+        $managed = implode(',', array_keys($payload['settings']));
+        set_config('policy_bundle_managed_keys', $managed, 'local_ai_course_assistant');
         $applied = (int) (get_config('local_ai_course_assistant', 'policy_bundle_applied_version') ?: 0);
         if ($version <= $applied) {
             return self::record('skipped', "bundle version {$version} is not newer than applied {$applied}");
@@ -268,6 +278,20 @@ class policy_bundle {
 
         $detail = 'applied version ' . $version . ' (' . count($changes) . ' setting(s) changed)';
         return self::record('applied', $detail);
+    }
+
+    /**
+     * Settings the last verified bundle carries (v7.8.0).
+     *
+     * Recorded on every verified envelope, applied or not newer. Empty until
+     * one has been verified since the upgrade; see switcher::managed_keys()
+     * for the fallback.
+     *
+     * @return string[]
+     */
+    public static function managed_keys(): array {
+        $raw = (string) get_config('local_ai_course_assistant', 'policy_bundle_managed_keys');
+        return array_values(array_filter(array_map('trim', explode(',', $raw))));
     }
 
     /**

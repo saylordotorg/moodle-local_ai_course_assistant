@@ -256,9 +256,13 @@ class token_cost_manager {
      * completion_tokens alone, which is the safe default for any provider
      * whose behaviour has not been confirmed.
      *
+     * v7.8.0: the list itself lives in model_capabilities, beside every other
+     * fact about how a model's request and usage are shaped; this constant
+     * names it for the two pricing paths here.
+     *
      * @var string[]
      */
-    private const REASONING_OUTSIDE_COMPLETION_PREFIXES = ['gemini-', 'gemini/', 'models/gemini-'];
+    private const REASONING_OUTSIDE_COMPLETION_PREFIXES = model_capabilities::BILLED_OUTSIDE_COMPLETION_PREFIXES;
 
     /**
      * Marker written onto model_name when a call was served by an offline

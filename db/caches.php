@@ -148,4 +148,13 @@ $definitions = [
         'simpledata' => false,
         'ttl' => 300,
     ],
+    // v7.8.0: learned model capability facts (local_ai_course_assistant_model_caps).
+    // Read on every provider call that builds a request, so it is cached; the
+    // table is tiny and model_capabilities purges this whenever it writes.
+    'modelcaps' => [
+        'mode'       => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => false,
+        'ttl'        => 3600,
+    ],
 ];

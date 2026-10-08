@@ -3204,3 +3204,166 @@ $string['survey_admin:err_invalid_bounds'] = 'Su\'aalaha qiimaynta waa inay isti
 $string['survey_admin:err_no_title'] = 'Geli cinwaanka sahanka.';
 
 $string['settings:int_range'] = 'Geli tiro dhan oo u dhaxaysa {$a->min} ilaa {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Xaqiiqooyinka awoodda moodeelka laga bartay diidmooyinka bixiyeyaasha';
+$string['settings:reasoning_effort'] = 'Dadaalka fekerka';
+$string['settings:reasoning_effort_desc'] = 'Inta ay moodeellada fekera ka hor jawaabta loo sheegayo inay fekeraan. Waxay khusaysaa moodeellada fekerka ee OpenAI (GPT-5, GPT-6, taxanaha o) sida <code>reasoning_effort</code> iyo moodeellada fekerka ee Gemini sida miisaaniyad fekereed. Moodeel kasta oo fekera wuxuu sidoo kale helayaa meel uu ku fekero oo ka baxsan dhererka jawaabta kor ku xusan, sidaas darteed fekerku mar dambe ma gaabin karo jawaab. Hoose ayaa ku habboon macallin: jawaabuhu way dhaqso badan yihiin, kharash yarna way leeyihiin. Dansan wuxuu demiyaa fekerka halka moodeelku u oggolaado. Moodeellada aan lahayn xakameyn fekereed way iska indhatiraan dejintan.';
+$string['settings:reasoning_effort_off'] = 'Dansan (inta ugu yar ee moodeelku oggol yahay)';
+$string['settings:reasoning_effort_low'] = 'Hoose (lagu taliyay)';
+$string['settings:reasoning_effort_medium'] = 'Dhexdhexaad';
+$string['settings:reasoning_effort_high'] = 'Sare';
+$string['modelregistry:learned_heading'] = 'Xaqiiqooyinka awoodda laga bartay bixiyeyaasha';
+$string['modelregistry:learned_desc'] = 'Marka bixiye uu diido codsi sababtoo ah moodeel uusan mar dambe aqbalin halbeeg, [[tutorshort]] wuxuu beddelaa halbeeggaas keliya, hal mar ayuu isku dayaa, oo halkan ayuu ku xasuustaa saxitaanka si codsiga xiga uu markiisa hore sax u noqdo. Iska illow xaqiiqo si moodeelka loogu celiyo xeerarka caadiga ah.';
+$string['modelregistry:learned_none'] = 'Weli bixiye kama diidin qaab codsi.';
+$string['modelregistry:col_field'] = 'Awood';
+$string['modelregistry:col_value'] = 'Qiimaha la bartay';
+$string['modelregistry:col_evidence'] = 'Waxa bixiyuhu yiri';
+$string['modelregistry:forget'] = 'Iska illow';
+$string['modelregistry:forget_confirm'] = 'Ma iska illoobaysaa xaqiiqadan? Codsiga xiga ee moodeelkan wuxuu mar kale isticmaalayaa xeerarka caadiga ah.';
+$string['modelregistry:forget_done'] = 'Xaqiiqada waa la illoobay. Codsiga xiga ee moodeelkan wuxuu isticmaalayaa xeerarka caadiga ah.';
+$string['modelregistry:forget_missing'] = 'Xaqiiqadaas mar dambe ma jirto.';
+$string['event:model_capability_learned'] = 'Awoodda moodeelka ayaa laga bartay bixiye';
+
+$string['autoupgrade:title'] = 'Cusboonaysiinta moodeellada';
+$string['autoupgrade:navtitle'] = 'Cusboonaysiinta moodeellada [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] wuxuu raadiyaa moodeello cusub oo ka yimid bixiyeyaasha uu horey u isticmaalo, wuxuu tijaabiyaa musharax kasta isagoo la barbardhigaya moodeelka uu beddeli lahaa (isla prompts-ka, isla miisaaniyadda jawaabta, isla garsooraha, isla orodka), wuxuuna beddelaa oo keliya marka musharaxu yahay qiimo isku mid ah ama ka jaban jawaab kasta, una wanaagsan, u ammaan ah oo u kalsoon yahay, laba jeer oo xiriir ah. Beddel kasta waxaa la ilaaliyaa 48 saacadood oo taraafig dhab ah ah, waana dib loo celiyaa haddii uu xumaado.';
+$string['autoupgrade:l_statusheading'] = 'Xaalad';
+$string['autoupgrade:l_mode'] = 'Habka';
+$string['autoupgrade:l_budget'] = 'Miisaaniyadda tijaabada';
+$string['autoupgrade:l_changemode'] = 'Beddel';
+$string['autoupgrade:l_discover'] = 'Hadda raadi moodeello';
+$string['autoupgrade:l_rolesheading'] = 'Doorarka';
+$string['autoupgrade:l_current'] = 'Moodeelka hadda';
+$string['autoupgrade:l_profile'] = 'Astaanta awoodda';
+$string['autoupgrade:l_policy'] = 'Cusboonaysiin';
+$string['autoupgrade:l_nocandidates'] = 'Musharax ma jiro. Raadintu waxay calaamadisaa moodeellada isla bixiyaha ee qiimo la mid ah.';
+$string['autoupgrade:l_colpasses'] = 'Guulaha';
+$string['autoupgrade:l_collast'] = 'Qiimeyntii ugu dambeysay';
+$string['autoupgrade:l_evaluate'] = 'Hadda qiimee';
+$string['autoupgrade:l_evaluating'] = 'Saf ku jira ama socda';
+$string['autoupgrade:l_switch'] = 'U beddel';
+$string['autoupgrade:l_switchconfirm'] = 'Hadda doorkan ma u beddeshaa musharaxa? Isbeddelka waxaa la ilaaliyaa 48 saacadood, dibna waa loo celin karaa.';
+$string['autoupgrade:l_evalsheading'] = 'Qiimeynaha';
+$string['autoupgrade:l_noevals'] = 'Weli qiimeyn ma jirto.';
+$string['autoupgrade:l_colwhen'] = 'Goorma';
+$string['autoupgrade:l_colrole'] = 'Door';
+$string['autoupgrade:l_colcandidate'] = 'Musharax';
+$string['autoupgrade:l_colincumbent'] = 'Moodeelka hadda';
+$string['autoupgrade:l_colcost'] = 'La isticmaalay / qiyaas';
+$string['autoupgrade:l_colgate'] = 'Hubinta heerka';
+$string['autoupgrade:l_switchesheading'] = 'Beddelaadyada iyo dib-u-celinta';
+$string['autoupgrade:l_noswitches'] = 'Weli beddel ma jiro.';
+$string['autoupgrade:l_colfrom'] = 'Ka';
+$string['autoupgrade:l_colto'] = 'Ku';
+$string['autoupgrade:l_colmode'] = 'Sida';
+$string['autoupgrade:l_colreason'] = 'Sababta';
+$string['autoupgrade:l_coluntil'] = 'La ilaalinayo ilaa';
+$string['autoupgrade:l_rollback'] = 'Dib u celi';
+$string['autoupgrade:l_rollbackconfirm'] = 'Hadda ma soo celisaa moodeelkii hore?';
+$string['autoupgrade:l_manage'] = 'Dib u eeg ama illow xaqiiqooyinka la bartay ee bogga diiwaanka moodeellada';
+$string['autoupgrade:l_notinuse'] = 'lama isticmaalo';
+$string['autoupgrade:mode_off'] = 'Dami: wax toos ah ma dhacaan';
+$string['autoupgrade:mode_recommend'] = 'Talo: tijaabi musharaxiinta oo talo ku dir iimayl';
+$string['autoupgrade:mode_auto'] = 'Toos: tijaabi musharaxiinta oo beddel marka mid ku guuleysto';
+$string['autoupgrade:budget_line'] = '${$a->spent} oo ka mid ah ${$a->limit} ayaa bishan la isticmaalay (${$a->left} ayaa haray)';
+$string['autoupgrade:last_discovery'] = 'Raadintii ugu dambeysay waxay socotay {$a}.';
+$string['autoupgrade:never_discovered'] = 'Raadintu weli ma socon.';
+$string['autoupgrade:role_chat'] = 'Wada-sheekeysi (moodeelka ugu weyn)';
+$string['autoupgrade:role_premium'] = 'Heerka premium';
+$string['autoupgrade:role_failover'] = 'Kaydka beddelka';
+$string['autoupgrade:role_quiz'] = 'Samaynta su\'aalaha imtixaanka';
+$string['autoupgrade:role_classifier'] = 'Kala-saaraha hanashada';
+$string['autoupgrade:role_safety'] = 'Tixraaca badbaadada';
+$string['autoupgrade:role_soapbox'] = 'Dhibcaha Soapbox';
+$string['autoupgrade:not_configured'] = 'Lama dejin (wuxuu dhaxlaa moodeelka wada-sheekeysiga)';
+$string['autoupgrade:policy_auto'] = 'La qiimeeyay, si toos ahna loogu beddelay habka Toos';
+$string['autoupgrade:policy_recommend'] = 'La qiimeeyay oo lagu taliyay; maamule ayaa beddela';
+$string['autoupgrade:policy_none'] = 'Liiska musharaxiinta oo keliya: ma jiro benchmark cabbira hawsha doorkan';
+$string['autoupgrade:cand_candidate'] = 'Musharax';
+$string['autoupgrade:cand_passed'] = 'Hal mar ku guuleystay';
+$string['autoupgrade:cand_eligible'] = 'U qalma';
+$string['autoupgrade:cand_failed'] = 'Ku guuldareystay';
+$string['autoupgrade:cand_switched'] = 'La isticmaalayo';
+$string['autoupgrade:cand_rolledback'] = 'Dib loo celiyay';
+$string['autoupgrade:cand_retired'] = 'Liiska kuma jiro mar dambe';
+$string['autoupgrade:eval_queued'] = 'Saf ku jira';
+$string['autoupgrade:eval_running'] = 'Socda';
+$string['autoupgrade:eval_complete'] = 'Dhammaaday';
+$string['autoupgrade:eval_failed'] = 'Guuldareystay';
+$string['autoupgrade:eval_skipped'] = 'Lama orodsiin';
+$string['autoupgrade:gate_pass'] = 'Ku guuleystay:';
+$string['autoupgrade:gate_fail'] = 'Kuma guuleysan:';
+$string['autoupgrade:how_auto'] = 'Si toos ah';
+$string['autoupgrade:how_manual'] = 'Maamule ayaa sameeyay';
+$string['autoupgrade:switch_watching'] = 'La ilaalinayo';
+$string['autoupgrade:switch_kept'] = 'La hayo';
+$string['autoupgrade:switch_rolledback'] = 'Dib loo celiyay';
+$string['autoupgrade:switch_superseded'] = 'Markaas kadib maamule ayaa beddelay';
+$string['autoupgrade:block_role'] = 'Doorkan halkan lagama beddeli karo.';
+$string['autoupgrade:block_emergency'] = 'Xakame degdeg ah ayaa shaqeynaya, sidaa darteed moodeel lama beddelayo ilaa laga soo celiyo.';
+$string['autoupgrade:block_allowlist'] = 'Dejinta {$a} ma aha mid beddel uu beddeli karo qof la\'aan, sidaa darteed doorkan gacan ayaa lagu beddelaa.';
+$string['autoupgrade:block_bundle'] = 'Dejinta {$a} waxaa maamula xirmada siyaasadda ee la saxiixay. Moodeelka ku beddel xirmada.';
+$string['autoupgrade:block_watching'] = 'Beddel doorkan ah ayaa weli la ilaalinayaa. Sug ilaa la hayo ama dib loo celiyo.';
+$string['autoupgrade:block_noeval'] = 'Musharaxani ma laha qiimeyn dhammaatay.';
+$string['autoupgrade:block_gate'] = 'Qiimeyntii ugu dambeysay ee musharaxan kama gudbin heerka.';
+$string['autoupgrade:block_changed'] = 'Moodeelka doorka ayaa isbeddelay qiimeynta kadib, sidaa darteed mar dambe ma barbardhigayo labada saxda ah. Mar kale qiimee.';
+$string['autoupgrade:switched'] = '{$a->role} waxaa loo beddelay {$a->model}. Waxaa la ilaalinayaa 48 saacadood.';
+$string['autoupgrade:rolledback'] = 'Beddelka {$a} dib ayaa loo celiyay.';
+$string['autoupgrade:rollback_missing'] = 'Beddelkaas dib looma celin karo.';
+$string['autoupgrade:rollback_superseded'] = 'Dejinta ayaa la beddelay beddelka kadib, sidaa darteed waxba dib looma celin.';
+$string['autoupgrade:rollback_by_admin'] = 'Maamule ayaa dib u celiyay.';
+$string['autoupgrade:queued'] = 'Qiimeynta saf ayay gashay. Waxay socon doontaa wareegga cron ee xiga, waxayna qaadataa dhowr daqiiqo.';
+$string['autoupgrade:discovered'] = 'Raadintu waxay liis gareysay {$a->providers} bixiye, waxay diiwaangelisay {$a->registered} moodeel, waxayna calaamadisay {$a->candidates} musharax. Bixiyeyaasha aan la liis gareyn karin: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Doorkan si toos ah looma beddelo.';
+$string['autoupgrade:why_recommend_mode'] = 'Cusboonaysiinta tooska ah ee moodeellada waxay ku jirtaa habka Talo.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} waxaa loo beddelay {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] wuxuu doorka {$a->role} ka beddelay {$a->from} una beddelay {$a->to}.
+
+Wuxuu ka gudbay hubin kasta oo lagu barbardhigay moodeelka hadda, isla orodka lagu cabbiray, laba jeer oo xiriir ah:
+{$a->gate}
+
+Moodeelka cusub waxaa lagu ilaalinayaa taraafig dhab ah {$a->hours} saacadood, waxaana si toos ah dib loo celinayaa haddii khaladaadka, jawaabaha go\'an, diidmooyinka ama kharashka jawaabtiiba ay xumaadaan. Adiga ayaa dib u celin kara wakhti kasta:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} dib loogu celiyay {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] wuxuu doorka {$a->role} ka soo celiyay {$a->to} una celiyay {$a->from}.
+
+Sababta: {$a->reason}
+
+Musharaxa mar kale lama tijaabin doono 30 maalmood. Faahfaahin:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Beddelka {$a->role} ee {$a->to} waa la hayaa';
+$string['autoupgrade:mail_kept_body'] = 'Beddelka doorka {$a->role} ee {$a->from} ilaa {$a->to} wuu adkaystay {$a->hours} saacadood oo {$a->turns} jawaabood oo dhab ah ah, waana la hayaa.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Beddelka doorka {$a->role} ee {$a->from} ilaa {$a->to} waa la hayaa {$a->hours} saacadood kadib, laakiin {$a->turns} jawaabood oo dhab ah oo keliya ayaa la arkay, taasoo aad u yar si loo go\'aamiyo. Ku sii fiirso.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Lagu taliyay: {$a->role} oo ku shaqeeya {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} wuxuu ka gudbay hubin kasta oo lagu barbardhigay {$a->current} doorka {$a->role}, laba jeer oo xiriir ah, si toos ahna looma beddelin: {$a->why}
+
+{$a->gate}
+
+Beddel ama ka tag, halkan:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Tan waad heshay sababtoo ah ciwaankaagu waa qaataha digniinaha kharashka [[tutorshort]].';
+$string['event:model_switched'] = 'Moodeelka waa la beddelay';
+$string['event:model_switch_rolled_back'] = 'Beddelka moodeelka dib ayaa loo celiyay';
+$string['task:discover_models'] = 'Raadi moodeello AI cusub oo qiimeyno saf geli';
+$string['task:evaluate_model_candidate'] = 'Qiimee moodeel AI ah oo musharax ah';
+$string['task:watch_model_switches'] = 'Ilaali beddelaadyada dhowaan ee moodeellada AI';
+$string['settings:autoupgrade_heading'] = 'Cusboonaysiinta tooska ah ee moodeellada';
+$string['settings:autoupgrade_heading_desc'] = 'Maalin kasta [[tutorshort]] wuxuu liis gareeyaa moodeellada ay bixiyeyaashaadu bixiyaan, wuxuuna calaamadiyaa musharaxiin door kasta: isla bixiyaha, qiimo liiseed la mid ah, iyo qiimo la yaqaan. Wuxuu ku tijaabiyaa moodeelka hadda prompts-ka macallinka, tijaabooyinka jailbreak iyo kharash u eg kan dhabta ah, wuxuuna beddelaa moodeelka caadiga ah ee goobta oo keliya marka musharaxu yahay qiimo isku mid ah ama ka jaban jawaab kasta, una wanaagsan, u ammaan ah oo u kalsoon yahay, laba jeer oo xiriir ah. Koorsooyinka leh moodeel u gaar ah way haystaan. Beddel kasta waxaa iimayl loogu diraa qaatayaasha digniinaha kharashka waxaana la ilaaliyaa 48 saacadood.';
+$string['settings:autoupgrade_mode'] = 'Habka';
+$string['settings:autoupgrade_mode_desc'] = 'Toos wuu beddelaa marka musharax ku guuleysto. Talo wuxuu tijaabiyaa musharaxiinta wuxuuna halkii ku diraa talo iimayl ah. Dami waxba si toos ah uma sameeyo.';
+$string['settings:autoupgrade_budget_usd'] = 'Miisaaniyadda tijaabada bishii (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Inta ugu badan ee qiimeynaha tooska ahi ku bixin karaan bil taariikheed, garsooraha ku jiro. Qiimeyn ka badin karta bishan xaddigan ma bilaabanto.';
+$string['settings:autoupgrade_eval_courseid'] = 'Aqoonsiga koorsada qiimeynta';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Qiimeynaha waxay ku jawaabaan prompt-ka nidaamka ee koorsadani runtii isticmaasho, oo loo dhisay aqoonsiga martida, sidaa darteed xog arday lama diro. 0 wuxuu doortaa koorsada leh jawaabaha wada-sheekeysiga ugu badan 30-kii maalmood ee la soo dhaafay.';
+$string['privacy:metadata:model_eval'] = 'Qiimeynaha tooska ah ee moodeellada: moodeelka musharaxa ah ee lala barbardhigay moodeelka hadda, iyo natiijada la cabbiray. Xogta shakhsiyeed ee keliya waa aqoonsiga maamulaha codsaday qiimeynta. Safafkani waa dejinta goobta, ma aha xog shakhsiyeed oo arday ku saabsan, sidaa darteed laguma daro dhoofinta xogta lagamana tirtiro marka isticmaale codsado tirtirid.';
+$string['privacy:metadata:model_eval:createdby'] = 'Maamulaha goobta ee codsaday qiimeyntan. Waa madhan marka raadintu saf gelisay.';
+$string['privacy:metadata:model_switch'] = 'Beddelaadyada iyo dib-u-celinta moodeellada: moodeelka doorku ka guuray iyo kan uu u guuray, iyo sababta. Xogta shakhsiyeed ee keliya waa aqoonsiga maamulaha sameeyay ama dib u celiyay beddelka. Safafkani waa dejinta goobta, ma aha xog shakhsiyeed oo arday ku saabsan, sidaa darteed laguma daro dhoofinta xogta lagamana tirtiro marka isticmaale codsado tirtirid.';
+$string['privacy:metadata:model_switch:createdby'] = 'Maamulaha goobta ee sameeyay beddelkan. Waa madhan marka uu toos ahaa.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Maamulaha goobta ee dib u celiyay beddelkan. Waa madhan marka ilaaliyuhu dib u celiyay ama aan dib loo celin.';
+
+$string['autoupgrade:block_reasoning'] = 'Dadaalka fekerka waa hal dejin oo loogu talagalay goobta oo dhan, doorka {$a} sidoo kale wuxuu socodsiiyaa nooc fekera oo aan lagu tijaabin heerka cusub. Gacanta ku beddel haddii taas tahay waxa aad rabto.';
+$string['autoupgrade:block_reasoning_course'] = 'Dadaalka sababaynta waa hal dejin oo loogu talagalay goobta oo dhan, koorsona waxay isticmaashaa moodal fikireed u gaar ah ({$a}) oo aan lagu tijaabin heerka cusub. Gacanta ku beddel haddii taas tahay waxa aad rabto.';

@@ -126,13 +126,14 @@ abstract class openai_compatible_provider extends base_provider implements batch
      *
      * When true and the response carries no explicit reasoning count,
      * {@see shape_usage()} records total - prompt - completion as the
-     * reasoning tokens. False here, so no OpenAI-shaped provider changes
-     * behaviour; gemini_provider overrides it.
+     * reasoning tokens. Read from the capability profile: true for the Gemini
+     * family only, so no OpenAI-shaped provider changes behaviour.
      *
      * @return bool
      */
     protected function completion_excludes_reasoning(): bool {
-        return false;
+        // v7.8.0: a capability-profile field rather than a per-class override.
+        return (bool) ($this->capability_profile()['billed_outside_completion'] ?? false);
     }
 
     /**
@@ -177,21 +178,85 @@ abstract class openai_compatible_provider extends base_provider implements batch
     /**
      * Whether this model expects max_completion_tokens instead of max_tokens.
      *
-     * GPT-5 and OpenAI reasoning-series chat models reject max_tokens.
+     * v7.8.0: answered by the capability profile (rules, then learned facts)
+     * instead of a name check that only knew gpt-5 and the o-series, which is
+     * why every gpt-6 call failed with HTTP 400 on 2026-10-07.
      *
      * @return bool
      */
     protected function uses_max_completion_tokens(): bool {
-        $model = strtolower(trim($this->model));
-        if ($model === '') {
+        if (trim($this->model) === '') {
             return false;
         }
+        return $this->capability_profile()['token_param'] === \local_ai_course_assistant\model_capabilities::TOKENS_MAX_COMPLETION;
+    }
 
-        if (str_starts_with($model, 'gpt-5')) {
-            return true;
+    /**
+     * Output tokens and reasoning control, per the capability profile.
+     *
+     * The answer keeps the max_tokens the caller asked for. A model that
+     * reasons by default gets headroom ON TOP of it (2 x requested, clamped
+     * 512..2048), because on these APIs thinking is paid from the same
+     * output budget as the answer: gpt-5-mini at 1,024 returned 4 empty and 17
+     * truncated answers out of 50 on 2026-10-07, the bug v7.7.6 fixed for
+     * Gemini. The total never exceeds the model's known output limit.
+     *
+     * The reasoning level is the caller's `reasoning` option, else the site's
+     * reasoning_effort setting (default 'low'):
+     *  - OpenAI-style models get reasoning_effort, mapped to a value the model
+     *    accepts. Sent whether or not the call sets max_tokens.
+     *  - Gemini thinking models get Google's thinking_config budget, sent as a
+     *    literal top-level `extra_body` key (a top-level `google` key is a
+     *    400). 'off' sends a budget of 0 where the model allows it.
+     *  - Nothing else is touched, so a model the profile does not describe is
+     *    sent exactly what it was sent before v7.8.0.
+     * reasoning_effort and thinking_config are never both sent: Google rejects
+     * that combination with a 400, and a profile names only one control.
+     *
+     * @param array $body
+     * @param array $profile
+     * @param array $options
+     * @return array
+     */
+    protected function apply_reasoning(array $body, array $profile, array $options): array {
+        $caps = \local_ai_course_assistant\model_capabilities::class;
+        $level = isset($options['reasoning']) && is_string($options['reasoning']) && $options['reasoning'] !== ''
+            ? strtolower($options['reasoning'])
+            : $caps::site_level();
+        $requested = isset($options['max_tokens']) ? (int) $options['max_tokens'] : null;
+        $headroom = 0;
+
+        if ($profile['reasoning'] === $caps::REASONING_OPENAI) {
+            $effort = $caps::effort_for($profile, $level);
+            if ($effort !== null) {
+                $body['reasoning_effort'] = $effort;
+            }
+            if ($requested !== null && !empty($profile['thinks']) && $effort !== 'none') {
+                $headroom = $caps::headroom($requested);
+            }
+        } else if ($profile['reasoning'] === $caps::REASONING_GEMINI && !empty($profile['thinks'])) {
+            $off = $level === 'off' && ($profile['thinking_off'] ?? 'allowed') !== 'forbidden';
+            if ($off) {
+                $body['extra_body'] = ['google' => ['thinking_config' => ['thinking_budget' => 0]]];
+            } else if ($requested !== null && $requested > 0) {
+                $headroom = $caps::headroom($requested);
+                $body['extra_body'] = ['google' => ['thinking_config' => ['thinking_budget' => $headroom]]];
+            }
+        } else if ($requested !== null && !empty($profile['thinks'])) {
+            // Reasons by default but takes no control (o1-mini): headroom only.
+            $headroom = $caps::headroom($requested);
         }
 
-        return preg_match('/^o(?:1|3|4)(?:[-.]|$)/', $model) === 1;
+        if ($requested !== null) {
+            $total = $requested + $headroom;
+            $limit = $profile['max_output_tokens'] ?? null;
+            if ($limit !== null && (int) $limit > 0) {
+                $total = min($total, (int) $limit);
+            }
+            $field = $profile['token_param'] === $caps::TOKENS_MAX_COMPLETION ? 'max_completion_tokens' : 'max_tokens';
+            $body[$field] = $total;
+        }
+        return $body;
     }
 
     /**
@@ -252,13 +317,17 @@ abstract class openai_compatible_provider extends base_provider implements batch
         $body = [
             'model' => $this->model,
             'messages' => $apimessages,
-            'temperature' => $options['temperature'] ?? $this->temperature,
         ];
 
-        if (isset($options['max_tokens'])) {
-            $tokenfield = $this->uses_max_completion_tokens() ? 'max_completion_tokens' : 'max_tokens';
-            $body[$tokenfield] = $options['max_tokens'];
+        // v7.8.0: every parameter that differs between models comes from the
+        // capability profile. Temperature is left out where the model rejects
+        // it (GPT-5 and GPT-6 accept only their default), which is harmless:
+        // the model then uses that default.
+        $profile = $this->capability_profile();
+        if ($profile['temperature'] === \local_ai_course_assistant\model_capabilities::TEMP_ANY) {
+            $body['temperature'] = $options['temperature'] ?? $this->temperature;
         }
+        $body = $this->apply_reasoning($body, $profile, $options);
 
         if (!empty($options['response_schema'])) {
             $schema = $options['response_schema'];
@@ -288,9 +357,21 @@ abstract class openai_compatible_provider extends base_provider implements batch
 
     public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
         $url = $this->baseurl . $this->get_endpoint();
+        $this->begin_call();
         $body = $this->build_body($systemprompt, $messages, false, $options);
         $this->last_finish_reason = null;
-        $response = $this->http_post($url, $this->get_headers(), $body);
+        try {
+            $response = $this->http_post($url, $this->get_headers(), $body);
+        } catch (\Throwable $e) {
+            // v7.8.0: a 400 that names a parameter is fixed and retried ONCE.
+            // Nothing has been shown to anyone on a non-streaming call.
+            if (!$this->heal_request($e, $body, false)) {
+                throw $e;
+            }
+            $body = $this->build_body($systemprompt, $messages, false, $options);
+            $response = $this->http_post($url, $this->get_headers(), $body);
+            $this->commit_heal();
+        }
 
         $data = json_decode($response, true);
         if (is_array($data) && isset($data['choices'][0]['finish_reason'])) {
@@ -316,13 +397,39 @@ abstract class openai_compatible_provider extends base_provider implements batch
 
     public function chat_completion_stream(string $systemprompt, array $messages, callable $callback, array $options = []): void {
         $url = $this->baseurl . $this->get_endpoint();
+        $this->begin_call();
         $body = $this->build_body($systemprompt, $messages, true, $options);
+        // Whether any answer text has reached the caller. A healed retry is
+        // only ever made while this is false, so a learner can never see the
+        // start of an answer twice.
+        $forwarded = false;
+        try {
+            $this->stream_once($url, $body, $callback, $forwarded);
+        } catch (\Throwable $e) {
+            if (!$this->heal_request($e, $body, $forwarded)) {
+                throw $e;
+            }
+            $body = $this->build_body($systemprompt, $messages, true, $options);
+            $this->stream_once($url, $body, $callback, $forwarded);
+            $this->commit_heal();
+        }
+    }
 
+    /**
+     * One streamed request: parse SSE lines, forward content, record usage.
+     *
+     * @param string $url
+     * @param string $body
+     * @param callable $callback
+     * @param bool $forwarded Set to true once any content is forwarded.
+     * @return void
+     */
+    private function stream_once(string $url, string $body, callable $callback, bool &$forwarded): void {
         $buffer = '';
         $this->last_token_usage = null;
         $this->last_finish_reason = null;
 
-        $this->http_post_stream($url, $this->get_headers(), $body, function ($data) use ($callback, &$buffer) {
+        $this->http_post_stream($url, $this->get_headers(), $body, function ($data) use ($callback, &$buffer, &$forwarded) {
             $buffer .= $data;
 
             while (($pos = strpos($buffer, "\n")) !== false) {
@@ -364,6 +471,7 @@ abstract class openai_compatible_provider extends base_provider implements batch
 
                 $content = $event['choices'][0]['delta']['content'] ?? '';
                 if ($content !== '') {
+                    $forwarded = true;
                     $callback($content);
                 }
             }

@@ -3181,3 +3181,166 @@ $string['survey_admin:err_invalid_bounds'] = 'Àwọn ìbéèrè ìdíwọ̀n gb
 $string['survey_admin:err_no_title'] = 'Tẹ àkòrí ìwádìí sí i.';
 
 $string['settings:int_range'] = 'Tẹ nọ́mbà odidi láti {$a->min} sí {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Àwọn òtítọ́ nípa agbára awoṣe tí a kọ́ láti inú ìkọ̀sílẹ̀ olùpèsè';
+$string['settings:reasoning_effort'] = 'Ìpele ìrònú';
+$string['settings:reasoning_effort_desc'] = 'Iye ìrònú tí a ní kí àwọn awoṣe tí ń ronú kí wọ́n tó dáhùn ṣe. Ó kan àwọn awoṣe ìrònú OpenAI (GPT-5, GPT-6, ẹ̀ka o) gẹ́gẹ́ bí <code>reasoning_effort</code>, àti àwọn awoṣe ìrònú Gemini gẹ́gẹ́ bí ìnáwó ìrònú. Gbogbo awoṣe ìrònú tún ń gba àyè fún ìrònú rẹ̀ lórí ìgùn ìdáhùn tí ó wà lókè, nítorí náà ìrònú kò lè gé ìdáhùn kúrú mọ́. Kékeré bá olùkọ́ mu: àwọn ìdáhùn ń dé kíákíá, wọn kò sì wọ́n tó bẹ́ẹ̀. Pa á ń pa ìrònú níbi tí awoṣe bá gbà á láàyè. Àwọn awoṣe tí kò ní ìṣàkóso ìrònú kò ní ka ètò yìí sí.';
+$string['settings:reasoning_effort_off'] = 'Pa á (díẹ̀ jùlọ tí awoṣe gbà láàyè)';
+$string['settings:reasoning_effort_low'] = 'Kékeré (a dámọ̀ràn)';
+$string['settings:reasoning_effort_medium'] = 'Àárín';
+$string['settings:reasoning_effort_high'] = 'Gíga';
+$string['modelregistry:learned_heading'] = 'Àwọn òtítọ́ agbára tí a kọ́ láti ọ̀dọ̀ àwọn olùpèsè';
+$string['modelregistry:learned_desc'] = 'Nígbà tí olùpèsè kan bá kọ ìbéèrè kan nítorí pé awoṣe kò gba paramita kan mọ́, [[tutorshort]] á yí paramita yẹn nìkan padà, á tún gbìyànjú lẹ́ẹ̀kan, á sì rántí àtúnṣe náà níbí kí ìbéèrè tó kàn lè tọ̀nà láti ìgbà àkọ́kọ́. Gbàgbé òtítọ́ kan láti dá awoṣe padà sí àwọn òfin tí ó wá pẹ̀lú ohun èlò náà.';
+$string['modelregistry:learned_none'] = 'Kò sí olùpèsè tí ó tíì kọ ìrísí ìbéèrè kan.';
+$string['modelregistry:col_field'] = 'Agbára';
+$string['modelregistry:col_value'] = 'Iye tí a kọ́';
+$string['modelregistry:col_evidence'] = 'Ohun tí olùpèsè sọ';
+$string['modelregistry:forget'] = 'Gbàgbé';
+$string['modelregistry:forget_confirm'] = 'Ṣé kí a gbàgbé òtítọ́ yìí? Ìbéèrè tó kàn sí awoṣe yìí yóò tún lo àwọn òfin tí ó wá pẹ̀lú ohun èlò náà.';
+$string['modelregistry:forget_done'] = 'A ti gbàgbé òtítọ́ náà. Ìbéèrè tó kàn sí awoṣe yìí yóò lo àwọn òfin tí ó wá pẹ̀lú ohun èlò náà.';
+$string['modelregistry:forget_missing'] = 'Òtítọ́ yẹn kò sí mọ́.';
+$string['event:model_capability_learned'] = 'A kọ́ agbára awoṣe láti ọ̀dọ̀ olùpèsè kan';
+
+$string['autoupgrade:title'] = 'Ìgbéga awoṣe';
+$string['autoupgrade:navtitle'] = 'Ìgbéga awoṣe [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] máa ń wá àwọn awoṣe tuntun láti ọ̀dọ̀ àwọn olùpèsè tí ó ti ń lò tẹ́lẹ̀, ó máa ń dán olùdíje kọ̀ọ̀kan wò lòdì sí awoṣe tí yóò rọ́pò (àwọn ìtọ́ni kan náà, ìnáwó ìdáhùn kan náà, onídàájọ́ kan náà, nínú ìṣiṣẹ́ kan náà), ó sì máa ń yípadà nìkan nígbà tí olùdíje bá ní iye owó kan náà tàbí tí ó dínwó jù fún ìdáhùn kọ̀ọ̀kan, tí ó dára tó, tí ó wà láìléwu tó, tí a sì lè gbẹ́kẹ̀lé tó, lẹ́ẹ̀mejì ní ìtẹ̀léra. A máa ń ṣọ́ ìyípadà kọ̀ọ̀kan fún wákàtí 48 lórí ìlò gidi, a sì máa ń dá a padà tí ó bá burú sí i.';
+$string['autoupgrade:l_statusheading'] = 'Ipò';
+$string['autoupgrade:l_mode'] = 'Ìlànà';
+$string['autoupgrade:l_budget'] = 'Ìnáwó ìdánwò';
+$string['autoupgrade:l_changemode'] = 'Yípadà';
+$string['autoupgrade:l_discover'] = 'Wá àwọn awoṣe báyìí';
+$string['autoupgrade:l_rolesheading'] = 'Àwọn ipa';
+$string['autoupgrade:l_current'] = 'Awoṣe lọ́wọ́lọ́wọ́';
+$string['autoupgrade:l_profile'] = 'Àkọsílẹ̀ agbára';
+$string['autoupgrade:l_policy'] = 'Àwọn ìgbéga';
+$string['autoupgrade:l_nocandidates'] = 'Kò sí olùdíje. Ìwákiri máa ń sàmì sí àwọn awoṣe láti ọ̀dọ̀ olùpèsè kan náà tí iye owó wọn jọra.';
+$string['autoupgrade:l_colpasses'] = 'Ìgbà tí ó yege';
+$string['autoupgrade:l_collast'] = 'Àyẹ̀wò tó kẹ́yìn';
+$string['autoupgrade:l_evaluate'] = 'Ṣàyẹ̀wò báyìí';
+$string['autoupgrade:l_evaluating'] = 'Ó wà nínú ìlà tàbí ó ń ṣiṣẹ́';
+$string['autoupgrade:l_switch'] = 'Yí i padà';
+$string['autoupgrade:l_switchconfirm'] = 'Ṣé kí a yí ipa yìí padà sí olùdíje náà báyìí? A ó ṣọ́ ìyípadà náà fún wákàtí 48, a sì lè dá a padà.';
+$string['autoupgrade:l_evalsheading'] = 'Àwọn àyẹ̀wò';
+$string['autoupgrade:l_noevals'] = 'Kò sí àyẹ̀wò kankan síbẹ̀.';
+$string['autoupgrade:l_colwhen'] = 'Ìgbà wo';
+$string['autoupgrade:l_colrole'] = 'Ipa';
+$string['autoupgrade:l_colcandidate'] = 'Olùdíje';
+$string['autoupgrade:l_colincumbent'] = 'Awoṣe lọ́wọ́lọ́wọ́';
+$string['autoupgrade:l_colcost'] = 'Iye tí a ná / ìfojúbù';
+$string['autoupgrade:l_colgate'] = 'Àwọn àyẹ̀wò ààlà';
+$string['autoupgrade:l_switchesheading'] = 'Àwọn ìyípadà àti ìdápadà';
+$string['autoupgrade:l_noswitches'] = 'Kò sí ìyípadà kankan síbẹ̀.';
+$string['autoupgrade:l_colfrom'] = 'Láti';
+$string['autoupgrade:l_colto'] = 'Sí';
+$string['autoupgrade:l_colmode'] = 'Bí ó ṣe ṣẹlẹ̀';
+$string['autoupgrade:l_colreason'] = 'Ìdí';
+$string['autoupgrade:l_coluntil'] = 'A ń ṣọ́ ọ títí di';
+$string['autoupgrade:l_rollback'] = 'Dá a padà';
+$string['autoupgrade:l_rollbackconfirm'] = 'Ṣé kí a dá awoṣe ti tẹ́lẹ̀ padà báyìí?';
+$string['autoupgrade:l_manage'] = 'Ṣàtúnyẹ̀wò tàbí gbàgbé àwọn òtítọ́ tí a ti kọ́ lójú ewé registry awoṣe';
+$string['autoupgrade:l_notinuse'] = 'a kò lò ó';
+$string['autoupgrade:mode_off'] = 'Pípa: kò sí ohun aládàáṣe';
+$string['autoupgrade:mode_recommend'] = 'Ṣèdámọ̀ràn: dán àwọn olùdíje wò kí o sì fi ìmọ̀ràn ránṣẹ́ nípasẹ̀ ímeèlì';
+$string['autoupgrade:mode_auto'] = 'Aládàáṣe: dán àwọn olùdíje wò kí o sì yípadà nígbà tí ọ̀kan bá yege';
+$string['autoupgrade:budget_line'] = 'A ti ná ${$a->spent} nínú ${$a->limit} ní oṣù yìí (${$a->left} ló kù)';
+$string['autoupgrade:last_discovery'] = 'Ìwákiri ṣiṣẹ́ kẹ́yìn ní {$a}.';
+$string['autoupgrade:never_discovered'] = 'Ìwákiri kò tíì ṣiṣẹ́ rí.';
+$string['autoupgrade:role_chat'] = 'Ìjíròrò (awoṣe àkọ́kọ́)';
+$string['autoupgrade:role_premium'] = 'Ìpele Ere';
+$string['autoupgrade:role_failover'] = 'Awoṣe àfidípò';
+$string['autoupgrade:role_quiz'] = 'Ṣíṣe ìdánwò kékeré';
+$string['autoupgrade:role_classifier'] = 'Olùpínsísọ̀rí ìmọ̀ọ́ṣe';
+$string['autoupgrade:role_safety'] = 'Ìtọ́kasí ààbò';
+$string['autoupgrade:role_soapbox'] = 'Ìfimáàkì Soapbox';
+$string['autoupgrade:not_configured'] = 'A kò ṣètò rẹ̀ (ó ń jogún awoṣe ìjíròrò)';
+$string['autoupgrade:policy_auto'] = 'A ń ṣàyẹ̀wò rẹ̀, a sì ń yí i padà fúnra rẹ̀ ní ìlànà Aládàáṣe';
+$string['autoupgrade:policy_recommend'] = 'A ń ṣàyẹ̀wò rẹ̀ a sì ń dámọ̀ràn rẹ̀; alábòójútó ló ń yí i padà';
+$string['autoupgrade:policy_none'] = 'Àwọn olùdíje nìkan ni a ṣe àkójọ: kò sí ìwọ̀n àfiwé tí ó ń wọn iṣẹ́ ipa yìí';
+$string['autoupgrade:cand_candidate'] = 'Olùdíje';
+$string['autoupgrade:cand_passed'] = 'Ó yege lẹ́ẹ̀kan';
+$string['autoupgrade:cand_eligible'] = 'Ó tọ́';
+$string['autoupgrade:cand_failed'] = 'Kò yege';
+$string['autoupgrade:cand_switched'] = 'A ń lò ó';
+$string['autoupgrade:cand_rolledback'] = 'A ti dá a padà';
+$string['autoupgrade:cand_retired'] = 'Kò sí nínú àkójọ mọ́';
+$string['autoupgrade:eval_queued'] = 'Ó wà nínú ìlà';
+$string['autoupgrade:eval_running'] = 'Ó ń ṣiṣẹ́';
+$string['autoupgrade:eval_complete'] = 'Ó ti parí';
+$string['autoupgrade:eval_failed'] = 'Ó kùnà';
+$string['autoupgrade:eval_skipped'] = 'A kò ṣe é';
+$string['autoupgrade:gate_pass'] = 'Ó yege:';
+$string['autoupgrade:gate_fail'] = 'Kò yege:';
+$string['autoupgrade:how_auto'] = 'Aládàáṣe';
+$string['autoupgrade:how_manual'] = 'Látọwọ́ alábòójútó';
+$string['autoupgrade:switch_watching'] = 'A ń ṣọ́ ọ';
+$string['autoupgrade:switch_kept'] = 'A pa á mọ́';
+$string['autoupgrade:switch_rolledback'] = 'A ti dá a padà';
+$string['autoupgrade:switch_superseded'] = 'Alábòójútó ti yí i padà lẹ́yìn náà';
+$string['autoupgrade:block_role'] = 'A kò lè yí ipa yìí padà láti ibí.';
+$string['autoupgrade:block_emergency'] = 'Ìdarí pàjáwìrì kan ń ṣiṣẹ́, nítorí náà a kò ní yí awoṣe kankan padà títí a ó fi dá a padà sí bí ó ti wà.';
+$string['autoupgrade:block_allowlist'] = 'Ètò {$a} kì í ṣe èyí tí ìyípadà lè yí láìsí ènìyàn, nítorí náà ọwọ́ ni a fi ń yí ipa yìí padà.';
+$string['autoupgrade:block_bundle'] = 'Àpò ìlànà tí a fọwọ́ sí ló ń ṣàkóso ètò {$a}. Yí awoṣe náà padà nínú àpò náà dípò.';
+$string['autoupgrade:block_watching'] = 'A ṣì ń ṣọ́ ìyípadà kan ti ipa yìí. Dúró títí a ó fi pa á mọ́ tàbí dá a padà.';
+$string['autoupgrade:block_noeval'] = 'Olùdíje yìí kò ní àyẹ̀wò tí ó ti parí.';
+$string['autoupgrade:block_gate'] = 'Àyẹ̀wò tó kẹ́yìn ti olùdíje yìí kò yege ààlà náà.';
+$string['autoupgrade:block_changed'] = 'Awoṣe ipa náà yípadà lẹ́yìn àyẹ̀wò, nítorí náà kò fi ẹgbẹ́ méjì tó tọ́ wéra mọ́. Ṣàyẹ̀wò lẹ́ẹ̀kan sí i.';
+$string['autoupgrade:switched'] = 'A ti yí {$a->role} padà sí {$a->model}. A ó ṣọ́ ọ fún wákàtí 48.';
+$string['autoupgrade:rolledback'] = 'A ti dá ìyípadà {$a} padà.';
+$string['autoupgrade:rollback_missing'] = 'A kò lè dá ìyípadà yẹn padà.';
+$string['autoupgrade:rollback_superseded'] = 'A yí àwọn ètò padà lẹ́yìn ìyípadà náà, nítorí náà a kò dá nǹkan kan padà.';
+$string['autoupgrade:rollback_by_admin'] = 'Alábòójútó ló dá a padà.';
+$string['autoupgrade:queued'] = 'Àyẹ̀wò ti wà nínú ìlà. Yóò ṣiṣẹ́ ní ìgbà cron tó kàn, yóò sì gba ìṣẹ́jú díẹ̀.';
+$string['autoupgrade:discovered'] = 'Ìwákiri ṣe àkójọ olùpèsè {$a->providers}, ó forúkọ awoṣe {$a->registered} sílẹ̀, ó sì sàmì sí olùdíje {$a->candidates}. Àwọn olùpèsè tí a kò lè ṣe àkójọ wọn: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'A kì í yí ipa yìí padà fúnra rẹ̀.';
+$string['autoupgrade:why_recommend_mode'] = 'Ìgbéga awoṣe aládàáṣe wà ní ìlànà Ṣèdámọ̀ràn.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] A ti yí {$a->role} padà sí {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] ti yí ipa {$a->role} padà láti {$a->from} sí {$a->to}.
+
+Ó yege gbogbo àyẹ̀wò lòdì sí awoṣe lọ́wọ́lọ́wọ́, tí a wọ̀n nínú ìṣiṣẹ́ kan náà, lẹ́ẹ̀mejì ní ìtẹ̀léra:
+{$a->gate}
+
+A ó ṣọ́ awoṣe tuntun náà lórí ìlò gidi fún wákàtí {$a->hours}, a ó sì dá a padà fúnra rẹ̀ tí àṣìṣe, ìdáhùn tí ó gé kúrú, ìkọ̀sílẹ̀ tàbí iye owó ìdáhùn kọ̀ọ̀kan bá burú sí i. O lè dá a padà fúnra rẹ nígbàkígbà:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] A ti dá {$a->role} padà sí {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] ti dá ipa {$a->role} padà láti {$a->to} sí {$a->from}.
+
+Ìdí: {$a->reason}
+
+A kò ní gbìyànjú olùdíje náà mọ́ fún ọjọ́ 30. Àlàyé:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] A pa ìyípadà {$a->role} sí {$a->to} mọ́';
+$string['autoupgrade:mail_kept_body'] = 'Ìyípadà ipa {$a->role} láti {$a->from} sí {$a->to} dúró dáadáa fún wákàtí {$a->hours} lórí ìdáhùn gidi {$a->turns}, a sì pa á mọ́.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'A pa ìyípadà ipa {$a->role} láti {$a->from} sí {$a->to} mọ́ lẹ́yìn wákàtí {$a->hours}, ṣùgbọ́n ìdáhùn gidi {$a->turns} péré ni a rí, wọ́n kéré jù láti ṣèdájọ́. Máa ṣọ́ ọ.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Ìmọ̀ràn: {$a->role} lórí {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} yege gbogbo àyẹ̀wò lòdì sí {$a->current} fún ipa {$a->role}, lẹ́ẹ̀mejì ní ìtẹ̀léra, a kò sì yí i padà fúnra rẹ̀: {$a->why}
+
+{$a->gate}
+
+Yí i padà, tàbí fi sílẹ̀, níbí:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'O gba èyí nítorí pé àdírẹ́sì rẹ jẹ́ olùgbà ìkìlọ̀ ìnáwó [[tutorshort]].';
+$string['event:model_switched'] = 'A ti yí awoṣe padà';
+$string['event:model_switch_rolled_back'] = 'A ti dá ìyípadà awoṣe padà';
+$string['task:discover_models'] = 'Wá àwọn awoṣe AI tuntun kí o sì fi àwọn àyẹ̀wò sínú ìlà';
+$string['task:evaluate_model_candidate'] = 'Ṣàyẹ̀wò awoṣe AI olùdíje kan';
+$string['task:watch_model_switches'] = 'Ṣọ́ àwọn ìyípadà awoṣe AI àìpẹ́ yìí';
+$string['settings:autoupgrade_heading'] = 'Ìgbéga awoṣe aládàáṣe';
+$string['settings:autoupgrade_heading_desc'] = 'Lójoojúmọ́ [[tutorshort]] máa ń ṣe àkójọ àwọn awoṣe tí àwọn olùpèsè rẹ ń pèsè, ó sì máa ń sàmì sí àwọn olùdíje fún ipa kọ̀ọ̀kan: olùpèsè kan náà, iye owó àkójọ tí ó jọra, àti iye owó tí a mọ̀. Ó máa ń dán wọn wò lòdì sí awoṣe lọ́wọ́lọ́wọ́ lórí àwọn ìtọ́ni olùkọ́, àkójọ ìdánwò jailbreak àti iye owó tí ó jọ ti lílò gidi, ó sì máa ń yí awoṣe àyànfẹ́ ojú òpó padà nìkan nígbà tí olùdíje bá ní iye owó kan náà tàbí tí ó dínwó jù fún ìdáhùn kọ̀ọ̀kan, tí ó dára tó, tí ó wà láìléwu tó, tí a sì lè gbẹ́kẹ̀lé tó, lẹ́ẹ̀mejì ní ìtẹ̀léra. Àwọn kọ́ọ̀sì tí wọ́n ní awoṣe tiwọn máa ń pa á mọ́. A máa ń fi ímeèlì ránṣẹ́ nípa ìyípadà kọ̀ọ̀kan sí àwọn olùgbà ìkìlọ̀ ìnáwó, a sì máa ń ṣọ́ ọ fún wákàtí 48.';
+$string['settings:autoupgrade_mode'] = 'Ìlànà';
+$string['settings:autoupgrade_mode_desc'] = 'Aládàáṣe máa ń yípadà nígbà tí olùdíje bá yege. Ṣèdámọ̀ràn máa ń dán àwọn olùdíje wò, ó sì máa ń fi ìmọ̀ràn ránṣẹ́ nípasẹ̀ ímeèlì dípò. Pípa kì í ṣe nǹkan kan fúnra rẹ̀.';
+$string['settings:autoupgrade_budget_usd'] = 'Ìnáwó ìdánwò oṣooṣù (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Iye tó pọ̀ jù tí àwọn àyẹ̀wò aládàáṣe lè ná nínú oṣù kàlẹ́ńdà kan, pẹ̀lú onídàájọ́. Àyẹ̀wò tí ó lè mú oṣù kọjá iye yìí kò ní bẹ̀rẹ̀.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID kọ́ọ̀sì àyẹ̀wò';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Àwọn àyẹ̀wò máa ń dáhùn lábẹ́ ìtọ́ni ètò tí kọ́ọ̀sì yìí ń lò ní tòótọ́, tí a kọ́ fún ìdánimọ̀ àlejò kí a má baà fi dátà akẹ́kọ̀ọ́ kankan ránṣẹ́. 0 máa ń yan kọ́ọ̀sì tí ó ní ìdáhùn ìjíròrò jù lọ ní ọjọ́ 30 sẹ́yìn.';
+$string['privacy:metadata:model_eval'] = 'Àwọn àyẹ̀wò awoṣe aládàáṣe: awoṣe olùdíje wo ni a fi wé awoṣe lọ́wọ́lọ́wọ́ wo, àti èsì tí a wọ̀n. Dátà ti ara ẹni kan ṣoṣo ni ìdánimọ̀ alábòójútó tí ó béèrè fún àyẹ̀wò náà. Àwọn ìlà yìí jẹ́ ètò ojú òpó, kì í ṣe dátà ti ara ẹni nípa akẹ́kọ̀ọ́, nítorí náà a kò fi wọ́n sínú ìkójáde dátà, a kò sì pa wọ́n rẹ́ nígbà tí olùlò bá béèrè pé kí a pa dátà rẹ̀ rẹ́.';
+$string['privacy:metadata:model_eval:createdby'] = 'Alábòójútó ojú òpó tí ó béèrè fún àyẹ̀wò yìí. Ó ṣófo nígbà tí ìwákiri ló fi í sínú ìlà.';
+$string['privacy:metadata:model_switch'] = 'Àwọn ìyípadà àti ìdápadà awoṣe: awoṣe wo ni ipa kan ti kúrò àti èyí tí ó lọ sí, àti ìdí rẹ̀. Dátà ti ara ẹni kan ṣoṣo ni ìdánimọ̀ alábòójútó tí ó ṣe ìyípadà náà tàbí tí ó yí i padà. Àwọn ìlà yìí jẹ́ ètò ojú òpó, kì í ṣe dátà ti ara ẹni nípa akẹ́kọ̀ọ́, nítorí náà a kò fi wọ́n sínú ìkójáde dátà, a kò sì pa wọ́n rẹ́ nígbà tí olùlò bá béèrè pé kí a pa dátà rẹ̀ rẹ́.';
+$string['privacy:metadata:model_switch:createdby'] = 'Alábòójútó ojú òpó tí ó ṣe ìyípadà yìí. Ó ṣófo nígbà tí ó jẹ́ aládàáṣe.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Alábòójútó ojú òpó tí ó dá ìyípadà yìí padà. Ó ṣófo nígbà tí olùṣọ́ ló ṣe é, tàbí tí a kò dá a padà.';
+
+$string['autoupgrade:block_reasoning'] = 'Ìpele ìrònú jẹ́ ètò kan ṣoṣo fún gbogbo ojú òpó, ipa {$a} náà sì ń lo àwòṣe ìrònú tí a kò tíì dánwò ní ìpele tuntun náà. Yí i padà fúnra rẹ bí ìyẹn bá jẹ́ ohun tí o fẹ́.';
+$string['autoupgrade:block_reasoning_course'] = 'Ìsapá ìrònú jẹ́ ètò kan fún gbogbo ojú-òpó náà, ẹ̀kọ́ kan sì ń lo àwòṣe ìrònú tirẹ̀ ({$a}) tí a kò dán wò ní ìpele tuntun. Yí i padà fúnra rẹ bí ìyẹn bá ni ohun tí o fẹ́.';

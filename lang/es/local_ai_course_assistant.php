@@ -3187,3 +3187,166 @@ $string['survey_admin:err_invalid_bounds'] = 'Las preguntas de valoración deben
 $string['survey_admin:err_no_title'] = 'Introduce un título para la encuesta.';
 
 $string['settings:int_range'] = 'Introduce un número entero entre {$a->min} y {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Datos de capacidades de modelos aprendidos de los rechazos de proveedores';
+$string['settings:reasoning_effort'] = 'Esfuerzo de razonamiento';
+$string['settings:reasoning_effort_desc'] = 'Cuánto se pide pensar a los modelos que razonan antes de responder. Se aplica a los modelos de razonamiento de OpenAI (GPT-5, GPT-6, serie o) como <code>reasoning_effort</code> y a los modelos de pensamiento de Gemini como presupuesto de pensamiento. Cada modelo de razonamiento también recibe espacio para pensar además de la longitud de respuesta indicada arriba, por lo que el pensamiento ya no puede cortar una respuesta. Bajo es adecuado para un tutor: las respuestas llegan antes y cuestan menos. Desactivado apaga el pensamiento cuando el modelo lo permite. Los modelos sin control de razonamiento ignoran este ajuste.';
+$string['settings:reasoning_effort_off'] = 'Desactivado (lo mínimo que permita el modelo)';
+$string['settings:reasoning_effort_low'] = 'Bajo (recomendado)';
+$string['settings:reasoning_effort_medium'] = 'Medio';
+$string['settings:reasoning_effort_high'] = 'Alto';
+$string['modelregistry:learned_heading'] = 'Datos de capacidades aprendidos de los proveedores';
+$string['modelregistry:learned_desc'] = 'Cuando un proveedor rechaza una solicitud porque un modelo ya no acepta un parámetro, [[tutorshort]] cambia solo ese parámetro, reintenta una vez y guarda la corrección aquí para que la siguiente solicitud sea correcta desde el principio. Olvide un dato para que el modelo vuelva a las reglas predeterminadas.';
+$string['modelregistry:learned_none'] = 'Ningún proveedor ha rechazado todavía el formato de una solicitud.';
+$string['modelregistry:col_field'] = 'Capacidad';
+$string['modelregistry:col_value'] = 'Valor aprendido';
+$string['modelregistry:col_evidence'] = 'Lo que dijo el proveedor';
+$string['modelregistry:forget'] = 'Olvidar';
+$string['modelregistry:forget_confirm'] = '¿Olvidar este dato? La siguiente solicitud a este modelo volverá a usar las reglas predeterminadas.';
+$string['modelregistry:forget_done'] = 'Dato olvidado. La siguiente solicitud a este modelo usa las reglas predeterminadas.';
+$string['modelregistry:forget_missing'] = 'Ese dato ya no existe.';
+$string['event:model_capability_learned'] = 'Capacidad de modelo aprendida de un proveedor';
+
+$string['autoupgrade:title'] = 'Actualizaciones de modelos';
+$string['autoupgrade:navtitle'] = 'Actualizaciones de modelos de [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] busca modelos más nuevos de los proveedores que ya usa, prueba cada candidato frente al modelo que reemplazaría (mismas instrucciones, mismo presupuesto de respuesta, mismo evaluador, en la misma ejecución) y solo cambia cuando el candidato cuesta lo mismo o menos por respuesta y es igual de bueno, seguro y fiable, dos veces seguidas. Cada cambio se vigila durante 48 horas con tráfico real y se revierte si empeora.';
+$string['autoupgrade:l_statusheading'] = 'Estado';
+$string['autoupgrade:l_mode'] = 'Modo';
+$string['autoupgrade:l_budget'] = 'Presupuesto de pruebas';
+$string['autoupgrade:l_changemode'] = 'Cambiar';
+$string['autoupgrade:l_discover'] = 'Descubrir modelos ahora';
+$string['autoupgrade:l_rolesheading'] = 'Funciones';
+$string['autoupgrade:l_current'] = 'Modelo actual';
+$string['autoupgrade:l_profile'] = 'Perfil de capacidades';
+$string['autoupgrade:l_policy'] = 'Actualizaciones';
+$string['autoupgrade:l_nocandidates'] = 'No hay candidatos. El descubrimiento marca modelos del mismo proveedor con un precio comparable.';
+$string['autoupgrade:l_colpasses'] = 'Aprobaciones';
+$string['autoupgrade:l_collast'] = 'Última evaluación';
+$string['autoupgrade:l_evaluate'] = 'Evaluar ahora';
+$string['autoupgrade:l_evaluating'] = 'En cola o en curso';
+$string['autoupgrade:l_switch'] = 'Cambiar modelo';
+$string['autoupgrade:l_switchconfirm'] = '¿Cambiar ahora esta función al candidato? El cambio se vigila durante 48 horas y se puede revertir.';
+$string['autoupgrade:l_evalsheading'] = 'Evaluaciones';
+$string['autoupgrade:l_noevals'] = 'Aún no hay evaluaciones.';
+$string['autoupgrade:l_colwhen'] = 'Cuándo';
+$string['autoupgrade:l_colrole'] = 'Función';
+$string['autoupgrade:l_colcandidate'] = 'Candidato';
+$string['autoupgrade:l_colincumbent'] = 'Modelo actual';
+$string['autoupgrade:l_colcost'] = 'Gastado / estimado';
+$string['autoupgrade:l_colgate'] = 'Controles de aprobación';
+$string['autoupgrade:l_switchesheading'] = 'Cambios y reversiones';
+$string['autoupgrade:l_noswitches'] = 'Aún no hay cambios.';
+$string['autoupgrade:l_colfrom'] = 'De';
+$string['autoupgrade:l_colto'] = 'A';
+$string['autoupgrade:l_colmode'] = 'Cómo';
+$string['autoupgrade:l_colreason'] = 'Motivo';
+$string['autoupgrade:l_coluntil'] = 'Vigilado hasta';
+$string['autoupgrade:l_rollback'] = 'Revertir';
+$string['autoupgrade:l_rollbackconfirm'] = '¿Restaurar ahora el modelo anterior?';
+$string['autoupgrade:l_manage'] = 'Revise u olvide los datos aprendidos en la página del registro de modelos';
+$string['autoupgrade:l_notinuse'] = 'sin usar';
+$string['autoupgrade:mode_off'] = 'Desactivado: nada automático';
+$string['autoupgrade:mode_recommend'] = 'Recomendar: probar candidatos y enviar una recomendación por correo';
+$string['autoupgrade:mode_auto'] = 'Automático: probar candidatos y cambiar cuando uno apruebe';
+$string['autoupgrade:budget_line'] = '${$a->spent} de ${$a->limit} gastados este mes (quedan ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'El descubrimiento se ejecutó por última vez {$a}.';
+$string['autoupgrade:never_discovered'] = 'El descubrimiento aún no se ha ejecutado.';
+$string['autoupgrade:role_chat'] = 'Chat (modelo principal)';
+$string['autoupgrade:role_premium'] = 'Nivel premium';
+$string['autoupgrade:role_failover'] = 'Respaldo';
+$string['autoupgrade:role_quiz'] = 'Generación de cuestionarios';
+$string['autoupgrade:role_classifier'] = 'Clasificador de dominio';
+$string['autoupgrade:role_safety'] = 'Referencia de seguridad';
+$string['autoupgrade:role_soapbox'] = 'Puntuación de Soapbox';
+$string['autoupgrade:not_configured'] = 'Sin configurar (hereda el modelo de chat)';
+$string['autoupgrade:policy_auto'] = 'Se evalúa y se cambia automáticamente en modo Automático';
+$string['autoupgrade:policy_recommend'] = 'Se evalúa y se recomienda; un administrador lo cambia';
+$string['autoupgrade:policy_none'] = 'Solo se listan candidatos: ninguna prueba mide la tarea de esta función';
+$string['autoupgrade:cand_candidate'] = 'Candidato';
+$string['autoupgrade:cand_passed'] = 'Aprobó una vez';
+$string['autoupgrade:cand_eligible'] = 'Apto';
+$string['autoupgrade:cand_failed'] = 'No aprobó';
+$string['autoupgrade:cand_switched'] = 'En uso';
+$string['autoupgrade:cand_rolledback'] = 'Revertido';
+$string['autoupgrade:cand_retired'] = 'Ya no aparece';
+$string['autoupgrade:eval_queued'] = 'En cola';
+$string['autoupgrade:eval_running'] = 'En curso';
+$string['autoupgrade:eval_complete'] = 'Completada';
+$string['autoupgrade:eval_failed'] = 'Fallida';
+$string['autoupgrade:eval_skipped'] = 'No ejecutada';
+$string['autoupgrade:gate_pass'] = 'Aprobado:';
+$string['autoupgrade:gate_fail'] = 'No aprobado:';
+$string['autoupgrade:how_auto'] = 'Automático';
+$string['autoupgrade:how_manual'] = 'Por un administrador';
+$string['autoupgrade:switch_watching'] = 'En vigilancia';
+$string['autoupgrade:switch_kept'] = 'Mantenido';
+$string['autoupgrade:switch_rolledback'] = 'Revertido';
+$string['autoupgrade:switch_superseded'] = 'Cambiado después por un administrador';
+$string['autoupgrade:block_role'] = 'Esta función no se puede cambiar desde aquí.';
+$string['autoupgrade:block_emergency'] = 'Hay un control de emergencia activado, así que no se cambia ningún modelo hasta que se restablezca.';
+$string['autoupgrade:block_allowlist'] = 'El ajuste {$a} no es uno que un cambio pueda modificar sin una persona, así que esta función se cambia a mano.';
+$string['autoupgrade:block_bundle'] = 'El ajuste {$a} lo gestiona el paquete de políticas firmado. Cambie el modelo en el paquete.';
+$string['autoupgrade:block_watching'] = 'Todavía se vigila un cambio de esta función. Espere a que se mantenga o se revierta.';
+$string['autoupgrade:block_noeval'] = 'Este candidato no tiene ninguna evaluación completada.';
+$string['autoupgrade:block_gate'] = 'La última evaluación de este candidato no superó los controles.';
+$string['autoupgrade:block_changed'] = 'El modelo de la función cambió después de la evaluación, así que ya no compara el par correcto. Vuelva a evaluar.';
+$string['autoupgrade:switched'] = 'Se cambió {$a->role} a {$a->model}. Se vigila durante 48 horas.';
+$string['autoupgrade:rolledback'] = 'Se revirtió el cambio de {$a}.';
+$string['autoupgrade:rollback_missing'] = 'Ese cambio no se puede revertir.';
+$string['autoupgrade:rollback_superseded'] = 'Los ajustes se modificaron después del cambio, así que no se revirtió nada.';
+$string['autoupgrade:rollback_by_admin'] = 'Revertido por un administrador.';
+$string['autoupgrade:queued'] = 'Evaluación en cola. Se ejecuta en la próxima pasada del cron y tarda varios minutos.';
+$string['autoupgrade:discovered'] = 'El descubrimiento listó {$a->providers} proveedor(es), registró {$a->registered} modelo(s) y marcó {$a->candidates} candidato(s). Proveedores que no se pudieron listar: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Esta función no se cambia automáticamente.';
+$string['autoupgrade:why_recommend_mode'] = 'Las actualizaciones automáticas de modelos están en modo Recomendar.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} cambiado a {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] cambió la función {$a->role} de {$a->from} a {$a->to}.
+
+Superó todos los controles frente al modelo actual, medidos en la misma ejecución, dos veces seguidas:
+{$a->gate}
+
+El nuevo modelo se vigila con tráfico real durante {$a->hours} horas y se revierte automáticamente si empeoran los errores, las respuestas cortadas, los rechazos o el coste por respuesta. Puede revertirlo usted mismo en cualquier momento:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} revertido a {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] devolvió la función {$a->role} de {$a->to} a {$a->from}.
+
+Motivo: {$a->reason}
+
+El candidato no se volverá a probar durante 30 días. Detalles:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] se mantiene el cambio de {$a->role} a {$a->to}';
+$string['autoupgrade:mail_kept_body'] = 'El cambio de la función {$a->role} de {$a->from} a {$a->to} funcionó bien durante {$a->hours} horas con {$a->turns} respuestas reales y se mantiene.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'El cambio de la función {$a->role} de {$a->from} a {$a->to} se mantiene tras {$a->hours} horas, pero solo se vieron {$a->turns} respuestas reales, muy pocas para juzgar. Vigílelo.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Recomendado: {$a->role} con {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} superó todos los controles frente a {$a->current} para la función {$a->role}, dos veces seguidas, y no se cambió automáticamente: {$a->why}
+
+{$a->gate}
+
+Cámbielo, o déjelo como está, aquí:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Recibe este mensaje porque su dirección es destinataria de las alertas de gasto de [[tutorshort]].';
+$string['event:model_switched'] = 'Modelo cambiado';
+$string['event:model_switch_rolled_back'] = 'Cambio de modelo revertido';
+$string['task:discover_models'] = 'Descubrir nuevos modelos de IA y poner evaluaciones en cola';
+$string['task:evaluate_model_candidate'] = 'Evaluar un modelo de IA candidato';
+$string['task:watch_model_switches'] = 'Vigilar los cambios recientes de modelos de IA';
+$string['settings:autoupgrade_heading'] = 'Actualizaciones automáticas de modelos';
+$string['settings:autoupgrade_heading_desc'] = 'Cada día [[tutorshort]] lista los modelos que ofrecen sus proveedores y marca candidatos para cada función: mismo proveedor, precio de lista comparable y precio conocido. Los prueba frente al modelo actual con las instrucciones del tutor, la batería de jailbreak y un coste similar al real, y cambia el modelo predeterminado del sitio solo cuando un candidato cuesta lo mismo o menos por respuesta y es igual de bueno, seguro y fiable, dos veces seguidas. Los cursos con su propio modelo lo conservan. Cada cambio se notifica por correo a los destinatarios de alertas de gasto y se vigila durante 48 horas.';
+$string['settings:autoupgrade_mode'] = 'Modo';
+$string['settings:autoupgrade_mode_desc'] = 'Automático cambia cuando un candidato aprueba. Recomendar prueba candidatos y envía una recomendación por correo. Desactivado no hace nada automático.';
+$string['settings:autoupgrade_budget_usd'] = 'Presupuesto mensual de pruebas (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Lo máximo que pueden gastar las evaluaciones automáticas en un mes natural, evaluador incluido. Una evaluación que podría superar este límite del mes no se inicia.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID del curso de evaluación';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Las evaluaciones responden con el prompt del sistema que este curso usa realmente, generado para la identidad de invitado para no enviar datos de ningún estudiante. 0 elige el curso con más respuestas de chat en los últimos 30 días.';
+$string['privacy:metadata:model_eval'] = 'Evaluaciones automáticas de modelos: qué modelo candidato se comparó con qué modelo actual y el resultado medido. El único dato personal es el identificador del administrador que solicitó la evaluación. Estas filas son configuración del sitio y no datos personales de un estudiante, por lo que no se incluyen en una exportación de datos ni se eliminan cuando un usuario solicita el borrado.';
+$string['privacy:metadata:model_eval:createdby'] = 'El administrador del sitio que solicitó esta evaluación. Vacío cuando la puso en cola el descubrimiento.';
+$string['privacy:metadata:model_switch'] = 'Cambios y reversiones de modelos: de qué modelo a qué modelo pasó una función y por qué. El único dato personal es el identificador del administrador que hizo o deshizo el cambio. Estas filas son configuración del sitio y no datos personales de un estudiante, por lo que no se incluyen en una exportación de datos ni se eliminan cuando un usuario solicita el borrado.';
+$string['privacy:metadata:model_switch:createdby'] = 'El administrador del sitio que hizo este cambio. Vacío cuando fue automático.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'El administrador del sitio que revirtió este cambio. Vacío cuando lo hizo el vigilante o no se revirtió.';
+
+$string['autoupgrade:block_reasoning'] = 'El esfuerzo de razonamiento es un único ajuste para todo el sitio, y el rol {$a} también usa un modelo de pensamiento que no se probó en el nuevo nivel. Cámbielo manualmente si eso es lo que quiere.';
+$string['autoupgrade:block_reasoning_course'] = 'El esfuerzo de razonamiento es un único ajuste para todo el sitio, y un curso usa su propio modelo de pensamiento ({$a}) que no se probó en el nuevo nivel. Cámbielo manualmente si eso es lo que quiere.';

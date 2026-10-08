@@ -3158,3 +3158,166 @@ $string['survey_admin:err_invalid_bounds'] = '평가 문항은 {$a->min}에서 {
 $string['survey_admin:err_no_title'] = '설문 제목을 입력하세요.';
 
 $string['settings:int_range'] = '{$a->min}에서 {$a->max} 사이의 정수를 입력하세요.';
+
+$string['cachedef_modelcaps'] = '제공업체 거부로부터 학습한 모델 기능 정보';
+$string['settings:reasoning_effort'] = '추론 강도';
+$string['settings:reasoning_effort_desc'] = '답변 전에 추론하는 모델에게 얼마나 생각하도록 요청할지 정합니다. OpenAI 추론 모델(GPT-5, GPT-6, o 시리즈)에는 <code>reasoning_effort</code>로, Gemini 사고 모델에는 사고 예산으로 적용됩니다. 모든 추론 모델은 위의 응답 길이에 더해 사고를 위한 여유도 받으므로, 사고 때문에 답변이 잘리는 일이 더 이상 없습니다. 튜터에는 낮음이 적합합니다. 답변이 더 빨리 오고 비용도 적습니다. 끔은 모델이 허용하는 경우 사고를 끕니다. 추론 제어가 없는 모델은 이 설정을 무시합니다.';
+$string['settings:reasoning_effort_off'] = '끔(모델이 허용하는 최소한)';
+$string['settings:reasoning_effort_low'] = '낮음(권장)';
+$string['settings:reasoning_effort_medium'] = '중간';
+$string['settings:reasoning_effort_high'] = '높음';
+$string['modelregistry:learned_heading'] = '제공업체로부터 학습한 기능 정보';
+$string['modelregistry:learned_desc'] = '모델이 더 이상 어떤 매개변수를 받지 않아 제공업체가 요청을 거부하면, [[tutorshort]]는 그 매개변수 하나만 바꿔 한 번 다시 시도하고, 다음 요청이 처음부터 올바르도록 이 수정을 여기에 기억합니다. 정보를 삭제하면 해당 모델은 기본 제공 규칙으로 돌아갑니다.';
+$string['modelregistry:learned_none'] = '아직 요청 형식을 거부한 제공업체가 없습니다.';
+$string['modelregistry:col_field'] = '기능';
+$string['modelregistry:col_value'] = '학습한 값';
+$string['modelregistry:col_evidence'] = '제공업체의 응답';
+$string['modelregistry:forget'] = '삭제';
+$string['modelregistry:forget_confirm'] = '이 정보를 삭제할까요? 이 모델에 대한 다음 요청은 다시 기본 제공 규칙을 사용합니다.';
+$string['modelregistry:forget_done'] = '정보를 삭제했습니다. 이 모델에 대한 다음 요청은 기본 제공 규칙을 사용합니다.';
+$string['modelregistry:forget_missing'] = '해당 정보가 더 이상 존재하지 않습니다.';
+$string['event:model_capability_learned'] = '제공업체로부터 모델 기능을 학습함';
+
+$string['autoupgrade:title'] = '모델 업그레이드';
+$string['autoupgrade:navtitle'] = '[[tutorshort]] 모델 업그레이드';
+$string['autoupgrade:intro'] = '[[tutorshort]]는 이미 사용 중인 제공자의 최신 모델을 찾아, 각 후보를 대체할 모델과 비교 테스트합니다(같은 프롬프트, 같은 답변 예산, 같은 평가자, 같은 실행). 후보가 답변당 비용이 같거나 더 저렴하고 품질, 안전성, 신뢰성도 같은 수준임이 두 번 연속 확인될 때만 전환합니다. 모든 전환은 실제 트래픽에서 48시간 동안 모니터링되며 성능이 나빠지면 롤백됩니다.';
+$string['autoupgrade:l_statusheading'] = '상태';
+$string['autoupgrade:l_mode'] = '모드';
+$string['autoupgrade:l_budget'] = '테스트 예산';
+$string['autoupgrade:l_changemode'] = '변경';
+$string['autoupgrade:l_discover'] = '지금 모델 찾기';
+$string['autoupgrade:l_rolesheading'] = '역할';
+$string['autoupgrade:l_current'] = '현재 모델';
+$string['autoupgrade:l_profile'] = '기능 프로필';
+$string['autoupgrade:l_policy'] = '업그레이드';
+$string['autoupgrade:l_nocandidates'] = '후보가 없습니다. 검색은 같은 제공자의 비슷한 가격대 모델을 후보로 표시합니다.';
+$string['autoupgrade:l_colpasses'] = '통과 횟수';
+$string['autoupgrade:l_collast'] = '마지막 평가';
+$string['autoupgrade:l_evaluate'] = '지금 평가';
+$string['autoupgrade:l_evaluating'] = '대기 중 또는 실행 중';
+$string['autoupgrade:l_switch'] = '전환';
+$string['autoupgrade:l_switchconfirm'] = '지금 이 역할을 후보로 전환할까요? 변경 사항은 48시간 동안 모니터링되며 롤백할 수 있습니다.';
+$string['autoupgrade:l_evalsheading'] = '평가';
+$string['autoupgrade:l_noevals'] = '아직 평가가 없습니다.';
+$string['autoupgrade:l_colwhen'] = '시점';
+$string['autoupgrade:l_colrole'] = '역할';
+$string['autoupgrade:l_colcandidate'] = '후보';
+$string['autoupgrade:l_colincumbent'] = '현재 모델';
+$string['autoupgrade:l_colcost'] = '사용액 / 예상액';
+$string['autoupgrade:l_colgate'] = '기준 검사';
+$string['autoupgrade:l_switchesheading'] = '전환 및 롤백';
+$string['autoupgrade:l_noswitches'] = '아직 전환이 없습니다.';
+$string['autoupgrade:l_colfrom'] = '이전';
+$string['autoupgrade:l_colto'] = '이후';
+$string['autoupgrade:l_colmode'] = '방식';
+$string['autoupgrade:l_colreason'] = '사유';
+$string['autoupgrade:l_coluntil'] = '모니터링 종료';
+$string['autoupgrade:l_rollback'] = '롤백';
+$string['autoupgrade:l_rollbackconfirm'] = '지금 이전 모델로 되돌릴까요?';
+$string['autoupgrade:l_manage'] = '모델 레지스트리 페이지에서 학습된 정보를 검토하거나 삭제하세요';
+$string['autoupgrade:l_notinuse'] = '사용 안 함';
+$string['autoupgrade:mode_off'] = '끄기: 자동 작업 없음';
+$string['autoupgrade:mode_recommend'] = '추천: 후보를 테스트하고 추천을 이메일로 보냄';
+$string['autoupgrade:mode_auto'] = '자동: 후보를 테스트하고 통과하면 전환';
+$string['autoupgrade:budget_line'] = '이번 달 ${$a->limit} 중 ${$a->spent} 사용 (${$a->left} 남음)';
+$string['autoupgrade:last_discovery'] = '마지막 검색: {$a}.';
+$string['autoupgrade:never_discovered'] = '아직 검색이 실행되지 않았습니다.';
+$string['autoupgrade:role_chat'] = '채팅(기본 모델)';
+$string['autoupgrade:role_premium'] = '프리미엄 등급';
+$string['autoupgrade:role_failover'] = '장애 조치';
+$string['autoupgrade:role_quiz'] = '퀴즈 생성';
+$string['autoupgrade:role_classifier'] = '숙달도 분류기';
+$string['autoupgrade:role_safety'] = '안전 기준';
+$string['autoupgrade:role_soapbox'] = 'Soapbox 채점';
+$string['autoupgrade:not_configured'] = '구성되지 않음(채팅 모델 상속)';
+$string['autoupgrade:policy_auto'] = '평가 후 자동 모드에서 자동으로 전환';
+$string['autoupgrade:policy_recommend'] = '평가 후 추천하며, 전환은 관리자가 수행';
+$string['autoupgrade:policy_none'] = '후보 목록만 표시: 이 역할의 작업을 측정하는 벤치마크가 없음';
+$string['autoupgrade:cand_candidate'] = '후보';
+$string['autoupgrade:cand_passed'] = '1회 통과';
+$string['autoupgrade:cand_eligible'] = '적격';
+$string['autoupgrade:cand_failed'] = '불합격';
+$string['autoupgrade:cand_switched'] = '사용 중';
+$string['autoupgrade:cand_rolledback'] = '롤백됨';
+$string['autoupgrade:cand_retired'] = '더 이상 목록에 없음';
+$string['autoupgrade:eval_queued'] = '대기 중';
+$string['autoupgrade:eval_running'] = '실행 중';
+$string['autoupgrade:eval_complete'] = '완료';
+$string['autoupgrade:eval_failed'] = '실패';
+$string['autoupgrade:eval_skipped'] = '실행 안 함';
+$string['autoupgrade:gate_pass'] = '통과:';
+$string['autoupgrade:gate_fail'] = '미통과:';
+$string['autoupgrade:how_auto'] = '자동';
+$string['autoupgrade:how_manual'] = '관리자가 수행';
+$string['autoupgrade:switch_watching'] = '모니터링 중';
+$string['autoupgrade:switch_kept'] = '유지됨';
+$string['autoupgrade:switch_rolledback'] = '롤백됨';
+$string['autoupgrade:switch_superseded'] = '이후 관리자가 변경함';
+$string['autoupgrade:block_role'] = '이 역할은 여기에서 전환할 수 없습니다.';
+$string['autoupgrade:block_emergency'] = '비상 제어가 활성화되어 있어 복구될 때까지 모델이 전환되지 않습니다.';
+$string['autoupgrade:block_allowlist'] = '{$a} 설정은 사람의 확인 없이 전환으로 변경할 수 없으므로 이 역할은 수동으로 전환합니다.';
+$string['autoupgrade:block_bundle'] = '{$a} 설정은 서명된 정책 번들에서 관리됩니다. 번들에서 모델을 변경하세요.';
+$string['autoupgrade:block_watching'] = '이 역할의 전환이 아직 모니터링 중입니다. 유지되거나 롤백될 때까지 기다리세요.';
+$string['autoupgrade:block_noeval'] = '이 후보에는 완료된 평가가 없습니다.';
+$string['autoupgrade:block_gate'] = '이 후보의 마지막 평가가 기준을 통과하지 못했습니다.';
+$string['autoupgrade:block_changed'] = '평가 후 역할의 모델이 변경되어 더 이상 올바른 쌍을 비교하지 않습니다. 다시 평가하세요.';
+$string['autoupgrade:switched'] = '{$a->role}을(를) {$a->model}(으)로 전환했습니다. 48시간 동안 모니터링됩니다.';
+$string['autoupgrade:rolledback'] = '{$a} 전환을 롤백했습니다.';
+$string['autoupgrade:rollback_missing'] = '해당 전환은 롤백할 수 없습니다.';
+$string['autoupgrade:rollback_superseded'] = '전환 후 설정이 변경되어 아무것도 롤백되지 않았습니다.';
+$string['autoupgrade:rollback_by_admin'] = '관리자가 롤백했습니다.';
+$string['autoupgrade:queued'] = '평가가 대기열에 추가되었습니다. 다음 cron 실행 때 실행되며 몇 분 정도 걸립니다.';
+$string['autoupgrade:discovered'] = '검색 결과 제공자 {$a->providers}개를 조회하고, 모델 {$a->registered}개를 등록했으며, 후보 {$a->candidates}개를 표시했습니다. 조회하지 못한 제공자: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = '이 역할은 자동으로 전환되지 않습니다.';
+$string['autoupgrade:why_recommend_mode'] = '자동 모델 업그레이드가 추천 모드입니다.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role}이(가) {$a->to}(으)로 전환됨';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]]가 {$a->role} 역할을 {$a->from}에서 {$a->to}(으)로 전환했습니다.
+
+같은 실행에서 측정한 현재 모델과의 비교에서 모든 검사를 두 번 연속 통과했습니다.
+{$a->gate}
+
+새 모델은 실제 트래픽에서 {$a->hours}시간 동안 모니터링되며, 오류, 잘린 답변, 거부 또는 답변당 비용이 나빠지면 자동으로 롤백됩니다. 언제든지 직접 롤백할 수도 있습니다.
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role}이(가) {$a->from}(으)로 롤백됨';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]]가 {$a->role} 역할을 {$a->to}에서 {$a->from}(으)로 되돌렸습니다.
+
+사유: {$a->reason}
+
+이 후보는 30일 동안 다시 시도되지 않습니다. 세부 정보:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] {$a->role}의 {$a->to} 전환 유지됨';
+$string['autoupgrade:mail_kept_body'] = '{$a->role} 역할의 {$a->from}에서 {$a->to}(으)로의 전환이 {$a->hours}시간 동안 실제 답변 {$a->turns}개에서 문제없이 유지되어 그대로 유지됩니다.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = '{$a->role} 역할의 {$a->from}에서 {$a->to}(으)로의 전환이 {$a->hours}시간 후 유지되지만, 실제 답변이 {$a->turns}개뿐이라 판단하기에는 너무 적습니다. 계속 지켜봐 주세요.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] 추천: {$a->role}에 {$a->model} 사용';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model}이(가) {$a->role} 역할에서 {$a->current}와(과)의 비교 검사를 모두 두 번 연속 통과했지만 자동으로 전환되지 않았습니다: {$a->why}
+
+{$a->gate}
+
+여기에서 전환하거나 그대로 둘 수 있습니다.
+{$a->url}';
+$string['autoupgrade:mail_reason'] = '귀하의 주소가 [[tutorshort]] 지출 알림 수신자로 등록되어 있어 이 메일을 받았습니다.';
+$string['event:model_switched'] = '모델 전환됨';
+$string['event:model_switch_rolled_back'] = '모델 전환 롤백됨';
+$string['task:discover_models'] = '새 AI 모델을 찾아 평가를 대기열에 추가';
+$string['task:evaluate_model_candidate'] = '후보 AI 모델 평가';
+$string['task:watch_model_switches'] = '최근 AI 모델 전환 모니터링';
+$string['settings:autoupgrade_heading'] = '자동 모델 업그레이드';
+$string['settings:autoupgrade_heading_desc'] = '[[tutorshort]]는 매일 제공자가 제공하는 모델을 조회하고 각 역할의 후보를 표시합니다(같은 제공자, 비슷한 정가, 알려진 가격). 튜터 프롬프트, 탈옥 테스트 세트, 실제 사용과 비슷한 비용으로 현재 모델과 비교 테스트하며, 후보가 답변당 비용이 같거나 더 저렴하고 품질, 안전성, 신뢰성도 같은 수준임이 두 번 연속 확인될 때만 사이트 기본 모델을 전환합니다. 자체 모델이 있는 강좌는 해당 모델을 유지합니다. 모든 전환은 지출 알림 수신자에게 이메일로 알려지며 48시간 동안 모니터링됩니다.';
+$string['settings:autoupgrade_mode'] = '모드';
+$string['settings:autoupgrade_mode_desc'] = '자동은 후보가 통과하면 전환합니다. 추천은 후보를 테스트하고 대신 추천을 이메일로 보냅니다. 끄기는 자동으로 아무것도 하지 않습니다.';
+$string['settings:autoupgrade_budget_usd'] = '월간 테스트 예산(USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = '자동 평가가 한 달(달력 기준) 동안 쓸 수 있는 최대 금액이며 평가자 비용을 포함합니다. 이 금액을 넘길 수 있는 평가는 시작되지 않습니다.';
+$string['settings:autoupgrade_eval_courseid'] = '평가용 강좌 ID';
+$string['settings:autoupgrade_eval_courseid_desc'] = '평가는 이 강좌가 실제로 사용하는 시스템 프롬프트를 게스트 신원으로 구성해 답변하므로 학습자의 데이터는 전송되지 않습니다. 0이면 최근 30일 동안 채팅 답변이 가장 많은 강좌를 선택합니다.';
+$string['privacy:metadata:model_eval'] = '자동 모델 평가: 어떤 후보 모델을 어떤 현재 모델과 비교했는지와 측정 결과입니다. 유일한 개인 데이터는 평가를 요청한 관리자의 식별자입니다. 이 행은 학습자에 관한 개인 데이터가 아닌 사이트 구성이므로 데이터 내보내기에 포함되지 않으며 사용자가 삭제를 요청해도 제거되지 않습니다.';
+$string['privacy:metadata:model_eval:createdby'] = '이 평가를 요청한 사이트 관리자입니다. 검색이 대기열에 추가한 경우 비어 있습니다.';
+$string['privacy:metadata:model_switch'] = '모델 전환 및 롤백: 역할이 어떤 모델에서 어떤 모델로 바뀌었는지와 그 이유입니다. 유일한 개인 데이터는 전환을 수행하거나 되돌린 관리자의 식별자입니다. 이 행은 학습자에 관한 개인 데이터가 아닌 사이트 구성이므로 데이터 내보내기에 포함되지 않으며 사용자가 삭제를 요청해도 제거되지 않습니다.';
+$string['privacy:metadata:model_switch:createdby'] = '이 전환을 수행한 사이트 관리자입니다. 자동 전환이면 비어 있습니다.';
+$string['privacy:metadata:model_switch:rolledbackby'] = '이 전환을 롤백한 사이트 관리자입니다. 모니터링 기능이 롤백했거나 롤백되지 않은 경우 비어 있습니다.';
+
+$string['autoupgrade:block_reasoning'] = '추론 강도는 사이트 전체에 적용되는 하나의 설정이며, {$a} 역할도 새 수준에서 테스트되지 않은 사고 모델을 사용합니다. 원하시면 직접 전환하세요.';
+$string['autoupgrade:block_reasoning_course'] = '추론 강도는 사이트 전체에 적용되는 하나의 설정이며, 한 강좌가 새 수준에서 테스트되지 않은 자체 사고 모델({$a})을 사용합니다. 원하시면 직접 전환하세요.';

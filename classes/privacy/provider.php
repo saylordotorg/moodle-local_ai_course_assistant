@@ -294,6 +294,22 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             ['createdby' => 'privacy:metadata:bench:createdby'],
             'privacy:metadata:bench'
         );
+        // v7.8.0: automatic model evaluations and switches. The same class of
+        // row as the bench table above: site configuration, with the id of the
+        // administrator who asked, declared but not exported or erased.
+        $collection->add_database_table(
+            'local_ai_course_assistant_model_eval',
+            ['createdby' => 'privacy:metadata:model_eval:createdby'],
+            'privacy:metadata:model_eval'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_model_switch',
+            [
+                'createdby' => 'privacy:metadata:model_switch:createdby',
+                'rolledbackby' => 'privacy:metadata:model_switch:rolledbackby',
+            ],
+            'privacy:metadata:model_switch'
+        );
         // Same class of row, found by the guard below rather than by core:
         // which staff member last edited a Soapbox assignment. Course
         // configuration, not learner data, and erasing it would silently

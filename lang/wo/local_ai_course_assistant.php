@@ -3181,3 +3181,166 @@ $string['survey_admin:err_invalid_bounds'] = 'Laaj yu natt dañuy jëfandikoo ba
 $string['survey_admin:err_no_title'] = 'Bindal turu enkët bi.';
 
 $string['settings:int_range'] = 'Bindal benn limu ñu mat ci diggante {$a->min} ak {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Xibaar ci mën-mënu modèle yi, yu ñu jàng ci gàntu yi fournisseur yi def';
+$string['settings:reasoning_effort'] = 'Dayob xalaat';
+$string['settings:reasoning_effort_desc'] = 'Naka la modèle yiy xalaat balaa ñuy tontu war a xalaate. Dafay jëm ci modèle xalaat yu OpenAI (GPT-5, GPT-6, séri o) ni <code>reasoning_effort</code>, ak ci modèle xalaat yu Gemini ni budget xalaat. Bépp modèle xalaat dina am itam bérab ngir xalaatam, ci kaw guddaayu tontu gi nekk ci kaw, kon xalaat mënatul dog tontu. Tuuti mooy gën ci jàngalekat: tontu yi dañuy gaaw a ñëw te seerul. Fey dafay fey xalaat bu modèle bi ko mayee. Modèle yi amul saytu xalaat duñu topp tànneef bii.';
+$string['settings:reasoning_effort_off'] = 'Fey (li gën a tuuti li modèle bi may)';
+$string['settings:reasoning_effort_low'] = 'Tuuti (ñu ngi ko digle)';
+$string['settings:reasoning_effort_medium'] = 'Diggdigg';
+$string['settings:reasoning_effort_high'] = 'Bu kawe';
+$string['modelregistry:learned_heading'] = 'Xibaar ci mën-mën yu ñu jàng ci fournisseur yi';
+$string['modelregistry:learned_desc'] = 'Bu fournisseur gàntoo laaj ndaxte modèle bi nangootul benn paramètre, [[tutorshort]] dafay soppi paramètre boobu rekk, jéemaat benn yoon, te fattaliku fii ni mu ko defaraa, ngir laaj bi ci topp jub ca yoon wu njëkk wa. Fatte benn xibaar ngir delloo modèle bi ci sàrt yi ñu ko joxe.';
+$string['modelregistry:learned_none'] = 'Benn fournisseur gàntoogul benn melokaanu laaj ba leegi.';
+$string['modelregistry:col_field'] = 'Mën-mën';
+$string['modelregistry:col_value'] = 'Valeur bi ñu jàng';
+$string['modelregistry:col_evidence'] = 'Li fournisseur bi wax';
+$string['modelregistry:forget'] = 'Fatte';
+$string['modelregistry:forget_confirm'] = 'Fatte xibaar bii? Laaj bi ci topp ci modèle bii dina jëfandikoowaat sàrt yi ñu ko joxe.';
+$string['modelregistry:forget_done'] = 'Xibaar bi fatte nañu ko. Laaj bi ci topp ci modèle bii dina jëfandikoo sàrt yi ñu ko joxe.';
+$string['modelregistry:forget_missing'] = 'Xibaar boobu amatul.';
+$string['event:model_capability_learned'] = 'Mën-mënu modèle bu ñu jàng ci benn fournisseur';
+
+$string['autoupgrade:title'] = 'Yokk modèle yi';
+$string['autoupgrade:navtitle'] = 'Yokk modèle yu [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] dafay seet modèle yu gën a bees ci fournisseur yi mu jëfandikoo ba noppi, di test benn-benn candidat ak modèle bi mu war a wuutu (laaj yu mel, budget tontu bu mel, jàngkat bu mel, ci benn doxin), te du soppi lu dul candidat bi njëgam ci tontu bu nekk yemoo walla mu gën a yomb, mu baax ni moom, wóor ni moom te ñu man koo dëgal ni moom, ñaari yoon toppante. Soppi yépp dañu koy topp 48 waxtu ci trafic bu dëgg te dañu koy dellu ginnaaw bu yàqoo.';
+$string['autoupgrade:l_statusheading'] = 'Fi mu tollu';
+$string['autoupgrade:l_mode'] = 'Anam';
+$string['autoupgrade:l_budget'] = 'Budget test';
+$string['autoupgrade:l_changemode'] = 'Soppi';
+$string['autoupgrade:l_discover'] = 'Seet modèle yi léegi';
+$string['autoupgrade:l_rolesheading'] = 'Rôle yi';
+$string['autoupgrade:l_current'] = 'Modèle bi am léegi';
+$string['autoupgrade:l_profile'] = 'Profil ci li mu man';
+$string['autoupgrade:l_policy'] = 'Yokk yi';
+$string['autoupgrade:l_nocandidates'] = 'Amul candidat. Seet bi dafay mark modèle yu benn fournisseur te seen njëg jege.';
+$string['autoupgrade:l_colpasses'] = 'Yoon yu mu jàll';
+$string['autoupgrade:l_collast'] = 'Évaluation bu mujj';
+$string['autoupgrade:l_evaluate'] = 'Évaluer léegi';
+$string['autoupgrade:l_evaluating'] = 'Mu ngi xaar walla mu ngi dox';
+$string['autoupgrade:l_switch'] = 'Soppi';
+$string['autoupgrade:l_switchconfirm'] = 'Ndax ñu soppi rôle bii jëm ci candidat bi léegi? Ñu ngi koy topp 48 waxtu te man nañu ko dellu ginnaaw.';
+$string['autoupgrade:l_evalsheading'] = 'Évaluation yi';
+$string['autoupgrade:l_noevals'] = 'Amagul benn évaluation.';
+$string['autoupgrade:l_colwhen'] = 'Kañ';
+$string['autoupgrade:l_colrole'] = 'Rôle';
+$string['autoupgrade:l_colcandidate'] = 'Candidat';
+$string['autoupgrade:l_colincumbent'] = 'Modèle bi am léegi';
+$string['autoupgrade:l_colcost'] = 'Lu ñu dépenser / estimation';
+$string['autoupgrade:l_colgate'] = 'Seet yu seuil';
+$string['autoupgrade:l_switchesheading'] = 'Soppi yi ak dellu yi';
+$string['autoupgrade:l_noswitches'] = 'Amagul benn soppi.';
+$string['autoupgrade:l_colfrom'] = 'Fu mu jóge';
+$string['autoupgrade:l_colto'] = 'Fu mu jëm';
+$string['autoupgrade:l_colmode'] = 'Naka';
+$string['autoupgrade:l_colreason'] = 'Lu ko waral';
+$string['autoupgrade:l_coluntil'] = 'Ñu ngi koy topp ba';
+$string['autoupgrade:l_rollback'] = 'Dellu ginnaaw';
+$string['autoupgrade:l_rollbackconfirm'] = 'Ndax ñu delloo modèle bu jiitu bi léegi?';
+$string['autoupgrade:l_manage'] = 'Seetaat walla far xam-xam yu ñu jàng ci xët registre modèle bi';
+$string['autoupgrade:l_notinuse'] = 'jëfandikoowuñu ko';
+$string['autoupgrade:mode_off'] = 'Fey: dara du dox moom kese';
+$string['autoupgrade:mode_recommend'] = 'Digal: test candidat yi te yónne recommandation ci email';
+$string['autoupgrade:mode_auto'] = 'Automatique: test candidat yi te soppi su benn jàllee';
+$string['autoupgrade:budget_line'] = '${$a->spent} ci ${$a->limit} lañu dépenser weer wii (des na ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Seet bi dox na mujj {$a}.';
+$string['autoupgrade:never_discovered'] = 'Seet bi doxagul.';
+$string['autoupgrade:role_chat'] = 'Waxtaan (modèle bu njëkk)';
+$string['autoupgrade:role_premium'] = 'Tolluwaay premium';
+$string['autoupgrade:role_failover'] = 'Modèle bu wuutu';
+$string['autoupgrade:role_quiz'] = 'Defar quiz';
+$string['autoupgrade:role_classifier'] = 'Classifieur xam-xam';
+$string['autoupgrade:role_safety'] = 'Référence kaarange';
+$string['autoupgrade:role_soapbox'] = 'Jox poñ Soapbox';
+$string['autoupgrade:not_configured'] = 'Configurewuñu ko (dafay jël modèle waxtaan bi)';
+$string['autoupgrade:policy_auto'] = 'Ñu ngi koy évaluer, te dañu koy soppi moom kese ci anam Automatique';
+$string['autoupgrade:policy_recommend'] = 'Ñu ngi koy évaluer te digal ko; administrateur moo koy soppi';
+$string['autoupgrade:policy_none'] = 'Candidat yi rekk lañu lim: amul benn benchmark buy natt liggéeyu rôle bii';
+$string['autoupgrade:cand_candidate'] = 'Candidat';
+$string['autoupgrade:cand_passed'] = 'Jàll na benn yoon';
+$string['autoupgrade:cand_eligible'] = 'Mat na';
+$string['autoupgrade:cand_failed'] = 'Jàllul';
+$string['autoupgrade:cand_switched'] = 'Ñu ngi koy jëfandikoo';
+$string['autoupgrade:cand_rolledback'] = 'Dellu nañu ko ginnaaw';
+$string['autoupgrade:cand_retired'] = 'Nekkatul ci lim bi';
+$string['autoupgrade:eval_queued'] = 'Mu ngi xaar';
+$string['autoupgrade:eval_running'] = 'Mu ngi dox';
+$string['autoupgrade:eval_complete'] = 'Jeex na';
+$string['autoupgrade:eval_failed'] = 'Antuwul';
+$string['autoupgrade:eval_skipped'] = 'Doxul';
+$string['autoupgrade:gate_pass'] = 'Jàll na:';
+$string['autoupgrade:gate_fail'] = 'Jàllul:';
+$string['autoupgrade:how_auto'] = 'Moom kese';
+$string['autoupgrade:how_manual'] = 'Administrateur moo ko def';
+$string['autoupgrade:switch_watching'] = 'Ñu ngi koy topp';
+$string['autoupgrade:switch_kept'] = 'Denc nañu ko';
+$string['autoupgrade:switch_rolledback'] = 'Dellu nañu ko ginnaaw';
+$string['autoupgrade:switch_superseded'] = 'Administrateur soppi na ko ginnaaw ga';
+$string['autoupgrade:block_role'] = 'Manuñoo soppi rôle bii fii.';
+$string['autoupgrade:block_emergency'] = 'Benn contrôle urgence mu ngi dox, kon duñu soppi benn modèle ba ñu ko delloo.';
+$string['autoupgrade:block_allowlist'] = 'Paramètre {$a} du benn bu soppi man koo soppi te nit nekku ci, kon rôle bii ak loxo lañu koy soppi.';
+$string['autoupgrade:block_bundle'] = 'Paramètre {$a} paquet politique bu ñu signer moo koy saytu. Soppil modèle bi ci paquet bi.';
+$string['autoupgrade:block_watching'] = 'Benn soppiku rôle bii ñu ngi koy topp ba léegi. Xaaral ba ñu denc ko walla ñu dellu ko ginnaaw.';
+$string['autoupgrade:block_noeval'] = 'Candidat bii amul benn évaluation bu jeex.';
+$string['autoupgrade:block_gate'] = 'Évaluation bu mujj bu candidat bii jàllul seuil bi.';
+$string['autoupgrade:block_changed'] = 'Modèle bu rôle bi soppiku na ginnaaw évaluation bi, kon du méngaleeti ñaar yu jub yi. Évaluer ko ci kanam.';
+$string['autoupgrade:switched'] = 'Soppi nañu {$a->role} jëm ci {$a->model}. Dañu koy topp 48 waxtu.';
+$string['autoupgrade:rolledback'] = 'Dellu nañu ginnaaw soppi {$a}.';
+$string['autoupgrade:rollback_missing'] = 'Manuñoo dellu soppi boobu ginnaaw.';
+$string['autoupgrade:rollback_superseded'] = 'Paramètre yi soppiku nañu ginnaaw soppi bi, kon dara dellu ginnaaw.';
+$string['autoupgrade:rollback_by_admin'] = 'Administrateur moo ko dellu ginnaaw.';
+$string['autoupgrade:queued'] = 'Évaluation bi mu ngi ci file bi. Dina dox ci cron bi topp te dina yàgg ay simili.';
+$string['autoupgrade:discovered'] = 'Seet bi lim na {$a->providers} fournisseur, bind {$a->registered} modèle te mark {$a->candidates} candidat. Fournisseur yu ñu manul a lim: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Rôle bii duñu ko soppi moom kese.';
+$string['autoupgrade:why_recommend_mode'] = 'Yokk modèle yu automatique yi ñu ngi ci anam Digal.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} soppi nañu ko jëm ci {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] soppi na rôle {$a->role} jóge ci {$a->from} jëm ci {$a->to}.
+
+Jàll na seet yépp ak modèle bi am léegi, ñu natt leen ci benn doxin, ñaari yoon toppante:
+{$a->gate}
+
+Modèle bu bees bi dañu koy topp ci trafic bu dëgg {$a->hours} waxtu te dañu koy dellu ginnaaw moom kese su njuumte yi, tontu yu dagg, bañ yi walla njëg ci tontu bu nekk yàqoo. Yaw itam man nga koo dellu ginnaaw saa su la neexee:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} dellu nañu ko ci {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] delloo na rôle {$a->role} jóge ci {$a->to} dellu ci {$a->from}.
+
+Lu ko waral: {$a->reason}
+
+Duñu jéemaat candidat bi ci 30 fan. Leeral yi:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Soppi {$a->role} jëm ci {$a->to} denc nañu ko';
+$string['autoupgrade:mail_kept_body'] = 'Soppi rôle {$a->role} jóge ci {$a->from} jëm ci {$a->to} taxaw na bu baax {$a->hours} waxtu ci {$a->turns} tontu yu dëgg te denc nañu ko.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Soppi rôle {$a->role} jóge ci {$a->from} jëm ci {$a->to} denc nañu ko ginnaaw {$a->hours} waxtu, waaye {$a->turns} tontu yu dëgg rekk lañu gis, lu néew lool ngir àtte. Toppal ko bu baax.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Digal: {$a->role} ci {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} jàll na seet yépp ak {$a->current} ci rôle {$a->role}, ñaari yoon toppante, te soppiwuñu ko moom kese: {$a->why}
+
+{$a->gate}
+
+Soppil ko, walla bàyyi ko, fii:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Jot nga lii ndax sa adresse benn ci ñiy jot alerte dépense yu [[tutorshort]] la.';
+$string['event:model_switched'] = 'Soppi nañu modèle bi';
+$string['event:model_switch_rolled_back'] = 'Dellu nañu ginnaaw soppi modèle bi';
+$string['task:discover_models'] = 'Seet modèle AI yu bees te teg évaluation yi ci file bi';
+$string['task:evaluate_model_candidate'] = 'Évaluer benn modèle AI bu candidat';
+$string['task:watch_model_switches'] = 'Topp soppi modèle AI yu mujj yi';
+$string['settings:autoupgrade_heading'] = 'Yokk modèle yu automatique';
+$string['settings:autoupgrade_heading_desc'] = 'Bés bu nekk [[tutorshort]] dafay lim modèle yi sa fournisseur yi joxe te mark candidat yi ci rôle bu nekk: benn fournisseur, njëg catalogue bu jege, ak njëg bu ñu xam. Dafay test leen ak modèle bi am léegi ci laaj yu tuteur bi, suite jailbreak bi ak njëg bu mel ni jëfandikoo bu dëgg, te du soppi défaut site bi lu dul candidat bi njëgam ci tontu bu nekk yemoo walla mu gën a yomb, mu baax ni moom, wóor ni moom te ñu man koo dëgal ni moom, ñaari yoon toppante. Cours yu am seen modèle dañuy denc seen bos. Soppi yépp dañu koy yónne ci email ñiy jot alerte dépense yi te topp ko 48 waxtu.';
+$string['settings:autoupgrade_mode'] = 'Anam';
+$string['settings:autoupgrade_mode_desc'] = 'Automatique dafay soppi su benn candidat jàllee. Digal dafay test candidat yi te yónne recommandation ci email ci barab boobu. Fey du def dara moom kese.';
+$string['settings:autoupgrade_budget_usd'] = 'Budget test bu weer wu nekk (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Xaalis bi gën a bari bi évaluation yu automatique yi man nañu dépenser ci benn weeru calendrier, jàngkat bi ci biir. Évaluation bu man a jàllale weer wi xaalis bii du tàmbali.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID cours bu évaluation';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Évaluation yi dañuy tontu ci prompt système bi cours bii di jëfandikoo ci dëgg, ñu defar ko ngir identité invité, kon duñu yónne benn donnée bu benn jàngalekat. 0 dafay tànn cours bi gën a am tontu waxtaan ci 30 fan yu mujj yi.';
+$string['privacy:metadata:model_eval'] = 'Évaluation modèle yu automatique: ban modèle candidat lañu méngale ak ban modèle bu am léegi, ak njureef bi ñu natt. Donnée personnelle bi rekk mooy identifiant administrateur bi laaj évaluation bi. Ligne yii configuration site lañu, du donnée personnelle ci benn jàngalekat, kon nekkuñu ci export donnée te duñu leen far su benn jëfandikukat laajee ñu far ay donnéeam.';
+$string['privacy:metadata:model_eval:createdby'] = 'Administrateur site bi laaj évaluation bii. Dafay nekk neen su seet bi moo ko teg ci file bi.';
+$string['privacy:metadata:model_switch'] = 'Soppi modèle yi ak dellu yi: ban modèle la rôle bi jóge ak ban modèle la jëm, ak lu ko waral. Donnée personnelle bi rekk mooy identifiant administrateur bi def walla neenal soppi bi. Ligne yii configuration site lañu, du donnée personnelle ci benn jàngalekat, kon nekkuñu ci export donnée te duñu leen far su benn jëfandikukat laajee ñu far ay donnéeam.';
+$string['privacy:metadata:model_switch:createdby'] = 'Administrateur site bi def soppi bii. Dafay nekk neen su soppi bi automatique la woon.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Administrateur site bi dellu soppi bii ginnaaw. Dafay nekk neen su ki koy topp moo ko def, walla su ñu ko delluwul ginnaaw.';
+
+$string['autoupgrade:block_reasoning'] = 'Dayob xalaat ab tànneef rekk la ngir site bi yépp, te liggéey {$a} itam dafay jëfandikoo ab modèle bu xalaat bu ñu nattuwul ci tolluwaay bu bees bi. Soppi ko ak sa loxo su loolu nga bëgg.';
+$string['autoupgrade:block_reasoning_course'] = 'Jéemu xalaat benn tànneef la ci site bi yépp, te am njàng mu ngi jëfandikoo modeel xalaatam bopp ({$a}) bu ñu natteegul ci tolluwaay bu bees bi. Soppil ko ak sa loxo bu loolu nga bëgg.';

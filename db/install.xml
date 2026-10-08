@@ -42,7 +42,7 @@
         <FIELD NAME="rag_latency_ms" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="v5.4.6: wall-clock time the rag_retriever::retrieve call took for this turn (null when RAG was off or not used)"/>
         <FIELD NAME="cached_tokens" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="v6.1.0: prompt tokens served from the provider's prompt cache this call (OpenAI prompt_tokens_details.cached_tokens or Anthropic cache_read_input_tokens). Null when the provider reported nothing."/>
         <FIELD NAME="reasoning_tokens" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="v7.4.2: thinking/reasoning tokens the provider reported for this call (usage.completion_tokens_details.reasoning_tokens), stored exactly as reported and deliberately NOT added into completion_tokens: OpenAI already counts them there, Google's Gemini OpenAI-compat shim has not reliably done so while still billing them as output. The consumer knows the provider and decides. Null when the provider reported none."/>
-        <FIELD NAME="stream_outcome" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="How the turn ended: complete, client_aborted, provider_error, truncated. Null on rows written before v7.1.1."/>
+        <FIELD NAME="stream_outcome" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="How the turn ended: complete, client_aborted, provider_error, truncated, refused (v7.8.0). Null on rows written before v7.1.1."/>
         <FIELD NAME="chunk_count" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Number of RAG passages retrieved for this turn; 0 means retrieval ran and found nothing."/>
         <FIELD NAME="top_score" TYPE="number" LENGTH="10" DECIMALS="6" NOTNULL="false" SEQUENCE="false" COMMENT="Similarity score of the best retrieved passage."/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -878,6 +878,116 @@
         <INDEX NAME="runid_uq" UNIQUE="true" FIELDS="runid"/>
         <INDEX NAME="function_model_time" UNIQUE="false" FIELDS="sola_function, model_name, timecreated"/>
         <INDEX NAME="registrykey_time" UNIQUE="false" FIELDS="registry_key, timecreated"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_ai_course_assistant_model_caps" COMMENT="v7.8.0 learned model capability facts. One row per (provider, model, field) that a provider taught SOLA by rejecting a request with a 400 naming the parameter. Read by model_capabilities on top of its rules table; an admin can delete a row from the model registry page.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="provider" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Provider id that served the rejected request (openai, gemini, claude, together, ...)"/>
+        <FIELD NAME="modelkey" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Exact model id, lowercased, without a models/ prefix"/>
+        <FIELD NAME="field" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="Capability field: token_param, temperature, reasoning, reasoning_efforts, thinking_off, max_output_tokens, forced_tool_choice"/>
+        <FIELD NAME="value" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Learned value, validated against model_capabilities::LEARNABLE before it is stored or read"/>
+        <FIELD NAME="evidence" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The provider's own error text, redacted and capped at 400 characters, so an admin can judge the fact"/>
+        <FIELD NAME="hits" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="How many times the provider has taught this same fact"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="provider_model_field_uq" UNIQUE="true" FIELDS="provider, modelkey, field"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_ai_course_assistant_model_cand" COMMENT="v7.8.0 candidate models per SOLA role, found by model discovery. Status moves candidate, passed, eligible (two consecutive passing evaluations), switched; failed, rolledback and retired otherwise.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="role" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" COMMENT="chat, premium, failover, quiz, classifier, safety, soapbox"/>
+        <FIELD NAME="provider" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="model" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="variant" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" COMMENT="Configuration variant: empty, or off for thinking switched off"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="candidate" SEQUENCE="false"/>
+        <FIELD NAME="passes" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Consecutive passing evaluations"/>
+        <FIELD NAME="lastevalid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="reason" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Why discovery marked it"/>
+        <FIELD NAME="timestatus" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="When the status last changed; the second pass and the 30-day retry are timed from it. Discovery seeing the candidate again does not touch it."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="role_provider_model_variant_uq" UNIQUE="true" FIELDS="role, provider, model, variant"/>
+        <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_ai_course_assistant_model_eval" COMMENT="v7.8.0 automatic evaluations: a candidate against the model it would replace, measured in the same run, with the gate verdict and the money spent. Aggregates only; no learner data.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="candidateid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="role" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="provider" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="model" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="variant" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="inc_provider" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="inc_model" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="inc_variant" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="queued" SEQUENCE="false" COMMENT="queued, running, complete, failed, skipped"/>
+        <FIELD NAME="est_cost_usd" TYPE="number" LENGTH="12" DECIMALS="6" NOTNULL="false" SEQUENCE="false" COMMENT="High estimate checked against the monthly budget before the run"/>
+        <FIELD NAME="actual_cost_usd" TYPE="number" LENGTH="12" DECIMALS="6" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Measured spend, judge included; summed for the monthly budget"/>
+        <FIELD NAME="cand_runid" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="inc_runid" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="metrics" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: both sides' quality, cost, truncation, errors, latency, jailbreak"/>
+        <FIELD NAME="gate_passed" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="gate_detail" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: every gate check with its numbers"/>
+        <FIELD NAME="message" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Administrator who asked, null when discovery queued it"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timestarted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="When a worker began running it; a run still going long after this is presumed dead"/>
+        <FIELD NAME="timecompleted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="createdby_fk_eval" TYPE="foreign" FIELDS="createdby" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="candidate_status" UNIQUE="false" FIELDS="candidateid, status"/>
+        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_ai_course_assistant_model_switch" COMMENT="v7.8.0 model switches and rollbacks: the site settings a switch wrote, their previous values, the pre-switch traffic baseline and the 48-hour watch. Aggregates only; no learner data.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="role" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="from_provider" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="from_model" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="from_variant" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="to_provider" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="to_model" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="to_variant" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="candidateid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="evalid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="mode" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="auto" SEQUENCE="false" COMMENT="auto or manual"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="watching" SEQUENCE="false" COMMENT="watching, kept, rolledback, superseded"/>
+        <FIELD NAME="prevconfig" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: the previous value of every setting the switch wrote; never a secret"/>
+        <FIELD NAME="newconfig" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: the values the switch wrote"/>
+        <FIELD NAME="baseline" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: the old model's last 7 days of traffic, aggregated"/>
+        <FIELD NAME="livemetrics" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: the new model's traffic since the switch, aggregated"/>
+        <FIELD NAME="watchuntil" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="reason" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Why it was rolled back"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Administrator who switched by hand, null when automatic"/>
+        <FIELD NAME="rolledbackby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Administrator who rolled back by hand"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timeresolved" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="createdby_fk_switch" TYPE="foreign" FIELDS="createdby" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="rolledbackby_fk_switch" TYPE="foreign" FIELDS="rolledbackby" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="role_status" UNIQUE="false" FIELDS="role, status"/>
       </INDEXES>
     </TABLE>
   </TABLES>

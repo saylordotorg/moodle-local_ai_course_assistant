@@ -3212,3 +3212,166 @@ $string['survey_admin:err_invalid_bounds'] = 'Pertanyaan penilaian harus menggun
 $string['survey_admin:err_no_title'] = 'Masukkan judul survei.';
 
 $string['settings:int_range'] = 'Masukkan bilangan bulat dari {$a->min} sampai {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Fakta kemampuan model yang dipelajari dari penolakan penyedia';
+$string['settings:reasoning_effort'] = 'Upaya penalaran';
+$string['settings:reasoning_effort_desc'] = 'Seberapa banyak model yang bernalar sebelum menjawab diminta berpikir. Berlaku untuk model penalaran OpenAI (GPT-5, GPT-6, seri o) sebagai <code>reasoning_effort</code> dan untuk model berpikir Gemini sebagai anggaran berpikir. Setiap model penalaran juga mendapat ruang untuk berpikir di luar panjang jawaban di atas, sehingga proses berpikir tidak lagi dapat memotong jawaban. Rendah cocok untuk tutor: jawaban datang lebih cepat dan lebih murah. Mati menonaktifkan proses berpikir jika model mengizinkannya. Model tanpa kontrol penalaran mengabaikan pengaturan ini.';
+$string['settings:reasoning_effort_off'] = 'Mati (seminimal yang diizinkan model)';
+$string['settings:reasoning_effort_low'] = 'Rendah (disarankan)';
+$string['settings:reasoning_effort_medium'] = 'Sedang';
+$string['settings:reasoning_effort_high'] = 'Tinggi';
+$string['modelregistry:learned_heading'] = 'Fakta kemampuan yang dipelajari dari penyedia';
+$string['modelregistry:learned_desc'] = 'Saat penyedia menolak permintaan karena model tidak lagi menerima suatu parameter, [[tutorshort]] mengubah parameter itu saja, mencoba ulang sekali, dan mengingat perbaikannya di sini agar permintaan berikutnya langsung benar. Lupakan fakta untuk mengembalikan model ke aturan bawaan.';
+$string['modelregistry:learned_none'] = 'Belum ada penyedia yang menolak bentuk permintaan.';
+$string['modelregistry:col_field'] = 'Kemampuan';
+$string['modelregistry:col_value'] = 'Nilai yang dipelajari';
+$string['modelregistry:col_evidence'] = 'Kata penyedia';
+$string['modelregistry:forget'] = 'Lupakan';
+$string['modelregistry:forget_confirm'] = 'Lupakan fakta ini? Permintaan berikutnya ke model ini akan kembali memakai aturan bawaan.';
+$string['modelregistry:forget_done'] = 'Fakta dilupakan. Permintaan berikutnya ke model ini memakai aturan bawaan.';
+$string['modelregistry:forget_missing'] = 'Fakta tersebut sudah tidak ada.';
+$string['event:model_capability_learned'] = 'Kemampuan model dipelajari dari penyedia';
+
+$string['autoupgrade:title'] = 'Peningkatan model';
+$string['autoupgrade:navtitle'] = 'Peningkatan model [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] mencari model yang lebih baru dari penyedia yang sudah digunakannya, menguji setiap kandidat terhadap model yang akan digantikannya (prompt sama, anggaran jawaban sama, penilai sama, dalam proses yang sama), dan hanya beralih jika kandidat berbiaya sama atau lebih murah per jawaban, sama baiknya, sama amannya, dan sama andalnya, dua kali berturut-turut. Setiap peralihan dipantau selama 48 jam pada lalu lintas langsung dan dibatalkan jika hasilnya memburuk.';
+$string['autoupgrade:l_statusheading'] = 'Keadaan';
+$string['autoupgrade:l_mode'] = 'Mode kerja';
+$string['autoupgrade:l_budget'] = 'Anggaran pengujian';
+$string['autoupgrade:l_changemode'] = 'Ubah';
+$string['autoupgrade:l_discover'] = 'Temukan model sekarang';
+$string['autoupgrade:l_rolesheading'] = 'Peran';
+$string['autoupgrade:l_current'] = 'Model saat ini';
+$string['autoupgrade:l_profile'] = 'Profil kemampuan';
+$string['autoupgrade:l_policy'] = 'Peningkatan';
+$string['autoupgrade:l_nocandidates'] = 'Tidak ada kandidat. Penemuan menandai model dari penyedia yang sama dengan harga yang sebanding.';
+$string['autoupgrade:l_colpasses'] = 'Lulus';
+$string['autoupgrade:l_collast'] = 'Evaluasi terakhir';
+$string['autoupgrade:l_evaluate'] = 'Evaluasi sekarang';
+$string['autoupgrade:l_evaluating'] = 'Dalam antrean atau berjalan';
+$string['autoupgrade:l_switch'] = 'Alihkan';
+$string['autoupgrade:l_switchconfirm'] = 'Alihkan peran ini ke kandidat sekarang? Perubahan dipantau selama 48 jam dan dapat dibatalkan.';
+$string['autoupgrade:l_evalsheading'] = 'Evaluasi';
+$string['autoupgrade:l_noevals'] = 'Belum ada evaluasi.';
+$string['autoupgrade:l_colwhen'] = 'Waktu';
+$string['autoupgrade:l_colrole'] = 'Peran';
+$string['autoupgrade:l_colcandidate'] = 'Kandidat';
+$string['autoupgrade:l_colincumbent'] = 'Model saat ini';
+$string['autoupgrade:l_colcost'] = 'Terpakai / perkiraan';
+$string['autoupgrade:l_colgate'] = 'Pemeriksaan kelulusan';
+$string['autoupgrade:l_switchesheading'] = 'Peralihan dan pembatalan';
+$string['autoupgrade:l_noswitches'] = 'Belum ada peralihan.';
+$string['autoupgrade:l_colfrom'] = 'Dari';
+$string['autoupgrade:l_colto'] = 'Ke';
+$string['autoupgrade:l_colmode'] = 'Cara';
+$string['autoupgrade:l_colreason'] = 'Alasan';
+$string['autoupgrade:l_coluntil'] = 'Dipantau hingga';
+$string['autoupgrade:l_rollback'] = 'Batalkan';
+$string['autoupgrade:l_rollbackconfirm'] = 'Kembalikan model sebelumnya sekarang?';
+$string['autoupgrade:l_manage'] = 'Tinjau atau lupakan fakta yang dipelajari di halaman registri model';
+$string['autoupgrade:l_notinuse'] = 'tidak digunakan';
+$string['autoupgrade:mode_off'] = 'Nonaktif: tidak ada yang otomatis';
+$string['autoupgrade:mode_recommend'] = 'Rekomendasikan: uji kandidat dan kirim rekomendasi lewat email';
+$string['autoupgrade:mode_auto'] = 'Otomatis: uji kandidat dan alihkan saat ada yang lulus';
+$string['autoupgrade:budget_line'] = '${$a->spent} dari ${$a->limit} terpakai bulan ini (sisa ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Penemuan terakhir dijalankan {$a}.';
+$string['autoupgrade:never_discovered'] = 'Penemuan belum pernah dijalankan.';
+$string['autoupgrade:role_chat'] = 'Obrolan (model utama)';
+$string['autoupgrade:role_premium'] = 'Tingkat premium';
+$string['autoupgrade:role_failover'] = 'Cadangan';
+$string['autoupgrade:role_quiz'] = 'Pembuatan kuis';
+$string['autoupgrade:role_classifier'] = 'Pengklasifikasi penguasaan';
+$string['autoupgrade:role_safety'] = 'Acuan keamanan';
+$string['autoupgrade:role_soapbox'] = 'Penilaian Soapbox';
+$string['autoupgrade:not_configured'] = 'Belum dikonfigurasi (mewarisi model obrolan)';
+$string['autoupgrade:policy_auto'] = 'Dievaluasi, dan dialihkan otomatis dalam mode Otomatis';
+$string['autoupgrade:policy_recommend'] = 'Dievaluasi dan direkomendasikan; administrator yang mengalihkannya';
+$string['autoupgrade:policy_none'] = 'Kandidat hanya dicantumkan: tidak ada tolok ukur yang mengukur tugas peran ini';
+$string['autoupgrade:cand_candidate'] = 'Kandidat';
+$string['autoupgrade:cand_passed'] = 'Lulus sekali';
+$string['autoupgrade:cand_eligible'] = 'Memenuhi syarat';
+$string['autoupgrade:cand_failed'] = 'Gagal';
+$string['autoupgrade:cand_switched'] = 'Digunakan';
+$string['autoupgrade:cand_rolledback'] = 'Dibatalkan';
+$string['autoupgrade:cand_retired'] = 'Tidak lagi tercantum';
+$string['autoupgrade:eval_queued'] = 'Dalam antrean';
+$string['autoupgrade:eval_running'] = 'Berjalan';
+$string['autoupgrade:eval_complete'] = 'Selesai';
+$string['autoupgrade:eval_failed'] = 'Gagal';
+$string['autoupgrade:eval_skipped'] = 'Tidak dijalankan';
+$string['autoupgrade:gate_pass'] = 'Lulus:';
+$string['autoupgrade:gate_fail'] = 'Tidak lulus:';
+$string['autoupgrade:how_auto'] = 'Otomatis';
+$string['autoupgrade:how_manual'] = 'Oleh administrator';
+$string['autoupgrade:switch_watching'] = 'Dipantau';
+$string['autoupgrade:switch_kept'] = 'Dipertahankan';
+$string['autoupgrade:switch_rolledback'] = 'Dibatalkan';
+$string['autoupgrade:switch_superseded'] = 'Sudah diubah oleh administrator';
+$string['autoupgrade:block_role'] = 'Peran ini tidak dapat dialihkan dari sini.';
+$string['autoupgrade:block_emergency'] = 'Kontrol darurat sedang aktif, jadi tidak ada model yang dialihkan sampai kontrol itu dipulihkan.';
+$string['autoupgrade:block_allowlist'] = 'Pengaturan {$a} tidak boleh diubah oleh peralihan tanpa campur tangan manusia, jadi peran ini dialihkan secara manual.';
+$string['autoupgrade:block_bundle'] = 'Pengaturan {$a} dikelola oleh paket kebijakan bertanda tangan. Ubah model di paket tersebut.';
+$string['autoupgrade:block_watching'] = 'Peralihan peran ini masih dipantau. Tunggu hingga dipertahankan atau dibatalkan.';
+$string['autoupgrade:block_noeval'] = 'Kandidat ini belum memiliki evaluasi yang selesai.';
+$string['autoupgrade:block_gate'] = 'Evaluasi terakhir kandidat ini tidak lulus pemeriksaan.';
+$string['autoupgrade:block_changed'] = 'Model peran ini berubah setelah evaluasi, jadi evaluasi itu tidak lagi membandingkan pasangan yang benar. Evaluasi ulang.';
+$string['autoupgrade:switched'] = '{$a->role} dialihkan ke {$a->model}. Model ini dipantau selama 48 jam.';
+$string['autoupgrade:rolledback'] = 'Peralihan {$a} dibatalkan.';
+$string['autoupgrade:rollback_missing'] = 'Peralihan itu tidak dapat dibatalkan.';
+$string['autoupgrade:rollback_superseded'] = 'Pengaturan diubah setelah peralihan, jadi tidak ada yang dibatalkan.';
+$string['autoupgrade:rollback_by_admin'] = 'Dibatalkan oleh administrator.';
+$string['autoupgrade:queued'] = 'Evaluasi masuk antrean. Evaluasi berjalan pada putaran cron berikutnya dan memakan waktu beberapa menit.';
+$string['autoupgrade:discovered'] = 'Penemuan mencantumkan {$a->providers} penyedia, mendaftarkan {$a->registered} model, dan menandai {$a->candidates} kandidat. Penyedia yang tidak dapat dicantumkan: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Peran ini tidak dialihkan secara otomatis.';
+$string['autoupgrade:why_recommend_mode'] = 'Peningkatan model otomatis berada dalam mode Rekomendasikan.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} dialihkan ke {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] mengalihkan peran {$a->role} dari {$a->from} ke {$a->to}.
+
+Model ini lulus semua pemeriksaan terhadap model saat ini, diukur dalam proses yang sama, dua kali berturut-turut:
+{$a->gate}
+
+Model baru dipantau pada lalu lintas langsung selama {$a->hours} jam dan dibatalkan otomatis jika galat, jawaban terpotong, penolakan, atau biaya per jawaban memburuk. Anda dapat membatalkannya sendiri kapan saja:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} dikembalikan ke {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] mengembalikan peran {$a->role} dari {$a->to} ke {$a->from}.
+
+Alasan: {$a->reason}
+
+Kandidat tidak akan dicoba lagi selama 30 hari. Detail:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] peralihan {$a->role} ke {$a->to} dipertahankan';
+$string['autoupgrade:mail_kept_body'] = 'Peralihan peran {$a->role} dari {$a->from} ke {$a->to} bertahan selama {$a->hours} jam pada {$a->turns} jawaban langsung dan dipertahankan.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Peralihan peran {$a->role} dari {$a->from} ke {$a->to} dipertahankan setelah {$a->hours} jam, tetapi hanya {$a->turns} jawaban langsung yang teramati, terlalu sedikit untuk menilai. Terus awasi.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Direkomendasikan: {$a->role} dengan {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} lulus semua pemeriksaan terhadap {$a->current} untuk peran {$a->role}, dua kali berturut-turut, dan tidak dialihkan otomatis: {$a->why}
+
+{$a->gate}
+
+Alihkan, atau biarkan, di sini:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Anda menerima pesan ini karena alamat Anda adalah penerima peringatan pengeluaran [[tutorshort]].';
+$string['event:model_switched'] = 'Model dialihkan';
+$string['event:model_switch_rolled_back'] = 'Peralihan model dibatalkan';
+$string['task:discover_models'] = 'Temukan model AI baru dan masukkan evaluasi ke antrean';
+$string['task:evaluate_model_candidate'] = 'Evaluasi model AI kandidat';
+$string['task:watch_model_switches'] = 'Pantau peralihan model AI terbaru';
+$string['settings:autoupgrade_heading'] = 'Peningkatan model otomatis';
+$string['settings:autoupgrade_heading_desc'] = 'Setiap hari [[tutorshort]] mencantumkan model yang ditawarkan penyedia Anda dan menandai kandidat untuk setiap peran: penyedia sama, harga daftar sebanding, dan harga diketahui. Kandidat diuji terhadap model saat ini pada prompt tutor, rangkaian uji jailbreak, dan biaya yang menyerupai penggunaan nyata, dan model bawaan situs hanya dialihkan jika kandidat berbiaya sama atau lebih murah per jawaban, sama baiknya, sama amannya, dan sama andalnya, dua kali berturut-turut. Kursus yang memiliki model sendiri tetap memakainya. Setiap peralihan dikirim lewat email ke penerima peringatan pengeluaran dan dipantau selama 48 jam.';
+$string['settings:autoupgrade_mode'] = 'Mode kerja';
+$string['settings:autoupgrade_mode_desc'] = 'Otomatis mengalihkan saat kandidat lulus. Rekomendasikan menguji kandidat dan mengirim rekomendasi lewat email sebagai gantinya. Nonaktif tidak melakukan apa pun secara otomatis.';
+$string['settings:autoupgrade_budget_usd'] = 'Anggaran pengujian bulanan (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Jumlah maksimum yang boleh dibelanjakan evaluasi otomatis dalam satu bulan kalender, termasuk penilai. Evaluasi yang bisa melampaui batas bulan ini tidak dimulai.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID kursus evaluasi';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Evaluasi menjawab dengan prompt sistem yang benar-benar dipakai kursus ini, disusun untuk identitas tamu sehingga tidak ada data pelajar yang dikirim. 0 memilih kursus dengan jawaban obrolan terbanyak dalam 30 hari terakhir.';
+$string['privacy:metadata:model_eval'] = 'Evaluasi model otomatis: model kandidat mana yang dibandingkan dengan model saat ini yang mana, dan hasil yang diukur. Satu-satunya data pribadi adalah pengenal administrator yang meminta evaluasi. Baris ini adalah konfigurasi situs, bukan data pribadi tentang pelajar, sehingga tidak disertakan dalam ekspor data dan tidak dihapus saat pengguna meminta penghapusan.';
+$string['privacy:metadata:model_eval:createdby'] = 'Administrator situs yang meminta evaluasi ini. Kosong jika penemuan yang memasukkannya ke antrean.';
+$string['privacy:metadata:model_switch'] = 'Peralihan dan pembatalan model: dari model mana ke model mana suatu peran berpindah, dan alasannya. Satu-satunya data pribadi adalah pengenal administrator yang melakukan atau membatalkan peralihan. Baris ini adalah konfigurasi situs, bukan data pribadi tentang pelajar, sehingga tidak disertakan dalam ekspor data dan tidak dihapus saat pengguna meminta penghapusan.';
+$string['privacy:metadata:model_switch:createdby'] = 'Administrator situs yang melakukan peralihan ini. Kosong jika peralihan otomatis.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Administrator situs yang membatalkan peralihan ini. Kosong jika pemantau yang membatalkannya, atau peralihan tidak dibatalkan.';
+
+$string['autoupgrade:block_reasoning'] = 'Upaya penalaran adalah satu pengaturan untuk seluruh situs, dan peran {$a} juga menjalankan model berpikir yang belum diuji pada tingkat baru. Ubah secara manual jika itu yang Anda inginkan.';
+$string['autoupgrade:block_reasoning_course'] = 'Upaya penalaran adalah satu pengaturan untuk seluruh situs, dan satu kursus memakai model berpikirnya sendiri ({$a}) yang belum diuji pada tingkat baru. Ganti secara manual jika itu yang Anda inginkan.';

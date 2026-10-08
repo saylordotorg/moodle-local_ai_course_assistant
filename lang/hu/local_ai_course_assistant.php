@@ -3200,3 +3200,166 @@ $string['survey_admin:err_invalid_bounds'] = 'Az értékelő kérdéseknek {$a->
 $string['survey_admin:err_no_title'] = 'Adjon meg egy címet a felméréshez.';
 
 $string['settings:int_range'] = 'Adjon meg egy egész számot {$a->min} és {$a->max} között.';
+
+$string['cachedef_modelcaps'] = 'A szolgáltatói elutasításokból tanult modellképesség-adatok';
+$string['settings:reasoning_effort'] = 'Gondolkodási ráfordítás';
+$string['settings:reasoning_effort_desc'] = 'Mennyit gondolkodjanak a válasz előtt gondolkodó modellek. Az OpenAI gondolkodó modelljeinél (GPT-5, GPT-6, o-sorozat) <code>reasoning_effort</code> paraméterként, a Gemini gondolkodó modelljeinél gondolkodási keretként érvényesül. Minden gondolkodó modell a fenti válaszhosszon felül is kap helyet a gondolkodásra, így a gondolkodás már nem vághatja le a választ. Az Alacsony egy oktatóhoz illik: a válaszok hamarabb érkeznek és kevesebbe kerülnek. A Ki kikapcsolja a gondolkodást, ahol a modell engedi. A gondolkodásvezérlő nélküli modellek figyelmen kívül hagyják ezt a beállítást.';
+$string['settings:reasoning_effort_off'] = 'Ki (a modell által engedett minimum)';
+$string['settings:reasoning_effort_low'] = 'Alacsony (ajánlott)';
+$string['settings:reasoning_effort_medium'] = 'Közepes';
+$string['settings:reasoning_effort_high'] = 'Magas';
+$string['modelregistry:learned_heading'] = 'Szolgáltatóktól tanult képességadatok';
+$string['modelregistry:learned_desc'] = 'Ha egy szolgáltató elutasít egy kérést, mert egy modell már nem fogad el egy paramétert, a(z) [[tutorshort]] csak azt az egy paramétert módosítja, egyszer újrapróbálja, és itt megjegyzi a javítást, hogy a következő kérés elsőre helyes legyen. Egy adat elfelejtésével a modell visszakerül az alapértelmezett szabályokra.';
+$string['modelregistry:learned_none'] = 'Még egy szolgáltató sem utasított el kérésformátumot.';
+$string['modelregistry:col_field'] = 'Képesség';
+$string['modelregistry:col_value'] = 'Tanult érték';
+$string['modelregistry:col_evidence'] = 'A szolgáltató válasza';
+$string['modelregistry:forget'] = 'Elfelejtés';
+$string['modelregistry:forget_confirm'] = 'Elfelejti ezt az adatot? A modellhez intézett következő kérés ismét az alapértelmezett szabályokat használja.';
+$string['modelregistry:forget_done'] = 'Az adat elfelejtve. A modellhez intézett következő kérés az alapértelmezett szabályokat használja.';
+$string['modelregistry:forget_missing'] = 'Ez az adat már nem létezik.';
+$string['event:model_capability_learned'] = 'Szolgáltatótól tanult modellképesség';
+
+$string['autoupgrade:title'] = 'Modellfrissítések';
+$string['autoupgrade:navtitle'] = '[[tutorshort]] modellfrissítések';
+$string['autoupgrade:intro'] = 'A(z) [[tutorshort]] újabb modelleket keres a már használt szolgáltatóknál, minden jelöltet összevet azzal a modellel, amelyet leváltana (ugyanazok a promptok, ugyanaz a válaszkeret, ugyanaz az értékelő, ugyanabban a futásban), és csak akkor vált, ha a jelölt válaszonként ugyanannyiba vagy kevesebbe kerül, és ugyanolyan jó, biztonságos és megbízható, kétszer egymás után. Minden váltást 48 órán át figyel éles forgalmon, és visszavonja, ha romlanak az eredmények.';
+$string['autoupgrade:l_statusheading'] = 'Állapot';
+$string['autoupgrade:l_mode'] = 'Üzemmód';
+$string['autoupgrade:l_budget'] = 'Tesztelési keret';
+$string['autoupgrade:l_changemode'] = 'Módosítás';
+$string['autoupgrade:l_discover'] = 'Modellek keresése most';
+$string['autoupgrade:l_rolesheading'] = 'Szerepkörök';
+$string['autoupgrade:l_current'] = 'Jelenlegi modell';
+$string['autoupgrade:l_profile'] = 'Képességprofil';
+$string['autoupgrade:l_policy'] = 'Frissítések';
+$string['autoupgrade:l_nocandidates'] = 'Nincs jelölt. A keresés az azonos szolgáltató hasonló árú modelljeit jelöli meg.';
+$string['autoupgrade:l_colpasses'] = 'Sikeres futások';
+$string['autoupgrade:l_collast'] = 'Legutóbbi értékelés';
+$string['autoupgrade:l_evaluate'] = 'Értékelés most';
+$string['autoupgrade:l_evaluating'] = 'Sorban áll vagy fut';
+$string['autoupgrade:l_switch'] = 'Váltás';
+$string['autoupgrade:l_switchconfirm'] = 'Átállítja most ezt a szerepkört a jelöltre? A változást 48 órán át figyeljük, és visszavonható.';
+$string['autoupgrade:l_evalsheading'] = 'Értékelések';
+$string['autoupgrade:l_noevals'] = 'Még nincs értékelés.';
+$string['autoupgrade:l_colwhen'] = 'Időpont';
+$string['autoupgrade:l_colrole'] = 'Szerepkör';
+$string['autoupgrade:l_colcandidate'] = 'Jelölt';
+$string['autoupgrade:l_colincumbent'] = 'Jelenlegi modell';
+$string['autoupgrade:l_colcost'] = 'Elköltött / becsült';
+$string['autoupgrade:l_colgate'] = 'Kapuellenőrzések';
+$string['autoupgrade:l_switchesheading'] = 'Váltások és visszavonások';
+$string['autoupgrade:l_noswitches'] = 'Még nincs váltás.';
+$string['autoupgrade:l_colfrom'] = 'Honnan';
+$string['autoupgrade:l_colto'] = 'Hová';
+$string['autoupgrade:l_colmode'] = 'Hogyan';
+$string['autoupgrade:l_colreason'] = 'Ok';
+$string['autoupgrade:l_coluntil'] = 'Figyelés vége';
+$string['autoupgrade:l_rollback'] = 'Visszavonás';
+$string['autoupgrade:l_rollbackconfirm'] = 'Visszaállítja most az előző modellt?';
+$string['autoupgrade:l_manage'] = 'A tanult tények áttekintése vagy elfelejtése a modellregiszter oldalán';
+$string['autoupgrade:l_notinuse'] = 'nincs használatban';
+$string['autoupgrade:mode_off'] = 'Ki: semmi sem automatikus';
+$string['autoupgrade:mode_recommend'] = 'Ajánlás: jelöltek tesztelése és ajánlás küldése e-mailben';
+$string['autoupgrade:mode_auto'] = 'Automatikus: jelöltek tesztelése és váltás, ha valamelyik megfelel';
+$string['autoupgrade:budget_line'] = '${$a->spent} / ${$a->limit} elköltve ebben a hónapban (${$a->left} maradt)';
+$string['autoupgrade:last_discovery'] = 'A keresés legutóbb ekkor futott: {$a}.';
+$string['autoupgrade:never_discovered'] = 'A keresés még nem futott.';
+$string['autoupgrade:role_chat'] = 'Csevegés (elsődleges modell)';
+$string['autoupgrade:role_premium'] = 'Prémium szint';
+$string['autoupgrade:role_failover'] = 'Tartalék';
+$string['autoupgrade:role_quiz'] = 'Kvízkészítés';
+$string['autoupgrade:role_classifier'] = 'Elsajátítás-osztályozó';
+$string['autoupgrade:role_safety'] = 'Biztonsági referencia';
+$string['autoupgrade:role_soapbox'] = 'Soapbox pontozás';
+$string['autoupgrade:not_configured'] = 'Nincs beállítva (a csevegőmodellt örökli)';
+$string['autoupgrade:policy_auto'] = 'Értékelve, és Automatikus módban automatikusan váltva';
+$string['autoupgrade:policy_recommend'] = 'Értékelve és ajánlva; a váltást egy rendszergazda végzi';
+$string['autoupgrade:policy_none'] = 'A jelöltek csak listázva: egyetlen teszt sem méri ennek a szerepkörnek a feladatát';
+$string['autoupgrade:cand_candidate'] = 'Jelölt';
+$string['autoupgrade:cand_passed'] = 'Egyszer megfelelt';
+$string['autoupgrade:cand_eligible'] = 'Alkalmas';
+$string['autoupgrade:cand_failed'] = 'Nem felelt meg';
+$string['autoupgrade:cand_switched'] = 'Használatban';
+$string['autoupgrade:cand_rolledback'] = 'Visszavonva';
+$string['autoupgrade:cand_retired'] = 'Már nem szerepel a listán';
+$string['autoupgrade:eval_queued'] = 'Sorban áll';
+$string['autoupgrade:eval_running'] = 'Fut';
+$string['autoupgrade:eval_complete'] = 'Kész';
+$string['autoupgrade:eval_failed'] = 'Sikertelen';
+$string['autoupgrade:eval_skipped'] = 'Nem futott';
+$string['autoupgrade:gate_pass'] = 'Megfelelt:';
+$string['autoupgrade:gate_fail'] = 'Nem felelt meg:';
+$string['autoupgrade:how_auto'] = 'Automatikusan';
+$string['autoupgrade:how_manual'] = 'Rendszergazda által';
+$string['autoupgrade:switch_watching'] = 'Figyelés alatt';
+$string['autoupgrade:switch_kept'] = 'Megtartva';
+$string['autoupgrade:switch_rolledback'] = 'Visszavonva';
+$string['autoupgrade:switch_superseded'] = 'Azóta egy rendszergazda módosította';
+$string['autoupgrade:block_role'] = 'Ez a szerepkör innen nem váltható.';
+$string['autoupgrade:block_emergency'] = 'Vészhelyzeti vezérlő van bekapcsolva, ezért egyetlen modell sem vált, amíg vissza nem állítják.';
+$string['autoupgrade:block_allowlist'] = 'A(z) {$a} beállítást váltás nem módosíthatja ember nélkül, ezért ez a szerepkör kézzel váltható.';
+$string['autoupgrade:block_bundle'] = 'A(z) {$a} beállítást az aláírt szabálycsomag kezeli. A modellt inkább a csomagban módosítsa.';
+$string['autoupgrade:block_watching'] = 'Ennek a szerepkörnek egy váltása még figyelés alatt áll. Várja meg, amíg megtartják vagy visszavonják.';
+$string['autoupgrade:block_noeval'] = 'Ennek a jelöltnek nincs befejezett értékelése.';
+$string['autoupgrade:block_gate'] = 'A jelölt legutóbbi értékelése nem ment át a kapuellenőrzésen.';
+$string['autoupgrade:block_changed'] = 'A szerepkör modellje az értékelés után megváltozott, így az már nem a megfelelő párt hasonlítja össze. Értékelje újra.';
+$string['autoupgrade:switched'] = '{$a->role} átállítva erre: {$a->model}. 48 órán át figyeljük.';
+$string['autoupgrade:rolledback'] = 'A(z) {$a} váltás visszavonva.';
+$string['autoupgrade:rollback_missing'] = 'Ez a váltás nem vonható vissza.';
+$string['autoupgrade:rollback_superseded'] = 'A beállítások a váltás után megváltoztak, ezért semmi sem lett visszavonva.';
+$string['autoupgrade:rollback_by_admin'] = 'Egy rendszergazda visszavonta.';
+$string['autoupgrade:queued'] = 'Az értékelés sorba állítva. A következő cron-futáskor indul, és több percig tart.';
+$string['autoupgrade:discovered'] = 'A keresés {$a->providers} szolgáltatót listázott, {$a->registered} modellt regisztrált és {$a->candidates} jelöltet jelölt meg. Nem listázható szolgáltatók: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Ez a szerepkör nem vált automatikusan.';
+$string['autoupgrade:why_recommend_mode'] = 'Az automatikus modellfrissítések Ajánlás módban vannak.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} átállítva erre: {$a->to}';
+$string['autoupgrade:mail_switched_body'] = 'A(z) [[tutorshort]] a(z) {$a->role} szerepkört átállította erről: {$a->from}, erre: {$a->to}.
+
+Minden ellenőrzésen megfelelt a jelenlegi modellel szemben, ugyanabban a futásban mérve, kétszer egymás után:
+{$a->gate}
+
+Az új modellt {$a->hours} órán át figyeljük éles forgalmon, és automatikusan visszavonjuk, ha romlanak a hibák, a megszakadt válaszok, az elutasítások vagy a válaszonkénti költség. Bármikor maga is visszavonhatja:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} visszaállítva erre: {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = 'A(z) [[tutorshort]] a(z) {$a->role} szerepkört visszaállította erről: {$a->to}, erre: {$a->from}.
+
+Ok: {$a->reason}
+
+A jelöltet 30 napig nem próbáljuk újra. Részletek:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] {$a->role} váltás erre: {$a->to} megtartva';
+$string['autoupgrade:mail_kept_body'] = 'A(z) {$a->role} szerepkör váltása erről: {$a->from}, erre: {$a->to} {$a->hours} órán át, {$a->turns} éles válaszon bevált, ezért megtartjuk.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'A(z) {$a->role} szerepkör váltását erről: {$a->from}, erre: {$a->to} {$a->hours} óra után megtartjuk, de csak {$a->turns} éles válasz volt, ami túl kevés az ítélethez. Tartsa szemmel.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Ajánlott: {$a->role} ezzel: {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = 'A(z) {$a->model} minden ellenőrzésen megfelelt a(z) {$a->current} modellel szemben a(z) {$a->role} szerepkörben, kétszer egymás után, de nem lett automatikusan átállítva: {$a->why}
+
+{$a->gate}
+
+Állítsa át, vagy hagyja így, itt:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Ezt azért kapja, mert az Ön címe a(z) [[tutorshort]] költségriasztásainak címzettje.';
+$string['event:model_switched'] = 'Modell váltva';
+$string['event:model_switch_rolled_back'] = 'Modellváltás visszavonva';
+$string['task:discover_models'] = 'Új MI-modellek keresése és értékelések sorba állítása';
+$string['task:evaluate_model_candidate'] = 'Jelölt MI-modell értékelése';
+$string['task:watch_model_switches'] = 'A legutóbbi MI-modellváltások figyelése';
+$string['settings:autoupgrade_heading'] = 'Automatikus modellfrissítések';
+$string['settings:autoupgrade_heading_desc'] = 'A(z) [[tutorshort]] naponta listázza a szolgáltatói által kínált modelleket, és minden szerepkörhöz jelölteket jelöl meg: azonos szolgáltató, hasonló listaár és ismert ár. Összeveti őket a jelenlegi modellel a tutor promptjain, a jailbreak-tesztsoron és valóshoz hasonló költségen, és csak akkor váltja a webhely alapértelmezett modelljét, ha egy jelölt válaszonként ugyanannyiba vagy kevesebbe kerül, és ugyanolyan jó, biztonságos és megbízható, kétszer egymás után. A saját modellel rendelkező kurzusok megtartják azt. Minden váltásról e-mail megy a költségriasztások címzettjeinek, és 48 órán át figyeljük.';
+$string['settings:autoupgrade_mode'] = 'Üzemmód';
+$string['settings:autoupgrade_mode_desc'] = 'Az Automatikus vált, ha egy jelölt megfelel. Az Ajánlás teszteli a jelölteket, és helyette ajánlást küld e-mailben. A Ki semmit sem tesz automatikusan.';
+$string['settings:autoupgrade_budget_usd'] = 'Havi tesztelési keret (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Ennyit költhetnek legfeljebb az automatikus értékelések egy naptári hónapban, az értékelővel együtt. Az az értékelés, amely túllépheti a havi keretet, nem indul el.';
+$string['settings:autoupgrade_eval_courseid'] = 'Értékelési kurzus azonosítója';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Az értékelések a kurzus által ténylegesen használt rendszerprompttal válaszolnak, vendégidentitásra összeállítva, így egyetlen tanuló adatai sem kerülnek elküldésre. A 0 az elmúlt 30 nap legtöbb csevegőválaszával rendelkező kurzust választja.';
+$string['privacy:metadata:model_eval'] = 'Automatikus modellértékelések: melyik jelölt modellt melyik jelenlegi modellel hasonlították össze, és a mért eredmény. Az egyetlen személyes adat az értékelést kérő rendszergazda azonosítója. Ezek a sorok webhelybeállítások, nem pedig egy tanuló személyes adatai, ezért nem kerülnek bele az adatexportba, és nem törlődnek, amikor egy felhasználó törlést kér.';
+$string['privacy:metadata:model_eval:createdby'] = 'A webhely rendszergazdája, aki ezt az értékelést kérte. Üres, ha a keresés állította sorba.';
+$string['privacy:metadata:model_switch'] = 'Modellváltások és visszavonások: egy szerepkör melyik modellről melyikre váltott, és miért. Az egyetlen személyes adat a váltást végző vagy visszavonó rendszergazda azonosítója. Ezek a sorok webhelybeállítások, nem pedig egy tanuló személyes adatai, ezért nem kerülnek bele az adatexportba, és nem törlődnek, amikor egy felhasználó törlést kér.';
+$string['privacy:metadata:model_switch:createdby'] = 'A webhely rendszergazdája, aki ezt a váltást végezte. Üres, ha automatikus volt.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'A webhely rendszergazdája, aki visszavonta ezt a váltást. Üres, ha a figyelő vonta vissza, vagy nem vonták vissza.';
+
+$string['autoupgrade:block_reasoning'] = 'A Gondolkodási ráfordítás egyetlen beállítás az egész webhelyre, és a(z) {$a} szerepkör is egy gondolkodó modellt futtat, amelyet nem teszteltek az új szinten. Ha ezt szeretné, váltson kézzel.';
+$string['autoupgrade:block_reasoning_course'] = 'Az érvelési erőfeszítés egyetlen beállítás az egész webhelyre, és egy kurzus saját gondolkodó modellt ({$a}) használ, amelyet nem teszteltek az új szinten. Váltson kézzel, ha ezt szeretné.';

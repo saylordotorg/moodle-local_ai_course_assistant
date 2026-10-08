@@ -3187,3 +3187,166 @@ $string['survey_admin:err_invalid_bounds'] = 'Tambayoyin ƙima dole su yi amfani
 $string['survey_admin:err_no_title'] = 'Shigar da taken binciken.';
 
 $string['settings:int_range'] = 'Shigar da cikakkiyar lamba daga {$a->min} zuwa {$a->max}.';
+
+$string['cachedef_modelcaps'] = 'Bayanan iyawar samfura da aka koya daga ƙin masu samarwa';
+$string['settings:reasoning_effort'] = 'Ƙoƙarin tunani';
+$string['settings:reasoning_effort_desc'] = 'Yawan tunanin da ake neman samfuran da ke tunani kafin amsa su yi. Yana aiki ga samfuran tunani na OpenAI (GPT-5, GPT-6, jerin o) a matsayin <code>reasoning_effort</code> da kuma samfuran tunani na Gemini a matsayin kasafin tunani. Kowane samfurin tunani yana kuma samun sarari don tunaninsa bayan tsawon amsar da ke sama, don haka tunani ba zai iya katse amsa ba kuma. Ƙasa ya dace da malami: amsoshi suna zuwa da wuri kuma kuɗinsu ya ragu. A kashe yana kashe tunani inda samfurin ya yarda. Samfuran da ba su da ikon sarrafa tunani suna watsi da wannan saiti.';
+$string['settings:reasoning_effort_off'] = 'A kashe (mafi ƙanƙanta da samfurin ya yarda)';
+$string['settings:reasoning_effort_low'] = 'Ƙasa (an ba da shawara)';
+$string['settings:reasoning_effort_medium'] = 'Matsakaici';
+$string['settings:reasoning_effort_high'] = 'Babba';
+$string['modelregistry:learned_heading'] = 'Bayanan iyawa da aka koya daga masu samarwa';
+$string['modelregistry:learned_desc'] = 'Idan mai samarwa ya ƙi buƙata saboda samfuri ba ya karɓar wani siga, [[tutorshort]] yana canza wannan siga ɗaya kawai, ya sake gwadawa sau ɗaya, kuma ya tuna gyaran a nan don buƙata ta gaba ta yi daidai tun farko. Manta da bayani don mayar da samfurin kan ƙa\'idodin asali.';
+$string['modelregistry:learned_none'] = 'Babu mai samarwa da ya ƙi tsarin buƙata tukuna.';
+$string['modelregistry:col_field'] = 'Iyawa';
+$string['modelregistry:col_value'] = 'Ƙimar da aka koya';
+$string['modelregistry:col_evidence'] = 'Abin da mai samarwa ya ce';
+$string['modelregistry:forget'] = 'Manta';
+$string['modelregistry:forget_confirm'] = 'A manta da wannan bayani? Buƙata ta gaba zuwa wannan samfuri za ta sake amfani da ƙa\'idodin asali.';
+$string['modelregistry:forget_done'] = 'An manta da bayanin. Buƙata ta gaba zuwa wannan samfuri tana amfani da ƙa\'idodin asali.';
+$string['modelregistry:forget_missing'] = 'Wannan bayani ba ya nan kuma.';
+$string['event:model_capability_learned'] = 'An koyi iyawar samfuri daga mai samarwa';
+
+$string['autoupgrade:title'] = 'Haɓaka samfura';
+$string['autoupgrade:navtitle'] = 'Haɓaka samfuran [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] yana neman sababbin samfura daga masu ba da sabis da yake amfani da su, yana gwada kowane ɗan takara da samfurin da zai maye gurbinsa (umarni iri ɗaya, kasafin amsa iri ɗaya, alƙali iri ɗaya, a cikin gudu ɗaya), kuma yana sauyawa ne kawai idan ɗan takarar yana da farashi iri ɗaya ko ƙasa a kowace amsa, yana da kyau, aminci da dogaro iri ɗaya, sau biyu a jere. Ana sa ido kan kowane sauyi na awa 48 a kan zirga-zirgar gaske, kuma ana mayar da shi idan ya yi muni.';
+$string['autoupgrade:l_statusheading'] = 'Matsayi';
+$string['autoupgrade:l_mode'] = 'Yanayi';
+$string['autoupgrade:l_budget'] = 'Kasafin gwaji';
+$string['autoupgrade:l_changemode'] = 'Canza';
+$string['autoupgrade:l_discover'] = 'Nemo samfura yanzu';
+$string['autoupgrade:l_rolesheading'] = 'Ayyuka';
+$string['autoupgrade:l_current'] = 'Samfurin yanzu';
+$string['autoupgrade:l_profile'] = 'Bayanin iyawa';
+$string['autoupgrade:l_policy'] = 'Haɓakawa';
+$string['autoupgrade:l_nocandidates'] = 'Babu ƴan takara. Nema yana alamta samfura daga mai ba da sabis ɗaya masu farashi mai kama.';
+$string['autoupgrade:l_colpasses'] = 'Nasarori';
+$string['autoupgrade:l_collast'] = 'Kimantawa ta ƙarshe';
+$string['autoupgrade:l_evaluate'] = 'Kimanta yanzu';
+$string['autoupgrade:l_evaluating'] = 'A layi ko ana gudana';
+$string['autoupgrade:l_switch'] = 'Sauya';
+$string['autoupgrade:l_switchconfirm'] = 'A sauya wannan aikin zuwa ɗan takarar yanzu? Ana sa ido kan canjin na awa 48 kuma ana iya mayar da shi.';
+$string['autoupgrade:l_evalsheading'] = 'Kimantawa';
+$string['autoupgrade:l_noevals'] = 'Babu kimantawa tukuna.';
+$string['autoupgrade:l_colwhen'] = 'Yaushe';
+$string['autoupgrade:l_colrole'] = 'Aiki';
+$string['autoupgrade:l_colcandidate'] = 'Ɗan takara';
+$string['autoupgrade:l_colincumbent'] = 'Samfurin yanzu';
+$string['autoupgrade:l_colcost'] = 'An kashe / ƙiyasi';
+$string['autoupgrade:l_colgate'] = 'Binciken ƙofa';
+$string['autoupgrade:l_switchesheading'] = 'Sauye-sauye da mayarwa';
+$string['autoupgrade:l_noswitches'] = 'Babu sauyi tukuna.';
+$string['autoupgrade:l_colfrom'] = 'Daga';
+$string['autoupgrade:l_colto'] = 'Zuwa';
+$string['autoupgrade:l_colmode'] = 'Yadda';
+$string['autoupgrade:l_colreason'] = 'Dalili';
+$string['autoupgrade:l_coluntil'] = 'Ana sa ido har zuwa';
+$string['autoupgrade:l_rollback'] = 'Mayar';
+$string['autoupgrade:l_rollbackconfirm'] = 'A mayar da samfurin baya yanzu?';
+$string['autoupgrade:l_manage'] = 'Duba ko manta da bayanan da aka koya a shafin rajistar samfura';
+$string['autoupgrade:l_notinuse'] = 'ba a amfani da shi';
+$string['autoupgrade:mode_off'] = 'A kashe: babu abin da ke atomatik';
+$string['autoupgrade:mode_recommend'] = 'Shawara: gwada ƴan takara kuma a aika shawara ta imel';
+$string['autoupgrade:mode_auto'] = 'Atomatik: gwada ƴan takara kuma a sauya idan ɗaya ya ci';
+$string['autoupgrade:budget_line'] = 'An kashe ${$a->spent} daga ${$a->limit} a wannan watan (saura ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Nema ya gudana a ƙarshe {$a}.';
+$string['autoupgrade:never_discovered'] = 'Nema bai gudana ba tukuna.';
+$string['autoupgrade:role_chat'] = 'Hira (babban samfuri)';
+$string['autoupgrade:role_premium'] = 'Matakin premium';
+$string['autoupgrade:role_failover'] = 'Madadin gaggawa';
+$string['autoupgrade:role_quiz'] = 'Ƙirƙirar tambayoyi';
+$string['autoupgrade:role_classifier'] = 'Mai rarraba ƙwarewa';
+$string['autoupgrade:role_safety'] = 'Ma\'aunin tsaro';
+$string['autoupgrade:role_soapbox'] = 'Ƙididdigar Soapbox';
+$string['autoupgrade:not_configured'] = 'Ba a saita ba (yana gadon samfurin hira)';
+$string['autoupgrade:policy_auto'] = 'Ana kimantawa, kuma ana sauyawa ta atomatik a yanayin Atomatik';
+$string['autoupgrade:policy_recommend'] = 'Ana kimantawa kuma ana ba da shawara; mai gudanarwa ne ke sauyawa';
+$string['autoupgrade:policy_none'] = 'Ana jera ƴan takara kawai: babu gwajin da ke auna aikin wannan matsayi';
+$string['autoupgrade:cand_candidate'] = 'Ɗan takara';
+$string['autoupgrade:cand_passed'] = 'Ya ci sau ɗaya';
+$string['autoupgrade:cand_eligible'] = 'Ya cancanta';
+$string['autoupgrade:cand_failed'] = 'Ya faɗi';
+$string['autoupgrade:cand_switched'] = 'Ana amfani da shi';
+$string['autoupgrade:cand_rolledback'] = 'An mayar';
+$string['autoupgrade:cand_retired'] = 'Ba a jera shi kuma';
+$string['autoupgrade:eval_queued'] = 'A layi';
+$string['autoupgrade:eval_running'] = 'Ana gudana';
+$string['autoupgrade:eval_complete'] = 'An kammala';
+$string['autoupgrade:eval_failed'] = 'Ya gaza';
+$string['autoupgrade:eval_skipped'] = 'Ba a gudanar ba';
+$string['autoupgrade:gate_pass'] = 'Ya ci:';
+$string['autoupgrade:gate_fail'] = 'Bai ci ba:';
+$string['autoupgrade:how_auto'] = 'Ta atomatik';
+$string['autoupgrade:how_manual'] = 'Ta hannun mai gudanarwa';
+$string['autoupgrade:switch_watching'] = 'Ana sa ido';
+$string['autoupgrade:switch_kept'] = 'An ajiye';
+$string['autoupgrade:switch_rolledback'] = 'An mayar';
+$string['autoupgrade:switch_superseded'] = 'Mai gudanarwa ya canza shi tun daga lokacin';
+$string['autoupgrade:block_role'] = 'Ba za a iya sauya wannan aikin daga nan ba.';
+$string['autoupgrade:block_emergency'] = 'Akwai ikon gaggawa da ke aiki, don haka ba za a sauya kowane samfuri ba har sai an dawo da shi.';
+$string['autoupgrade:block_allowlist'] = 'Saitin {$a} ba wanda sauyi zai iya canzawa ba tare da mutum ba ne, don haka ana sauya wannan aikin da hannu.';
+$string['autoupgrade:block_bundle'] = 'Kunshin manufofin da aka sanya wa hannu ne ke sarrafa saitin {$a}. Ka canza samfurin a cikin kunshin maimakon haka.';
+$string['autoupgrade:block_watching'] = 'Ana ci gaba da sa ido kan sauyin wannan aikin. Jira har sai an ajiye shi ko an mayar da shi.';
+$string['autoupgrade:block_noeval'] = 'Wannan ɗan takarar ba shi da kimantawar da aka kammala.';
+$string['autoupgrade:block_gate'] = 'Kimantawar ƙarshe ta wannan ɗan takarar ba ta wuce binciken ƙofa ba.';
+$string['autoupgrade:block_changed'] = 'Samfurin aikin ya canza bayan kimantawar, don haka ba ta kwatanta biyun da suka dace ba kuma. Sake kimantawa.';
+$string['autoupgrade:switched'] = 'An sauya {$a->role} zuwa {$a->model}. Ana sa ido a kansa na awa 48.';
+$string['autoupgrade:rolledback'] = 'An mayar da sauyin {$a}.';
+$string['autoupgrade:rollback_missing'] = 'Ba za a iya mayar da wannan sauyin ba.';
+$string['autoupgrade:rollback_superseded'] = 'An canza saitunan bayan sauyin, don haka ba a mayar da komai ba.';
+$string['autoupgrade:rollback_by_admin'] = 'Mai gudanarwa ne ya mayar.';
+$string['autoupgrade:queued'] = 'An saka kimantawa a layi. Za ta gudana a zagayen cron na gaba kuma tana ɗaukar mintuna da yawa.';
+$string['autoupgrade:discovered'] = 'Nema ya jera masu ba da sabis {$a->providers}, ya yi rajistar samfura {$a->registered} kuma ya alamta ƴan takara {$a->candidates}. Masu ba da sabis da ba a iya jerawa ba: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Ba a sauya wannan aikin ta atomatik.';
+$string['autoupgrade:why_recommend_mode'] = 'Haɓaka samfura ta atomatik yana cikin yanayin Shawara.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] An sauya {$a->role} zuwa {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] ya sauya aikin {$a->role} daga {$a->from} zuwa {$a->to}.
+
+Ya ci kowane bincike idan aka kwatanta da samfurin yanzu, an auna a cikin gudu ɗaya, sau biyu a jere:
+{$a->gate}
+
+Ana sa ido kan sabon samfurin a zirga-zirgar gaske na awa {$a->hours} kuma za a mayar da shi ta atomatik idan kurakurai, amsoshin da aka yanke, ƙin amsa ko farashi kowace amsa sun yi muni. Kuna iya mayar da shi da kanku a kowane lokaci:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] An mayar da {$a->role} zuwa {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] ya mayar da aikin {$a->role} daga {$a->to} zuwa {$a->from}.
+
+Dalili: {$a->reason}
+
+Ba za a sake gwada ɗan takarar ba har tsawon kwanaki 30. Cikakkun bayanai:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] An ajiye sauyin {$a->role} zuwa {$a->to}';
+$string['autoupgrade:mail_kept_body'] = 'Sauyin aikin {$a->role} daga {$a->from} zuwa {$a->to} ya tsaya da kyau na awa {$a->hours} a kan amsoshin gaske {$a->turns} kuma an ajiye shi.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'An ajiye sauyin aikin {$a->role} daga {$a->from} zuwa {$a->to} bayan awa {$a->hours}, amma amsoshin gaske {$a->turns} kawai aka gani, sun yi kaɗan don yanke hukunci. Ku ci gaba da lura da shi.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Shawara: {$a->role} a kan {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} ya ci kowane bincike idan aka kwatanta da {$a->current} don aikin {$a->role}, sau biyu a jere, kuma ba a sauya shi ta atomatik ba: {$a->why}
+
+{$a->gate}
+
+Sauya shi, ko bar shi, a nan:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Kuna karɓar wannan saboda adireshinku yana cikin masu karɓar faɗakarwar kashe kuɗi na [[tutorshort]].';
+$string['event:model_switched'] = 'An sauya samfuri';
+$string['event:model_switch_rolled_back'] = 'An mayar da sauyin samfuri';
+$string['task:discover_models'] = 'Nemo sababbin samfuran AI kuma a saka kimantawa a layi';
+$string['task:evaluate_model_candidate'] = 'Kimanta samfurin AI ɗan takara';
+$string['task:watch_model_switches'] = 'Sa ido kan sauye-sauyen samfuran AI na kwanan nan';
+$string['settings:autoupgrade_heading'] = 'Haɓaka samfura ta atomatik';
+$string['settings:autoupgrade_heading_desc'] = 'Kowace rana [[tutorshort]] yana jera samfuran da masu ba ku sabis ke bayarwa kuma yana alamta ƴan takara don kowane aiki: mai ba da sabis ɗaya, farashin jeri mai kama, da sananne farashi. Yana gwada su da samfurin yanzu a kan umarnin malami, rukunin gwajin jailbreak da farashi mai kama da na gaske, kuma yana sauya tsohon samfurin shafin ne kawai idan ɗan takara yana da farashi iri ɗaya ko ƙasa a kowace amsa, yana da kyau, aminci da dogaro iri ɗaya, sau biyu a jere. Kwasa-kwasan da ke da nasu samfurin suna riƙe shi. Ana aika imel game da kowane sauyi ga masu karɓar faɗakarwar kashe kuɗi, kuma ana sa ido a kansa na awa 48.';
+$string['settings:autoupgrade_mode'] = 'Yanayi';
+$string['settings:autoupgrade_mode_desc'] = 'Atomatik yana sauyawa idan ɗan takara ya ci. Shawara yana gwada ƴan takara kuma yana aika shawara ta imel maimakon haka. A kashe ba ya yin komai ta atomatik.';
+$string['settings:autoupgrade_budget_usd'] = 'Kasafin gwaji na wata (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Mafi yawan abin da kimantawa ta atomatik za ta iya kashewa a cikin watan kalanda, har da alƙali. Kimantawar da za ta iya wuce wannan iyaka na wata ba za ta fara ba.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID na kwas ɗin kimantawa';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Kimantawa tana amsawa a ƙarƙashin umarnin tsarin da wannan kwas ke amfani da shi a zahiri, wanda aka gina don asalin baƙo don kada a aika bayanan kowane ɗalibi. 0 yana zaɓar kwas ɗin da ke da mafi yawan amsoshin hira a cikin kwanaki 30 da suka gabata.';
+$string['privacy:metadata:model_eval'] = 'Kimantawar samfura ta atomatik: wane samfurin ɗan takara aka kwatanta da wane samfurin yanzu, da sakamakon da aka auna. Bayanin sirri ɗaya tilo shine lambar shaidar mai gudanarwar da ya nemi kimantawar. Waɗannan layukan saitin shafi ne ba bayanan sirri na ɗalibi ba, don haka ba a saka su a cikin fitar da bayanai kuma ba a share su idan mai amfani ya nemi a goge.';
+$string['privacy:metadata:model_eval:createdby'] = 'Mai gudanar da shafin da ya nemi wannan kimantawar. Babu komai idan nema ne ya saka ta a layi.';
+$string['privacy:metadata:model_switch'] = 'Sauye-sauyen samfura da mayarwa: daga wane samfuri zuwa wane samfuri aiki ya koma, da dalili. Bayanin sirri ɗaya tilo shine lambar shaidar mai gudanarwar da ya yi ko ya soke sauyin. Waɗannan layukan saitin shafi ne ba bayanan sirri na ɗalibi ba, don haka ba a saka su a cikin fitar da bayanai kuma ba a share su idan mai amfani ya nemi a goge.';
+$string['privacy:metadata:model_switch:createdby'] = 'Mai gudanar da shafin da ya yi wannan sauyin. Babu komai idan ta atomatik ne.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Mai gudanar da shafin da ya mayar da wannan sauyin. Babu komai idan mai sa ido ne ya mayar, ko ba a mayar da shi ba.';
+
+$string['autoupgrade:block_reasoning'] = 'Ƙoƙarin tunani saiti ɗaya ne ga dukkan shafin, kuma rawar {$a} ma tana gudanar da samfurin tunani da ba a gwada shi a sabon mataki ba. Canza da hannu idan abin da kake so ke nan.';
+$string['autoupgrade:block_reasoning_course'] = 'Ƙoƙarin tunani saiti ɗaya ne ga dukkan shafin, kuma wani kwas yana amfani da nasa samfurin tunani ({$a}) wanda ba a gwada shi a sabon mataki ba. Canja da hannu idan abin da kake so ke nan.';

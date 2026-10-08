@@ -22,7 +22,7 @@
  *
  * Three modes:
  *
- *   --mode=run     Send each prompt in tests/golden/tutor_prompts.json
+ *   --mode=run     Send each prompt in fixtures/golden/tutor_prompts.json
  *                  through each row of `comparison_providers` (or the
  *                  filtered subset), capture response + token counts +
  *                  TTFT + total latency + cost. CSV out.
@@ -67,6 +67,8 @@ require(__DIR__ . '/../../../../config.php');
 global $CFG;
 require_once($CFG->dirroot . '/lib/filelib.php');
 
+use local_ai_course_assistant\bench\golden_csv;
+use local_ai_course_assistant\bench\judge as golden_judge;
 use local_ai_course_assistant\model_bench;
 use local_ai_course_assistant\provider\base_provider;
 use local_ai_course_assistant\task\run_model_benchmark;
@@ -86,6 +88,10 @@ $judgemodel = 'claude-sonnet-4-6';
 $limit = 0; // 0 = all prompts
 $promptsfile = ''; // empty = use tutor_prompts.json default
 $registrykey = ''; // optional local_ai_course_assistant_models.modelkey to attribute the run to
+// v7.8.0: the answer budget, as sse.php sends it. 0 keeps the historical
+// behaviour (no max_tokens: Claude's 4,096 default, unbounded elsewhere), which
+// hides truncation, so a production-shaped run should pass the site's value.
+$maxtokens = 0;
 $delay = 0.0; // seconds to sleep between calls (throttle for rate-limited free tiers)
 // Issue #265 item 5. Three repeats distinguish a three-of-three behaviour from
 // a three-of-six one; they cannot bound a rate below roughly 15 percent. The
@@ -117,6 +123,8 @@ foreach ($argv as $arg) {
         $delay = (float) $m[1];
     } else if (preg_match('/^--repeats=(\d+)$/', $arg, $m)) {
         $repeats = max(1, (int) $m[1]);
+    } else if (preg_match('/^--max-tokens=(\d+)$/', $arg, $m)) {
+        $maxtokens = (int) $m[1];
     } else if (preg_match('/^--registry-key=(.+)$/', $arg, $m)) {
         $registrykey = strtolower(trim($m[1]));
     } else if ($arg === '--help' || $arg === '-h') {
@@ -133,7 +141,7 @@ Options:
   --providers=label1,label2     Limit run to a subset of comparison_providers labels.
   --limit=N                     Limit run to the first N prompts (for smoke tests).
   --prompts=FILE                Path to a tutor_prompts.json-shaped file (default:
-                                tests/golden/tutor_prompts.json). Use for one-off
+                                fixtures/golden/tutor_prompts.json). Use for one-off
                                 fixture sets like the A.10 premium-escalation bake-off
                                 or the domain-tagged set (tutor_prompts_domains.json).
   --delay=N                     Sleep N seconds between calls in run mode (throttle
@@ -145,6 +153,8 @@ Options:
                                 three-of-three behaviour from a three-of-six one.
                                 A rate below roughly 15 percent cannot be bounded
                                 at any n this harness will realistically run.
+  --max-tokens=N                Answer budget sent with every call, as sse.php sends
+                                the site's max_tokens (default 0 = none sent).
   --judge-provider=ID           Provider id for the rubric judge (default: claude).
   --judge-model=NAME            Model name for the rubric judge (default: claude-sonnet-4-6).
   --registry-key=KEY            Attribute the persisted result to this model-registry
@@ -164,7 +174,16 @@ TXT;
 $outdir = make_writable_directory($outdir);
 
 if ($mode === 'run' || $mode === 'all') {
-    $runin = local_ai_course_assistant_golden_mode_run($providersfilter, $outdir, $datetag, $limit, $promptsfile, $delay, $repeats);
+    $runin = local_ai_course_assistant_golden_mode_run(
+        $providersfilter,
+        $outdir,
+        $datetag,
+        $limit,
+        $promptsfile,
+        $delay,
+        $repeats,
+        $maxtokens
+    );
 }
 if ($mode === 'judge' || $mode === 'all') {
     if ($runin === '') {
@@ -201,9 +220,19 @@ exit(0);
  * @param string $promptsfile Optional alternate path to a tutor_prompts.json-shaped file.
  * @param float $delay Seconds to sleep between calls (0 = no throttle).
  * @param int $repeats How many times to send each prompt per provider (issue #265).
+ * @param int $maxtokens Answer budget to send, 0 for none.
  * @return string Path to run CSV.
  */
-function local_ai_course_assistant_golden_mode_run(string $providersfilter, string $outdir, string $datetag, int $limit, string $promptsfile = '', float $delay = 0.0, int $repeats = 1): string {
+function local_ai_course_assistant_golden_mode_run(
+    string $providersfilter,
+    string $outdir,
+    string $datetag,
+    int $limit,
+    string $promptsfile = '',
+    float $delay = 0.0,
+    int $repeats = 1,
+    int $maxtokens = 0
+): string {
     $prompts = local_ai_course_assistant_golden_load_prompts($promptsfile);
     if ($limit > 0) {
         $prompts = array_slice($prompts, 0, $limit);
@@ -251,11 +280,15 @@ function local_ai_course_assistant_golden_mode_run(string $providersfilter, stri
         : 'cli (no session user)';
     $promptfingerprint = substr(sha1(run_model_benchmark::SYSTEM_PROMPT), 0, 12);
 
-    fputcsv($fh, [
+    // v7.8.0: written and read through golden_csv (RFC 4180, no backslash
+    // escape), which LaTeX answers broke; plus the finish reason, so a cut-off
+    // answer is visible and the judge is told it was cut off, and the reasoning
+    // tokens, so a thinking model's cost includes its thinking.
+    golden_csv::write_row($fh, [
         'provider_label', 'provider_id', 'model', 'prompt_id', 'category', 'repeat',
         'response_text', 'prompt_tokens', 'completion_tokens',
         'ttft_ms', 'total_latency_ms', 'cost_cents', 'error', 'timestamp',
-        'account', 'system_prompt_sha',
+        'account', 'system_prompt_sha', 'finish_reason', 'reasoning_tokens',
     ]);
 
     // The prompt under test lives on the ad-hoc task, which is the
@@ -269,8 +302,8 @@ function local_ai_course_assistant_golden_mode_run(string $providersfilter, stri
         printf("\n[provider] %s (%s)%s\n", $row['label'], $row['models'], $urltag);
         foreach ($prompts as $p) {
             for ($rep = 1; $rep <= $repeats; $rep++) {
-            $result = local_ai_course_assistant_golden_run_one_call($row, $systemprompt, $p['text']);
-            fputcsv($fh, [
+            $result = local_ai_course_assistant_golden_run_one_call($row, $systemprompt, $p['text'], $maxtokens);
+            golden_csv::write_row($fh, [
                 $row['label'],
                 $row['provider'],
                 $row['models'],
@@ -287,6 +320,8 @@ function local_ai_course_assistant_golden_mode_run(string $providersfilter, stri
                 date('c'),
                 $account,
                 $promptfingerprint,
+                $result['finish_reason'] ?? '',
+                $result['reasoning_tokens'] ?? '',
             ]);
             printf(
                 "  %s%s [%s] %s\n",
@@ -314,9 +349,16 @@ function local_ai_course_assistant_golden_mode_run(string $providersfilter, stri
  * @param array $row Provider row: ['label', 'provider', 'models', 'apikey', 'temperature'].
  * @param string $systemprompt
  * @param string $userprompt
- * @return array Result row: ['response', 'prompt_tokens', 'completion_tokens', 'ttft_ms', 'total_latency_ms', 'cost_cents', 'error'].
+ * @param int $maxtokens Answer budget to send, 0 for none.
+ * @return array Result row: ['response', 'prompt_tokens', 'completion_tokens', 'ttft_ms', 'total_latency_ms',
+ *               'cost_cents', 'error', 'finish_reason', 'reasoning_tokens'].
  */
-function local_ai_course_assistant_golden_run_one_call(array $row, string $systemprompt, string $userprompt): array {
+function local_ai_course_assistant_golden_run_one_call(
+    array $row,
+    string $systemprompt,
+    string $userprompt,
+    int $maxtokens = 0
+): array {
     try {
         $provider = base_provider::create_for_comparison($row['provider'], $row['models'], 0, false);
         $start = microtime(true);
@@ -328,17 +370,24 @@ function local_ai_course_assistant_golden_run_one_call(array $row, string $syste
             }
             $response .= $chunk;
         };
+        $options = ['temperature' => (float) ($row['temperature'] ?: 0.4)];
+        if ($maxtokens > 0) {
+            $options['max_tokens'] = $maxtokens;
+        }
         $provider->chat_completion_stream($systemprompt, [
             ['role' => 'user', 'content' => $userprompt],
-        ], $callback, ['temperature' => (float) ($row['temperature'] ?: 0.4)]);
+        ], $callback, $options);
         $total = (int) round((microtime(true) - $start) * 1000);
         $usage = $provider->get_last_token_usage();
         $cost = null;
         if (!empty($usage['prompt_tokens']) && isset($usage['completion_tokens']) && !empty($usage['model'])) {
+            // Reasoning tokens are passed so Gemini's thinking, which it reports
+            // outside completion_tokens and bills as output, is in the cost.
             $estimate = token_cost_manager::estimate_cost(
                 $usage['model'],
                 (int) $usage['prompt_tokens'],
-                (int) $usage['completion_tokens']
+                (int) $usage['completion_tokens'],
+                (int) ($usage['reasoning_tokens'] ?? 0)
             );
             if ($estimate !== null) {
                 $cost = round($estimate * 100, 6); // dollars -> cents
@@ -352,6 +401,8 @@ function local_ai_course_assistant_golden_run_one_call(array $row, string $syste
             'total_latency_ms'   => $total,
             'cost_cents'         => $cost,
             'error'              => '',
+            'finish_reason'      => (string) ($provider->get_last_finish_reason() ?? ''),
+            'reasoning_tokens'   => $usage['reasoning_tokens'] ?? null,
         ];
     } catch (\Throwable $e) {
         return [
@@ -388,11 +439,12 @@ function local_ai_course_assistant_golden_mode_judge(string $runcsv, string $out
     }
     $outfile = "$outdir/$datetag-judge.csv";
     $fh = fopen($outfile, 'w');
-    fputcsv($fh, ['provider_label', 'prompt_id', 'category', 'score_socratic', 'score_accuracy', 'score_tone', 'score_total', 'judge_notes', 'judge_error']);
+    golden_csv::write_row($fh, ['provider_label', 'prompt_id', 'category', 'score_socratic', 'score_accuracy',
+        'score_tone', 'score_total', 'judge_notes', 'judge_error']);
 
     $judge = base_provider::create_for_comparison($judgeprovider, $judgemodel, 0, false);
     $in = fopen($runcsv, 'r');
-    $header = fgetcsv($in);
+    $header = golden_csv::read_row($in);
     $col = array_flip($header);
 
     $prompts = local_ai_course_assistant_golden_load_prompts($promptsfile);
@@ -401,19 +453,27 @@ function local_ai_course_assistant_golden_mode_judge(string $runcsv, string $out
         $promptmap[$p['id']] = $p['text'];
     }
 
-    while (($r = fgetcsv($in)) !== false) {
+    while (($r = golden_csv::read_row($in)) !== false) {
+        if (count($r) !== count($header)) {
+            continue;
+        }
         $promptid = $r[$col['prompt_id']];
         $label    = $r[$col['provider_label']];
         $category = $r[$col['category']];
         $response = $r[$col['response_text']];
         $error    = $r[$col['error']];
         if ($error !== '' || $response === '') {
-            fputcsv($fh, [$label, $promptid, $category, '', '', '', '', '', 'skipped: response empty or errored']);
+            golden_csv::write_row($fh, [$label, $promptid, $category, '', '', '', '', '',
+                'skipped: response empty or errored']);
             continue;
         }
-        $rubric = local_ai_course_assistant_golden_score_one($judge, $promptmap[$promptid] ?? '', $response);
+        // Run CSVs from before v7.8.0 have no finish_reason column; those
+        // answers are judged as complete, exactly as they were then.
+        $truncated = isset($col['finish_reason'])
+            && \local_ai_course_assistant\provider\base_provider::is_truncation($r[$col['finish_reason']] ?: null);
+        $rubric = local_ai_course_assistant_golden_score_one($judge, $promptmap[$promptid] ?? '', $response, $truncated);
         $total = ($rubric['socratic'] ?? 0) + ($rubric['accuracy'] ?? 0) + ($rubric['tone'] ?? 0);
-        fputcsv($fh, [
+        golden_csv::write_row($fh, [
             $label, $promptid, $category,
             $rubric['socratic'] ?? '',
             $rubric['accuracy'] ?? '',
@@ -438,40 +498,25 @@ function local_ai_course_assistant_golden_mode_judge(string $runcsv, string $out
 }
 
 /**
- * Send (prompt, response) to the rubric judge and parse a strict-JSON score.
+ * Send (prompt, response) to the rubric judge and parse its scores.
+ *
+ * v7.8.0: through bench\judge, shared with the adhoc task. A cut-off answer is
+ * labelled as one so the judge grades it instead of continuing it, the JSON is
+ * found wherever it sits in the reply, and a reply with no scores gets one
+ * follow-up asking for the JSON alone.
  *
  * @param \local_ai_course_assistant\provider\provider_interface $judge
  * @param string $prompt
  * @param string $response
+ * @param bool $truncated Whether the answer hit its output limit.
  * @return array{socratic?: int, accuracy?: int, tone?: int, notes?: string, error?: string}
  */
-function local_ai_course_assistant_golden_score_one($judge, string $prompt, string $response): array {
-    // Shared with the ad-hoc task for the same reason as the tutor prompt
-    // above: a rubric that differs between the two runners silently makes their
-    // scores incomparable.
-    $systemprompt = run_model_benchmark::JUDGE_PROMPT;
-
-    $user = "STUDENT PROMPT:\n" . $prompt . "\n\nTUTOR RESPONSE:\n" . $response;
-
-    try {
-        $out = $judge->chat_completion($systemprompt, [
-            ['role' => 'user', 'content' => $user],
-        ], ['temperature' => 0.0]);
-        // Strip optional code-fence wrapper.
-        $out = preg_replace('/^```(?:json)?\s*|\s*```$/m', '', trim($out));
-        $parsed = json_decode($out, true);
-        if (!is_array($parsed)) {
-            return ['error' => 'judge returned non-JSON: ' . mb_substr($out, 0, 80)];
-        }
-        return [
-            'socratic' => (int) ($parsed['socratic'] ?? 0),
-            'accuracy' => (int) ($parsed['accuracy'] ?? 0),
-            'tone'     => (int) ($parsed['tone'] ?? 0),
-            'notes'    => (string) ($parsed['notes'] ?? ''),
-        ];
-    } catch (\Throwable $e) {
-        return ['error' => mb_substr($e->getMessage(), 0, 200)];
+function local_ai_course_assistant_golden_score_one($judge, string $prompt, string $response, bool $truncated = false): array {
+    $outcome = golden_judge::score($judge, $prompt, $response, $truncated);
+    if ($outcome['scores'] === null) {
+        return ['error' => $outcome['error']];
     }
+    return $outcome['scores'];
 }
 
 // ---------- mode: report ----------
@@ -752,7 +797,7 @@ function local_ai_course_assistant_golden_persist_summary(array $summary, array 
 
 /**
  * Load the golden prompt set. Optional $path overrides the default
- * tests/golden/tutor_prompts.json so one-off fixture sets like the A.10
+ * fixtures/golden/tutor_prompts.json so one-off fixture sets like the A.10
  * premium-escalation bake-off can be driven without renaming files.
  *
  * @param string $path Optional absolute or repo-relative path to a tutor_prompts.json-shaped file.
@@ -760,10 +805,11 @@ function local_ai_course_assistant_golden_persist_summary(array $summary, array 
  */
 function local_ai_course_assistant_golden_load_prompts(string $path = ''): array {
     if ($path === '') {
-        $path = __DIR__ . '/../../tests/golden/tutor_prompts.json';
+        $path = __DIR__ . '/../../' . run_model_benchmark::DEFAULT_FIXTURE;
     } else if ($path[0] !== '/') {
-        // Repo-relative path. Resolve against plugin root.
-        $path = __DIR__ . '/../../' . $path;
+        // Repo-relative path. Resolve against plugin root; the pre-v7.8.0
+        // tests/golden/ spelling of a tutor set still works.
+        $path = __DIR__ . '/../../' . model_bench::canonical_fixture($path);
     }
     $raw = file_get_contents($path);
     if ($raw === false) {
@@ -835,17 +881,11 @@ function local_ai_course_assistant_golden_parse_comparison_providers(): array {
  * @return array<int, array<string, string>>
  */
 function local_ai_course_assistant_golden_read_csv(string $path): array {
-    if (!is_readable($path)) {
+    $rows = golden_csv::read_all($path);
+    if ($rows === null) {
         fwrite(STDERR, "ERROR: CSV not readable: $path\n");
         exit(1);
     }
-    $fh = fopen($path, 'r');
-    $header = fgetcsv($fh);
-    $rows = [];
-    while (($r = fgetcsv($fh)) !== false) {
-        $rows[] = array_combine($header, $r);
-    }
-    fclose($fh);
     return $rows;
 }
 
