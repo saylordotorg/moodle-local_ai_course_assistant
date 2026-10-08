@@ -111,6 +111,32 @@ final class autoupgrade_discovery_test extends \advanced_testcase {
         );
     }
 
+    public function test_a_listed_model_that_cannot_be_called_is_not_a_candidate(): void {
+        set_config('model', 'gemini-2.5-flash', 'local_ai_course_assistant');
+        set_config('provider', 'gemini', 'local_ai_course_assistant');
+        set_config('comparison_providers', "gemini|AIzaSECRETKEY1234567890|gemini-2.5-flash", 'local_ai_course_assistant');
+        $this->price('gemini/gemini-2.5-flash', 0.30, 2.50);
+        $this->price('gemini/gemini-3.5-flash-lite', 0.30, 2.50);
+        $this->price('gemini/gemini-3.6-flash', 0.30, 2.50);
+        $probed = [];
+        $probe = function (string $provider, string $model) use (&$probed): bool {
+            $probed[] = $model;
+            return $model !== 'gemini-3.5-flash-lite';
+        };
+        $seen = [];
+        $http = $this->http([
+            'generativelanguage' => ['models' => array_map(function ($id) {
+                return ['name' => 'models/' . $id, 'supportedGenerationMethods' => ['generateContent']];
+            }, ['gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.6-flash'])],
+        ], $seen);
+        $summary = (new discovery($http, $probe))->run();
+        $chat = $summary['candidates'][roles::CHAT];
+        $this->assertNotContains('gemini-3.5-flash-lite', $chat, 'A model the API refuses is not offered.');
+        $this->assertContains('gemini-3.6-flash', $chat);
+        $this->assertContains('gemini-3.5-flash-lite', $probed);
+        $this->assertNotContains('gemini-2.5-flash', $probed, 'The current model is never probed.');
+    }
+
     public function test_run_registers_marks_and_never_leaks_a_key(): void {
         global $DB;
         set_config('model', 'gemini-2.5-flash', 'local_ai_course_assistant');

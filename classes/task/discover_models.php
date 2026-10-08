@@ -66,7 +66,7 @@ class discover_models extends \core\task\scheduled_task {
             return;
         }
         \core_php_time_limit::raise(300);
-        $summary = (new discovery())->run();
+        $summary = discovery::live()->run();
         foreach ($summary['providers'] as $provider => $count) {
             mtrace("Model discovery: {$provider} lists {$count} model(s).");
         }

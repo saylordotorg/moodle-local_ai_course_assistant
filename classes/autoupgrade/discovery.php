@@ -17,6 +17,8 @@
 namespace local_ai_course_assistant\autoupgrade;
 
 use local_ai_course_assistant\model_capabilities;
+use local_ai_course_assistant\provider\base_provider;
+use local_ai_course_assistant\provider\provider_http_exception;
 use local_ai_course_assistant\model_registry;
 use local_ai_course_assistant\security;
 
@@ -93,13 +95,53 @@ class discovery {
     /** @var callable HTTP GET: fn(string $url, array $headers): array{0: int, 1: string} */
     private $http;
 
+    /** @var callable|null Probe: fn(string $provider, string $model): bool. Null skips probing (tests). */
+    private $probe;
+
     /**
      * Constructor.
      *
      * @param callable|null $http Replaces the network for tests.
+     * @param callable|null $probe Asks whether a model can really be called; null skips the check.
      */
-    public function __construct(?callable $http = null) {
+    public function __construct(?callable $http = null, ?callable $probe = null) {
         $this->http = $http ?? [self::class, 'http_get'];
+        $this->probe = $probe;
+    }
+
+    /**
+     * The discovery the scheduled task and the admin page run: real network, real probe.
+     *
+     * @return self
+     */
+    public static function live(): self {
+        return new self(null, [self::class, 'probe']);
+    }
+
+    /**
+     * Whether a listed model can actually be called.
+     *
+     * A provider's model list can name a model its API then refuses:
+     * gemini-2.5-flash-lite was listed by Google and answered 404. Offering such a
+     * model as a candidate wastes an evaluation slot and test budget. One
+     * one-token call settles it. Only a clear "no such model" (HTTP 404) says no;
+     * a timeout, a rate limit, a key problem or a missing comparison row proves
+     * nothing about the model, so those keep the candidate.
+     *
+     * @param string $provider
+     * @param string $model
+     * @return bool False only when the provider says the model does not exist.
+     */
+    public static function probe(string $provider, string $model): bool {
+        try {
+            $client = base_provider::create_for_comparison($provider, $model, 0, false);
+            $client->chat_completion('Reply with the single word OK.', [['role' => 'user', 'content' => 'ok']], ['max_tokens' => 16]);
+            return true;
+        } catch (provider_http_exception $e) {
+            return $e->status !== 404;
+        } catch (\Throwable $e) {
+            return true;
+        }
     }
 
     /**
@@ -133,7 +175,7 @@ class discovery {
             if (!$current['inuse'] || !isset($listed[$current['provider']])) {
                 continue;
             }
-            $marked = self::mark_candidates($role, $current, $listed[$current['provider']]);
+            $marked = self::mark_candidates($role, $current, $listed[$current['provider']], $this->probe);
             $summary['candidates'][$role] = $marked;
         }
         set_config('autoupgrade_last_discovery', (string) time(), 'local_ai_course_assistant');
@@ -151,9 +193,10 @@ class discovery {
      * @param string $role
      * @param array $current From roles::current().
      * @param string[] $models Model ids the provider lists.
+     * @param callable|null $probe fn(provider, model): bool; a model it rejects is not marked.
      * @return string[] "model [variant]" labels marked.
      */
-    public static function mark_candidates(string $role, array $current, array $models): array {
+    public static function mark_candidates(string $role, array $current, array $models, ?callable $probe = null): array {
         $incumbent = self::known_price($current['provider'], $current['model']);
         if ($incumbent === null) {
             // Without the current model's price there is nothing to compare a
@@ -179,6 +222,9 @@ class discovery {
             }
             $ratio = $incumbentturn > 0 ? self::turn_cost($price) / $incumbentturn : INF;
             if ($ratio < self::BAND_MIN || $ratio > self::BAND_MAX) {
+                continue;
+            }
+            if ($probe !== null && !$probe($current['provider'], $model)) {
                 continue;
             }
             $keep[] = $model;
