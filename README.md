@@ -8,10 +8,10 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 
 A 3-minute tour, recorded on Saylor University's live Degrees site in a hidden test course with fake demo students. The learner half is shown in student view: answers drawn only from the course's own content, Socratic guidance, Quiz Me, Study Plan, and 46 languages with automatic detection. The admin half covers mastery tracking, provider settings and guardrails, analytics, Learning Radar, and cost tracking.
 
-## Version 7.8.1
+## Version 7.8.2
 
 **Release Date:** October 2026
-**Plugin build:** 2026100801
+**Plugin build:** 2026100802
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1. `version.php` declares support through 5.2.
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+
