@@ -1748,7 +1748,7 @@ $string['settings:provider_heading_desc'] = 'የAI መድረክን፣ ሞዴሉ�
 $string['settings:claude_temperature_allow_prefixes'] = 'የtemperature መለኪያን የሚደግፉ የClaude ሞዴሎች';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'በየመስመሩ አንድ የሞዴል ስም መቅድም። ስማቸው ከእነዚህ በአንዱ የሚጀምሩ የAnthropic ሞዴሎች አሁንም የ<code>temperature</code> የናሙና መለኪያን ይቀበላሉ። ከየትኛውም መቅድም ጋር ለማይዛመድ የClaude ሞዴል temperature ይተዋል (ከOpus 4.7 ጀምሮ ያሉ የማመዛዘን ሞዴሎች በHTTP 400 ስህተት ይቀበሉታል)። ከተሰኪው ጋር የመጣውን ነባሪ እሴት ለመጠቀም ባዶ ይተዉት።';
 $string['settings:max_tokens'] = 'ከፍተኛ የመልስ ርዝመት (ቶከኖች)';
-$string['settings:max_tokens_desc'] = 'በየAI መልስ ከፍተኛ የቶከን ቁጥር። ዝቅተኛ እሴቶች አጭርና ፈጣን መልሶችን ይሰጣሉ። 512 = በግምት 2-3 ዓረፍተ ነገር፣ 1024 = በግምት 1-2 አንቀጽ፣ 2048 = ረዘም ያሉ ማብራሪያዎች። ወሰን እንዳይኖር 0 ያድርጉ (የአቅራቢው ነባሪ እሴት ይሠራል)።';
+$string['settings:max_tokens_desc'] = 'በእያንዳንዱ የAI ምላሽ ውስጥ ከፍተኛው የቶከኖች (tokens) ብዛት። ዝቅተኛ እሴቶች አጠር ያሉና ፈጣን ምላሾችን ይሰጣሉ። 512 = ከ2-3 ዓረፍተ ነገሮች ገደማ፣ 1024 = ከ1-2 አንቀጾች ገደማ፣ 2048 = ረዘም ያሉ ማብራሪያዎች። ገደብ ለማስቀረት 0 ያድርጉ (የአቅራቢው ነባሪ)። ከመመለሳቸው በፊት የሚያመዛዝኑ ሞዴሎች (Gemini 2.5 እና 3፣ GPT-5 እና ከዚያ በኋላ ያሉት፣ Claude 5.5) ከዚህ ቁጥር በላይ ለማሰብ ተጨማሪ ቦታ ያገኛሉ፤ ስለዚህ አስተሳሰብ ሲበራ ረጅም ምላሽ በሦስት እጥፍ ገደማ ሊደርስ ይችላል፤ አስተሳሰብ ሲጠፋ ምላሹ በዚህ ቁጥር ላይ በትክክል ይቆረጣል።';
 $string['settings:profile_update_interval'] = 'የተማሪ መገለጫ የማዘመን ጊዜ ልዩነት';
 $string['settings:profile_update_interval_desc'] = 'በኮርስ ውስጥ ከተማሪው ይህን ያህል መልእክት ከመጣ በኋላ አጋዡ ጥንካሬዎችን፣ ድክመቶችን፣ የመማር ስልትንና ፍላጎቶችን የሚያጠቃልል የመማር መገለጫ ይገነባል (ወይም ያድሳል)። ግላዊ መልሶች እንዲኖሩ መገለጫው በሥርዓቱ መመሪያ ውስጥ ይካተታል። ለማጥፋት 0 ያድርጉ። ነባሪ፦ 10።';
 $string['settings:enable_thinking'] = 'የተስፋፋ ማመዛዘን (Claude ብቻ)';
@@ -3190,7 +3190,7 @@ $string['settings:int_range'] = 'ከ{$a->min} እስከ {$a->max} ያለ ሙሉ 
 
 $string['cachedef_modelcaps'] = 'ከአቅራቢዎች ውድቅ ምላሾች የተማሩ የሞዴል ችሎታዎች';
 $string['settings:reasoning_effort'] = 'የምክንያት ጥረት';
-$string['settings:reasoning_effort_desc'] = 'ከመመለሳቸው በፊት የሚያስቡ ሞዴሎች ምን ያህል እንዲያስቡ እንደሚጠየቁ። ለOpenAI የምክንያት ሞዴሎች (GPT-5፣ GPT-6፣ o ተከታታይ) እንደ <code>reasoning_effort</code>፣ ለGemini የማሰቢያ ሞዴሎች ደግሞ እንደ የማሰቢያ በጀት ይተገበራል። እያንዳንዱ የምክንያት ሞዴል ከላይ ካለው የመልስ ርዝመት በተጨማሪ ለማሰቢያው ቦታ ያገኛል፣ ስለዚህ ማሰብ ከአሁን በኋላ መልስን ማሳጠር አይችልም። ዝቅተኛ ለአስጠኚ ተስማሚ ነው፡ መልሶች ቶሎ ይደርሳሉ፣ ዋጋቸውም ያነሰ ነው። ጠፍቷል ሞዴሉ በሚፈቅድበት ቦታ ማሰብን ያጠፋል። የምክንያት መቆጣጠሪያ የሌላቸው ሞዴሎች ይህን ቅንብር ችላ ይላሉ።';
+$string['settings:reasoning_effort_desc'] = 'ከመመለሳቸው በፊት የሚያመዛዝኑ ሞዴሎች ምን ያህል እንዲያስቡ እንደሚጠየቁ። ለOpenAI የማመዛዘን ሞዴሎች (GPT-5፣ GPT-6፣ o-ተከታታይ) እንደ <code>reasoning_effort</code>፣ ለGemini የአስተሳሰብ ሞዴሎች እንደ የአስተሳሰብ በጀት፣ ለClaude Sonnet 5.5 እና Opus 5.5 ደግሞ እንደ የጥረት ደረጃ ይተገበራል (አጥፋ ዝቅተኛውን ቅንብር ይጠቀማል፤ Opus 5.5 አስተሳሰብን ማጥፋት አይችልም)። እያንዳንዱ የማመዛዘን ሞዴል ከላይ ካለው የምላሽ ርዝመት በተጨማሪ ለማሰብ ቦታ ያገኛል፤ ስለዚህ አስተሳሰብ ምላሽን ከዚህ በኋላ መቁረጥ አይችልም። ዝቅተኛ ለአስተማሪ ተስማሚ ነው፤ ምላሾች ቶሎ ይደርሳሉ፤ ወጪውም ያነሰ ነው። አጥፋ ሞዴሉ በሚፈቅድበት አስተሳሰብን ያጠፋል። የማመዛዘን ቁጥጥር የሌላቸው ሞዴሎች ይህን ቅንብር ችላ ይላሉ።';
 $string['settings:reasoning_effort_off'] = 'ጠፍቷል (ሞዴሉ የሚፈቅደውን ያህል ትንሽ)';
 $string['settings:reasoning_effort_low'] = 'ዝቅተኛ (የሚመከር)';
 $string['settings:reasoning_effort_medium'] = 'መካከለኛ';
@@ -3359,3 +3359,8 @@ $string['savereport:empty'] = 'ባዶ';
 $string['check:primary_name'] = 'የ AI Course Assistant ዋና አቅራቢ';
 $string['check:primary_ok'] = 'ባለፉት 24 ሰዓታት ውስጥ ከዋናው የውይይት አቅራቢ ምንም ውድቀት አልተከሰተም።';
 $string['check:primary_failing'] = 'ዋናው የውይይት አቅራቢ ({$a->model}) ባለፉት 24 ሰዓታት ውስጥ {$a->failures} ጊዜ አልተሳካም። የመጠባበቂያ አቅራቢው ከእነዚህ ውስጥ {$a->rescued} ምላሾችን መልሷል፤ ስለዚህ ተማሪዎች ላያስተውሉ ይችላሉ። የመጨረሻ ስህተት፦ {$a->reason}';
+
+$string['settings:essay_provider'] = 'የጽሑፍ አስተያየት አቅራቢ';
+$string['settings:essay_provider_desc'] = 'ለጽሑፍ አስተያየት የአቅራቢ መታወቂያ (ለምሳሌ <code>claude</code>፣ <code>openai</code>)። በንጽጽር አቅራቢዎች ውስጥ ካለ አንድ ረድፍ ጋር መመሳሰል አለበት። የውይይት አቅራቢውን ለመጠቀም ባዶ ይተዉ። መተካቱ እንዲተገበር ይህ መስክና ሞዴሉ ሁለቱም መዘጋጀት አለባቸው።';
+$string['settings:essay_model'] = 'የጽሑፍ አስተያየት ሞዴል';
+$string['settings:essay_model_desc'] = 'ለጽሑፍ አስተያየት የሞዴል ስም፣ ለምሳሌ <code>claude-haiku-4-5</code>። በጥቅምት 2026 ንጽጽር ፈተና የClaude ሞዴሎች ከGemini 2.5 Flash ወይም ከGPT-4o mini በግልጽ የተሻለ የጽሑፍ አስተያየት ሰጥተዋል። የውይይት ሞዴሉን ለመጠቀም ባዶ ይተዉ።';

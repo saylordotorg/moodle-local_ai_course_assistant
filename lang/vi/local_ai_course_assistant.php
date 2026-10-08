@@ -1734,7 +1734,7 @@ $string['settings:provider_heading_desc'] = 'Cấu hình nền tảng AI, mô h�
 $string['settings:claude_temperature_allow_prefixes'] = 'Các mô hình Claude hỗ trợ tham số temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Mỗi dòng một tiền tố tên mô hình. Các mô hình Anthropic có tên bắt đầu bằng một trong số này vẫn chấp nhận tham số lấy mẫu <code>temperature</code>. Với mọi mô hình Claude không khớp tiền tố nào, temperature sẽ bị bỏ qua (các mô hình suy luận từ Opus 4.7 trở đi từ chối tham số này với lỗi HTTP 400). Để trống để dùng giá trị mặc định đi kèm plugin.';
 $string['settings:max_tokens'] = 'Độ dài phản hồi tối đa (token)';
-$string['settings:max_tokens_desc'] = 'Số token tối đa cho mỗi phản hồi của AI. Giá trị nhỏ hơn cho phản hồi ngắn và nhanh hơn. 512 = khoảng 2-3 câu, 1024 = khoảng 1-2 đoạn, 2048 = giải thích dài hơn. Đặt 0 để không giới hạn (dùng mặc định của nhà cung cấp).';
+$string['settings:max_tokens_desc'] = 'Số token tối đa cho mỗi phản hồi của AI. Giá trị thấp hơn cho phản hồi ngắn và nhanh hơn. 512 = ~2-3 câu, 1024 = ~1-2 đoạn, 2048 = giải thích dài hơn. Đặt 0 để không giới hạn (mặc định của nhà cung cấp). Các mô hình suy luận trước khi trả lời (Gemini 2.5 và 3, GPT-5 trở lên, Claude 5.5) được cấp thêm dung lượng cho phần suy nghĩ ngoài con số này, nên khi bật suy nghĩ, một câu trả lời dài có thể lên tới khoảng gấp ba; khi tắt suy nghĩ, câu trả lời bị cắt đúng ở con số này.';
 $string['settings:profile_update_interval'] = 'Khoảng cập nhật hồ sơ người học';
 $string['settings:profile_update_interval_desc'] = 'Sau số tin nhắn này của người học trong một khóa học, trợ lý sẽ tạo (hoặc làm mới) một hồ sơ học tập tóm tắt điểm mạnh, điểm yếu, phong cách học và mối quan tâm. Hồ sơ được đưa vào lời nhắc hệ thống để cá nhân hóa phản hồi. Đặt 0 để tắt. Mặc định: 10.';
 $string['settings:enable_thinking'] = 'Suy luận mở rộng (chỉ Claude)';
@@ -3183,7 +3183,7 @@ $string['settings:int_range'] = 'Nhập một số nguyên từ {$a->min} đến
 
 $string['cachedef_modelcaps'] = 'Thông tin về khả năng của mô hình học được từ các lần nhà cung cấp từ chối';
 $string['settings:reasoning_effort'] = 'Mức độ suy luận';
-$string['settings:reasoning_effort_desc'] = 'Mức độ suy nghĩ mà các mô hình suy luận trước khi trả lời được yêu cầu thực hiện. Áp dụng cho các mô hình suy luận của OpenAI (GPT-5, GPT-6, dòng o) dưới dạng <code>reasoning_effort</code> và cho các mô hình tư duy của Gemini dưới dạng ngân sách tư duy. Mỗi mô hình suy luận cũng được cấp thêm dung lượng cho phần suy nghĩ ngoài độ dài câu trả lời ở trên, nên việc suy nghĩ không còn làm câu trả lời bị cắt ngắn. Thấp phù hợp với gia sư: câu trả lời đến nhanh hơn và tốn ít chi phí hơn. Tắt sẽ tắt việc suy nghĩ khi mô hình cho phép. Các mô hình không có tùy chọn điều khiển suy luận sẽ bỏ qua thiết lập này.';
+$string['settings:reasoning_effort_desc'] = 'Mức độ yêu cầu các mô hình suy luận trước khi trả lời phải suy nghĩ. Áp dụng cho các mô hình suy luận của OpenAI (GPT-5, GPT-6, dòng o) dưới dạng <code>reasoning_effort</code>, cho các mô hình suy nghĩ của Gemini dưới dạng ngân sách suy nghĩ, và cho Claude Sonnet 5.5 và Opus 5.5 dưới dạng mức nỗ lực (Tắt dùng thiết lập thấp nhất; Opus 5.5 không thể tắt suy nghĩ). Mọi mô hình suy luận cũng được cấp thêm chỗ để suy nghĩ ngoài độ dài phản hồi ở trên, nên suy nghĩ không còn làm cụt câu trả lời. Mức Thấp phù hợp với gia sư: câu trả lời đến nhanh hơn và rẻ hơn. Tắt sẽ tắt suy nghĩ ở nơi mô hình cho phép. Các mô hình không có điều khiển suy luận sẽ bỏ qua thiết lập này.';
 $string['settings:reasoning_effort_off'] = 'Tắt (mức thấp nhất mô hình cho phép)';
 $string['settings:reasoning_effort_low'] = 'Thấp (khuyến nghị)';
 $string['settings:reasoning_effort_medium'] = 'Trung bình';
@@ -3352,3 +3352,8 @@ $string['savereport:empty'] = 'trống';
 $string['check:primary_name'] = 'Nhà cung cấp chính của AI Course Assistant';
 $string['check:primary_ok'] = 'Không có lỗi nào từ nhà cung cấp trò chuyện chính trong 24 giờ qua.';
 $string['check:primary_failing'] = 'Nhà cung cấp trò chuyện chính ({$a->model}) đã gặp lỗi {$a->failures} lần trong 24 giờ qua. Nhà cung cấp dự phòng đã trả lời {$a->rescued} trong số các yêu cầu đó, nên người học có thể không nhận ra. Lỗi gần nhất: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Nhà cung cấp nhận xét bài luận';
+$string['settings:essay_provider_desc'] = 'ID nhà cung cấp (ví dụ <code>claude</code>, <code>openai</code>) cho nhận xét bài luận. Phải khớp với một dòng trong Nhà cung cấp so sánh. Để trống để dùng nhà cung cấp của cuộc trò chuyện. Cả trường này và mô hình đều phải được đặt thì phần ghi đè mới có hiệu lực.';
+$string['settings:essay_model'] = 'Mô hình nhận xét bài luận';
+$string['settings:essay_model_desc'] = 'Tên mô hình cho nhận xét bài luận, ví dụ <code>claude-haiku-4-5</code>. Trong bài đánh giá chuẩn tháng 10 năm 2026, các mô hình Claude cho nhận xét bài luận tốt hơn rõ rệt so với Gemini 2.5 Flash hoặc GPT-4o mini. Để trống để dùng mô hình của cuộc trò chuyện.';

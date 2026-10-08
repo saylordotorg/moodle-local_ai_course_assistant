@@ -608,7 +608,7 @@ final class model_recommender_test extends \advanced_testcase {
         $r = model_recommender::report(['novolume' => true]);
 
         $this->assertSame(
-            ['chat', 'quiz', 'classifier', 'rag', 'analytics', 'safety', 'soapbox'],
+            ['chat', 'quiz', 'essay', 'classifier', 'rag', 'analytics', 'safety', 'soapbox'],
             array_keys($r['functions'])
         );
         $this->assertSame(model_recommender::DEFAULT_SAVINGS_FLOOR, $r['tunables']['savingsfloor']);

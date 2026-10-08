@@ -1735,7 +1735,7 @@ $string['settings:provider_heading_desc'] = 'Hazie ikpo okwu AI, ihe nlereanya, 
 $string['settings:claude_temperature_allow_prefixes'] = 'Ihe nlereanya Claude nke na-akwado paramita temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Otu mmalite aha ihe nlereanya n\'ahịrị ọ bụla. Ihe nlereanya Anthropic bụ́ ndị aha ha na-amalite na otu n\'ime ndị a ka na-anabata paramita nnyocha <code>temperature</code>. Maka ihe nlereanya Claude ọ bụla na-adabaghị na mmalite ọ bụla, a na-ahapụ temperature (ihe nlereanya echiche site na Opus 4.7 gaa n\'ihu na-ajụ ya site na njehie HTTP 400). Hapụ ya nkịtị iji jiri uru ndabara nke na-eso mgbakwunye ahụ.';
 $string['settings:max_tokens'] = 'Ogologo azịza kachasị (tokens)';
-$string['settings:max_tokens_desc'] = 'Ọnụọgụgụ tokens kachasị maka azịza AI ọ bụla. Uru dị ala na-enye azịza dị mkpirikpi ma ngwa ngwa. 512 = ihe dịka ahịrịokwu 2-3, 1024 = ihe dịka paragraf 1-2, 2048 = nkọwa ndị toro ogologo. Tinye 0 ka enweghị oke (uru ndabara nke onye na-enye ga-arụ ọrụ).';
+$string['settings:max_tokens_desc'] = 'Ọnụọgụ kachasị nke tokens n\'azịza AI ọ bụla. Ụkpụrụ dị ala na-enye azịza ndị dị mkpụmkpụ ma ngwa ngwa. 512 = ihe dị ka ahịrịokwu 2-3, 1024 = ihe dị ka paragraf 1-2, 2048 = nkọwa ndị ka ogologo. Tọọ 0 ka ọ bụghị oke (ntọala ndabara nke onye na-eweta ọrụ). Ụdị ndị na-atụgharị uche tupu ha aza (Gemini 2.5 na 3, GPT-5 na ndị na-esote ya, Claude 5.5) na-enweta ohere ọzọ maka echiche ha n\'elu ọnụọgụ a, ya mere mgbe echiche gbanyere, azịza ogologo nwere ike ruo ihe dị ka okpukpu atọ; mgbe echiche gbanyụrụ, a na-egbutu azịza n\'ọnụọgụ a kpọmkwem.';
 $string['settings:profile_update_interval'] = 'Oge nmelite profaịlụ nwa akwụkwọ';
 $string['settings:profile_update_interval_desc'] = 'Mgbe ọnụọgụgụ ozi a si n\'aka nwa akwụkwọ n\'ime nkuzi gasịrị, onye enyemaka na-ewu (ma ọ bụ na-emelite) profaịlụ mmụta nke na-achịkọta ike, adịghị ike, ụdị mmụta, na ihe mmasị. A na-etinye profaịlụ a n\'ime ntuziaka sistemu maka azịza ahaziri onwe. Tinye 0 ka i mechie ya. Ndabara: 10.';
 $string['settings:enable_thinking'] = 'Echiche gbasaa (Claude naanị)';
@@ -3178,7 +3178,7 @@ $string['settings:int_range'] = 'Tinye ọnụọgụ zuru oke site na {$a->min}
 
 $string['cachedef_modelcaps'] = 'Eziokwu gbasara ikike model a mụtara site n\'ịjụ ndị na-enye ọrụ';
 $string['settings:reasoning_effort'] = 'Mgbalị echiche';
-$string['settings:reasoning_effort_desc'] = 'Ole a na-arịọ model ndị na-eche echiche tupu ha azaa ka ha chee. Ọ na-emetụta model echiche OpenAI (GPT-5, GPT-6, usoro o) dị ka <code>reasoning_effort</code> na model echiche Gemini dị ka mmefu echiche. Model echiche ọ bụla na-enwekwa ohere maka echiche ya karịa ogologo azịza dị n\'elu, ya mere echiche enweghịzi ike ịkwụsị azịza n\'etiti. Ala dabara maka onye nkuzi: azịza na-abịa ngwa ngwa ma na-efu obere. Gbanyụọ na-agbanyụ echiche ebe model kwere. Model ndị na-enweghị njikwa echiche na-eleghara ntọala a anya.';
+$string['settings:reasoning_effort_desc'] = 'Otu ọtụtụ echiche a na-arịọ ụdị ndị na-atụgharị uche tupu ha aza ka ha chee. Ọ na-emetụta ụdị mgbaghara nke OpenAI (GPT-5, GPT-6, usoro o) dị ka <code>reasoning_effort</code>, ụdị echiche Gemini dị ka mmefu echiche, na Claude Sonnet 5.5 na Opus 5.5 dị ka ọkwa mgbalị (Gbanyụọ na-eji ntọala kacha ala; Opus 5.5 enweghị ike gbanyụọ echiche). Ụdị mgbaghara ọ bụla na-enwekwa ohere maka echiche n\'elu ogologo azịza dị n\'elu, ya mere echiche enweghịzi ike igbutu azịza. Ala dabara onye nkuzi: azịza na-abịa ngwa ngwa ma na-efu obere. Gbanyụọ na-agbanyụ echiche ebe ụdị ahụ kwere. Ụdị ndị na-enweghị njikwa mgbaghara anaghị eche ntọala a.';
 $string['settings:reasoning_effort_off'] = 'Gbanyụọ (obere dịka model kwere)';
 $string['settings:reasoning_effort_low'] = 'Ala (a na-atụ aro ya)';
 $string['settings:reasoning_effort_medium'] = 'Etiti';
@@ -3347,3 +3347,8 @@ $string['savereport:empty'] = 'efu';
 $string['check:primary_name'] = 'Onye na-eweta ọrụ bụ isi nke AI Course Assistant';
 $string['check:primary_ok'] = 'Enweghị ọdịda ọ bụla sitere n\'aka onye na-eweta ọrụ mkparịta ụka bụ isi n\'ime awa 24 gara aga.';
 $string['check:primary_failing'] = 'Onye na-eweta ọrụ mkparịta ụka bụ isi ({$a->model}) dara ugboro {$a->failures} n\'ime awa 24 gara aga. Onye na-eweta ọrụ nkwado zara {$a->rescued} n\'ime arịrịọ ndị ahụ, ya mere ọ pụrụ ịbụ na ụmụ akwụkwọ amataghị. Njehie ikpeazụ: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Onye na-eweta nzaghachi edemede';
+$string['settings:essay_provider_desc'] = 'ID onye na-eweta ọrụ (dịka <code>claude</code>, <code>openai</code>) maka nzaghachi edemede. Ọ ga-agbakọ otu ahịrị n\'ime Ndị na-eweta ntụnyere. Hapụ ya efu iji jiri onye na-eweta ọrụ nke mkparịta ụka. Ọ dị mkpa ka e tọọ ngalaba a na ụdị ahụ abụọ ka mgbanwe ahụ rụọ ọrụ.';
+$string['settings:essay_model'] = 'Ụdị nzaghachi edemede';
+$string['settings:essay_model_desc'] = 'Aha ụdị maka nzaghachi edemede, dịka <code>claude-haiku-4-5</code>. N\'ule ntụnyere nke Ọktoba 2026, ụdị Claude nyere nzaghachi edemede ka mma n\'ụzọ doro anya karịa Gemini 2.5 Flash ma ọ bụ GPT-4o mini. Hapụ ya efu iji jiri ụdị mkparịta ụka.';

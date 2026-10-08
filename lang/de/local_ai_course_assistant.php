@@ -1712,7 +1712,7 @@ $string['settings:provider_heading_desc'] = 'Konfigurieren Sie das KI-Backend, d
 $string['settings:claude_temperature_allow_prefixes'] = 'Claude-Modelle, die temperature akzeptieren';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Ein Modellnamen-Präfix pro Zeile. Anthropic-Modelle, deren Name mit einem dieser Präfixe beginnt, akzeptieren weiterhin den Sampling-Parameter <code>temperature</code>. Bei jedem Claude-Modell, das auf kein Präfix passt, wird temperature weggelassen (Modelle der Reasoning-Klasse ab Opus 4.7 lehnen ihn mit HTTP 400 ab). Leer lassen, um den mitgelieferten Standard zu verwenden.';
 $string['settings:max_tokens'] = 'Maximale Antwortlänge (Token)';
-$string['settings:max_tokens_desc'] = 'Maximale Anzahl an Token pro KI-Antwort. Niedrigere Werte erzeugen kürzere, schnellere Antworten. 512 = ca. 2-3 Sätze, 1024 = ca. 1-2 Absätze, 2048 = längere Erklärungen. 0 bedeutet keine Begrenzung (Standard des Anbieters).';
+$string['settings:max_tokens_desc'] = 'Maximale Anzahl an Tokens pro KI-Antwort. Niedrigere Werte erzeugen kürzere, schnellere Antworten. 512 = ca. 2-3 Sätze, 1024 = ca. 1-2 Absätze, 2048 = längere Erklärungen. Auf 0 setzen für keine Begrenzung (Standard des Anbieters). Modelle, die vor der Antwort nachdenken (Gemini 2.5 und 3, GPT-5 und neuer, Claude 5.5), erhalten zusätzlich zu dieser Zahl weiteren Spielraum für ihr Denken. Bei aktiviertem Denken kann eine lange Antwort daher etwa das Dreifache erreichen; bei deaktiviertem Denken wird die Antwort genau bei dieser Zahl abgeschnitten.';
 $string['settings:profile_update_interval'] = 'Aktualisierungsintervall des Lernendenprofils';
 $string['settings:profile_update_interval_desc'] = 'Nach dieser Anzahl an Nachrichten der bzw. des Lernenden in einem Kurs erstellt (oder aktualisiert) der Assistent ein Lernprofil, das Stärken, Schwächen, Lernstil und Interessen zusammenfasst. Das Profil wird für personalisierte Antworten in den System-Prompt eingefügt. 0 deaktiviert die Funktion. Standard: 10.';
 $string['settings:enable_thinking'] = 'Erweitertes Nachdenken (nur Claude)';
@@ -3163,7 +3163,7 @@ $string['settings:int_range'] = 'Geben Sie eine ganze Zahl von {$a->min} bis {$a
 
 $string['cachedef_modelcaps'] = 'Von Anbietern bei Ablehnungen gelernte Modellfähigkeiten';
 $string['settings:reasoning_effort'] = 'Denkaufwand';
-$string['settings:reasoning_effort_desc'] = 'Wie stark Modelle, die vor der Antwort nachdenken, zum Nachdenken angehalten werden. Gilt für OpenAI-Reasoning-Modelle (GPT-5, GPT-6, o-Serie) als <code>reasoning_effort</code> und für Gemini-Thinking-Modelle als Denkbudget. Jedes Reasoning-Modell erhält zusätzlich zur oben festgelegten Antwortlänge Raum für sein Nachdenken, sodass das Nachdenken eine Antwort nicht mehr abschneiden kann. Niedrig passt zu einem Tutor: Antworten kommen schneller und kosten weniger. Aus schaltet das Nachdenken ab, wo das Modell es zulässt. Modelle ohne Steuerung des Denkaufwands ignorieren diese Einstellung.';
+$string['settings:reasoning_effort_desc'] = 'Wie intensiv Modelle, die vor der Antwort nachdenken, zum Denken aufgefordert werden. Gilt für OpenAI-Reasoning-Modelle (GPT-5, GPT-6, o-Serie) als <code>reasoning_effort</code>, für Gemini-Thinking-Modelle als Denkbudget und für Claude Sonnet 5.5 und Opus 5.5 als Aufwandsstufe (Aus verwendet die niedrigste Einstellung; bei Opus 5.5 lässt sich das Denken nicht ausschalten). Jedes Reasoning-Modell erhält zusätzlich zur oben festgelegten Antwortlänge Raum für sein Denken, sodass das Denken eine Antwort nicht mehr abschneiden kann. Niedrig passt zu einem Tutor: Antworten kommen schneller und kosten weniger. Aus schaltet das Denken ab, sofern das Modell es zulässt. Modelle ohne Reasoning-Steuerung ignorieren diese Einstellung.';
 $string['settings:reasoning_effort_off'] = 'Aus (so wenig, wie das Modell zulässt)';
 $string['settings:reasoning_effort_low'] = 'Niedrig (empfohlen)';
 $string['settings:reasoning_effort_medium'] = 'Mittel';
@@ -3332,3 +3332,8 @@ $string['savereport:empty'] = 'leer';
 $string['check:primary_name'] = 'Hauptanbieter von AI Course Assistant';
 $string['check:primary_ok'] = 'In den letzten 24 Stunden gab es keine Fehler beim Haupt-Chat-Anbieter.';
 $string['check:primary_failing'] = 'Der Haupt-Chat-Anbieter ({$a->model}) ist in den letzten 24 Stunden {$a->failures}-mal ausgefallen. Der Ersatzanbieter hat {$a->rescued} dieser Anfragen beantwortet, sodass die Lernenden es möglicherweise nicht bemerkt haben. Letzter Fehler: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Anbieter für Aufsatz-Feedback';
+$string['settings:essay_provider_desc'] = 'Anbieter-ID (z. B. <code>claude</code>, <code>openai</code>) für das Aufsatz-Feedback. Muss mit einer Zeile unter Vergleichsanbieter übereinstimmen. Leer lassen, um den Chat-Anbieter zu verwenden. Sowohl dieses Feld als auch das Modell müssen gesetzt sein, damit die Überschreibung greift.';
+$string['settings:essay_model'] = 'Modell für Aufsatz-Feedback';
+$string['settings:essay_model_desc'] = 'Modellname für das Aufsatz-Feedback, z. B. <code>claude-haiku-4-5</code>. Im Benchmark vom Oktober 2026 lieferten Claude-Modelle deutlich besseres Aufsatz-Feedback als Gemini 2.5 Flash oder GPT-4o mini. Leer lassen, um das Chat-Modell zu verwenden.';

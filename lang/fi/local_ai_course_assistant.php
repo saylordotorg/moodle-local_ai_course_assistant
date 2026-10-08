@@ -1714,7 +1714,7 @@ $string['settings:provider_heading_desc'] = 'Määritä tekoälytaustajärjestel
 $string['settings:claude_temperature_allow_prefixes'] = 'Claude-mallit, jotka hyväksyvät temperature-parametrin';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Yksi mallinimen etuliite riviä kohden. Anthropicin mallit, joiden nimi alkaa jollakin näistä, hyväksyvät edelleen näytteenottoparametrin <code>temperature</code>. Kaikilta Claude-malleilta, jotka eivät vastaa etuliitettä, temperature jätetään pois (Opus 4.7:stä alkaen päättelymallit hylkäävät sen HTTP 400 -virheellä). Jätä tyhjäksi käyttääksesi mukana tulevaa oletusarvoa.';
 $string['settings:max_tokens'] = 'Vastauksen enimmäispituus (tokenia)';
-$string['settings:max_tokens_desc'] = 'Tokenien enimmäismäärä tekoälyn vastausta kohden. Pienemmät arvot tuottavat lyhyempiä ja nopeampia vastauksia. 512 = noin 2-3 virkettä, 1024 = noin 1-2 kappaletta, 2048 = pidempiä selityksiä. Aseta arvoksi 0, jos rajaa ei haluta (palveluntarjoajan oletusarvo).';
+$string['settings:max_tokens_desc'] = 'Tokenien enimmäismäärä yhdessä tekoälyn vastauksessa. Pienemmät arvot tuottavat lyhyempiä ja nopeampia vastauksia. 512 = noin 2-3 lausetta, 1024 = noin 1-2 kappaletta, 2048 = pidempiä selityksiä. Aseta 0, jos rajaa ei haluta (palveluntarjoajan oletus). Mallit, jotka päättelevät ennen vastaamista (Gemini 2.5 ja 3, GPT-5 ja uudemmat, Claude 5.5), saavat tämän luvun lisäksi ylimääräistä tilaa ajattelulleen, joten ajattelun ollessa päällä pitkä vastaus voi olla noin kolminkertainen; ajattelun ollessa pois päältä vastaus katkaistaan täsmälleen tähän lukuun.';
 $string['settings:profile_update_interval'] = 'Opiskelijaprofiilin päivitysväli';
 $string['settings:profile_update_interval_desc'] = 'Kun opiskelija on lähettänyt kurssilla tämän verran viestejä, avustaja luo (tai päivittää) oppimisprofiilin, joka tiivistää vahvuudet, heikkoudet, oppimistyylin ja kiinnostuksen kohteet. Profiili liitetään järjestelmäkehotteeseen yksilöllisiä vastauksia varten. Aseta arvoksi 0 ottaaksesi pois käytöstä. Oletus: 10.';
 $string['settings:enable_thinking'] = 'Laajennettu päättely (vain Claude)';
@@ -3163,7 +3163,7 @@ $string['settings:int_range'] = 'Anna kokonaisluku väliltä {$a->min}–{$a->ma
 
 $string['cachedef_modelcaps'] = 'Palveluntarjoajien hylkäyksistä opitut mallien ominaisuustiedot';
 $string['settings:reasoning_effort'] = 'Päättelyn määrä';
-$string['settings:reasoning_effort_desc'] = 'Kuinka paljon ennen vastaamista päätteleviä malleja pyydetään ajattelemaan. Koskee OpenAI:n päättelymalleja (GPT-5, GPT-6, o-sarja) parametrina <code>reasoning_effort</code> ja Geminin ajattelumalleja ajattelubudjettina. Jokainen päättelymalli saa lisäksi tilaa ajattelulleen yllä olevan vastauspituuden päälle, joten ajattelu ei enää voi katkaista vastausta. Matala sopii tutorille: vastaukset tulevat nopeammin ja maksavat vähemmän. Pois kytkee ajattelun pois, jos malli sallii sen. Mallit, joilla ei ole päättelyn säätöä, ohittavat tämän asetuksen.';
+$string['settings:reasoning_effort_desc'] = 'Kuinka paljon ennen vastaamista päättelevien mallien pyydetään ajattelemaan. Koskee OpenAI:n päättelymalleja (GPT-5, GPT-6, o-sarja) arvona <code>reasoning_effort</code>, Geminin ajattelumalleja ajattelubudjettina sekä Claude Sonnet 5.5:tä ja Opus 5.5:tä vaivannäön tasona (Pois käyttää matalinta asetusta; Opus 5.5:ssä ajattelua ei voi kytkeä pois). Jokainen päättelymalli saa myös tilaa ajattelulleen yllä asetetun vastauksen pituuden lisäksi, joten ajattelu ei enää voi katkaista vastausta. Matala sopii opettajalle: vastaukset tulevat nopeammin ja maksavat vähemmän. Pois kytkee ajattelun pois, kun malli sen sallii. Mallit, joissa ei ole päättelyn säätöä, ohittavat tämän asetuksen.';
 $string['settings:reasoning_effort_off'] = 'Pois (niin vähän kuin malli sallii)';
 $string['settings:reasoning_effort_low'] = 'Matala (suositus)';
 $string['settings:reasoning_effort_medium'] = 'Keskitaso';
@@ -3332,3 +3332,8 @@ $string['savereport:empty'] = 'tyhjä';
 $string['check:primary_name'] = 'AI Course Assistantin ensisijainen palveluntarjoaja';
 $string['check:primary_ok'] = 'Ensisijaisessa chat-palveluntarjoajassa ei ollut virheitä viimeisen 24 tunnin aikana.';
 $string['check:primary_failing'] = 'Ensisijainen chat-palveluntarjoaja ({$a->model}) epäonnistui {$a->failures} kertaa viimeisen 24 tunnin aikana. Varapalveluntarjoaja vastasi {$a->rescued} näistä pyynnöistä, joten oppijat eivät ehkä huomanneet mitään. Viimeisin virhe: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Esseepalautteen palveluntarjoaja';
+$string['settings:essay_provider_desc'] = 'Palveluntarjoajan tunnus (esim. <code>claude</code>, <code>openai</code>) esseepalautteelle. Sen on vastattava jotakin Vertailupalveluntarjoajat-kohdan riviä. Jätä tyhjäksi, niin käytetään keskustelun palveluntarjoajaa. Sekä tämän kentän että mallin on oltava asetettuja, jotta ohitus tulee voimaan.';
+$string['settings:essay_model'] = 'Esseepalautteen malli';
+$string['settings:essay_model_desc'] = 'Mallin nimi esseepalautteelle, esim. <code>claude-haiku-4-5</code>. Lokakuun 2026 vertailussa Claude-mallit antoivat selvästi parempaa esseepalautetta kuin Gemini 2.5 Flash tai GPT-4o mini. Jätä tyhjäksi, niin käytetään keskustelun mallia.';

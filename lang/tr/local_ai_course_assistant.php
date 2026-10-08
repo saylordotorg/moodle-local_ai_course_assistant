@@ -1714,7 +1714,7 @@ $string['settings:provider_heading_desc'] = 'Yapay zekâ platformunu, modeli ve 
 $string['settings:claude_temperature_allow_prefixes'] = 'temperature parametresini destekleyen Claude modelleri';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Her satırda bir model adı öneki. Adı bunlardan biriyle başlayan Anthropic modelleri <code>temperature</code> örnekleme parametresini kabul etmeye devam eder. Hiçbir önekle eşleşmeyen Claude modellerinde temperature atlanır (Opus 4.7 ve sonrasındaki akıl yürütme modelleri bunu HTTP 400 hatasıyla reddeder). Eklentiyle gelen varsayılanı kullanmak için boş bırakın.';
 $string['settings:max_tokens'] = 'En fazla yanıt uzunluğu (token)';
-$string['settings:max_tokens_desc'] = 'Yapay zekâ yanıtı başına en fazla token sayısı. Düşük değerler daha kısa ve daha hızlı yanıtlar verir. 512 = yaklaşık 2-3 cümle, 1024 = yaklaşık 1-2 paragraf, 2048 = daha uzun açıklamalar. Sınır olmaması için 0 girin (sağlayıcının varsayılanı geçerli olur).';
+$string['settings:max_tokens_desc'] = 'Yapay zekâ yanıtı başına en fazla token sayısı. Düşük değerler daha kısa ve hızlı yanıtlar üretir. 512 = yaklaşık 2-3 cümle, 1024 = yaklaşık 1-2 paragraf, 2048 = daha uzun açıklamalar. Sınırsız için 0 yapın (sağlayıcı varsayılanı). Yanıtlamadan önce akıl yürüten modeller (Gemini 2.5 ve 3, GPT-5 ve sonrası, Claude 5.5) bu sayının üzerine düşünmeleri için ek alan alır; bu nedenle düşünme açıkken uzun bir yanıt yaklaşık üç katına çıkabilir, düşünme kapalıyken yanıt tam olarak bu sayıda kesilir.';
 $string['settings:profile_update_interval'] = 'Öğrenci profili güncelleme aralığı';
 $string['settings:profile_update_interval_desc'] = 'Bir derste öğrenciden bu kadar mesaj geldikten sonra asistan; güçlü ve zayıf yönleri, öğrenme biçimini ve ilgi alanlarını özetleyen bir öğrenme profili oluşturur (veya yeniler). Profil, kişiselleştirilmiş yanıtlar için sistem istemine eklenir. Devre dışı bırakmak için 0 girin. Varsayılan: 10.';
 $string['settings:enable_thinking'] = 'Genişletilmiş akıl yürütme (yalnızca Claude)';
@@ -3164,7 +3164,7 @@ $string['settings:int_range'] = '{$a->min} ile {$a->max} arasında bir tam sayı
 
 $string['cachedef_modelcaps'] = 'Sağlayıcı retlerinden öğrenilen model yeteneği bilgileri';
 $string['settings:reasoning_effort'] = 'Akıl yürütme düzeyi';
-$string['settings:reasoning_effort_desc'] = 'Yanıt vermeden önce akıl yürüten modellerden ne kadar düşünmelerinin isteneceği. OpenAI akıl yürütme modellerine (GPT-5, GPT-6, o serisi) <code>reasoning_effort</code> olarak, Gemini düşünme modellerine ise düşünme bütçesi olarak uygulanır. Her akıl yürütme modeline, yukarıdaki yanıt uzunluğuna ek olarak düşünmesi için alan da verilir, böylece düşünme artık bir yanıtı yarıda kesemez. Düşük, bir eğitmen için uygundur: yanıtlar daha çabuk gelir ve daha az maliyetlidir. Kapalı, modelin izin verdiği durumlarda düşünmeyi kapatır. Akıl yürütme denetimi olmayan modeller bu ayarı yok sayar.';
+$string['settings:reasoning_effort_desc'] = 'Yanıtlamadan önce akıl yürüten modellerden ne kadar düşünmeleri istendiği. OpenAI akıl yürütme modellerinde (GPT-5, GPT-6, o serisi) <code>reasoning_effort</code> olarak, Gemini düşünme modellerinde düşünme bütçesi olarak, Claude Sonnet 5.5 ve Opus 5.5\'te ise çaba düzeyi olarak uygulanır (Kapalı en düşük ayarı kullanır; Opus 5.5\'te düşünme kapatılamaz). Her akıl yürütme modeli, yukarıdaki yanıt uzunluğunun üzerine düşünmesi için de alan alır; böylece düşünme artık bir yanıtı yarıda kesemez. Düşük, bir eğitmen için uygundur: yanıtlar daha hızlı gelir ve daha az maliyetlidir. Kapalı, model izin verdiği yerde düşünmeyi kapatır. Akıl yürütme denetimi olmayan modeller bu ayarı yok sayar.';
 $string['settings:reasoning_effort_off'] = 'Kapalı (modelin izin verdiği en az düzey)';
 $string['settings:reasoning_effort_low'] = 'Düşük (önerilen)';
 $string['settings:reasoning_effort_medium'] = 'Orta';
@@ -3333,3 +3333,8 @@ $string['savereport:empty'] = 'boş';
 $string['check:primary_name'] = 'AI Course Assistant ana sağlayıcısı';
 $string['check:primary_ok'] = 'Son 24 saatte ana sohbet sağlayıcısında hata olmadı.';
 $string['check:primary_failing'] = 'Ana sohbet sağlayıcısı ({$a->model}) son 24 saatte {$a->failures} kez başarısız oldu. Yedek sağlayıcı bu isteklerin {$a->rescued} tanesini yanıtladı, bu nedenle öğrenenler fark etmemiş olabilir. Son hata: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Kompozisyon geri bildirimi sağlayıcısı';
+$string['settings:essay_provider_desc'] = 'Kompozisyon geri bildirimi için sağlayıcı kimliği (ör. <code>claude</code>, <code>openai</code>). Karşılaştırma sağlayıcıları içindeki bir satırla eşleşmelidir. Sohbet sağlayıcısını kullanmak için boş bırakın. Geçersiz kılmanın uygulanması için hem bu alan hem de model ayarlanmış olmalıdır.';
+$string['settings:essay_model'] = 'Kompozisyon geri bildirimi modeli';
+$string['settings:essay_model_desc'] = 'Kompozisyon geri bildirimi için model adı, ör. <code>claude-haiku-4-5</code>. Ekim 2026 karşılaştırmasında Claude modelleri, Gemini 2.5 Flash veya GPT-4o mini\'ye göre belirgin biçimde daha iyi kompozisyon geri bildirimi verdi. Sohbet modelini kullanmak için boş bırakın.';

@@ -722,7 +722,9 @@ final class quiz_learner_journey_test extends \advanced_testcase {
         $this->assertSame(7, $clean['questions'][0]['id']);
         $this->assertSame($result['questions'][0]['question'], $clean['questions'][0]['question']);
         $this->assertSame($result['questions'][0]['choices'], $clean['questions'][0]['choices']);
-        $this->assertSame('B', $clean['questions'][0]['correct']);
+        // v7.8.2: the key is shuffled to a random letter; it still points at 'Rechts'.
+        $letter = $clean['questions'][0]['correct'];
+        $this->assertSame($letter . ') Rechts', $clean['questions'][0]['choices'][strpos('ABCD', $letter)]);
         $this->assertSame($explanation, $clean['questions'][0]['explanation']);
         $this->assertSame($realid, $clean['questions'][0]['objectiveid']);
 

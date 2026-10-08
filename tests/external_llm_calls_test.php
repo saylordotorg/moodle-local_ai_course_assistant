@@ -69,7 +69,10 @@ final class external_llm_calls_test extends \advanced_testcase {
 
         $this->assertTrue($result['success']);
         $this->assertCount(3, $result['questions']);
-        $this->assertEquals('A', $result['questions'][0]['correct']);
+        // v7.8.2: the key moves to a random letter; it must still name the choice the stub marked correct.
+        $q0 = $result['questions'][0];
+        $this->assertContains($q0['correct'], ['A', 'B', 'C', 'D']);
+        $this->assertStringStartsWith($q0['correct'] . ') ', $q0['choices'][strpos('ABCD', $q0['correct'])]);
         $this->assertNotEmpty($result['questions'][0]['question']);
         // Verify provider was actually called and saw a quiz-shaped prompt.
         $this->assertCount(1, stub_provider::$calls);

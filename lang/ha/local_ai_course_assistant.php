@@ -1749,7 +1749,7 @@ $string['settings:provider_heading_desc'] = 'Saita dandalin AI, samfurin, da hal
 $string['settings:claude_temperature_allow_prefixes'] = 'Samfuran Claude da ke goyon bayan sigar temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Gaba ɗaya ɗaya na sunan samfuri a kowane layi. Samfuran Anthropic da sunayensu ke farawa da ɗaya daga cikin waɗannan har yanzu suna karɓar sigar samfuri ta <code>temperature</code>. Ga duk samfurin Claude da bai dace da kowane gaba ba, ana barin temperature (samfuran tunani tun daga Opus 4.7 suna ƙin sa da kuskuren HTTP 400). Ka bar shi babu komai don amfani da ƙimar asali da ke zuwa da ƙarin abin.';
 $string['settings:max_tokens'] = 'Matsakaicin tsawon amsa (tokens)';
-$string['settings:max_tokens_desc'] = 'Matsakaicin adadin tokens ga kowace amsar AI. Ƙananan ƙima suna ba da amsoshi gajeru kuma masu sauri. 512 = kusan jimloli 2-3, 1024 = kusan sakin layi 1-2, 2048 = bayanai masu tsawo. Sa 0 don kada a sami iyaka (ƙimar asali ta mai bayarwa za ta yi aiki).';
+$string['settings:max_tokens_desc'] = 'Matsakaicin adadin tokens a kowace amsar AI. Ƙananan ƙimomi suna ba da amsoshi gajeru kuma masu sauri. 512 = kimanin jumloli 2-3, 1024 = kimanin sakin layi 1-2, 2048 = bayani mai tsawo. Saita 0 don babu iyaka (tsohon saitin mai samar da sabis). Samfuran da ke tunani kafin su amsa (Gemini 2.5 da 3, GPT-5 da na bayansa, Claude 5.5) suna samun ƙarin sarari don tunaninsu a kan wannan lamba, don haka idan tunani yana kunne, doguwar amsa na iya kai kusan sau uku; idan tunani yana kashe, ana yanke amsa daidai a wannan lamba.';
 $string['settings:profile_update_interval'] = 'Tazarar sabunta bayanan ɗalibi';
 $string['settings:profile_update_interval_desc'] = 'Bayan wannan adadin saƙonni daga ɗalibi a cikin kwas, mataimakin yana gina (ko sabunta) bayanan koyo da ke taƙaita ƙarfi, rauni, salon koyo, da abubuwan sha\'awa. Ana saka wannan bayanin a cikin umarnin tsarin don amsoshi na musamman. Sa 0 don kashe shi. Asali: 10.';
 $string['settings:enable_thinking'] = 'Faɗaɗɗen tunani (Claude kaɗai)';
@@ -3190,7 +3190,7 @@ $string['settings:int_range'] = 'Shigar da cikakkiyar lamba daga {$a->min} zuwa 
 
 $string['cachedef_modelcaps'] = 'Bayanan iyawar samfura da aka koya daga ƙin masu samarwa';
 $string['settings:reasoning_effort'] = 'Ƙoƙarin tunani';
-$string['settings:reasoning_effort_desc'] = 'Yawan tunanin da ake neman samfuran da ke tunani kafin amsa su yi. Yana aiki ga samfuran tunani na OpenAI (GPT-5, GPT-6, jerin o) a matsayin <code>reasoning_effort</code> da kuma samfuran tunani na Gemini a matsayin kasafin tunani. Kowane samfurin tunani yana kuma samun sarari don tunaninsa bayan tsawon amsar da ke sama, don haka tunani ba zai iya katse amsa ba kuma. Ƙasa ya dace da malami: amsoshi suna zuwa da wuri kuma kuɗinsu ya ragu. A kashe yana kashe tunani inda samfurin ya yarda. Samfuran da ba su da ikon sarrafa tunani suna watsi da wannan saiti.';
+$string['settings:reasoning_effort_desc'] = 'Yawan tunanin da ake nema daga samfuran da ke tunani kafin su amsa. Yana aiki ga samfuran tunani na OpenAI (GPT-5, GPT-6, jerin o) a matsayin <code>reasoning_effort</code>, ga samfuran tunani na Gemini a matsayin kasafin tunani, da kuma ga Claude Sonnet 5.5 da Opus 5.5 a matsayin matakin ƙoƙari (Kashe yana amfani da mafi ƙarancin saiti; Opus 5.5 ba zai iya kashe tunani ba). Kowane samfurin tunani yana kuma samun sarari don tunani a kan tsawon amsar da ke sama, don haka tunani ba zai iya yanke amsa ba kuma. Ƙasa ya dace da malami: amsoshi suna zuwa da wuri kuma suna kashe ƙasa. Kashe yana kashe tunani inda samfurin ya yarda. Samfuran da ba su da sarrafa tunani suna watsi da wannan saiti.';
 $string['settings:reasoning_effort_off'] = 'A kashe (mafi ƙanƙanta da samfurin ya yarda)';
 $string['settings:reasoning_effort_low'] = 'Ƙasa (an ba da shawara)';
 $string['settings:reasoning_effort_medium'] = 'Matsakaici';
@@ -3359,3 +3359,8 @@ $string['savereport:empty'] = 'babu komai';
 $string['check:primary_name'] = 'Babban mai samar da sabis na AI Course Assistant';
 $string['check:primary_ok'] = 'Babu gazawa daga babban mai samar da tattaunawa a cikin awanni 24 da suka wuce.';
 $string['check:primary_failing'] = 'Babban mai samar da tattaunawa ({$a->model}) ya yi kasa sau {$a->failures} a cikin awanni 24 da suka wuce. Mai samar da sabis na ajiya ya amsa {$a->rescued} daga cikin waɗannan buƙatu, don haka wataƙila ɗalibai ba su lura ba. Kuskure na ƙarshe: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Mai samar da ra\'ayi kan muqala';
+$string['settings:essay_provider_desc'] = 'ID na mai samar da sabis (misali <code>claude</code>, <code>openai</code>) don ra\'ayi kan muqala. Dole ne ya dace da layi ɗaya a cikin Masu samar da kwatanta. Bar shi fanko don amfani da mai samar da sabis na tattaunawa. Dole ne a saita wannan filin da samfurin duka don a yi amfani da maye gurbin.';
+$string['settings:essay_model'] = 'Samfurin ra\'ayi kan muqala';
+$string['settings:essay_model_desc'] = 'Sunan samfuri don ra\'ayi kan muqala, misali <code>claude-haiku-4-5</code>. A gwajin kwatanta na Oktoba 2026, samfuran Claude sun ba da ra\'ayi kan muqala mafi kyau a fili fiye da Gemini 2.5 Flash ko GPT-4o mini. Bar shi fanko don amfani da samfurin tattaunawa.';

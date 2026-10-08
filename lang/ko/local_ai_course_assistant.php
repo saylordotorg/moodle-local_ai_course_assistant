@@ -1712,7 +1712,7 @@ $string['settings:provider_heading_desc'] = 'AI 플랫폼, 모델, 대화 동작
 $string['settings:claude_temperature_allow_prefixes'] = 'temperature 매개변수를 지원하는 Claude 모델';
 $string['settings:claude_temperature_allow_prefixes_desc'] = '한 줄에 모델 이름 접두사 하나씩 입력합니다. 이름이 이 중 하나로 시작하는 Anthropic 모델은 <code>temperature</code> 샘플링 매개변수를 계속 허용합니다. 어떤 접두사와도 일치하지 않는 Claude 모델에서는 temperature가 생략됩니다(Opus 4.7 이후의 추론 계열 모델은 HTTP 400 오류로 거부합니다). 플러그인 기본값을 사용하려면 비워 두십시오.';
 $string['settings:max_tokens'] = '최대 응답 길이(토큰)';
-$string['settings:max_tokens_desc'] = 'AI 응답 한 건당 최대 토큰 수입니다. 값이 작을수록 응답이 짧고 빨라집니다. 512 = 약 2~3문장, 1024 = 약 1~2문단, 2048 = 더 긴 설명. 제한을 두지 않으려면 0으로 설정하십시오(공급자 기본값이 적용됩니다).';
+$string['settings:max_tokens_desc'] = 'AI 응답 하나당 최대 토큰 수입니다. 값이 낮을수록 응답이 짧고 빠릅니다. 512 = 약 2~3문장, 1024 = 약 1~2문단, 2048 = 더 긴 설명. 0으로 설정하면 제한이 없습니다(제공업체 기본값). 답하기 전에 추론하는 모델(Gemini 2.5 및 3, GPT-5 이상, Claude 5.5)은 이 숫자와 별도로 사고를 위한 여유 공간을 추가로 받으므로, 사고가 켜져 있으면 긴 답변은 대략 세 배까지 늘어날 수 있습니다. 사고가 꺼져 있으면 답변은 정확히 이 숫자에서 잘립니다.';
 $string['settings:profile_update_interval'] = '학습자 프로필 갱신 주기';
 $string['settings:profile_update_interval_desc'] = '강좌에서 학습자가 이 횟수만큼 메시지를 보내면 어시스턴트가 강점, 약점, 학습 유형, 관심사를 요약한 학습 프로필을 만들거나 갱신합니다. 이 프로필은 개인화된 응답을 위해 시스템 프롬프트에 포함됩니다. 사용하지 않으려면 0으로 설정하십시오. 기본값: 10.';
 $string['settings:enable_thinking'] = '확장 추론(Claude 전용)';
@@ -3161,7 +3161,7 @@ $string['settings:int_range'] = '{$a->min}에서 {$a->max} 사이의 정수를 �
 
 $string['cachedef_modelcaps'] = '제공업체 거부로부터 학습한 모델 기능 정보';
 $string['settings:reasoning_effort'] = '추론 강도';
-$string['settings:reasoning_effort_desc'] = '답변 전에 추론하는 모델에게 얼마나 생각하도록 요청할지 정합니다. OpenAI 추론 모델(GPT-5, GPT-6, o 시리즈)에는 <code>reasoning_effort</code>로, Gemini 사고 모델에는 사고 예산으로 적용됩니다. 모든 추론 모델은 위의 응답 길이에 더해 사고를 위한 여유도 받으므로, 사고 때문에 답변이 잘리는 일이 더 이상 없습니다. 튜터에는 낮음이 적합합니다. 답변이 더 빨리 오고 비용도 적습니다. 끔은 모델이 허용하는 경우 사고를 끕니다. 추론 제어가 없는 모델은 이 설정을 무시합니다.';
+$string['settings:reasoning_effort_desc'] = '답하기 전에 추론하는 모델에게 얼마나 깊이 생각하도록 요청할지 정합니다. OpenAI 추론 모델(GPT-5, GPT-6, o 시리즈)에는 <code>reasoning_effort</code>로, Gemini 사고 모델에는 사고 예산으로, Claude Sonnet 5.5와 Opus 5.5에는 노력 수준으로 적용됩니다(끄기는 가장 낮은 설정을 사용하며, Opus 5.5는 사고를 끌 수 없습니다). 모든 추론 모델은 위의 응답 길이와 별도로 사고를 위한 여유 공간도 받으므로, 이제 사고 때문에 답변이 중간에 잘리지 않습니다. 낮음은 튜터에 알맞습니다. 답변이 더 빨리 도착하고 비용도 적게 듭니다. 끄기는 모델이 허용하는 경우 사고를 끕니다. 추론 제어가 없는 모델은 이 설정을 무시합니다.';
 $string['settings:reasoning_effort_off'] = '끔(모델이 허용하는 최소한)';
 $string['settings:reasoning_effort_low'] = '낮음(권장)';
 $string['settings:reasoning_effort_medium'] = '중간';
@@ -3330,3 +3330,8 @@ $string['savereport:empty'] = '비어 있음';
 $string['check:primary_name'] = 'AI Course Assistant 기본 제공자';
 $string['check:primary_ok'] = '지난 24시간 동안 기본 채팅 제공자에서 발생한 실패가 없습니다.';
 $string['check:primary_failing'] = '기본 채팅 제공자({$a->model})가 지난 24시간 동안 {$a->failures}회 실패했습니다. 백업 제공자가 그중 {$a->rescued}건에 응답했으므로 학습자는 눈치채지 못했을 수 있습니다. 마지막 오류: {$a->reason}';
+
+$string['settings:essay_provider'] = '에세이 피드백 제공업체';
+$string['settings:essay_provider_desc'] = '에세이 피드백에 사용할 제공업체 ID입니다(예: <code>claude</code>, <code>openai</code>). 비교 제공업체의 행 중 하나와 일치해야 합니다. 비워 두면 채팅 제공업체를 사용합니다. 재정의가 적용되려면 이 항목과 모델을 모두 설정해야 합니다.';
+$string['settings:essay_model'] = '에세이 피드백 모델';
+$string['settings:essay_model_desc'] = '에세이 피드백에 사용할 모델 이름입니다(예: <code>claude-haiku-4-5</code>). 2026년 10월 벤치마크에서 Claude 모델은 Gemini 2.5 Flash나 GPT-4o mini보다 확연히 더 나은 에세이 피드백을 제공했습니다. 비워 두면 채팅 모델을 사용합니다.';

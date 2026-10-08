@@ -94,9 +94,13 @@ final class autoupgrade_discovery_test extends \advanced_testcase {
         $this->price('claude-haiku', 1.0, 5.0);
         $this->price('gpt-5-mini', 0.25, 2.0);
         $this->price('gemini/gemini-3.5-flash-lite', 0.30, 2.50);
+        // claude-haiku-5-5 has its own row ($0.10/$0.50) since v7.8.2. Before that the
+        // bare 'claude-haiku' catch-all priced it at ten times its real rate, and the
+        // catch-all must still never answer for a model nobody has priced.
+        $this->assertSame(0.10, discovery::known_price('claude', 'claude-haiku-5-5')['input']);
         $this->assertNull(
-            discovery::known_price('claude', 'claude-haiku-5-5'),
-            'A family catch-all priced claude-haiku-5-5 at ten times its real rate.'
+            discovery::known_price('claude', 'claude-haiku-9-9'),
+            'A family catch-all priced an unpriced Haiku at a rate that is not its own.'
         );
         $this->assertSame(
             'gpt-5-mini',

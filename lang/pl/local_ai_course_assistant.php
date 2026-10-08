@@ -1713,7 +1713,7 @@ $string['settings:provider_heading_desc'] = 'Skonfiguruj zaplecze AI, model oraz
 $string['settings:claude_temperature_allow_prefixes'] = 'Modele Claude akceptujące parametr temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Jeden przedrostek nazwy modelu w wierszu. Modele Anthropic, których nazwa zaczyna się od jednego z nich, nadal akceptują parametr próbkowania <code>temperature</code>. W każdym modelu Claude niepasującym do przedrostka parametr temperature jest pomijany (modele klasy rozumowania od Opus 4.7 odrzucają go błędem HTTP 400). Pozostaw puste, aby użyć dostarczonej wartości domyślnej.';
 $string['settings:max_tokens'] = 'Maksymalna długość odpowiedzi (tokeny)';
-$string['settings:max_tokens_desc'] = 'Maksymalna liczba tokenów na jedną odpowiedź AI. Niższe wartości dają krótsze i szybsze odpowiedzi. 512 = około 2-3 zdania, 1024 = około 1-2 akapity, 2048 = dłuższe wyjaśnienia. Ustaw 0, aby nie stosować limitu (wartość domyślna dostawcy).';
+$string['settings:max_tokens_desc'] = 'Maksymalna liczba tokenów w jednej odpowiedzi AI. Niższe wartości dają krótsze i szybsze odpowiedzi. 512 = ok. 2-3 zdania, 1024 = ok. 1-2 akapity, 2048 = dłuższe wyjaśnienia. Ustaw 0, aby wyłączyć limit (wartość domyślna dostawcy). Modele, które rozumują przed odpowiedzią (Gemini 2.5 i 3, GPT-5 i nowsze, Claude 5.5), dostają ponad tę liczbę dodatkowy zapas na myślenie, więc przy włączonym myśleniu długa odpowiedź może mieć około trzykrotnie więcej tokenów; przy wyłączonym myśleniu odpowiedź jest ucinana dokładnie przy tej liczbie.';
 $string['settings:profile_update_interval'] = 'Częstotliwość aktualizacji profilu studenta';
 $string['settings:profile_update_interval_desc'] = 'Po tylu wiadomościach studenta w kursie asystent tworzy (lub odświeża) profil uczenia się, podsumowujący mocne i słabe strony, styl uczenia się oraz zainteresowania. Profil jest umieszczany w komunikacie systemowym, aby odpowiedzi były spersonalizowane. Ustaw 0, aby wyłączyć. Domyślnie: 10.';
 $string['settings:enable_thinking'] = 'Rozszerzone rozumowanie (tylko Claude)';
@@ -3163,7 +3163,7 @@ $string['settings:int_range'] = 'Wpisz liczbę całkowitą od {$a->min} do {$a->
 
 $string['cachedef_modelcaps'] = 'Fakty o możliwościach modeli poznane z odrzuceń dostawców';
 $string['settings:reasoning_effort'] = 'Intensywność rozumowania';
-$string['settings:reasoning_effort_desc'] = 'Określa, jak dużo mają myśleć modele, które rozumują przed udzieleniem odpowiedzi. Dotyczy modeli rozumujących OpenAI (GPT-5, GPT-6, seria o) jako <code>reasoning_effort</code> oraz modeli myślących Gemini jako budżet na myślenie. Każdy model rozumujący dostaje też miejsce na myślenie ponad powyższą długość odpowiedzi, więc myślenie nie może już skrócić odpowiedzi. Niski poziom pasuje do tutora: odpowiedzi przychodzą szybciej i kosztują mniej. Wyłączone wyłącza myślenie tam, gdzie model na to pozwala. Modele bez kontroli rozumowania ignorują to ustawienie.';
+$string['settings:reasoning_effort_desc'] = 'Jak intensywnie modele rozumujące przed odpowiedzią mają myśleć. Dotyczy modeli rozumujących OpenAI (GPT-5, GPT-6, seria o) jako <code>reasoning_effort</code>, modeli myślących Gemini jako budżet myślenia oraz Claude Sonnet 5.5 i Opus 5.5 jako poziom wysiłku (Wyłączone używa najniższego ustawienia; w Opus 5.5 nie można wyłączyć myślenia). Każdy model rozumujący dostaje też zapas na myślenie ponad długość odpowiedzi ustawioną powyżej, więc myślenie nie może już uciąć odpowiedzi. Niski poziom pasuje do korepetytora: odpowiedzi przychodzą szybciej i kosztują mniej. Wyłączone wyłącza myślenie tam, gdzie model na to pozwala. Modele bez sterowania rozumowaniem ignorują to ustawienie.';
 $string['settings:reasoning_effort_off'] = 'Wyłączone (tak mało, jak pozwala model)';
 $string['settings:reasoning_effort_low'] = 'Niska (zalecane)';
 $string['settings:reasoning_effort_medium'] = 'Średnia';
@@ -3332,3 +3332,8 @@ $string['savereport:empty'] = 'puste';
 $string['check:primary_name'] = 'Główny dostawca AI Course Assistant';
 $string['check:primary_ok'] = 'W ciągu ostatnich 24 godzin nie wystąpiły błędy głównego dostawcy czatu.';
 $string['check:primary_failing'] = 'Główny dostawca czatu ({$a->model}) zawiódł {$a->failures} razy w ciągu ostatnich 24 godzin. Zapasowy dostawca odpowiedział na {$a->rescued} z tych żądań, więc uczący się mogli tego nie zauważyć. Ostatni błąd: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Dostawca opinii o wypracowaniach';
+$string['settings:essay_provider_desc'] = 'Identyfikator dostawcy (np. <code>claude</code>, <code>openai</code>) dla opinii o wypracowaniach. Musi odpowiadać wierszowi w sekcji Dostawcy porównawczy. Pozostaw puste, aby użyć dostawcy czatu. Aby zastąpienie zadziałało, muszą być ustawione zarówno to pole, jak i model.';
+$string['settings:essay_model'] = 'Model opinii o wypracowaniach';
+$string['settings:essay_model_desc'] = 'Nazwa modelu dla opinii o wypracowaniach, np. <code>claude-haiku-4-5</code>. W teście porównawczym z października 2026 r. modele Claude dawały wyraźnie lepsze opinie o wypracowaniach niż Gemini 2.5 Flash czy GPT-4o mini. Pozostaw puste, aby użyć modelu czatu.';

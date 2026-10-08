@@ -1714,7 +1714,7 @@ $string['settings:provider_heading_desc'] = 'Konfigurer AI-backend, model og adf
 $string['settings:claude_temperature_allow_prefixes'] = 'Claude-modeller der accepterer temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Ét modelnavnepræfiks pr. linje. Anthropic-modeller, hvis navn begynder med et af disse, accepterer stadig samplingsparameteren <code>temperature</code>. For enhver Claude-model, der ikke matcher et præfiks, udelades temperature (ræsonnementsmodeller fra og med Opus 4.7 afviser den med HTTP 400). Lad feltet stå tomt for at bruge den medfølgende standardværdi.';
 $string['settings:max_tokens'] = 'Maksimal svarlængde (tokens)';
-$string['settings:max_tokens_desc'] = 'Maksimalt antal tokens pr. AI-svar. Lavere værdier giver kortere og hurtigere svar. 512 = ca. 2-3 sætninger, 1024 = ca. 1-2 afsnit, 2048 = længere forklaringer. Sæt til 0 for ingen grænse (udbyderens standardværdi).';
+$string['settings:max_tokens_desc'] = 'Maksimalt antal tokens pr. AI-svar. Lavere værdier giver kortere og hurtigere svar. 512 = ca. 2-3 sætninger, 1024 = ca. 1-2 afsnit, 2048 = længere forklaringer. Angiv 0 for ingen grænse (udbyderens standard). Modeller, der ræsonnerer, før de svarer (Gemini 2.5 og 3, GPT-5 og nyere, Claude 5.5), får ekstra plads til at tænke oven i dette tal, så med tænkning slået til kan et langt svar nå op på omkring tre gange så meget; med tænkning slået fra afskæres svaret præcis ved dette tal.';
 $string['settings:profile_update_interval'] = 'Interval for opdatering af studenterprofil';
 $string['settings:profile_update_interval_desc'] = 'Efter dette antal beskeder fra den studerende i et kursus opretter (eller opdaterer) assistenten en læringsprofil, der opsummerer styrker, svagheder, læringsstil og interesser. Profilen indsættes i systemprompten for at give personlige svar. Sæt til 0 for at slå fra. Standard: 10.';
 $string['settings:enable_thinking'] = 'Udvidet ræsonnement (kun Claude)';
@@ -3163,7 +3163,7 @@ $string['settings:int_range'] = 'Indtast et helt tal fra {$a->min} til {$a->max}
 
 $string['cachedef_modelcaps'] = 'Modelkapabiliteter lært fra udbyderes afvisninger';
 $string['settings:reasoning_effort'] = 'Ræsonneringsindsats';
-$string['settings:reasoning_effort_desc'] = 'Hvor meget modeller, der tænker før de svarer, bliver bedt om at tænke. Gælder OpenAI-ræsonneringsmodeller (GPT-5, GPT-6, o-serien) som <code>reasoning_effort</code> og Gemini-tænkemodeller som et tænkebudget. Hver ræsonneringsmodel får også plads til sin tænkning oven i svarlængden ovenfor, så tænkningen ikke længere kan afkorte et svar. Lav passer til en tutor: svar kommer hurtigere og koster mindre. Fra slår tænkning fra, hvor modellen tillader det. Modeller uden styring af ræsonnering ignorerer denne indstilling.';
+$string['settings:reasoning_effort_desc'] = 'Hvor meget modeller, der ræsonnerer, før de svarer, bliver bedt om at tænke. Gælder for OpenAI\'s ræsonnementsmodeller (GPT-5, GPT-6, o-serien) som <code>reasoning_effort</code>, for Gemini-tænkemodeller som et tænkebudget og for Claude Sonnet 5.5 og Opus 5.5 som indsatsniveau (Fra bruger den laveste indstilling; Opus 5.5 kan ikke slå tænkning fra). Hver ræsonnementsmodel får også plads til at tænke oven i svarlængden ovenfor, så tænkning ikke længere kan afkorte et svar. Lav passer til en vejleder: svarene kommer hurtigere og koster mindre. Fra slår tænkning fra, hvor modellen tillader det. Modeller uden ræsonnementskontrol ignorerer denne indstilling.';
 $string['settings:reasoning_effort_off'] = 'Fra (så lidt som modellen tillader)';
 $string['settings:reasoning_effort_low'] = 'Lav (anbefalet)';
 $string['settings:reasoning_effort_medium'] = 'Middel';
@@ -3332,3 +3332,8 @@ $string['savereport:empty'] = 'tom';
 $string['check:primary_name'] = 'Primær udbyder for AI Course Assistant';
 $string['check:primary_ok'] = 'Ingen fejl fra den primære chatudbyder inden for de seneste 24 timer.';
 $string['check:primary_failing'] = 'Den primære chatudbyder ({$a->model}) fejlede {$a->failures} gange inden for de seneste 24 timer. Backup-udbyderen besvarede {$a->rescued} af disse forespørgsler, så de studerende har måske ikke bemærket det. Seneste fejl: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Udbyder til opgavefeedback';
+$string['settings:essay_provider_desc'] = 'Udbyder-id (f.eks. <code>claude</code>, <code>openai</code>) til opgavefeedback. Skal matche en række under Sammenligningsudbydere. Lad feltet stå tomt for at bruge chatudbyderen. Både dette felt og modellen skal være angivet, for at tilsidesættelsen gælder.';
+$string['settings:essay_model'] = 'Model til opgavefeedback';
+$string['settings:essay_model_desc'] = 'Modelnavn til opgavefeedback, f.eks. <code>claude-haiku-4-5</code>. I benchmarken fra oktober 2026 gav Claude-modeller tydeligt bedre opgavefeedback end Gemini 2.5 Flash eller GPT-4o mini. Lad feltet stå tomt for at bruge chatmodellen.';
