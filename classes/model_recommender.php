@@ -189,6 +189,12 @@ class model_recommender {
             'modelkeys' => ['quiz_model', 'model'],
             'capability' => 'chat',
         ],
+        'essay' => [
+            'label' => 'Essay feedback',
+            'providerkeys' => ['essay_provider', 'provider'],
+            'modelkeys' => ['essay_model', 'model'],
+            'capability' => 'chat',
+        ],
         'classifier' => [
             'label' => 'Mastery classifier',
             'providerkeys' => ['mastery_classifier_provider', 'provider'],

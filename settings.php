@@ -2667,6 +2667,23 @@ if ($hassiteconfig) {
         PARAM_TEXT
     ));
 
+    // v7.8.2: essay feedback has its own optional provider/model, same shape as
+    // the quiz pair. Empty keeps it on the chat model, as before.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/essay_provider',
+        get_string('settings:essay_provider', 'local_ai_course_assistant'),
+        get_string('settings:essay_provider_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_ALPHANUMEXT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/essay_model',
+        get_string('settings:essay_model', 'local_ai_course_assistant'),
+        get_string('settings:essay_model_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_TEXT
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_classifier_provider',
         get_string('settings:mastery_classifier_provider', 'local_ai_course_assistant'),

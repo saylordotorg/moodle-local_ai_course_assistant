@@ -106,6 +106,15 @@ class roles {
             'evaluable' => false,
             'fixture' => null,
         ],
+        'essay' => [
+            'providerkey' => 'essay_provider',
+            'modelkey' => 'essay_model',
+            'variantkey' => null,
+            'enabledkey' => null,
+            'auto' => false,
+            'evaluable' => false,
+            'fixture' => null,
+        ],
         'classifier' => [
             'providerkey' => 'mastery_classifier_provider',
             'modelkey' => 'mastery_classifier_model',

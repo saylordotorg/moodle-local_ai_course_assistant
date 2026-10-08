@@ -82,7 +82,7 @@ class score_essay extends external_api {
             . "\n\n{$rubricblock}\n\nESSAY:\n{$essaytext}";
 
         try {
-            $provider = base_provider::create_from_config((int) $params['courseid']);
+            $provider = self::resolve_essay_provider((int) $params['courseid']);
             $response = $provider->chat_completion(
                 $sysprompt,
                 [['role' => 'user', 'content' => 'Produce the feedback JSON now.']],
@@ -180,5 +180,29 @@ class score_essay extends external_api {
                 new external_value(PARAM_RAW, 'Revision suggestion')
             ),
         ]);
+    }
+
+    /**
+     * The provider for essay feedback: the dedicated pair when both settings are set.
+     *
+     * Falls back to the course's chat provider when either is empty or the
+     * dedicated one cannot be built, so a typo in the new settings never takes
+     * essay feedback down. Same shape as quiz generation's resolver.
+     *
+     * @param int $courseid
+     * @return \local_ai_course_assistant\provider\provider_interface
+     */
+    private static function resolve_essay_provider(int $courseid) {
+        $providerid = trim((string) get_config('local_ai_course_assistant', 'essay_provider'));
+        $model = trim((string) get_config('local_ai_course_assistant', 'essay_model'));
+        if ($providerid !== '' && $model !== '') {
+            try {
+                return base_provider::create_for_comparison($providerid, $model, $courseid);
+            } catch (\Throwable $e) {
+                debugging('essay provider unavailable, falling back to chat tier: '
+                    . $e->getMessage(), DEBUG_DEVELOPER);
+            }
+        }
+        return base_provider::create_from_config($courseid);
     }
 }

@@ -3623,3 +3623,9 @@ $string['savereport:empty'] = 'empty';
 $string['check:primary_name'] = 'AI Course Assistant main provider';
 $string['check:primary_ok'] = 'No failures from the main chat provider in the last 24 hours.';
 $string['check:primary_failing'] = 'The main chat provider ({$a->model}) failed {$a->failures} times in the last 24 hours. The failover provider answered {$a->rescued} of those turns, so learners may not have noticed. Last error: {$a->reason}';
+
+// Essay feedback model and the other 7.8.2 admin strings.
+$string['settings:essay_provider'] = 'Essay feedback provider';
+$string['settings:essay_provider_desc'] = 'Provider id (e.g. <code>claude</code>, <code>openai</code>) for essay feedback. Must match a row in Comparison providers. Leave empty to use the chat provider. Both this and the model must be set for the override to apply.';
+$string['settings:essay_model'] = 'Essay feedback model';
+$string['settings:essay_model_desc'] = 'Model name for essay feedback, e.g. <code>claude-haiku-4-5</code>. In the October 2026 benchmark Claude models gave clearly better essay feedback than Gemini 2.5 Flash or GPT-4o mini. Leave empty to use the chat model.';
