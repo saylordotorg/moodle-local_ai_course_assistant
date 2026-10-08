@@ -132,7 +132,9 @@ class switcher {
         $bestkey = null;
         foreach ($DB->get_records(candidates::TABLE, ['role' => $role, 'status' => candidates::ELIGIBLE]) as $row) {
             $eval = $row->lastevalid ? $DB->get_record(evaluator::TABLE, ['id' => $row->lastevalid]) : null;
-            if (!$eval || (string) $eval->inc_model !== $current['model'] || (string) $eval->inc_provider !== $current['provider']) {
+            $stale = !$eval || (string) $eval->inc_model !== $current['model']
+                || (string) $eval->inc_provider !== $current['provider'];
+            if ($stale) {
                 $DB->update_record(candidates::TABLE, (object) ['id' => $row->id, 'status' => candidates::CANDIDATE,
                     'passes' => 0, 'timestatus' => time(), 'timemodified' => time()]);
                 continue;

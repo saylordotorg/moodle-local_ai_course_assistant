@@ -315,8 +315,9 @@ class evaluator {
         // production: the current model at today's level, the candidate at the
         // level the switch would write. Measuring a candidate at one level and
         // putting it live at another would make the cost gate meaningless.
+        $sitelevel = \local_ai_course_assistant\model_capabilities::site_level();
         $level = $bucket === 'incumbent'
-            ? ((string) $side['variant'] === roles::VARIANT_THINKING_OFF ? 'off' : \local_ai_course_assistant\model_capabilities::site_level())
+            ? ((string) $side['variant'] === roles::VARIANT_THINKING_OFF ? 'off' : $sitelevel)
             : roles::level_after($role, (string) $side['variant']);
         $options = ['max_tokens' => $maxtokens, 'reasoning' => $level];
 
