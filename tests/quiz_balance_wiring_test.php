@@ -113,7 +113,7 @@ final class quiz_balance_wiring_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
         $out = $this->balance($this->fake(new \RuntimeException('boom')), [$this->longkey()]);
-        $this->assertDebuggingCalled('distractor repair skipped: boom');
+        $this->assertDebuggingCalled('generate_quiz: distractor repair skipped: boom');
         $this->assertCount(1, $out);
         $this->assertCount(4, $out[0]['choices']);
     }
