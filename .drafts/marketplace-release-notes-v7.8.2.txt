@@ -1,0 +1,9 @@
+Version 7.8.2 (build 2026100802)
+
+Quiz answer keys are now balanced. Every question's correct answer moves to a random letter (before, most models almost never keyed D), and where the correct answer is noticeably the longest choice, the distractors are rewritten to match its length, so picking the longest choice no longer scores well. Explanations that name a letter follow the shuffle.
+
+Essay feedback has its own optional provider and model settings; left empty it uses the chat model, as before.
+
+The reasoning-effort setting now reaches Claude Sonnet 5.5 and Opus 5.5 (effort, and the lowest thinking setting where the model allows it). Claude thinking tokens are recorded. Prices were added for claude-haiku-5-5 and gpt-oss-120b and corrected for OpenRouter's Llama 3.1 8B, so cost estimates and automatic model upgrades handle them. Automatic model discovery now makes a one-token call before offering a model, so a model the provider lists but refuses is not proposed. The Max tokens and reasoning-effort help texts say what the limits really are.
+
+Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.
