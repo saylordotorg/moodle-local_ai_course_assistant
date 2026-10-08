@@ -162,6 +162,21 @@ final class autoupgrade_evaluation_test extends \advanced_testcase {
         $this->assertSame('cand-model', get_config('local_ai_course_assistant', 'model'));
     }
 
+    public function test_a_run_given_up_as_stale_keeps_failed(): void {
+        global $DB;
+        [$cid, $eid] = $this->queued();
+        $evaluator = new evaluator(function (string $provider, string $model) use ($eid) {
+            global $DB;
+            // Here fail_stale() marks it FAILED while it is still measuring.
+            $DB->set_field(evaluator::TABLE, 'status', evaluator::FAILED, ['id' => $eid]);
+            return new fake_eval_provider($model);
+        });
+        $eval = $evaluator->run($eid);
+        $this->assertSame(evaluator::FAILED, $eval->status);
+        $this->assertGreaterThan(0, (float) $eval->actual_cost_usd, 'What it spent is still written.');
+        $this->assertSame(0, (int) candidates::get($cid)->passes, 'No verdict from a run already given up on.');
+    }
+
     public function test_recommend_mode_emails_and_does_not_switch(): void {
         set_config('autoupgrade_mode', switcher::MODE_RECOMMEND, 'local_ai_course_assistant');
         $sink = $this->redirectEmails();

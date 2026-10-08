@@ -3322,3 +3322,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Den webstedsadministrator,
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Den webstedsadministrator, der rullede dette skift tilbage. Tom, når overvågningen gjorde det, eller hvis det ikke blev rullet tilbage.';
 
 $string['autoupgrade:block_reasoning'] = 'Ræsonneringsindsats er én indstilling for hele webstedet, og rollen {$a} kører også en tænkende model, der ikke er testet på det nye niveau. Skift manuelt, hvis det er det, du vil.';
+$string['autoupgrade:block_reasoning_course'] = 'Ræsonneringsindsats er én indstilling for hele webstedet, og et kursus bruger sin egen tænkende model ({$a}), som ikke er testet på det nye niveau. Skift manuelt, hvis det er det, du vil.';

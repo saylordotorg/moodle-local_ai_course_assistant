@@ -3367,3 +3367,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Umphathi wesayithi owenze 
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Umphathi wesayithi obuyisele lolu shintsho emuva. Akunalutho uma umqaphi nguye owakwenza, noma uma lungabuyiselwanga emuva.';
 
 $string['autoupgrade:block_reasoning'] = 'Izinga lokucabanga liyisilungiselelo esisodwa sesayithi lonke, futhi indima ye-{$a} nayo isebenzisa imodeli ecabangayo engazange ihlolwe ezingeni elisha. Shintsha ngesandla uma yilokho okufunayo.';
+$string['autoupgrade:block_reasoning_course'] = 'Umzamo wokucabanga uyisilungiselelo esisodwa sesayithi lonke, futhi esinye isifundo sisebenzisa imodeli yaso yokucabanga ({$a}) engazange ihlolwe ezingeni elisha. Shintsha ngesandla uma lokho yikho okufunayo.';

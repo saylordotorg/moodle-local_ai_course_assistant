@@ -94,16 +94,27 @@ class switcher {
         if ($cand->status !== candidates::ELIGIBLE) {
             return;
         }
-        $best = self::best_eligible((string) $cand->role);
-        if ($best === null) {
+        $ranked = self::ranked_eligible((string) $cand->role);
+        if (!$ranked) {
             return;
         }
+        $best = reset($ranked);
         $besteval = $DB->get_record(evaluator::TABLE, ['id' => (int) $best->lastevalid]);
         $spec = roles::spec((string) $best->role);
         if (self::mode() === self::MODE_AUTO && !empty($spec['auto'])) {
-            $result = self::switch_to($best, $besteval ?: null, 'auto', 0);
-            if (!$result['ok'] && $besteval) {
-                notifier::recommend($best, $besteval, $result['message']);
+            // Best first; one blocked for a reason of its own (the reasoning
+            // check on a thinking-off variant, say) doesn't hold back the next.
+            $first = null;
+            foreach ($ranked as $row) {
+                $roweval = $DB->get_record(evaluator::TABLE, ['id' => (int) $row->lastevalid]);
+                $result = self::switch_to($row, $roweval ?: null, 'auto', 0);
+                if ($result['ok']) {
+                    return;
+                }
+                $first = $first ?? $result['message'];
+            }
+            if ($besteval) {
+                notifier::recommend($best, $besteval, (string) $first);
             }
             return;
         }
@@ -126,10 +137,22 @@ class switcher {
      * @return \stdClass|null
      */
     public static function best_eligible(string $role): ?\stdClass {
+        $ranked = self::ranked_eligible($role);
+        return $ranked ? reset($ranked) : null;
+    }
+
+    /**
+     * Eligible candidates of a role, best first (quality, then cost). One whose
+     * evaluation measured a model the role no longer runs goes back to
+     * CANDIDATE with its passes reset, and isn't returned.
+     *
+     * @param string $role
+     * @return \stdClass[]
+     */
+    public static function ranked_eligible(string $role): array {
         global $DB;
         $current = roles::current($role);
-        $best = null;
-        $bestkey = null;
+        $ranked = [];
         foreach ($DB->get_records(candidates::TABLE, ['role' => $role, 'status' => candidates::ELIGIBLE]) as $row) {
             $eval = $row->lastevalid ? $DB->get_record(evaluator::TABLE, ['id' => $row->lastevalid]) : null;
             $stale = !$eval || (string) $eval->inc_model !== $current['model']
@@ -142,13 +165,12 @@ class switcher {
             $metrics = json_decode((string) $eval->metrics, true);
             $q = (float) ($metrics['candidate']['quality'] ?? 0);
             $c = (float) ($metrics['candidate']['cost_cents'] ?? INF);
-            $key = [$q, -$c];
-            if ($bestkey === null || $key > $bestkey) {
-                $best = $row;
-                $bestkey = $key;
-            }
+            $ranked[] = ['key' => [$q, -$c], 'row' => $row];
         }
-        return $best;
+        usort($ranked, function ($a, $b) {
+            return $b['key'] <=> $a['key'];
+        });
+        return array_column($ranked, 'row');
     }
 
     /**
@@ -185,22 +207,21 @@ class switcher {
         // was evaluated at the new level, so it waits for a person.
         $spec = roles::spec($role);
         if ($spec['variantkey'] !== null && array_key_exists($spec['variantkey'], $writes)) {
-            foreach (roles::all() as $other => $current) {
-                if ($other === $role || !$current['inuse'] || $current['model'] === '') {
-                    continue;
-                }
-                $profile = model_capabilities::profile($current['provider'], $current['model']);
+            foreach (roles::other_models($role) as $other) {
+                $profile = model_capabilities::profile($other['provider'], $other['model']);
                 $controlled = in_array(
                     $profile['reasoning'],
                     [model_capabilities::REASONING_OPENAI, model_capabilities::REASONING_GEMINI],
                     true
                 );
                 if (!empty($profile['thinks']) && $controlled) {
-                    return get_string(
-                        'autoupgrade:block_reasoning',
-                        'local_ai_course_assistant',
-                        get_string('autoupgrade:role_' . $other, 'local_ai_course_assistant')
-                    );
+                    return $other['kind'] === 'course'
+                        ? get_string('autoupgrade:block_reasoning_course', 'local_ai_course_assistant', $other['label'])
+                        : get_string(
+                            'autoupgrade:block_reasoning',
+                            'local_ai_course_assistant',
+                            get_string('autoupgrade:role_' . $other['label'], 'local_ai_course_assistant')
+                        );
                 }
             }
         }

@@ -3322,3 +3322,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Sivuston ylläpitäjä, jo
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Sivuston ylläpitäjä, joka perui tämän vaihdon. Tyhjä, kun seurantaprosessi perui sen tai sitä ei peruttu.';
 
 $string['autoupgrade:block_reasoning'] = 'Päättelyn määrä on yksi asetus koko sivustolle, ja roolissa {$a} toimii myös ajatteleva malli, jota ei ole testattu uudella tasolla. Vaihda käsin, jos haluat niin.';
+$string['autoupgrade:block_reasoning_course'] = 'Päättelyn määrä on yksi asetus koko sivustolle, ja yksi kurssi käyttää omaa ajattelevaa malliaan ({$a}), jota ei testattu uudella tasolla. Vaihda käsin, jos haluat niin.';

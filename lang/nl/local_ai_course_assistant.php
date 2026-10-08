@@ -3345,3 +3345,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'De sitebeheerder die deze 
 $string['privacy:metadata:model_switch:rolledbackby'] = 'De sitebeheerder die deze wissel terugdraaide. Leeg als de bewaking het deed, of als die niet is teruggedraaid.';
 
 $string['autoupgrade:block_reasoning'] = 'Redeneerinspanning is één instelling voor de hele site, en de rol {$a} gebruikt ook een denkmodel dat niet op het nieuwe niveau is getest. Schakel handmatig over als u dat wilt.';
+$string['autoupgrade:block_reasoning_course'] = 'Redeneerinspanning is één instelling voor de hele site, en een cursus gebruikt een eigen denkend model ({$a}) dat niet op het nieuwe niveau is getest. Schakel handmatig over als u dat wilt.';

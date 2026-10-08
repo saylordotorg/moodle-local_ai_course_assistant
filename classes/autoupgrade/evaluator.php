@@ -169,6 +169,14 @@ class evaluator {
         }
         $this->flush_spend();
 
+        // A run that took so long fail_stale() gave up on it keeps FAILED: its
+        // candidate may already be queued again, and a verdict now would count
+        // twice. Only what it spent is written.
+        if ($DB->get_field(self::TABLE, 'status', ['id' => $evalid]) !== self::RUNNING) {
+            $DB->set_field(self::TABLE, 'actual_cost_usd', round($this->usd, 6), ['id' => $evalid]);
+            return $DB->get_record(self::TABLE, ['id' => $evalid], '*', MUST_EXIST);
+        }
+
         $record = (object) array_merge(['id' => $evalid, 'actual_cost_usd' => round($this->usd, 6),
             'timecompleted' => time()], $result);
         foreach (['metrics', 'gate_detail'] as $json) {

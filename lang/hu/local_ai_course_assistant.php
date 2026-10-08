@@ -3362,3 +3362,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'A webhely rendszergazdája
 $string['privacy:metadata:model_switch:rolledbackby'] = 'A webhely rendszergazdája, aki visszavonta ezt a váltást. Üres, ha a figyelő vonta vissza, vagy nem vonták vissza.';
 
 $string['autoupgrade:block_reasoning'] = 'A Gondolkodási ráfordítás egyetlen beállítás az egész webhelyre, és a(z) {$a} szerepkör is egy gondolkodó modellt futtat, amelyet nem teszteltek az új szinten. Ha ezt szeretné, váltson kézzel.';
+$string['autoupgrade:block_reasoning_course'] = 'Az érvelési erőfeszítés egyetlen beállítás az egész webhelyre, és egy kurzus saját gondolkodó modellt ({$a}) használ, amelyet nem teszteltek az új szinten. Váltson kézzel, ha ezt szeretné.';

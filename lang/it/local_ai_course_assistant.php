@@ -3360,3 +3360,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'L\'amministratore del sito
 $string['privacy:metadata:model_switch:rolledbackby'] = 'L\'amministratore del sito che ha ripristinato questo cambio. Vuoto quando lo ha fatto il monitoraggio o se non è stato ripristinato.';
 
 $string['autoupgrade:block_reasoning'] = 'L\'intensità del ragionamento è un\'unica impostazione per tutto il sito, e il ruolo {$a} usa anche un modello di ragionamento che non è stato testato al nuovo livello. Cambia manualmente se è ciò che desideri.';
+$string['autoupgrade:block_reasoning_course'] = 'Lo sforzo di ragionamento è un\'unica impostazione per tutto il sito, e un corso usa un proprio modello che ragiona ({$a}) non testato al nuovo livello. Cambia a mano se è ciò che vuoi.';

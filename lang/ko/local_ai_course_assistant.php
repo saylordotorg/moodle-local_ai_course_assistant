@@ -3320,3 +3320,4 @@ $string['privacy:metadata:model_switch:createdby'] = '이 전환을 수행한 �
 $string['privacy:metadata:model_switch:rolledbackby'] = '이 전환을 롤백한 사이트 관리자입니다. 모니터링 기능이 롤백했거나 롤백되지 않은 경우 비어 있습니다.';
 
 $string['autoupgrade:block_reasoning'] = '추론 강도는 사이트 전체에 적용되는 하나의 설정이며, {$a} 역할도 새 수준에서 테스트되지 않은 사고 모델을 사용합니다. 원하시면 직접 전환하세요.';
+$string['autoupgrade:block_reasoning_course'] = '추론 강도는 사이트 전체에 적용되는 하나의 설정이며, 한 강좌가 새 수준에서 테스트되지 않은 자체 사고 모델({$a})을 사용합니다. 원하시면 직접 전환하세요.';

@@ -3323,3 +3323,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'L’administrateur du site
 $string['privacy:metadata:model_switch:rolledbackby'] = 'L’administrateur du site qui a annulé cette bascule. Vide si c’est le surveillant qui l’a fait, ou si elle n’a pas été annulée.';
 
 $string['autoupgrade:block_reasoning'] = 'L\'effort de raisonnement est un seul réglage pour tout le site, et le rôle {$a} utilise aussi un modèle de réflexion qui n\'a pas été testé au nouveau niveau. Changez-le manuellement si c\'est ce que vous voulez.';
+$string['autoupgrade:block_reasoning_course'] = 'L\'effort de raisonnement est un seul réglage pour tout le site, et un cours utilise son propre modèle à réflexion ({$a}) qui n\'a pas été testé au nouveau niveau. Changez-le à la main si c\'est ce que vous voulez.';

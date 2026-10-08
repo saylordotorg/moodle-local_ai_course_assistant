@@ -3323,3 +3323,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Bu geçişi yapan site yö
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Bu geçişi geri alan site yöneticisi. İzleyici geri aldıysa veya geri alınmadıysa boştur.';
 
 $string['autoupgrade:block_reasoning'] = 'Akıl yürütme düzeyi tüm site için tek bir ayardır ve {$a} rolü de yeni düzeyde test edilmemiş bir düşünen model çalıştırır. İstediğiniz buysa elle değiştirin.';
+$string['autoupgrade:block_reasoning_course'] = 'Akıl yürütme çabası tüm site için tek bir ayardır ve bir ders yeni düzeyde test edilmemiş kendi düşünen modelini ({$a}) kullanıyor. İstediğiniz buysa elle değiştirin.';

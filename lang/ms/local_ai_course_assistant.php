@@ -3365,3 +3365,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Pentadbir laman yang membu
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Pentadbir laman yang mengembalikan pertukaran ini. Kosong apabila pemantau yang melakukannya, atau ia tidak dikembalikan.';
 
 $string['autoupgrade:block_reasoning'] = 'Usaha penaakulan ialah satu tetapan untuk seluruh tapak, dan peranan {$a} juga menjalankan model pemikiran yang belum diuji pada tahap baharu. Tukar secara manual jika itu yang anda mahukan.';
+$string['autoupgrade:block_reasoning_course'] = 'Usaha penaakulan ialah satu tetapan untuk seluruh laman, dan satu kursus menggunakan model berfikirnya sendiri ({$a}) yang belum diuji pada tahap baharu. Tukar secara manual jika itu yang anda mahukan.';

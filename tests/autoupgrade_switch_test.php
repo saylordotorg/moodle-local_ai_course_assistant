@@ -133,6 +133,40 @@ final class autoupgrade_switch_test extends \advanced_testcase {
         $this->assertTrue(switcher::switch_to($cand, $eval, 'auto', 0)['ok']);
     }
 
+    public function test_a_reasoning_switch_checks_every_failover_member_and_course_model(): void {
+        global $DB;
+        [$cand, $eval] = $this->passed(roles::CHAT, 'gemini', 'gemini-2.5-flash', roles::VARIANT_THINKING_OFF);
+        // A thinking model second in the failover chain.
+        $rows = "openai|sk-test|gpt-4o-mini|0.4\ngemini|gk-test|gemini-2.5-pro|0.4";
+        set_config('comparison_providers', $rows, 'local_ai_course_assistant');
+        set_config('spend_failover_chain', "chat:openai\nchat:gemini", 'local_ai_course_assistant');
+        $this->assertFalse(switcher::switch_to($cand, $eval, 'auto', 0)['ok'], 'The second member thinks.');
+        set_config('spend_failover_chain', 'chat:openai', 'local_ai_course_assistant');
+        // A course with its own thinking model.
+        $course = $this->getDataGenerator()->create_course();
+        $DB->insert_record('local_ai_course_assistant_course_cfg', (object) ['courseid' => $course->id, 'enabled' => 1,
+            'provider' => 'openai', 'model' => 'o4-mini', 'timecreated' => time(), 'timemodified' => time()]);
+        $out = switcher::switch_to($cand, $eval, 'auto', 0);
+        $this->assertFalse($out['ok']);
+        $this->assertStringContainsString('o4-mini', $out['message']);
+        $DB->set_field('local_ai_course_assistant_course_cfg', 'enabled', 0, ['courseid' => $course->id]);
+        $this->assertTrue(switcher::switch_to($cand, $eval, 'auto', 0)['ok']);
+    }
+
+    public function test_a_blocked_best_candidate_does_not_hold_back_the_next(): void {
+        set_config('quiz_provider', 'openai', 'local_ai_course_assistant');
+        set_config('quiz_model', 'gpt-5-mini', 'local_ai_course_assistant');
+        // The thinking-off variant ranks first but is blocked by the quiz role.
+        [$variant, $veval] = $this->passed(roles::CHAT, 'gemini', 'gemini-2.5-flash', roles::VARIANT_THINKING_OFF);
+        global $DB;
+        $better = json_encode(['candidate' => ['quality' => 14.9, 'cost_cents' => 0.1]]);
+        $DB->set_field(evaluator::TABLE, 'metrics', $better, ['id' => $veval->id]);
+        [$plain, $peval] = $this->passed();
+        switcher::after_evaluation($plain, $peval);
+        $this->assertSame('gemini-3.5-flash-lite', get_config('local_ai_course_assistant', 'model'));
+        $this->assertSame(candidates::ELIGIBLE, candidates::get($variant->id)->status);
+    }
+
     public function test_the_premium_tier_changes_its_model_and_never_its_triggers(): void {
         set_config('premium_escalation_enabled', 1, 'local_ai_course_assistant');
         set_config('premium_escalation_provider', 'claude', 'local_ai_course_assistant');
@@ -223,12 +257,27 @@ final class autoupgrade_switch_test extends \advanced_testcase {
         // Every call to the new model fails and the fallback answers: no answer
         // row names the new model, only the chain's audit rows do.
         for ($i = 0; $i < 40; $i++) {
-            $DB->insert_record('local_ai_course_assistant_audit', (object) ['action' => 'failover_fallthrough',
+            $DB->insert_record('local_ai_course_assistant_audit', (object) ['action' => 'failover_rescued',
                 'userid' => 0, 'courseid' => 0, 'ipaddress' => '', 'useragent' => '',
-                'details' => json_encode(['failed_label' => 'gemini-primary', 'failed_model' => 'gemini-3.5-flash-lite',
-                    'reason' => 'HTTP 404']), 'timecreated' => $now + 10 + $i]);
+                'details' => json_encode(['failed_model' => 'gemini-3.5-flash-lite', 'primary' => 'gemini-primary',
+                    'answered_label' => 'openai']), 'timecreated' => $now + 10 + $i]);
         }
         $this->assertSame('rolledback', watcher::check_one($DB->get_record(switcher::TABLE, ['id' => $id]), $now + 3600));
+    }
+
+    public function test_a_turn_the_whole_chain_failed_counts_once(): void {
+        global $DB;
+        $now = time();
+        // The failed-turn row names the primary, and the chain also audited the
+        // primary's fall-through: still one turn, one error.
+        $this->traffic('gemini-3.5-flash-lite', 1, 1, $now);
+        $DB->insert_record('local_ai_course_assistant_audit', (object) ['action' => 'failover_fallthrough',
+            'userid' => 0, 'courseid' => 0, 'ipaddress' => '', 'useragent' => '',
+            'details' => json_encode(['failed_label' => 'gemini-primary', 'failed_model' => 'gemini-3.5-flash-lite',
+                'reason' => 'HTTP 404']), 'timecreated' => $now]);
+        $m = watcher::metrics('gemini', 'gemini-3.5-flash-lite', $now - 10, $now + 10);
+        $this->assertSame(1, $m['turns']);
+        $this->assertSame(1, $m['error']);
     }
 
     public function test_the_watcher_keeps_a_healthy_switch_after_48_hours(): void {

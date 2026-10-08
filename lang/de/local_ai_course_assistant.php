@@ -3322,3 +3322,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Die Website-Administration
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Die Website-Administration, die diesen Wechsel zurückgesetzt hat. Leer, wenn die Überwachung dies tat oder er nicht zurückgesetzt wurde.';
 
 $string['autoupgrade:block_reasoning'] = 'Denkaufwand ist eine Einstellung für die gesamte Website, und die Rolle {$a} nutzt ebenfalls ein Denkmodell, das auf der neuen Stufe nicht getestet wurde. Wechseln Sie manuell, wenn Sie das möchten.';
+$string['autoupgrade:block_reasoning_course'] = 'Der Denkaufwand ist eine Einstellung für die ganze Website, und ein Kurs nutzt ein eigenes denkendes Modell ({$a}), das auf der neuen Stufe nicht getestet wurde. Wechseln Sie manuell, wenn Sie das möchten.';

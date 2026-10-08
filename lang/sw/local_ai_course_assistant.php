@@ -3366,3 +3366,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Msimamizi wa tovuti aliyef
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Msimamizi wa tovuti aliyerudisha nyuma mabadiliko haya. Tupu ikiwa mfuatiliaji ndiye aliyeyarudisha au hayakurudishwa.';
 
 $string['autoupgrade:block_reasoning'] = 'Kiwango cha kufikiri ni mpangilio mmoja kwa tovuti nzima, na jukumu la {$a} pia linaendesha modeli ya kufikiri ambayo haijajaribiwa katika kiwango kipya. Badilisha mwenyewe ikiwa hilo ndilo unalotaka.';
+$string['autoupgrade:block_reasoning_course'] = 'Juhudi za kufikiri ni mpangilio mmoja kwa tovuti nzima, na kozi moja inatumia modeli yake ya kufikiri ({$a}) ambayo haijajaribiwa katika kiwango kipya. Badilisha kwa mkono ikiwa ndivyo unavyotaka.';

@@ -3351,3 +3351,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Siti ɲɛmɔgɔ min ye nin
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Siti ɲɛmɔgɔ min ye nin yɛlɛma kɔsegin. A lankolon don ni lajɛbaga de y\'a kɛ, walima ni a ma kɔsegin.';
 
 $string['autoupgrade:block_reasoning'] = 'Miiriya cɛsiri ye labɛn kelen ye siti bɛɛ ye, ani {$a} jɔyɔrɔ fana bɛ miiri modɛli dɔ baara, o ma kɔrɔbɔ dakun kura la. A falen i yɛrɛ ma ni o ye i sago ye.';
+$string['autoupgrade:block_reasoning_course'] = 'Hakilijakabɔ sabali ye labɛn kelen ye siti bɛɛ kama, kalan dɔ bɛ a yɛrɛ ka miiri modɛli ({$a}) baara min ma kɔrɔbɔ dakun kura la. A falen i yɛrɛ bolo ni o ye i sago ye.';

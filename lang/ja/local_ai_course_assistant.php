@@ -3320,3 +3320,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'この切り替えを行�
 $string['privacy:metadata:model_switch:rolledbackby'] = 'この切り替えをロールバックしたサイト管理者。監視機能がロールバックした場合、またはロールバックされていない場合は空です。';
 
 $string['autoupgrade:block_reasoning'] = '推論の強度はサイト全体で1つの設定です。また、{$a} ロールも新しいレベルでテストされていない思考モデルを使用しています。それが望ましい場合は手動で切り替えてください。';
+$string['autoupgrade:block_reasoning_course'] = '推論の強さはサイト全体で1つの設定です。あるコースは新しいレベルでテストされていない独自の思考モデル（{$a}）を使っています。それでよければ手動で切り替えてください。';

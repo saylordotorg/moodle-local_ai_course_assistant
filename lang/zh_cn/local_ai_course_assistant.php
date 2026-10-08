@@ -3358,3 +3358,4 @@ $string['privacy:metadata:model_switch:createdby'] = '执行此切换的站点�
 $string['privacy:metadata:model_switch:rolledbackby'] = '回滚此切换的站点管理员。由监控程序回滚或未回滚时为空。';
 
 $string['autoupgrade:block_reasoning'] = '推理强度是整个站点共用的一个设置，而 {$a} 角色也在运行一个未在新级别下测试过的思考模型。如果您确实想这样做，请手动切换。';
+$string['autoupgrade:block_reasoning_course'] = '推理强度是整个站点共用的一个设置，而某门课程使用了自己的思考模型（{$a}），该模型未在新级别下测试过。如果您确实需要，请手动切换。';

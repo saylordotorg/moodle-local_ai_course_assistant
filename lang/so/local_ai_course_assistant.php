@@ -3366,3 +3366,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Maamulaha goobta ee sameey
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Maamulaha goobta ee dib u celiyay beddelkan. Waa madhan marka ilaaliyuhu dib u celiyay ama aan dib loo celin.';
 
 $string['autoupgrade:block_reasoning'] = 'Dadaalka fekerka waa hal dejin oo loogu talagalay goobta oo dhan, doorka {$a} sidoo kale wuxuu socodsiiyaa nooc fekera oo aan lagu tijaabin heerka cusub. Gacanta ku beddel haddii taas tahay waxa aad rabto.';
+$string['autoupgrade:block_reasoning_course'] = 'Dadaalka sababaynta waa hal dejin oo loogu talagalay goobta oo dhan, koorsona waxay isticmaashaa moodal fikireed u gaar ah ({$a}) oo aan lagu tijaabin heerka cusub. Gacanta ku beddel haddii taas tahay waxa aad rabto.';

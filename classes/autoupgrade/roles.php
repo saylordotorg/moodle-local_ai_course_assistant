@@ -191,6 +191,50 @@ class roles {
     }
 
     /**
+     * Every other model the site runs that a site-wide setting would reach:
+     * the other roles in use, every member of the chat failover chain, and
+     * each enabled course's own model.
+     *
+     * @param string $except The role being switched.
+     * @return array<int, array{kind: string, label: string, provider: string, model: string}>
+     *         kind is 'role' (label is a role) or 'course' (label is a model).
+     */
+    public static function other_models(string $except): array {
+        global $DB;
+        $out = [];
+        foreach (self::all() as $role => $current) {
+            if ($role === $except || $role === self::FAILOVER || !$current['inuse'] || $current['model'] === '') {
+                continue;
+            }
+            $out[] = ['kind' => 'role', 'label' => $role, 'provider' => $current['provider'], 'model' => $current['model']];
+        }
+        if ($except !== self::FAILOVER) {
+            foreach (spend_guard::resolve_failover_chain('chat') as $member) {
+                if (!empty($member['model'])) {
+                    $out[] = ['kind' => 'role', 'label' => self::FAILOVER,
+                        'provider' => strtolower((string) $member['provider']), 'model' => (string) $member['model']];
+                }
+            }
+        }
+        $rows = $DB->get_records_select(
+            'local_ai_course_assistant_course_cfg',
+            "enabled = 1 AND model IS NOT NULL AND model <> ''",
+            null,
+            '',
+            'id, provider, model'
+        );
+        foreach ($rows as $row) {
+            $provider = strtolower(trim((string) $row->provider));
+            if ($provider === '' || $provider === 'auto') {
+                $provider = self::infer_provider((string) $row->model);
+            }
+            $out[] = ['kind' => 'course', 'label' => (string) $row->model, 'provider' => $provider,
+                'model' => (string) $row->model];
+        }
+        return $out;
+    }
+
+    /**
      * Every role, current state.
      *
      * @return array<string, array>

@@ -3322,3 +3322,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Administratorul site-ului 
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Administratorul site-ului care a anulat această schimbare. Gol când a anulat-o monitorul sau nu a fost anulată.';
 
 $string['autoupgrade:block_reasoning'] = 'Efortul de raționament este o singură setare pentru întregul site, iar rolul {$a} folosește și un model de gândire care nu a fost testat la noul nivel. Comutați manual dacă asta doriți.';
+$string['autoupgrade:block_reasoning_course'] = 'Efortul de raționament este o singură setare pentru tot site-ul, iar un curs folosește propriul model care gândește ({$a}), netestat la noul nivel. Comutați manual dacă asta doriți.';

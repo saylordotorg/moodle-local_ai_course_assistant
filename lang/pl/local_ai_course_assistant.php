@@ -3322,3 +3322,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Administrator witryny, kt�
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Administrator witryny, który cofnął to przełączenie. Puste, gdy zrobił to mechanizm obserwacji lub przełączenia nie cofnięto.';
 
 $string['autoupgrade:block_reasoning'] = 'Intensywność rozumowania to jedno ustawienie dla całej witryny, a rola {$a} również korzysta z modelu myślącego, który nie był testowany na nowym poziomie. Przełącz ręcznie, jeśli tego chcesz.';
+$string['autoupgrade:block_reasoning_course'] = 'Wysiłek rozumowania to jedno ustawienie dla całej witryny, a jeden kurs używa własnego modelu myślącego ({$a}), którego nie przetestowano na nowym poziomie. Przełącz ręcznie, jeśli tego chcesz.';

@@ -3320,3 +3320,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Nettstedsadministratoren s
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Nettstedsadministratoren som rullet tilbake dette byttet. Tom når overvåkingen gjorde det, eller det ikke ble rullet tilbake.';
 
 $string['autoupgrade:block_reasoning'] = 'Resonneringsinnsats er én innstilling for hele nettstedet, og rollen {$a} kjører også en tenkende modell som ikke er testet på det nye nivået. Bytt manuelt hvis det er det du vil.';
+$string['autoupgrade:block_reasoning_course'] = 'Resonneringsinnsats er én innstilling for hele nettstedet, og et kurs bruker sin egen tenkende modell ({$a}) som ikke er testet på det nye nivået. Bytt manuelt hvis det er det du vil.';

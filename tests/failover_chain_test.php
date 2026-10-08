@@ -76,6 +76,66 @@ final class failover_chain_test extends \advanced_testcase {
     }
 
     /**
+     * v7.8.0: a turn a fallback answered after the primary failed writes one
+     * rescued row naming the primary's model; a turn the whole chain failed
+     * writes none (the failed-turn row already counts it).
+     */
+    public function test_a_rescued_turn_is_audited_once_and_a_lost_one_not_at_all(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $named = function (provider_interface $inner, string $model) {
+            return new class ($inner, $model) implements provider_interface {
+                public function __construct(private provider_interface $inner, private string $model) {
+                }
+                public function model_id(): string {
+                    return $this->model;
+                }
+                public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
+                    return $this->inner->chat_completion($systemprompt, $messages, $options);
+                }
+                public function chat_completion_stream(string $s, array $m, callable $cb, array $options = []): void {
+                    $this->inner->chat_completion_stream($s, $m, $cb, $options);
+                }
+                public function get_last_token_usage(): ?array {
+                    return null;
+                }
+                public function get_last_finish_reason(): ?string {
+                    return null;
+                }
+            };
+        };
+        $chain = new failover_chain($named(self::failing_provider('404'), 'new-model'), 'rescue-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'rescue-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        $chain->chat_completion_stream('sys', [['role' => 'user', 'content' => 'hi']], function () {
+        });
+        $rows = $DB->get_records('local_ai_course_assistant_audit', ['action' => failover_chain::AUDIT_EVENT_RESCUED]);
+        $this->assertCount(1, $rows);
+        $this->assertSame('new-model', json_decode(reset($rows)->details, true)['failed_model']);
+
+        $lost = new failover_chain($named(self::failing_provider('404'), 'new-model'), 'lost-primary', [
+            ['provider' => self::failing_provider('also down'), 'label' => 'lost-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        try {
+            $lost->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+        } catch (\moodle_exception $e) {
+            unset($e);
+        }
+        $rescued = ['action' => failover_chain::AUDIT_EVENT_RESCUED];
+        $this->assertSame(1, $DB->count_records('local_ai_course_assistant_audit', $rescued));
+
+        $fine = new failover_chain($named(self::fake_provider('PRIMARY-OUT', false), 'new-model'), 'fine-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'fine-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        $this->assertSame('PRIMARY-OUT', $fine->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]));
+        $this->assertSame(
+            1,
+            $DB->count_records('local_ai_course_assistant_audit', $rescued),
+            'A turn the primary answered is not a rescue.'
+        );
+    }
+
+    /**
      * All entries fail: the FIRST exception propagates, with a trail naming
      * every attempt.
      *

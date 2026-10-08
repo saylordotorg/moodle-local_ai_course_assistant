@@ -3342,3 +3342,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Quản trị viên trang �
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Quản trị viên trang đã hoàn tác lần chuyển đổi này. Để trống khi bộ giám sát hoàn tác, hoặc khi nó không bị hoàn tác.';
 
 $string['autoupgrade:block_reasoning'] = 'Mức độ suy luận là một cài đặt chung cho toàn bộ trang, và vai trò {$a} cũng chạy một mô hình tư duy chưa được kiểm thử ở mức mới. Hãy chuyển thủ công nếu đó là điều bạn muốn.';
+$string['autoupgrade:block_reasoning_course'] = 'Mức độ suy luận là một thiết lập chung cho toàn bộ trang, và một khóa học dùng mô hình suy nghĩ riêng ({$a}) chưa được kiểm tra ở mức mới. Hãy chuyển thủ công nếu đó là điều bạn muốn.';

@@ -3343,3 +3343,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Alábòójútó ojú òpó
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Alábòójútó ojú òpó tí ó dá ìyípadà yìí padà. Ó ṣófo nígbà tí olùṣọ́ ló ṣe é, tàbí tí a kò dá a padà.';
 
 $string['autoupgrade:block_reasoning'] = 'Ìpele ìrònú jẹ́ ètò kan ṣoṣo fún gbogbo ojú òpó, ipa {$a} náà sì ń lo àwòṣe ìrònú tí a kò tíì dánwò ní ìpele tuntun náà. Yí i padà fúnra rẹ bí ìyẹn bá jẹ́ ohun tí o fẹ́.';
+$string['autoupgrade:block_reasoning_course'] = 'Ìsapá ìrònú jẹ́ ètò kan fún gbogbo ojú-òpó náà, ẹ̀kọ́ kan sì ń lo àwòṣe ìrònú tirẹ̀ ({$a}) tí a kò dán wò ní ìpele tuntun. Yí i padà fúnra rẹ bí ìyẹn bá ni ohun tí o fẹ́.';

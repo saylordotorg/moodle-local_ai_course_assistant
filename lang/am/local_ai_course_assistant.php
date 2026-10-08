@@ -3349,3 +3349,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'ይህን ለውጥ ያደ
 $string['privacy:metadata:model_switch:rolledbackby'] = 'ይህን ለውጥ ወደ ቀድሞው የመለሰው የጣቢያ አስተዳዳሪ። ተከታታዩ ሲመልሰው ወይም ካልተመለሰ ባዶ ነው።';
 
 $string['autoupgrade:block_reasoning'] = 'የምክንያት ጥረት ለመላው ጣቢያ አንድ ቅንብር ነው፤ የ{$a} ሚናም በአዲሱ ደረጃ ያልተፈተነ የማሰብ ሞዴል ያሄዳል። ይህን ከፈለጉ በእጅ ይቀይሩ።';
+$string['autoupgrade:block_reasoning_course'] = 'የአስተሳሰብ ጥረት ለመላው ጣቢያ አንድ ቅንብር ነው፣ እና አንድ ኮርስ በአዲሱ ደረጃ ያልተፈተነ የራሱን አስተሳሰብ ሞዴል ({$a}) ይጠቀማል። ይህን ከፈለጉ በእጅ ይቀይሩ።';

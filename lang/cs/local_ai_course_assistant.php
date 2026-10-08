@@ -3323,3 +3323,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Správce webu, který toto
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Správce webu, který toto přepnutí vrátil zpět. Prázdné, pokud to udělal hlídač nebo pokud vráceno nebylo.';
 
 $string['autoupgrade:block_reasoning'] = 'Úsilí uvažování je jedno nastavení pro celý web a role {$a} také používá přemýšlející model, který nebyl na nové úrovni otestován. Pokud to chcete, přepněte ručně.';
+$string['autoupgrade:block_reasoning_course'] = 'Úsilí o uvažování je jedno nastavení pro celý web a jeden kurz používá vlastní přemýšlející model ({$a}), který nebyl na nové úrovni otestován. Pokud to chcete, přepněte ručně.';

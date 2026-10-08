@@ -3337,3 +3337,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Onye nchịkwa saịtị m
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Onye nchịkwa saịtị laghachiri mgbanwe a azụ. Efu mgbe onye nlele mere ya, ma ọ bụ mgbe alaghachighị ya azụ.';
 
 $string['autoupgrade:block_reasoning'] = 'Mgbalị echiche bụ otu ntọala maka saịtị niile, ọrụ {$a} na-ejikwa ụdị nwere echiche nke a na-anwalebeghị n\'ọkwa ọhụrụ ahụ. Gbanwee ya n\'aka ma ọ bụrụ na ọ bụ ihe ị chọrọ.';
+$string['autoupgrade:block_reasoning_course'] = 'Mgbalị ntụgharị uche bụ otu ntọala maka saịtị niile, otu nkuzi na-eji ụdị echiche nke ya ({$a}) a na-anwalebeghị n\'ọkwa ọhụrụ. Gbanwee ya n\'aka ma ọ bụrụ na nke ahụ ka ịchọrọ.';

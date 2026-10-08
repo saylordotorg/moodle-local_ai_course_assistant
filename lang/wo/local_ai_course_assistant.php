@@ -3343,3 +3343,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Administrateur site bi def
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Administrateur site bi dellu soppi bii ginnaaw. Dafay nekk neen su ki koy topp moo ko def, walla su ñu ko delluwul ginnaaw.';
 
 $string['autoupgrade:block_reasoning'] = 'Dayob xalaat ab tànneef rekk la ngir site bi yépp, te liggéey {$a} itam dafay jëfandikoo ab modèle bu xalaat bu ñu nattuwul ci tolluwaay bu bees bi. Soppi ko ak sa loxo su loolu nga bëgg.';
+$string['autoupgrade:block_reasoning_course'] = 'Jéemu xalaat benn tànneef la ci site bi yépp, te am njàng mu ngi jëfandikoo modeel xalaatam bopp ({$a}) bu ñu natteegul ci tolluwaay bu bees bi. Soppil ko ak sa loxo bu loolu nga bëgg.';

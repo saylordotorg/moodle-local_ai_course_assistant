@@ -3342,3 +3342,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'O administrador do site qu
 $string['privacy:metadata:model_switch:rolledbackby'] = 'O administrador do site que reverteu esta troca. Vazio quando o monitor reverteu ou ela não foi revertida.';
 
 $string['autoupgrade:block_reasoning'] = 'O esforço de raciocínio é uma única configuração para todo o site, e a função {$a} também usa um modelo de raciocínio que não foi testado no novo nível. Troque manualmente se for isso que você quer.';
+$string['autoupgrade:block_reasoning_course'] = 'O esforço de raciocínio é uma configuração única para todo o site, e um curso usa seu próprio modelo de raciocínio ({$a}) que não foi testado no novo nível. Troque manualmente se for isso que você quer.';

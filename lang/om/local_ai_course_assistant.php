@@ -3354,3 +3354,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Bulchaa saayitii jijjiiram
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Bulchaa saayitii jijjiirama kana deebise. Yoo hordofaan deebise, ykn hin deebifamne duwwaa dha.';
 
 $string['autoupgrade:block_reasoning'] = 'Carraaqqiin yaadaa qindaa\'ina tokko marsariitii guutuuf ta\'e dha, akkasumas gaheen {$a} moodeela yaadu sadarkaa haaraa irratti hin qoratamne hojjechiisa. Kana yoo barbaadde harkaan jijjiiri.';
+$string['autoupgrade:block_reasoning_course'] = 'Carraaqqiin yaadaa qindaa\'ina tokko marsariitii guutuuf, koorsiin tokko moodeela yaadaa ofii isaa ({$a}) sadarkaa haaraatti hin qoramne fayyadama. Yoo kana barbaaddan harkaan jijjiiraa.';

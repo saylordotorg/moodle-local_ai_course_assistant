@@ -147,12 +147,13 @@ class watcher {
         $rs->close();
         // A turn the failover chain rescued is a failure of this model even
         // though the learner was answered: the answer row names the fallback.
-        // The chain audits every member that failed, with its model.
+        // The chain writes one row per rescued turn, naming the primary that
+        // failed; a turn the whole chain failed is a failed-turn row instead.
         $rescued = (int) $DB->count_records_select(
             'local_ai_course_assistant_audit',
             'action = :action AND timecreated >= :from AND timecreated < :to AND '
                 . $DB->sql_like('details', ':needle', false),
-            ['action' => \local_ai_course_assistant\provider\failover_chain::AUDIT_EVENT_FALLTHROUGH, 'from' => $from,
+            ['action' => \local_ai_course_assistant\provider\failover_chain::AUDIT_EVENT_RESCUED, 'from' => $from,
             'to' => $to,
             'needle' => '%' . $DB->sql_like_escape('"failed_model":' . json_encode($model)) . '%']
         );

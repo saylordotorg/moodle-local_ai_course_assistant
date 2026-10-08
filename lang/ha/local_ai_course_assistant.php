@@ -3349,3 +3349,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Mai gudanar da shafin da y
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Mai gudanar da shafin da ya mayar da wannan sauyin. Babu komai idan mai sa ido ne ya mayar, ko ba a mayar da shi ba.';
 
 $string['autoupgrade:block_reasoning'] = 'Ƙoƙarin tunani saiti ɗaya ne ga dukkan shafin, kuma rawar {$a} ma tana gudanar da samfurin tunani da ba a gwada shi a sabon mataki ba. Canza da hannu idan abin da kake so ke nan.';
+$string['autoupgrade:block_reasoning_course'] = 'Ƙoƙarin tunani saiti ɗaya ne ga dukkan shafin, kuma wani kwas yana amfani da nasa samfurin tunani ({$a}) wanda ba a gwada shi a sabon mataki ba. Canja da hannu idan abin da kake so ke nan.';

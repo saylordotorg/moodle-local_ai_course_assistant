@@ -3322,3 +3322,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Administrátor stránky, k
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Administrátor stránky, ktorý toto prepnutie vrátil. Prázdne, ak ho vrátil sledovací proces alebo sa nevracalo.';
 
 $string['autoupgrade:block_reasoning'] = 'Intenzita uvažovania je jedno nastavenie pre celú lokalitu a rola {$a} tiež používa premýšľajúci model, ktorý nebol na novej úrovni otestovaný. Ak to chcete, prepnite ručne.';
+$string['autoupgrade:block_reasoning_course'] = 'Úsilie pri uvažovaní je jedno nastavenie pre celú lokalitu a jeden kurz používa vlastný premýšľajúci model ({$a}), ktorý nebol na novej úrovni otestovaný. Ak to chcete, prepnite ručne.';

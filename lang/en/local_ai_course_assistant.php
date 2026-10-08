@@ -3551,6 +3551,7 @@ $string['autoupgrade:block_emergency'] = 'An emergency control is engaged, so no
 $string['autoupgrade:block_allowlist'] = 'The setting {$a} is not one a switch may change without a person, so this role is switched by hand.';
 $string['autoupgrade:block_bundle'] = 'The setting {$a} is managed by the signed policy bundle. Change the model in the bundle instead.';
 $string['autoupgrade:block_reasoning'] = 'Reasoning effort is one setting for the whole site, and the {$a} role also runs a thinking model that was not tested at the new level. Switch by hand if that is what you want.';
+$string['autoupgrade:block_reasoning_course'] = 'Reasoning effort is one setting for the whole site, and a course uses its own thinking model ({$a}) that wasn\'t tested at the new level. Switch by hand if that\'s what you want.';
 $string['autoupgrade:block_watching'] = 'A switch of this role is still being watched. Wait until it is kept or rolled back.';
 $string['autoupgrade:block_noeval'] = 'This candidate has no completed evaluation.';
 $string['autoupgrade:block_gate'] = 'This candidate\'s last evaluation did not pass the gate.';

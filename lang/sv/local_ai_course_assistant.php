@@ -3321,3 +3321,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'Webbplatsadministratören 
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Webbplatsadministratören som återställde det här bytet. Tom när övervakaren gjorde det eller när det inte återställdes.';
 
 $string['autoupgrade:block_reasoning'] = 'Resonemangsnivå är en enda inställning för hela webbplatsen, och rollen {$a} kör också en tänkande modell som inte har testats på den nya nivån. Byt manuellt om det är det du vill.';
+$string['autoupgrade:block_reasoning_course'] = 'Resonemangsinsats är en enda inställning för hela webbplatsen, och en kurs använder en egen tänkande modell ({$a}) som inte testats på den nya nivån. Byt manuellt om det är vad du vill.';

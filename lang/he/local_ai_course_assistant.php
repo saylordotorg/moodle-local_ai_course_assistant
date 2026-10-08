@@ -3361,3 +3361,4 @@ $string['privacy:metadata:model_switch:createdby'] = 'מנהל האתר שביצ
 $string['privacy:metadata:model_switch:rolledbackby'] = 'מנהל האתר שביטל את ההחלפה הזו. ריק כשהמנגנון המנטר ביטל אותה, או כשהיא לא בוטלה.';
 
 $string['autoupgrade:block_reasoning'] = 'מאמץ חשיבה הוא הגדרה אחת לכל האתר, והתפקיד {$a} מפעיל גם מודל חשיבה שלא נבדק ברמה החדשה. החליפו ידנית אם זה מה שאתם רוצים.';
+$string['autoupgrade:block_reasoning_course'] = 'מאמץ החשיבה הוא הגדרה אחת לכל האתר, וקורס אחד משתמש במודל חושב משלו ({$a}) שלא נבדק ברמה החדשה. החליפו ידנית אם זה מה שאתם רוצים.';
