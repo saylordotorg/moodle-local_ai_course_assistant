@@ -1235,8 +1235,9 @@ abstract class base_provider implements provider_interface {
      *
      * An explicit provider choice never reaches here. Rules:
      *  - A configured SOLA chat API key means the admin wants a direct
-     *    provider, so 'auto' resolves to the historical default (openai) with
-     *    that key.
+     *    provider, so 'auto' resolves to the provider that makes the configured
+     *    model (claude-*, gemini-*, gpt-*) with that key, and to the historical
+     *    default (openai) when the model name says nothing.
      *  - Otherwise, if Moodle core_ai is available AND has a configured
      *    provider, resolve to 'coreai' (zero-config on centrally-managed sites).
      *  - Otherwise fall back to openai, which surfaces the usual
@@ -1250,7 +1251,20 @@ abstract class base_provider implements provider_interface {
             ? $overrides['apikey']
             : (\local_ai_course_assistant\secrets::get('apikey') ?: '');
         if (!empty($apikey)) {
-            return 'openai';
+            // v7.8.1: the key belongs to whoever makes the configured model. A
+            // Gemini key with gemini-2.5-flash used to resolve to openai, get a
+            // 401, and be answered by the failover without a word -- a site
+            // ran on its backup model for a day. The auto-upgrade code already
+            // reads the provider off the model name; this makes chat agree.
+            $model = trim((string) ($overrides['model'] ?? ''));
+            if ($model === '') {
+                $model = trim((string) get_config('local_ai_course_assistant', 'model'));
+            }
+            // A gateway (LiteLLM, a proxy, vLLM) speaks the OpenAI wire format
+            // whatever model name it serves, so a custom base URL keeps openai.
+            $gateway = trim((string) ($overrides['apibaseurl'] ?? '')) !== '';
+            $inferred = ($model === '' || $gateway) ? '' : \local_ai_course_assistant\autoupgrade\roles::infer_provider($model);
+            return $inferred !== '' ? $inferred : 'openai';
         }
         if (coreai_provider::is_available()) {
             return 'coreai';

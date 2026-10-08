@@ -3363,3 +3363,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'A webhely rendszergazd�
 
 $string['autoupgrade:block_reasoning'] = 'A Gondolkodási ráfordítás egyetlen beállítás az egész webhelyre, és a(z) {$a} szerepkör is egy gondolkodó modellt futtat, amelyet nem teszteltek az új szinten. Ha ezt szeretné, váltson kézzel.';
 $string['autoupgrade:block_reasoning_course'] = 'Az érvelési erőfeszítés egyetlen beállítás az egész webhelyre, és egy kurzus saját gondolkodó modellt ({$a}) használ, amelyet nem teszteltek az új szinten. Váltson kézzel, ha ezt szeretné.';
+
+$string['savereport:summary'] = 'Ennél a mentésnél {$a} AI Course Assistant beállítás módosult:';
+$string['savereport:many'] = '<p>Egyetlen mentés során {$a} beállítás módosult. Az összes beállítást tartalmazó oldal az összes mezőjét egyszerre menti, ezért ebben a listában ellenőrizze, hogy nem módosult-e valami, amit nem akart megváltoztatni. Az AI Course Assistant alatti minden beállítási oldal csak a saját mezőit menti.</p>';
+$string['savereport:secret'] = 'módosítva (az érték rejtett)';
+$string['savereport:lineendings'] = 'újra mentve, csak eltérő sorvégekkel';
+$string['savereport:empty'] = 'üres';
+$string['check:primary_name'] = 'Az AI Course Assistant elsődleges szolgáltatója';
+$string['check:primary_ok'] = 'Az elmúlt 24 órában nem volt hiba az elsődleges csevegőszolgáltatónál.';
+$string['check:primary_failing'] = 'Az elsődleges csevegőszolgáltató ({$a->model}) az elmúlt 24 órában {$a->failures} alkalommal hibázott. A tartalék szolgáltató ezek közül {$a->rescued} kérésre válaszolt, így a tanulók talán nem vették észre. Utolsó hiba: {$a->reason}';

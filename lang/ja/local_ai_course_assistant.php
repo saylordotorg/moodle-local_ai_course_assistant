@@ -3321,3 +3321,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'この切り替えを�
 
 $string['autoupgrade:block_reasoning'] = '推論の強度はサイト全体で1つの設定です。また、{$a} ロールも新しいレベルでテストされていない思考モデルを使用しています。それが望ましい場合は手動で切り替えてください。';
 $string['autoupgrade:block_reasoning_course'] = '推論の強さはサイト全体で1つの設定です。あるコースは新しいレベルでテストされていない独自の思考モデル（{$a}）を使っています。それでよければ手動で切り替えてください。';
+
+$string['savereport:summary'] = '今回の保存で AI Course Assistant の設定が {$a} 件変更されました:';
+$string['savereport:many'] = '<p>1 回の保存で {$a} 件の設定が変更されました。すべての設定ページは、含まれるすべての項目を一度に保存します。意図せず変更された項目がないか、この一覧を確認してください。AI Course Assistant 配下の各設定ページは、そのページ自身の項目のみを保存します。</p>';
+$string['savereport:secret'] = '変更済み(値は非表示)';
+$string['savereport:lineendings'] = '改行コードの違いのみで再保存されました';
+$string['savereport:empty'] = '空';
+$string['check:primary_name'] = 'AI Course Assistant のメインプロバイダー';
+$string['check:primary_ok'] = '過去 24 時間に、メインのチャットプロバイダーでの失敗はありません。';
+$string['check:primary_failing'] = 'メインのチャットプロバイダー ({$a->model}) は、過去 24 時間に {$a->failures} 回失敗しました。そのうち {$a->rescued} 件のやり取りはバックアップのプロバイダーが応答したため、学習者は気づいていない可能性があります。直近のエラー: {$a->reason}';

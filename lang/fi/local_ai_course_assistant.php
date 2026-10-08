@@ -3323,3 +3323,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Sivuston ylläpitäjä,
 
 $string['autoupgrade:block_reasoning'] = 'Päättelyn määrä on yksi asetus koko sivustolle, ja roolissa {$a} toimii myös ajatteleva malli, jota ei ole testattu uudella tasolla. Vaihda käsin, jos haluat niin.';
 $string['autoupgrade:block_reasoning_course'] = 'Päättelyn määrä on yksi asetus koko sivustolle, ja yksi kurssi käyttää omaa ajattelevaa malliaan ({$a}), jota ei testattu uudella tasolla. Vaihda käsin, jos haluat niin.';
+
+$string['savereport:summary'] = 'Tässä tallennuksessa muuttui {$a} AI Course Assistant -asetusta:';
+$string['savereport:many'] = '<p>Yhdessä tallennuksessa muuttui {$a} asetusta. Kaikkien asetusten sivu tallentaa kaikki kenttänsä kerralla, joten tarkista tästä luettelosta, onko mukana jotain, mitä et aikonut muuttaa. Jokainen AI Course Assistantin asetussivu tallentaa vain omat kenttänsä.</p>';
+$string['savereport:secret'] = 'muutettu (arvo piilotettu)';
+$string['savereport:lineendings'] = 'tallennettu uudelleen vain eri rivinvaihdoilla';
+$string['savereport:empty'] = 'tyhjä';
+$string['check:primary_name'] = 'AI Course Assistantin ensisijainen palveluntarjoaja';
+$string['check:primary_ok'] = 'Ensisijaisessa chat-palveluntarjoajassa ei ollut virheitä viimeisen 24 tunnin aikana.';
+$string['check:primary_failing'] = 'Ensisijainen chat-palveluntarjoaja ({$a->model}) epäonnistui {$a->failures} kertaa viimeisen 24 tunnin aikana. Varapalveluntarjoaja vastasi {$a->rescued} näistä pyynnöistä, joten oppijat eivät ehkä huomanneet mitään. Viimeisin virhe: {$a->reason}';

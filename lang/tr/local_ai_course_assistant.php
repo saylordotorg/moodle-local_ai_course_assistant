@@ -3324,3 +3324,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Bu geçişi geri alan s
 
 $string['autoupgrade:block_reasoning'] = 'Akıl yürütme düzeyi tüm site için tek bir ayardır ve {$a} rolü de yeni düzeyde test edilmemiş bir düşünen model çalıştırır. İstediğiniz buysa elle değiştirin.';
 $string['autoupgrade:block_reasoning_course'] = 'Akıl yürütme çabası tüm site için tek bir ayardır ve bir ders yeni düzeyde test edilmemiş kendi düşünen modelini ({$a}) kullanıyor. İstediğiniz buysa elle değiştirin.';
+
+$string['savereport:summary'] = 'Bu kayıtta {$a} AI Course Assistant ayarı değiştirildi:';
+$string['savereport:many'] = '<p>Tek bir kayıtta {$a} ayar değiştirildi. Tüm ayarlar sayfası içindeki bütün alanları aynı anda kaydeder; bu nedenle değiştirmeyi düşünmediğiniz bir şey olup olmadığını bu listeden kontrol edin. AI Course Assistant altındaki her ayar sayfası yalnızca kendi alanlarını kaydeder.</p>';
+$string['savereport:secret'] = 'değiştirildi (değer gizli)';
+$string['savereport:lineendings'] = 'yalnızca satır sonu farklarıyla yeniden kaydedildi';
+$string['savereport:empty'] = 'boş';
+$string['check:primary_name'] = 'AI Course Assistant ana sağlayıcısı';
+$string['check:primary_ok'] = 'Son 24 saatte ana sohbet sağlayıcısında hata olmadı.';
+$string['check:primary_failing'] = 'Ana sohbet sağlayıcısı ({$a->model}) son 24 saatte {$a->failures} kez başarısız oldu. Yedek sağlayıcı bu isteklerin {$a->rescued} tanesini yanıtladı, bu nedenle öğrenenler fark etmemiş olabilir. Son hata: {$a->reason}';

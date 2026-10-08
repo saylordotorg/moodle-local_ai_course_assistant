@@ -3323,3 +3323,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Administrátor stránky
 
 $string['autoupgrade:block_reasoning'] = 'Intenzita uvažovania je jedno nastavenie pre celú lokalitu a rola {$a} tiež používa premýšľajúci model, ktorý nebol na novej úrovni otestovaný. Ak to chcete, prepnite ručne.';
 $string['autoupgrade:block_reasoning_course'] = 'Úsilie pri uvažovaní je jedno nastavenie pre celú lokalitu a jeden kurz používa vlastný premýšľajúci model ({$a}), ktorý nebol na novej úrovni otestovaný. Ak to chcete, prepnite ručne.';
+
+$string['savereport:summary'] = 'Pri tomto uložení sa zmenilo {$a} nastavení AI Course Assistant:';
+$string['savereport:many'] = '<p>Pri jednom uložení sa zmenilo {$a} nastavení. Stránka so všetkými nastaveniami ukladá všetky svoje polia naraz, preto v tomto zozname skontrolujte, či sa nezmenilo niečo, čo ste meniť nechceli. Každá stránka nastavení v AI Course Assistant ukladá len svoje vlastné polia.</p>';
+$string['savereport:secret'] = 'zmenené (hodnota je skrytá)';
+$string['savereport:lineendings'] = 'znova uložené len s inými koncami riadkov';
+$string['savereport:empty'] = 'prázdne';
+$string['check:primary_name'] = 'Hlavný poskytovateľ AI Course Assistant';
+$string['check:primary_ok'] = 'Za posledných 24 hodín sa u hlavného poskytovateľa chatu nevyskytli žiadne chyby.';
+$string['check:primary_failing'] = 'Hlavný poskytovateľ chatu ({$a->model}) za posledných 24 hodín zlyhal {$a->failures}-krát. Záložný poskytovateľ odpovedal na {$a->rescued} z týchto požiadaviek, takže si to študenti možno nevšimli. Posledná chyba: {$a->reason}';

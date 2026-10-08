@@ -3350,3 +3350,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Mai gudanar da shafin d
 
 $string['autoupgrade:block_reasoning'] = 'Ƙoƙarin tunani saiti ɗaya ne ga dukkan shafin, kuma rawar {$a} ma tana gudanar da samfurin tunani da ba a gwada shi a sabon mataki ba. Canza da hannu idan abin da kake so ke nan.';
 $string['autoupgrade:block_reasoning_course'] = 'Ƙoƙarin tunani saiti ɗaya ne ga dukkan shafin, kuma wani kwas yana amfani da nasa samfurin tunani ({$a}) wanda ba a gwada shi a sabon mataki ba. Canja da hannu idan abin da kake so ke nan.';
+
+$string['savereport:summary'] = 'An canza saitunan AI Course Assistant guda {$a} a wannan ajiyar:';
+$string['savereport:many'] = '<p>An canza saituna {$a} a ajiya ɗaya. Shafin dukkan saituna yana ajiye dukkan filayen da ke cikinsa a lokaci guda, don haka a duba wannan jerin domin gano duk abin da ba ka nufi canzawa ba. Kowane shafin saituna a ƙarƙashin AI Course Assistant yana ajiye filayensa kawai.</p>';
+$string['savereport:secret'] = 'an canza (an ɓoye ƙima)';
+$string['savereport:lineendings'] = 'an sake ajiyewa da bambancin ƙarshen layi kawai';
+$string['savereport:empty'] = 'babu komai';
+$string['check:primary_name'] = 'Babban mai samar da sabis na AI Course Assistant';
+$string['check:primary_ok'] = 'Babu gazawa daga babban mai samar da tattaunawa a cikin awanni 24 da suka wuce.';
+$string['check:primary_failing'] = 'Babban mai samar da tattaunawa ({$a->model}) ya yi kasa sau {$a->failures} a cikin awanni 24 da suka wuce. Mai samar da sabis na ajiya ya amsa {$a->rescued} daga cikin waɗannan buƙatu, don haka wataƙila ɗalibai ba su lura ba. Kuskure na ƙarshe: {$a->reason}';

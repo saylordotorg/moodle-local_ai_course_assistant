@@ -3367,3 +3367,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Maamulaha goobta ee dib
 
 $string['autoupgrade:block_reasoning'] = 'Dadaalka fekerka waa hal dejin oo loogu talagalay goobta oo dhan, doorka {$a} sidoo kale wuxuu socodsiiyaa nooc fekera oo aan lagu tijaabin heerka cusub. Gacanta ku beddel haddii taas tahay waxa aad rabto.';
 $string['autoupgrade:block_reasoning_course'] = 'Dadaalka sababaynta waa hal dejin oo loogu talagalay goobta oo dhan, koorsona waxay isticmaashaa moodal fikireed u gaar ah ({$a}) oo aan lagu tijaabin heerka cusub. Gacanta ku beddel haddii taas tahay waxa aad rabto.';
+
+$string['savereport:summary'] = '{$a} dejin AI Course Assistant ayaa isbeddelay kaydintan:';
+$string['savereport:many'] = '<p>{$a} dejin ayaa isbeddelay hal kaydin. Bogga dhammaan dejinta wuxuu keydiyaa dhammaan meelaha uu ka kooban yahay isla markiiba, haddaba liistadan ka eeg wax aadan ujeedin inaad bedesho. Bog kasta oo dejin ah oo hoos yimaada AI Course Assistant wuxuu keydiyaa oo keliya meelihiisa u gaarka ah.</p>';
+$string['savereport:secret'] = 'waa la bedelay (qiimaha waa la qariyay)';
+$string['savereport:lineendings'] = 'dib ayaa loo keydiyay iyadoo kaliya dhammaadka safafka ay kala duwan yihiin';
+$string['savereport:empty'] = 'madhan';
+$string['check:primary_name'] = 'Bixiyaha ugu weyn ee AI Course Assistant';
+$string['check:primary_ok'] = 'Ma jirin guuldarro ka timid bixiyaha sheekada ugu weyn muddadii 24-ka saacadood ee la soo dhaafay.';
+$string['check:primary_failing'] = 'Bixiyaha sheekada ugu weyn ({$a->model}) wuu fashilmay {$a->failures} jeer muddadii 24-ka saacadood ee la soo dhaafay. Bixiyaha kaabka ah ayaa ka jawaabay {$a->rescued} codsiyadaas, sidaa darteed ardaydu laga yaabaa inaysan dareemin. Khaladkii ugu dambeeyay: {$a->reason}';

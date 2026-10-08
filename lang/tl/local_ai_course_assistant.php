@@ -3367,3 +3367,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Ang administrator ng si
 
 $string['autoupgrade:block_reasoning'] = 'Ang antas ng pangangatwiran ay iisang setting para sa buong site, at ang tungkuling {$a} ay gumagamit din ng modelong nag-iisip na hindi pa nasubok sa bagong antas. Manu-manong lumipat kung iyon ang gusto mo.';
 $string['autoupgrade:block_reasoning_course'] = 'Ang pagsisikap sa pangangatwiran ay iisang setting para sa buong site, at may kursong gumagamit ng sarili nitong thinking model ({$a}) na hindi pa nasubok sa bagong antas. Manwal na palitan kung iyon ang gusto mo.';
+
+$string['savereport:summary'] = '{$a} setting ng AI Course Assistant ang nabago sa pag-save na ito:';
+$string['savereport:many'] = '<p>{$a} setting ang nabago sa isang pag-save. Sabay-sabay na sine-save ng pahina ng lahat ng setting ang lahat ng field nito, kaya tingnan ang listahang ito para sa anumang hindi mo balak baguhin. Ang bawat pahina ng setting sa ilalim ng AI Course Assistant ay sine-save lamang ang sarili nitong mga field.</p>';
+$string['savereport:secret'] = 'nabago (nakatago ang halaga)';
+$string['savereport:lineendings'] = 'na-save ulit na iba lang ang mga dulo ng linya';
+$string['savereport:empty'] = 'walang laman';
+$string['check:primary_name'] = 'Pangunahing provider ng AI Course Assistant';
+$string['check:primary_ok'] = 'Walang pagkabigo mula sa pangunahing provider ng chat sa nakalipas na 24 oras.';
+$string['check:primary_failing'] = 'Nabigo nang {$a->failures} beses ang pangunahing provider ng chat ({$a->model}) sa nakalipas na 24 oras. Sinagot ng backup na provider ang {$a->rescued} sa mga iyon, kaya maaaring hindi napansin ng mga mag-aaral. Huling error: {$a->reason}';

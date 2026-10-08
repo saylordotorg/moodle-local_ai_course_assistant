@@ -3344,3 +3344,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Administrateur site bi 
 
 $string['autoupgrade:block_reasoning'] = 'Dayob xalaat ab tànneef rekk la ngir site bi yépp, te liggéey {$a} itam dafay jëfandikoo ab modèle bu xalaat bu ñu nattuwul ci tolluwaay bu bees bi. Soppi ko ak sa loxo su loolu nga bëgg.';
 $string['autoupgrade:block_reasoning_course'] = 'Jéemu xalaat benn tànneef la ci site bi yépp, te am njàng mu ngi jëfandikoo modeel xalaatam bopp ({$a}) bu ñu natteegul ci tolluwaay bu bees bi. Soppil ko ak sa loxo bu loolu nga bëgg.';
+
+$string['savereport:summary'] = '{$a} tànnéef yu AI Course Assistant soppeeku nañu ci denc bii:';
+$string['savereport:many'] = '<p>{$a} tànnéef soppeeku nañu ci benn denc. Xët wi am tànnéef yépp dafay denc àll yépp yi nekk ci moom ci benn yoon, kon seetal limu nii ngir gis lu ngeen bëggul woon soppi. Xët wu nekk ci AI Course Assistant dafay denc ay àllam rekk.</p>';
+$string['savereport:secret'] = 'soppeeku na (nekkin bi nëbbu na)';
+$string['savereport:lineendings'] = 'dencaat nañu ko, tendu rëdd yi rekk a wuute';
+$string['savereport:empty'] = 'neen';
+$string['check:primary_name'] = 'Yëfkat bu mag bu AI Course Assistant';
+$string['check:primary_ok'] = 'Amul njuumte bu bawoo ci yëfkat bu mag bu waxtaan bi ci 24 waxtu yu jiitu yi.';
+$string['check:primary_failing'] = 'Yëfkat bu mag bu waxtaan bi ({$a->model}) daa tàggoo {$a->failures} yoon ci 24 waxtu yu jiitu yi. Yëfkat bu dolli bi tontu na {$a->rescued} ci yooyu bëgg, kon xaritu jàng yi am na ñu ko gisul. Njuumte bu mujj bi: {$a->reason}';

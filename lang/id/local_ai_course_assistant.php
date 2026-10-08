@@ -3375,3 +3375,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Administrator situs yan
 
 $string['autoupgrade:block_reasoning'] = 'Upaya penalaran adalah satu pengaturan untuk seluruh situs, dan peran {$a} juga menjalankan model berpikir yang belum diuji pada tingkat baru. Ubah secara manual jika itu yang Anda inginkan.';
 $string['autoupgrade:block_reasoning_course'] = 'Upaya penalaran adalah satu pengaturan untuk seluruh situs, dan satu kursus memakai model berpikirnya sendiri ({$a}) yang belum diuji pada tingkat baru. Ganti secara manual jika itu yang Anda inginkan.';
+
+$string['savereport:summary'] = '{$a} pengaturan AI Course Assistant diubah pada penyimpanan ini:';
+$string['savereport:many'] = '<p>{$a} pengaturan diubah dalam satu kali penyimpanan. Halaman semua pengaturan menyimpan semua kolomnya sekaligus, jadi periksa daftar ini untuk melihat apakah ada yang tidak Anda maksudkan untuk diubah. Setiap halaman pengaturan di bawah AI Course Assistant hanya menyimpan kolomnya sendiri.</p>';
+$string['savereport:secret'] = 'diubah (nilai disembunyikan)';
+$string['savereport:lineendings'] = 'disimpan ulang hanya dengan akhir baris yang berbeda';
+$string['savereport:empty'] = 'kosong';
+$string['check:primary_name'] = 'Penyedia utama AI Course Assistant';
+$string['check:primary_ok'] = 'Tidak ada kegagalan dari penyedia obrolan utama dalam 24 jam terakhir.';
+$string['check:primary_failing'] = 'Penyedia obrolan utama ({$a->model}) gagal {$a->failures} kali dalam 24 jam terakhir. Penyedia cadangan menjawab {$a->rescued} dari permintaan tersebut, sehingga peserta didik mungkin tidak menyadarinya. Kesalahan terakhir: {$a->reason}';

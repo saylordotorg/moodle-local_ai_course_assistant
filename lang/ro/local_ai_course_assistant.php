@@ -3323,3 +3323,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Administratorul site-ul
 
 $string['autoupgrade:block_reasoning'] = 'Efortul de raționament este o singură setare pentru întregul site, iar rolul {$a} folosește și un model de gândire care nu a fost testat la noul nivel. Comutați manual dacă asta doriți.';
 $string['autoupgrade:block_reasoning_course'] = 'Efortul de raționament este o singură setare pentru tot site-ul, iar un curs folosește propriul model care gândește ({$a}), netestat la noul nivel. Comutați manual dacă asta doriți.';
+
+$string['savereport:summary'] = 'La această salvare au fost modificate {$a} setări AI Course Assistant:';
+$string['savereport:many'] = '<p>Au fost modificate {$a} setări la o singură salvare. Pagina cu toate setările salvează toate câmpurile ei deodată, așa că verificați această listă pentru orice nu ați vrut să modificați. Fiecare pagină de setări din AI Course Assistant salvează doar propriile câmpuri.</p>';
+$string['savereport:secret'] = 'modificat (valoare ascunsă)';
+$string['savereport:lineendings'] = 'salvat din nou doar cu terminații de rând diferite';
+$string['savereport:empty'] = 'gol';
+$string['check:primary_name'] = 'Furnizorul principal AI Course Assistant';
+$string['check:primary_ok'] = 'Nicio eroare de la furnizorul principal de chat în ultimele 24 de ore.';
+$string['check:primary_failing'] = 'Furnizorul principal de chat ({$a->model}) a eșuat de {$a->failures} ori în ultimele 24 de ore. Furnizorul de rezervă a răspuns la {$a->rescued} dintre aceste solicitări, deci este posibil ca cursanții să nu fi observat. Ultima eroare: {$a->reason}';

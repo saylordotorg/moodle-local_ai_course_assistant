@@ -3352,3 +3352,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Siti ɲɛmɔgɔ min ye 
 
 $string['autoupgrade:block_reasoning'] = 'Miiriya cɛsiri ye labɛn kelen ye siti bɛɛ ye, ani {$a} jɔyɔrɔ fana bɛ miiri modɛli dɔ baara, o ma kɔrɔbɔ dakun kura la. A falen i yɛrɛ ma ni o ye i sago ye.';
 $string['autoupgrade:block_reasoning_course'] = 'Hakilijakabɔ sabali ye labɛn kelen ye siti bɛɛ kama, kalan dɔ bɛ a yɛrɛ ka miiri modɛli ({$a}) baara min ma kɔrɔbɔ dakun kura la. A falen i yɛrɛ bolo ni o ye i sago ye.';
+
+$string['savereport:summary'] = '{$a} AI Course Assistant sazi minnu yɛlɛmana nin mara in na:';
+$string['savereport:many'] = '<p>{$a} sazi yɛlɛmana mara kelen na. Sazi bɛɛ ɲɛ bɛ a kɔnɔ cogoyaw bɛɛ mara ɲɔgɔn fɛ, o la i ka nin lisɛ lajɛ i ma min fɛ ka yɛlɛma. Sazi ɲɛ o ɲɛ min bɛ AI Course Assistant kɔnɔ, o bɛ a yɛrɛ ka cogoyaw dɔrɔn mara.</p>';
+$string['savereport:secret'] = 'yɛlɛmana (nilifɛn dogolen don)';
+$string['savereport:lineendings'] = 'a marara kokura, sirili laban hakɛ dɔrɔn ye min yɛlɛmana';
+$string['savereport:empty'] = 'fanga';
+$string['check:primary_name'] = 'AI Course Assistant dili kuntigi';
+$string['check:primary_ok'] = 'Kuntigi hakilijagabɔ dili la, fili si ma kɛ tile 24 laban kɔnɔ.';
+$string['check:primary_failing'] = 'Hakilijagabɔ dili kuntigi ({$a->model}) ye {$a->failures} fili tile 24 laban kɔnɔ. Dili dɔ min bɛ sɛgɛsɛgɛli kɛ, o ye nin jaabi {$a->rescued} di, o kosɔn kalandenw tun bɛ se ka a ɲɛnabɔ ka dɔgɔya. Fili laban: {$a->reason}';

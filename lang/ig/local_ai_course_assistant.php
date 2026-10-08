@@ -3338,3 +3338,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Onye nchịkwa saịt�
 
 $string['autoupgrade:block_reasoning'] = 'Mgbalị echiche bụ otu ntọala maka saịtị niile, ọrụ {$a} na-ejikwa ụdị nwere echiche nke a na-anwalebeghị n\'ọkwa ọhụrụ ahụ. Gbanwee ya n\'aka ma ọ bụrụ na ọ bụ ihe ị chọrọ.';
 $string['autoupgrade:block_reasoning_course'] = 'Mgbalị ntụgharị uche bụ otu ntọala maka saịtị niile, otu nkuzi na-eji ụdị echiche nke ya ({$a}) a na-anwalebeghị n\'ọkwa ọhụrụ. Gbanwee ya n\'aka ma ọ bụrụ na nke ahụ ka ịchọrọ.';
+
+$string['savereport:summary'] = 'E gbanwere ntọala AI Course Assistant {$a} n\'ichekwa a:';
+$string['savereport:many'] = '<p>E gbanwere ntọala {$a} n\'otu ichekwa. Ibe ntọala niile na-echekwa ogige niile dị na ya n\'otu oge, ya mere lelee ndepụta a maka ihe ọ bụla ịchọghị ịgbanwe. Ibe ntọala ọ bụla n\'okpuru AI Course Assistant na-echekwa naanị ogige nke ya.</p>';
+$string['savereport:secret'] = 'agbanwere (ezoro uru ya)';
+$string['savereport:lineendings'] = 'echekwara ọzọ naanị n\'ihi ọdịiche n\'njedebe ahịrị';
+$string['savereport:empty'] = 'efu';
+$string['check:primary_name'] = 'Onye na-eweta ọrụ bụ isi nke AI Course Assistant';
+$string['check:primary_ok'] = 'Enweghị ọdịda ọ bụla sitere n\'aka onye na-eweta ọrụ mkparịta ụka bụ isi n\'ime awa 24 gara aga.';
+$string['check:primary_failing'] = 'Onye na-eweta ọrụ mkparịta ụka bụ isi ({$a->model}) dara ugboro {$a->failures} n\'ime awa 24 gara aga. Onye na-eweta ọrụ nkwado zara {$a->rescued} n\'ime arịrịọ ndị ahụ, ya mere ọ pụrụ ịbụ na ụmụ akwụkwọ amataghị. Njehie ikpeazụ: {$a->reason}';

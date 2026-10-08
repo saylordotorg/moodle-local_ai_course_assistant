@@ -3366,3 +3366,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Pentadbir laman yang me
 
 $string['autoupgrade:block_reasoning'] = 'Usaha penaakulan ialah satu tetapan untuk seluruh tapak, dan peranan {$a} juga menjalankan model pemikiran yang belum diuji pada tahap baharu. Tukar secara manual jika itu yang anda mahukan.';
 $string['autoupgrade:block_reasoning_course'] = 'Usaha penaakulan ialah satu tetapan untuk seluruh laman, dan satu kursus menggunakan model berfikirnya sendiri ({$a}) yang belum diuji pada tahap baharu. Tukar secara manual jika itu yang anda mahukan.';
+
+$string['savereport:summary'] = '{$a} tetapan AI Course Assistant telah diubah dalam simpanan ini:';
+$string['savereport:many'] = '<p>{$a} tetapan telah diubah dalam satu simpanan. Halaman semua tetapan menyimpan semua medannya serentak, jadi semak senarai ini untuk mana-mana perkara yang anda tidak berniat untuk ubah. Setiap halaman tetapan di bawah AI Course Assistant hanya menyimpan medannya sendiri.</p>';
+$string['savereport:secret'] = 'diubah (nilai disembunyikan)';
+$string['savereport:lineendings'] = 'disimpan semula dengan hanya pengakhir baris yang berbeza';
+$string['savereport:empty'] = 'kosong';
+$string['check:primary_name'] = 'Pembekal utama AI Course Assistant';
+$string['check:primary_ok'] = 'Tiada kegagalan daripada pembekal sembang utama dalam 24 jam yang lalu.';
+$string['check:primary_failing'] = 'Pembekal sembang utama ({$a->model}) gagal sebanyak {$a->failures} kali dalam 24 jam yang lalu. Pembekal sandaran menjawab {$a->rescued} daripada permintaan tersebut, jadi pelajar mungkin tidak perasan. Ralat terakhir: {$a->reason}';

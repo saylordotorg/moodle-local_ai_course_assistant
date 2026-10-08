@@ -3324,3 +3324,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'L’administrateur du s
 
 $string['autoupgrade:block_reasoning'] = 'L\'effort de raisonnement est un seul réglage pour tout le site, et le rôle {$a} utilise aussi un modèle de réflexion qui n\'a pas été testé au nouveau niveau. Changez-le manuellement si c\'est ce que vous voulez.';
 $string['autoupgrade:block_reasoning_course'] = 'L\'effort de raisonnement est un seul réglage pour tout le site, et un cours utilise son propre modèle à réflexion ({$a}) qui n\'a pas été testé au nouveau niveau. Changez-le à la main si c\'est ce que vous voulez.';
+
+$string['savereport:summary'] = '{$a} paramètres d\'AI Course Assistant ont été modifiés lors de cet enregistrement :';
+$string['savereport:many'] = '<p>{$a} paramètres ont été modifiés en un seul enregistrement. La page de tous les paramètres enregistre tous ses champs d\'un coup ; vérifiez donc cette liste pour repérer tout ce que vous n\'aviez pas l\'intention de modifier. Chaque page de paramètres d\'AI Course Assistant n\'enregistre que ses propres champs.</p>';
+$string['savereport:secret'] = 'modifié (valeur masquée)';
+$string['savereport:lineendings'] = 'enregistré de nouveau avec uniquement des fins de ligne différentes';
+$string['savereport:empty'] = 'vide';
+$string['check:primary_name'] = 'Fournisseur principal d\'AI Course Assistant';
+$string['check:primary_ok'] = 'Aucun échec du fournisseur de chat principal au cours des dernières 24 heures.';
+$string['check:primary_failing'] = 'Le fournisseur de chat principal ({$a->model}) a échoué {$a->failures} fois au cours des dernières 24 heures. Le fournisseur de secours a répondu à {$a->rescued} de ces demandes, il est donc possible que les apprenants ne l\'aient pas remarqué. Dernière erreur : {$a->reason}';

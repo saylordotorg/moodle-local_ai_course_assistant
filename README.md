@@ -8,10 +8,10 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 
 A 3-minute tour, recorded on Saylor University's live Degrees site in a hidden test course with fake demo students. The learner half is shown in student view: answers drawn only from the course's own content, Socratic guidance, Quiz Me, Study Plan, and 46 languages with automatic detection. The admin half covers mastery tracking, provider settings and guardrails, analytics, Learning Radar, and cost tracking.
 
-## Version 7.8.0
+## Version 7.8.1
 
 **Release Date:** October 2026
-**Plugin build:** 2026100701
+**Plugin build:** 2026100801
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1. `version.php` declares support through 5.2.
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+
@@ -149,7 +149,7 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 
 ### Finding the admin pages
 
-All admin pages live under one hub: **Site administration → Plugins → Local plugins → AI Course Assistant**. Bookmark the hub directly: `{moodle_root_url}/admin/category.php?category=local_ai_course_assistant` — it lists every settings page and tool (Analytics, RAG Index, Prompt Debug Log, Emergency Controls, the editors). The Site administration search box also finds every page by name (try "AI Course"). Course staff additionally get **Course AI Settings** and **AI Tutor Analytics** links in each course's "More" menu (v6.6.1+). Note: Moodle does not show a "Settings" link for local plugins on the Plugins overview page (admin/plugins.php) — that column only exists for other plugin types, so use the hub bookmark instead.
+All admin pages live under one hub: **Site administration → Plugins → Local plugins → AI Course Assistant**. Bookmark the hub directly: `{moodle_root_url}/admin/category.php?category=local_ai_course_assistant` — it lists every settings page and tool (Analytics, RAG Index, Prompt Debug Log, Emergency Controls, the editors). The Site administration search box also finds every page by name (try "AI Course"). Course staff additionally get **Course AI Settings** and **AI Tutor Analytics** links in each course's "More" menu (v6.6.1+). **Change settings from the individual pages, not the hub's combined form.** Opening the hub's category URL shows every setting from every page in one very large form (about 350 fields), and Save rewrites all of them at once, so a stray click on one field changes it without any sign. Use the page links under **AI Course Assistant** (AI provider and models, Integrations and delivery, and so on); each saves only its own fields. Since v7.8.1 every save, from either place, ends with a notice listing the settings it changed. Note: Moodle does not show a "Settings" link for local plugins on the Plugins overview page (admin/plugins.php) — that column only exists for other plugin types, so use the hub bookmark instead.
 
 ## Configuration
 
