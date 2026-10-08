@@ -91,6 +91,9 @@ class watcher {
      * A row belongs to the model when its model_name is the configured id or a
      * dated snapshot of it (providers answer "gpt-5-mini-2025-08-07" to a
      * request for "gpt-5-mini"). Benchmark and evaluation rows are excluded.
+     * Failures the failover chain rescued count as this model's turns and
+     * errors, from the chain's audit rows: a switched model that fails on
+     * every call would otherwise look like a model with no traffic.
      *
      * @param string $provider
      * @param string $model
@@ -142,9 +145,20 @@ class watcher {
             $answered += (int) $row->n;
         }
         $rs->close();
+        // A turn the failover chain rescued is a failure of this model even
+        // though the learner was answered: the answer row names the fallback.
+        // The chain audits every member that failed, with its model.
+        $rescued = (int) $DB->count_records_select(
+            'local_ai_course_assistant_audit',
+            'action = :action AND timecreated >= :from AND timecreated < :to AND '
+                . $DB->sql_like('details', ':needle', false),
+            ['action' => \local_ai_course_assistant\provider\failover_chain::AUDIT_EVENT_FALLTHROUGH, 'from' => $from,
+            'to' => $to,
+            'needle' => '%' . $DB->sql_like_escape('"failed_model":' . json_encode($model)) . '%']
+        );
         return [
-            'turns' => (int) ($counts->turns ?? 0),
-            'error' => (int) ($counts->errors ?? 0),
+            'turns' => (int) ($counts->turns ?? 0) + $rescued,
+            'error' => (int) ($counts->errors ?? 0) + $rescued,
             'truncated' => (int) ($counts->truncated ?? 0),
             'refused' => (int) ($counts->refused ?? 0),
             'cost_cents' => (!$unknown && $answered > 0) ? $cents / $answered : null,

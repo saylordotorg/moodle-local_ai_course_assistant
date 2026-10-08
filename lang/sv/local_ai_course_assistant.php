@@ -3319,3 +3319,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Webbplatsadministratören so
 $string['privacy:metadata:model_switch'] = 'Modellbyten och återställningar: vilken modell en roll bytte från och till, och varför. Den enda personuppgiften är id för administratören som gjorde eller ångrade bytet. Raderna är webbplatskonfiguration och inte personuppgifter om en elev, så de ingår inte i en dataexport och tas inte bort när en användare begär radering.';
 $string['privacy:metadata:model_switch:createdby'] = 'Webbplatsadministratören som gjorde det här bytet. Tom när det var automatiskt.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Webbplatsadministratören som återställde det här bytet. Tom när övervakaren gjorde det eller när det inte återställdes.';
+
+$string['autoupgrade:block_reasoning'] = 'Resonemangsnivå är en enda inställning för hela webbplatsen, och rollen {$a} kör också en tänkande modell som inte har testats på den nya nivån. Byt manuellt om det är det du vill.';

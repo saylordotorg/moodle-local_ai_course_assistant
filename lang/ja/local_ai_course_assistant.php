@@ -3318,3 +3318,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'この評価を依頼した�
 $string['privacy:metadata:model_switch'] = 'モデルの切り替えとロールバック: ロールがどのモデルからどのモデルに移ったか、およびその理由。個人データは切り替えを行った、または取り消した管理者の識別子のみです。これらの行は学習者の個人データではなくサイト設定であるため、データのエクスポートには含まれず、ユーザーが消去を求めても削除されません。';
 $string['privacy:metadata:model_switch:createdby'] = 'この切り替えを行ったサイト管理者。自動の場合は空です。';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'この切り替えをロールバックしたサイト管理者。監視機能がロールバックした場合、またはロールバックされていない場合は空です。';
+
+$string['autoupgrade:block_reasoning'] = '推論の強度はサイト全体で1つの設定です。また、{$a} ロールも新しいレベルでテストされていない思考モデルを使用しています。それが望ましい場合は手動で切り替えてください。';

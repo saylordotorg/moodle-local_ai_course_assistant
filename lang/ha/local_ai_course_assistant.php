@@ -3347,3 +3347,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Mai gudanar da shafin da ya 
 $string['privacy:metadata:model_switch'] = 'Sauye-sauyen samfura da mayarwa: daga wane samfuri zuwa wane samfuri aiki ya koma, da dalili. Bayanin sirri ɗaya tilo shine lambar shaidar mai gudanarwar da ya yi ko ya soke sauyin. Waɗannan layukan saitin shafi ne ba bayanan sirri na ɗalibi ba, don haka ba a saka su a cikin fitar da bayanai kuma ba a share su idan mai amfani ya nemi a goge.';
 $string['privacy:metadata:model_switch:createdby'] = 'Mai gudanar da shafin da ya yi wannan sauyin. Babu komai idan ta atomatik ne.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Mai gudanar da shafin da ya mayar da wannan sauyin. Babu komai idan mai sa ido ne ya mayar, ko ba a mayar da shi ba.';
+
+$string['autoupgrade:block_reasoning'] = 'Ƙoƙarin tunani saiti ɗaya ne ga dukkan shafin, kuma rawar {$a} ma tana gudanar da samfurin tunani da ba a gwada shi a sabon mataki ba. Canza da hannu idan abin da kake so ke nan.';

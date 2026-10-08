@@ -3347,3 +3347,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'ይህን ግምገማ የ�
 $string['privacy:metadata:model_switch'] = 'የሞዴል ለውጦች እና መመለሻዎች: አንድ ሚና ከየትኛው ሞዴል ወደ የትኛው እንደተዛወረ እና ለምን። ብቸኛው የግል ውሂብ ለውጡን ያደረገው ወይም የቀለበሰው አስተዳዳሪ መለያ ነው። እነዚህ ረድፎች ስለ ተማሪ የግል ውሂብ ሳይሆኑ የጣቢያ ውቅር ስለሆኑ በውሂብ ወደ ውጭ መላክ ውስጥ አይካተቱም፣ ተጠቃሚ መሰረዝን ሲጠይቅም አይወገዱም።';
 $string['privacy:metadata:model_switch:createdby'] = 'ይህን ለውጥ ያደረገው የጣቢያ አስተዳዳሪ። ራስ-ሰር ሲሆን ባዶ ነው።';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'ይህን ለውጥ ወደ ቀድሞው የመለሰው የጣቢያ አስተዳዳሪ። ተከታታዩ ሲመልሰው ወይም ካልተመለሰ ባዶ ነው።';
+
+$string['autoupgrade:block_reasoning'] = 'የምክንያት ጥረት ለመላው ጣቢያ አንድ ቅንብር ነው፤ የ{$a} ሚናም በአዲሱ ደረጃ ያልተፈተነ የማሰብ ሞዴል ያሄዳል። ይህን ከፈለጉ በእጅ ይቀይሩ።';

@@ -3340,3 +3340,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'O administrador do site que 
 $string['privacy:metadata:model_switch'] = 'Trocas e reversões de modelos: de qual para qual modelo uma função mudou e por quê. O único dado pessoal é o identificador do administrador que fez ou desfez a troca. Estes registros são configuração do site, não dados pessoais de um aluno, então não entram na exportação de dados e não são removidos quando um usuário pede exclusão.';
 $string['privacy:metadata:model_switch:createdby'] = 'O administrador do site que fez esta troca. Vazio quando foi automática.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'O administrador do site que reverteu esta troca. Vazio quando o monitor reverteu ou ela não foi revertida.';
+
+$string['autoupgrade:block_reasoning'] = 'O esforço de raciocínio é uma única configuração para todo o site, e a função {$a} também usa um modelo de raciocínio que não foi testado no novo nível. Troque manualmente se for isso que você quer.';

@@ -231,16 +231,40 @@ class roles {
         }
         $out = [$spec['modelkey'] => $model];
         if ($spec['variantkey'] !== null) {
-            $current = model_capabilities::site_level();
-            if ($variant === self::VARIANT_THINKING_OFF) {
-                $out[$spec['variantkey']] = 'off';
-            } else if ($current === self::VARIANT_THINKING_OFF) {
-                // Leaving the thinking-off variant for another model puts the
-                // reasoning level back to the shipped default.
-                $out[$spec['variantkey']] = model_capabilities::DEFAULT_LEVEL;
+            // Written only when it changes, from the same rule the evaluation
+            // measured the candidate at (level_after()).
+            $level = self::level_after($role, $variant);
+            if ($level !== model_capabilities::site_level()) {
+                $out[$spec['variantkey']] = $level;
             }
         }
         return $out;
+    }
+
+    /**
+     * The reasoning level a model would run at in this role after a switch to it.
+     *
+     * The ONE rule both the switch (writes()) and the evaluation use, so a
+     * candidate is measured at the level it will actually run at: the
+     * thinking-off variant at 'off'; any other candidate of a role with a
+     * reasoning setting at the level writes() would leave (the shipped default
+     * when the site is currently off, the site level otherwise); a role with
+     * no reasoning setting at the site level.
+     *
+     * @param string $role
+     * @param string $variant
+     * @return string
+     */
+    public static function level_after(string $role, string $variant): string {
+        $spec = self::spec($role);
+        if ($variant === self::VARIANT_THINKING_OFF) {
+            return 'off';
+        }
+        $current = model_capabilities::site_level();
+        if ($spec['variantkey'] !== null && $current === self::VARIANT_THINKING_OFF) {
+            return model_capabilities::DEFAULT_LEVEL;
+        }
+        return $current;
     }
 
     /**

@@ -3349,3 +3349,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Siti ɲɛmɔgɔ min ye nin l
 $string['privacy:metadata:model_switch'] = 'Modeli yɛlɛmaw ani kɔseginw: baara bɔra modeli min na ani a taara min na, ani mun na. Mɔgɔ yɛrɛ kunnafoni kelen min bɛ yen, o ye ɲɛmɔgɔ taamasiyɛn ye min ye yɛlɛma kɛ walima k\'a kɔsegin. Nin layiniw ye siti labɛnni ye, u tɛ kalanden ka kunnafoni yɛrɛw ye, o la u tɛ don kunnafoniw labɔli la ani u tɛ jɔsi ni baarakɛla ye a ɲini ko a ka kunnafoniw ka jɔsi.';
 $string['privacy:metadata:model_switch:createdby'] = 'Siti ɲɛmɔgɔ min ye nin yɛlɛma kɛ. A lankolon don ni a kɛra a yɛrɛ ma.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Siti ɲɛmɔgɔ min ye nin yɛlɛma kɔsegin. A lankolon don ni lajɛbaga de y\'a kɛ, walima ni a ma kɔsegin.';
+
+$string['autoupgrade:block_reasoning'] = 'Miiriya cɛsiri ye labɛn kelen ye siti bɛɛ ye, ani {$a} jɔyɔrɔ fana bɛ miiri modɛli dɔ baara, o ma kɔrɔbɔ dakun kura la. A falen i yɛrɛ ma ni o ye i sago ye.';

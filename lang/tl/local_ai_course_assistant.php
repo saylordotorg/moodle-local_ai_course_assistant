@@ -3364,3 +3364,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Ang administrator ng site na
 $string['privacy:metadata:model_switch'] = 'Mga paglipat at pagbabalik ng modelo: mula at patungo sa aling modelo lumipat ang isang tungkulin, at kung bakit. Ang tanging personal na datos ay ang identifier ng administrator na gumawa o nagbaligtad ng paglipat. Ang mga hilerang ito ay configuration ng site at hindi personal na datos tungkol sa isang mag-aaral, kaya hindi kasama ang mga ito sa pag-export ng datos at hindi binubura kapag humiling ang user ng pagbura.';
 $string['privacy:metadata:model_switch:createdby'] = 'Ang administrator ng site na gumawa ng paglipat na ito. Walang laman kapag awtomatiko ito.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Ang administrator ng site na nagbalik ng paglipat na ito. Walang laman kapag ang tagabantay ang nagbalik nito, o kapag hindi ito ibinalik.';
+
+$string['autoupgrade:block_reasoning'] = 'Ang antas ng pangangatwiran ay iisang setting para sa buong site, at ang tungkuling {$a} ay gumagamit din ng modelong nag-iisip na hindi pa nasubok sa bagong antas. Manu-manong lumipat kung iyon ang gusto mo.';

@@ -122,6 +122,17 @@ final class autoupgrade_switch_test extends \advanced_testcase {
         $this->assertSame('gemini-2.5-flash', get_config('local_ai_course_assistant', 'model'));
     }
 
+    public function test_a_reasoning_switch_waits_when_another_role_thinks(): void {
+        set_config('quiz_provider', 'openai', 'local_ai_course_assistant');
+        set_config('quiz_model', 'gpt-5-mini', 'local_ai_course_assistant');
+        [$cand, $eval] = $this->passed(roles::CHAT, 'gemini', 'gemini-2.5-flash', roles::VARIANT_THINKING_OFF);
+        $out = switcher::switch_to($cand, $eval, 'auto', 0);
+        $this->assertFalse($out['ok'], 'The quiz model thinks, and reasoning effort is site-wide.');
+        $this->assertNotSame('off', get_config('local_ai_course_assistant', 'reasoning_effort'));
+        set_config('quiz_model', 'gpt-4o-mini', 'local_ai_course_assistant');
+        $this->assertTrue(switcher::switch_to($cand, $eval, 'auto', 0)['ok']);
+    }
+
     public function test_the_premium_tier_changes_its_model_and_never_its_triggers(): void {
         set_config('premium_escalation_enabled', 1, 'local_ai_course_assistant');
         set_config('premium_escalation_provider', 'claude', 'local_ai_course_assistant');
@@ -203,6 +214,23 @@ final class autoupgrade_switch_test extends \advanced_testcase {
         $this->assertSame('gemini-2.5-flash', get_config('local_ai_course_assistant', 'model'));
     }
 
+    public function test_failures_the_failover_chain_rescued_still_count(): void {
+        global $DB;
+        $now = time();
+        $this->traffic('gemini-2.5-flash', 200, 2, $now - 3 * DAYSECS);
+        [$cand, $eval] = $this->passed();
+        $id = switcher::switch_to($cand, $eval, 'auto', 0)['switchid'];
+        // Every call to the new model fails and the fallback answers: no answer
+        // row names the new model, only the chain's audit rows do.
+        for ($i = 0; $i < 40; $i++) {
+            $DB->insert_record('local_ai_course_assistant_audit', (object) ['action' => 'failover_fallthrough',
+                'userid' => 0, 'courseid' => 0, 'ipaddress' => '', 'useragent' => '',
+                'details' => json_encode(['failed_label' => 'gemini-primary', 'failed_model' => 'gemini-3.5-flash-lite',
+                    'reason' => 'HTTP 404']), 'timecreated' => $now + 10 + $i]);
+        }
+        $this->assertSame('rolledback', watcher::check_one($DB->get_record(switcher::TABLE, ['id' => $id]), $now + 3600));
+    }
+
     public function test_the_watcher_keeps_a_healthy_switch_after_48_hours(): void {
         global $DB;
         $now = time();
@@ -214,6 +242,17 @@ final class autoupgrade_switch_test extends \advanced_testcase {
         $this->assertSame('watching', watcher::check_one($row, $now + 3600));
         $this->assertSame('kept', watcher::check_one($row, $now + 49 * HOURSECS));
         $this->assertSame('gemini-3.5-flash-lite', get_config('local_ai_course_assistant', 'model'));
+    }
+
+    public function test_the_baseline_starts_when_failed_turns_began_to_name_their_model(): void {
+        global $DB;
+        $now = time();
+        $this->traffic('gemini-2.5-flash', 50, 0, $now - 3 * DAYSECS);
+        set_config('autoupgrade_failed_turns_since', $now - DAYSECS, 'local_ai_course_assistant');
+        [$cand, $eval] = $this->passed();
+        $id = switcher::switch_to($cand, $eval, 'auto', 0)['switchid'];
+        $baseline = json_decode($DB->get_field(switcher::TABLE, 'baseline', ['id' => $id]), true);
+        $this->assertSame(0, $baseline['turns'], 'Traffic from before failures were attributed is not a baseline.');
     }
 
     public function test_decide_needs_a_real_rise_not_noise(): void {

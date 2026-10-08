@@ -3360,3 +3360,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'A webhely rendszergazdája, 
 $string['privacy:metadata:model_switch'] = 'Modellváltások és visszavonások: egy szerepkör melyik modellről melyikre váltott, és miért. Az egyetlen személyes adat a váltást végző vagy visszavonó rendszergazda azonosítója. Ezek a sorok webhelybeállítások, nem pedig egy tanuló személyes adatai, ezért nem kerülnek bele az adatexportba, és nem törlődnek, amikor egy felhasználó törlést kér.';
 $string['privacy:metadata:model_switch:createdby'] = 'A webhely rendszergazdája, aki ezt a váltást végezte. Üres, ha automatikus volt.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'A webhely rendszergazdája, aki visszavonta ezt a váltást. Üres, ha a figyelő vonta vissza, vagy nem vonták vissza.';
+
+$string['autoupgrade:block_reasoning'] = 'A Gondolkodási ráfordítás egyetlen beállítás az egész webhelyre, és a(z) {$a} szerepkör is egy gondolkodó modellt futtat, amelyet nem teszteltek az új szinten. Ha ezt szeretné, váltson kézzel.';

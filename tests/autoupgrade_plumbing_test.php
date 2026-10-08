@@ -78,6 +78,57 @@ final class autoupgrade_plumbing_test extends \advanced_testcase {
         $this->assertSame([], discover_models::queue_due());
     }
 
+    public function test_nightly_discovery_does_not_reset_the_pass_and_retry_clocks(): void {
+        global $DB;
+        $now = time();
+        $passed = candidates::upsert(roles::CHAT, 'openai', 'a-1', '', 'test');
+        candidates::record_verdict($passed, true, 0, 2);
+        $failed = candidates::upsert(roles::CHAT, 'openai', 'a-2', '', 'test');
+        candidates::record_verdict($failed, false, 0, 2);
+        $DB->set_field(candidates::TABLE, 'timestatus', $now - 21 * HOURSECS, ['id' => $passed]);
+        $DB->set_field(candidates::TABLE, 'timestatus', $now - 31 * DAYSECS, ['id' => $failed]);
+        // Discovery sees both again tonight, just before queueing.
+        candidates::upsert(roles::CHAT, 'openai', 'a-1', '', 'seen again');
+        candidates::upsert(roles::CHAT, 'openai', 'a-2', '', 'seen again');
+        $this->assertTrue(candidates::due(candidates::get($passed), $now), 'The second pass is due 20 h after the first.');
+        $this->assertTrue(candidates::due(candidates::get($failed), $now), 'A failed candidate is retried after 30 days.');
+        $this->assertCount(2, discover_models::queue_due($now));
+    }
+
+    public function test_a_dead_run_is_failed_and_its_candidate_queued_again(): void {
+        global $DB;
+        $cid = candidates::upsert(roles::CHAT, 'openai', 'a-1', '', 'test');
+        $eid = $DB->insert_record(evaluator::TABLE, (object) ['candidateid' => $cid, 'role' => roles::CHAT,
+            'provider' => 'openai', 'model' => 'a-1', 'variant' => '', 'inc_provider' => 'openai', 'inc_model' => 'gpt-4o-mini',
+            'inc_variant' => '', 'status' => evaluator::RUNNING, 'est_cost_usd' => 3, 'actual_cost_usd' => 0.4,
+            'timecreated' => time() - 8 * HOURSECS, 'timestarted' => time() - 7 * HOURSECS]);
+        $this->assertEqualsWithDelta(3.0, budget::spent(), 1e-6, 'A run in flight holds its estimate.');
+        $this->assertEqualsWithDelta(0.0, budget::spent(null, (int) $eid), 1e-6, 'Except against itself.');
+        $this->assertCount(1, discover_models::queue_due());
+        $this->assertSame(evaluator::FAILED, $DB->get_field(evaluator::TABLE, 'status', ['id' => $eid]));
+        $this->assertEqualsWithDelta(0.4, budget::spent(), 1e-6, 'What it spent before dying still counts.');
+    }
+
+    public function test_evaluate_now_twice_queues_one_run(): void {
+        global $DB;
+        $cid = candidates::upsert(roles::CHAT, 'openai', 'a-1', '', 'test');
+        $this->assertSame('success', autoupgrade\page::evaluate_now($cid, 2)['level']);
+        $this->assertSame('warning', autoupgrade\page::evaluate_now($cid, 2)['level']);
+        $this->assertSame(1, $DB->count_records(evaluator::TABLE, ['candidateid' => $cid]));
+    }
+
+    public function test_a_stale_eligible_candidate_is_sent_back_for_evaluation(): void {
+        global $DB;
+        $cid = candidates::upsert(roles::CHAT, 'openai', 'a-1', '', 'test');
+        $eid = $DB->insert_record(evaluator::TABLE, (object) ['candidateid' => $cid, 'role' => roles::CHAT,
+            'provider' => 'openai', 'model' => 'a-1', 'variant' => '', 'inc_provider' => 'openai', 'inc_model' => 'gpt-4.1-mini',
+            'inc_variant' => '', 'status' => evaluator::COMPLETE, 'gate_passed' => 1, 'actual_cost_usd' => 0,
+            'timecreated' => time()]);
+        candidates::record_verdict($cid, true, (int) $eid, 1);
+        $this->assertNull(switcher::best_eligible(roles::CHAT), 'It measured a model the role no longer runs.');
+        $this->assertSame(candidates::CANDIDATE, candidates::get($cid)->status);
+    }
+
     public function test_any_emergency_control_counts(): void {
         $this->assertFalse(emergency_control::any_active());
         emergency_control::disable([emergency_control::FLAG_OUTREACH], 'test', 'test');

@@ -79,9 +79,13 @@ class candidates {
         $key = ['role' => $role, 'provider' => $provider, 'model' => $model, 'variant' => $variant];
         $row = $DB->get_record(self::TABLE, $key);
         if ($row) {
+            // Seeing a candidate again must not touch timestatus: due() times
+            // the second pass and the 30-day retry from it, and discovery runs
+            // every night.
             $update = (object) ['id' => $row->id, 'reason' => $reason, 'timemodified' => $now];
             if ($row->status === self::RETIRED) {
                 $update->status = self::CANDIDATE;
+                $update->timestatus = $now;
             }
             $DB->update_record(self::TABLE, $update);
             return (int) $row->id;
@@ -91,6 +95,7 @@ class candidates {
             'passes' => 0,
             'lastevalid' => null,
             'reason' => $reason,
+            'timestatus' => $now,
             'timecreated' => $now,
             'timemodified' => $now,
         ]));
@@ -134,7 +139,7 @@ class candidates {
                     && in_array($row->status, [self::CANDIDATE, self::PASSED, self::FAILED], true)
             ) {
                 $DB->update_record(self::TABLE, (object) ['id' => $row->id, 'status' => self::RETIRED,
-                    'timemodified' => time()]);
+                    'timestatus' => time(), 'timemodified' => time()]);
             }
         }
     }
@@ -154,7 +159,7 @@ class candidates {
         $passes = $passed ? (int) $row->passes + 1 : 0;
         $status = !$passed ? self::FAILED : ($passes >= $required ? self::ELIGIBLE : self::PASSED);
         $DB->update_record(self::TABLE, (object) ['id' => $id, 'passes' => $passes, 'status' => $status,
-            'lastevalid' => $evalid, 'timemodified' => time()]);
+            'lastevalid' => $evalid, 'timestatus' => time(), 'timemodified' => time()]);
         return $DB->get_record(self::TABLE, ['id' => $id], '*', MUST_EXIST);
     }
 
@@ -167,7 +172,8 @@ class candidates {
      */
     public static function set_status(int $id, string $status): void {
         global $DB;
-        $DB->update_record(self::TABLE, (object) ['id' => $id, 'status' => $status, 'timemodified' => time()]);
+        $DB->update_record(self::TABLE, (object) ['id' => $id, 'status' => $status, 'timestatus' => time(),
+            'timemodified' => time()]);
     }
 
     /**
@@ -184,10 +190,10 @@ class candidates {
             case self::PASSED:
                 // The second pass is taken on another day, so the two
                 // measurements see different provider conditions.
-                return $now - (int) $row->timemodified >= 20 * HOURSECS;
+                return $now - (int) $row->timestatus >= 20 * HOURSECS;
             case self::FAILED:
             case self::ROLLEDBACK:
-                return $now - (int) $row->timemodified >= self::RETRY_AFTER_DAYS * DAYSECS;
+                return $now - (int) $row->timestatus >= self::RETRY_AFTER_DAYS * DAYSECS;
             default:
                 return false;
         }

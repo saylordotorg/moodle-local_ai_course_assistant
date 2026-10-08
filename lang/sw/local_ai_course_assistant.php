@@ -3364,3 +3364,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Msimamizi wa tovuti aliyeomb
 $string['privacy:metadata:model_switch'] = 'Mabadiliko na urejeshaji wa modeli: jukumu lilihama kutoka modeli gani kwenda ipi, na kwa nini. Data binafsi pekee ni kitambulisho cha msimamizi aliyefanya au kutengua mabadiliko. Safu hizi ni usanidi wa tovuti, si data binafsi ya mwanafunzi, kwa hivyo hazijumuishwi katika usafirishaji wa data na hazifutwi mtumiaji anapoomba kufutwa.';
 $string['privacy:metadata:model_switch:createdby'] = 'Msimamizi wa tovuti aliyefanya mabadiliko haya. Tupu ikiwa yalikuwa ya kiotomatiki.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Msimamizi wa tovuti aliyerudisha nyuma mabadiliko haya. Tupu ikiwa mfuatiliaji ndiye aliyeyarudisha au hayakurudishwa.';
+
+$string['autoupgrade:block_reasoning'] = 'Kiwango cha kufikiri ni mpangilio mmoja kwa tovuti nzima, na jukumu la {$a} pia linaendesha modeli ya kufikiri ambayo haijajaribiwa katika kiwango kipya. Badilisha mwenyewe ikiwa hilo ndilo unalotaka.';

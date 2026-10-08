@@ -3358,3 +3358,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'L\'amministratore del sito c
 $string['privacy:metadata:model_switch'] = 'Cambi e ripristini di modello: da quale a quale modello è passato un ruolo e perché. L\'unico dato personale è l\'identificativo dell\'amministratore che ha fatto o annullato il cambio. Queste righe sono configurazione del sito e non dati personali di uno studente, quindi non sono incluse in un\'esportazione dei dati e non vengono rimosse quando un utente chiede la cancellazione.';
 $string['privacy:metadata:model_switch:createdby'] = 'L\'amministratore del sito che ha fatto questo cambio. Vuoto quando è stato automatico.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'L\'amministratore del sito che ha ripristinato questo cambio. Vuoto quando lo ha fatto il monitoraggio o se non è stato ripristinato.';
+
+$string['autoupgrade:block_reasoning'] = 'L\'intensità del ragionamento è un\'unica impostazione per tutto il sito, e il ruolo {$a} usa anche un modello di ragionamento che non è stato testato al nuovo livello. Cambia manualmente se è ciò che desideri.';

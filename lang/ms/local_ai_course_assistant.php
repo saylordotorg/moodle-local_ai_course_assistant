@@ -3363,3 +3363,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Pentadbir laman yang meminta
 $string['privacy:metadata:model_switch'] = 'Pertukaran dan pengembalian model: dari model mana dan ke model mana sesuatu peranan beralih, dan sebabnya. Satu-satunya data peribadi ialah pengecam pentadbir yang membuat atau membatalkan pertukaran. Baris ini ialah konfigurasi laman dan bukan data peribadi tentang pelajar, jadi ia tidak dimasukkan dalam eksport data dan tidak dibuang apabila pengguna meminta pemadaman.';
 $string['privacy:metadata:model_switch:createdby'] = 'Pentadbir laman yang membuat pertukaran ini. Kosong apabila ia automatik.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Pentadbir laman yang mengembalikan pertukaran ini. Kosong apabila pemantau yang melakukannya, atau ia tidak dikembalikan.';
+
+$string['autoupgrade:block_reasoning'] = 'Usaha penaakulan ialah satu tetapan untuk seluruh tapak, dan peranan {$a} juga menjalankan model pemikiran yang belum diuji pada tahap baharu. Tukar secara manual jika itu yang anda mahukan.';

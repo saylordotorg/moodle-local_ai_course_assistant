@@ -18,6 +18,7 @@ namespace local_ai_course_assistant\autoupgrade;
 
 use local_ai_course_assistant\audit_logger;
 use local_ai_course_assistant\emergency_control;
+use local_ai_course_assistant\model_capabilities;
 use local_ai_course_assistant\policy_bundle;
 
 /**
@@ -89,39 +90,54 @@ class switcher {
      * @return void
      */
     public static function after_evaluation(\stdClass $cand, \stdClass $eval): void {
+        global $DB;
         if ($cand->status !== candidates::ELIGIBLE) {
             return;
         }
         $best = self::best_eligible((string) $cand->role);
-        if ($best === null || (int) $best->id !== (int) $cand->id) {
+        if ($best === null) {
             return;
         }
-        $spec = roles::spec((string) $cand->role);
+        $besteval = $DB->get_record(evaluator::TABLE, ['id' => (int) $best->lastevalid]);
+        $spec = roles::spec((string) $best->role);
         if (self::mode() === self::MODE_AUTO && !empty($spec['auto'])) {
-            $result = self::switch_to($cand, $eval, 'auto', 0);
-            if (!$result['ok']) {
-                notifier::recommend($cand, $eval, $result['message']);
+            $result = self::switch_to($best, $besteval ?: null, 'auto', 0);
+            if (!$result['ok'] && $besteval) {
+                notifier::recommend($best, $besteval, $result['message']);
             }
             return;
         }
-        notifier::recommend($cand, $eval, empty($spec['auto'])
-            ? get_string('autoupgrade:why_manual_role', 'local_ai_course_assistant')
-            : get_string('autoupgrade:why_recommend_mode', 'local_ai_course_assistant'));
+        if ($besteval) {
+            notifier::recommend($best, $besteval, empty($spec['auto'])
+                ? get_string('autoupgrade:why_manual_role', 'local_ai_course_assistant')
+                : get_string('autoupgrade:why_recommend_mode', 'local_ai_course_assistant'));
+        }
     }
 
     /**
      * The best eligible candidate of a role: highest measured quality, then cheapest.
+     *
+     * An eligible candidate whose evaluations measured a model the role no
+     * longer runs is stale: it goes back to being a plain candidate, to be
+     * evaluated again against the model it would now replace, instead of
+     * outranking a fresh one it can never be switched in over.
      *
      * @param string $role
      * @return \stdClass|null
      */
     public static function best_eligible(string $role): ?\stdClass {
         global $DB;
+        $current = roles::current($role);
         $best = null;
         $bestkey = null;
         foreach ($DB->get_records(candidates::TABLE, ['role' => $role, 'status' => candidates::ELIGIBLE]) as $row) {
             $eval = $row->lastevalid ? $DB->get_record(evaluator::TABLE, ['id' => $row->lastevalid]) : null;
-            $metrics = $eval ? json_decode((string) $eval->metrics, true) : null;
+            if (!$eval || (string) $eval->inc_model !== $current['model'] || (string) $eval->inc_provider !== $current['provider']) {
+                $DB->update_record(candidates::TABLE, (object) ['id' => $row->id, 'status' => candidates::CANDIDATE,
+                    'passes' => 0, 'timestatus' => time(), 'timemodified' => time()]);
+                continue;
+            }
+            $metrics = json_decode((string) $eval->metrics, true);
             $q = (float) ($metrics['candidate']['quality'] ?? 0);
             $c = (float) ($metrics['candidate']['cost_cents'] ?? INF);
             $key = [$q, -$c];
@@ -159,6 +175,30 @@ class switcher {
             foreach (array_keys($writes) as $key) {
                 if (in_array($key, $managed, true)) {
                     return get_string('autoupgrade:block_bundle', 'local_ai_course_assistant', $key);
+                }
+            }
+        }
+        // The reasoning setting is site-wide. A switch that changes it changes
+        // how every other role's thinking model thinks too, and none of them
+        // was evaluated at the new level, so it waits for a person.
+        $spec = roles::spec($role);
+        if ($spec['variantkey'] !== null && array_key_exists($spec['variantkey'], $writes)) {
+            foreach (roles::all() as $other => $current) {
+                if ($other === $role || !$current['inuse'] || $current['model'] === '') {
+                    continue;
+                }
+                $profile = model_capabilities::profile($current['provider'], $current['model']);
+                $controlled = in_array(
+                    $profile['reasoning'],
+                    [model_capabilities::REASONING_OPENAI, model_capabilities::REASONING_GEMINI],
+                    true
+                );
+                if (!empty($profile['thinks']) && $controlled) {
+                    return get_string(
+                        'autoupgrade:block_reasoning',
+                        'local_ai_course_assistant',
+                        get_string('autoupgrade:role_' . $other, 'local_ai_course_assistant')
+                    );
                 }
             }
         }
@@ -202,10 +242,17 @@ class switcher {
             $previous[$key] = $old === false ? null : (string) $old;
         }
         $now = time();
+        // From the release that started recording failed turns' models at the
+        // latest: before it, every failure had a blank model and the old model
+        // would look error-free.
+        $since = max(
+            $now - watcher::BASELINE_DAYS * DAYSECS,
+            (int) get_config('local_ai_course_assistant', 'autoupgrade_failed_turns_since')
+        );
         $baseline = watcher::metrics(
             $current['provider'],
             $current['model'],
-            $now - watcher::BASELINE_DAYS * DAYSECS,
+            $since,
             $now
         );
         foreach ($writes as $key => $value) {

@@ -76,17 +76,26 @@ class budget {
     }
 
     /**
-     * What evaluations spent this calendar month, in USD.
+     * What evaluations spent, or have committed to, this calendar month, in USD.
      *
      * @param int|null $now
+     * @param int $exclude Evaluation id to leave out (the one asking).
      * @return float
      */
-    public static function spent(?int $now = null): float {
+    public static function spent(?int $now = null, int $exclude = 0): float {
         global $DB;
-        $sum = $DB->get_field_sql(
-            'SELECT SUM(actual_cost_usd) FROM {' . evaluator::TABLE . '} WHERE timecreated >= :since',
-            ['since' => self::month_start($now)]
-        );
+        // A finished run counts what it actually spent, in the month it finished.
+        // A queued or running one counts the larger of its estimate and what it
+        // has spent so far, so two runs starting together cannot both see the
+        // whole remaining budget. $exclude leaves out the run asking.
+        $sql = 'SELECT SUM(CASE WHEN status IN (:queued, :running)
+                                THEN (CASE WHEN COALESCE(est_cost_usd, 0) > actual_cost_usd
+                                           THEN COALESCE(est_cost_usd, 0) ELSE actual_cost_usd END)
+                                ELSE actual_cost_usd END)
+                  FROM {' . evaluator::TABLE . '}
+                 WHERE COALESCE(timecompleted, timecreated) >= :since AND id <> :exclude';
+        $sum = $DB->get_field_sql($sql, ['queued' => evaluator::QUEUED, 'running' => evaluator::RUNNING,
+            'since' => self::month_start($now), 'exclude' => $exclude]);
         return (float) ($sum ?: 0);
     }
 
@@ -94,10 +103,11 @@ class budget {
      * What is left this month.
      *
      * @param int|null $now
+     * @param int $exclude Evaluation id to leave out (the one asking).
      * @return float
      */
-    public static function remaining(?int $now = null): float {
-        return max(0.0, self::limit() - self::spent($now));
+    public static function remaining(?int $now = null, int $exclude = 0): float {
+        return max(0.0, self::limit() - self::spent($now, $exclude));
     }
 
     /**

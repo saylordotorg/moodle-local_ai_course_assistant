@@ -3320,3 +3320,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Administrátor stránky, kto
 $string['privacy:metadata:model_switch'] = 'Prepnutia a návraty modelov: z ktorého na ktorý model rola prešla a prečo. Jediný osobný údaj je identifikátor administrátora, ktorý prepnutie vykonal alebo vrátil. Tieto riadky sú konfiguráciou stránky, nie osobnými údajmi o študentovi, preto nie sú súčasťou exportu údajov a neodstraňujú sa, keď používateľ požiada o vymazanie.';
 $string['privacy:metadata:model_switch:createdby'] = 'Administrátor stránky, ktorý vykonal toto prepnutie. Prázdne, ak bolo automatické.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Administrátor stránky, ktorý toto prepnutie vrátil. Prázdne, ak ho vrátil sledovací proces alebo sa nevracalo.';
+
+$string['autoupgrade:block_reasoning'] = 'Intenzita uvažovania je jedno nastavenie pre celú lokalitu a rola {$a} tiež používa premýšľajúci model, ktorý nebol na novej úrovni otestovaný. Ak to chcete, prepnite ručne.';

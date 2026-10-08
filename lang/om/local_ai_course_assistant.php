@@ -3352,3 +3352,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Bulchaa saayitii madaallii k
 $string['privacy:metadata:model_switch'] = 'Jijjiiramootaa fi deebisuu moodeelaa: gaheen tokko moodeela kam irraa gara kamitti akka darbe, fi maaliif. Odeeffannoon dhuunfaa qofti eenyummeessaa bulchaa jijjiirama raawwatee ykn deebisee ti. Tarreewwan kun qindaa\'ina saayitii malee odeeffannoo dhuunfaa barataa waa\'ee hin taane, kanaafuu baasii odeeffannoo keessatti hin hammataman, yeroo fayyadamaan haquu gaafatus hin haqaman.';
 $string['privacy:metadata:model_switch:createdby'] = 'Bulchaa saayitii jijjiirama kana raawwate. Yoo ofumaan ta\'e duwwaa dha.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Bulchaa saayitii jijjiirama kana deebise. Yoo hordofaan deebise, ykn hin deebifamne duwwaa dha.';
+
+$string['autoupgrade:block_reasoning'] = 'Carraaqqiin yaadaa qindaa\'ina tokko marsariitii guutuuf ta\'e dha, akkasumas gaheen {$a} moodeela yaadu sadarkaa haaraa irratti hin qoratamne hojjechiisa. Kana yoo barbaadde harkaan jijjiiri.';

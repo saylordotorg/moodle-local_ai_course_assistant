@@ -3320,3 +3320,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Administrator witryny, któr
 $string['privacy:metadata:model_switch'] = 'Przełączenia i wycofania modeli: z którego na który model przeszła rola i dlaczego. Jedyną daną osobową jest identyfikator administratora, który wykonał lub cofnął przełączenie. Te wiersze są konfiguracją witryny, a nie danymi osobowymi uczącego się, więc nie są uwzględniane w eksporcie danych ani usuwane, gdy użytkownik żąda usunięcia danych.';
 $string['privacy:metadata:model_switch:createdby'] = 'Administrator witryny, który wykonał to przełączenie. Puste, gdy było automatyczne.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Administrator witryny, który cofnął to przełączenie. Puste, gdy zrobił to mechanizm obserwacji lub przełączenia nie cofnięto.';
+
+$string['autoupgrade:block_reasoning'] = 'Intensywność rozumowania to jedno ustawienie dla całej witryny, a rola {$a} również korzysta z modelu myślącego, który nie był testowany na nowym poziomie. Przełącz ręcznie, jeśli tego chcesz.';

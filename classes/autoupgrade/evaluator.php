@@ -84,6 +84,15 @@ class evaluator {
     /** @var float USD spent by this run so far. */
     private float $usd = 0.0;
 
+    /** @var int Evaluation being run, for writing spend as it accrues. */
+    private int $evalid = 0;
+
+    /** @var int Calls accounted since spend was last written. */
+    private int $unsaved = 0;
+
+    /** @var int Hours after which a running evaluation is presumed dead. */
+    public const STALE_HOURS = 6;
+
     /**
      * Constructor.
      *
@@ -146,7 +155,8 @@ class evaluator {
         if ($eval->status !== self::QUEUED) {
             return $eval;
         }
-        $DB->set_field(self::TABLE, 'status', self::RUNNING, ['id' => $evalid]);
+        $DB->update_record(self::TABLE, (object) ['id' => $evalid, 'status' => self::RUNNING, 'timestarted' => time()]);
+        $this->evalid = $evalid;
 
         try {
             $result = $this->measure($eval);
@@ -229,7 +239,7 @@ class evaluator {
             return ['status' => self::SKIPPED,
                 'message' => 'One of the models, or the judge, has no known price, so the run cannot be budgeted.'];
         }
-        $remaining = budget::remaining();
+        $remaining = budget::remaining(null, (int) $eval->id);
         if ($estimate > $remaining) {
             return ['status' => self::SKIPPED, 'message' => sprintf(
                 'Over the monthly testing budget: this run is estimated at $%.2f and $%.2f of $%.2f is left this month.',
@@ -301,10 +311,14 @@ class evaluator {
         int $evalid
     ): array {
         $provider = ($this->factory)((string) $side['provider'], (string) $side['model']);
-        $options = ['max_tokens' => $maxtokens];
-        if ((string) $side['variant'] === roles::VARIANT_THINKING_OFF) {
-            $options['reasoning'] = 'off';
-        }
+        // Each side runs at the reasoning level it runs (or would run) at in
+        // production: the current model at today's level, the candidate at the
+        // level the switch would write. Measuring a candidate at one level and
+        // putting it live at another would make the cost gate meaningless.
+        $level = $bucket === 'incumbent'
+            ? ((string) $side['variant'] === roles::VARIANT_THINKING_OFF ? 'off' : \local_ai_course_assistant\model_capabilities::site_level())
+            : roles::level_after($role, (string) $side['variant']);
+        $options = ['max_tokens' => $maxtokens, 'reasoning' => $level];
 
         $calls = 0;
         $errors = 0;
@@ -435,6 +449,35 @@ class evaluator {
     }
 
     /**
+     * Mark evaluations that have been running for too long as failed.
+     *
+     * A worker killed mid-run never reaches its own catch block, so its row
+     * would stay RUNNING for ever, blocking its candidate from being queued
+     * again and holding its estimate against the budget. What it spent before
+     * dying was written as it accrued and still counts.
+     *
+     * @param int|null $now
+     * @return int Rows marked.
+     */
+    public static function fail_stale(?int $now = null): int {
+        global $DB;
+        $cutoff = ($now ?? time()) - self::STALE_HOURS * HOURSECS;
+        $rows = $DB->get_records_select(
+            self::TABLE,
+            'status = :running AND COALESCE(timestarted, timecreated) < :cutoff',
+            ['running' => self::RUNNING, 'cutoff' => $cutoff],
+            '',
+            'id'
+        );
+        foreach ($rows as $row) {
+            $DB->update_record(self::TABLE, (object) ['id' => $row->id, 'status' => self::FAILED,
+                'message' => 'The run stopped without finishing (the worker was probably killed).',
+                'timecompleted' => $now ?? time()]);
+        }
+        return count($rows);
+    }
+
+    /**
      * The prompt set for a role, confined to the plugin directory.
      *
      * @param string $relpath
@@ -523,6 +566,13 @@ class evaluator {
         $cents = self::cost_cents($usage);
         if ($cents !== null) {
             $this->usd += $cents / 100;
+        }
+        // Written as it accrues, so a worker that dies mid-run (a fatal, an
+        // out-of-memory kill) still leaves its spend counted in the budget.
+        if (++$this->unsaved >= 10 && $this->evalid > 0) {
+            global $DB;
+            $DB->set_field(self::TABLE, 'actual_cost_usd', round($this->usd, 6), ['id' => $this->evalid]);
+            $this->unsaved = 0;
         }
         if (!isset($this->spend[$bucket])) {
             $this->spend[$bucket] = ['prompt_tokens' => 0, 'completion_tokens' => 0, 'cached_tokens' => 0,

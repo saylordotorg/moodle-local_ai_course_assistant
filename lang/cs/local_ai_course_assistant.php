@@ -3321,3 +3321,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Správce webu, který o toto
 $string['privacy:metadata:model_switch'] = 'Přepnutí a vrácení modelů: z kterého modelu a na který se role přesunula a proč. Jedinými osobními údaji je identifikátor správce, který přepnutí provedl nebo vrátil. Tyto záznamy jsou konfigurací webu, nikoli osobními údaji o studentovi, proto nejsou součástí exportu dat a neodstraňují se, když uživatel požádá o výmaz.';
 $string['privacy:metadata:model_switch:createdby'] = 'Správce webu, který toto přepnutí provedl. Prázdné, pokud bylo automatické.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Správce webu, který toto přepnutí vrátil zpět. Prázdné, pokud to udělal hlídač nebo pokud vráceno nebylo.';
+
+$string['autoupgrade:block_reasoning'] = 'Úsilí uvažování je jedno nastavení pro celý web a role {$a} také používá přemýšlející model, který nebyl na nové úrovni otestován. Pokud to chcete, přepněte ručně.';

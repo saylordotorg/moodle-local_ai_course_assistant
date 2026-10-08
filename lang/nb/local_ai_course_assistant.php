@@ -3318,3 +3318,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Nettstedsadministratoren som
 $string['privacy:metadata:model_switch'] = 'Modellbytter og tilbakerullinger: hvilken modell en rolle gikk fra og til, og hvorfor. Den eneste personopplysningen er identifikatoren til administratoren som gjorde eller omgjorde byttet. Disse radene er nettstedskonfigurasjon og ikke personopplysninger om en elev, så de tas ikke med i en dataeksport og fjernes ikke når en bruker ber om sletting.';
 $string['privacy:metadata:model_switch:createdby'] = 'Nettstedsadministratoren som gjorde dette byttet. Tom når det var automatisk.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Nettstedsadministratoren som rullet tilbake dette byttet. Tom når overvåkingen gjorde det, eller det ikke ble rullet tilbake.';
+
+$string['autoupgrade:block_reasoning'] = 'Resonneringsinnsats er én innstilling for hele nettstedet, og rollen {$a} kjører også en tenkende modell som ikke er testet på det nye nivået. Bytt manuelt hvis det er det du vil.';

@@ -3341,3 +3341,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Administrateur site bi laaj 
 $string['privacy:metadata:model_switch'] = 'Soppi modèle yi ak dellu yi: ban modèle la rôle bi jóge ak ban modèle la jëm, ak lu ko waral. Donnée personnelle bi rekk mooy identifiant administrateur bi def walla neenal soppi bi. Ligne yii configuration site lañu, du donnée personnelle ci benn jàngalekat, kon nekkuñu ci export donnée te duñu leen far su benn jëfandikukat laajee ñu far ay donnéeam.';
 $string['privacy:metadata:model_switch:createdby'] = 'Administrateur site bi def soppi bii. Dafay nekk neen su soppi bi automatique la woon.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Administrateur site bi dellu soppi bii ginnaaw. Dafay nekk neen su ki koy topp moo ko def, walla su ñu ko delluwul ginnaaw.';
+
+$string['autoupgrade:block_reasoning'] = 'Dayob xalaat ab tànneef rekk la ngir site bi yépp, te liggéey {$a} itam dafay jëfandikoo ab modèle bu xalaat bu ñu nattuwul ci tolluwaay bu bees bi. Soppi ko ak sa loxo su loolu nga bëgg.';

@@ -89,6 +89,7 @@ class discover_models extends \core\task\scheduled_task {
     public static function queue_due(?int $now = null): array {
         global $DB;
         $now = $now ?? time();
+        evaluator::fail_stale($now);
         if (budget::remaining($now) <= 0) {
             return [];
         }

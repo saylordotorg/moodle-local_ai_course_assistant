@@ -3372,3 +3372,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Administrator situs yang mem
 $string['privacy:metadata:model_switch'] = 'Peralihan dan pembatalan model: dari model mana ke model mana suatu peran berpindah, dan alasannya. Satu-satunya data pribadi adalah pengenal administrator yang melakukan atau membatalkan peralihan. Baris ini adalah konfigurasi situs, bukan data pribadi tentang pelajar, sehingga tidak disertakan dalam ekspor data dan tidak dihapus saat pengguna meminta penghapusan.';
 $string['privacy:metadata:model_switch:createdby'] = 'Administrator situs yang melakukan peralihan ini. Kosong jika peralihan otomatis.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Administrator situs yang membatalkan peralihan ini. Kosong jika pemantau yang membatalkannya, atau peralihan tidak dibatalkan.';
+
+$string['autoupgrade:block_reasoning'] = 'Upaya penalaran adalah satu pengaturan untuk seluruh situs, dan peran {$a} juga menjalankan model berpikir yang belum diuji pada tingkat baru. Ubah secara manual jika itu yang Anda inginkan.';

@@ -101,8 +101,8 @@ final class autoupgrade_evaluation_test extends \advanced_testcase {
         $this->assertSame(3, $m['candidate']['jailbreak']['runs']);
         $this->assertLessThan($m['incumbent']['cost_cents'], $m['candidate']['cost_cents']);
         $answers = array_count_values(fake_eval_provider::$calls);
-        $this->assertSame(50, $answers['inc-model:answer']);
-        $this->assertSame(50, $answers['cand-model:answer']);
+        $this->assertSame(50, $answers['inc-model:answer:low']);
+        $this->assertSame(50, $answers['cand-model:answer:low']);
         $this->assertSame(96, $answers['cand-model:probe'], 'Three jailbreak runs of 32 probes.');
         $this->assertGreaterThan(0, (float) $eval->actual_cost_usd);
         $this->assertSame(2, $DB->count_records(model_bench::TABLE, ['harness' => evaluator::HARNESS]));
@@ -201,7 +201,24 @@ final class autoupgrade_evaluation_test extends \advanced_testcase {
         $this->evaluator()->run($eid);
         $calls = array_count_values(fake_eval_provider::$calls);
         $this->assertSame(50, $calls['inc-model:answer:off']);
-        $this->assertSame(50, $calls['inc-model:answer']);
+        $this->assertSame(50, $calls['inc-model:answer:low']);
+    }
+
+    public function test_a_candidate_is_measured_at_the_level_it_would_run_at(): void {
+        // The site already runs the thinking-off variant. A candidate of another
+        // model would be switched in at the default level, so that is the level
+        // it is measured at; the current model keeps its own.
+        set_config('reasoning_effort', 'off', 'local_ai_course_assistant');
+        [, $eid] = $this->queued();
+        $this->evaluator()->run($eid);
+        $calls = array_count_values(fake_eval_provider::$calls);
+        $this->assertSame(50, $calls['cand-model:answer:low'] ?? 0);
+        $this->assertSame(50, $calls['inc-model:answer:off'] ?? 0);
+        $this->assertSame(
+            ['model' => 'cand-model', 'reasoning_effort' => 'low'],
+            roles::writes(roles::CHAT, 'cand-model', ''),
+            'The switch writes the level that was measured.'
+        );
     }
 
     public function test_an_emergency_stop_skips_the_run(): void {

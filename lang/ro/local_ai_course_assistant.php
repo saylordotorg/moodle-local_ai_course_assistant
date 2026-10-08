@@ -3320,3 +3320,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Administratorul site-ului ca
 $string['privacy:metadata:model_switch'] = 'Schimbări și reveniri de modele: de la ce model la ce model a trecut un rol și de ce. Singura dată personală este identificatorul administratorului care a făcut sau a anulat schimbarea. Aceste rânduri sunt configurație a site-ului, nu date personale despre un cursant, așa că nu sunt incluse într-un export de date și nu sunt șterse când un utilizator cere ștergerea.';
 $string['privacy:metadata:model_switch:createdby'] = 'Administratorul site-ului care a făcut această schimbare. Gol când a fost automată.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Administratorul site-ului care a anulat această schimbare. Gol când a anulat-o monitorul sau nu a fost anulată.';
+
+$string['autoupgrade:block_reasoning'] = 'Efortul de raționament este o singură setare pentru întregul site, iar rolul {$a} folosește și un model de gândire care nu a fost testat la noul nivel. Comutați manual dacă asta doriți.';

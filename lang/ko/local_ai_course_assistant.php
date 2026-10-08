@@ -3318,3 +3318,5 @@ $string['privacy:metadata:model_eval:createdby'] = '이 평가를 요청한 사�
 $string['privacy:metadata:model_switch'] = '모델 전환 및 롤백: 역할이 어떤 모델에서 어떤 모델로 바뀌었는지와 그 이유입니다. 유일한 개인 데이터는 전환을 수행하거나 되돌린 관리자의 식별자입니다. 이 행은 학습자에 관한 개인 데이터가 아닌 사이트 구성이므로 데이터 내보내기에 포함되지 않으며 사용자가 삭제를 요청해도 제거되지 않습니다.';
 $string['privacy:metadata:model_switch:createdby'] = '이 전환을 수행한 사이트 관리자입니다. 자동 전환이면 비어 있습니다.';
 $string['privacy:metadata:model_switch:rolledbackby'] = '이 전환을 롤백한 사이트 관리자입니다. 모니터링 기능이 롤백했거나 롤백되지 않은 경우 비어 있습니다.';
+
+$string['autoupgrade:block_reasoning'] = '추론 강도는 사이트 전체에 적용되는 하나의 설정이며, {$a} 역할도 새 수준에서 테스트되지 않은 사고 모델을 사용합니다. 원하시면 직접 전환하세요.';

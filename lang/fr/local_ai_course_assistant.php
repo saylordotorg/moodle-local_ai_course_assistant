@@ -3321,3 +3321,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'L’administrateur du site q
 $string['privacy:metadata:model_switch'] = 'Bascules et annulations de modèles : de quel modèle vers quel modèle un rôle est passé, et pourquoi. La seule donnée personnelle est l’identifiant de l’administrateur qui a effectué ou annulé la bascule. Ces lignes relèvent de la configuration du site et non des données personnelles d’un apprenant ; elles ne sont donc pas incluses dans un export de données ni supprimées lorsqu’un utilisateur demande l’effacement.';
 $string['privacy:metadata:model_switch:createdby'] = 'L’administrateur du site qui a effectué cette bascule. Vide lorsqu’elle était automatique.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'L’administrateur du site qui a annulé cette bascule. Vide si c’est le surveillant qui l’a fait, ou si elle n’a pas été annulée.';
+
+$string['autoupgrade:block_reasoning'] = 'L\'effort de raisonnement est un seul réglage pour tout le site, et le rôle {$a} utilise aussi un modèle de réflexion qui n\'a pas été testé au nouveau niveau. Changez-le manuellement si c\'est ce que vous voulez.';

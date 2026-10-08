@@ -3321,3 +3321,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Bu değerlendirmeyi isteyen 
 $string['privacy:metadata:model_switch'] = 'Model geçişleri ve geri almalar: bir görevin hangi modelden hangi modele geçtiği ve nedeni. Tek kişisel veri, geçişi yapan veya geri çeviren yöneticinin kimliğidir. Bu satırlar bir öğrenciye ait kişisel veri değil, site yapılandırmasıdır; bu nedenle veri dışa aktarımına dahil edilmez ve bir kullanıcı silme talep ettiğinde kaldırılmaz.';
 $string['privacy:metadata:model_switch:createdby'] = 'Bu geçişi yapan site yöneticisi. Geçiş otomatikse boştur.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Bu geçişi geri alan site yöneticisi. İzleyici geri aldıysa veya geri alınmadıysa boştur.';
+
+$string['autoupgrade:block_reasoning'] = 'Akıl yürütme düzeyi tüm site için tek bir ayardır ve {$a} rolü de yeni düzeyde test edilmemiş bir düşünen model çalıştırır. İstediğiniz buysa elle değiştirin.';

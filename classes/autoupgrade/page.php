@@ -268,8 +268,19 @@ class page {
      */
     public static function evaluate_now(int $candidateid, int $userid): array {
         $cand = candidates::get($candidateid);
+        global $DB;
         if ($cand === null || empty(roles::spec((string) $cand->role)['evaluable'])) {
             return self::result('error', get_string('autoupgrade:block_role', 'local_ai_course_assistant'));
+        }
+        // A double submit must not queue two billable runs.
+        if (
+            $DB->record_exists_select(
+                evaluator::TABLE,
+                'candidateid = :c AND status IN (:q, :r)',
+                ['c' => $candidateid, 'q' => evaluator::QUEUED, 'r' => evaluator::RUNNING]
+            )
+        ) {
+            return self::result('warning', get_string('autoupgrade:l_evaluating', 'local_ai_course_assistant'));
         }
         evaluator::queue($candidateid, $userid);
         return self::result('success', get_string('autoupgrade:queued', 'local_ai_course_assistant'));

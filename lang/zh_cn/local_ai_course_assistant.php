@@ -3356,3 +3356,5 @@ $string['privacy:metadata:model_eval:createdby'] = '请求此评估的站点管�
 $string['privacy:metadata:model_switch'] = '模型切换与回滚：某个角色从哪个模型切换到哪个模型，以及原因。唯一的个人数据是执行或撤销切换的管理员的标识符。这些记录属于站点配置，而非关于学习者的个人数据，因此不包含在数据导出中，用户请求删除数据时也不会被删除。';
 $string['privacy:metadata:model_switch:createdby'] = '执行此切换的站点管理员。自动切换时为空。';
 $string['privacy:metadata:model_switch:rolledbackby'] = '回滚此切换的站点管理员。由监控程序回滚或未回滚时为空。';
+
+$string['autoupgrade:block_reasoning'] = '推理强度是整个站点共用的一个设置，而 {$a} 角色也在运行一个未在新级别下测试过的思考模型。如果您确实想这样做，请手动切换。';

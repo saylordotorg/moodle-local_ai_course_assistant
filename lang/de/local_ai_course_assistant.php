@@ -3320,3 +3320,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Die Website-Administration, 
 $string['privacy:metadata:model_switch'] = 'Modellwechsel und Rücksetzungen: von welchem zu welchem Modell eine Rolle gewechselt hat und warum. Die einzigen personenbezogenen Daten sind die Kennung der Administratorin oder des Administrators, die oder der den Wechsel vorgenommen oder rückgängig gemacht hat. Diese Zeilen sind Website-Konfiguration und keine personenbezogenen Daten über Lernende, daher werden sie weder in einen Datenexport aufgenommen noch bei einem Löschantrag entfernt.';
 $string['privacy:metadata:model_switch:createdby'] = 'Die Website-Administration, die diesen Wechsel vorgenommen hat. Leer, wenn er automatisch erfolgte.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Die Website-Administration, die diesen Wechsel zurückgesetzt hat. Leer, wenn die Überwachung dies tat oder er nicht zurückgesetzt wurde.';
+
+$string['autoupgrade:block_reasoning'] = 'Denkaufwand ist eine Einstellung für die gesamte Website, und die Rolle {$a} nutzt ebenfalls ein Denkmodell, das auf der neuen Stufe nicht getestet wurde. Wechseln Sie manuell, wenn Sie das möchten.';

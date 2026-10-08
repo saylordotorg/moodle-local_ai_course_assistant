@@ -3347,3 +3347,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'El administrador del sitio q
 $string['privacy:metadata:model_switch'] = 'Cambios y reversiones de modelos: de qué modelo a qué modelo pasó una función y por qué. El único dato personal es el identificador del administrador que hizo o deshizo el cambio. Estas filas son configuración del sitio y no datos personales de un estudiante, por lo que no se incluyen en una exportación de datos ni se eliminan cuando un usuario solicita el borrado.';
 $string['privacy:metadata:model_switch:createdby'] = 'El administrador del sitio que hizo este cambio. Vacío cuando fue automático.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'El administrador del sitio que revirtió este cambio. Vacío cuando lo hizo el vigilante o no se revirtió.';
+
+$string['autoupgrade:block_reasoning'] = 'El esfuerzo de razonamiento es un único ajuste para todo el sitio, y el rol {$a} también usa un modelo de pensamiento que no se probó en el nuevo nivel. Cámbielo manualmente si eso es lo que quiere.';

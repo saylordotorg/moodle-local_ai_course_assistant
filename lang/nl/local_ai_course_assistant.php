@@ -3343,3 +3343,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'De sitebeheerder die om deze
 $string['privacy:metadata:model_switch'] = 'Modelwissels en terugdraaiingen: van welk naar welk model een rol ging, en waarom. Het enige persoonsgegeven is de identificatie van de beheerder die de wissel uitvoerde of terugdraaide. Deze rijen zijn siteconfiguratie en geen persoonsgegevens over een student, dus ze worden niet opgenomen in een gegevensexport en niet verwijderd wanneer een gebruiker om wissing vraagt.';
 $string['privacy:metadata:model_switch:createdby'] = 'De sitebeheerder die deze wissel uitvoerde. Leeg als die automatisch was.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'De sitebeheerder die deze wissel terugdraaide. Leeg als de bewaking het deed, of als die niet is teruggedraaid.';
+
+$string['autoupgrade:block_reasoning'] = 'Redeneerinspanning is één instelling voor de hele site, en de rol {$a} gebruikt ook een denkmodel dat niet op het nieuwe niveau is getest. Schakel handmatig over als u dat wilt.';

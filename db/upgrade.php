@@ -2218,11 +2218,12 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         $table->add_field('role', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
         $table->add_field('provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
         $table->add_field('model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
         $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'candidate');
         $table->add_field('passes', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('lastevalid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $table->add_field('reason', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timestatus', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
@@ -2238,10 +2239,10 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         $table->add_field('role', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
         $table->add_field('provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
         $table->add_field('model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, '');
-        $table->add_field('inc_provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, '');
-        $table->add_field('inc_model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '');
-        $table->add_field('inc_variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('inc_provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('inc_model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('inc_variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
         $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'queued');
         $table->add_field('est_cost_usd', XMLDB_TYPE_NUMBER, '12, 6', null, null, null, null);
         $table->add_field('actual_cost_usd', XMLDB_TYPE_NUMBER, '12, 6', null, XMLDB_NOTNULL, null, '0');
@@ -2253,6 +2254,7 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         $table->add_field('message', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('createdby', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timestarted', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $table->add_field('timecompleted', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('createdby_fk_eval', XMLDB_KEY_FOREIGN, ['createdby'], 'user', ['id']);
@@ -2265,12 +2267,12 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         $table = new xmldb_table('local_ai_course_assistant_model_switch');
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('role', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('from_provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, '');
-        $table->add_field('from_model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '');
-        $table->add_field('from_variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, '');
-        $table->add_field('to_provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, '');
-        $table->add_field('to_model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '');
-        $table->add_field('to_variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, '');
+        $table->add_field('from_provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('from_model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('from_variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('to_provider', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('to_model', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('to_variant', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
         $table->add_field('candidateid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $table->add_field('evalid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $table->add_field('mode', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, 'auto');
@@ -2292,6 +2294,11 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
+
+        // From this release failed turns record their provider and model. The
+        // watcher's error baseline starts here, so a switch in the first week
+        // is not compared with a past that could not record its errors.
+        set_config('autoupgrade_failed_turns_since', (string) time(), 'local_ai_course_assistant');
 
         upgrade_plugin_savepoint(true, 2026100701, 'local', 'ai_course_assistant');
     }

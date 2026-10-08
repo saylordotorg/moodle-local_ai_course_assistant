@@ -3364,3 +3364,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Maamulaha goobta ee codsaday
 $string['privacy:metadata:model_switch'] = 'Beddelaadyada iyo dib-u-celinta moodeellada: moodeelka doorku ka guuray iyo kan uu u guuray, iyo sababta. Xogta shakhsiyeed ee keliya waa aqoonsiga maamulaha sameeyay ama dib u celiyay beddelka. Safafkani waa dejinta goobta, ma aha xog shakhsiyeed oo arday ku saabsan, sidaa darteed laguma daro dhoofinta xogta lagamana tirtiro marka isticmaale codsado tirtirid.';
 $string['privacy:metadata:model_switch:createdby'] = 'Maamulaha goobta ee sameeyay beddelkan. Waa madhan marka uu toos ahaa.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Maamulaha goobta ee dib u celiyay beddelkan. Waa madhan marka ilaaliyuhu dib u celiyay ama aan dib loo celin.';
+
+$string['autoupgrade:block_reasoning'] = 'Dadaalka fekerka waa hal dejin oo loogu talagalay goobta oo dhan, doorka {$a} sidoo kale wuxuu socodsiiyaa nooc fekera oo aan lagu tijaabin heerka cusub. Gacanta ku beddel haddii taas tahay waxa aad rabto.';

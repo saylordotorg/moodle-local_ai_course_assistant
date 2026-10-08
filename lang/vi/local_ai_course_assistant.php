@@ -3340,3 +3340,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Quản trị viên trang đ�
 $string['privacy:metadata:model_switch'] = 'Chuyển đổi và hoàn tác mô hình: một vai trò đã chuyển từ mô hình nào sang mô hình nào, và lý do. Dữ liệu cá nhân duy nhất là mã định danh của quản trị viên đã thực hiện hoặc đảo ngược việc chuyển đổi. Các hàng này là cấu hình trang chứ không phải dữ liệu cá nhân về học viên, nên không có trong bản xuất dữ liệu và không bị xóa khi người dùng yêu cầu xóa dữ liệu.';
 $string['privacy:metadata:model_switch:createdby'] = 'Quản trị viên trang đã thực hiện lần chuyển đổi này. Để trống khi chuyển đổi là tự động.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Quản trị viên trang đã hoàn tác lần chuyển đổi này. Để trống khi bộ giám sát hoàn tác, hoặc khi nó không bị hoàn tác.';
+
+$string['autoupgrade:block_reasoning'] = 'Mức độ suy luận là một cài đặt chung cho toàn bộ trang, và vai trò {$a} cũng chạy một mô hình tư duy chưa được kiểm thử ở mức mới. Hãy chuyển thủ công nếu đó là điều bạn muốn.';

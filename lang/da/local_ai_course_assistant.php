@@ -3320,3 +3320,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Den webstedsadministrator, d
 $string['privacy:metadata:model_switch'] = 'Modelskift og tilbagerulninger: hvilken model en rolle skiftede fra og til, og hvorfor. De eneste personoplysninger er id\'et for den administrator, der foretog eller omgjorde skiftet. Disse rækker er webstedskonfiguration og ikke personoplysninger om en kursist, så de medtages ikke i en dataeksport og fjernes ikke, når en bruger anmoder om sletning.';
 $string['privacy:metadata:model_switch:createdby'] = 'Den webstedsadministrator, der foretog dette skift. Tom, når det var automatisk.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Den webstedsadministrator, der rullede dette skift tilbage. Tom, når overvågningen gjorde det, eller hvis det ikke blev rullet tilbage.';
+
+$string['autoupgrade:block_reasoning'] = 'Ræsonneringsindsats er én indstilling for hele webstedet, og rollen {$a} kører også en tænkende model, der ikke er testet på det nye niveau. Skift manuelt, hvis det er det, du vil.';

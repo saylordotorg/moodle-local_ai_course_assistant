@@ -3341,3 +3341,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Alábòójútó ojú òpó t
 $string['privacy:metadata:model_switch'] = 'Àwọn ìyípadà àti ìdápadà awoṣe: awoṣe wo ni ipa kan ti kúrò àti èyí tí ó lọ sí, àti ìdí rẹ̀. Dátà ti ara ẹni kan ṣoṣo ni ìdánimọ̀ alábòójútó tí ó ṣe ìyípadà náà tàbí tí ó yí i padà. Àwọn ìlà yìí jẹ́ ètò ojú òpó, kì í ṣe dátà ti ara ẹni nípa akẹ́kọ̀ọ́, nítorí náà a kò fi wọ́n sínú ìkójáde dátà, a kò sì pa wọ́n rẹ́ nígbà tí olùlò bá béèrè pé kí a pa dátà rẹ̀ rẹ́.';
 $string['privacy:metadata:model_switch:createdby'] = 'Alábòójútó ojú òpó tí ó ṣe ìyípadà yìí. Ó ṣófo nígbà tí ó jẹ́ aládàáṣe.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Alábòójútó ojú òpó tí ó dá ìyípadà yìí padà. Ó ṣófo nígbà tí olùṣọ́ ló ṣe é, tàbí tí a kò dá a padà.';
+
+$string['autoupgrade:block_reasoning'] = 'Ìpele ìrònú jẹ́ ètò kan ṣoṣo fún gbogbo ojú òpó, ipa {$a} náà sì ń lo àwòṣe ìrònú tí a kò tíì dánwò ní ìpele tuntun náà. Yí i padà fúnra rẹ bí ìyẹn bá jẹ́ ohun tí o fẹ́.';

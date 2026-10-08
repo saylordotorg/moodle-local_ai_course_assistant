@@ -355,6 +355,11 @@ class failover_chain implements provider_interface {
                 (int) $this->options['courseid'],
                 [
                     'failed_label' => $failed['label'],
+                    // v7.8.0: the model that failed, so the watcher of a model
+                    // switch counts a failure the chain rescued; the learner's
+                    // answer row names the fallback model, not this one.
+                    'failed_model' => method_exists($failed['provider'], 'model_id')
+                        ? (string) $failed['provider']->model_id() : '',
                     'primary'      => $this->primarylabel,
                     'reason'       => mb_substr($reason, 0, 500),
                     'latency_ms'   => (int) round($elapsedseconds * 1000),

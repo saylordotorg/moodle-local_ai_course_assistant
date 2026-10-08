@@ -3320,3 +3320,5 @@ $string['privacy:metadata:model_eval:createdby'] = 'Sivuston ylläpitäjä, joka
 $string['privacy:metadata:model_switch'] = 'Mallien vaihdot ja peruutukset: mistä mallista mihin malliin rooli siirtyi ja miksi. Ainoa henkilötieto on vaihdon tehneen tai perineen ylläpitäjän tunniste. Nämä rivit ovat sivuston asetuksia eivätkä oppijaa koskevia henkilötietoja, joten niitä ei sisällytetä tietojen vientiin eikä poisteta, kun käyttäjä pyytää tietojensa poistamista.';
 $string['privacy:metadata:model_switch:createdby'] = 'Sivuston ylläpitäjä, joka teki tämän vaihdon. Tyhjä, kun vaihto oli automaattinen.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'Sivuston ylläpitäjä, joka perui tämän vaihdon. Tyhjä, kun seurantaprosessi perui sen tai sitä ei peruttu.';
+
+$string['autoupgrade:block_reasoning'] = 'Päättelyn määrä on yksi asetus koko sivustolle, ja roolissa {$a} toimii myös ajatteleva malli, jota ei ole testattu uudella tasolla. Vaihda käsin, jos haluat niin.';
