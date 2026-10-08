@@ -1,0 +1,11 @@
+Version 7.8.0 (build 2026100701)
+
+Newer models work, and new ones won't break the assistant. What each model accepts (its length field, temperature, and how its thinking is controlled) now lives in data instead of checks on model names. OpenAI's GPT-6 models, which failed every request, now work, and GPT-5 and o-series reasoning models get room to think so their answers aren't empty or cut off.
+
+Requests heal themselves. When a provider rejects a request and names the parameter, the assistant changes that one parameter, retries once, and remembers the fix for that model. It never retries an error it doesn't recognize.
+
+Automatic model upgrades. Each night the assistant can test newer models against the current one and switch to one that costs the same or less per answer and does at least as well on tutoring quality, jailbreak resistance, cut-off answers and errors, then roll back by itself if live answers get worse. On by default, capped at 10 USD a month of test calls, and switchable to recommend-only or off.
+
+New Reasoning effort setting (low by default) for OpenAI reasoning models; for Gemini, Off turns thinking off.
+
+Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.
