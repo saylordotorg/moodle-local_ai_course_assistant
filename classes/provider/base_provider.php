@@ -571,7 +571,7 @@ abstract class base_provider implements provider_interface {
             $detail = "The model \"{$this->model}\" was not found (HTTP 404). "
                 . "Check the model name in Site Admin > Plugins > AI Course Assistant. "
                 . "The default for this provider is \"{$defaultmodel}\".";
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $detail);
+            throw new model_not_found_exception($detail);
         }
 
         if ($httpcode === 503) {

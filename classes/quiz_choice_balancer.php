@@ -27,7 +27,8 @@ namespace local_ai_course_assistant;
  *
  * Two different tools fix the two biases:
  *  - shuffle() puts the key at a uniformly random letter, so letters carry no
- *    information. It cannot touch length, which moves with the option.
+ *    information. It cannot touch length, which moves with the option, and it
+ *    leaves a question alone when text in it names a letter.
  *  - flag_long_keys() finds questions whose key stands out by length, so the
  *    caller can have the distractors rewritten (replaced, never the key
  *    shortened, which would change what the question tests) before shuffling.
@@ -147,15 +148,66 @@ class quiz_choice_balancer {
     }
 
     /**
-     * Put the key at a random letter, relabel the choices, and fix letters named in the explanation.
+     * Whether text refers to a choice by letter ("option B", "(C)", "A is correct").
+     *
+     * Deliberately broad: a false positive only leaves one question in the order
+     * the model wrote it, while rewriting such text would also rewrite subject
+     * matter ("Vitamin C is the correct answer", "Plan B", "Hepatitis (B)").
+     *
+     * @param string $text
+     * @return bool
+     */
+    public static function references_letters(string $text): bool {
+        return preg_match(
+            '/\b(?:options?|choices?|answers?|letters?)\s+(?-i:[A-D])\b|\((?-i:[A-D])\)'
+            . '|\b(?-i:[A-D])\s+(?:is|was)\s+(?:the\s+)?(?:correct|incorrect|wrong|right)\b/iu',
+            $text
+        ) === 1;
+    }
+
+    /**
+     * Whether a choice's own text depends on the other choices or their order.
+     *
+     * "All of the above", "Both A and B", "A and C only": moving these makes
+     * the correct answer say something else, so such a question is never shuffled.
+     *
+     * @param array $choices
+     * @return bool
+     */
+    public static function choices_refer_to_each_other(array $choices): bool {
+        foreach ($choices as $c) {
+            $text = self::strip_label((string) $c);
+            if (preg_match(
+                '/\b(?:above|below)\b'
+                . '|(?-i:\b[A-D]\b)\s*(?:,|and|or|&)\s*(?-i:\b[A-D]\b)'
+                . '|\b(?:both|neither|either|options?|choices?|answers?)\s+(?-i:[A-D])\b/iu',
+                $text
+            ) === 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Put the key at a random letter and relabel the choices.
+     *
+     * A question is left exactly as written when it is not a clean A-D item,
+     * when a choice depends on the other choices, or when its explanation names
+     * a letter, because the shuffle would then make that text point at the wrong
+     * option. The prompt asks models not to name letters, so this is the exception.
      *
      * @param array $q A question.
      * @param callable|null $rand fn(int $max): int returning 0..$max, for tests. Defaults to random_int.
-     * @return array The question; unchanged when it is not a clean A-D item.
+     * @return array The question.
      */
     public static function shuffle(array $q, ?callable $rand = null): array {
         $k = self::key_index($q);
-        if ($k === null) {
+        if (
+            $k === null
+            || self::choices_refer_to_each_other($q['choices'])
+            || self::references_letters((string) ($q['explanation'] ?? ''))
+        ) {
             return $q;
         }
         $rand = $rand ?? static fn(int $max): int => random_int(0, $max);
@@ -167,19 +219,14 @@ class quiz_choice_balancer {
             $j = $rand($i);
             [$items[$i], $items[$j]] = [$items[$j], $items[$i]];
         }
-        $map = [];
         $choices = [];
         foreach ($items as $new => $item) {
-            $map[self::LETTERS[$item['old']]] = self::LETTERS[$new];
             $choices[] = $item['text'];
             if ($item['old'] === $k) {
                 $q['correct'] = self::LETTERS[$new];
             }
         }
         $q['choices'] = self::relabel($choices);
-        if (!empty($q['explanation'])) {
-            $q['explanation'] = self::remap_letters((string) $q['explanation'], $map);
-        }
         return $q;
     }
 
@@ -195,32 +242,5 @@ class quiz_choice_balancer {
             $out[] = self::LETTERS[$i] . ') ' . $t;
         }
         return $out;
-    }
-
-    /**
-     * Rewrite letters an explanation uses to name choices ("option B", "(C)", "A is correct").
-     *
-     * One pass over one combined pattern, so a letter is never mapped twice.
-     * Only forms that clearly name a choice are touched; a bare "A" in a
-     * sentence is the article and is left alone.
-     *
-     * @param string $text
-     * @param array $map old letter => new letter
-     * @return string
-     */
-    public static function remap_letters(string $text, array $map): string {
-        $pattern = '/\b(?<pre>(?:options?|choices?|answers?|letters?)\s+)(?<a>(?-i:[A-D]))\b'
-            . '|\((?<b>(?-i:[A-D]))\)'
-            . '|\b(?<c>(?-i:[A-D]))(?<post>\s+(?:is|was)\s+(?:the\s+)?(?:correct|incorrect|wrong|right)\b)/iu';
-        return preg_replace_callback($pattern, static function (array $m) use ($map): string {
-            $swap = static fn(string $l): string => $map[strtoupper($l)] ?? strtoupper($l);
-            if (!empty($m['a'])) {
-                return $m['pre'] . $swap($m['a']);
-            }
-            if (!empty($m['b'])) {
-                return '(' . $swap($m['b']) . ')';
-            }
-            return $swap($m['c']) . $m['post'];
-        }, $text);
     }
 }

@@ -106,6 +106,8 @@ class failover_chain implements provider_interface {
      */
     public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
         $chain = $this->build_chain();
+        // Same reason as the providers' own reset: a chain that fails must not report the last success's usage.
+        $this->lastused = null;
         // v7.2.8: keep the FIRST failure and a trail of every attempt.
         // Rethrowing only the last one meant the surfaced error came from
         // the end of the chain, so a gemini primary that failed was

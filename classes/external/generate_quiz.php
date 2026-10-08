@@ -434,6 +434,8 @@ class generate_quiz extends external_api {
                 'id' => $i,
                 'question' => $q['question'],
                 'correct_answer' => quiz_choice_balancer::strip_label((string) $q['choices'][$k]),
+                // Why the key is right, so a rewritten distractor is not accidentally also right.
+                'why_correct' => $q['explanation'],
                 'current_distractors' => $distractors,
             ];
         }
@@ -446,8 +448,9 @@ class generate_quiz extends external_api {
             . "- Each must be a plausible misconception, common mistake or near-miss, and clearly wrong.\n"
             . "- Same grammatical form as the correct answer; no \"all of the above\" or \"none of the above\".\n"
             . "- No absolute words (always, never, only, exclusively, obviously, certainly).\n"
-            . "- Never equal to the correct answer or to each other.\n"
-            . "Return JSON only.";
+            . "- Never equal to the correct answer or to each other, and clearly wrong given why_correct.\n"
+            . "Return ONLY JSON of exactly this shape, with one entry per item and the item's id: "
+            . '{"items":[{"id":0,"distractors":["...","...","..."]}]}';
         $schema = [
             'name' => 'rewrite_distractors',
             'description' => 'New distractors for the listed quiz questions',
@@ -482,7 +485,14 @@ class generate_quiz extends external_api {
             self::record_quiz_usage($provider, $courseid, count($flagged), $topic, $cmid, ' (distractor rewrite)');
         }
         $decoded = json_decode((string) $response, true);
-        foreach ((array) ($decoded['items'] ?? []) as $item) {
+        if (!is_array($decoded)) {
+            // A provider that ignores response_schema may fence the JSON or add words around it.
+            $text = preg_replace('/^```(?:json)?\s*|\s*```$/m', '', (string) $response);
+            if (preg_match('/\{.*\}/s', (string) $text, $m)) {
+                $decoded = json_decode($m[0], true);
+            }
+        }
+        foreach ((array) (is_array($decoded) ? ($decoded['items'] ?? []) : []) as $item) {
             $i = (int) ($item['id'] ?? -1);
             if (!in_array($i, $flagged, true) || !is_array($item['distractors'] ?? null)) {
                 continue;

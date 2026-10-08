@@ -141,6 +141,52 @@ final class autoupgrade_discovery_test extends \advanced_testcase {
         $this->assertNotContains('gemini-2.5-flash', $probed, 'The current model is never probed.');
     }
 
+    public function test_the_real_probe_rejects_only_a_missing_model(): void {
+        $client = static function ($throw) {
+            return static function () use ($throw) {
+                return new class($throw) {
+                    /** @var \Throwable|null */
+                    private $throw;
+
+                    public function __construct($throw) {
+                        $this->throw = $throw;
+                    }
+
+                    public function chat_completion(string $s, array $m, array $o = []): string {
+                        if ($this->throw) {
+                            throw $this->throw;
+                        }
+                        return 'OK';
+                    }
+                };
+            };
+        };
+        $nf = new \local_ai_course_assistant\provider\model_not_found_exception('no such model');
+        $this->assertFalse(discovery::probe('gemini', 'm', $client($nf)));
+        $this->assertTrue(discovery::probe('gemini', 'm', $client(null)));
+        $this->assertTrue(discovery::probe('gemini', 'm', $client(new \local_ai_course_assistant\provider\provider_http_exception(400, 'bad'))));
+        $this->assertTrue(discovery::probe('gemini', 'm', $client(new \RuntimeException('timeout'))), 'Inconclusive keeps the candidate.');
+        $this->assertTrue(discovery::probe('gemini', 'm', $client(new \moodle_exception('chat:error_auth', 'local_ai_course_assistant'))));
+    }
+
+    public function test_a_404_from_the_provider_is_the_model_not_found_type(): void {
+        $p = new \local_ai_course_assistant\provider\openai_provider(['apikey' => 'k-test', 'model' => 'gpt-nope']);
+        $m = new \ReflectionMethod($p, 'check_http_error');
+        $m->setAccessible(true);
+        try {
+            $m->invoke($p, 404, '{}');
+            $this->fail('A 404 must throw.');
+        } catch (\local_ai_course_assistant\provider\model_not_found_exception $e) {
+            $this->assertStringContainsString('gpt-nope', (string) $e->debuginfo);
+        }
+        try {
+            $m->invoke($p, 400, '{}');
+            $this->fail('A 400 must throw.');
+        } catch (\local_ai_course_assistant\provider\provider_http_exception $e) {
+            $this->assertSame(400, $e->status);
+        }
+    }
+
     public function test_run_registers_marks_and_never_leaks_a_key(): void {
         global $DB;
         set_config('model', 'gemini-2.5-flash', 'local_ai_course_assistant');

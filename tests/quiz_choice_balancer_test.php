@@ -74,23 +74,40 @@ final class quiz_choice_balancer_test extends \basic_testcase {
         $this->assertSame('A) bravo text', $out['choices'][0]);
     }
 
-    public function test_explanation_letters_follow_the_choices(): void {
-        $out = quiz_choice_balancer::shuffle(
-            $this->q('Option A is right, (B) is a trap, and C is incorrect. A company is not an answer a student gives.'),
-            static fn(int $max): int => 0
-        );
-        // That order maps A to D, B to A, C to B and D to C.
-        $this->assertStringContainsString('Option D is right', $out['explanation']);
-        $this->assertStringContainsString('(A) is a trap', $out['explanation']);
-        $this->assertStringContainsString('B is incorrect', $out['explanation']);
-        $this->assertStringContainsString('A company', $out['explanation']);
-        $this->assertStringContainsString('answer a student', $out['explanation']);
+    public function test_a_question_whose_explanation_names_a_letter_is_left_alone(): void {
+        foreach ([
+            'Option A is right.', 'Choice (B) is a trap.', 'A is correct because it nets out.',
+            'Vitamin C is the correct answer because it prevents scurvy.', 'Plan B was the right call.',
+        ] as $text) {
+            $q = $this->q($text);
+            $this->assertSame($q, quiz_choice_balancer::shuffle($q, static fn(int $max): int => 0), $text);
+        }
     }
 
-    public function test_a_letter_is_never_remapped_twice(): void {
-        $text = quiz_choice_balancer::remap_letters('Option A is correct while option B is wrong.', ['A' => 'B', 'B' => 'A']);
-        $this->assertSame('Option B is correct while option A is wrong.', $text);
-        $this->assertSame('B is correct', quiz_choice_balancer::remap_letters('A is correct', ['A' => 'B']));
+    public function test_ordinary_explanations_do_not_block_the_shuffle(): void {
+        $q = $this->q('A balance sheet lists assets and liabilities, and answers a student gives should show both.');
+        $this->assertNotSame($q['choices'], quiz_choice_balancer::shuffle($q, static fn(int $max): int => 0)['choices']);
+    }
+
+    public function test_choices_that_depend_on_each_other_are_never_shuffled(): void {
+        foreach ([
+            ['A) Mitosis', 'B) Meiosis', 'C) Binary fission', 'D) Both A and B'],
+            ['A) One', 'B) Two', 'C) Three', 'D) All of the above'],
+            ['A) One', 'B) Two', 'C) A and C only', 'D) None of the above'],
+            ['A) One', 'B) Two', 'C) Three', 'D) Both of the above'],
+            ['A) One', 'B) Two', 'C) Three', 'D) Options B and C'],
+        ] as $choices) {
+            $q = ['choices' => $choices, 'correct' => 'D', 'explanation' => ''];
+            $this->assertSame($q, quiz_choice_balancer::shuffle($q, static fn(int $max): int => 0), json_encode($choices));
+        }
+    }
+
+    public function test_ordinary_choices_with_capital_letters_still_shuffle(): void {
+        $q = [
+            'choices' => ['A) Vitamin A', 'B) Vitamin C', 'C) Plan B funding', 'D) Type A behavior'],
+            'correct' => 'A', 'explanation' => '',
+        ];
+        $this->assertNotSame($q, quiz_choice_balancer::shuffle($q, static fn(int $max): int => 0));
     }
 
     public function test_unclean_questions_are_left_alone(): void {

@@ -118,6 +118,64 @@ final class quiz_balance_wiring_test extends \advanced_testcase {
         $this->assertCount(4, $out[0]['choices']);
     }
 
+    public function test_a_fenced_reply_with_words_around_it_is_still_read(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $json = json_encode(['items' => [['id' => 0, 'distractors' => [
+            'a similar sized but plainly wrong claim made here', 'another plausible yet wrong answer of this size',
+            'yet one more wrong answer of equal length too',
+        ]]]]);
+        $out = $this->balance($this->fake("Here you go:\n```json\n" . $json . "\n```"), [$this->longkey()]);
+        $this->assertSame([], quiz_choice_balancer::flag_long_keys([$out[0]]));
+    }
+
+    public function test_the_repair_request_carries_the_json_shape_and_the_reason(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $seen = (object) ['system' => '', 'user' => ''];
+        $provider = new class($seen) {
+            /** @var object */
+            private $seen;
+
+            public function __construct($seen) {
+                $this->seen = $seen;
+            }
+
+            public function chat_completion(string $system, array $messages, array $options = []): string {
+                $this->seen->system = $system;
+                $this->seen->user = $messages[0]['content'];
+                return '{}';
+            }
+
+            public function get_last_token_usage(): ?array {
+                return null;
+            }
+        };
+        $this->balance($provider, [$this->longkey()]);
+        $this->assertStringContainsString('{"items":[{"id":0,"distractors"', $seen->system);
+        $this->assertStringContainsString('"why_correct":"Because."', $seen->user);
+    }
+
+    public function test_a_failed_repair_call_does_not_bill_the_previous_calls_usage_again(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $provider = new \local_ai_course_assistant\provider\openai_provider([
+            'apikey' => 'k-test', 'model' => 'gpt-4o-mini', 'apibaseurl' => 'http://127.0.0.1:9/v1',
+        ]);
+        // A previous successful call left usage behind.
+        $prop = new \ReflectionProperty($provider, 'last_token_usage');
+        $prop->setAccessible(true);
+        $prop->setValue($provider, ['model' => 'gpt-4o-mini', 'prompt_tokens' => 999, 'completion_tokens' => 999]);
+        // The next call fails before any response: nothing listens on that port.
+        try {
+            $provider->chat_completion('s', [['role' => 'user', 'content' => 'u']], []);
+        } catch (\Throwable $e) {
+            unset($e);
+        }
+        $this->assertNull($provider->get_last_token_usage(), 'A failed call must not leave the previous usage behind.');
+    }
+
     public function test_garbage_reply_is_ignored(): void {
         $this->resetAfterTest();
         $this->setAdminUser();

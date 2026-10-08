@@ -18,7 +18,7 @@ namespace local_ai_course_assistant\autoupgrade;
 
 use local_ai_course_assistant\model_capabilities;
 use local_ai_course_assistant\provider\base_provider;
-use local_ai_course_assistant\provider\provider_http_exception;
+use local_ai_course_assistant\provider\model_not_found_exception;
 use local_ai_course_assistant\model_registry;
 use local_ai_course_assistant\security;
 
@@ -95,6 +95,9 @@ class discovery {
     /** @var callable HTTP GET: fn(string $url, array $headers): array{0: int, 1: string} */
     private $http;
 
+    /** @var array<string, bool> Probe answers this request, so a model is asked about once. */
+    private static array $probed = [];
+
     /** @var callable|null Probe: fn(string $provider, string $model): bool. Null skips probing (tests). */
     private $probe;
 
@@ -130,18 +133,30 @@ class discovery {
      *
      * @param string $provider
      * @param string $model
+     * @param callable|null $factory fn(provider, model): client, for tests.
      * @return bool False only when the provider says the model does not exist.
      */
-    public static function probe(string $provider, string $model): bool {
-        try {
-            $client = base_provider::create_for_comparison($provider, $model, 0, false);
-            $client->chat_completion('Reply with the single word OK.', [['role' => 'user', 'content' => 'ok']], ['max_tokens' => 16]);
-            return true;
-        } catch (provider_http_exception $e) {
-            return $e->status !== 404;
-        } catch (\Throwable $e) {
-            return true;
+    public static function probe(string $provider, string $model, ?callable $factory = null): bool {
+        // One call per model per run: the same model is a candidate for several roles.
+        $key = strtolower($provider . '|' . $model);
+        if ($factory === null && isset(self::$probed[$key])) {
+            return self::$probed[$key];
         }
+        try {
+            $client = $factory !== null
+                ? $factory($provider, $model)
+                : base_provider::create_for_comparison($provider, $model, 0, false);
+            $client->chat_completion('Reply with the single word OK.', [['role' => 'user', 'content' => 'ok']], ['max_tokens' => 16]);
+            $ok = true;
+        } catch (model_not_found_exception $e) {
+            $ok = false;
+        } catch (\Throwable $e) {
+            $ok = true;
+        }
+        if ($factory === null) {
+            self::$probed[$key] = $ok;
+        }
+        return $ok;
     }
 
     /**

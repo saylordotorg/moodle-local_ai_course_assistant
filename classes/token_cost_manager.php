@@ -141,9 +141,10 @@ class token_cost_manager {
         // longest-prefix means no claude-sonnet-5* string ever reaches it.
         // claude-haiku-5-5 is $0.10/$0.50 for prompts up to 100k tokens (verified
         // 2026-10-08), a tenth of Haiku 4.5. With no row it fell through to the
-        // bare 'claude-haiku' $1/$5 and priced every call 10x too high, and the
-        // price-gated auto-upgrade could not consider it. The long-prompt tier is
-        // not modelled; SOLA prompts sit far below 100k.
+        // bare 'claude-haiku' $1/$5 and priced every call 10x too high. Its price is
+        // also below the auto-upgrade's 0.2x band against a Haiku 4.5 incumbent, so
+        // discovery still offers it only to a role whose model is in that price range.
+        // The long-prompt tier is not modelled; SOLA prompts sit far below 100k.
         'claude-haiku-5-5'  => ['input' => 0.10, 'output' => 0.50],
         'claude-haiku-4-5'  => ['input' => 1.00, 'output' => 5.00],
         'claude-haiku'      => ['input' => 1.00, 'output' => 5.00],
