@@ -3323,3 +3323,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Administrator witryny, 
 
 $string['autoupgrade:block_reasoning'] = 'Intensywność rozumowania to jedno ustawienie dla całej witryny, a rola {$a} również korzysta z modelu myślącego, który nie był testowany na nowym poziomie. Przełącz ręcznie, jeśli tego chcesz.';
 $string['autoupgrade:block_reasoning_course'] = 'Wysiłek rozumowania to jedno ustawienie dla całej witryny, a jeden kurs używa własnego modelu myślącego ({$a}), którego nie przetestowano na nowym poziomie. Przełącz ręcznie, jeśli tego chcesz.';
+
+$string['savereport:summary'] = 'Podczas tego zapisu zmieniono {$a} ustawień AI Course Assistant:';
+$string['savereport:many'] = '<p>W jednym zapisie zmieniono {$a} ustawień. Strona wszystkich ustawień zapisuje wszystkie swoje pola naraz, więc sprawdź tę listę pod kątem zmian, których nie zamierzałeś wprowadzać. Każda strona ustawień w AI Course Assistant zapisuje tylko własne pola.</p>';
+$string['savereport:secret'] = 'zmieniono (wartość ukryta)';
+$string['savereport:lineendings'] = 'zapisano ponownie tylko z innymi znakami końca wiersza';
+$string['savereport:empty'] = 'puste';
+$string['check:primary_name'] = 'Główny dostawca AI Course Assistant';
+$string['check:primary_ok'] = 'W ciągu ostatnich 24 godzin nie wystąpiły błędy głównego dostawcy czatu.';
+$string['check:primary_failing'] = 'Główny dostawca czatu ({$a->model}) zawiódł {$a->failures} razy w ciągu ostatnich 24 godzin. Zapasowy dostawca odpowiedział na {$a->rescued} z tych żądań, więc uczący się mogli tego nie zauważyć. Ostatni błąd: {$a->reason}';

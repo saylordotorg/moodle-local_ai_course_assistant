@@ -3323,3 +3323,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Den webstedsadministrat
 
 $string['autoupgrade:block_reasoning'] = 'Ræsonneringsindsats er én indstilling for hele webstedet, og rollen {$a} kører også en tænkende model, der ikke er testet på det nye niveau. Skift manuelt, hvis det er det, du vil.';
 $string['autoupgrade:block_reasoning_course'] = 'Ræsonneringsindsats er én indstilling for hele webstedet, og et kursus bruger sin egen tænkende model ({$a}), som ikke er testet på det nye niveau. Skift manuelt, hvis det er det, du vil.';
+
+$string['savereport:summary'] = '{$a} indstillinger i AI Course Assistant blev ændret ved denne gemning:';
+$string['savereport:many'] = '<p>{$a} indstillinger blev ændret ved én gemning. Siden med alle indstillinger gemmer alle sine felter på én gang, så tjek listen for noget, du ikke havde tænkt dig at ændre. Hver indstillingsside under AI Course Assistant gemmer kun sine egne felter.</p>';
+$string['savereport:secret'] = 'ændret (værdien er skjult)';
+$string['savereport:lineendings'] = 'gemt igen med kun andre linjeskift';
+$string['savereport:empty'] = 'tom';
+$string['check:primary_name'] = 'Primær udbyder for AI Course Assistant';
+$string['check:primary_ok'] = 'Ingen fejl fra den primære chatudbyder inden for de seneste 24 timer.';
+$string['check:primary_failing'] = 'Den primære chatudbyder ({$a->model}) fejlede {$a->failures} gange inden for de seneste 24 timer. Backup-udbyderen besvarede {$a->rescued} af disse forespørgsler, så de studerende har måske ikke bemærket det. Seneste fejl: {$a->reason}';

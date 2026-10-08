@@ -29,4 +29,8 @@ $observers = [
         'eventname' => '\core\event\course_deleted',
         'callback'  => '\local_ai_course_assistant\observer::course_deleted',
     ],
+    [
+        'eventname' => '\core\event\config_log_created',
+        'callback'  => '\local_ai_course_assistant\settings_save_report::observe',
+    ],
 ];

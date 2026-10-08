@@ -3350,3 +3350,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'El administrador del si
 
 $string['autoupgrade:block_reasoning'] = 'El esfuerzo de razonamiento es un único ajuste para todo el sitio, y el rol {$a} también usa un modelo de pensamiento que no se probó en el nuevo nivel. Cámbielo manualmente si eso es lo que quiere.';
 $string['autoupgrade:block_reasoning_course'] = 'El esfuerzo de razonamiento es un único ajuste para todo el sitio, y un curso usa su propio modelo de pensamiento ({$a}) que no se probó en el nuevo nivel. Cámbielo manualmente si eso es lo que quiere.';
+
+$string['savereport:summary'] = 'En este guardado se cambiaron {$a} ajustes de AI Course Assistant:';
+$string['savereport:many'] = '<p>Se cambiaron {$a} ajustes en un solo guardado. La página de todos los ajustes guarda todos sus campos a la vez, así que revise esta lista por si hay algo que no quería cambiar. Cada página de ajustes de AI Course Assistant guarda solo sus propios campos.</p>';
+$string['savereport:secret'] = 'cambiado (valor oculto)';
+$string['savereport:lineendings'] = 'guardado de nuevo solo con distintos finales de línea';
+$string['savereport:empty'] = 'vacío';
+$string['check:primary_name'] = 'Proveedor principal de AI Course Assistant';
+$string['check:primary_ok'] = 'No hubo fallos del proveedor de chat principal en las últimas 24 horas.';
+$string['check:primary_failing'] = 'El proveedor de chat principal ({$a->model}) falló {$a->failures} veces en las últimas 24 horas. El proveedor de respaldo respondió {$a->rescued} de esas solicitudes, por lo que es posible que los estudiantes no lo notaran. Último error: {$a->reason}';

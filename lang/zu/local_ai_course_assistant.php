@@ -3368,3 +3368,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Umphathi wesayithi obuy
 
 $string['autoupgrade:block_reasoning'] = 'Izinga lokucabanga liyisilungiselelo esisodwa sesayithi lonke, futhi indima ye-{$a} nayo isebenzisa imodeli ecabangayo engazange ihlolwe ezingeni elisha. Shintsha ngesandla uma yilokho okufunayo.';
 $string['autoupgrade:block_reasoning_course'] = 'Umzamo wokucabanga uyisilungiselelo esisodwa sesayithi lonke, futhi esinye isifundo sisebenzisa imodeli yaso yokucabanga ({$a}) engazange ihlolwe ezingeni elisha. Shintsha ngesandla uma lokho yikho okufunayo.';
+
+$string['savereport:summary'] = 'Izilungiselelo ze-AI Course Assistant ezingu-{$a} ziguquliwe kulokhu kulondoloza:';
+$string['savereport:many'] = '<p>Izilungiselelo ezingu-{$a} ziguquliwe ekulondolozeni okukodwa. Ikhasi lazo zonke izilungiselelo lilondoloza zonke izinkambu zalo ngesikhathi esisodwa, ngakho-ke hlola leli rhasi uthole noma yini obungahlosile ukuyiguqula. Ikhasi ngalinye lezilungiselelo ngaphansi kwe-AI Course Assistant lilondoloza izinkambu zalo kuphela.</p>';
+$string['savereport:secret'] = 'iguquliwe (inani lifihliwe)';
+$string['savereport:lineendings'] = 'ilondolozwe futhi ngokwehlukile kokuphela kwemigqa kuphela';
+$string['savereport:empty'] = 'ize';
+$string['check:primary_name'] = 'Umhlinzeki oyinhloko we-AI Course Assistant';
+$string['check:primary_ok'] = 'Azikho izehlakalo zokwehluleka zomhlinzeki oyinhloko wengxoxo emahoreni angu-24 edlule.';
+$string['check:primary_failing'] = 'Umhlinzeki oyinhloko wengxoxo ({$a->model}) wehlulekile izikhathi ezingu-{$a->failures} emahoreni angu-24 edlule. Umhlinzeki wesipele uphendule izicelo ezingu-{$a->rescued} kuzo, ngakho abafundi kungenzeka bangaziboni. Iphutha lokugcina: {$a->reason}';

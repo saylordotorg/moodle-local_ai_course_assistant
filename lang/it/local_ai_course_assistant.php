@@ -3361,3 +3361,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'L\'amministratore del s
 
 $string['autoupgrade:block_reasoning'] = 'L\'intensità del ragionamento è un\'unica impostazione per tutto il sito, e il ruolo {$a} usa anche un modello di ragionamento che non è stato testato al nuovo livello. Cambia manualmente se è ciò che desideri.';
 $string['autoupgrade:block_reasoning_course'] = 'Lo sforzo di ragionamento è un\'unica impostazione per tutto il sito, e un corso usa un proprio modello che ragiona ({$a}) non testato al nuovo livello. Cambia a mano se è ciò che vuoi.';
+
+$string['savereport:summary'] = 'In questo salvataggio sono state modificate {$a} impostazioni di AI Course Assistant:';
+$string['savereport:many'] = '<p>In un solo salvataggio sono state modificate {$a} impostazioni. La pagina con tutte le impostazioni salva tutti i suoi campi in una volta, quindi controlla questo elenco per individuare ciò che non intendevi modificare. Ogni pagina di impostazioni di AI Course Assistant salva solo i propri campi.</p>';
+$string['savereport:secret'] = 'modificato (valore nascosto)';
+$string['savereport:lineendings'] = 'salvato di nuovo solo con terminatori di riga diversi';
+$string['savereport:empty'] = 'vuoto';
+$string['check:primary_name'] = 'Provider principale di AI Course Assistant';
+$string['check:primary_ok'] = 'Nessun errore dal provider di chat principale nelle ultime 24 ore.';
+$string['check:primary_failing'] = 'Il provider di chat principale ({$a->model}) ha avuto errori {$a->failures} volte nelle ultime 24 ore. Il provider di riserva ha risposto a {$a->rescued} di queste richieste, quindi gli studenti potrebbero non essersene accorti. Ultimo errore: {$a->reason}';

@@ -3323,3 +3323,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Die Website-Administrat
 
 $string['autoupgrade:block_reasoning'] = 'Denkaufwand ist eine Einstellung für die gesamte Website, und die Rolle {$a} nutzt ebenfalls ein Denkmodell, das auf der neuen Stufe nicht getestet wurde. Wechseln Sie manuell, wenn Sie das möchten.';
 $string['autoupgrade:block_reasoning_course'] = 'Der Denkaufwand ist eine Einstellung für die ganze Website, und ein Kurs nutzt ein eigenes denkendes Modell ({$a}), das auf der neuen Stufe nicht getestet wurde. Wechseln Sie manuell, wenn Sie das möchten.';
+
+$string['savereport:summary'] = '{$a} Einstellungen von AI Course Assistant wurden bei diesem Speichern geändert:';
+$string['savereport:many'] = '<p>Bei einem einzigen Speichervorgang wurden {$a} Einstellungen geändert. Die Seite mit allen Einstellungen speichert alle ihre Felder auf einmal. Prüfen Sie diese Liste daher auf Änderungen, die Sie nicht beabsichtigt hatten. Jede Einstellungsseite unter AI Course Assistant speichert nur ihre eigenen Felder.</p>';
+$string['savereport:secret'] = 'geändert (Wert verborgen)';
+$string['savereport:lineendings'] = 'erneut gespeichert, nur mit anderen Zeilenenden';
+$string['savereport:empty'] = 'leer';
+$string['check:primary_name'] = 'Hauptanbieter von AI Course Assistant';
+$string['check:primary_ok'] = 'In den letzten 24 Stunden gab es keine Fehler beim Haupt-Chat-Anbieter.';
+$string['check:primary_failing'] = 'Der Haupt-Chat-Anbieter ({$a->model}) ist in den letzten 24 Stunden {$a->failures}-mal ausgefallen. Der Ersatzanbieter hat {$a->rescued} dieser Anfragen beantwortet, sodass die Lernenden es möglicherweise nicht bemerkt haben. Letzter Fehler: {$a->reason}';

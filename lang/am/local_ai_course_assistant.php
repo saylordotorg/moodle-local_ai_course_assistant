@@ -3350,3 +3350,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'ይህን ለውጥ ወ
 
 $string['autoupgrade:block_reasoning'] = 'የምክንያት ጥረት ለመላው ጣቢያ አንድ ቅንብር ነው፤ የ{$a} ሚናም በአዲሱ ደረጃ ያልተፈተነ የማሰብ ሞዴል ያሄዳል። ይህን ከፈለጉ በእጅ ይቀይሩ።';
 $string['autoupgrade:block_reasoning_course'] = 'የአስተሳሰብ ጥረት ለመላው ጣቢያ አንድ ቅንብር ነው፣ እና አንድ ኮርስ በአዲሱ ደረጃ ያልተፈተነ የራሱን አስተሳሰብ ሞዴል ({$a}) ይጠቀማል። ይህን ከፈለጉ በእጅ ይቀይሩ።';
+
+$string['savereport:summary'] = 'በዚህ ማስቀመጥ ውስጥ {$a} የ AI Course Assistant ቅንብሮች ተለውጠዋል፦';
+$string['savereport:many'] = '<p>በአንድ ማስቀመጥ {$a} ቅንብሮች ተለውጠዋል። የሁሉም ቅንብሮች ገጽ በውስጡ ያሉትን ሁሉንም መስኮች በአንድ ጊዜ ያስቀምጣል፤ ስለዚህ ለመቀየር ያላሰቡትን ነገር ለማግኘት ይህን ዝርዝር ይመልከቱ። በ AI Course Assistant ስር ያለ እያንዳንዱ የቅንብሮች ገጽ የራሱን መስኮች ብቻ ያስቀምጣል።</p>';
+$string['savereport:secret'] = 'ተለውጧል (እሴቱ ተደብቋል)';
+$string['savereport:lineendings'] = 'በመስመር መጨረሻ ልዩነት ብቻ እንደገና ተቀምጧል';
+$string['savereport:empty'] = 'ባዶ';
+$string['check:primary_name'] = 'የ AI Course Assistant ዋና አቅራቢ';
+$string['check:primary_ok'] = 'ባለፉት 24 ሰዓታት ውስጥ ከዋናው የውይይት አቅራቢ ምንም ውድቀት አልተከሰተም።';
+$string['check:primary_failing'] = 'ዋናው የውይይት አቅራቢ ({$a->model}) ባለፉት 24 ሰዓታት ውስጥ {$a->failures} ጊዜ አልተሳካም። የመጠባበቂያ አቅራቢው ከእነዚህ ውስጥ {$a->rescued} ምላሾችን መልሷል፤ ስለዚህ ተማሪዎች ላያስተውሉ ይችላሉ። የመጨረሻ ስህተት፦ {$a->reason}';

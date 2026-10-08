@@ -3343,3 +3343,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'O administrador do site
 
 $string['autoupgrade:block_reasoning'] = 'O esforço de raciocínio é uma única configuração para todo o site, e a função {$a} também usa um modelo de raciocínio que não foi testado no novo nível. Troque manualmente se for isso que você quer.';
 $string['autoupgrade:block_reasoning_course'] = 'O esforço de raciocínio é uma configuração única para todo o site, e um curso usa seu próprio modelo de raciocínio ({$a}) que não foi testado no novo nível. Troque manualmente se for isso que você quer.';
+
+$string['savereport:summary'] = '{$a} configurações do AI Course Assistant foram alteradas neste salvamento:';
+$string['savereport:many'] = '<p>{$a} configurações foram alteradas em um único salvamento. A página de todas as configurações salva todos os seus campos de uma vez, então confira esta lista para ver se algo foi alterado sem querer. Cada página de configurações do AI Course Assistant salva apenas os próprios campos.</p>';
+$string['savereport:secret'] = 'alterado (valor oculto)';
+$string['savereport:lineendings'] = 'salvo novamente apenas com finais de linha diferentes';
+$string['savereport:empty'] = 'vazio';
+$string['check:primary_name'] = 'Provedor principal do AI Course Assistant';
+$string['check:primary_ok'] = 'Nenhuma falha do provedor de chat principal nas últimas 24 horas.';
+$string['check:primary_failing'] = 'O provedor de chat principal ({$a->model}) falhou {$a->failures} vezes nas últimas 24 horas. O provedor de reserva respondeu a {$a->rescued} dessas solicitações, então os alunos podem não ter percebido. Último erro: {$a->reason}';

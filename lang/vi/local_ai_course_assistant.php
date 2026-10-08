@@ -3343,3 +3343,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Quản trị viên tran
 
 $string['autoupgrade:block_reasoning'] = 'Mức độ suy luận là một cài đặt chung cho toàn bộ trang, và vai trò {$a} cũng chạy một mô hình tư duy chưa được kiểm thử ở mức mới. Hãy chuyển thủ công nếu đó là điều bạn muốn.';
 $string['autoupgrade:block_reasoning_course'] = 'Mức độ suy luận là một thiết lập chung cho toàn bộ trang, và một khóa học dùng mô hình suy nghĩ riêng ({$a}) chưa được kiểm tra ở mức mới. Hãy chuyển thủ công nếu đó là điều bạn muốn.';
+
+$string['savereport:summary'] = '{$a} cài đặt của AI Course Assistant đã thay đổi trong lần lưu này:';
+$string['savereport:many'] = '<p>{$a} cài đặt đã thay đổi trong một lần lưu. Trang tất cả cài đặt lưu mọi trường trên đó cùng một lúc, vì vậy hãy xem danh sách này để tìm bất kỳ thay đổi nào bạn không có ý định thực hiện. Mỗi trang cài đặt trong AI Course Assistant chỉ lưu các trường của riêng nó.</p>';
+$string['savereport:secret'] = 'đã thay đổi (giá trị bị ẩn)';
+$string['savereport:lineendings'] = 'đã lưu lại, chỉ khác ký tự kết thúc dòng';
+$string['savereport:empty'] = 'trống';
+$string['check:primary_name'] = 'Nhà cung cấp chính của AI Course Assistant';
+$string['check:primary_ok'] = 'Không có lỗi nào từ nhà cung cấp trò chuyện chính trong 24 giờ qua.';
+$string['check:primary_failing'] = 'Nhà cung cấp trò chuyện chính ({$a->model}) đã gặp lỗi {$a->failures} lần trong 24 giờ qua. Nhà cung cấp dự phòng đã trả lời {$a->rescued} trong số các yêu cầu đó, nên người học có thể không nhận ra. Lỗi gần nhất: {$a->reason}';

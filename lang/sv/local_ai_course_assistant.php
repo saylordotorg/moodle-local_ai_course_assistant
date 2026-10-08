@@ -3322,3 +3322,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Webbplatsadministratör
 
 $string['autoupgrade:block_reasoning'] = 'Resonemangsnivå är en enda inställning för hela webbplatsen, och rollen {$a} kör också en tänkande modell som inte har testats på den nya nivån. Byt manuellt om det är det du vill.';
 $string['autoupgrade:block_reasoning_course'] = 'Resonemangsinsats är en enda inställning för hela webbplatsen, och en kurs använder en egen tänkande modell ({$a}) som inte testats på den nya nivån. Byt manuellt om det är vad du vill.';
+
+$string['savereport:summary'] = '{$a} inställningar i AI Course Assistant ändrades vid den här sparningen:';
+$string['savereport:many'] = '<p>{$a} inställningar ändrades vid en enda sparning. Sidan med alla inställningar sparar alla sina fält på en gång, så kontrollera den här listan för sådant du inte tänkt ändra. Varje inställningssida under AI Course Assistant sparar bara sina egna fält.</p>';
+$string['savereport:secret'] = 'ändrad (värdet är dolt)';
+$string['savereport:lineendings'] = 'sparades igen med enbart andra radbrytningar';
+$string['savereport:empty'] = 'tom';
+$string['check:primary_name'] = 'Primär leverantör för AI Course Assistant';
+$string['check:primary_ok'] = 'Inga fel från den primära chattleverantören de senaste 24 timmarna.';
+$string['check:primary_failing'] = 'Den primära chattleverantören ({$a->model}) misslyckades {$a->failures} gånger de senaste 24 timmarna. Reservleverantören besvarade {$a->rescued} av de förfrågningarna, så de studerande har kanske inte märkt något. Senaste fel: {$a->reason}';

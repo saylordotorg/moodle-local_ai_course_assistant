@@ -3344,3 +3344,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Alábòójútó ojú ò
 
 $string['autoupgrade:block_reasoning'] = 'Ìpele ìrònú jẹ́ ètò kan ṣoṣo fún gbogbo ojú òpó, ipa {$a} náà sì ń lo àwòṣe ìrònú tí a kò tíì dánwò ní ìpele tuntun náà. Yí i padà fúnra rẹ bí ìyẹn bá jẹ́ ohun tí o fẹ́.';
 $string['autoupgrade:block_reasoning_course'] = 'Ìsapá ìrònú jẹ́ ètò kan fún gbogbo ojú-òpó náà, ẹ̀kọ́ kan sì ń lo àwòṣe ìrònú tirẹ̀ ({$a}) tí a kò dán wò ní ìpele tuntun. Yí i padà fúnra rẹ bí ìyẹn bá ni ohun tí o fẹ́.';
+
+$string['savereport:summary'] = 'A ti yi eto AI Course Assistant {$a} pada ninu ifipamọ yii:';
+$string['savereport:many'] = '<p>A ti yi eto {$a} pada ninu ifipamọ kan. Oju-iwe gbogbo eto n fi gbogbo awọn aaye inu rẹ pamọ ni ẹẹkan, nitorinaa ṣayẹwo atokọ yii fun ohunkohun ti o ko fẹ yipada. Oju-iwe eto kọọkan labẹ AI Course Assistant n fi awọn aaye tirẹ nikan pamọ.</p>';
+$string['savereport:secret'] = 'ti yipada (a fi iye pamọ)';
+$string['savereport:lineendings'] = 'a tun fi pamọ pẹlu iyatọ ipari ila nikan';
+$string['savereport:empty'] = 'ofo';
+$string['check:primary_name'] = 'Olupese akọkọ ti AI Course Assistant';
+$string['check:primary_ok'] = 'Ko si ikuna kankan lati ọdọ olupese ifọrọranṣẹ akọkọ ni wakati 24 sẹhin.';
+$string['check:primary_failing'] = 'Olupese ifọrọranṣẹ akọkọ ({$a->model}) kuna ni igba {$a->failures} ni wakati 24 sẹhin. Olupese afẹyinti dahun si {$a->rescued} ninu awọn ibeere wọnyẹn, nitorinaa o ṣee ṣe ki awọn akẹkọọ ma ṣe akiyesi. Aṣiṣe ikẹhin: {$a->reason}';

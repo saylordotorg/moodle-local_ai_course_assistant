@@ -3362,3 +3362,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'מנהל האתר שב�
 
 $string['autoupgrade:block_reasoning'] = 'מאמץ חשיבה הוא הגדרה אחת לכל האתר, והתפקיד {$a} מפעיל גם מודל חשיבה שלא נבדק ברמה החדשה. החליפו ידנית אם זה מה שאתם רוצים.';
 $string['autoupgrade:block_reasoning_course'] = 'מאמץ החשיבה הוא הגדרה אחת לכל האתר, וקורס אחד משתמש במודל חושב משלו ({$a}) שלא נבדק ברמה החדשה. החליפו ידנית אם זה מה שאתם רוצים.';
+
+$string['savereport:summary'] = 'בשמירה זו שונו {$a} הגדרות של AI Course Assistant:';
+$string['savereport:many'] = '<p>בשמירה אחת שונו {$a} הגדרות. דף כל ההגדרות שומר את כל השדות שבו בבת אחת, לכן כדאי לעבור על הרשימה הזו ולבדוק אם שונה משהו שלא התכוונתם לשנות. כל דף הגדרות ב-AI Course Assistant שומר רק את השדות שלו.</p>';
+$string['savereport:secret'] = 'שונה (הערך מוסתר)';
+$string['savereport:lineendings'] = 'נשמר שוב עם הבדל בסימני סוף שורה בלבד';
+$string['savereport:empty'] = 'ריק';
+$string['check:primary_name'] = 'הספק הראשי של AI Course Assistant';
+$string['check:primary_ok'] = 'לא היו כשלים מצד ספק הצ\'אט הראשי ב-24 השעות האחרונות.';
+$string['check:primary_failing'] = 'ספק הצ\'אט הראשי ({$a->model}) נכשל {$a->failures} פעמים ב-24 השעות האחרונות. ספק הגיבוי השיב על {$a->rescued} מהבקשות האלה, ולכן ייתכן שהלומדים לא שמו לב. השגיאה האחרונה: {$a->reason}';

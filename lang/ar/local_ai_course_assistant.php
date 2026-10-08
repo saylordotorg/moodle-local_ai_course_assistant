@@ -3321,3 +3321,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'مسؤول الموقع
 
 $string['autoupgrade:block_reasoning'] = 'جهد الاستدلال إعداد واحد للموقع كله، ودور {$a} يشغّل أيضًا نموذج تفكير لم يُختبر عند المستوى الجديد. بدّل يدويًا إذا كان هذا ما تريده.';
 $string['autoupgrade:block_reasoning_course'] = 'جهد الاستدلال إعداد واحد للموقع بأكمله، وهناك مقرر يستخدم نموذج تفكير خاصًا به ({$a}) لم يُختبر عند المستوى الجديد. بدّل يدويًا إن كان هذا ما تريده.';
+
+$string['savereport:summary'] = 'تم تغيير {$a} من إعدادات AI Course Assistant في عملية الحفظ هذه:';
+$string['savereport:many'] = '<p>تم تغيير {$a} من الإعدادات في عملية حفظ واحدة. تحفظ صفحة جميع الإعدادات كل الحقول الموجودة فيها دفعة واحدة، لذا راجع هذه القائمة بحثًا عن أي شيء لم تقصد تغييره. أما كل صفحة إعدادات ضمن AI Course Assistant فتحفظ حقولها الخاصة فقط.</p>';
+$string['savereport:secret'] = 'تم التغيير (القيمة مخفية)';
+$string['savereport:lineendings'] = 'أُعيد حفظه مع اختلاف في نهايات الأسطر فقط';
+$string['savereport:empty'] = 'فارغ';
+$string['check:primary_name'] = 'المزوّد الرئيسي لـ AI Course Assistant';
+$string['check:primary_ok'] = 'لا توجد أي إخفاقات من مزوّد الدردشة الرئيسي خلال آخر 24 ساعة.';
+$string['check:primary_failing'] = 'أخفق مزوّد الدردشة الرئيسي ({$a->model}) {$a->failures} مرة خلال آخر 24 ساعة. وقد أجاب المزوّد الاحتياطي عن {$a->rescued} من هذه الطلبات، لذا ربما لم يلاحظ المتعلمون ذلك. آخر خطأ: {$a->reason}';

@@ -28,6 +28,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
+    // v7.8.1: show what the previous save changed, by setting name.
+    \local_ai_course_assistant\settings_save_report::flush();
+
     // Read plugin version for the banner text.
     $pluginfo   = core_plugin_manager::instance()->get_plugin_info('local_ai_course_assistant');
     $release    = $pluginfo ? htmlspecialchars($pluginfo->release, ENT_QUOTES) : '?';

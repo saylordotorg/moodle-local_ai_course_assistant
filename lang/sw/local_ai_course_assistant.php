@@ -3367,3 +3367,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Msimamizi wa tovuti ali
 
 $string['autoupgrade:block_reasoning'] = 'Kiwango cha kufikiri ni mpangilio mmoja kwa tovuti nzima, na jukumu la {$a} pia linaendesha modeli ya kufikiri ambayo haijajaribiwa katika kiwango kipya. Badilisha mwenyewe ikiwa hilo ndilo unalotaka.';
 $string['autoupgrade:block_reasoning_course'] = 'Juhudi za kufikiri ni mpangilio mmoja kwa tovuti nzima, na kozi moja inatumia modeli yake ya kufikiri ({$a}) ambayo haijajaribiwa katika kiwango kipya. Badilisha kwa mkono ikiwa ndivyo unavyotaka.';
+
+$string['savereport:summary'] = 'Mipangilio {$a} ya AI Course Assistant ilibadilishwa katika uhifadhi huu:';
+$string['savereport:many'] = '<p>Mipangilio {$a} ilibadilishwa kwa uhifadhi mmoja. Ukurasa wa mipangilio yote huhifadhi sehemu zake zote kwa wakati mmoja, kwa hivyo angalia orodha hii kwa kitu chochote ambacho hukukusudia kubadilisha. Kila ukurasa wa mipangilio chini ya AI Course Assistant huhifadhi sehemu zake yenyewe tu.</p>';
+$string['savereport:secret'] = 'imebadilishwa (thamani imefichwa)';
+$string['savereport:lineendings'] = 'imehifadhiwa tena kwa tofauti ya miisho ya mistari tu';
+$string['savereport:empty'] = 'tupu';
+$string['check:primary_name'] = 'Mtoa huduma mkuu wa AI Course Assistant';
+$string['check:primary_ok'] = 'Hakuna hitilafu kutoka kwa mtoa huduma mkuu wa gumzo katika saa 24 zilizopita.';
+$string['check:primary_failing'] = 'Mtoa huduma mkuu wa gumzo ({$a->model}) alishindwa mara {$a->failures} katika saa 24 zilizopita. Mtoa huduma mbadala alijibu {$a->rescued} kati ya maombi hayo, kwa hivyo huenda wanafunzi hawakugundua. Hitilafu ya mwisho: {$a->reason}';

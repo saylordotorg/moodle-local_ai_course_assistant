@@ -3359,3 +3359,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = '回滚此切换的站�
 
 $string['autoupgrade:block_reasoning'] = '推理强度是整个站点共用的一个设置，而 {$a} 角色也在运行一个未在新级别下测试过的思考模型。如果您确实想这样做，请手动切换。';
 $string['autoupgrade:block_reasoning_course'] = '推理强度是整个站点共用的一个设置，而某门课程使用了自己的思考模型（{$a}），该模型未在新级别下测试过。如果您确实需要，请手动切换。';
+
+$string['savereport:summary'] = '本次保存更改了 {$a} 项 AI Course Assistant 设置:';
+$string['savereport:many'] = '<p>一次保存中更改了 {$a} 项设置。“所有设置”页面会一次性保存页面上的全部字段,因此请检查此列表,看看是否有您并不打算更改的项目。AI Course Assistant 下的每个设置页面只保存其自身的字段。</p>';
+$string['savereport:secret'] = '已更改(值已隐藏)';
+$string['savereport:lineendings'] = '仅换行符不同,已再次保存';
+$string['savereport:empty'] = '空';
+$string['check:primary_name'] = 'AI Course Assistant 主要提供商';
+$string['check:primary_ok'] = '过去 24 小时内主聊天提供商没有出现故障。';
+$string['check:primary_failing'] = '主聊天提供商 ({$a->model}) 在过去 24 小时内失败了 {$a->failures} 次。备用提供商应答了其中 {$a->rescued} 次请求,因此学习者可能没有察觉。最近一次错误:{$a->reason}';

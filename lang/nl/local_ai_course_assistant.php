@@ -3346,3 +3346,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'De sitebeheerder die de
 
 $string['autoupgrade:block_reasoning'] = 'Redeneerinspanning is één instelling voor de hele site, en de rol {$a} gebruikt ook een denkmodel dat niet op het nieuwe niveau is getest. Schakel handmatig over als u dat wilt.';
 $string['autoupgrade:block_reasoning_course'] = 'Redeneerinspanning is één instelling voor de hele site, en een cursus gebruikt een eigen denkend model ({$a}) dat niet op het nieuwe niveau is getest. Schakel handmatig over als u dat wilt.';
+
+$string['savereport:summary'] = 'Bij deze opslag zijn {$a} instellingen van AI Course Assistant gewijzigd:';
+$string['savereport:many'] = '<p>Bij één opslag zijn {$a} instellingen gewijzigd. De pagina met alle instellingen slaat al zijn velden in één keer op. Controleer deze lijst dus op wijzigingen die u niet bedoeld had. Elke instellingenpagina onder AI Course Assistant slaat alleen zijn eigen velden op.</p>';
+$string['savereport:secret'] = 'gewijzigd (waarde verborgen)';
+$string['savereport:lineendings'] = 'opnieuw opgeslagen met alleen andere regeleinden';
+$string['savereport:empty'] = 'leeg';
+$string['check:primary_name'] = 'Primaire provider van AI Course Assistant';
+$string['check:primary_ok'] = 'Geen storingen bij de primaire chatprovider in de afgelopen 24 uur.';
+$string['check:primary_failing'] = 'De primaire chatprovider ({$a->model}) is de afgelopen 24 uur {$a->failures} keer uitgevallen. De reserveprovider heeft {$a->rescued} van die verzoeken beantwoord, dus cursisten hebben het mogelijk niet gemerkt. Laatste fout: {$a->reason}';

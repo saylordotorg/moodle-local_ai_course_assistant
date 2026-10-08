@@ -277,3 +277,12 @@ function local_ai_course_assistant_user_preferences(): array {
     ];
     return $preferences;
 }
+
+/**
+ * Status checks for Site administration > Reports > Status (v7.8.1).
+ *
+ * @return \core\check\check[]
+ */
+function local_ai_course_assistant_status_checks(): array {
+    return [new \local_ai_course_assistant\check\primary_provider()];
+}

@@ -3321,3 +3321,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Nettstedsadministratore
 
 $string['autoupgrade:block_reasoning'] = 'Resonneringsinnsats er én innstilling for hele nettstedet, og rollen {$a} kjører også en tenkende modell som ikke er testet på det nye nivået. Bytt manuelt hvis det er det du vil.';
 $string['autoupgrade:block_reasoning_course'] = 'Resonneringsinnsats er én innstilling for hele nettstedet, og et kurs bruker sin egen tenkende modell ({$a}) som ikke er testet på det nye nivået. Bytt manuelt hvis det er det du vil.';
+
+$string['savereport:summary'] = '{$a} innstillinger i AI Course Assistant ble endret ved denne lagringen:';
+$string['savereport:many'] = '<p>{$a} innstillinger ble endret i én lagring. Siden med alle innstillinger lagrer alle feltene sine på én gang, så sjekk denne listen for noe du ikke hadde tenkt å endre. Hver innstillingsside under AI Course Assistant lagrer bare sine egne felt.</p>';
+$string['savereport:secret'] = 'endret (verdien er skjult)';
+$string['savereport:lineendings'] = 'lagret på nytt med bare andre linjeskift';
+$string['savereport:empty'] = 'tom';
+$string['check:primary_name'] = 'Hovedleverandør for AI Course Assistant';
+$string['check:primary_ok'] = 'Ingen feil fra hovedleverandøren for chat de siste 24 timene.';
+$string['check:primary_failing'] = 'Hovedleverandøren for chat ({$a->model}) feilet {$a->failures} ganger de siste 24 timene. Reserveleverandøren besvarte {$a->rescued} av disse forespørslene, så de som lærer, har kanskje ikke merket noe. Siste feil: {$a->reason}';

@@ -1,0 +1,9 @@
+Version 7.8.1 (build 2026100801)
+
+A site that set a Gemini or Claude key and left the provider on Automatic no longer sends its chat to OpenAI. Automatic now picks the provider that makes the configured model. Before, such a site's calls were rejected and quietly answered by the backup model.
+
+A new status check, under Site administration > Reports > Status, says when the main chat provider has been failing and the backup is answering instead.
+
+Every settings save now ends with a notice naming each setting it changed (credentials are never shown). The all-settings page saves about 350 fields at once, so the README now points admins to the individual settings pages.
+
+Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.

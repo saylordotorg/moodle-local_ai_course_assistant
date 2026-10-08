@@ -3355,3 +3355,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = 'Bulchaa saayitii jijjii
 
 $string['autoupgrade:block_reasoning'] = 'Carraaqqiin yaadaa qindaa\'ina tokko marsariitii guutuuf ta\'e dha, akkasumas gaheen {$a} moodeela yaadu sadarkaa haaraa irratti hin qoratamne hojjechiisa. Kana yoo barbaadde harkaan jijjiiri.';
 $string['autoupgrade:block_reasoning_course'] = 'Carraaqqiin yaadaa qindaa\'ina tokko marsariitii guutuuf, koorsiin tokko moodeela yaadaa ofii isaa ({$a}) sadarkaa haaraatti hin qoramne fayyadama. Yoo kana barbaaddan harkaan jijjiiraa.';
+
+$string['savereport:summary'] = 'Qindaa\'inni kun keessatti qindaa\'inni AI Course Assistant {$a} jijjiirameera:';
+$string['savereport:many'] = '<p>Qusannoo tokkoon qindaa\'inni {$a} jijjiirameera. Fuulli qindaa\'ina hundaa dirreewwan isa keessa jiran hunda yeroo tokkotti qusata; kanaaf tarreeffama kana ilaalaa wanta jijjiiruu hin barbaadin tokko jiraachuu isaa. Fuulli qindaa\'ina AI Course Assistant jalatti argamu hundi dirreewwan isaa qofa qusata.</p>';
+$string['savereport:secret'] = 'jijjiirameera (gatiin dhokfameera)';
+$string['savereport:lineendings'] = 'dhumaa sararaa adda ta\'een qofa deebi\'ee qusatameera';
+$string['savereport:empty'] = 'duwwaa';
+$string['check:primary_name'] = 'Dhiheessaa ijoo AI Course Assistant';
+$string['check:primary_ok'] = 'Sa\'aatii 24 darban keessatti dhiheessaa marii ijoo irraa kufaatiin hin mul\'anne.';
+$string['check:primary_failing'] = 'Dhiheessaan marii ijoo ({$a->model}) sa\'aatii 24 darban keessatti altokko {$a->failures} kufeera. Dhiheessaan kuufama deebii kan ta\'e kanneen keessaa {$a->rescued} deebiseera; kanaaf barattoonni hin hubanne ta\'uu danda\'a. Dogoggora isa dhumaa: {$a->reason}';

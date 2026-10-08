@@ -3613,3 +3613,13 @@ $string['privacy:metadata:model_eval:createdby'] = 'The site administrator who a
 $string['privacy:metadata:model_switch'] = 'Model switches and rollbacks: which model a role moved from and to, and why. The only personal data is the identifier of the administrator who made or reversed the switch. These rows are site configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure.';
 $string['privacy:metadata:model_switch:createdby'] = 'The site administrator who made this switch. Empty when it was automatic.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'The site administrator who rolled this switch back. Empty when the watcher did, or it was not rolled back.';
+
+// Settings save report and primary provider status check (v7.8.1).
+$string['savereport:summary'] = '{$a} AI Course Assistant settings changed in this save:';
+$string['savereport:many'] = '<p>{$a} settings changed in one save. The all-settings page saves every field on it at once, so check this list for anything you did not mean to change. Each settings page under AI Course Assistant saves only its own fields.</p>';
+$string['savereport:secret'] = 'changed (value hidden)';
+$string['savereport:lineendings'] = 'saved again with different line endings only';
+$string['savereport:empty'] = 'empty';
+$string['check:primary_name'] = 'AI Course Assistant main provider';
+$string['check:primary_ok'] = 'No failures from the main chat provider in the last 24 hours.';
+$string['check:primary_failing'] = 'The main chat provider ({$a->model}) failed {$a->failures} times in the last 24 hours. The failover provider answered {$a->rescued} of those turns, so learners may not have noticed. Last error: {$a->reason}';

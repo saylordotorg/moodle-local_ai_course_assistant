@@ -3321,3 +3321,12 @@ $string['privacy:metadata:model_switch:rolledbackby'] = '이 전환을 롤백한
 
 $string['autoupgrade:block_reasoning'] = '추론 강도는 사이트 전체에 적용되는 하나의 설정이며, {$a} 역할도 새 수준에서 테스트되지 않은 사고 모델을 사용합니다. 원하시면 직접 전환하세요.';
 $string['autoupgrade:block_reasoning_course'] = '추론 강도는 사이트 전체에 적용되는 하나의 설정이며, 한 강좌가 새 수준에서 테스트되지 않은 자체 사고 모델({$a})을 사용합니다. 원하시면 직접 전환하세요.';
+
+$string['savereport:summary'] = '이번 저장에서 AI Course Assistant 설정 {$a}개가 변경되었습니다:';
+$string['savereport:many'] = '<p>한 번의 저장으로 설정 {$a}개가 변경되었습니다. 전체 설정 페이지는 포함된 모든 필드를 한꺼번에 저장하므로, 의도하지 않게 바뀐 항목이 없는지 이 목록에서 확인하세요. AI Course Assistant 아래의 각 설정 페이지는 해당 페이지의 필드만 저장합니다.</p>';
+$string['savereport:secret'] = '변경됨(값 숨김)';
+$string['savereport:lineendings'] = '줄 바꿈 문자만 달라져 다시 저장됨';
+$string['savereport:empty'] = '비어 있음';
+$string['check:primary_name'] = 'AI Course Assistant 기본 제공자';
+$string['check:primary_ok'] = '지난 24시간 동안 기본 채팅 제공자에서 발생한 실패가 없습니다.';
+$string['check:primary_failing'] = '기본 채팅 제공자({$a->model})가 지난 24시간 동안 {$a->failures}회 실패했습니다. 백업 제공자가 그중 {$a->rescued}건에 응답했으므로 학습자는 눈치채지 못했을 수 있습니다. 마지막 오류: {$a->reason}';
