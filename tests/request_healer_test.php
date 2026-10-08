@@ -179,6 +179,10 @@ final class request_healer_test extends \advanced_testcase {
     public function test_value_and_size_errors_are_never_learned(): void {
         $this->assertNull($this->diagnose($this->openai_error("Invalid 'temperature': decimal above maximum value. "
             . 'Expected a value <= 2, but got 7 instead.', 'temperature'), ['temperature' => 7]));
+        $this->assertNull($this->diagnose(
+            $this->openai_error("Invalid argument: temperature must be in range [0.0, 2.0]."),
+            ['temperature' => 7]
+        ), 'An out-of-range value is a typo however the vendor words it.');
         $vllm = json_encode(['object' => 'error', 'message' => "'max_tokens' or 'max_completion_tokens' is too large: "
             . "1024. This model's maximum context length is 4096 tokens and your request has 3500 input tokens "
             . '(1024 > 4096 - 3500).']);

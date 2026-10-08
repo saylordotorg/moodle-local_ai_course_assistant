@@ -251,6 +251,12 @@ class request_healer {
         if (!array_key_exists('temperature', $sent) || !self::names($msg, 'temperature')) {
             return null;
         }
+        // A temperature outside 0..2, the widest range any vendor accepts, is a
+        // bad value (an admin's typo), whatever words the vendor chose to say
+        // so. Learning "omit" from it would outlive the typo.
+        if (is_numeric($sent['temperature']) && ((float) $sent['temperature'] < 0 || (float) $sent['temperature'] > 2)) {
+            return null;
+        }
         if (!self::rejects($msg) && !str_contains($msg, 'only supports')) {
             return null;
         }
