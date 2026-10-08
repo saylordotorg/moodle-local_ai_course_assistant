@@ -3224,3 +3224,147 @@ $string['modelregistry:forget_confirm'] = 'Khohlwa leli qiniso? Isicelo esilande
 $string['modelregistry:forget_done'] = 'Iqiniso likhohliwe. Isicelo esilandelayo kule modeli sizosebenzisa imithetho efika ne-plugin.';
 $string['modelregistry:forget_missing'] = 'Lelo qiniso alisekho.';
 $string['event:model_capability_learned'] = 'Amandla emodeli afundwe kumhlinzeki';
+
+$string['autoupgrade:title'] = 'Ukuthuthukiswa kwamamodeli';
+$string['autoupgrade:navtitle'] = 'Ukuthuthukiswa kwamamodeli e-[[tutorshort]]';
+$string['autoupgrade:intro'] = 'I-[[tutorshort]] ifuna amamodeli amasha avela kubahlinzeki esivele isebenzisa bona, ihlole umzongenela ngamunye iqhathanisa nemodeli ebizothathelwa indawo (imiyalo efanayo, isabelomali sempendulo esifanayo, umahluleli ofanayo, ekusebenzeni okufanayo), futhi ishintsha kuphela uma umzongenela enentengo efanayo noma ephansi ngempendulo ngayinye, emuhle ngokufanayo, ephephile ngokufanayo futhi ethembekile ngokufanayo, kabili ngokulandelana. Ushintsho ngalunye lubhekwa amahora angu-48 kuthrafikhi yangempela futhi lubuyiselwa emuva uma luba lubi kakhulu.';
+$string['autoupgrade:l_statusheading'] = 'Isimo';
+$string['autoupgrade:l_mode'] = 'Imodi';
+$string['autoupgrade:l_budget'] = 'Isabelomali sokuhlola';
+$string['autoupgrade:l_changemode'] = 'Shintsha';
+$string['autoupgrade:l_discover'] = 'Thola amamodeli manje';
+$string['autoupgrade:l_rolesheading'] = 'Izindima';
+$string['autoupgrade:l_current'] = 'Imodeli yamanje';
+$string['autoupgrade:l_profile'] = 'Iphrofayela yekhono';
+$string['autoupgrade:l_policy'] = 'Ukuthuthukiswa';
+$string['autoupgrade:l_nocandidates'] = 'Abekho abazongenela. Ukuthola kumaka amamodeli avela kumhlinzeki ofanayo anentengo efanayo.';
+$string['autoupgrade:l_colpasses'] = 'Ukuphumelela';
+$string['autoupgrade:l_collast'] = 'Ukuhlolwa kokugcina';
+$string['autoupgrade:l_evaluate'] = 'Hlola manje';
+$string['autoupgrade:l_evaluating'] = 'Kusemugqeni noma kuyasebenza';
+$string['autoupgrade:l_switch'] = 'Shintsha imodeli';
+$string['autoupgrade:l_switchconfirm'] = 'Shintsha le ndima uye kumzongenela manje? Ushintsho luzobhekwa amahora angu-48 futhi lungabuyiselwa emuva.';
+$string['autoupgrade:l_evalsheading'] = 'Ukuhlolwa';
+$string['autoupgrade:l_noevals'] = 'Akukabikho ukuhlolwa.';
+$string['autoupgrade:l_colwhen'] = 'Nini';
+$string['autoupgrade:l_colrole'] = 'Indima';
+$string['autoupgrade:l_colcandidate'] = 'Umzongenela';
+$string['autoupgrade:l_colincumbent'] = 'Imodeli yamanje';
+$string['autoupgrade:l_colcost'] = 'Okusetshenzisiwe / isilinganiso';
+$string['autoupgrade:l_colgate'] = 'Ukuhlolwa kwesango';
+$string['autoupgrade:l_switchesheading'] = 'Izinguquko nokubuyiselwa emuva';
+$string['autoupgrade:l_noswitches'] = 'Akukabikho zinguquko.';
+$string['autoupgrade:l_colfrom'] = 'Kusuka';
+$string['autoupgrade:l_colto'] = 'Kuya';
+$string['autoupgrade:l_colmode'] = 'Kanjani';
+$string['autoupgrade:l_colreason'] = 'Isizathu';
+$string['autoupgrade:l_coluntil'] = 'Kubhekwa kuze kube';
+$string['autoupgrade:l_rollback'] = 'Buyisela emuva';
+$string['autoupgrade:l_rollbackconfirm'] = 'Buyisela imodeli yangaphambilini manje?';
+$string['autoupgrade:l_manage'] = 'Buyekeza noma khohlwa amaqiniso afundiwe ekhasini le-registry yamamodeli';
+$string['autoupgrade:l_notinuse'] = 'akusetshenziswa';
+$string['autoupgrade:mode_off'] = 'Kuvaliwe: akukho okuzenzakalelayo';
+$string['autoupgrade:mode_recommend'] = 'Ncoma: hlola abazongenela bese uthumela isincomo nge-imeyili';
+$string['autoupgrade:mode_auto'] = 'Okuzenzakalelayo: hlola abazongenela bese ushintsha uma omunye ephumelela';
+$string['autoupgrade:budget_line'] = 'Kusetshenziswe u-${$a->spent} ku-${$a->limit} kule nyanga (kusele u-${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Ukuthola kugcine ukusebenza {$a}.';
+$string['autoupgrade:never_discovered'] = 'Ukuthola akukasebenzi.';
+$string['autoupgrade:role_chat'] = 'Ingxoxo (imodeli eyinhloko)';
+$string['autoupgrade:role_premium'] = 'Izinga le-premium';
+$string['autoupgrade:role_failover'] = 'Imodeli yesipele';
+$string['autoupgrade:role_quiz'] = 'Ukwakhiwa kwemibuzo';
+$string['autoupgrade:role_classifier'] = 'Isihlukanisi sokwazi';
+$string['autoupgrade:role_safety'] = 'Ireferensi yokuphepha';
+$string['autoupgrade:role_soapbox'] = 'Ukumaka kwe-Soapbox';
+$string['autoupgrade:not_configured'] = 'Akulungiselelwe (kuzuza imodeli yengxoxo)';
+$string['autoupgrade:policy_auto'] = 'Kuyahlolwa, futhi kushintshwa ngokuzenzakalelayo kumodi Okuzenzakalelayo';
+$string['autoupgrade:policy_recommend'] = 'Kuyahlolwa futhi kuyanconywa; umphathi uyakushintsha';
+$string['autoupgrade:policy_none'] = 'Kubhalwa abazongenela kuphela: alikho ibhentshimakhi elikala umsebenzi wale ndima';
+$string['autoupgrade:cand_candidate'] = 'Umzongenela';
+$string['autoupgrade:cand_passed'] = 'Uphumelele kanye';
+$string['autoupgrade:cand_eligible'] = 'Ufanelekile';
+$string['autoupgrade:cand_failed'] = 'Wehlulekile';
+$string['autoupgrade:cand_switched'] = 'Iyasetshenziswa';
+$string['autoupgrade:cand_rolledback'] = 'Kubuyiselwe emuva';
+$string['autoupgrade:cand_retired'] = 'Akusabhalwanga';
+$string['autoupgrade:eval_queued'] = 'Kusemugqeni';
+$string['autoupgrade:eval_running'] = 'Kuyasebenza';
+$string['autoupgrade:eval_complete'] = 'Kuqediwe';
+$string['autoupgrade:eval_failed'] = 'Kuhlulekile';
+$string['autoupgrade:eval_skipped'] = 'Akusetshenzwanga';
+$string['autoupgrade:gate_pass'] = 'Kuphumelele:';
+$string['autoupgrade:gate_fail'] = 'Akuphumelelanga:';
+$string['autoupgrade:how_auto'] = 'Ngokuzenzakalelayo';
+$string['autoupgrade:how_manual'] = 'Ngumphathi';
+$string['autoupgrade:switch_watching'] = 'Kuyabhekwa';
+$string['autoupgrade:switch_kept'] = 'Kugciniwe';
+$string['autoupgrade:switch_rolledback'] = 'Kubuyiselwe emuva';
+$string['autoupgrade:switch_superseded'] = 'Kushintshwe ngumphathi kamuva';
+$string['autoupgrade:block_role'] = 'Le ndima ayikwazi ukushintshwa lapha.';
+$string['autoupgrade:block_emergency'] = 'Kuvulwe ulawulo lwesimo esiphuthumayo, ngakho ayikho imodeli ezoshintshwa kuze kubuyiselwe.';
+$string['autoupgrade:block_allowlist'] = 'Isilungiselelo {$a} asisona leso ushintsho olungasishintsha ngaphandle komuntu, ngakho le ndima ishintshwa ngesandla.';
+$string['autoupgrade:block_bundle'] = 'Isilungiselelo {$a} siphethwe yiphakheji yenqubomgomo esayiniwe. Shintsha imodeli kuphakheji esikhundleni salokho.';
+$string['autoupgrade:block_watching'] = 'Ushintsho lwale ndima lusabhekwa. Linda kuze lugcinwe noma lubuyiselwe emuva.';
+$string['autoupgrade:block_noeval'] = 'Lo mzongenela akanakho ukuhlolwa okuqediwe.';
+$string['autoupgrade:block_gate'] = 'Ukuhlolwa kokugcina kwalo mzongenela akuzange kuphumelele esangweni.';
+$string['autoupgrade:block_changed'] = 'Imodeli yendima ishintshile ngemuva kokuhlolwa, ngakho ayisaqhathanisi ipheya elifanele. Phinda uhlole.';
+$string['autoupgrade:switched'] = 'I-{$a->role} ishintshelwe ku-{$a->model}. Izobhekwa amahora angu-48.';
+$string['autoupgrade:rolledback'] = 'Ushintsho lwe-{$a} lubuyiselwe emuva.';
+$string['autoupgrade:rollback_missing'] = 'Lolo shintsho alukwazi ukubuyiselwa emuva.';
+$string['autoupgrade:rollback_superseded'] = 'Izilungiselelo zashintshwa ngemuva koshintsho, ngakho akukho okubuyiselwe emuva.';
+$string['autoupgrade:rollback_by_admin'] = 'Kubuyiselwe emuva ngumphathi.';
+$string['autoupgrade:queued'] = 'Ukuhlolwa kufakwe emugqeni. Kuzosebenza ekusebenzeni okulandelayo kwe-cron futhi kuthathe imizuzu embalwa.';
+$string['autoupgrade:discovered'] = 'Ukuthola kubhale abahlinzeki abangu-{$a->providers}, kwabhalisa amamodeli angu-{$a->registered} futhi kwamaka abazongenela abangu-{$a->candidates}. Abahlinzeki abangakwazanga ukubhalwa: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Le ndima ayishintshwa ngokuzenzakalelayo.';
+$string['autoupgrade:why_recommend_mode'] = 'Ukuthuthukiswa kwamamodeli okuzenzakalelayo kusemodini Ncoma.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] I-{$a->role} ishintshelwe ku-{$a->to}';
+$string['autoupgrade:mail_switched_body'] = 'I-[[tutorshort]] ishintshe indima ye-{$a->role} isuka ku-{$a->from} iya ku-{$a->to}.
+
+Iphumelele kukho konke ukuhlolwa iqhathaniswa nemodeli yamanje, kwakalwa ekusebenzeni okufanayo, kabili ngokulandelana:
+{$a->gate}
+
+Imodeli entsha ibhekwa kuthrafikhi yangempela amahora angu-{$a->hours} futhi ibuyiselwa emuva ngokuzenzakalelayo uma amaphutha, izimpendulo ezinqunyiwe, ukwenqaba noma izindleko ngempendulo ngayinye kuba kubi kakhulu. Ungayibuyisela emuva wena ngokwakho noma nini:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] I-{$a->role} ibuyiselwe ku-{$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = 'I-[[tutorshort]] ibuyisele indima ye-{$a->role} isuka ku-{$a->to} yabuyela ku-{$a->from}.
+
+Isizathu: {$a->reason}
+
+Umzongenela ngeke aphinde azanywe izinsuku ezingu-30. Imininingwane:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Ushintsho lwe-{$a->role} luye ku-{$a->to} lugciniwe';
+$string['autoupgrade:mail_kept_body'] = 'Ushintsho lwendima ye-{$a->role} olusuka ku-{$a->from} luya ku-{$a->to} lume kahle amahora angu-{$a->hours} ezimpendulweni zangempela ezingu-{$a->turns} futhi lugciniwe.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Ushintsho lwendima ye-{$a->role} olusuka ku-{$a->from} luya ku-{$a->to} lugciniwe ngemuva kwamahora angu-{$a->hours}, kodwa kubonwe izimpendulo zangempela ezingu-{$a->turns} kuphela, ezimbalwa kakhulu ukuthi kwahlulelwe. Qhubeka ulubheka.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Kunconywa: i-{$a->role} ku-{$a->model}';
+$string['autoupgrade:mail_recommend_body'] = 'I-{$a->model} iphumelele kukho konke ukuhlolwa iqhathaniswa ne-{$a->current} endimeni ye-{$a->role}, kabili ngokulandelana, futhi ayizange ishintshwe ngokuzenzakalelayo: {$a->why}
+
+{$a->gate}
+
+Yishintshe, noma uyiyeke, lapha:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Uthola lokhu ngoba ikheli lakho lingumamukeli wezexwayiso zokusetshenziswa kwemali ze-[[tutorshort]].';
+$string['event:model_switched'] = 'Imodeli ishintshiwe';
+$string['event:model_switch_rolled_back'] = 'Ushintsho lwemodeli lubuyiselwe emuva';
+$string['task:discover_models'] = 'Thola amamodeli amasha e-AI bese ufaka ukuhlolwa emugqeni';
+$string['task:evaluate_model_candidate'] = 'Hlola imodeli ye-AI engumzongenela';
+$string['task:watch_model_switches'] = 'Bheka izinguquko zakamuva zamamodeli e-AI';
+$string['settings:autoupgrade_heading'] = 'Ukuthuthukiswa kwamamodeli okuzenzakalelayo';
+$string['settings:autoupgrade_heading_desc'] = 'Nsuku zonke i-[[tutorshort]] ibhala amamodeli ahlinzekwa ngabahlinzeki bakho futhi imake abazongenela endimeni ngayinye: umhlinzeki ofanayo, intengo yohlu efanayo, nentengo eyaziwayo. Ibahlola iqhathanisa nemodeli yamanje ngemiyalo kathisha, iqoqo lokuhlola i-jailbreak nezindleko ezifana nokusetshenziswa kwangempela, futhi ishintsha imodeli ezenzakalelayo yesayithi kuphela uma umzongenela enentengo efanayo noma ephansi ngempendulo ngayinye, emuhle ngokufanayo, ephephile ngokufanayo futhi ethembekile ngokufanayo, kabili ngokulandelana. Izifundo ezinemodeli yazo ziyayigcina. Ushintsho ngalunye luthunyelwa nge-imeyili kubamukeli bezexwayiso zokusetshenziswa kwemali futhi lubhekwa amahora angu-48.';
+$string['settings:autoupgrade_mode'] = 'Imodi';
+$string['settings:autoupgrade_mode_desc'] = 'Okuzenzakalelayo kuyashintsha uma umzongenela ephumelela. Ncoma kuhlola abazongenela bese kuthumela isincomo nge-imeyili esikhundleni salokho. Kuvaliwe akwenzi lutho ngokuzenzakalelayo.';
+$string['settings:autoupgrade_budget_usd'] = 'Isabelomali sokuhlola senyanga (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Imali ephezulu ukuhlolwa okuzenzakalelayo okungayisebenzisa enyangeni yekhalenda, kuhlanganise nomahluleli. Ukuhlolwa okungase kudlulise inyanga kule mali akuqali.';
+$string['settings:autoupgrade_eval_courseid'] = 'I-ID yesifundo sokuhlola';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Ukuhlolwa kuphendula ngaphansi komyalo wesistimu lesi sifundo esiwusebenzisa ngempela, owakhelwe ubunikazi besivakashi ukuze kungathunyelwa idatha yanoma yimuphi umfundi. U-0 ukhetha isifundo esinezimpendulo eziningi kakhulu zengxoxo ezinsukwini ezingu-30 ezedlule.';
+$string['privacy:metadata:model_eval'] = 'Ukuhlolwa kwamamodeli okuzenzakalelayo: iyiphi imodeli engumzongenela eqhathaniswe nayiphi imodeli yamanje, nomphumela okaliwe. Idatha yomuntu siqu kuphela yisihlonzi somphathi ocele ukuhlolwa. Le migqa ingukulungiselelwa kwesayithi hhayi idatha yomuntu siqu ngomfundi, ngakho ayifakwa ekuthunyelweni kwedatha futhi ayisuswa uma umsebenzisi ecela ukusulwa.';
+$string['privacy:metadata:model_eval:createdby'] = 'Umphathi wesayithi ocele lokhu kuhlolwa. Akunalutho uma ukuthola yikho okukufake emugqeni.';
+$string['privacy:metadata:model_switch'] = 'Izinguquko zamamodeli nokubuyiselwa emuva: indima isuke kuyiphi imodeli yaya kuyiphi, nokuthi kungani. Idatha yomuntu siqu kuphela yisihlonzi somphathi owenze noma owahlehlisa ushintsho. Le migqa ingukulungiselelwa kwesayithi hhayi idatha yomuntu siqu ngomfundi, ngakho ayifakwa ekuthunyelweni kwedatha futhi ayisuswa uma umsebenzisi ecela ukusulwa.';
+$string['privacy:metadata:model_switch:createdby'] = 'Umphathi wesayithi owenze lolu shintsho. Akunalutho uma lwaluzenzakalela.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Umphathi wesayithi obuyisele lolu shintsho emuva. Akunalutho uma umqaphi nguye owakwenza, noma uma lungabuyiselwanga emuva.';
+
+$string['autoupgrade:block_reasoning'] = 'Izinga lokucabanga liyisilungiselelo esisodwa sesayithi lonke, futhi indima ye-{$a} nayo isebenzisa imodeli ecabangayo engazange ihlolwe ezingeni elisha. Shintsha ngesandla uma yilokho okufunayo.';
+$string['autoupgrade:block_reasoning_course'] = 'Umzamo wokucabanga uyisilungiselelo esisodwa sesayithi lonke, futhi esinye isifundo sisebenzisa imodeli yaso yokucabanga ({$a}) engazange ihlolwe ezingeni elisha. Shintsha ngesandla uma lokho yikho okufunayo.';

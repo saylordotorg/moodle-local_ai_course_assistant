@@ -1,0 +1,293 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+    @copyright  2026 Tom Caswell & David Ta / Saylor University
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+{{!
+    @template local_ai_course_assistant/model_upgrades
+
+    Model upgrades admin page (v7.8.0): status and monthly testing budget,
+    each role with its capability profile and candidates, the evaluation
+    history with every gate check, the switch and rollback history, and the
+    capability facts learned from providers.
+
+    Every string arrives pre-resolved in `l`.
+
+    Context variables required for this template:
+    * posturl, sesskey - for every POST form.
+    * l - map of every resolved label.
+    * status - {mode, budget, lastdiscovery, emergency, settingsurl}.
+    * roles - [{role, label, current, inuse, policy, profile, hascandidates,
+      candidates[{id, model, status, passes, reason, last, canevaluate, busy, canswitch}]}].
+    * evals, hasevals - [{when, role, candidate, incumbent, status, gatepassed,
+      gatefailed, cost, cand, inc, checks[{name, ok, detail}], message}].
+    * switches, hasswitches - [{id, when, role, from, to, mode, status, reason,
+      until, canrollback}].
+    * learned - {has, rows[{provider, model, field, value, evidence, updated}]}.
+    * registryurl - link to the learned facts on the model registry page.
+
+    Example context (json):
+    {
+        "posturl": "https://example.org/local/ai_course_assistant/model_upgrades.php",
+        "sesskey": "abc123",
+        "l": {"intro": "SOLA looks for newer models.", "statusheading": "Status", "mode": "Mode",
+            "budget": "Testing budget", "changemode": "Change", "emergency": "An emergency control is engaged.",
+            "discover": "Discover models now", "rolesheading": "Roles", "current": "Current model",
+            "profile": "Capability profile", "policy": "Policy", "candidates": "Candidates",
+            "nocandidates": "No candidates.", "colmodel": "Model", "colstatus": "Status", "colpasses": "Passes",
+            "collast": "Last evaluation", "colactions": "Actions", "evaluate": "Evaluate now",
+            "evaluating": "Queued or running", "switch": "Switch", "switchconfirm": "Switch?",
+            "evalsheading": "Evaluations", "noevals": "None yet.", "colwhen": "When", "colrole": "Role",
+            "colcandidate": "Candidate", "colincumbent": "Current", "colcost": "Spent / estimate",
+            "colgate": "Gate", "switchesheading": "Switches", "noswitches": "None yet.", "colfrom": "From",
+            "colto": "To", "colmode": "How", "colreason": "Reason", "coluntil": "Watched until",
+            "rollback": "Roll back", "rollbackconfirm": "Roll back?", "learnedheading": "Learned facts",
+            "learnednone": "None.", "colprovider": "Provider", "colfield": "Capability", "colvalue": "Value",
+            "colevidence": "Provider said", "colupdated": "Updated", "manage": "Manage on the model registry page",
+            "notinuse": "not in use"},
+        "status": {"mode": "Automatic", "budget": "$1.20 of $10.00 spent this month", "lastdiscovery": "Last run today",
+            "emergency": false, "settingsurl": "https://example.org/admin/settings.php"},
+        "roles": [{"role": "chat", "label": "Chat", "current": "gemini/gemini-2.5-flash", "inuse": true,
+            "policy": "Switches automatically", "profile": "max_tokens | temperature any", "hascandidates": true,
+            "candidates": [{"id": 1, "model": "gemini-2.5-flash [off]", "status": "Candidate", "passes": 0,
+                "reason": "Thinking off", "last": "", "canevaluate": true, "busy": false, "canswitch": false}]}],
+        "evals": [{"when": "7/10/26", "role": "Chat", "candidate": "a", "incumbent": "b", "status": "Complete",
+            "gatepassed": true, "gatefailed": false, "cost": "$0.90 / $2.40", "cand": "quality 14.1",
+            "inc": "quality 14.0", "checks": [{"name": "cost", "ok": true, "detail": "0.18 vs 0.33"}], "message": ""}],
+        "hasevals": true,
+        "switches": [{"id": 1, "when": "8/10/26", "role": "Chat", "from": "a", "to": "b", "mode": "Automatic",
+            "status": "Watching", "reason": "", "until": "10/10/26", "canrollback": true}],
+        "hasswitches": true,
+        "learned": {"has": false, "rows": []},
+        "registryurl": "https://example.org/local/ai_course_assistant/model_registry.php"
+    }
+}}
+<div class="sola-modelupgrades">
+    <p class="text-muted">{{l.intro}}</p>
+
+    <h4>{{l.statusheading}}</h4>
+    {{#status.emergency}}
+        <div class="alert alert-warning" role="alert">{{l.emergency}}</div>
+    {{/status.emergency}}
+    <ul class="list-unstyled">
+        <li><strong>{{l.mode}}:</strong> {{status.mode}} <a href="{{status.settingsurl}}">{{l.changemode}}</a></li>
+        <li><strong>{{l.budget}}:</strong> {{status.budget}}</li>
+        <li class="text-muted">{{status.lastdiscovery}}</li>
+    </ul>
+    <form method="post" action="{{posturl}}" class="mb-4">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="action" value="discover">
+        <button type="submit" class="btn btn-secondary">{{l.discover}}</button>
+    </form>
+
+    <h4>{{l.rolesheading}}</h4>
+    {{#roles}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{label}} {{^inuse}}<span class="badge badge-secondary">{{l.notinuse}}</span>{{/inuse}}</h5>
+                <p class="mb-1"><strong>{{l.current}}:</strong> <code>{{current}}</code></p>
+                <p class="mb-1"><strong>{{l.policy}}:</strong> {{policy}}</p>
+                {{#profile}}<p class="mb-2 small text-muted"><strong>{{l.profile}}:</strong> {{.}}</p>{{/profile}}
+                {{^hascandidates}}<p class="text-muted mb-0"><em>{{l.nocandidates}}</em></p>{{/hascandidates}}
+                {{#hascandidates}}
+                    <div class="table-responsive">
+                        <table class="table table-sm generaltable mb-0">
+                            <thead>
+                                <tr>
+                                    <th>{{l.colmodel}}</th>
+                                    <th>{{l.colstatus}}</th>
+                                    <th>{{l.colpasses}}</th>
+                                    <th>{{l.collast}}</th>
+                                    <th>{{l.colactions}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#candidates}}
+                                    <tr>
+                                        <td><code>{{model}}</code><div class="small text-muted">{{reason}}</div></td>
+                                        <td>{{status}}</td>
+                                        <td>{{passes}}</td>
+                                        <td class="small">{{last}}</td>
+                                        <td>
+                                            {{#busy}}<span class="badge badge-info">{{l.evaluating}}</span>{{/busy}}
+                                            {{#canevaluate}}
+                                                <form method="post" action="{{posturl}}" class="d-inline">
+                                                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                                    <input type="hidden" name="action" value="evaluate">
+                                                    <input type="hidden" name="candidateid" value="{{id}}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary">{{l.evaluate}}</button>
+                                                </form>
+                                            {{/canevaluate}}
+                                            {{#canswitch}}
+                                                <form method="post" action="{{posturl}}" class="d-inline ml-1"
+                                                      data-confirm="{{l.switchconfirm}}">
+                                                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                                    <input type="hidden" name="action" value="switch">
+                                                    <input type="hidden" name="candidateid" value="{{id}}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">{{l.switch}}</button>
+                                                </form>
+                                            {{/canswitch}}
+                                        </td>
+                                    </tr>
+                                {{/candidates}}
+                            </tbody>
+                        </table>
+                    </div>
+                {{/hascandidates}}
+            </div>
+        </div>
+    {{/roles}}
+
+    <h4>{{l.evalsheading}}</h4>
+    {{^hasevals}}<p class="text-muted"><em>{{l.noevals}}</em></p>{{/hasevals}}
+    {{#hasevals}}
+        <div class="table-responsive mb-3">
+            <table class="table table-sm generaltable">
+                <thead>
+                    <tr>
+                        <th>{{l.colwhen}}</th>
+                        <th>{{l.colrole}}</th>
+                        <th>{{l.colcandidate}}</th>
+                        <th>{{l.colincumbent}}</th>
+                        <th>{{l.colstatus}}</th>
+                        <th>{{l.colgate}}</th>
+                        <th>{{l.colcost}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#evals}}
+                        <tr>
+                            <td>{{when}}</td>
+                            <td>{{role}}</td>
+                            <td><code>{{candidate}}</code><div class="small text-muted">{{cand}}</div></td>
+                            <td><code>{{incumbent}}</code><div class="small text-muted">{{inc}}</div></td>
+                            <td>{{status}}{{#message}}<div class="small text-muted">{{.}}</div>{{/message}}</td>
+                            <td class="small">
+                                {{#checks}}
+                                    <div>{{#ok}}<span class="text-success">&#10003;</span>{{/ok}}{{^ok}}<span class="text-danger">&#10007;</span>{{/ok}} {{name}}: {{detail}}</div>
+                                {{/checks}}
+                            </td>
+                            <td>{{cost}}</td>
+                        </tr>
+                    {{/evals}}
+                </tbody>
+            </table>
+        </div>
+    {{/hasevals}}
+
+    <h4>{{l.switchesheading}}</h4>
+    {{^hasswitches}}<p class="text-muted"><em>{{l.noswitches}}</em></p>{{/hasswitches}}
+    {{#hasswitches}}
+        <div class="table-responsive mb-3">
+            <table class="table table-sm generaltable">
+                <thead>
+                    <tr>
+                        <th>{{l.colwhen}}</th>
+                        <th>{{l.colrole}}</th>
+                        <th>{{l.colfrom}}</th>
+                        <th>{{l.colto}}</th>
+                        <th>{{l.colmode}}</th>
+                        <th>{{l.colstatus}}</th>
+                        <th>{{l.colreason}}</th>
+                        <th>{{l.colactions}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#switches}}
+                        <tr>
+                            <td>{{when}}</td>
+                            <td>{{role}}</td>
+                            <td><code>{{from}}</code></td>
+                            <td><code>{{to}}</code></td>
+                            <td>{{mode}}</td>
+                            <td>{{status}}{{#until}}<div class="small text-muted">{{l.coluntil}}: {{.}}</div>{{/until}}</td>
+                            <td class="small">{{reason}}</td>
+                            <td>
+                                {{#canrollback}}
+                                    <form method="post" action="{{posturl}}" class="d-inline" data-confirm="{{l.rollbackconfirm}}">
+                                        <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                        <input type="hidden" name="action" value="rollback">
+                                        <input type="hidden" name="switchid" value="{{id}}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">{{l.rollback}}</button>
+                                    </form>
+                                {{/canrollback}}
+                            </td>
+                        </tr>
+                    {{/switches}}
+                </tbody>
+            </table>
+        </div>
+    {{/hasswitches}}
+
+    <h4>{{l.learnedheading}}</h4>
+    {{^learned.has}}<p class="text-muted"><em>{{l.learnednone}}</em></p>{{/learned.has}}
+    {{#learned.has}}
+        <div class="table-responsive mb-2">
+            <table class="table table-sm generaltable">
+                <thead>
+                    <tr>
+                        <th>{{l.colprovider}}</th>
+                        <th>{{l.colmodel}}</th>
+                        <th>{{l.colfield}}</th>
+                        <th>{{l.colvalue}}</th>
+                        <th>{{l.colevidence}}</th>
+                        <th>{{l.colupdated}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#learned.rows}}
+                        <tr>
+                            <td>{{provider}}</td>
+                            <td><code>{{model}}</code></td>
+                            <td>{{field}}</td>
+                            <td><code>{{value}}</code></td>
+                            <td class="small text-muted">{{evidence}}</td>
+                            <td>{{updated}}</td>
+                        </tr>
+                    {{/learned.rows}}
+                </tbody>
+            </table>
+        </div>
+    {{/learned.has}}
+    <p><a href="{{registryurl}}">{{l.manage}}</a></p>
+</div>
+{{#js}}
+require(['core/notification', 'core/str'], function(Notification, Str) {
+    var forms = document.querySelectorAll('.sola-modelupgrades form[data-confirm]');
+    Array.prototype.forEach.call(forms, function(form) {
+        var confirmed = false;
+        form.addEventListener('submit', function(e) {
+            if (confirmed) {
+                return;
+            }
+            e.preventDefault();
+            Str.get_strings([
+                {key: 'confirm', component: 'moodle'},
+                {key: 'yes', component: 'moodle'}
+            ]).then(function(labels) {
+                return Notification.saveCancelPromise(labels[0], form.dataset.confirm, labels[1]);
+            }).then(function() {
+                confirmed = true;
+                form.submit();
+                return null;
+            }).catch(function() {
+                return null;
+            });
+        });
+    });
+});
+{{/js}}

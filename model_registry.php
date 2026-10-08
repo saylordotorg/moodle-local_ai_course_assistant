@@ -367,6 +367,7 @@ $labels = [
     'colevidence'        => get_string('modelregistry:col_evidence', 'local_ai_course_assistant'),
     'forget'             => get_string('modelregistry:forget', 'local_ai_course_assistant'),
     'forgetconfirm'      => get_string('modelregistry:forget_confirm', 'local_ai_course_assistant'),
+    'upgradeslink'       => branding::str('autoupgrade:navtitle'),
 ];
 
 $defaultsamples = (int) (get_config('local_ai_course_assistant', 'bench_default_samples')
@@ -387,6 +388,7 @@ $templatedata = [
     'drift'     => $drift,
     'bench'     => $bench,
     'learned'   => $learned,
+    'upgradesurl' => (new moodle_url('/local/ai_course_assistant/model_upgrades.php'))->out(false),
     'queue'     => [
         'models'    => $queuemodels,
         'hasmodels' => !empty($queuemodels),

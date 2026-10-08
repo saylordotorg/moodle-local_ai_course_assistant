@@ -3177,3 +3177,147 @@ $string['modelregistry:forget_confirm'] = 'Glemme dette faktumet? Neste forespø
 $string['modelregistry:forget_done'] = 'Faktumet er glemt. Neste forespørsel til denne modellen bruker de medfølgende reglene.';
 $string['modelregistry:forget_missing'] = 'Det faktumet finnes ikke lenger.';
 $string['event:model_capability_learned'] = 'Modellkapabilitet lært fra en leverandør';
+
+$string['autoupgrade:title'] = 'Modelloppgraderinger';
+$string['autoupgrade:navtitle'] = 'Modelloppgraderinger for [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] ser etter nyere modeller fra leverandørene den allerede bruker, tester hver kandidat mot modellen den ville erstattet (samme prompter, samme svarbudsjett, samme dommer, i samme kjøring) og bytter bare når kandidaten koster like mye eller mindre per svar og er like god, like trygg og like pålitelig, to ganger på rad. Hvert bytte overvåkes i 48 timer på ekte trafikk og rulles tilbake hvis det blir verre.';
+$string['autoupgrade:l_statusheading'] = 'Tilstand';
+$string['autoupgrade:l_mode'] = 'Modus';
+$string['autoupgrade:l_budget'] = 'Testbudsjett';
+$string['autoupgrade:l_changemode'] = 'Endre';
+$string['autoupgrade:l_discover'] = 'Finn modeller nå';
+$string['autoupgrade:l_rolesheading'] = 'Roller';
+$string['autoupgrade:l_current'] = 'Nåværende modell';
+$string['autoupgrade:l_profile'] = 'Kapasitetsprofil';
+$string['autoupgrade:l_policy'] = 'Oppgraderinger';
+$string['autoupgrade:l_nocandidates'] = 'Ingen kandidater. Søket merker modeller fra samme leverandør med sammenlignbar pris.';
+$string['autoupgrade:l_colpasses'] = 'Beståtte';
+$string['autoupgrade:l_collast'] = 'Siste evaluering';
+$string['autoupgrade:l_evaluate'] = 'Evaluer nå';
+$string['autoupgrade:l_evaluating'] = 'I kø eller kjører';
+$string['autoupgrade:l_switch'] = 'Bytt';
+$string['autoupgrade:l_switchconfirm'] = 'Bytte denne rollen til kandidaten nå? Endringen overvåkes i 48 timer og kan rulles tilbake.';
+$string['autoupgrade:l_evalsheading'] = 'Evalueringer';
+$string['autoupgrade:l_noevals'] = 'Ingen evalueringer ennå.';
+$string['autoupgrade:l_colwhen'] = 'Når';
+$string['autoupgrade:l_colrole'] = 'Rolle';
+$string['autoupgrade:l_colcandidate'] = 'Kandidat';
+$string['autoupgrade:l_colincumbent'] = 'Nåværende modell';
+$string['autoupgrade:l_colcost'] = 'Brukt / anslag';
+$string['autoupgrade:l_colgate'] = 'Terskelkontroller';
+$string['autoupgrade:l_switchesheading'] = 'Bytter og tilbakerullinger';
+$string['autoupgrade:l_noswitches'] = 'Ingen bytter ennå.';
+$string['autoupgrade:l_colfrom'] = 'Fra';
+$string['autoupgrade:l_colto'] = 'Til';
+$string['autoupgrade:l_colmode'] = 'Hvordan';
+$string['autoupgrade:l_colreason'] = 'Årsak';
+$string['autoupgrade:l_coluntil'] = 'Overvåkes til';
+$string['autoupgrade:l_rollback'] = 'Rull tilbake';
+$string['autoupgrade:l_rollbackconfirm'] = 'Sette tilbake forrige modell nå?';
+$string['autoupgrade:l_manage'] = 'Se gjennom eller glem lærte fakta på siden for modellregisteret';
+$string['autoupgrade:l_notinuse'] = 'ikke i bruk';
+$string['autoupgrade:mode_off'] = 'Av: ingenting automatisk';
+$string['autoupgrade:mode_recommend'] = 'Anbefal: test kandidater og send en anbefaling på e-post';
+$string['autoupgrade:mode_auto'] = 'Automatisk: test kandidater og bytt når en består';
+$string['autoupgrade:budget_line'] = '${$a->spent} av ${$a->limit} brukt denne måneden (${$a->left} igjen)';
+$string['autoupgrade:last_discovery'] = 'Søket kjørte sist {$a}.';
+$string['autoupgrade:never_discovered'] = 'Søket har ikke kjørt ennå.';
+$string['autoupgrade:role_chat'] = 'Chat (hovedmodell)';
+$string['autoupgrade:role_premium'] = 'Premiumnivå';
+$string['autoupgrade:role_failover'] = 'Reservemodell';
+$string['autoupgrade:role_quiz'] = 'Quizgenerering';
+$string['autoupgrade:role_classifier'] = 'Mestringsklassifisering';
+$string['autoupgrade:role_safety'] = 'Sikkerhetsreferanse';
+$string['autoupgrade:role_soapbox'] = 'Soapbox-poengsetting';
+$string['autoupgrade:not_configured'] = 'Ikke konfigurert (arver chatmodellen)';
+$string['autoupgrade:policy_auto'] = 'Evalueres, og byttes automatisk i Automatisk-modus';
+$string['autoupgrade:policy_recommend'] = 'Evalueres og anbefales; en administrator bytter';
+$string['autoupgrade:policy_none'] = 'Bare kandidatliste: ingen referansetest måler denne rollens oppgave';
+$string['autoupgrade:cand_candidate'] = 'Kandidat';
+$string['autoupgrade:cand_passed'] = 'Bestått én gang';
+$string['autoupgrade:cand_eligible'] = 'Kvalifisert';
+$string['autoupgrade:cand_failed'] = 'Ikke bestått';
+$string['autoupgrade:cand_switched'] = 'I bruk';
+$string['autoupgrade:cand_rolledback'] = 'Rullet tilbake';
+$string['autoupgrade:cand_retired'] = 'Ikke lenger oppført';
+$string['autoupgrade:eval_queued'] = 'I kø';
+$string['autoupgrade:eval_running'] = 'Kjører';
+$string['autoupgrade:eval_complete'] = 'Fullført';
+$string['autoupgrade:eval_failed'] = 'Mislyktes';
+$string['autoupgrade:eval_skipped'] = 'Ikke kjørt';
+$string['autoupgrade:gate_pass'] = 'Bestått:';
+$string['autoupgrade:gate_fail'] = 'Ikke bestått:';
+$string['autoupgrade:how_auto'] = 'Automatisk';
+$string['autoupgrade:how_manual'] = 'Av en administrator';
+$string['autoupgrade:switch_watching'] = 'Overvåkes';
+$string['autoupgrade:switch_kept'] = 'Beholdt';
+$string['autoupgrade:switch_rolledback'] = 'Rullet tilbake';
+$string['autoupgrade:switch_superseded'] = 'Endret senere av en administrator';
+$string['autoupgrade:block_role'] = 'Denne rollen kan ikke byttes herfra.';
+$string['autoupgrade:block_emergency'] = 'En nødkontroll er aktiv, så ingen modell byttes før den er gjenopprettet.';
+$string['autoupgrade:block_allowlist'] = 'Innstillingen {$a} kan ikke endres av et bytte uten en person, så denne rollen byttes manuelt.';
+$string['autoupgrade:block_bundle'] = 'Innstillingen {$a} styres av den signerte policypakken. Endre modellen i pakken i stedet.';
+$string['autoupgrade:block_watching'] = 'Et bytte av denne rollen overvåkes fortsatt. Vent til det er beholdt eller rullet tilbake.';
+$string['autoupgrade:block_noeval'] = 'Denne kandidaten har ingen fullført evaluering.';
+$string['autoupgrade:block_gate'] = 'Den siste evalueringen av denne kandidaten besto ikke terskelen.';
+$string['autoupgrade:block_changed'] = 'Modellen for rollen ble endret etter evalueringen, så den sammenligner ikke lenger riktig par. Evaluer på nytt.';
+$string['autoupgrade:switched'] = 'Byttet {$a->role} til {$a->model}. Det overvåkes i 48 timer.';
+$string['autoupgrade:rolledback'] = 'Rullet tilbake byttet av {$a}.';
+$string['autoupgrade:rollback_missing'] = 'Det byttet kan ikke rulles tilbake.';
+$string['autoupgrade:rollback_superseded'] = 'Innstillingene ble endret etter byttet, så ingenting ble rullet tilbake.';
+$string['autoupgrade:rollback_by_admin'] = 'Rullet tilbake av en administrator.';
+$string['autoupgrade:queued'] = 'Evalueringen er i kø. Den kjører ved neste cron-kjøring og tar noen minutter.';
+$string['autoupgrade:discovered'] = 'Søket listet {$a->providers} leverandør(er), registrerte {$a->registered} modell(er) og merket {$a->candidates} kandidat(er). Leverandører som ikke kunne listes: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Denne rollen byttes ikke automatisk.';
+$string['autoupgrade:why_recommend_mode'] = 'Automatiske modelloppgraderinger er i Anbefal-modus.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} byttet til {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] byttet rollen {$a->role} fra {$a->from} til {$a->to}.
+
+Den besto alle kontroller mot nåværende modell, målt i samme kjøring, to ganger på rad:
+{$a->gate}
+
+Den nye modellen overvåkes på ekte trafikk i {$a->hours} timer og rulles automatisk tilbake hvis feil, avkortede svar, avvisninger eller kostnad per svar blir verre. Du kan rulle den tilbake selv når som helst:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} rullet tilbake til {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] satte rollen {$a->role} tilbake fra {$a->to} til {$a->from}.
+
+Årsak: {$a->reason}
+
+Kandidaten prøves ikke igjen på 30 dager. Detaljer:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Bytte av {$a->role} til {$a->to} beholdt';
+$string['autoupgrade:mail_kept_body'] = 'Byttet av rollen {$a->role} fra {$a->from} til {$a->to} holdt i {$a->hours} timer over {$a->turns} ekte svar og beholdes.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Byttet av rollen {$a->role} fra {$a->from} til {$a->to} beholdes etter {$a->hours} timer, men bare {$a->turns} ekte svar ble sett, for få til å vurdere. Følg med på det.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Anbefalt: {$a->role} på {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} besto alle kontroller mot {$a->current} for rollen {$a->role}, to ganger på rad, og ble ikke byttet automatisk: {$a->why}
+
+{$a->gate}
+
+Bytt, eller la det være, her:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Du får denne fordi adressen din er mottaker av kostnadsvarsler for [[tutorshort]].';
+$string['event:model_switched'] = 'Modell byttet';
+$string['event:model_switch_rolled_back'] = 'Modellbytte rullet tilbake';
+$string['task:discover_models'] = 'Finn nye AI-modeller og sett evalueringer i kø';
+$string['task:evaluate_model_candidate'] = 'Evaluer en kandidat-AI-modell';
+$string['task:watch_model_switches'] = 'Overvåk nylige bytter av AI-modeller';
+$string['settings:autoupgrade_heading'] = 'Automatiske modelloppgraderinger';
+$string['settings:autoupgrade_heading_desc'] = 'Hver dag lister [[tutorshort]] modellene leverandørene dine tilbyr og merker kandidater for hver rolle: samme leverandør, sammenlignbar listepris og kjent pris. Den tester dem mot nåværende modell på veilederpromptene, jailbreak-pakken og kostnad som ved ekte bruk, og bytter standarden for nettstedet bare når en kandidat koster like mye eller mindre per svar og er like god, like trygg og like pålitelig, to ganger på rad. Emner med egen modell beholder den. Hvert bytte sendes på e-post til mottakerne av kostnadsvarsler og overvåkes i 48 timer.';
+$string['settings:autoupgrade_mode'] = 'Modus';
+$string['settings:autoupgrade_mode_desc'] = 'Automatisk bytter når en kandidat består. Anbefal tester kandidater og sender i stedet en anbefaling på e-post. Av gjør ingenting automatisk.';
+$string['settings:autoupgrade_budget_usd'] = 'Månedlig testbudsjett (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Det meste automatiske evalueringer kan bruke i en kalendermåned, dommer inkludert. En evaluering som kan føre måneden over dette, starter ikke.';
+$string['settings:autoupgrade_eval_courseid'] = 'Emne-ID for evaluering';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Evalueringer svarer med systemprompten dette emnet faktisk bruker, bygd for gjesteidentiteten slik at ingen data om elever sendes. 0 velger emnet med flest chatsvar de siste 30 dagene.';
+$string['privacy:metadata:model_eval'] = 'Automatiske modellevalueringer: hvilken kandidatmodell som ble sammenlignet med hvilken nåværende modell, og det målte resultatet. Den eneste personopplysningen er identifikatoren til administratoren som ba om evalueringen. Disse radene er nettstedskonfigurasjon og ikke personopplysninger om en elev, så de tas ikke med i en dataeksport og fjernes ikke når en bruker ber om sletting.';
+$string['privacy:metadata:model_eval:createdby'] = 'Nettstedsadministratoren som ba om denne evalueringen. Tom når søket satte den i kø.';
+$string['privacy:metadata:model_switch'] = 'Modellbytter og tilbakerullinger: hvilken modell en rolle gikk fra og til, og hvorfor. Den eneste personopplysningen er identifikatoren til administratoren som gjorde eller omgjorde byttet. Disse radene er nettstedskonfigurasjon og ikke personopplysninger om en elev, så de tas ikke med i en dataeksport og fjernes ikke når en bruker ber om sletting.';
+$string['privacy:metadata:model_switch:createdby'] = 'Nettstedsadministratoren som gjorde dette byttet. Tom når det var automatisk.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Nettstedsadministratoren som rullet tilbake dette byttet. Tom når overvåkingen gjorde det, eller det ikke ble rullet tilbake.';
+
+$string['autoupgrade:block_reasoning'] = 'Resonneringsinnsats er én innstilling for hele nettstedet, og rollen {$a} kjører også en tenkende modell som ikke er testet på det nye nivået. Bytt manuelt hvis det er det du vil.';
+$string['autoupgrade:block_reasoning_course'] = 'Resonneringsinnsats er én innstilling for hele nettstedet, og et kurs bruker sin egen tenkende modell ({$a}) som ikke er testet på det nye nivået. Bytt manuelt hvis det er det du vil.';

@@ -3180,3 +3180,147 @@ $string['modelregistry:forget_confirm'] = 'Zapomenout tento záznam? Další po�
 $string['modelregistry:forget_done'] = 'Záznam zapomenut. Další požadavek na tento model použije dodaná pravidla.';
 $string['modelregistry:forget_missing'] = 'Tento záznam již neexistuje.';
 $string['event:model_capability_learned'] = 'Schopnost modelu zjištěna od poskytovatele';
+
+$string['autoupgrade:title'] = 'Upgrady modelů';
+$string['autoupgrade:navtitle'] = 'Upgrady modelů [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] hledá novější modely od poskytovatelů, které už používá, testuje každého kandidáta proti modelu, který by nahradil (stejné výzvy, stejný rozpočet na odpověď, stejný hodnotitel, ve stejném běhu), a přepne jen tehdy, když je kandidát stejně drahý nebo levnější na odpověď, stejně dobrý, stejně bezpečný a stejně spolehlivý, a to dvakrát po sobě. Každé přepnutí se 48 hodin sleduje na živém provozu a při zhoršení se vrátí zpět.';
+$string['autoupgrade:l_statusheading'] = 'Stav';
+$string['autoupgrade:l_mode'] = 'Režim';
+$string['autoupgrade:l_budget'] = 'Rozpočet na testování';
+$string['autoupgrade:l_changemode'] = 'Změnit';
+$string['autoupgrade:l_discover'] = 'Vyhledat modely nyní';
+$string['autoupgrade:l_rolesheading'] = 'Role';
+$string['autoupgrade:l_current'] = 'Aktuální model';
+$string['autoupgrade:l_profile'] = 'Profil schopností';
+$string['autoupgrade:l_policy'] = 'Upgrady';
+$string['autoupgrade:l_nocandidates'] = 'Žádní kandidáti. Vyhledávání označuje modely od stejného poskytovatele se srovnatelnou cenou.';
+$string['autoupgrade:l_colpasses'] = 'Úspěšné průchody';
+$string['autoupgrade:l_collast'] = 'Poslední hodnocení';
+$string['autoupgrade:l_evaluate'] = 'Vyhodnotit nyní';
+$string['autoupgrade:l_evaluating'] = 'Ve frontě nebo probíhá';
+$string['autoupgrade:l_switch'] = 'Přepnout';
+$string['autoupgrade:l_switchconfirm'] = 'Přepnout tuto roli na kandidáta nyní? Změna se 48 hodin sleduje a lze ji vrátit zpět.';
+$string['autoupgrade:l_evalsheading'] = 'Hodnocení';
+$string['autoupgrade:l_noevals'] = 'Zatím žádná hodnocení.';
+$string['autoupgrade:l_colwhen'] = 'Kdy';
+$string['autoupgrade:l_colrole'] = 'Role modelu';
+$string['autoupgrade:l_colcandidate'] = 'Kandidát';
+$string['autoupgrade:l_colincumbent'] = 'Aktuální model';
+$string['autoupgrade:l_colcost'] = 'Utraceno / odhad';
+$string['autoupgrade:l_colgate'] = 'Kontroly brány';
+$string['autoupgrade:l_switchesheading'] = 'Přepnutí a vrácení';
+$string['autoupgrade:l_noswitches'] = 'Zatím žádná přepnutí.';
+$string['autoupgrade:l_colfrom'] = 'Z';
+$string['autoupgrade:l_colto'] = 'Na';
+$string['autoupgrade:l_colmode'] = 'Jak';
+$string['autoupgrade:l_colreason'] = 'Důvod';
+$string['autoupgrade:l_coluntil'] = 'Sledováno do';
+$string['autoupgrade:l_rollback'] = 'Vrátit zpět';
+$string['autoupgrade:l_rollbackconfirm'] = 'Vrátit nyní předchozí model?';
+$string['autoupgrade:l_manage'] = 'Naučená fakta zkontrolujte nebo zapomeňte na stránce registru modelů';
+$string['autoupgrade:l_notinuse'] = 'nepoužívá se';
+$string['autoupgrade:mode_off'] = 'Vypnuto: nic automaticky';
+$string['autoupgrade:mode_recommend'] = 'Doporučit: testovat kandidáty a poslat doporučení e-mailem';
+$string['autoupgrade:mode_auto'] = 'Automaticky: testovat kandidáty a přepnout, když některý projde';
+$string['autoupgrade:budget_line'] = 'Tento měsíc utraceno ${$a->spent} z ${$a->limit} (zbývá ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Vyhledávání naposledy proběhlo {$a}.';
+$string['autoupgrade:never_discovered'] = 'Vyhledávání zatím neproběhlo.';
+$string['autoupgrade:role_chat'] = 'Chat (hlavní model)';
+$string['autoupgrade:role_premium'] = 'Prémiová úroveň';
+$string['autoupgrade:role_failover'] = 'Záložní model';
+$string['autoupgrade:role_quiz'] = 'Generování testů';
+$string['autoupgrade:role_classifier'] = 'Klasifikátor zvládnutí';
+$string['autoupgrade:role_safety'] = 'Bezpečnostní reference';
+$string['autoupgrade:role_soapbox'] = 'Hodnocení Soapbox';
+$string['autoupgrade:not_configured'] = 'Nenastaveno (přebírá model chatu)';
+$string['autoupgrade:policy_auto'] = 'Hodnoceno a v automatickém režimu přepnuto automaticky';
+$string['autoupgrade:policy_recommend'] = 'Hodnoceno a doporučeno; přepíná správce';
+$string['autoupgrade:policy_none'] = 'Kandidáti jsou jen uvedeni: úlohu této role neměří žádný benchmark';
+$string['autoupgrade:cand_candidate'] = 'Kandidát';
+$string['autoupgrade:cand_passed'] = 'Prošel jednou';
+$string['autoupgrade:cand_eligible'] = 'Způsobilý';
+$string['autoupgrade:cand_failed'] = 'Neprošel';
+$string['autoupgrade:cand_switched'] = 'Používá se';
+$string['autoupgrade:cand_rolledback'] = 'Vráceno zpět';
+$string['autoupgrade:cand_retired'] = 'Již není v nabídce';
+$string['autoupgrade:eval_queued'] = 'Ve frontě';
+$string['autoupgrade:eval_running'] = 'Probíhá';
+$string['autoupgrade:eval_complete'] = 'Dokončeno';
+$string['autoupgrade:eval_failed'] = 'Selhalo';
+$string['autoupgrade:eval_skipped'] = 'Nespuštěno';
+$string['autoupgrade:gate_pass'] = 'Prošlo:';
+$string['autoupgrade:gate_fail'] = 'Neprošlo:';
+$string['autoupgrade:how_auto'] = 'Automaticky';
+$string['autoupgrade:how_manual'] = 'Správcem';
+$string['autoupgrade:switch_watching'] = 'Sleduje se';
+$string['autoupgrade:switch_kept'] = 'Ponecháno';
+$string['autoupgrade:switch_rolledback'] = 'Vráceno zpět';
+$string['autoupgrade:switch_superseded'] = 'Mezitím změněno správcem';
+$string['autoupgrade:block_role'] = 'Tuto roli zde nelze přepnout.';
+$string['autoupgrade:block_emergency'] = 'Je aktivní nouzové ovládání, takže se žádný model nepřepne, dokud nebude obnoveno.';
+$string['autoupgrade:block_allowlist'] = 'Nastavení {$a} nesmí přepnutí změnit bez člověka, proto se tato role přepíná ručně.';
+$string['autoupgrade:block_bundle'] = 'Nastavení {$a} spravuje podepsaný balíček zásad. Změňte model raději v balíčku.';
+$string['autoupgrade:block_watching'] = 'Přepnutí této role se stále sleduje. Počkejte, až bude ponecháno nebo vráceno zpět.';
+$string['autoupgrade:block_noeval'] = 'Tento kandidát nemá žádné dokončené hodnocení.';
+$string['autoupgrade:block_gate'] = 'Poslední hodnocení tohoto kandidáta neprošlo bránou.';
+$string['autoupgrade:block_changed'] = 'Model role se po hodnocení změnil, takže už neporovnává správnou dvojici. Vyhodnoťte znovu.';
+$string['autoupgrade:switched'] = 'Role {$a->role} přepnuta na {$a->model}. Bude se 48 hodin sledovat.';
+$string['autoupgrade:rolledback'] = 'Přepnutí {$a} bylo vráceno zpět.';
+$string['autoupgrade:rollback_missing'] = 'Toto přepnutí nelze vrátit zpět.';
+$string['autoupgrade:rollback_superseded'] = 'Nastavení se po přepnutí změnila, takže se nic nevrátilo.';
+$string['autoupgrade:rollback_by_admin'] = 'Vráceno zpět správcem.';
+$string['autoupgrade:queued'] = 'Hodnocení je ve frontě. Spustí se při příštím běhu cronu a trvá několik minut.';
+$string['autoupgrade:discovered'] = 'Vyhledávání prošlo {$a->providers} poskytovatele, zaregistrovalo {$a->registered} model(ů) a označilo {$a->candidates} kandidát(ů). Poskytovatelé, které nebylo možné načíst: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Tato role se nepřepíná automaticky.';
+$string['autoupgrade:why_recommend_mode'] = 'Automatické upgrady modelů jsou v režimu Doporučit.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} přepnuto na {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] přepnul roli {$a->role} z {$a->from} na {$a->to}.
+
+Prošel všemi kontrolami proti aktuálnímu modelu, měřenými ve stejném běhu, dvakrát po sobě:
+{$a->gate}
+
+Nový model se {$a->hours} hodin sleduje na živém provozu a automaticky se vrátí zpět, pokud se zhorší chyby, useknuté odpovědi, odmítnutí nebo cena za odpověď. Kdykoli ho můžete vrátit zpět sami:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} vráceno zpět na {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] vrátil roli {$a->role} z {$a->to} zpět na {$a->from}.
+
+Důvod: {$a->reason}
+
+Kandidát se 30 dní znovu nezkusí. Podrobnosti:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] přepnutí {$a->role} na {$a->to} ponecháno';
+$string['autoupgrade:mail_kept_body'] = 'Přepnutí role {$a->role} z {$a->from} na {$a->to} obstálo {$a->hours} hodin při {$a->turns} živých odpovědích a zůstává.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Přepnutí role {$a->role} z {$a->from} na {$a->to} je po {$a->hours} hodinách ponecháno, ale bylo zaznamenáno jen {$a->turns} živých odpovědí, což je na posouzení málo. Sledujte ho.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Doporučeno: {$a->role} na {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} prošel všemi kontrolami proti {$a->current} pro roli {$a->role}, dvakrát po sobě, a nebyl přepnut automaticky: {$a->why}
+
+{$a->gate}
+
+Přepněte ho, nebo ho ponechte, zde:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Tuto zprávu dostáváte, protože vaše adresa je příjemcem upozornění na výdaje [[tutorshort]].';
+$string['event:model_switched'] = 'Model přepnut';
+$string['event:model_switch_rolled_back'] = 'Přepnutí modelu vráceno zpět';
+$string['task:discover_models'] = 'Vyhledat nové modely AI a zařadit hodnocení do fronty';
+$string['task:evaluate_model_candidate'] = 'Vyhodnotit kandidátský model AI';
+$string['task:watch_model_switches'] = 'Sledovat nedávná přepnutí modelů AI';
+$string['settings:autoupgrade_heading'] = 'Automatické upgrady modelů';
+$string['settings:autoupgrade_heading_desc'] = '[[tutorshort]] každý den vypíše modely, které vaši poskytovatelé nabízejí, a označí kandidáty pro každou roli: stejný poskytovatel, srovnatelná ceníková cena a známá cena. Testuje je proti aktuálnímu modelu na výzvách tutora, sadě jailbreak testů a nákladech podobných živému provozu a výchozí model webu přepne jen tehdy, když je kandidát stejně drahý nebo levnější na odpověď, stejně dobrý, stejně bezpečný a stejně spolehlivý, a to dvakrát po sobě. Kurzy s vlastním modelem si ho ponechají. Každé přepnutí se e-mailem oznámí příjemcům upozornění na výdaje a 48 hodin se sleduje.';
+$string['settings:autoupgrade_mode'] = 'Režim';
+$string['settings:autoupgrade_mode_desc'] = 'Automaticky přepne, když kandidát projde. Doporučit testuje kandidáty a místo toho pošle doporučení e-mailem. Vypnuto nedělá nic automaticky.';
+$string['settings:autoupgrade_budget_usd'] = 'Měsíční rozpočet na testování (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Nejvyšší částka, kterou mohou automatická hodnocení utratit za kalendářní měsíc, včetně hodnotitele. Hodnocení, které by mohlo měsíc překročit, se nespustí.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID kurzu pro hodnocení';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Hodnocení odpovídají pod systémovou výzvou, kterou tento kurz skutečně používá, sestavenou pro identitu hosta, takže se neodesílají data žádného studenta. 0 vybere kurz s nejvíce odpověďmi chatu za posledních 30 dní.';
+$string['privacy:metadata:model_eval'] = 'Automatická hodnocení modelů: který kandidátský model byl porovnán s kterým aktuálním modelem a naměřený výsledek. Jedinými osobními údaji je identifikátor správce, který o hodnocení požádal. Tyto záznamy jsou konfigurací webu, nikoli osobními údaji o studentovi, proto nejsou součástí exportu dat a neodstraňují se, když uživatel požádá o výmaz.';
+$string['privacy:metadata:model_eval:createdby'] = 'Správce webu, který o toto hodnocení požádal. Prázdné, pokud ho do fronty zařadilo vyhledávání.';
+$string['privacy:metadata:model_switch'] = 'Přepnutí a vrácení modelů: z kterého modelu a na který se role přesunula a proč. Jedinými osobními údaji je identifikátor správce, který přepnutí provedl nebo vrátil. Tyto záznamy jsou konfigurací webu, nikoli osobními údaji o studentovi, proto nejsou součástí exportu dat a neodstraňují se, když uživatel požádá o výmaz.';
+$string['privacy:metadata:model_switch:createdby'] = 'Správce webu, který toto přepnutí provedl. Prázdné, pokud bylo automatické.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Správce webu, který toto přepnutí vrátil zpět. Prázdné, pokud to udělal hlídač nebo pokud vráceno nebylo.';
+
+$string['autoupgrade:block_reasoning'] = 'Úsilí uvažování je jedno nastavení pro celý web a role {$a} také používá přemýšlející model, který nebyl na nové úrovni otestován. Pokud to chcete, přepněte ručně.';
+$string['autoupgrade:block_reasoning_course'] = 'Úsilí o uvažování je jedno nastavení pro celý web a jeden kurz používá vlastní přemýšlející model ({$a}), který nebyl na nové úrovni otestován. Pokud to chcete, přepněte ručně.';

@@ -927,6 +927,12 @@ class conversation_manager {
         if ($clientaborted) {
             return 'client_aborted';
         }
+        // v7.8.0: a model's own safety layer declining (Anthropic 'refusal',
+        // OpenAI and Gemini 'content_filter') is its own outcome, so the
+        // watcher of a model switch can tell a model that refuses more often.
+        if ($finishreason !== null && in_array(strtolower($finishreason), ['refusal', 'content_filter'], true)) {
+            return 'refused';
+        }
         return provider\base_provider::is_truncation($finishreason) ? 'truncated' : 'complete';
     }
 

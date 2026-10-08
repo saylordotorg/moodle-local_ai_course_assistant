@@ -3178,3 +3178,147 @@ $string['modelregistry:forget_confirm'] = 'ลืมข้อมูลนี้�
 $string['modelregistry:forget_done'] = 'ลืมข้อมูลแล้ว คำขอครั้งถัดไปถึงโมเดลนี้จะใช้กฎที่มาพร้อมปลั๊กอิน';
 $string['modelregistry:forget_missing'] = 'ข้อมูลนั้นไม่มีอยู่แล้ว';
 $string['event:model_capability_learned'] = 'เรียนรู้ความสามารถของโมเดลจากผู้ให้บริการ';
+
+$string['autoupgrade:title'] = 'การอัปเกรดโมเดล';
+$string['autoupgrade:navtitle'] = 'การอัปเกรดโมเดลของ [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] จะค้นหาโมเดลที่ใหม่กว่าจากผู้ให้บริการที่ใช้อยู่แล้ว ทดสอบโมเดลตัวเลือกแต่ละตัวเทียบกับโมเดลที่จะถูกแทนที่ (พรอมต์เดียวกัน งบคำตอบเดียวกัน ผู้ตัดสินเดียวกัน ในการรันเดียวกัน) และจะสลับเฉพาะเมื่อตัวเลือกมีราคาต่อคำตอบเท่าเดิมหรือถูกกว่า ดีเท่ากัน ปลอดภัยเท่ากัน และเชื่อถือได้เท่ากัน สองครั้งติดต่อกัน ทุกการสลับจะถูกเฝ้าดูเป็นเวลา 48 ชั่วโมงบนทราฟฟิกจริง และจะถูกย้อนกลับหากแย่ลง';
+$string['autoupgrade:l_statusheading'] = 'สถานะ';
+$string['autoupgrade:l_mode'] = 'โหมด';
+$string['autoupgrade:l_budget'] = 'งบประมาณการทดสอบ';
+$string['autoupgrade:l_changemode'] = 'เปลี่ยน';
+$string['autoupgrade:l_discover'] = 'ค้นหาโมเดลตอนนี้';
+$string['autoupgrade:l_rolesheading'] = 'บทบาท';
+$string['autoupgrade:l_current'] = 'โมเดลปัจจุบัน';
+$string['autoupgrade:l_profile'] = 'โปรไฟล์ความสามารถ';
+$string['autoupgrade:l_policy'] = 'การอัปเกรด';
+$string['autoupgrade:l_nocandidates'] = 'ไม่มีตัวเลือก การค้นหาจะทำเครื่องหมายโมเดลจากผู้ให้บริการเดียวกันที่มีราคาใกล้เคียงกัน';
+$string['autoupgrade:l_colpasses'] = 'จำนวนครั้งที่ผ่าน';
+$string['autoupgrade:l_collast'] = 'การประเมินล่าสุด';
+$string['autoupgrade:l_evaluate'] = 'ประเมินตอนนี้';
+$string['autoupgrade:l_evaluating'] = 'อยู่ในคิวหรือกำลังทำงาน';
+$string['autoupgrade:l_switch'] = 'สลับ';
+$string['autoupgrade:l_switchconfirm'] = 'สลับบทบาทนี้ไปใช้ตัวเลือกตอนนี้หรือไม่ การเปลี่ยนแปลงจะถูกเฝ้าดูเป็นเวลา 48 ชั่วโมงและสามารถย้อนกลับได้';
+$string['autoupgrade:l_evalsheading'] = 'การประเมิน';
+$string['autoupgrade:l_noevals'] = 'ยังไม่มีการประเมิน';
+$string['autoupgrade:l_colwhen'] = 'เมื่อ';
+$string['autoupgrade:l_colrole'] = 'บทบาท';
+$string['autoupgrade:l_colcandidate'] = 'ตัวเลือก';
+$string['autoupgrade:l_colincumbent'] = 'โมเดลปัจจุบัน';
+$string['autoupgrade:l_colcost'] = 'ใช้ไป / ประมาณการ';
+$string['autoupgrade:l_colgate'] = 'การตรวจสอบตามเกณฑ์';
+$string['autoupgrade:l_switchesheading'] = 'การสลับและการย้อนกลับ';
+$string['autoupgrade:l_noswitches'] = 'ยังไม่มีการสลับ';
+$string['autoupgrade:l_colfrom'] = 'จาก';
+$string['autoupgrade:l_colto'] = 'ไปยัง';
+$string['autoupgrade:l_colmode'] = 'วิธี';
+$string['autoupgrade:l_colreason'] = 'เหตุผล';
+$string['autoupgrade:l_coluntil'] = 'เฝ้าดูจนถึง';
+$string['autoupgrade:l_rollback'] = 'ย้อนกลับ';
+$string['autoupgrade:l_rollbackconfirm'] = 'นำโมเดลก่อนหน้ากลับมาใช้ตอนนี้หรือไม่';
+$string['autoupgrade:l_manage'] = 'ตรวจสอบหรือลบข้อเท็จจริงที่เรียนรู้ไว้ในหน้าทะเบียนโมเดล';
+$string['autoupgrade:l_notinuse'] = 'ไม่ได้ใช้งาน';
+$string['autoupgrade:mode_off'] = 'ปิด: ไม่มีการทำงานอัตโนมัติ';
+$string['autoupgrade:mode_recommend'] = 'แนะนำ: ทดสอบตัวเลือกและส่งอีเมลคำแนะนำ';
+$string['autoupgrade:mode_auto'] = 'อัตโนมัติ: ทดสอบตัวเลือกและสลับเมื่อมีตัวที่ผ่าน';
+$string['autoupgrade:budget_line'] = 'ใช้ไป ${$a->spent} จาก ${$a->limit} ในเดือนนี้ (เหลือ ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'การค้นหาทำงานล่าสุดเมื่อ {$a}';
+$string['autoupgrade:never_discovered'] = 'การค้นหายังไม่เคยทำงาน';
+$string['autoupgrade:role_chat'] = 'แชต (โมเดลหลัก)';
+$string['autoupgrade:role_premium'] = 'ระดับพรีเมียม';
+$string['autoupgrade:role_failover'] = 'โมเดลสำรอง';
+$string['autoupgrade:role_quiz'] = 'การสร้างแบบทดสอบ';
+$string['autoupgrade:role_classifier'] = 'ตัวจำแนกระดับความเชี่ยวชาญ';
+$string['autoupgrade:role_safety'] = 'ข้อมูลอ้างอิงด้านความปลอดภัย';
+$string['autoupgrade:role_soapbox'] = 'การให้คะแนน Soapbox';
+$string['autoupgrade:not_configured'] = 'ยังไม่ได้กำหนดค่า (ใช้โมเดลแชต)';
+$string['autoupgrade:policy_auto'] = 'ประเมินแล้ว และสลับอัตโนมัติในโหมดอัตโนมัติ';
+$string['autoupgrade:policy_recommend'] = 'ประเมินและแนะนำแล้ว ผู้ดูแลระบบเป็นผู้สลับ';
+$string['autoupgrade:policy_none'] = 'แสดงรายการตัวเลือกเท่านั้น: ไม่มีเกณฑ์มาตรฐานใดวัดงานของบทบาทนี้';
+$string['autoupgrade:cand_candidate'] = 'ตัวเลือก';
+$string['autoupgrade:cand_passed'] = 'ผ่านหนึ่งครั้ง';
+$string['autoupgrade:cand_eligible'] = 'มีสิทธิ์';
+$string['autoupgrade:cand_failed'] = 'ไม่ผ่าน';
+$string['autoupgrade:cand_switched'] = 'กำลังใช้งาน';
+$string['autoupgrade:cand_rolledback'] = 'ย้อนกลับแล้ว';
+$string['autoupgrade:cand_retired'] = 'ไม่อยู่ในรายการแล้ว';
+$string['autoupgrade:eval_queued'] = 'อยู่ในคิว';
+$string['autoupgrade:eval_running'] = 'กำลังทำงาน';
+$string['autoupgrade:eval_complete'] = 'เสร็จสมบูรณ์';
+$string['autoupgrade:eval_failed'] = 'ล้มเหลว';
+$string['autoupgrade:eval_skipped'] = 'ไม่ได้รัน';
+$string['autoupgrade:gate_pass'] = 'ผ่าน:';
+$string['autoupgrade:gate_fail'] = 'ไม่ผ่าน:';
+$string['autoupgrade:how_auto'] = 'อัตโนมัติ';
+$string['autoupgrade:how_manual'] = 'โดยผู้ดูแลระบบ';
+$string['autoupgrade:switch_watching'] = 'กำลังเฝ้าดู';
+$string['autoupgrade:switch_kept'] = 'คงไว้';
+$string['autoupgrade:switch_rolledback'] = 'ย้อนกลับแล้ว';
+$string['autoupgrade:switch_superseded'] = 'ผู้ดูแลระบบเปลี่ยนแปลงภายหลัง';
+$string['autoupgrade:block_role'] = 'ไม่สามารถสลับบทบาทนี้จากที่นี่ได้';
+$string['autoupgrade:block_emergency'] = 'มีการเปิดใช้การควบคุมฉุกเฉิน จึงจะไม่มีการสลับโมเดลจนกว่าจะคืนค่า';
+$string['autoupgrade:block_allowlist'] = 'การตั้งค่า {$a} ไม่ใช่การตั้งค่าที่การสลับจะเปลี่ยนได้โดยไม่มีคนดำเนินการ บทบาทนี้จึงต้องสลับด้วยตนเอง';
+$string['autoupgrade:block_bundle'] = 'การตั้งค่า {$a} ถูกจัดการโดยชุดนโยบายที่ลงนามแล้ว โปรดเปลี่ยนโมเดลในชุดนโยบายแทน';
+$string['autoupgrade:block_watching'] = 'การสลับของบทบาทนี้ยังอยู่ระหว่างการเฝ้าดู โปรดรอจนกว่าจะถูกคงไว้หรือย้อนกลับ';
+$string['autoupgrade:block_noeval'] = 'ตัวเลือกนี้ยังไม่มีการประเมินที่เสร็จสมบูรณ์';
+$string['autoupgrade:block_gate'] = 'การประเมินล่าสุดของตัวเลือกนี้ไม่ผ่านเกณฑ์';
+$string['autoupgrade:block_changed'] = 'โมเดลของบทบาทเปลี่ยนไปหลังการประเมิน จึงไม่ได้เปรียบเทียบคู่ที่ถูกต้องอีกต่อไป โปรดประเมินอีกครั้ง';
+$string['autoupgrade:switched'] = 'สลับ {$a->role} ไปใช้ {$a->model} แล้ว ระบบจะเฝ้าดูเป็นเวลา 48 ชั่วโมง';
+$string['autoupgrade:rolledback'] = 'ย้อนกลับการสลับ {$a} แล้ว';
+$string['autoupgrade:rollback_missing'] = 'ไม่สามารถย้อนกลับการสลับนั้นได้';
+$string['autoupgrade:rollback_superseded'] = 'การตั้งค่าถูกเปลี่ยนหลังการสลับ จึงไม่มีการย้อนกลับ';
+$string['autoupgrade:rollback_by_admin'] = 'ย้อนกลับโดยผู้ดูแลระบบ';
+$string['autoupgrade:queued'] = 'เพิ่มการประเมินเข้าคิวแล้ว จะทำงานในรอบ cron ถัดไปและใช้เวลาหลายนาที';
+$string['autoupgrade:discovered'] = 'การค้นหาพบผู้ให้บริการ {$a->providers} ราย ลงทะเบียนโมเดล {$a->registered} รายการ และทำเครื่องหมายตัวเลือก {$a->candidates} รายการ ผู้ให้บริการที่ดึงรายการไม่ได้: {$a->errors}';
+$string['autoupgrade:why_manual_role'] = 'บทบาทนี้ไม่ถูกสลับโดยอัตโนมัติ';
+$string['autoupgrade:why_recommend_mode'] = 'การอัปเกรดโมเดลอัตโนมัติอยู่ในโหมดแนะนำ';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] สลับ {$a->role} ไปใช้ {$a->to} แล้ว';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] สลับบทบาท {$a->role} จาก {$a->from} ไปใช้ {$a->to} แล้ว
+
+โมเดลนี้ผ่านทุกการตรวจสอบเมื่อเทียบกับโมเดลปัจจุบัน ซึ่งวัดในการรันเดียวกัน สองครั้งติดต่อกัน:
+{$a->gate}
+
+โมเดลใหม่จะถูกเฝ้าดูบนทราฟฟิกจริงเป็นเวลา {$a->hours} ชั่วโมง และจะถูกย้อนกลับอัตโนมัติหากข้อผิดพลาด คำตอบที่ถูกตัด การปฏิเสธ หรือค่าใช้จ่ายต่อคำตอบแย่ลง คุณสามารถย้อนกลับเองได้ทุกเมื่อ:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] ย้อนกลับ {$a->role} ไปใช้ {$a->from} แล้ว';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] นำบทบาท {$a->role} กลับจาก {$a->to} ไปใช้ {$a->from}
+
+เหตุผล: {$a->reason}
+
+จะไม่ลองใช้ตัวเลือกนี้อีกเป็นเวลา 30 วัน รายละเอียด:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] คงการสลับ {$a->role} ไปใช้ {$a->to} ไว้';
+$string['autoupgrade:mail_kept_body'] = 'การสลับบทบาท {$a->role} จาก {$a->from} ไปใช้ {$a->to} ทำงานได้ดีตลอด {$a->hours} ชั่วโมงกับคำตอบจริง {$a->turns} รายการ และจะคงไว้
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'การสลับบทบาท {$a->role} จาก {$a->from} ไปใช้ {$a->to} จะคงไว้หลังจาก {$a->hours} ชั่วโมง แต่พบคำตอบจริงเพียง {$a->turns} รายการ ซึ่งน้อยเกินกว่าจะตัดสินได้ โปรดติดตามอย่างใกล้ชิด
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] คำแนะนำ: {$a->role} บน {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} ผ่านทุกการตรวจสอบเมื่อเทียบกับ {$a->current} สำหรับบทบาท {$a->role} สองครั้งติดต่อกัน และไม่ได้ถูกสลับโดยอัตโนมัติ: {$a->why}
+
+{$a->gate}
+
+สลับหรือคงไว้ได้ที่นี่:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'คุณได้รับอีเมลนี้เนื่องจากที่อยู่ของคุณเป็นผู้รับการแจ้งเตือนค่าใช้จ่ายของ [[tutorshort]]';
+$string['event:model_switched'] = 'สลับโมเดลแล้ว';
+$string['event:model_switch_rolled_back'] = 'ย้อนกลับการสลับโมเดลแล้ว';
+$string['task:discover_models'] = 'ค้นหาโมเดล AI ใหม่และเพิ่มการประเมินเข้าคิว';
+$string['task:evaluate_model_candidate'] = 'ประเมินโมเดล AI ที่เป็นตัวเลือก';
+$string['task:watch_model_switches'] = 'เฝ้าดูการสลับโมเดล AI ล่าสุด';
+$string['settings:autoupgrade_heading'] = 'การอัปเกรดโมเดลอัตโนมัติ';
+$string['settings:autoupgrade_heading_desc'] = 'ทุกวัน [[tutorshort]] จะดึงรายการโมเดลที่ผู้ให้บริการของคุณมี และทำเครื่องหมายตัวเลือกสำหรับแต่ละบทบาท: ผู้ให้บริการเดียวกัน ราคาตามรายการใกล้เคียงกัน และทราบราคา จากนั้นทดสอบเทียบกับโมเดลปัจจุบันด้วยพรอมต์ของติวเตอร์ ชุดทดสอบเจลเบรก และค่าใช้จ่ายที่จำลองตามการใช้งานจริง และจะสลับค่าเริ่มต้นของไซต์เฉพาะเมื่อตัวเลือกมีราคาต่อคำตอบเท่าเดิมหรือถูกกว่า ดีเท่ากัน ปลอดภัยเท่ากัน และเชื่อถือได้เท่ากัน สองครั้งติดต่อกัน รายวิชาที่มีโมเดลของตนเองจะคงโมเดลนั้นไว้ ทุกการสลับจะส่งอีเมลถึงผู้รับการแจ้งเตือนค่าใช้จ่ายและถูกเฝ้าดูเป็นเวลา 48 ชั่วโมง';
+$string['settings:autoupgrade_mode'] = 'โหมด';
+$string['settings:autoupgrade_mode_desc'] = 'อัตโนมัติจะสลับเมื่อตัวเลือกผ่าน แนะนำจะทดสอบตัวเลือกและส่งอีเมลคำแนะนำแทน ปิดจะไม่ทำสิ่งใดโดยอัตโนมัติ';
+$string['settings:autoupgrade_budget_usd'] = 'งบประมาณการทดสอบรายเดือน (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'จำนวนเงินสูงสุดที่การประเมินอัตโนมัติใช้ได้ในหนึ่งเดือนปฏิทิน รวมผู้ตัดสินด้วย การประเมินที่อาจทำให้ยอดของเดือนเกินจำนวนนี้จะไม่เริ่ม';
+$string['settings:autoupgrade_eval_courseid'] = 'รหัสรายวิชาสำหรับการประเมิน';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'การประเมินจะตอบภายใต้พรอมต์ระบบที่รายวิชานี้ใช้จริง ซึ่งสร้างขึ้นสำหรับตัวตนผู้เยี่ยมชม จึงไม่มีการส่งข้อมูลของผู้เรียนคนใด ค่า 0 จะเลือกรายวิชาที่มีคำตอบแชตมากที่สุดใน 30 วันที่ผ่านมา';
+$string['privacy:metadata:model_eval'] = 'การประเมินโมเดลอัตโนมัติ: โมเดลตัวเลือกใดถูกเปรียบเทียบกับโมเดลปัจจุบันใด และผลที่วัดได้ ข้อมูลส่วนบุคคลเพียงอย่างเดียวคือตัวระบุของผู้ดูแลระบบที่ขอการประเมิน แถวเหล่านี้เป็นการกำหนดค่าไซต์ ไม่ใช่ข้อมูลส่วนบุคคลของผู้เรียน จึงไม่รวมอยู่ในการส่งออกข้อมูลและไม่ถูกลบเมื่อผู้ใช้ขอให้ลบข้อมูล';
+$string['privacy:metadata:model_eval:createdby'] = 'ผู้ดูแลไซต์ที่ขอการประเมินนี้ ว่างเปล่าเมื่อการค้นหาเป็นผู้เพิ่มเข้าคิว';
+$string['privacy:metadata:model_switch'] = 'การสลับและการย้อนกลับโมเดล: บทบาทย้ายจากโมเดลใดไปโมเดลใด และเพราะเหตุใด ข้อมูลส่วนบุคคลเพียงอย่างเดียวคือตัวระบุของผู้ดูแลระบบที่ทำหรือยกเลิกการสลับ แถวเหล่านี้เป็นการกำหนดค่าไซต์ ไม่ใช่ข้อมูลส่วนบุคคลของผู้เรียน จึงไม่รวมอยู่ในการส่งออกข้อมูลและไม่ถูกลบเมื่อผู้ใช้ขอให้ลบข้อมูล';
+$string['privacy:metadata:model_switch:createdby'] = 'ผู้ดูแลไซต์ที่ทำการสลับนี้ ว่างเปล่าเมื่อเป็นการสลับอัตโนมัติ';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'ผู้ดูแลไซต์ที่ย้อนกลับการสลับนี้ ว่างเปล่าเมื่อระบบเฝ้าดูเป็นผู้ย้อนกลับ หรือเมื่อไม่ได้ถูกย้อนกลับ';
+
+$string['autoupgrade:block_reasoning'] = 'ระดับการใช้เหตุผลเป็นการตั้งค่าเดียวสำหรับทั้งไซต์ และบทบาท {$a} ก็ใช้โมเดลแบบคิดที่ยังไม่ได้ทดสอบที่ระดับใหม่ด้วย หากต้องการเช่นนั้น ให้สลับด้วยตนเอง';
+$string['autoupgrade:block_reasoning_course'] = 'ระดับการใช้เหตุผลเป็นการตั้งค่าเดียวสำหรับทั้งไซต์ และมีรายวิชาหนึ่งใช้โมเดลแบบคิดของตัวเอง ({$a}) ที่ยังไม่ได้ทดสอบในระดับใหม่ หากต้องการเช่นนั้นให้สลับด้วยตนเอง';

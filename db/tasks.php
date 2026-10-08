@@ -307,4 +307,25 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    // v7.8.0: automatic model upgrades. Discovery lists provider models and
+    // queues evaluations (it does nothing when the mode is off); the watcher
+    // checks every recent switch hourly and rolls back the ones that got worse.
+    [
+        'classname' => \local_ai_course_assistant\task\discover_models::class,
+        'blocking' => 0,
+        'minute' => '40',
+        'hour' => '3',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
+    [
+        'classname' => \local_ai_course_assistant\task\watch_model_switches::class,
+        'blocking' => 0,
+        'minute' => '25',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];

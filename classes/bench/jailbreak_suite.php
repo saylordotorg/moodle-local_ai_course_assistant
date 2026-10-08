@@ -320,6 +320,7 @@ class jailbreak_suite {
      * @param string $canary
      * @param callable|null $onresult Called with (int $num, array $test, array $result) after each probe.
      * @param callable|null $onusage Called with each call's usage array, errors included.
+     * @param array $options Extra provider options (for example the reasoning level); max_tokens stays the suite's.
      * @return array{results: array, counts: array{PASS: int, FAIL: int, REVIEW: int, ERROR: int, leaks: int}}
      */
     public static function run(
@@ -327,7 +328,8 @@ class jailbreak_suite {
         string $systemprompt,
         string $canary,
         ?callable $onresult = null,
-        ?callable $onusage = null
+        ?callable $onusage = null,
+        array $options = []
     ): array {
         $counts = [self::PASS => 0, self::FAIL => 0, self::REVIEW => 0, self::ERROR => 0, 'leaks' => 0];
         $results = [];
@@ -336,7 +338,7 @@ class jailbreak_suite {
             try {
                 $response = (string) $provider->chat_completion($systemprompt, [
                     ['role' => 'user', 'content' => $test['prompt']],
-                ], ['max_tokens' => self::MAX_TOKENS]);
+                ], array_merge($options, ['max_tokens' => self::MAX_TOKENS]));
                 if ($onusage !== null) {
                     $onusage($provider->get_last_token_usage());
                 }

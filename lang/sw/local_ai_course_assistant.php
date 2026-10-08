@@ -3223,3 +3223,147 @@ $string['modelregistry:forget_confirm'] = 'Sahau ukweli huu? Ombi linalofuata kw
 $string['modelregistry:forget_done'] = 'Ukweli umesahaulika. Ombi linalofuata kwa modeli hii litatumia kanuni za kawaida.';
 $string['modelregistry:forget_missing'] = 'Ukweli huo haupo tena.';
 $string['event:model_capability_learned'] = 'Uwezo wa modeli umejifunzwa kutoka kwa mtoa huduma';
+
+$string['autoupgrade:title'] = 'Maboresho ya modeli';
+$string['autoupgrade:navtitle'] = 'Maboresho ya modeli za [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] hutafuta modeli mpya kutoka kwa watoa huduma inaowatumia tayari, hujaribu kila mgombea dhidi ya modeli ambayo angeibadilisha (vidokezo vilevile, bajeti ileile ya jibu, mwamuzi yuleyule, katika mzunguko uleule), na hubadilisha tu mgombea anapokuwa na bei ileile au nafuu zaidi kwa kila jibu, mzuri vilevile, salama vilevile na wa kutegemewa vilevile, mara mbili mfululizo. Kila mabadiliko hufuatiliwa kwa saa 48 kwenye trafiki halisi na kurudishwa nyuma yakizidi kuwa mabaya.';
+$string['autoupgrade:l_statusheading'] = 'Hali';
+$string['autoupgrade:l_mode'] = 'Modi';
+$string['autoupgrade:l_budget'] = 'Bajeti ya majaribio';
+$string['autoupgrade:l_changemode'] = 'Badilisha';
+$string['autoupgrade:l_discover'] = 'Gundua modeli sasa';
+$string['autoupgrade:l_rolesheading'] = 'Majukumu';
+$string['autoupgrade:l_current'] = 'Modeli ya sasa';
+$string['autoupgrade:l_profile'] = 'Wasifu wa uwezo';
+$string['autoupgrade:l_policy'] = 'Maboresho';
+$string['autoupgrade:l_nocandidates'] = 'Hakuna wagombea. Ugunduzi huweka alama kwenye modeli za mtoa huduma yuleyule kwa bei inayolingana.';
+$string['autoupgrade:l_colpasses'] = 'Ufaulu';
+$string['autoupgrade:l_collast'] = 'Tathmini ya mwisho';
+$string['autoupgrade:l_evaluate'] = 'Tathmini sasa';
+$string['autoupgrade:l_evaluating'] = 'Kwenye foleni au inaendelea';
+$string['autoupgrade:l_switch'] = 'Hamisha';
+$string['autoupgrade:l_switchconfirm'] = 'Hamisha jukumu hili kwa mgombea sasa? Mabadiliko hufuatiliwa kwa saa 48 na yanaweza kurudishwa nyuma.';
+$string['autoupgrade:l_evalsheading'] = 'Tathmini';
+$string['autoupgrade:l_noevals'] = 'Bado hakuna tathmini.';
+$string['autoupgrade:l_colwhen'] = 'Lini';
+$string['autoupgrade:l_colrole'] = 'Jukumu';
+$string['autoupgrade:l_colcandidate'] = 'Mgombea';
+$string['autoupgrade:l_colincumbent'] = 'Modeli ya sasa';
+$string['autoupgrade:l_colcost'] = 'Imetumika / makadirio';
+$string['autoupgrade:l_colgate'] = 'Ukaguzi wa kigezo';
+$string['autoupgrade:l_switchesheading'] = 'Mabadiliko na urejeshaji';
+$string['autoupgrade:l_noswitches'] = 'Bado hakuna mabadiliko.';
+$string['autoupgrade:l_colfrom'] = 'Kutoka';
+$string['autoupgrade:l_colto'] = 'Kwenda';
+$string['autoupgrade:l_colmode'] = 'Jinsi';
+$string['autoupgrade:l_colreason'] = 'Sababu';
+$string['autoupgrade:l_coluntil'] = 'Inafuatiliwa hadi';
+$string['autoupgrade:l_rollback'] = 'Rudisha nyuma';
+$string['autoupgrade:l_rollbackconfirm'] = 'Rudisha modeli ya awali sasa?';
+$string['autoupgrade:l_manage'] = 'Kagua au sahau ukweli uliojifunzwa kwenye ukurasa wa sajili ya modeli';
+$string['autoupgrade:l_notinuse'] = 'haitumiki';
+$string['autoupgrade:mode_off'] = 'Imezimwa: hakuna kitu kiotomatiki';
+$string['autoupgrade:mode_recommend'] = 'Pendekeza: jaribu wagombea na utume pendekezo kwa barua pepe';
+$string['autoupgrade:mode_auto'] = 'Kiotomatiki: jaribu wagombea na uhamishe mmoja anapofaulu';
+$string['autoupgrade:budget_line'] = '${$a->spent} kati ya ${$a->limit} zimetumika mwezi huu (zimebaki ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Ugunduzi uliendeshwa mara ya mwisho {$a}.';
+$string['autoupgrade:never_discovered'] = 'Ugunduzi bado haujaendeshwa.';
+$string['autoupgrade:role_chat'] = 'Gumzo (modeli kuu)';
+$string['autoupgrade:role_premium'] = 'Kiwango cha premium';
+$string['autoupgrade:role_failover'] = 'Modeli ya akiba';
+$string['autoupgrade:role_quiz'] = 'Utengenezaji wa maswali';
+$string['autoupgrade:role_classifier'] = 'Kiainishaji cha umahiri';
+$string['autoupgrade:role_safety'] = 'Rejea ya usalama';
+$string['autoupgrade:role_soapbox'] = 'Upimaji wa Soapbox';
+$string['autoupgrade:not_configured'] = 'Haijasanidiwa (inarithi modeli ya gumzo)';
+$string['autoupgrade:policy_auto'] = 'Hutathminiwa, na huhamishwa kiotomatiki katika modi ya Kiotomatiki';
+$string['autoupgrade:policy_recommend'] = 'Hutathminiwa na kupendekezwa; msimamizi ndiye huhamisha';
+$string['autoupgrade:policy_none'] = 'Orodha ya wagombea tu: hakuna kipimo kinachopima kazi ya jukumu hili';
+$string['autoupgrade:cand_candidate'] = 'Mgombea';
+$string['autoupgrade:cand_passed'] = 'Amefaulu mara moja';
+$string['autoupgrade:cand_eligible'] = 'Anastahili';
+$string['autoupgrade:cand_failed'] = 'Ameshindwa';
+$string['autoupgrade:cand_switched'] = 'Inatumika';
+$string['autoupgrade:cand_rolledback'] = 'Imerudishwa nyuma';
+$string['autoupgrade:cand_retired'] = 'Haiorodheshwi tena';
+$string['autoupgrade:eval_queued'] = 'Kwenye foleni';
+$string['autoupgrade:eval_running'] = 'Inaendelea';
+$string['autoupgrade:eval_complete'] = 'Imekamilika';
+$string['autoupgrade:eval_failed'] = 'Imeshindwa';
+$string['autoupgrade:eval_skipped'] = 'Haikuendeshwa';
+$string['autoupgrade:gate_pass'] = 'Imefaulu:';
+$string['autoupgrade:gate_fail'] = 'Haikufaulu:';
+$string['autoupgrade:how_auto'] = 'Kiotomatiki';
+$string['autoupgrade:how_manual'] = 'Na msimamizi';
+$string['autoupgrade:switch_watching'] = 'Inafuatiliwa';
+$string['autoupgrade:switch_kept'] = 'Imebakizwa';
+$string['autoupgrade:switch_rolledback'] = 'Imerudishwa nyuma';
+$string['autoupgrade:switch_superseded'] = 'Imebadilishwa baadaye na msimamizi';
+$string['autoupgrade:block_role'] = 'Jukumu hili haliwezi kuhamishwa kutoka hapa.';
+$string['autoupgrade:block_emergency'] = 'Udhibiti wa dharura umewashwa, kwa hivyo hakuna modeli itakayohamishwa hadi urejeshwe.';
+$string['autoupgrade:block_allowlist'] = 'Mpangilio {$a} si ule ambao mabadiliko yanaweza kuubadilisha bila mtu, kwa hivyo jukumu hili huhamishwa kwa mkono.';
+$string['autoupgrade:block_bundle'] = 'Mpangilio {$a} unasimamiwa na kifurushi cha sera kilichotiwa sahihi. Badilisha modeli kwenye kifurushi badala yake.';
+$string['autoupgrade:block_watching'] = 'Mabadiliko ya jukumu hili bado yanafuatiliwa. Subiri hadi yabakizwe au yarudishwe nyuma.';
+$string['autoupgrade:block_noeval'] = 'Mgombea huyu hana tathmini iliyokamilika.';
+$string['autoupgrade:block_gate'] = 'Tathmini ya mwisho ya mgombea huyu haikuvuka kigezo.';
+$string['autoupgrade:block_changed'] = 'Modeli ya jukumu ilibadilika baada ya tathmini, kwa hivyo hailinganishi tena jozi sahihi. Tathmini tena.';
+$string['autoupgrade:switched'] = '{$a->role} imehamishwa kwenda {$a->model}. Inafuatiliwa kwa saa 48.';
+$string['autoupgrade:rolledback'] = 'Mabadiliko ya {$a} yamerudishwa nyuma.';
+$string['autoupgrade:rollback_missing'] = 'Mabadiliko hayo hayawezi kurudishwa nyuma.';
+$string['autoupgrade:rollback_superseded'] = 'Mipangilio ilibadilishwa baada ya mabadiliko, kwa hivyo hakuna kilichorudishwa nyuma.';
+$string['autoupgrade:rollback_by_admin'] = 'Imerudishwa nyuma na msimamizi.';
+$string['autoupgrade:queued'] = 'Tathmini iko kwenye foleni. Itaendeshwa katika mzunguko ujao wa cron na huchukua dakika kadhaa.';
+$string['autoupgrade:discovered'] = 'Ugunduzi uliorodhesha watoa huduma {$a->providers}, ulisajili modeli {$a->registered} na kuweka alama kwa wagombea {$a->candidates}. Watoa huduma ambao hawakuweza kuorodheshwa: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'Jukumu hili halihamishwi kiotomatiki.';
+$string['autoupgrade:why_recommend_mode'] = 'Maboresho ya kiotomatiki ya modeli yako katika modi ya Pendekeza.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} imehamishwa kwenda {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] imehamisha jukumu la {$a->role} kutoka {$a->from} kwenda {$a->to}.
+
+Ilifaulu kila ukaguzi dhidi ya modeli ya sasa, uliopimwa katika mzunguko uleule, mara mbili mfululizo:
+{$a->gate}
+
+Modeli mpya inafuatiliwa kwenye trafiki halisi kwa saa {$a->hours} na itarudishwa nyuma kiotomatiki ikiwa makosa, majibu yaliyokatika, kukataa au gharama kwa kila jibu vitazidi kuwa vibaya. Unaweza kuirudisha nyuma mwenyewe wakati wowote:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} imerudishwa kwenda {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] imerudisha jukumu la {$a->role} kutoka {$a->to} kwenda {$a->from}.
+
+Sababu: {$a->reason}
+
+Mgombea hatajaribiwa tena kwa siku 30. Maelezo:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Mabadiliko ya {$a->role} kwenda {$a->to} yamebakizwa';
+$string['autoupgrade:mail_kept_body'] = 'Mabadiliko ya jukumu la {$a->role} kutoka {$a->from} kwenda {$a->to} yalidumu kwa saa {$a->hours} kwenye majibu halisi {$a->turns} na yamebakizwa.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Mabadiliko ya jukumu la {$a->role} kutoka {$a->from} kwenda {$a->to} yamebakizwa baada ya saa {$a->hours}, lakini ni majibu halisi {$a->turns} tu yaliyoonekana, machache mno kuamua. Endelea kuyafuatilia.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] Imependekezwa: {$a->role} kwa {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} ilifaulu kila ukaguzi dhidi ya {$a->current} kwa jukumu la {$a->role}, mara mbili mfululizo, na haikuhamishwa kiotomatiki: {$a->why}
+
+{$a->gate}
+
+Ihamishe, au iache, hapa:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Unapokea ujumbe huu kwa sababu anwani yako ni mpokeaji wa arifa za matumizi za [[tutorshort]].';
+$string['event:model_switched'] = 'Modeli imehamishwa';
+$string['event:model_switch_rolled_back'] = 'Mabadiliko ya modeli yamerudishwa nyuma';
+$string['task:discover_models'] = 'Gundua modeli mpya za AI na uweke tathmini kwenye foleni';
+$string['task:evaluate_model_candidate'] = 'Tathmini modeli ya AI inayogombea';
+$string['task:watch_model_switches'] = 'Fuatilia mabadiliko ya hivi karibuni ya modeli za AI';
+$string['settings:autoupgrade_heading'] = 'Maboresho ya kiotomatiki ya modeli';
+$string['settings:autoupgrade_heading_desc'] = 'Kila siku [[tutorshort]] huorodhesha modeli zinazotolewa na watoa huduma wako na kuweka alama kwa wagombea wa kila jukumu: mtoa huduma yuleyule, bei ya orodha inayolingana na bei inayojulikana. Huwajaribu dhidi ya modeli ya sasa kwa vidokezo vya mkufunzi, majaribio ya jailbreak na gharama inayofanana na halisi, na hubadilisha modeli chaguo-msingi ya tovuti tu mgombea anapokuwa na bei ileile au nafuu zaidi kwa kila jibu, mzuri vilevile, salama vilevile na wa kutegemewa vilevile, mara mbili mfululizo. Kozi zenye modeli yao huibakiza. Kila mabadiliko hutumwa kwa barua pepe kwa wapokeaji wa arifa za matumizi na hufuatiliwa kwa saa 48.';
+$string['settings:autoupgrade_mode'] = 'Modi';
+$string['settings:autoupgrade_mode_desc'] = 'Kiotomatiki huhamisha mgombea anapofaulu. Pendekeza hujaribu wagombea na badala yake hutuma pendekezo kwa barua pepe. Imezimwa haifanyi chochote kiotomatiki.';
+$string['settings:autoupgrade_budget_usd'] = 'Bajeti ya kila mwezi ya majaribio (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Kiasi cha juu ambacho tathmini za kiotomatiki zinaweza kutumia katika mwezi wa kalenda, pamoja na mwamuzi. Tathmini inayoweza kuvuka kiasi hiki katika mwezi huo haianzi.';
+$string['settings:autoupgrade_eval_courseid'] = 'Kitambulisho cha kozi ya tathmini';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Tathmini hujibu kwa kidokezo cha mfumo ambacho kozi hii inatumia kweli, kilichojengwa kwa utambulisho wa mgeni ili data ya mwanafunzi yeyote isitumwe. 0 huchagua kozi yenye majibu mengi zaidi ya gumzo katika siku 30 zilizopita.';
+$string['privacy:metadata:model_eval'] = 'Tathmini za kiotomatiki za modeli: ni modeli gani mgombea ililinganishwa na modeli gani ya sasa, na matokeo yaliyopimwa. Data binafsi pekee ni kitambulisho cha msimamizi aliyeomba tathmini. Safu hizi ni usanidi wa tovuti, si data binafsi ya mwanafunzi, kwa hivyo hazijumuishwi katika usafirishaji wa data na hazifutwi mtumiaji anapoomba kufutwa.';
+$string['privacy:metadata:model_eval:createdby'] = 'Msimamizi wa tovuti aliyeomba tathmini hii. Tupu ikiwa ugunduzi uliiweka kwenye foleni.';
+$string['privacy:metadata:model_switch'] = 'Mabadiliko na urejeshaji wa modeli: jukumu lilihama kutoka modeli gani kwenda ipi, na kwa nini. Data binafsi pekee ni kitambulisho cha msimamizi aliyefanya au kutengua mabadiliko. Safu hizi ni usanidi wa tovuti, si data binafsi ya mwanafunzi, kwa hivyo hazijumuishwi katika usafirishaji wa data na hazifutwi mtumiaji anapoomba kufutwa.';
+$string['privacy:metadata:model_switch:createdby'] = 'Msimamizi wa tovuti aliyefanya mabadiliko haya. Tupu ikiwa yalikuwa ya kiotomatiki.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Msimamizi wa tovuti aliyerudisha nyuma mabadiliko haya. Tupu ikiwa mfuatiliaji ndiye aliyeyarudisha au hayakurudishwa.';
+
+$string['autoupgrade:block_reasoning'] = 'Kiwango cha kufikiri ni mpangilio mmoja kwa tovuti nzima, na jukumu la {$a} pia linaendesha modeli ya kufikiri ambayo haijajaribiwa katika kiwango kipya. Badilisha mwenyewe ikiwa hilo ndilo unalotaka.';
+$string['autoupgrade:block_reasoning_course'] = 'Juhudi za kufikiri ni mpangilio mmoja kwa tovuti nzima, na kozi moja inatumia modeli yake ya kufikiri ({$a}) ambayo haijajaribiwa katika kiwango kipya. Badilisha kwa mkono ikiwa ndivyo unavyotaka.';

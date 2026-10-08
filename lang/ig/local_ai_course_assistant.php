@@ -3194,3 +3194,147 @@ $string['modelregistry:forget_confirm'] = 'Chefuo eziokwu a? Arịrịọ na-eso
 $string['modelregistry:forget_done'] = 'Echefuola eziokwu ahụ. Arịrịọ na-esote na model a na-eji iwu ndabara.';
 $string['modelregistry:forget_missing'] = 'Eziokwu ahụ adịghịzi.';
 $string['event:model_capability_learned'] = 'A mụtara ikike model n\'aka onye na-enye ọrụ';
+
+$string['autoupgrade:title'] = 'Nkwalite model';
+$string['autoupgrade:navtitle'] = 'Nkwalite model [[tutorshort]]';
+$string['autoupgrade:intro'] = '[[tutorshort]] na-achọ model ọhụrụ site n\'aka ndị na-enye ọ na-eji ugbu a, na-anwale nhọrọ ọ bụla megide model ọ ga-anọchi (otu ntụziaka, otu mmefu azịza, otu onye ikpe, n\'otu ọsọ), ma na-agbanwe naanị mgbe nhọrọ ahụ nwere otu ọnụahịa ma ọ bụ dị ọnụ ala kwa azịza, dị mma, dị nchebe ma tụkwasịrị obi otu ka nke ugbu a, ugboro abụọ n\'usoro. A na-elele mgbanwe ọ bụla ruo awa 48 n\'okporo ụzọ ndụ ma laghachi azụ ma ọ bụrụ na ọ ka njọ.';
+$string['autoupgrade:l_statusheading'] = 'Ọnọdụ';
+$string['autoupgrade:l_mode'] = 'Ụdị ọrụ';
+$string['autoupgrade:l_budget'] = 'Mmefu nnwale';
+$string['autoupgrade:l_changemode'] = 'Gbanwee';
+$string['autoupgrade:l_discover'] = 'Chọpụta model ugbu a';
+$string['autoupgrade:l_rolesheading'] = 'Ọrụ dị iche iche';
+$string['autoupgrade:l_current'] = 'Model ugbu a';
+$string['autoupgrade:l_profile'] = 'Profaịlụ ikike';
+$string['autoupgrade:l_policy'] = 'Nkwalite';
+$string['autoupgrade:l_nocandidates'] = 'Enweghị nhọrọ. Nchọpụta na-aka model sitere n\'otu onye na-enye nwere ọnụahịa yiri ya akara.';
+$string['autoupgrade:l_colpasses'] = 'Ngafe';
+$string['autoupgrade:l_collast'] = 'Nyocha ikpeazụ';
+$string['autoupgrade:l_evaluate'] = 'Nyochaa ugbu a';
+$string['autoupgrade:l_evaluating'] = 'Nọ n\'ahịrị ma ọ bụ na-agba';
+$string['autoupgrade:l_switch'] = 'Gbanwee model';
+$string['autoupgrade:l_switchconfirm'] = 'Gbanwee ọrụ a gaa na nhọrọ ahụ ugbu a? A ga-elele mgbanwe ahụ ruo awa 48, enwere ike ịlaghachi ya azụ.';
+$string['autoupgrade:l_evalsheading'] = 'Nyocha';
+$string['autoupgrade:l_noevals'] = 'Enweghị nyocha ọ bụla ka.';
+$string['autoupgrade:l_colwhen'] = 'Mgbe';
+$string['autoupgrade:l_colrole'] = 'Ọrụ';
+$string['autoupgrade:l_colcandidate'] = 'Nhọrọ';
+$string['autoupgrade:l_colincumbent'] = 'Model ugbu a';
+$string['autoupgrade:l_colcost'] = 'Ego e mefuru / atụmatụ';
+$string['autoupgrade:l_colgate'] = 'Nlele ọnụ ụzọ';
+$string['autoupgrade:l_switchesheading'] = 'Mgbanwe na nlaghachi azụ';
+$string['autoupgrade:l_noswitches'] = 'Enweghị mgbanwe ọ bụla ka.';
+$string['autoupgrade:l_colfrom'] = 'Site na';
+$string['autoupgrade:l_colto'] = 'Gaa na';
+$string['autoupgrade:l_colmode'] = 'Otú';
+$string['autoupgrade:l_colreason'] = 'Ihe kpatara ya';
+$string['autoupgrade:l_coluntil'] = 'A na-elele ruo';
+$string['autoupgrade:l_rollback'] = 'Laghachi azụ';
+$string['autoupgrade:l_rollbackconfirm'] = 'Weghachi model gara aga ugbu a?';
+$string['autoupgrade:l_manage'] = 'Lelee ma ọ bụ chefuo eziokwu a mụtara na ibe ndekọ model';
+$string['autoupgrade:l_notinuse'] = 'anaghị eji ya';
+$string['autoupgrade:mode_off'] = 'Gbanyụrụ: ọ dịghị ihe na-akpaghị aka';
+$string['autoupgrade:mode_recommend'] = 'Ndụmọdụ: nwalee nhọrọ ma zipu ndụmọdụ site na email';
+$string['autoupgrade:mode_auto'] = 'Akpaghị aka: nwalee nhọrọ ma gbanwee mgbe otu gafere';
+$string['autoupgrade:budget_line'] = 'E mefuru ${$a->spent} n\'ime ${$a->limit} n\'ọnwa a (fọdụrụ ${$a->left})';
+$string['autoupgrade:last_discovery'] = 'Nchọpụta gbara ikpeazụ {$a}.';
+$string['autoupgrade:never_discovered'] = 'Nchọpụta agbabeghị ka.';
+$string['autoupgrade:role_chat'] = 'Mkparịta ụka (model isi)';
+$string['autoupgrade:role_premium'] = 'Ọkwa premium';
+$string['autoupgrade:role_failover'] = 'Ndabere mberede';
+$string['autoupgrade:role_quiz'] = 'Ịmepụta ajụjụ nnwale';
+$string['autoupgrade:role_classifier'] = 'Onye nhazi nghọta';
+$string['autoupgrade:role_safety'] = 'Ntụaka nchekwa';
+$string['autoupgrade:role_soapbox'] = 'Akara Soapbox';
+$string['autoupgrade:not_configured'] = 'Ahazighị ya (na-eketa model mkparịta ụka)';
+$string['autoupgrade:policy_auto'] = 'A na-enyocha ya, ma na-agbanwe ya na-akpaghị aka n\'ọnọdụ Akpaghị aka';
+$string['autoupgrade:policy_recommend'] = 'A na-enyocha ya ma tụọ aro ya; onye nchịkwa na-agbanwe ya';
+$string['autoupgrade:policy_none'] = 'A na-edepụta nhọrọ naanị: ọ dịghị nnwale na-atụ ọrụ nke ọrụ a';
+$string['autoupgrade:cand_candidate'] = 'Nhọrọ';
+$string['autoupgrade:cand_passed'] = 'Gafere otu ugboro';
+$string['autoupgrade:cand_eligible'] = 'Ruru eru';
+$string['autoupgrade:cand_failed'] = 'Dara';
+$string['autoupgrade:cand_switched'] = 'A na-eji ya';
+$string['autoupgrade:cand_rolledback'] = 'Laghachiri azụ';
+$string['autoupgrade:cand_retired'] = 'Anọghịzi na ndepụta';
+$string['autoupgrade:eval_queued'] = 'Nọ n\'ahịrị';
+$string['autoupgrade:eval_running'] = 'Na-agba';
+$string['autoupgrade:eval_complete'] = 'Emechara';
+$string['autoupgrade:eval_failed'] = 'Ọ dara';
+$string['autoupgrade:eval_skipped'] = 'Agbaghị ya';
+$string['autoupgrade:gate_pass'] = 'Gafere:';
+$string['autoupgrade:gate_fail'] = 'Agafeghị:';
+$string['autoupgrade:how_auto'] = 'Na-akpaghị aka';
+$string['autoupgrade:how_manual'] = 'Site n\'aka onye nchịkwa';
+$string['autoupgrade:switch_watching'] = 'A na-elele ya';
+$string['autoupgrade:switch_kept'] = 'Edobere ya';
+$string['autoupgrade:switch_rolledback'] = 'Laghachiri azụ';
+$string['autoupgrade:switch_superseded'] = 'Onye nchịkwa agbanweela ya kemgbe ahụ';
+$string['autoupgrade:block_role'] = 'Enweghị ike ịgbanwe ọrụ a site ebe a.';
+$string['autoupgrade:block_emergency'] = 'Njikwa mberede gbanyere, ya mere a gaghị agbanwe model ọ bụla ruo mgbe eweghachiri ya.';
+$string['autoupgrade:block_allowlist'] = 'Ntọala {$a} abụghị nke mgbanwe nwere ike ịgbanwe na-enweghị mmadụ, ya mere a na-eji aka agbanwe ọrụ a.';
+$string['autoupgrade:block_bundle'] = 'Ngwugwu iwu a bịanyere aka na ya na-ahụ maka ntọala {$a}. Gbanwee model ahụ n\'ime ngwugwu ahụ kama.';
+$string['autoupgrade:block_watching'] = 'A ka na-elele mgbanwe nke ọrụ a. Chere ruo mgbe edobere ya ma ọ bụ laghachi ya azụ.';
+$string['autoupgrade:block_noeval'] = 'Nhọrọ a enweghị nyocha emechara.';
+$string['autoupgrade:block_gate'] = 'Nyocha ikpeazụ nke nhọrọ a agafeghị nlele ọnụ ụzọ.';
+$string['autoupgrade:block_changed'] = 'Model nke ọrụ ahụ gbanwere mgbe nyocha ahụ gasịrị, ya mere ọ naghịzi atụnyere ụzọ abụọ ziri ezi. Nyochaa ọzọ.';
+$string['autoupgrade:switched'] = 'Agbanwere {$a->role} gaa na {$a->model}. A ga-elele ya ruo awa 48.';
+$string['autoupgrade:rolledback'] = 'Alaghachiri mgbanwe {$a} azụ.';
+$string['autoupgrade:rollback_missing'] = 'Enweghị ike ịlaghachi mgbanwe ahụ azụ.';
+$string['autoupgrade:rollback_superseded'] = 'Agbanwere ntọala ndị ahụ mgbe mgbanwe ahụ gasịrị, ya mere ọ dịghị ihe alaghachiri azụ.';
+$string['autoupgrade:rollback_by_admin'] = 'Onye nchịkwa laghachiri ya azụ.';
+$string['autoupgrade:queued'] = 'Etinyere nyocha n\'ahịrị. Ọ ga-agba n\'ọsọ cron na-esote ma were ọtụtụ nkeji.';
+$string['autoupgrade:discovered'] = 'Nchọpụta depụtara ndị na-enye {$a->providers}, debanye model {$a->registered} aha ma kaa nhọrọ {$a->candidates} akara. Ndị na-enye a na-enweghị ike idepụta: {$a->errors}.';
+$string['autoupgrade:why_manual_role'] = 'A naghị agbanwe ọrụ a na-akpaghị aka.';
+$string['autoupgrade:why_recommend_mode'] = 'Nkwalite model na-akpaghị aka nọ n\'ọnọdụ Ndụmọdụ.';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] Agbanwere {$a->role} gaa na {$a->to}';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] gbanwere ọrụ {$a->role} site na {$a->from} gaa na {$a->to}.
+
+Ọ gafere nlele ọ bụla megide model ugbu a, a tụrụ n\'otu ọsọ, ugboro abụọ n\'usoro:
+{$a->gate}
+
+A na-elele model ọhụrụ ahụ n\'okporo ụzọ ndụ ruo awa {$a->hours}, a ga-alaghachikwa ya azụ na-akpaghị aka ma ọ bụrụ na njehie, azịza a kwụsịrị n\'etiti, ịjụ ịza ma ọ bụ ọnụahịa kwa azịza ka njọ. Ị nwere ike ịlaghachi ya azụ n\'onwe gị oge ọ bụla:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] Alaghachiri {$a->role} azụ gaa na {$a->from}';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] weghachiri ọrụ {$a->role} site na {$a->to} gaa na {$a->from}.
+
+Ihe kpatara ya: {$a->reason}
+
+A gaghị anwale nhọrọ ahụ ọzọ ruo ụbọchị 30. Nkọwa:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] Edobere mgbanwe {$a->role} gaa na {$a->to}';
+$string['autoupgrade:mail_kept_body'] = 'Mgbanwe nke ọrụ {$a->role} site na {$a->from} gaa na {$a->to} kwụsiri ike ruo awa {$a->hours} n\'azịza ndụ {$a->turns}, edobekwara ya.
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = 'Edobere mgbanwe nke ọrụ {$a->role} site na {$a->from} gaa na {$a->to} mgbe awa {$a->hours} gasịrị, mana ọ bụ naanị azịza ndụ {$a->turns} ka a hụrụ, ha dị ntakịrị maka ikpe ikpe. Nọgide na-elele ya.
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] A tụrụ aro: {$a->role} na {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} gafere nlele ọ bụla megide {$a->current} maka ọrụ {$a->role}, ugboro abụọ n\'usoro, ma agbanweghị ya na-akpaghị aka: {$a->why}
+
+{$a->gate}
+
+Gbanwee ya, ma ọ bụ hapụ ya, ebe a:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'Ị na-anata nke a n\'ihi na adreesị gị bụ onye na-anata ọkwa mmefu ego [[tutorshort]].';
+$string['event:model_switched'] = 'Agbanwere model';
+$string['event:model_switch_rolled_back'] = 'Alaghachiri mgbanwe model azụ';
+$string['task:discover_models'] = 'Chọpụta model AI ọhụrụ ma tinye nyocha n\'ahịrị';
+$string['task:evaluate_model_candidate'] = 'Nyochaa model AI nhọrọ';
+$string['task:watch_model_switches'] = 'Lelee mgbanwe model AI na nso nso a';
+$string['settings:autoupgrade_heading'] = 'Nkwalite model na-akpaghị aka';
+$string['settings:autoupgrade_heading_desc'] = 'Kwa ụbọchị [[tutorshort]] na-edepụta model ndị na-enye gị na-enye ma kaa nhọrọ akara maka ọrụ ọ bụla: otu onye na-enye, ọnụahịa ndepụta yiri ya, na ọnụahịa a ma ama. Ọ na-anwale ha megide model ugbu a n\'ntụziaka onye nkuzi, usoro nnwale jailbreak na ọnụahịa yiri nke ndụ, ma na-agbanwe model ndabara saịtị naanị mgbe nhọrọ nwere otu ọnụahịa ma ọ bụ dị ọnụ ala kwa azịza, dị mma, dị nchebe ma tụkwasịrị obi otu ka nke ugbu a, ugboro abụọ n\'usoro. Nkuzi ndị nwere model nke ha na-edobe ya. A na-ezigara ndị na-anata ọkwa mmefu ego email maka mgbanwe ọ bụla, a na-elekwa ya ruo awa 48.';
+$string['settings:autoupgrade_mode'] = 'Ụdị ọrụ';
+$string['settings:autoupgrade_mode_desc'] = 'Akpaghị aka na-agbanwe mgbe nhọrọ gafere. Ndụmọdụ na-anwale nhọrọ ma zipu ndụmọdụ site na email kama. Gbanyụrụ anaghị eme ihe ọ bụla na-akpaghị aka.';
+$string['settings:autoupgrade_budget_usd'] = 'Mmefu nnwale kwa ọnwa (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'Ego kachasị nyocha na-akpaghị aka nwere ike imefu n\'otu ọnwa kalenda, gụnyere onye ikpe. Nyocha nwere ike ịgafe oke a n\'ọnwa ahụ anaghị amalite.';
+$string['settings:autoupgrade_eval_courseid'] = 'ID nkuzi nyocha';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'Nyocha na-aza n\'okpuru ntụziaka sistemụ nkuzi a na-eji n\'ezie, e wuru maka njirimara ọbịa ka e wee ghara iziga data nke onye mmụta ọ bụla. 0 na-ahọrọ nkuzi nwere azịza mkparịta ụka kachasị n\'ụbọchị 30 gara aga.';
+$string['privacy:metadata:model_eval'] = 'Nyocha model na-akpaghị aka: model nhọrọ nke e jiri tụnyere model ugbu a nke, na nsonaazụ a tụrụ. Naanị data nkeonwe bụ njirimara onye nchịkwa rịọrọ maka nyocha ahụ. Ahịrị ndị a bụ ntọala saịtị, ọ bụghị data nkeonwe gbasara onye mmụta, ya mere etinyeghị ha na mbupụ data, a naghịkwa ehichapụ ha mgbe onye ọrụ rịọrọ ka ehichapụ.';
+$string['privacy:metadata:model_eval:createdby'] = 'Onye nchịkwa saịtị rịọrọ maka nyocha a. Efu mgbe nchọpụta tinyere ya n\'ahịrị.';
+$string['privacy:metadata:model_switch'] = 'Mgbanwe model na nlaghachi azụ: site na model nke gaa na model nke ọrụ si gaa, na ihe kpatara ya. Naanị data nkeonwe bụ njirimara onye nchịkwa mere ma ọ bụ kagbuo mgbanwe ahụ. Ahịrị ndị a bụ ntọala saịtị, ọ bụghị data nkeonwe gbasara onye mmụta, ya mere etinyeghị ha na mbupụ data, a naghịkwa ehichapụ ha mgbe onye ọrụ rịọrọ ka ehichapụ.';
+$string['privacy:metadata:model_switch:createdby'] = 'Onye nchịkwa saịtị mere mgbanwe a. Efu mgbe ọ bụ na-akpaghị aka.';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'Onye nchịkwa saịtị laghachiri mgbanwe a azụ. Efu mgbe onye nlele mere ya, ma ọ bụ mgbe alaghachighị ya azụ.';
+
+$string['autoupgrade:block_reasoning'] = 'Mgbalị echiche bụ otu ntọala maka saịtị niile, ọrụ {$a} na-ejikwa ụdị nwere echiche nke a na-anwalebeghị n\'ọkwa ọhụrụ ahụ. Gbanwee ya n\'aka ma ọ bụrụ na ọ bụ ihe ị chọrọ.';
+$string['autoupgrade:block_reasoning_course'] = 'Mgbalị ntụgharị uche bụ otu ntọala maka saịtị niile, otu nkuzi na-eji ụdị echiche nke ya ({$a}) a na-anwalebeghị n\'ọkwa ọhụrụ. Gbanwee ya n\'aka ma ọ bụrụ na nke ahụ ka ịchọrọ.';

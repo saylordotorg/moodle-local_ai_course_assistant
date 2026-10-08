@@ -3199,3 +3199,147 @@ $string['modelregistry:forget_confirm'] = 'ਕੀ ਇਹ ਤੱਥ ਭੁਲਾ�
 $string['modelregistry:forget_done'] = 'ਤੱਥ ਭੁਲਾ ਦਿੱਤਾ ਗਿਆ। ਇਸ ਮਾਡਲ ਨੂੰ ਅਗਲੀ ਬੇਨਤੀ ਮੂਲ ਨਿਯਮ ਵਰਤੇਗੀ।';
 $string['modelregistry:forget_missing'] = 'ਉਹ ਤੱਥ ਹੁਣ ਮੌਜੂਦ ਨਹੀਂ ਹੈ।';
 $string['event:model_capability_learned'] = 'ਪ੍ਰਦਾਤਾ ਤੋਂ ਮਾਡਲ ਸਮਰੱਥਾ ਸਿੱਖੀ ਗਈ';
+
+$string['autoupgrade:title'] = 'ਮਾਡਲ ਅੱਪਗ੍ਰੇਡ';
+$string['autoupgrade:navtitle'] = '[[tutorshort]] ਮਾਡਲ ਅੱਪਗ੍ਰੇਡ';
+$string['autoupgrade:intro'] = '[[tutorshort]] ਉਹਨਾਂ ਪ੍ਰਦਾਤਾਵਾਂ ਦੇ ਨਵੇਂ ਮਾਡਲ ਲੱਭਦਾ ਹੈ ਜੋ ਇਹ ਪਹਿਲਾਂ ਹੀ ਵਰਤਦਾ ਹੈ, ਹਰ ਉਮੀਦਵਾਰ ਨੂੰ ਉਸ ਮਾਡਲ ਨਾਲ ਪਰਖਦਾ ਹੈ ਜਿਸਦੀ ਇਹ ਥਾਂ ਲਵੇਗਾ (ਉਹੀ ਪ੍ਰੋਂਪਟ, ਉਹੀ ਜਵਾਬ ਬਜਟ, ਉਹੀ ਜੱਜ, ਉਸੇ ਰਨ ਵਿੱਚ), ਅਤੇ ਸਿਰਫ਼ ਉਦੋਂ ਬਦਲਦਾ ਹੈ ਜਦੋਂ ਉਮੀਦਵਾਰ ਪ੍ਰਤੀ ਜਵਾਬ ਬਰਾਬਰ ਜਾਂ ਸਸਤਾ, ਓਨਾ ਹੀ ਵਧੀਆ, ਸੁਰੱਖਿਅਤ ਅਤੇ ਭਰੋਸੇਯੋਗ ਹੋਵੇ, ਲਗਾਤਾਰ ਦੋ ਵਾਰ। ਹਰ ਬਦਲਾਅ ਨੂੰ ਅਸਲ ਟ੍ਰੈਫ਼ਿਕ \'ਤੇ 48 ਘੰਟੇ ਨਿਗਰਾਨੀ ਹੇਠ ਰੱਖਿਆ ਜਾਂਦਾ ਹੈ ਅਤੇ ਖ਼ਰਾਬ ਹੋਣ \'ਤੇ ਵਾਪਸ ਲਿਆ ਜਾਂਦਾ ਹੈ।';
+$string['autoupgrade:l_statusheading'] = 'ਸਥਿਤੀ';
+$string['autoupgrade:l_mode'] = 'ਮੋਡ';
+$string['autoupgrade:l_budget'] = 'ਟੈਸਟਿੰਗ ਬਜਟ';
+$string['autoupgrade:l_changemode'] = 'ਬਦਲੋ';
+$string['autoupgrade:l_discover'] = 'ਹੁਣੇ ਮਾਡਲ ਲੱਭੋ';
+$string['autoupgrade:l_rolesheading'] = 'ਭੂਮਿਕਾਵਾਂ';
+$string['autoupgrade:l_current'] = 'ਮੌਜੂਦਾ ਮਾਡਲ';
+$string['autoupgrade:l_profile'] = 'ਸਮਰੱਥਾ ਪ੍ਰੋਫਾਈਲ';
+$string['autoupgrade:l_policy'] = 'ਅੱਪਗ੍ਰੇਡ';
+$string['autoupgrade:l_nocandidates'] = 'ਕੋਈ ਉਮੀਦਵਾਰ ਨਹੀਂ। ਖੋਜ ਉਸੇ ਪ੍ਰਦਾਤਾ ਦੇ ਮਿਲਦੀ-ਜੁਲਦੀ ਕੀਮਤ ਵਾਲੇ ਮਾਡਲਾਂ ਨੂੰ ਨਿਸ਼ਾਨਬੱਧ ਕਰਦੀ ਹੈ।';
+$string['autoupgrade:l_colpasses'] = 'ਪਾਸ';
+$string['autoupgrade:l_collast'] = 'ਆਖਰੀ ਮੁਲਾਂਕਣ';
+$string['autoupgrade:l_evaluate'] = 'ਹੁਣੇ ਮੁਲਾਂਕਣ ਕਰੋ';
+$string['autoupgrade:l_evaluating'] = 'ਕਤਾਰ ਵਿੱਚ ਜਾਂ ਚੱਲ ਰਿਹਾ';
+$string['autoupgrade:l_switch'] = 'ਬਦਲਾਅ ਕਰੋ';
+$string['autoupgrade:l_switchconfirm'] = 'ਕੀ ਇਸ ਭੂਮਿਕਾ ਨੂੰ ਹੁਣੇ ਉਮੀਦਵਾਰ \'ਤੇ ਬਦਲਣਾ ਹੈ? ਬਦਲਾਅ 48 ਘੰਟੇ ਨਿਗਰਾਨੀ ਹੇਠ ਰਹਿੰਦਾ ਹੈ ਅਤੇ ਵਾਪਸ ਲਿਆ ਜਾ ਸਕਦਾ ਹੈ।';
+$string['autoupgrade:l_evalsheading'] = 'ਮੁਲਾਂਕਣ';
+$string['autoupgrade:l_noevals'] = 'ਅਜੇ ਕੋਈ ਮੁਲਾਂਕਣ ਨਹੀਂ।';
+$string['autoupgrade:l_colwhen'] = 'ਕਦੋਂ';
+$string['autoupgrade:l_colrole'] = 'ਭੂਮਿਕਾ';
+$string['autoupgrade:l_colcandidate'] = 'ਉਮੀਦਵਾਰ';
+$string['autoupgrade:l_colincumbent'] = 'ਮੌਜੂਦਾ ਮਾਡਲ';
+$string['autoupgrade:l_colcost'] = 'ਖਰਚਿਆ / ਅੰਦਾਜ਼ਾ';
+$string['autoupgrade:l_colgate'] = 'ਸੀਮਾ ਜਾਂਚਾਂ';
+$string['autoupgrade:l_switchesheading'] = 'ਬਦਲਾਅ ਅਤੇ ਵਾਪਸੀਆਂ';
+$string['autoupgrade:l_noswitches'] = 'ਅਜੇ ਕੋਈ ਬਦਲਾਅ ਨਹੀਂ।';
+$string['autoupgrade:l_colfrom'] = 'ਤੋਂ';
+$string['autoupgrade:l_colto'] = 'ਤੱਕ';
+$string['autoupgrade:l_colmode'] = 'ਕਿਵੇਂ';
+$string['autoupgrade:l_colreason'] = 'ਕਾਰਨ';
+$string['autoupgrade:l_coluntil'] = 'ਨਿਗਰਾਨੀ ਤੱਕ';
+$string['autoupgrade:l_rollback'] = 'ਵਾਪਸ ਲਿਆਓ';
+$string['autoupgrade:l_rollbackconfirm'] = 'ਕੀ ਪਿਛਲਾ ਮਾਡਲ ਹੁਣੇ ਵਾਪਸ ਲਗਾਉਣਾ ਹੈ?';
+$string['autoupgrade:l_manage'] = 'ਸਿੱਖੇ ਤੱਥਾਂ ਦੀ ਮਾਡਲ ਰਜਿਸਟਰੀ ਪੰਨੇ \'ਤੇ ਸਮੀਖਿਆ ਕਰੋ ਜਾਂ ਭੁੱਲ ਜਾਓ';
+$string['autoupgrade:l_notinuse'] = 'ਵਰਤੋਂ ਵਿੱਚ ਨਹੀਂ';
+$string['autoupgrade:mode_off'] = 'ਬੰਦ: ਕੁਝ ਵੀ ਸਵੈਚਲਿਤ ਨਹੀਂ';
+$string['autoupgrade:mode_recommend'] = 'ਸਿਫ਼ਾਰਸ਼: ਉਮੀਦਵਾਰਾਂ ਨੂੰ ਪਰਖੋ ਅਤੇ ਸਿਫ਼ਾਰਸ਼ ਈਮੇਲ ਕਰੋ';
+$string['autoupgrade:mode_auto'] = 'ਸਵੈਚਲਿਤ: ਉਮੀਦਵਾਰਾਂ ਨੂੰ ਪਰਖੋ ਅਤੇ ਕੋਈ ਪਾਸ ਹੋਣ \'ਤੇ ਬਦਲੋ';
+$string['autoupgrade:budget_line'] = 'ਇਸ ਮਹੀਨੇ ${$a->limit} ਵਿੱਚੋਂ ${$a->spent} ਖਰਚੇ (${$a->left} ਬਾਕੀ)';
+$string['autoupgrade:last_discovery'] = 'ਖੋਜ ਆਖਰੀ ਵਾਰ {$a} ਨੂੰ ਚੱਲੀ।';
+$string['autoupgrade:never_discovered'] = 'ਖੋਜ ਅਜੇ ਨਹੀਂ ਚੱਲੀ।';
+$string['autoupgrade:role_chat'] = 'ਚੈਟ (ਮੁੱਖ ਮਾਡਲ)';
+$string['autoupgrade:role_premium'] = 'ਪ੍ਰੀਮੀਅਮ ਪੱਧਰ';
+$string['autoupgrade:role_failover'] = 'ਬਦਲਵਾਂ ਮਾਡਲ';
+$string['autoupgrade:role_quiz'] = 'ਕੁਇਜ਼ ਬਣਾਉਣਾ';
+$string['autoupgrade:role_classifier'] = 'ਮੁਹਾਰਤ ਵਰਗੀਕਰਤਾ';
+$string['autoupgrade:role_safety'] = 'ਸੁਰੱਖਿਆ ਹਵਾਲਾ';
+$string['autoupgrade:role_soapbox'] = 'Soapbox ਸਕੋਰਿੰਗ';
+$string['autoupgrade:not_configured'] = 'ਕੌਂਫਿਗਰ ਨਹੀਂ (ਚੈਟ ਮਾਡਲ ਅਪਣਾਉਂਦਾ ਹੈ)';
+$string['autoupgrade:policy_auto'] = 'ਮੁਲਾਂਕਣ ਹੁੰਦਾ ਹੈ, ਅਤੇ ਸਵੈਚਲਿਤ ਮੋਡ ਵਿੱਚ ਆਪਣੇ ਆਪ ਬਦਲਿਆ ਜਾਂਦਾ ਹੈ';
+$string['autoupgrade:policy_recommend'] = 'ਮੁਲਾਂਕਣ ਅਤੇ ਸਿਫ਼ਾਰਸ਼ ਹੁੰਦੀ ਹੈ; ਪ੍ਰਬੰਧਕ ਇਸਨੂੰ ਬਦਲਦਾ ਹੈ';
+$string['autoupgrade:policy_none'] = 'ਸਿਰਫ਼ ਉਮੀਦਵਾਰ ਸੂਚੀਬੱਧ: ਕੋਈ ਬੈਂਚਮਾਰਕ ਇਸ ਭੂਮਿਕਾ ਦੇ ਕੰਮ ਨੂੰ ਨਹੀਂ ਮਾਪਦਾ';
+$string['autoupgrade:cand_candidate'] = 'ਉਮੀਦਵਾਰ';
+$string['autoupgrade:cand_passed'] = 'ਇੱਕ ਵਾਰ ਪਾਸ';
+$string['autoupgrade:cand_eligible'] = 'ਯੋਗ';
+$string['autoupgrade:cand_failed'] = 'ਫੇਲ੍ਹ';
+$string['autoupgrade:cand_switched'] = 'ਵਰਤੋਂ ਵਿੱਚ';
+$string['autoupgrade:cand_rolledback'] = 'ਵਾਪਸ ਲਿਆਂਦਾ';
+$string['autoupgrade:cand_retired'] = 'ਹੁਣ ਸੂਚੀ ਵਿੱਚ ਨਹੀਂ';
+$string['autoupgrade:eval_queued'] = 'ਕਤਾਰ ਵਿੱਚ';
+$string['autoupgrade:eval_running'] = 'ਚੱਲ ਰਿਹਾ';
+$string['autoupgrade:eval_complete'] = 'ਪੂਰਾ';
+$string['autoupgrade:eval_failed'] = 'ਅਸਫਲ';
+$string['autoupgrade:eval_skipped'] = 'ਨਹੀਂ ਚਲਾਇਆ';
+$string['autoupgrade:gate_pass'] = 'ਪਾਸ:';
+$string['autoupgrade:gate_fail'] = 'ਪਾਸ ਨਹੀਂ:';
+$string['autoupgrade:how_auto'] = 'ਸਵੈਚਲਿਤ';
+$string['autoupgrade:how_manual'] = 'ਪ੍ਰਬੰਧਕ ਵੱਲੋਂ';
+$string['autoupgrade:switch_watching'] = 'ਨਿਗਰਾਨੀ ਹੇਠ';
+$string['autoupgrade:switch_kept'] = 'ਰੱਖਿਆ';
+$string['autoupgrade:switch_rolledback'] = 'ਵਾਪਸ ਲਿਆਂਦਾ';
+$string['autoupgrade:switch_superseded'] = 'ਬਾਅਦ ਵਿੱਚ ਪ੍ਰਬੰਧਕ ਵੱਲੋਂ ਬਦਲਿਆ';
+$string['autoupgrade:block_role'] = 'ਇਹ ਭੂਮਿਕਾ ਇੱਥੋਂ ਨਹੀਂ ਬਦਲੀ ਜਾ ਸਕਦੀ।';
+$string['autoupgrade:block_emergency'] = 'ਇੱਕ ਐਮਰਜੈਂਸੀ ਕੰਟਰੋਲ ਚਾਲੂ ਹੈ, ਇਸ ਲਈ ਇਸਦੇ ਬਹਾਲ ਹੋਣ ਤੱਕ ਕੋਈ ਮਾਡਲ ਨਹੀਂ ਬਦਲਿਆ ਜਾਂਦਾ।';
+$string['autoupgrade:block_allowlist'] = 'ਸੈਟਿੰਗ {$a} ਨੂੰ ਕਿਸੇ ਵਿਅਕਤੀ ਤੋਂ ਬਿਨਾਂ ਬਦਲਾਅ ਨਹੀਂ ਬਦਲ ਸਕਦਾ, ਇਸ ਲਈ ਇਹ ਭੂਮਿਕਾ ਹੱਥੀਂ ਬਦਲੀ ਜਾਂਦੀ ਹੈ।';
+$string['autoupgrade:block_bundle'] = 'ਸੈਟਿੰਗ {$a} ਦਸਤਖਤ ਕੀਤੇ ਨੀਤੀ ਬੰਡਲ ਰਾਹੀਂ ਪ੍ਰਬੰਧਿਤ ਹੈ। ਇਸ ਦੀ ਬਜਾਏ ਬੰਡਲ ਵਿੱਚ ਮਾਡਲ ਬਦਲੋ।';
+$string['autoupgrade:block_watching'] = 'ਇਸ ਭੂਮਿਕਾ ਦਾ ਇੱਕ ਬਦਲਾਅ ਅਜੇ ਨਿਗਰਾਨੀ ਹੇਠ ਹੈ। ਇਸਦੇ ਰੱਖੇ ਜਾਣ ਜਾਂ ਵਾਪਸ ਲਿਆਂਦੇ ਜਾਣ ਤੱਕ ਉਡੀਕ ਕਰੋ।';
+$string['autoupgrade:block_noeval'] = 'ਇਸ ਉਮੀਦਵਾਰ ਦਾ ਕੋਈ ਪੂਰਾ ਮੁਲਾਂਕਣ ਨਹੀਂ ਹੈ।';
+$string['autoupgrade:block_gate'] = 'ਇਸ ਉਮੀਦਵਾਰ ਦਾ ਆਖਰੀ ਮੁਲਾਂਕਣ ਸੀਮਾ ਪਾਰ ਨਹੀਂ ਕਰ ਸਕਿਆ।';
+$string['autoupgrade:block_changed'] = 'ਮੁਲਾਂਕਣ ਤੋਂ ਬਾਅਦ ਭੂਮਿਕਾ ਦਾ ਮਾਡਲ ਬਦਲ ਗਿਆ, ਇਸ ਲਈ ਇਹ ਹੁਣ ਸਹੀ ਜੋੜੀ ਦੀ ਤੁਲਨਾ ਨਹੀਂ ਕਰਦਾ। ਦੁਬਾਰਾ ਮੁਲਾਂਕਣ ਕਰੋ।';
+$string['autoupgrade:switched'] = '{$a->role} ਨੂੰ {$a->model} \'ਤੇ ਬਦਲਿਆ। ਇਸਨੂੰ 48 ਘੰਟੇ ਨਿਗਰਾਨੀ ਹੇਠ ਰੱਖਿਆ ਜਾਂਦਾ ਹੈ।';
+$string['autoupgrade:rolledback'] = '{$a} ਬਦਲਾਅ ਵਾਪਸ ਲਿਆਂਦਾ।';
+$string['autoupgrade:rollback_missing'] = 'ਉਹ ਬਦਲਾਅ ਵਾਪਸ ਨਹੀਂ ਲਿਆਂਦਾ ਜਾ ਸਕਦਾ।';
+$string['autoupgrade:rollback_superseded'] = 'ਬਦਲਾਅ ਤੋਂ ਬਾਅਦ ਸੈਟਿੰਗਾਂ ਬਦਲੀਆਂ ਗਈਆਂ, ਇਸ ਲਈ ਕੁਝ ਵੀ ਵਾਪਸ ਨਹੀਂ ਲਿਆਂਦਾ ਗਿਆ।';
+$string['autoupgrade:rollback_by_admin'] = 'ਪ੍ਰਬੰਧਕ ਵੱਲੋਂ ਵਾਪਸ ਲਿਆਂਦਾ।';
+$string['autoupgrade:queued'] = 'ਮੁਲਾਂਕਣ ਕਤਾਰ ਵਿੱਚ ਹੈ। ਇਹ ਅਗਲੇ cron ਦੌਰ ਵਿੱਚ ਚੱਲਦਾ ਹੈ ਅਤੇ ਕੁਝ ਮਿੰਟ ਲੈਂਦਾ ਹੈ।';
+$string['autoupgrade:discovered'] = 'ਖੋਜ ਨੇ {$a->providers} ਪ੍ਰਦਾਤਾ ਸੂਚੀਬੱਧ ਕੀਤੇ, {$a->registered} ਮਾਡਲ ਦਰਜ ਕੀਤੇ ਅਤੇ {$a->candidates} ਉਮੀਦਵਾਰ ਨਿਸ਼ਾਨਬੱਧ ਕੀਤੇ। ਪ੍ਰਦਾਤਾ ਜੋ ਸੂਚੀਬੱਧ ਨਹੀਂ ਹੋ ਸਕੇ: {$a->errors}।';
+$string['autoupgrade:why_manual_role'] = 'ਇਹ ਭੂਮਿਕਾ ਆਪਣੇ ਆਪ ਨਹੀਂ ਬਦਲੀ ਜਾਂਦੀ।';
+$string['autoupgrade:why_recommend_mode'] = 'ਸਵੈਚਲਿਤ ਮਾਡਲ ਅੱਪਗ੍ਰੇਡ ਸਿਫ਼ਾਰਸ਼ ਮੋਡ ਵਿੱਚ ਹਨ।';
+$string['autoupgrade:mail_switched_subject'] = '[[[tutorshort]]] {$a->role} ਨੂੰ {$a->to} \'ਤੇ ਬਦਲਿਆ';
+$string['autoupgrade:mail_switched_body'] = '[[tutorshort]] ਨੇ {$a->role} ਭੂਮਿਕਾ ਨੂੰ {$a->from} ਤੋਂ {$a->to} \'ਤੇ ਬਦਲਿਆ।
+
+ਇਸਨੇ ਉਸੇ ਰਨ ਵਿੱਚ ਮਾਪੇ ਗਏ ਮੌਜੂਦਾ ਮਾਡਲ ਦੇ ਮੁਕਾਬਲੇ ਹਰ ਜਾਂਚ ਲਗਾਤਾਰ ਦੋ ਵਾਰ ਪਾਸ ਕੀਤੀ:
+{$a->gate}
+
+ਨਵੇਂ ਮਾਡਲ ਨੂੰ ਅਸਲ ਟ੍ਰੈਫ਼ਿਕ \'ਤੇ {$a->hours} ਘੰਟੇ ਨਿਗਰਾਨੀ ਹੇਠ ਰੱਖਿਆ ਜਾਂਦਾ ਹੈ ਅਤੇ ਜੇ ਗਲਤੀਆਂ, ਅਧੂਰੇ ਜਵਾਬ, ਇਨਕਾਰ ਜਾਂ ਪ੍ਰਤੀ ਜਵਾਬ ਲਾਗਤ ਖ਼ਰਾਬ ਹੋਵੇ ਤਾਂ ਆਪਣੇ ਆਪ ਵਾਪਸ ਲਿਆਂਦਾ ਜਾਂਦਾ ਹੈ। ਤੁਸੀਂ ਕਿਸੇ ਵੀ ਸਮੇਂ ਖੁਦ ਵਾਪਸ ਲਿਆ ਸਕਦੇ ਹੋ:
+{$a->url}';
+$string['autoupgrade:mail_rolledback_subject'] = '[[[tutorshort]]] {$a->role} ਨੂੰ {$a->from} \'ਤੇ ਵਾਪਸ ਲਿਆਂਦਾ';
+$string['autoupgrade:mail_rolledback_body'] = '[[tutorshort]] ਨੇ {$a->role} ਭੂਮਿਕਾ ਨੂੰ {$a->to} ਤੋਂ ਵਾਪਸ {$a->from} \'ਤੇ ਲਗਾਇਆ।
+
+ਕਾਰਨ: {$a->reason}
+
+ਇਸ ਉਮੀਦਵਾਰ ਨੂੰ 30 ਦਿਨਾਂ ਤੱਕ ਦੁਬਾਰਾ ਨਹੀਂ ਅਜ਼ਮਾਇਆ ਜਾਵੇਗਾ। ਵੇਰਵੇ:
+{$a->url}';
+$string['autoupgrade:mail_kept_subject'] = '[[[tutorshort]]] {$a->role} ਦਾ {$a->to} \'ਤੇ ਬਦਲਾਅ ਰੱਖਿਆ';
+$string['autoupgrade:mail_kept_body'] = '{$a->role} ਭੂਮਿਕਾ ਦਾ {$a->from} ਤੋਂ {$a->to} \'ਤੇ ਬਦਲਾਅ {$a->turns} ਅਸਲ ਜਵਾਬਾਂ \'ਤੇ {$a->hours} ਘੰਟੇ ਟਿਕਿਆ ਰਿਹਾ ਅਤੇ ਰੱਖਿਆ ਗਿਆ ਹੈ।
+
+{$a->url}';
+$string['autoupgrade:mail_kept_thin_body'] = '{$a->role} ਭੂਮਿਕਾ ਦਾ {$a->from} ਤੋਂ {$a->to} \'ਤੇ ਬਦਲਾਅ {$a->hours} ਘੰਟਿਆਂ ਬਾਅਦ ਰੱਖਿਆ ਗਿਆ ਹੈ, ਪਰ ਸਿਰਫ਼ {$a->turns} ਅਸਲ ਜਵਾਬ ਦੇਖੇ ਗਏ, ਜੋ ਫ਼ੈਸਲੇ ਲਈ ਬਹੁਤ ਘੱਟ ਹਨ। ਇਸ \'ਤੇ ਨਜ਼ਰ ਰੱਖੋ।
+
+{$a->url}';
+$string['autoupgrade:mail_recommend_subject'] = '[[[tutorshort]]] ਸਿਫ਼ਾਰਸ਼: {$a->role} ਲਈ {$a->model}';
+$string['autoupgrade:mail_recommend_body'] = '{$a->model} ਨੇ {$a->role} ਭੂਮਿਕਾ ਲਈ {$a->current} ਦੇ ਮੁਕਾਬਲੇ ਹਰ ਜਾਂਚ ਲਗਾਤਾਰ ਦੋ ਵਾਰ ਪਾਸ ਕੀਤੀ, ਅਤੇ ਆਪਣੇ ਆਪ ਨਹੀਂ ਬਦਲਿਆ ਗਿਆ: {$a->why}
+
+{$a->gate}
+
+ਇੱਥੇ ਬਦਲੋ, ਜਾਂ ਇਵੇਂ ਹੀ ਛੱਡੋ:
+{$a->url}';
+$string['autoupgrade:mail_reason'] = 'ਤੁਹਾਨੂੰ ਇਹ ਇਸ ਲਈ ਮਿਲ ਰਿਹਾ ਹੈ ਕਿਉਂਕਿ ਤੁਹਾਡਾ ਪਤਾ [[tutorshort]] ਖਰਚਾ ਚੇਤਾਵਨੀ ਪ੍ਰਾਪਤਕਰਤਾ ਹੈ।';
+$string['event:model_switched'] = 'ਮਾਡਲ ਬਦਲਿਆ';
+$string['event:model_switch_rolled_back'] = 'ਮਾਡਲ ਬਦਲਾਅ ਵਾਪਸ ਲਿਆਂਦਾ';
+$string['task:discover_models'] = 'ਨਵੇਂ AI ਮਾਡਲ ਲੱਭੋ ਅਤੇ ਮੁਲਾਂਕਣ ਕਤਾਰ ਵਿੱਚ ਪਾਓ';
+$string['task:evaluate_model_candidate'] = 'ਇੱਕ ਉਮੀਦਵਾਰ AI ਮਾਡਲ ਦਾ ਮੁਲਾਂਕਣ ਕਰੋ';
+$string['task:watch_model_switches'] = 'ਹਾਲੀਆ AI ਮਾਡਲ ਬਦਲਾਵਾਂ ਦੀ ਨਿਗਰਾਨੀ ਕਰੋ';
+$string['settings:autoupgrade_heading'] = 'ਸਵੈਚਲਿਤ ਮਾਡਲ ਅੱਪਗ੍ਰੇਡ';
+$string['settings:autoupgrade_heading_desc'] = 'ਹਰ ਰੋਜ਼ [[tutorshort]] ਤੁਹਾਡੇ ਪ੍ਰਦਾਤਾਵਾਂ ਵੱਲੋਂ ਪੇਸ਼ ਮਾਡਲ ਸੂਚੀਬੱਧ ਕਰਦਾ ਹੈ ਅਤੇ ਹਰ ਭੂਮਿਕਾ ਲਈ ਉਮੀਦਵਾਰ ਨਿਸ਼ਾਨਬੱਧ ਕਰਦਾ ਹੈ: ਉਹੀ ਪ੍ਰਦਾਤਾ, ਮਿਲਦੀ-ਜੁਲਦੀ ਸੂਚੀ ਕੀਮਤ, ਅਤੇ ਜਾਣੀ-ਪਛਾਣੀ ਕੀਮਤ। ਇਹ ਉਹਨਾਂ ਨੂੰ ਟਿਊਟਰ ਪ੍ਰੋਂਪਟਾਂ, ਜੇਲਬ੍ਰੇਕ ਟੈਸਟ ਸੈੱਟ ਅਤੇ ਅਸਲ ਵਰਤੋਂ ਵਰਗੀ ਲਾਗਤ \'ਤੇ ਮੌਜੂਦਾ ਮਾਡਲ ਨਾਲ ਪਰਖਦਾ ਹੈ, ਅਤੇ ਸਾਈਟ ਦਾ ਡਿਫ਼ਾਲਟ ਸਿਰਫ਼ ਉਦੋਂ ਬਦਲਦਾ ਹੈ ਜਦੋਂ ਉਮੀਦਵਾਰ ਪ੍ਰਤੀ ਜਵਾਬ ਬਰਾਬਰ ਜਾਂ ਸਸਤਾ, ਓਨਾ ਹੀ ਵਧੀਆ, ਸੁਰੱਖਿਅਤ ਅਤੇ ਭਰੋਸੇਯੋਗ ਹੋਵੇ, ਲਗਾਤਾਰ ਦੋ ਵਾਰ। ਆਪਣੇ ਮਾਡਲ ਵਾਲੇ ਕੋਰਸ ਉਸਨੂੰ ਹੀ ਰੱਖਦੇ ਹਨ। ਹਰ ਬਦਲਾਅ ਖਰਚਾ ਚੇਤਾਵਨੀ ਪ੍ਰਾਪਤਕਰਤਾਵਾਂ ਨੂੰ ਈਮੇਲ ਕੀਤਾ ਜਾਂਦਾ ਹੈ ਅਤੇ 48 ਘੰਟੇ ਨਿਗਰਾਨੀ ਹੇਠ ਰੱਖਿਆ ਜਾਂਦਾ ਹੈ।';
+$string['settings:autoupgrade_mode'] = 'ਮੋਡ';
+$string['settings:autoupgrade_mode_desc'] = 'ਸਵੈਚਲਿਤ ਉਮੀਦਵਾਰ ਪਾਸ ਹੋਣ \'ਤੇ ਬਦਲਦਾ ਹੈ। ਸਿਫ਼ਾਰਸ਼ ਉਮੀਦਵਾਰਾਂ ਨੂੰ ਪਰਖਦਾ ਹੈ ਅਤੇ ਬਦਲੇ ਵਿੱਚ ਸਿਫ਼ਾਰਸ਼ ਈਮੇਲ ਕਰਦਾ ਹੈ। ਬੰਦ ਕੁਝ ਵੀ ਸਵੈਚਲਿਤ ਨਹੀਂ ਕਰਦਾ।';
+$string['settings:autoupgrade_budget_usd'] = 'ਮਹੀਨਾਵਾਰ ਟੈਸਟਿੰਗ ਬਜਟ (USD)';
+$string['settings:autoupgrade_budget_usd_desc'] = 'ਸਵੈਚਲਿਤ ਮੁਲਾਂਕਣ ਇੱਕ ਕੈਲੰਡਰ ਮਹੀਨੇ ਵਿੱਚ ਵੱਧ ਤੋਂ ਵੱਧ ਜਿੰਨਾ ਖਰਚ ਕਰ ਸਕਦੇ ਹਨ, ਜੱਜ ਸਮੇਤ। ਜੋ ਮੁਲਾਂਕਣ ਮਹੀਨੇ ਨੂੰ ਇਸ ਤੋਂ ਉੱਪਰ ਲੈ ਜਾ ਸਕਦਾ ਹੈ, ਉਹ ਸ਼ੁਰੂ ਨਹੀਂ ਹੁੰਦਾ।';
+$string['settings:autoupgrade_eval_courseid'] = 'ਮੁਲਾਂਕਣ ਕੋਰਸ ID';
+$string['settings:autoupgrade_eval_courseid_desc'] = 'ਮੁਲਾਂਕਣ ਉਸ ਸਿਸਟਮ ਪ੍ਰੋਂਪਟ ਹੇਠ ਜਵਾਬ ਦਿੰਦੇ ਹਨ ਜੋ ਇਹ ਕੋਰਸ ਸੱਚਮੁੱਚ ਵਰਤਦਾ ਹੈ, ਮਹਿਮਾਨ ਪਛਾਣ ਲਈ ਬਣਾਇਆ, ਤਾਂ ਜੋ ਕਿਸੇ ਸਿਖਿਆਰਥੀ ਦਾ ਡਾਟਾ ਨਾ ਭੇਜਿਆ ਜਾਵੇ। 0 ਪਿਛਲੇ 30 ਦਿਨਾਂ ਵਿੱਚ ਸਭ ਤੋਂ ਵੱਧ ਚੈਟ ਜਵਾਬਾਂ ਵਾਲਾ ਕੋਰਸ ਚੁਣਦਾ ਹੈ।';
+$string['privacy:metadata:model_eval'] = 'ਸਵੈਚਲਿਤ ਮਾਡਲ ਮੁਲਾਂਕਣ: ਕਿਹੜੇ ਉਮੀਦਵਾਰ ਮਾਡਲ ਦੀ ਕਿਹੜੇ ਮੌਜੂਦਾ ਮਾਡਲ ਨਾਲ ਤੁਲਨਾ ਕੀਤੀ ਗਈ, ਅਤੇ ਮਾਪਿਆ ਨਤੀਜਾ। ਇੱਕੋ ਇੱਕ ਨਿੱਜੀ ਡਾਟਾ ਮੁਲਾਂਕਣ ਮੰਗਣ ਵਾਲੇ ਪ੍ਰਬੰਧਕ ਦਾ ਪਛਾਣਕਰਤਾ ਹੈ। ਇਹ ਕਤਾਰਾਂ ਕਿਸੇ ਸਿਖਿਆਰਥੀ ਬਾਰੇ ਨਿੱਜੀ ਡਾਟਾ ਨਹੀਂ ਸਗੋਂ ਸਾਈਟ ਸੰਰਚਨਾ ਹਨ, ਇਸ ਲਈ ਇਹ ਡਾਟਾ ਨਿਰਯਾਤ ਵਿੱਚ ਸ਼ਾਮਲ ਨਹੀਂ ਹੁੰਦੀਆਂ ਅਤੇ ਵਰਤੋਂਕਾਰ ਵੱਲੋਂ ਮਿਟਾਉਣ ਦੀ ਬੇਨਤੀ \'ਤੇ ਹਟਾਈਆਂ ਨਹੀਂ ਜਾਂਦੀਆਂ।';
+$string['privacy:metadata:model_eval:createdby'] = 'ਸਾਈਟ ਪ੍ਰਬੰਧਕ ਜਿਸਨੇ ਇਹ ਮੁਲਾਂਕਣ ਮੰਗਿਆ। ਜਦੋਂ ਖੋਜ ਨੇ ਇਸਨੂੰ ਕਤਾਰ ਵਿੱਚ ਪਾਇਆ ਤਾਂ ਖਾਲੀ।';
+$string['privacy:metadata:model_switch'] = 'ਮਾਡਲ ਬਦਲਾਅ ਅਤੇ ਵਾਪਸੀਆਂ: ਕੋਈ ਭੂਮਿਕਾ ਕਿਹੜੇ ਮਾਡਲ ਤੋਂ ਕਿਹੜੇ ਮਾਡਲ \'ਤੇ ਗਈ, ਅਤੇ ਕਿਉਂ। ਇੱਕੋ ਇੱਕ ਨਿੱਜੀ ਡਾਟਾ ਬਦਲਾਅ ਕਰਨ ਜਾਂ ਉਲਟਾਉਣ ਵਾਲੇ ਪ੍ਰਬੰਧਕ ਦਾ ਪਛਾਣਕਰਤਾ ਹੈ। ਇਹ ਕਤਾਰਾਂ ਕਿਸੇ ਸਿਖਿਆਰਥੀ ਬਾਰੇ ਨਿੱਜੀ ਡਾਟਾ ਨਹੀਂ ਸਗੋਂ ਸਾਈਟ ਸੰਰਚਨਾ ਹਨ, ਇਸ ਲਈ ਇਹ ਡਾਟਾ ਨਿਰਯਾਤ ਵਿੱਚ ਸ਼ਾਮਲ ਨਹੀਂ ਹੁੰਦੀਆਂ ਅਤੇ ਵਰਤੋਂਕਾਰ ਵੱਲੋਂ ਮਿਟਾਉਣ ਦੀ ਬੇਨਤੀ \'ਤੇ ਹਟਾਈਆਂ ਨਹੀਂ ਜਾਂਦੀਆਂ।';
+$string['privacy:metadata:model_switch:createdby'] = 'ਸਾਈਟ ਪ੍ਰਬੰਧਕ ਜਿਸਨੇ ਇਹ ਬਦਲਾਅ ਕੀਤਾ। ਜਦੋਂ ਇਹ ਸਵੈਚਲਿਤ ਸੀ ਤਾਂ ਖਾਲੀ।';
+$string['privacy:metadata:model_switch:rolledbackby'] = 'ਸਾਈਟ ਪ੍ਰਬੰਧਕ ਜਿਸਨੇ ਇਹ ਬਦਲਾਅ ਵਾਪਸ ਲਿਆਂਦਾ। ਜਦੋਂ ਨਿਗਰਾਨ ਨੇ ਕੀਤਾ, ਜਾਂ ਇਹ ਵਾਪਸ ਨਹੀਂ ਲਿਆਂਦਾ ਗਿਆ ਤਾਂ ਖਾਲੀ।';
+
+$string['autoupgrade:block_reasoning'] = 'ਤਰਕ ਦੀ ਕੋਸ਼ਿਸ਼ ਪੂਰੀ ਸਾਈਟ ਲਈ ਇੱਕ ਸੈਟਿੰਗ ਹੈ, ਅਤੇ {$a} ਭੂਮਿਕਾ ਵੀ ਇੱਕ ਸੋਚਣ ਵਾਲਾ ਮਾਡਲ ਚਲਾਉਂਦੀ ਹੈ ਜਿਸਦੀ ਨਵੇਂ ਪੱਧਰ ਤੇ ਜਾਂਚ ਨਹੀਂ ਹੋਈ। ਜੇ ਤੁਸੀਂ ਇਹੀ ਚਾਹੁੰਦੇ ਹੋ ਤਾਂ ਹੱਥੀਂ ਬਦਲੋ।';
+$string['autoupgrade:block_reasoning_course'] = 'ਤਰਕ ਯਤਨ ਪੂਰੀ ਸਾਈਟ ਲਈ ਇੱਕੋ ਸੈਟਿੰਗ ਹੈ, ਅਤੇ ਇੱਕ ਕੋਰਸ ਆਪਣਾ ਸੋਚਣ ਵਾਲਾ ਮਾਡਲ ({$a}) ਵਰਤਦਾ ਹੈ ਜਿਸਦੀ ਨਵੇਂ ਪੱਧਰ ’ਤੇ ਜਾਂਚ ਨਹੀਂ ਹੋਈ। ਜੇ ਤੁਸੀਂ ਇਹੀ ਚਾਹੁੰਦੇ ਹੋ ਤਾਂ ਹੱਥੀਂ ਬਦਲੋ।';
