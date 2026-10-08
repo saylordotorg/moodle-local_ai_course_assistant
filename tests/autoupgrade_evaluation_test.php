@@ -87,6 +87,17 @@ final class autoupgrade_evaluation_test extends \advanced_testcase {
         return [$cid, evaluator::queue($cid, 0)];
     }
 
+    /**
+     * Move the candidate's last verdict back past the gap between passes.
+     *
+     * @param int $cid
+     * @return void
+     */
+    private function a_day_later(int $cid): void {
+        global $DB;
+        $DB->set_field(candidates::TABLE, 'timestatus', time() - (candidates::PASS_GAP_HOURS + 1) * HOURSECS, ['id' => $cid]);
+    }
+
     public function test_both_sides_are_measured_in_one_run(): void {
         global $DB;
         [$cid, $eid] = $this->queued();
@@ -103,7 +114,7 @@ final class autoupgrade_evaluation_test extends \advanced_testcase {
         $answers = array_count_values(fake_eval_provider::$calls);
         $this->assertSame(50, $answers['inc-model:answer:low']);
         $this->assertSame(50, $answers['cand-model:answer:low']);
-        $this->assertSame(96, $answers['cand-model:probe'], 'Three jailbreak runs of 32 probes.');
+        $this->assertSame(96, $answers['cand-model:probe:low'], 'Three jailbreak runs of 32 probes, at the answers\' level.');
         $this->assertGreaterThan(0, (float) $eval->actual_cost_usd);
         $this->assertSame(2, $DB->count_records(model_bench::TABLE, ['harness' => evaluator::HARNESS]));
         $this->assertSame(candidates::PASSED, candidates::get($cid)->status);
@@ -121,6 +132,7 @@ final class autoupgrade_evaluation_test extends \advanced_testcase {
         $events = $this->redirectEvents();
         [$cid, $first] = $this->queued();
         $this->evaluator()->run($first);
+        $this->a_day_later($cid);
         $second = evaluator::queue($cid, 0);
         $this->evaluator()->run($second);
 
@@ -136,11 +148,26 @@ final class autoupgrade_evaluation_test extends \advanced_testcase {
         $this->assertCount(1, $switched);
     }
 
+    public function test_a_second_pass_too_soon_does_not_count(): void {
+        [$cid, $first] = $this->queued();
+        $this->evaluator()->run($first);
+        // Evaluate now, minutes later: the run is recorded but is not a second draw.
+        $this->evaluator()->run(evaluator::queue($cid, 0));
+        $row = candidates::get($cid);
+        $this->assertSame(candidates::PASSED, $row->status);
+        $this->assertSame(1, (int) $row->passes);
+        $this->assertSame('inc-model', get_config('local_ai_course_assistant', 'model'));
+        $this->a_day_later($cid);
+        $this->evaluator()->run(evaluator::queue($cid, 0));
+        $this->assertSame('cand-model', get_config('local_ai_course_assistant', 'model'));
+    }
+
     public function test_recommend_mode_emails_and_does_not_switch(): void {
         set_config('autoupgrade_mode', switcher::MODE_RECOMMEND, 'local_ai_course_assistant');
         $sink = $this->redirectEmails();
         [$cid, $first] = $this->queued();
         $this->evaluator()->run($first);
+        $this->a_day_later($cid);
         $this->evaluator()->run(evaluator::queue($cid, 0));
         $this->assertSame('inc-model', get_config('local_ai_course_assistant', 'model'));
         $this->assertSame(candidates::ELIGIBLE, candidates::get($cid)->status);
@@ -202,6 +229,8 @@ final class autoupgrade_evaluation_test extends \advanced_testcase {
         $calls = array_count_values(fake_eval_provider::$calls);
         $this->assertSame(50, $calls['inc-model:answer:off']);
         $this->assertSame(50, $calls['inc-model:answer:low']);
+        $this->assertSame(96, $calls['inc-model:probe:off'], 'The variant\'s safety runs are taken with thinking off too.');
+        $this->assertSame(96, $calls['inc-model:probe:low']);
     }
 
     public function test_a_candidate_is_measured_at_the_level_it_would_run_at(): void {

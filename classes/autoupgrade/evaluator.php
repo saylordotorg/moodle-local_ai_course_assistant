@@ -397,7 +397,10 @@ class evaluator {
                 null,
                 function ($u) use ($bucket) {
                     $this->account($bucket, is_array($u) ? $u : null);
-                }
+                },
+                // The safety runs use the same reasoning level as the answers,
+                // so the gate is measured on the configuration that would ship.
+                ['reasoning' => $level]
             );
             $jb['runs']++;
             foreach (['PASS', 'FAIL', 'REVIEW', 'ERROR', 'leaks'] as $k) {

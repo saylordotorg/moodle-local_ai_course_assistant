@@ -113,7 +113,7 @@ class fake_eval_provider implements provider_interface {
             $b = (int) ceil(($total - $a) / 2);
             return json_encode(['socratic' => $a, 'accuracy' => $b, 'tone' => $total - $a - $b, 'notes' => 'ok']);
         }
-        self::$calls[] = $this->model . ':probe';
+        self::$calls[] = $this->model . ':probe' . (isset($options['reasoning']) ? ':' . $options['reasoning'] : '');
         if ($b['fail']) {
             $this->usage = null;
             throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, 'scripted failure');

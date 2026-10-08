@@ -63,6 +63,9 @@ class candidates {
     /** @var int Days before a failed or rolled-back candidate may be evaluated again. */
     public const RETRY_AFTER_DAYS = 30;
 
+    /** @var int Hours between two passes that both count, so they are independent draws. */
+    public const PASS_GAP_HOURS = 20;
+
     /**
      * Insert or refresh one candidate. Never resets an evaluated status.
      *
@@ -156,10 +159,21 @@ class candidates {
     public static function record_verdict(int $id, bool $passed, int $evalid, int $required): \stdClass {
         global $DB;
         $row = $DB->get_record(self::TABLE, ['id' => $id], '*', MUST_EXIST);
+        $now = time();
+        // A pass only counts when it is at least PASS_GAP_HOURS after the pass
+        // before it, whichever path queued it (nightly or Evaluate now), so the
+        // passes are independent draws. One too soon is recorded but leaves the
+        // count and the clock as they were.
+        $toosoon = $passed && $row->status === self::PASSED
+            && $now - (int) $row->timestatus < self::PASS_GAP_HOURS * HOURSECS;
+        if ($toosoon) {
+            $DB->update_record(self::TABLE, (object) ['id' => $id, 'lastevalid' => $evalid, 'timemodified' => $now]);
+            return $DB->get_record(self::TABLE, ['id' => $id], '*', MUST_EXIST);
+        }
         $passes = $passed ? (int) $row->passes + 1 : 0;
         $status = !$passed ? self::FAILED : ($passes >= $required ? self::ELIGIBLE : self::PASSED);
         $DB->update_record(self::TABLE, (object) ['id' => $id, 'passes' => $passes, 'status' => $status,
-            'lastevalid' => $evalid, 'timestatus' => time(), 'timemodified' => time()]);
+            'lastevalid' => $evalid, 'timestatus' => $now, 'timemodified' => $now]);
         return $DB->get_record(self::TABLE, ['id' => $id], '*', MUST_EXIST);
     }
 
@@ -190,7 +204,7 @@ class candidates {
             case self::PASSED:
                 // The second pass is taken on another day, so the two
                 // measurements see different provider conditions.
-                return $now - (int) $row->timestatus >= 20 * HOURSECS;
+                return $now - (int) $row->timestatus >= self::PASS_GAP_HOURS * HOURSECS;
             case self::FAILED:
             case self::ROLLEDBACK:
                 return $now - (int) $row->timestatus >= self::RETRY_AFTER_DAYS * DAYSECS;
