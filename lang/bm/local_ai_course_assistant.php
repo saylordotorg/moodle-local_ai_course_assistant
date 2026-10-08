@@ -1749,7 +1749,7 @@ $string['settings:provider_heading_desc'] = 'AI dakun, misali, ni baro kɛcogo l
 $string['settings:claude_temperature_allow_prefixes'] = 'Claude misaliw minnu bɛ temperature dɔnniya dɛmɛ';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Misali tɔgɔ daminɛ kelen sira kelen kɔnɔ. Anthropic misaliw minnu tɔgɔ bɛ daminɛ ni nin dɔ ye, olu bɛ <code>temperature</code> sugandili dɔnniya minɛ halisa. Claude misali o misali min tɛ bɛn daminɛ si ma, temperature bɛ to yen (hakili misaliw ka bɔ Opus 4.7 la, olu b\'a ban ni HTTP 400 fili ye). A to lakolon walasa fɛn min nana ni fɛnfaraw ye o ka baara.';
 $string['settings:max_tokens'] = 'Jaabi jan bɛrɛ (tokens)';
-$string['settings:max_tokens_desc'] = 'Tokens hakɛ bɛrɛ AI jaabi kelen kɔnɔ. Hakɛ dɔgɔmanw bɛ jaabi surunw ni teliyalenw di. 512 = kuma 2-3 ɲɔgɔn, 1024 = dakun 1-2 ɲɔgɔn, 2048 = ɲɛfɔli janw. Aw ye 0 sigi walasa dan tɛ (dibaga ka fɛn tigitigi bɛ baara).';
+$string['settings:max_tokens_desc'] = 'Tokɛn (tokens) hakɛ ba min be se ka don AI jaabi kelen kɔnɔ. Hakɛ fitinin b\'a to jaabiw ka surun ani ka teliya. 512 = kuma 2-3 cɛ, 1024 = tɛmɛsira 1-2 cɛ, 2048 = ɲɛfɔli jan. 0 da a la walasa ka bali kana to. (baarakɛla ka fɔlɔ cogoya). Modɛli minnu b\'a miiri sani u ka jaabi di (Gemini 2.5 ni 3, GPT-5 ni min bɛ a kɔfɛ, Claude 5.5), olu b\'a sɔrɔ yɔrɔ wɛrɛ ka miiri nin hakɛ kan, o la ni miiri be da, jaabi jan be se ka taa a sanfɛla sôngô saba ɲɔgɔn ma; ni miiri banna, jaabi be tigɛ nin hakɛ yɛrɛ la.';
 $string['settings:profile_update_interval'] = 'Kalanden jateminɛ kuraya waati';
 $string['settings:profile_update_interval_desc'] = 'Ni kalanden ye cikan hakɛ nin bɔ kalanko dɔ kɔnɔ, dɛmɛbaga bɛ kalanni jateminɛ dɔ jɔ (walima a kura) min bɛ fanga, dɛsɛ, kalanni cogoya, ni fɛn minnu ka di a ye o bɛɛ fɔ. Jateminɛ nin bɛ don sistɛmu ɲininkali kɔnɔ walasa jaabiw ka kɛ mɔgɔ yɛrɛ ta ye. Aw ye 0 sigi walasa a dabila. Fɛn tigitigi: 10.';
 $string['settings:enable_thinking'] = 'Hakili bonya (Claude dɔrɔn)';
@@ -3192,7 +3192,7 @@ $string['settings:int_range'] = 'Jateden dafalen sɛbɛn ka bɔ {$a->min} la ka 
 
 $string['cachedef_modelcaps'] = 'Modɛli sebaayaw minnu dɔnna jiralikɛlaw ka banni fɛ';
 $string['settings:reasoning_effort'] = 'Miiriya cɛsiri';
-$string['settings:reasoning_effort_desc'] = 'Modɛli minnu bɛ miiri sani u ka jaabi di, olu bɛ ɲini u ka miiri cogo min na. A bɛ baara OpenAI miiriya modɛliw kan (GPT-5, GPT-6, o-sɛri) i n\'a fɔ <code>reasoning_effort</code>, ani Gemini miiriya modɛliw kan i n\'a fɔ miiriya wari hakɛ. Miiriya modɛli bɛɛ bɛ yɔrɔ sɔrɔ a ka miiriya kama ka fara jaabi janya kan san fɛ, o la miiriya tɛ se ka jaabi tigɛ tugun. Dɔgɔman bɛnnen don karamɔgɔ ma: jaabiw bɛ na joona ani u sɔngɔ ka dɔgɔ. Datugulen bɛ miiriya bɔ yɔrɔ minnu na modɛli b\'a to. Modɛli minnu tɛ miiriya ɲɛminɛcogo sɔrɔ, olu tɛ nin labɛn jate.';
+$string['settings:reasoning_effort_desc'] = 'Modɛli minnu b\'a miiri sani u ka jaabi di, u ka miiri hakɛ min ka kan. A be baara kɛ OpenAI miiri modɛliw la (GPT-5, GPT-6, o-sirisi) akɔ <code>reasoning_effort</code>, Gemini miiri modɛliw la akɔ miiri sɔrɔ, ani Claude Sonnet 5.5 ni Opus 5.5 la akɔ baara cɛsiri hakɛ (Ban be seginkanni dɔgɔmanin bɛɛ ta; Opus 5.5 t\'a se ka miiri ban). Miiri modɛli bɛɛ b\'a sɔrɔ yɔrɔ ka miiri jaabi janya sanfɛla kan, o la miiri t\'a se ka jaabi tigɛ tun. Dɔgɔman ka ɲi karamɔgɔ ye: jaabiw b\'na teliya ani wari dɔgɔman be bɔ. Ban be miiri ban modɛli be min yamaruya yɔrɔ min na. Modɛli minnu tɛ miiri kunnafoni la, olu t\'a lajɛ nin seginkanni na.';
 $string['settings:reasoning_effort_off'] = 'Datugulen (a dɔgɔya bɛɛ la modɛli b\'a to cogo min na)';
 $string['settings:reasoning_effort_low'] = 'Dɔgɔman (laadilen)';
 $string['settings:reasoning_effort_medium'] = 'Cɛmancɛ';
@@ -3361,3 +3361,8 @@ $string['savereport:empty'] = 'fanga';
 $string['check:primary_name'] = 'AI Course Assistant dili kuntigi';
 $string['check:primary_ok'] = 'Kuntigi hakilijagabɔ dili la, fili si ma kɛ tile 24 laban kɔnɔ.';
 $string['check:primary_failing'] = 'Hakilijagabɔ dili kuntigi ({$a->model}) ye {$a->failures} fili tile 24 laban kɔnɔ. Dili dɔ min bɛ sɛgɛsɛgɛli kɛ, o ye nin jaabi {$a->rescued} di, o kosɔn kalandenw tun bɛ se ka a ɲɛnabɔ ka dɔgɔya. Fili laban: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Sɛbɛn lamɔni jaabi baarakɛla';
+$string['settings:essay_provider_desc'] = 'Baarakɛla ID (misali la <code>claude</code>, <code>openai</code>) sɛbɛn lamɔni jaabi kama. A ka kan ka bɛn Baarakɛlaw ka suman ɲɔgɔn na dogo kelen ma. A to lankolon ka baarakɛla min be baro la baara kɛ. Nin yɔrɔ ni modɛli bɛɛ ka kan ka da walasa laban ka baara kɛ.';
+$string['settings:essay_model'] = 'Sɛbɛn lamɔni jaabi modɛli';
+$string['settings:essay_model_desc'] = 'Modɛli tɔgɔ sɛbɛn lamɔni jaabi kama, misali la <code>claude-haiku-4-5</code>. Ɔkutɔburu 2026 suman na, Claude modɛliw ye sɛbɛn lamɔni jaabi ɲuman di ka tɛmɛ Gemini 2.5 Flash walima GPT-4o mini kan. A to lankolon ka baro modɛli baara kɛ.';

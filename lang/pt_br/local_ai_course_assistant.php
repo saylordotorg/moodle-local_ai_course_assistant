@@ -1732,7 +1732,7 @@ $string['settings:provider_heading_desc'] = 'Configure o backend de IA, o modelo
 $string['settings:claude_temperature_allow_prefixes'] = 'Modelos Claude que aceitam temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Um prefixo de nome de modelo por linha. Modelos da Anthropic cujo nome comece por um destes prefixos ainda aceitam o parâmetro de amostragem <code>temperature</code>. Em qualquer modelo Claude que NÃO corresponda a um prefixo, temperature é omitido (modelos da classe de raciocínio a partir do Opus 4.7 o rejeitam com HTTP 400). Deixe em branco para usar o padrão fornecido.';
 $string['settings:max_tokens'] = 'Tamanho máximo da resposta (tokens)';
-$string['settings:max_tokens_desc'] = 'Número máximo de tokens por resposta da IA. Valores menores produzem respostas mais curtas e rápidas. 512 = ~2-3 frases, 1024 = ~1-2 parágrafos, 2048 = explicações mais longas. Use 0 para não aplicar limite (padrão do provedor).';
+$string['settings:max_tokens_desc'] = 'Número máximo de tokens por resposta da IA. Valores menores geram respostas mais curtas e rápidas. 512 = ~2-3 frases, 1024 = ~1-2 parágrafos, 2048 = explicações mais longas. Defina como 0 para não ter limite (padrão do provedor). Modelos que raciocinam antes de responder (Gemini 2.5 e 3, GPT-5 e posteriores, Claude 5.5) recebem espaço extra para pensar além deste número, então, com o raciocínio ativado, uma resposta longa pode chegar a cerca de três vezes esse valor; com o raciocínio desativado, a resposta é cortada exatamente neste número.';
 $string['settings:profile_update_interval'] = 'Intervalo de atualização do perfil do estudante';
 $string['settings:profile_update_interval_desc'] = 'Após esta quantidade de mensagens do estudante em um curso, o assistente gera (ou atualiza) um perfil de aprendizagem resumindo seus pontos fortes, dificuldades, estilo de aprendizagem e interesses. O perfil é inserido no prompt do sistema para gerar respostas personalizadas. Use 0 para desativar. Padrão: 10.';
 $string['settings:enable_thinking'] = 'Raciocínio estendido (somente Claude)';
@@ -3183,7 +3183,7 @@ $string['settings:int_range'] = 'Informe um número inteiro de {$a->min} a {$a->
 
 $string['cachedef_modelcaps'] = 'Fatos sobre capacidades de modelos aprendidos com rejeições de provedores';
 $string['settings:reasoning_effort'] = 'Esforço de raciocínio';
-$string['settings:reasoning_effort_desc'] = 'Quanto os modelos que raciocinam antes de responder devem pensar. Aplica-se aos modelos de raciocínio da OpenAI (GPT-5, GPT-6, série o) como <code>reasoning_effort</code> e aos modelos de pensamento do Gemini como orçamento de pensamento. Todo modelo de raciocínio também recebe espaço para pensar além do tamanho de resposta acima, então o pensamento não pode mais cortar uma resposta. Baixo é adequado para um tutor: as respostas chegam mais rápido e custam menos. Desligado desativa o pensamento quando o modelo permite. Modelos sem controle de raciocínio ignoram esta configuração.';
+$string['settings:reasoning_effort_desc'] = 'Quanto se pede que os modelos que raciocinam antes de responder pensem. Aplica-se aos modelos de raciocínio da OpenAI (GPT-5, GPT-6, série o) como <code>reasoning_effort</code>, aos modelos de raciocínio do Gemini como orçamento de raciocínio e ao Claude Sonnet 5.5 e ao Opus 5.5 como nível de esforço (Desativado usa a configuração mais baixa; o Opus 5.5 não pode desativar o raciocínio). Todo modelo de raciocínio também recebe espaço para pensar além do tamanho de resposta acima, então o raciocínio não pode mais cortar uma resposta no meio. Baixo é o ideal para um tutor: as respostas chegam mais rápido e custam menos. Desativado desliga o raciocínio quando o modelo permite. Modelos sem controle de raciocínio ignoram esta configuração.';
 $string['settings:reasoning_effort_off'] = 'Desligado (o mínimo que o modelo permitir)';
 $string['settings:reasoning_effort_low'] = 'Baixo (recomendado)';
 $string['settings:reasoning_effort_medium'] = 'Médio';
@@ -3352,3 +3352,8 @@ $string['savereport:empty'] = 'vazio';
 $string['check:primary_name'] = 'Provedor principal do AI Course Assistant';
 $string['check:primary_ok'] = 'Nenhuma falha do provedor de chat principal nas últimas 24 horas.';
 $string['check:primary_failing'] = 'O provedor de chat principal ({$a->model}) falhou {$a->failures} vezes nas últimas 24 horas. O provedor de reserva respondeu a {$a->rescued} dessas solicitações, então os alunos podem não ter percebido. Último erro: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Provedor do feedback de redações';
+$string['settings:essay_provider_desc'] = 'ID do provedor (por exemplo, <code>claude</code>, <code>openai</code>) para o feedback de redações. Deve corresponder a uma linha em Provedores de comparação. Deixe em branco para usar o provedor do chat. Este campo e o modelo precisam estar definidos para que a substituição seja aplicada.';
+$string['settings:essay_model'] = 'Modelo do feedback de redações';
+$string['settings:essay_model_desc'] = 'Nome do modelo para o feedback de redações, por exemplo, <code>claude-haiku-4-5</code>. No benchmark de outubro de 2026, os modelos Claude deram um feedback de redações claramente melhor do que o Gemini 2.5 Flash ou o GPT-4o mini. Deixe em branco para usar o modelo do chat.';

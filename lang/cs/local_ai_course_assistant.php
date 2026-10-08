@@ -1714,7 +1714,7 @@ $string['settings:provider_heading_desc'] = 'Nastavte backend AI, model a chová
 $string['settings:claude_temperature_allow_prefixes'] = 'Modely Claude přijímající parametr temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Jedna předpona názvu modelu na řádek. Modely Anthropic, jejichž název začíná některou z nich, stále přijímají vzorkovací parametr <code>temperature</code>. U každého modelu Claude, který předponě neodpovídá, se temperature vynechává (modely typu uvažování od Opus 4.7 jej odmítají chybou HTTP 400). Ponechte prázdné, chcete-li použít dodanou výchozí hodnotu.';
 $string['settings:max_tokens'] = 'Maximální délka odpovědi (tokeny)';
-$string['settings:max_tokens_desc'] = 'Maximální počet tokenů na jednu odpověď AI. Nižší hodnoty vedou ke kratším a rychlejším odpovědím. 512 = přibližně 2-3 věty, 1024 = přibližně 1-2 odstavce, 2048 = delší výklad. Nastavte 0 pro neomezenou délku (výchozí hodnota poskytovatele).';
+$string['settings:max_tokens_desc'] = 'Maximální počet tokenů v jedné odpovědi AI. Nižší hodnoty dávají kratší a rychlejší odpovědi. 512 = zhruba 2-3 věty, 1024 = zhruba 1-2 odstavce, 2048 = delší vysvětlení. Hodnota 0 znamená bez omezení (výchozí hodnota poskytovatele). Modely, které před odpovědí uvažují (Gemini 2.5 a 3, GPT-5 a novější, Claude 5.5), dostávají nad toto číslo další prostor na přemýšlení, takže se zapnutým přemýšlením může dlouhá odpověď dosáhnout zhruba trojnásobku; s vypnutým přemýšlením se odpověď ořízne přesně na tomto čísle.';
 $string['settings:profile_update_interval'] = 'Interval aktualizace profilu studenta';
 $string['settings:profile_update_interval_desc'] = 'Po tomto počtu zpráv studenta v kurzu asistent vytvoří (nebo obnoví) studijní profil shrnující silné a slabé stránky, styl učení a zájmy. Profil se vkládá do systémového promptu, aby byly odpovědi přizpůsobené. Nastavením 0 funkci vypnete. Výchozí: 10.';
 $string['settings:enable_thinking'] = 'Rozšířené uvažování (pouze Claude)';
@@ -3164,7 +3164,7 @@ $string['settings:int_range'] = 'Zadejte celé číslo od {$a->min} do {$a->max}
 
 $string['cachedef_modelcaps'] = 'Schopnosti modelů zjištěné z odmítnutí poskytovatelů';
 $string['settings:reasoning_effort'] = 'Úsilí uvažování';
-$string['settings:reasoning_effort_desc'] = 'Jak moc mají modely, které před odpovědí uvažují, přemýšlet. Platí pro modely OpenAI s uvažováním (GPT-5, GPT-6, řada o) jako <code>reasoning_effort</code> a pro modely Gemini s přemýšlením jako rozpočet na přemýšlení. Každý model s uvažováním dostane navíc k výše nastavené délce odpovědi prostor pro své přemýšlení, takže přemýšlení už nemůže odpověď zkrátit. Nízké se hodí pro tutora: odpovědi přicházejí rychleji a stojí méně. Vypnuto vypne přemýšlení tam, kde to model dovolí. Modely bez ovládání uvažování toto nastavení ignorují.';
+$string['settings:reasoning_effort_desc'] = 'Jak moc mají přemýšlet modely, které před odpovědí uvažují. Platí pro modely OpenAI s uvažováním (GPT-5, GPT-6, řada o) jako <code>reasoning_effort</code>, pro modely Gemini s přemýšlením jako rozpočet na přemýšlení a pro Claude Sonnet 5.5 a Opus 5.5 jako úroveň úsilí (Vypnuto používá nejnižší nastavení; u Opus 5.5 nelze přemýšlení vypnout). Každý model s uvažováním dostává navíc nad výše nastavenou délku odpovědi prostor na přemýšlení, takže přemýšlení už nemůže odpověď useknout. Nízká úroveň se hodí pro tutora: odpovědi přicházejí rychleji a stojí méně. Vypnuto přemýšlení vypne, pokud to model umožňuje. Modely bez ovládání uvažování toto nastavení ignorují.';
 $string['settings:reasoning_effort_off'] = 'Vypnuto (tak málo, jak model dovolí)';
 $string['settings:reasoning_effort_low'] = 'Nízké (doporučeno)';
 $string['settings:reasoning_effort_medium'] = 'Střední';
@@ -3333,3 +3333,8 @@ $string['savereport:empty'] = 'prázdné';
 $string['check:primary_name'] = 'Hlavní poskytovatel AI Course Assistant';
 $string['check:primary_ok'] = 'Za posledních 24 hodin se u hlavního poskytovatele chatu nevyskytla žádná chyba.';
 $string['check:primary_failing'] = 'Hlavní poskytovatel chatu ({$a->model}) za posledních 24 hodin selhal {$a->failures}krát. Záložní poskytovatel odpověděl na {$a->rescued} z těchto požadavků, takže si toho studenti možná nevšimli. Poslední chyba: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Poskytovatel zpětné vazby k esejím';
+$string['settings:essay_provider_desc'] = 'ID poskytovatele (např. <code>claude</code>, <code>openai</code>) pro zpětnou vazbu k esejím. Musí odpovídat řádku v části Srovnávací poskytovatelé. Nechte prázdné, chcete-li použít poskytovatele chatu. Aby se přepsání uplatnilo, musí být nastaveno toto pole i model.';
+$string['settings:essay_model'] = 'Model zpětné vazby k esejím';
+$string['settings:essay_model_desc'] = 'Název modelu pro zpětnou vazbu k esejím, např. <code>claude-haiku-4-5</code>. V srovnávacím testu z října 2026 dávaly modely Claude zřetelně lepší zpětnou vazbu k esejím než Gemini 2.5 Flash nebo GPT-4o mini. Nechte prázdné, chcete-li použít model chatu.';

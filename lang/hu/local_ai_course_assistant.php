@@ -1753,7 +1753,7 @@ $string['settings:provider_heading_desc'] = 'Az MI-platform, a modell és a besz
 $string['settings:claude_temperature_allow_prefixes'] = 'A temperature paramétert támogató Claude-modellek';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Soronként egy modellnév-előtag. Azok az Anthropic-modellek, amelyek neve ezek valamelyikével kezdődik, továbbra is elfogadják a <code>temperature</code> mintavételi paramétert. Minden olyan Claude-modellnél, amely egyik előtagra sem illeszkedik, a temperature kimarad (az Opus 4.7-től kezdődő gondolkodó modellek HTTP 400 hibával utasítják el). Hagyja üresen a gyárilag szállított alapérték használatához.';
 $string['settings:max_tokens'] = 'Legnagyobb válaszhossz (token)';
-$string['settings:max_tokens_desc'] = 'Az MI válaszainak legnagyobb tokenszáma. A kisebb érték rövidebb, gyorsabb válaszokat ad. 512 = körülbelül 2-3 mondat, 1024 = körülbelül 1-2 bekezdés, 2048 = hosszabb magyarázatok. A 0 azt jelenti, hogy nincs korlát (a szolgáltató alapértéke érvényes).';
+$string['settings:max_tokens_desc'] = 'A tokenek legnagyobb száma egy MI-válaszban. Az alacsonyabb értékek rövidebb, gyorsabb válaszokat adnak. 512 = kb. 2-3 mondat, 1024 = kb. 1-2 bekezdés, 2048 = hosszabb magyarázatok. 0 esetén nincs korlát (a szolgáltató alapértéke). A válasz előtt gondolkodó modellek (Gemini 2.5 és 3, GPT-5 és újabbak, Claude 5.5) ezen a számon felül további helyet kapnak a gondolkodásra, így bekapcsolt gondolkodásnál egy hosszú válasz nagyjából a háromszorosára is nőhet; kikapcsolt gondolkodásnál a válasz pontosan ennél a számnál megszakad.';
 $string['settings:profile_update_interval'] = 'Tanulói profil frissítési gyakorisága';
 $string['settings:profile_update_interval_desc'] = 'Ennyi tanulói üzenet után egy kurzuson belül az asszisztens létrehoz (vagy frissít) egy tanulási profilt, amely összefoglalja az erősségeket, gyengeségeket, a tanulási stílust és az érdeklődési köröket. A profil bekerül a rendszerpromptba a személyre szabott válaszokhoz. A 0 kikapcsolja. Alapérték: 10.';
 $string['settings:enable_thinking'] = 'Kiterjesztett gondolkodás (csak Claude)';
@@ -3203,7 +3203,7 @@ $string['settings:int_range'] = 'Adjon meg egy egész számot {$a->min} és {$a-
 
 $string['cachedef_modelcaps'] = 'A szolgáltatói elutasításokból tanult modellképesség-adatok';
 $string['settings:reasoning_effort'] = 'Gondolkodási ráfordítás';
-$string['settings:reasoning_effort_desc'] = 'Mennyit gondolkodjanak a válasz előtt gondolkodó modellek. Az OpenAI gondolkodó modelljeinél (GPT-5, GPT-6, o-sorozat) <code>reasoning_effort</code> paraméterként, a Gemini gondolkodó modelljeinél gondolkodási keretként érvényesül. Minden gondolkodó modell a fenti válaszhosszon felül is kap helyet a gondolkodásra, így a gondolkodás már nem vághatja le a választ. Az Alacsony egy oktatóhoz illik: a válaszok hamarabb érkeznek és kevesebbe kerülnek. A Ki kikapcsolja a gondolkodást, ahol a modell engedi. A gondolkodásvezérlő nélküli modellek figyelmen kívül hagyják ezt a beállítást.';
+$string['settings:reasoning_effort_desc'] = 'Mennyit gondolkodjanak a válasz előtt érvelő modellek. Az OpenAI érvelő modelljeire (GPT-5, GPT-6, o-sorozat) <code>reasoning_effort</code> néven, a Gemini gondolkodó modelljeire gondolkodási keretként, a Claude Sonnet 5.5-re és az Opus 5.5-re pedig erőfeszítési szintként vonatkozik (a Ki a legalacsonyabb beállítást használja; az Opus 5.5-nél a gondolkodás nem kapcsolható ki). Minden érvelő modell a fent megadott válaszhosszon felül külön helyet kap a gondolkodásra, így a gondolkodás már nem vághat félbe egy választ. Az Alacsony egy oktatóhoz illik: a válaszok gyorsabban érkeznek és olcsóbbak. A Ki kikapcsolja a gondolkodást, ahol a modell engedi. Az érvelés-vezérlés nélküli modellek figyelmen kívül hagyják ezt a beállítást.';
 $string['settings:reasoning_effort_off'] = 'Ki (a modell által engedett minimum)';
 $string['settings:reasoning_effort_low'] = 'Alacsony (ajánlott)';
 $string['settings:reasoning_effort_medium'] = 'Közepes';
@@ -3372,3 +3372,8 @@ $string['savereport:empty'] = 'üres';
 $string['check:primary_name'] = 'Az AI Course Assistant elsődleges szolgáltatója';
 $string['check:primary_ok'] = 'Az elmúlt 24 órában nem volt hiba az elsődleges csevegőszolgáltatónál.';
 $string['check:primary_failing'] = 'Az elsődleges csevegőszolgáltató ({$a->model}) az elmúlt 24 órában {$a->failures} alkalommal hibázott. A tartalék szolgáltató ezek közül {$a->rescued} kérésre válaszolt, így a tanulók talán nem vették észre. Utolsó hiba: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Esszévisszajelzés szolgáltatója';
+$string['settings:essay_provider_desc'] = 'A szolgáltató azonosítója (pl. <code>claude</code>, <code>openai</code>) az esszévisszajelzéshez. Egyeznie kell az Összehasonlító szolgáltatók egyik sorával. Hagyja üresen a csevegés szolgáltatójának használatához. A felülbíráláshoz ennek a mezőnek és a modellnek is be kell lennie állítva.';
+$string['settings:essay_model'] = 'Esszévisszajelzés modellje';
+$string['settings:essay_model_desc'] = 'A modell neve az esszévisszajelzéshez, pl. <code>claude-haiku-4-5</code>. A 2026. októberi összehasonlító tesztben a Claude modellek egyértelműen jobb esszévisszajelzést adtak, mint a Gemini 2.5 Flash vagy a GPT-4o mini. Hagyja üresen a csevegés modelljének használatához.';

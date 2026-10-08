@@ -1765,7 +1765,7 @@ $string['settings:provider_heading_desc'] = 'Sanidi jukwaa la AI, modeli na mwen
 $string['settings:claude_temperature_allow_prefixes'] = 'Modeli za Claude zinazounga mkono kigezo cha temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Kiambishi kimoja cha jina la modeli kwa kila mstari. Modeli za Anthropic ambazo majina yake yanaanza na mojawapo ya haya bado hukubali kigezo cha sampuli <code>temperature</code>. Kwa modeli yoyote ya Claude isiyolingana na kiambishi chochote, temperature huachwa (modeli za utambuzi kuanzia Opus 4.7 huikataa kwa hitilafu ya HTTP 400). Acha wazi ili kutumia thamani chaguo-msingi inayokuja na programu-jalizi.';
 $string['settings:max_tokens'] = 'Urefu wa juu wa jibu (tokeni)';
-$string['settings:max_tokens_desc'] = 'Idadi ya juu ya tokeni kwa kila jibu la AI. Thamani ndogo hutoa majibu mafupi na ya haraka zaidi. 512 = takriban sentensi 2-3, 1024 = takriban aya 1-2, 2048 = maelezo marefu zaidi. Weka 0 ili kuondoa kikomo (thamani chaguo-msingi ya mtoa huduma hutumika).';
+$string['settings:max_tokens_desc'] = 'Idadi ya juu ya tokeni kwa kila jibu la AI. Thamani ndogo hutoa majibu mafupi na ya haraka zaidi. 512 = takriban sentensi 2-3, 1024 = takriban aya 1-2, 2048 = maelezo marefu zaidi. Weka 0 kwa bila kikomo (chaguo-msingi la mtoa huduma). Miundo inayofikiri kabla ya kujibu (Gemini 2.5 na 3, GPT-5 na ya baadaye, Claude 5.5) hupata nafasi ya ziada ya kufikiri juu ya nambari hii, kwa hivyo kufikiri kukiwa kumewashwa jibu refu linaweza kufikia takriban mara tatu yake; kufikiri kukiwa kumezimwa jibu hukatwa kwenye nambari hii hasa.';
 $string['settings:profile_update_interval'] = 'Kipindi cha kusasisha wasifu wa mwanafunzi';
 $string['settings:profile_update_interval_desc'] = 'Baada ya idadi hii ya ujumbe kutoka kwa mwanafunzi katika kozi, msaidizi huunda (au huhuisha) wasifu wa kujifunza unaofupisha nguvu, udhaifu, mtindo wa kujifunza na mambo anayopenda. Wasifu huu hujumuishwa katika kidokezo cha mfumo kwa majibu ya kibinafsi. Weka 0 ili kuzima. Chaguo-msingi: 10.';
 $string['settings:enable_thinking'] = 'Utambuzi uliopanuliwa (Claude pekee)';
@@ -3207,7 +3207,7 @@ $string['settings:int_range'] = 'Weka nambari kamili kuanzia {$a->min} hadi {$a-
 
 $string['cachedef_modelcaps'] = 'Ukweli kuhusu uwezo wa modeli uliojifunzwa kutokana na makatao ya watoa huduma';
 $string['settings:reasoning_effort'] = 'Kiwango cha kufikiri';
-$string['settings:reasoning_effort_desc'] = 'Kiasi ambacho modeli zinazofikiri kabla ya kujibu zinaombwa kufikiri. Kinatumika kwa modeli za kufikiri za OpenAI (GPT-5, GPT-6, mfululizo wa o) kama <code>reasoning_effort</code> na kwa modeli za kufikiri za Gemini kama bajeti ya kufikiri. Kila modeli ya kufikiri pia hupata nafasi ya kufikiri juu ya urefu wa jibu ulio hapo juu, kwa hivyo kufikiri hakuwezi tena kukatisha jibu. Chini kinamfaa mkufunzi: majibu hufika mapema na hugharimu kidogo. Kimezimwa huzima kufikiri pale modeli inaporuhusu. Modeli zisizo na udhibiti wa kufikiri hupuuza mpangilio huu.';
+$string['settings:reasoning_effort_desc'] = 'Ni kiasi gani miundo inayofikiri kabla ya kujibu inaombwa kufikiri. Inatumika kwa miundo ya hoja ya OpenAI (GPT-5, GPT-6, mfululizo wa o) kama <code>reasoning_effort</code>, kwa miundo ya kufikiri ya Gemini kama bajeti ya kufikiri, na kwa Claude Sonnet 5.5 na Opus 5.5 kama kiwango cha juhudi (Zima hutumia mpangilio wa chini kabisa; Opus 5.5 haiwezi kuzima kufikiri). Kila muundo wa hoja pia hupata nafasi ya kufikiri juu ya urefu wa jibu ulio hapo juu, kwa hivyo kufikiri hakuwezi tena kukata jibu. Chini linafaa mkufunzi: majibu hufika haraka na gharama ni ndogo. Zima huzima kufikiri pale muundo unaporuhusu. Miundo isiyo na udhibiti wa hoja hupuuza mpangilio huu.';
 $string['settings:reasoning_effort_off'] = 'Kimezimwa (kidogo kadiri modeli inavyoruhusu)';
 $string['settings:reasoning_effort_low'] = 'Chini (kinapendekezwa)';
 $string['settings:reasoning_effort_medium'] = 'Wastani';
@@ -3376,3 +3376,8 @@ $string['savereport:empty'] = 'tupu';
 $string['check:primary_name'] = 'Mtoa huduma mkuu wa AI Course Assistant';
 $string['check:primary_ok'] = 'Hakuna hitilafu kutoka kwa mtoa huduma mkuu wa gumzo katika saa 24 zilizopita.';
 $string['check:primary_failing'] = 'Mtoa huduma mkuu wa gumzo ({$a->model}) alishindwa mara {$a->failures} katika saa 24 zilizopita. Mtoa huduma mbadala alijibu {$a->rescued} kati ya maombi hayo, kwa hivyo huenda wanafunzi hawakugundua. Hitilafu ya mwisho: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Mtoa huduma wa maoni kuhusu insha';
+$string['settings:essay_provider_desc'] = 'Kitambulisho cha mtoa huduma (mf. <code>claude</code>, <code>openai</code>) kwa maoni kuhusu insha. Lazima kilingane na safu katika Watoa huduma wa ulinganisho. Acha wazi ili kutumia mtoa huduma wa gumzo. Sehemu hii na muundo vyote lazima viwekwe ili ubatilishaji utumike.';
+$string['settings:essay_model'] = 'Muundo wa maoni kuhusu insha';
+$string['settings:essay_model_desc'] = 'Jina la muundo kwa maoni kuhusu insha, mf. <code>claude-haiku-4-5</code>. Katika jaribio la ulinganisho la Oktoba 2026, miundo ya Claude ilitoa maoni bora zaidi kuhusu insha kuliko Gemini 2.5 Flash au GPT-4o mini. Acha wazi ili kutumia muundo wa gumzo.';

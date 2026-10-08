@@ -1766,7 +1766,7 @@ $string['settings:provider_heading_desc'] = 'Atur platform AI, model, dan perila
 $string['settings:claude_temperature_allow_prefixes'] = 'Model Claude yang mendukung parameter temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Satu awalan nama model per baris. Model Anthropic yang namanya diawali salah satu dari ini tetap menerima parameter pengambilan sampel <code>temperature</code>. Untuk model Claude mana pun yang tidak cocok dengan awalan tersebut, temperature dihilangkan (model penalaran mulai Opus 4.7 menolaknya dengan galat HTTP 400). Kosongkan untuk memakai nilai bawaan yang disertakan plugin.';
 $string['settings:max_tokens'] = 'Panjang maksimum jawaban (token)';
-$string['settings:max_tokens_desc'] = 'Jumlah token maksimum per jawaban AI. Nilai yang lebih kecil menghasilkan jawaban yang lebih singkat dan cepat. 512 = sekitar 2-3 kalimat, 1024 = sekitar 1-2 paragraf, 2048 = penjelasan yang lebih panjang. Setel 0 agar tanpa batas (nilai bawaan penyedia berlaku).';
+$string['settings:max_tokens_desc'] = 'Jumlah token maksimum per respons AI. Nilai yang lebih rendah menghasilkan respons yang lebih singkat dan cepat. 512 = ~2-3 kalimat, 1024 = ~1-2 paragraf, 2048 = penjelasan yang lebih panjang. Atur ke 0 untuk tanpa batas (default penyedia). Model yang bernalar sebelum menjawab (Gemini 2.5 dan 3, GPT-5 dan yang lebih baru, Claude 5.5) mendapat ruang tambahan untuk berpikir di atas angka ini, sehingga dengan berpikir aktif, jawaban panjang bisa mencapai sekitar tiga kali lipat; dengan berpikir nonaktif, jawaban dipotong tepat pada angka ini.';
 $string['settings:profile_update_interval'] = 'Interval pembaruan profil pelajar';
 $string['settings:profile_update_interval_desc'] = 'Setelah sejumlah pesan pelajar ini dalam satu kursus, asisten membuat (atau menyegarkan) profil belajar yang merangkum kekuatan, kelemahan, gaya belajar, dan minat. Profil disertakan dalam prompt sistem untuk jawaban yang dipersonalisasi. Setel 0 untuk menonaktifkan. Bawaan: 10.';
 $string['settings:enable_thinking'] = 'Penalaran diperluas (khusus Claude)';
@@ -3215,7 +3215,7 @@ $string['settings:int_range'] = 'Masukkan bilangan bulat dari {$a->min} sampai {
 
 $string['cachedef_modelcaps'] = 'Fakta kemampuan model yang dipelajari dari penolakan penyedia';
 $string['settings:reasoning_effort'] = 'Upaya penalaran';
-$string['settings:reasoning_effort_desc'] = 'Seberapa banyak model yang bernalar sebelum menjawab diminta berpikir. Berlaku untuk model penalaran OpenAI (GPT-5, GPT-6, seri o) sebagai <code>reasoning_effort</code> dan untuk model berpikir Gemini sebagai anggaran berpikir. Setiap model penalaran juga mendapat ruang untuk berpikir di luar panjang jawaban di atas, sehingga proses berpikir tidak lagi dapat memotong jawaban. Rendah cocok untuk tutor: jawaban datang lebih cepat dan lebih murah. Mati menonaktifkan proses berpikir jika model mengizinkannya. Model tanpa kontrol penalaran mengabaikan pengaturan ini.';
+$string['settings:reasoning_effort_desc'] = 'Seberapa banyak model yang bernalar sebelum menjawab diminta untuk berpikir. Berlaku untuk model penalaran OpenAI (GPT-5, GPT-6, seri o) sebagai <code>reasoning_effort</code>, untuk model berpikir Gemini sebagai anggaran berpikir, dan untuk Claude Sonnet 5.5 dan Opus 5.5 sebagai tingkat upaya (Nonaktif memakai pengaturan terendah; Opus 5.5 tidak dapat menonaktifkan proses berpikir). Setiap model penalaran juga mendapat ruang untuk berpikir di atas panjang respons di atas, sehingga proses berpikir tidak lagi dapat memotong jawaban. Rendah cocok untuk tutor: jawaban datang lebih cepat dan biayanya lebih murah. Nonaktif mematikan proses berpikir jika model mengizinkan. Model tanpa kontrol penalaran mengabaikan pengaturan ini.';
 $string['settings:reasoning_effort_off'] = 'Mati (seminimal yang diizinkan model)';
 $string['settings:reasoning_effort_low'] = 'Rendah (disarankan)';
 $string['settings:reasoning_effort_medium'] = 'Sedang';
@@ -3384,3 +3384,8 @@ $string['savereport:empty'] = 'kosong';
 $string['check:primary_name'] = 'Penyedia utama AI Course Assistant';
 $string['check:primary_ok'] = 'Tidak ada kegagalan dari penyedia obrolan utama dalam 24 jam terakhir.';
 $string['check:primary_failing'] = 'Penyedia obrolan utama ({$a->model}) gagal {$a->failures} kali dalam 24 jam terakhir. Penyedia cadangan menjawab {$a->rescued} dari permintaan tersebut, sehingga peserta didik mungkin tidak menyadarinya. Kesalahan terakhir: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Penyedia umpan balik esai';
+$string['settings:essay_provider_desc'] = 'ID penyedia (mis. <code>claude</code>, <code>openai</code>) untuk umpan balik esai. Harus cocok dengan salah satu baris di Penyedia pembanding. Biarkan kosong untuk memakai penyedia obrolan. Kolom ini dan model sama-sama harus diatur agar penggantian berlaku.';
+$string['settings:essay_model'] = 'Model umpan balik esai';
+$string['settings:essay_model_desc'] = 'Nama model untuk umpan balik esai, mis. <code>claude-haiku-4-5</code>. Dalam benchmark Oktober 2026, model Claude memberikan umpan balik esai yang jelas lebih baik daripada Gemini 2.5 Flash atau GPT-4o mini. Biarkan kosong untuk memakai model obrolan.';

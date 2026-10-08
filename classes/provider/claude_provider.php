@@ -135,6 +135,52 @@ class claude_provider extends base_provider {
     }
 
     /**
+     * Apply the site's reasoning level to Claude models that expose one (v7.8.2).
+     *
+     * Sonnet 5.5 and Opus 5.5 think by default at effort high, which the October
+     * 2026 benchmark found changed nothing for tutoring quality while slowing the
+     * first token five-fold. The reasoning_effort setting now reaches them:
+     * low, medium and high go out as output_config.effort, and off sends
+     * {type: between_tools} where the model allows it (Sonnet 5.5; "disabled" is
+     * a 400). A caller that asked for thinking explicitly keeps adaptive thinking
+     * untouched. Thinking counts toward max_tokens, so a thinking call gets the
+     * same headroom Gemini and OpenAI reasoning models get.
+     *
+     * Gated on the profile still saying Claude thinking, so a model the request
+     * healer has taught that thinking is refused is sent neither field.
+     *
+     * @param array $body Request body so far.
+     * @param array $profile From model_capabilities::profile().
+     * @param array $options Call options.
+     * @return array
+     */
+    private function apply_reasoning_level(array $body, array $profile, array $options): array {
+        $caps = model_capabilities::class;
+        if ($profile['reasoning'] !== $caps::REASONING_CLAUDE || !empty($options['thinking'])) {
+            return $body;
+        }
+        $level = isset($options['reasoning']) && is_string($options['reasoning']) && $options['reasoning'] !== ''
+            ? strtolower($options['reasoning'])
+            : $caps::site_level();
+        if ($level === 'off' && ($profile['claude_thinking_off'] ?? '') === 'between_tools') {
+            $body['thinking'] = ['type' => 'between_tools'];
+            return $body;
+        }
+        if (!empty($profile['claude_effort'])) {
+            $effort = $level === 'off' ? 'low' : $level;
+            if (in_array($effort, ['low', 'medium', 'high'], true)) {
+                $body['output_config'] = ['effort' => $effort];
+            }
+        }
+        if (!empty($profile['thinks']) && isset($body['max_tokens'])) {
+            $limit = (int) ($profile['max_output_tokens'] ?? 0);
+            $total = (int) $body['max_tokens'] + $caps::headroom((int) $body['max_tokens']);
+            $body['max_tokens'] = $limit > 0 ? min($total, $limit) : $total;
+        }
+        return $body;
+    }
+
+    /**
      * Build the request body for Anthropic Messages API.
      *
      * @param string $systemprompt
@@ -221,6 +267,8 @@ class claude_provider extends base_provider {
         } else {
             $body['temperature'] = $options['temperature'] ?? $this->temperature;
         }
+
+        $body = $this->apply_reasoning_level($body, $profile, $options);
 
         // Structured output via tool_use pattern (Claude's native structured output).
         if (!empty($options['response_schema'])) {
@@ -432,6 +480,22 @@ class claude_provider extends base_provider {
     }
 
     /**
+     * Thinking tokens a response reports, or 0.
+     *
+     * Anthropic counts them INSIDE output_tokens and also itemises them in
+     * output_tokens_details.thinking_tokens. They are recorded so analytics can
+     * show how much of a Claude answer was thinking; cost is unchanged, because
+     * output_tokens already bills them, and Claude models are deliberately not in
+     * token_cost_manager's extra-output list, so adding them again cannot happen.
+     *
+     * @param array $usage The response's (or message_delta's) usage object.
+     * @return int
+     */
+    public static function thinking_tokens(array $usage): int {
+        return max(0, (int) ($usage['output_tokens_details']['thinking_tokens'] ?? 0));
+    }
+
+    /**
      * Add one response's token usage to last_token_usage.
      *
      * Adds rather than replaces, so a call that made two requests (the #298
@@ -450,6 +514,7 @@ class claude_provider extends base_provider {
             'completion_tokens'      => (int) ($data['usage']['output_tokens'] ?? 0),
             'cache_creation_tokens'  => (int) ($data['usage']['cache_creation_input_tokens'] ?? 0),
             'cache_read_tokens'      => (int) ($data['usage']['cache_read_input_tokens'] ?? 0),
+            'reasoning_tokens'       => self::thinking_tokens($data['usage']),
         ];
         if ($this->last_token_usage === null) {
             $this->last_token_usage = $usage + [
@@ -582,6 +647,7 @@ class claude_provider extends base_provider {
                     if ($eventtype === 'message_delta' && isset($event['usage']['output_tokens'])) {
                         if ($this->last_token_usage !== null) {
                             $this->last_token_usage['completion_tokens'] = (int) $event['usage']['output_tokens'];
+                            $this->last_token_usage['reasoning_tokens'] = self::thinking_tokens($event['usage']);
                         }
                     }
 

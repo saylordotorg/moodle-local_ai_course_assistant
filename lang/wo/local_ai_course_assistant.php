@@ -1741,7 +1741,7 @@ $string['settings:provider_heading_desc'] = 'Defaral pénkub AI, misaal bi, ak j
 $string['settings:claude_temperature_allow_prefixes'] = 'Misaal yu Claude yi nangu jëfandikukaay temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Benn njëkk-tur misaal ci rëdd bu nekk. Misaal yu Anthropic yi turu ñu tàmbalee ak kenn ci yooyu ñungi nangu ba tey jëfandikukaay bu ñu tànn <code>temperature</code>. Ci misaalu Claude bu mucc du dëppoo ak benn njëkk-tur, temperature dañu koy bàyyi (misaal yu xalaat yi dale ci Opus 4.7 dañu koy bañ ak njumteb HTTP 400). Bàyyi ko neen ngir jëfandikoo mbir mi ñu jottali ak dolliku bi.';
 $string['settings:max_tokens'] = 'Guddaayu tontu gi gën a réy (tokens)';
-$string['settings:max_tokens_desc'] = 'Limu tokens gi gën a réy ci tontuwu AI bu nekk. Xayma yu ndaw dañuy joxe tontu yu gàtt te gaaw. 512 = lu tollu ci 2-3 kàddu, 1024 = lu tollu ci 1-2 tëriin, 2048 = leeral yu gudd. Def 0 ngir amul dig (mbiru joxekat bi dafay jëf).';
+$string['settings:max_tokens_desc'] = 'Xaalis bu tokens (tokens) yu gëna bari ci tontu AI bu nekk. Gisaay yu ndaw di jur tontu yu gàtt te gaaw. 512 = ni 2-3 xaaj, 1024 = ni 1-2 paragaraaf, 2048 = leeral yu gën a gaaw. Def 0 ngir amul dig (sax bu jëfandikukat). Modèl yi di xalaat balaa ñu tontu (Gemini 2.5 ak 3, GPT-5 ak yi ci topp, Claude 5.5) am nañu bërëb bu gën a bare ngir seen xalaat ci kaw limu bii, kon su xalaat dalee, tontu bu gàtt mën na yegg ci ñetti yoon; su xalaat tàggoo, tontu bi dees na ko dog ci limu bii rekk.';
 $string['settings:profile_update_interval'] = 'Diggante yeesalub porofiil jàngkat';
 $string['settings:profile_update_interval_desc'] = 'Bu bataaxal yu tollu ci nii jóge ci jàngkat bi ci biir njàngale, dimbalikat bi dafay tabax (walla yeesal) porofiilu njàng bu tënk doole, seede, anamu njàng, ak soxla yi. Porofiil bi ñungi ko dugal ci ndigalu sistem ngir tontu yu ñu jagleel. Def 0 ngir tëj ko. Mbir mi: 10.';
 $string['settings:enable_thinking'] = 'Xalaat bu yaatu (Claude rekk)';
@@ -3184,7 +3184,7 @@ $string['settings:int_range'] = 'Bindal benn limu ñu mat ci diggante {$a->min} 
 
 $string['cachedef_modelcaps'] = 'Xibaar ci mën-mënu modèle yi, yu ñu jàng ci gàntu yi fournisseur yi def';
 $string['settings:reasoning_effort'] = 'Dayob xalaat';
-$string['settings:reasoning_effort_desc'] = 'Naka la modèle yiy xalaat balaa ñuy tontu war a xalaate. Dafay jëm ci modèle xalaat yu OpenAI (GPT-5, GPT-6, séri o) ni <code>reasoning_effort</code>, ak ci modèle xalaat yu Gemini ni budget xalaat. Bépp modèle xalaat dina am itam bérab ngir xalaatam, ci kaw guddaayu tontu gi nekk ci kaw, kon xalaat mënatul dog tontu. Tuuti mooy gën ci jàngalekat: tontu yi dañuy gaaw a ñëw te seerul. Fey dafay fey xalaat bu modèle bi ko mayee. Modèle yi amul saytu xalaat duñu topp tànneef bii.';
+$string['settings:reasoning_effort_desc'] = 'Naka la modèl yi di xalaat balaa ñu tontu ñuy ñaan ñu xalaat. Dafay jëfandikoo ci modèl yu xalaat yu OpenAI (GPT-5, GPT-6, o-sérí) ni <code>reasoning_effort</code>, ci modèl yu xalaat yu Gemini ni bëgg-bëgg xalaat, te ci Claude Sonnet 5.5 ak Opus 5.5 ni daraja jéego (Tàggoo day jëfandikoo seetu bi gën a ndaw; Opus 5.5 mënul tàggal xalaat bi). Modèl bu xalaat bu nekk am na it bërëb ngir xalaat ci kaw gàttal tontu bi ci kaw, kon xalaat mënatul dog benn tontu. Ndaw baax na ngir jàngalekat: tontu yi di agsi gaaw te dañuy yàq lu tuuti. Tàggoo day tàggal xalaat fu modèl bi may. Modèl yu amul kàttanu xalaat dañuy bàyyi seetu bii.';
 $string['settings:reasoning_effort_off'] = 'Fey (li gën a tuuti li modèle bi may)';
 $string['settings:reasoning_effort_low'] = 'Tuuti (ñu ngi ko digle)';
 $string['settings:reasoning_effort_medium'] = 'Diggdigg';
@@ -3353,3 +3353,8 @@ $string['savereport:empty'] = 'neen';
 $string['check:primary_name'] = 'Yëfkat bu mag bu AI Course Assistant';
 $string['check:primary_ok'] = 'Amul njuumte bu bawoo ci yëfkat bu mag bu waxtaan bi ci 24 waxtu yu jiitu yi.';
 $string['check:primary_failing'] = 'Yëfkat bu mag bu waxtaan bi ({$a->model}) daa tàggoo {$a->failures} yoon ci 24 waxtu yu jiitu yi. Yëfkat bu dolli bi tontu na {$a->rescued} ci yooyu bëgg, kon xaritu jàng yi am na ñu ko gisul. Njuumte bu mujj bi: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Jëfandikukat bu tontu ci bind';
+$string['settings:essay_provider_desc'] = 'ID bu jëfandikukat (misaal <code>claude</code>, <code>openai</code>) ngir tontu ci bind. War na àndak benn rëdd ci Jëfandikukat yu jubluñ. Bàyyil ko neen ngir jëfandikoo jëfandikukat bu waxtaan bi. War nañu def bërëb bii ak modèl bi ngir weccit bi mën a jëf.';
+$string['settings:essay_model'] = 'Modèl bu tontu ci bind';
+$string['settings:essay_model_desc'] = 'Tur modèl ngir tontu ci bind, misaal <code>claude-haiku-4-5</code>. Ci jéem bu Oktoobar 2026, modèl yu Claude jox nañu tontu ci bind bu gën a rafet ci Gemini 2.5 Flash walla GPT-4o mini. Bàyyil ko neen ngir jëfandikoo modèl bu waxtaan bi.';

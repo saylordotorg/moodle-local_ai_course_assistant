@@ -1713,7 +1713,7 @@ $string['settings:provider_heading_desc'] = 'Konfigurera AI-backend, modell och 
 $string['settings:claude_temperature_allow_prefixes'] = 'Claude-modeller som godtar temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Ett modellnamnsprefix per rad. Anthropic-modeller vars namn börjar med något av dessa godtar fortfarande samplingsparametern <code>temperature</code>. För varje Claude-modell som inte matchar ett prefix utelämnas temperature (resonemangsmodeller från och med Opus 4.7 avvisar den med HTTP 400). Lämna tomt för att använda det medföljande standardvärdet.';
 $string['settings:max_tokens'] = 'Maximal svarslängd (token)';
-$string['settings:max_tokens_desc'] = 'Maximalt antal token per AI-svar. Lägre värden ger kortare och snabbare svar. 512 = cirka 2-3 meningar, 1024 = cirka 1-2 stycken, 2048 = längre förklaringar. Ange 0 för ingen gräns (leverantörens standardvärde).';
+$string['settings:max_tokens_desc'] = 'Maximalt antal tokens per AI-svar. Lägre värden ger kortare och snabbare svar. 512 = ca 2-3 meningar, 1024 = ca 1-2 stycken, 2048 = längre förklaringar. Ange 0 för ingen gräns (leverantörens standard). Modeller som resonerar innan de svarar (Gemini 2.5 och 3, GPT-5 och senare, Claude 5.5) får extra utrymme för sitt tänkande utöver detta tal, så med tänkande påslaget kan ett långt svar bli ungefär tre gånger så långt; med tänkande avstängt klipps svaret av exakt vid detta tal.';
 $string['settings:profile_update_interval'] = 'Uppdateringsintervall för studentprofil';
 $string['settings:profile_update_interval_desc'] = 'Efter så här många meddelanden från studenten i en kurs skapar (eller uppdaterar) assistenten en lärprofil som sammanfattar styrkor, svagheter, lärstil och intressen. Profilen infogas i systemprompten för personligt anpassade svar. Ange 0 för att stänga av. Standard: 10.';
 $string['settings:enable_thinking'] = 'Utökat resonemang (endast Claude)';
@@ -3162,7 +3162,7 @@ $string['settings:int_range'] = 'Ange ett heltal från {$a->min} till {$a->max}.
 
 $string['cachedef_modelcaps'] = 'Fakta om modellers förmågor som lärts in från leverantörers avvisningar';
 $string['settings:reasoning_effort'] = 'Resonemangsnivå';
-$string['settings:reasoning_effort_desc'] = 'Hur mycket modeller som resonerar innan de svarar ombeds tänka. Gäller OpenAI:s resonemangsmodeller (GPT-5, GPT-6, o-serien) som <code>reasoning_effort</code> och Geminis tänkande modeller som en tankebudget. Varje resonemangsmodell får också utrymme för tänkandet utöver svarslängden ovan, så tänkandet kan inte längre korta av ett svar. Låg passar en handledare: svaren kommer snabbare och kostar mindre. Av stänger av tänkandet där modellen tillåter det. Modeller utan resonemangskontroll ignorerar den här inställningen.';
+$string['settings:reasoning_effort_desc'] = 'Hur mycket modeller som resonerar innan de svarar ska tänka. Gäller OpenAI:s resonemangsmodeller (GPT-5, GPT-6, o-serien) som <code>reasoning_effort</code>, Geminis tänkande modeller som en tänkandebudget och Claude Sonnet 5.5 och Opus 5.5 som ansträngningsnivå (Av använder den lägsta inställningen; Opus 5.5 kan inte stänga av tänkandet). Varje resonemangsmodell får också utrymme för sitt tänkande utöver svarslängden ovan, så tänkandet kan inte längre korta av ett svar. Låg passar en handledare: svaren kommer snabbare och kostar mindre. Av stänger av tänkandet där modellen tillåter det. Modeller utan resonemangskontroll ignorerar den här inställningen.';
 $string['settings:reasoning_effort_off'] = 'Av (så lite som modellen tillåter)';
 $string['settings:reasoning_effort_low'] = 'Låg (rekommenderas)';
 $string['settings:reasoning_effort_medium'] = 'Medel';
@@ -3331,3 +3331,8 @@ $string['savereport:empty'] = 'tom';
 $string['check:primary_name'] = 'Primär leverantör för AI Course Assistant';
 $string['check:primary_ok'] = 'Inga fel från den primära chattleverantören de senaste 24 timmarna.';
 $string['check:primary_failing'] = 'Den primära chattleverantören ({$a->model}) misslyckades {$a->failures} gånger de senaste 24 timmarna. Reservleverantören besvarade {$a->rescued} av de förfrågningarna, så de studerande har kanske inte märkt något. Senaste fel: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Leverantör för uppsatsåterkoppling';
+$string['settings:essay_provider_desc'] = 'Leverantörs-id (t.ex. <code>claude</code>, <code>openai</code>) för uppsatsåterkoppling. Måste matcha en rad under Jämförelseleverantörer. Lämna tomt för att använda chattens leverantör. Både detta fält och modellen måste anges för att åsidosättningen ska gälla.';
+$string['settings:essay_model'] = 'Modell för uppsatsåterkoppling';
+$string['settings:essay_model_desc'] = 'Modellnamn för uppsatsåterkoppling, t.ex. <code>claude-haiku-4-5</code>. I jämförelsetestet i oktober 2026 gav Claude-modeller tydligt bättre uppsatsåterkoppling än Gemini 2.5 Flash eller GPT-4o mini. Lämna tomt för att använda chattens modell.';

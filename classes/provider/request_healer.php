@@ -101,7 +101,7 @@ class request_healer {
             }
         }
         $rules = ['output_limit', 'token_param', 'temperature', 'reasoning_effort', 'gemini_thinking', 'claude_thinking',
-            'tool_choice'];
+            'claude_effort', 'tool_choice'];
         foreach ($rules as $rule) {
             if ($valueproblem && $rule !== 'output_limit') {
                 continue;
@@ -329,6 +329,24 @@ class request_healer {
         }
         if (self::names($msg, 'thinking') && self::rejects($msg)) {
             return ['field' => 'reasoning', 'value' => model_capabilities::REASONING_NONE];
+        }
+        return null;
+    }
+
+    /**
+     * output_config.effort refused for this Claude model.
+     *
+     * @param string $msg
+     * @param array $sent
+     * @param array $profile
+     * @return array|null
+     */
+    private static function rule_claude_effort(string $msg, array $sent, array $profile): ?array {
+        if (!isset($sent['output_config']) || ($profile['family'] ?? '') !== model_capabilities::FAMILY_CLAUDE) {
+            return null;
+        }
+        if ((self::names($msg, 'effort') || self::names($msg, 'output_config')) && self::rejects($msg)) {
+            return ['field' => 'claude_effort', 'value' => '0'];
         }
         return null;
     }

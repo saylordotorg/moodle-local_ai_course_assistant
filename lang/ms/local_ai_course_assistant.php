@@ -1757,7 +1757,7 @@ $string['settings:provider_heading_desc'] = 'Konfigurasikan platform AI, model d
 $string['settings:claude_temperature_allow_prefixes'] = 'Model Claude yang menyokong parameter temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Satu awalan nama model setiap baris. Model Anthropic yang namanya bermula dengan salah satu daripadanya masih menerima parameter pensampelan <code>temperature</code>. Bagi mana-mana model Claude yang tidak sepadan dengan sebarang awalan, temperature ditinggalkan (model penaakulan bermula Opus 4.7 menolaknya dengan ralat HTTP 400). Biarkan kosong untuk menggunakan nilai lalai yang disertakan bersama pemalam.';
 $string['settings:max_tokens'] = 'Panjang jawapan maksimum (token)';
-$string['settings:max_tokens_desc'] = 'Bilangan token maksimum bagi setiap jawapan AI. Nilai lebih rendah menghasilkan jawapan yang lebih ringkas dan pantas. 512 = lebih kurang 2-3 ayat, 1024 = lebih kurang 1-2 perenggan, 2048 = penerangan yang lebih panjang. Tetapkan 0 untuk tiada had (nilai lalai pembekal digunakan).';
+$string['settings:max_tokens_desc'] = 'Bilangan token maksimum bagi setiap respons AI. Nilai yang lebih rendah menghasilkan respons yang lebih pendek dan pantas. 512 = ~2-3 ayat, 1024 = ~1-2 perenggan, 2048 = penerangan yang lebih panjang. Tetapkan kepada 0 untuk tiada had (lalai penyedia). Model yang bernalar sebelum menjawab (Gemini 2.5 dan 3, GPT-5 dan yang lebih baharu, Claude 5.5) mendapat ruang tambahan untuk berfikir di atas nombor ini, jadi dengan pemikiran dihidupkan, jawapan panjang boleh mencecah kira-kira tiga kali ganda; dengan pemikiran dimatikan, jawapan dipotong tepat pada nombor ini.';
 $string['settings:profile_update_interval'] = 'Selang kemas kini profil pelajar';
 $string['settings:profile_update_interval_desc'] = 'Selepas bilangan mesej pelajar ini dalam sesuatu kursus, pembantu akan membina (atau menyegarkan) profil pembelajaran yang merumuskan kekuatan, kelemahan, gaya belajar dan minat. Profil ini disertakan dalam gesaan sistem untuk jawapan yang diperibadikan. Tetapkan 0 untuk melumpuhkannya. Lalai: 10.';
 $string['settings:enable_thinking'] = 'Penaakulan lanjutan (Claude sahaja)';
@@ -3206,7 +3206,7 @@ $string['settings:int_range'] = 'Masukkan nombor bulat dari {$a->min} hingga {$a
 
 $string['cachedef_modelcaps'] = 'Fakta keupayaan model yang dipelajari daripada penolakan penyedia';
 $string['settings:reasoning_effort'] = 'Usaha penaakulan';
-$string['settings:reasoning_effort_desc'] = 'Berapa banyak model yang menaakul sebelum menjawab diminta berfikir. Digunakan pada model penaakulan OpenAI (GPT-5, GPT-6, siri o) sebagai <code>reasoning_effort</code> dan pada model pemikiran Gemini sebagai bajet pemikiran. Setiap model penaakulan juga diberi ruang untuk berfikir di atas panjang jawapan di atas, jadi pemikiran tidak lagi boleh memotong jawapan. Rendah sesuai untuk tutor: jawapan tiba lebih cepat dan kosnya lebih rendah. Mati mematikan pemikiran jika model membenarkannya. Model tanpa kawalan penaakulan mengabaikan tetapan ini.';
+$string['settings:reasoning_effort_desc'] = 'Sejauh mana model yang bernalar sebelum menjawab diminta untuk berfikir. Terpakai pada model penaakulan OpenAI (GPT-5, GPT-6, siri o) sebagai <code>reasoning_effort</code>, pada model pemikiran Gemini sebagai belanjawan pemikiran, dan pada Claude Sonnet 5.5 dan Opus 5.5 sebagai tahap usaha (Mati menggunakan tetapan terendah; Opus 5.5 tidak boleh mematikan pemikiran). Setiap model penaakulan juga mendapat ruang untuk berfikir di atas panjang respons di atas, jadi pemikiran tidak lagi boleh memotong sesuatu jawapan. Rendah sesuai untuk tutor: jawapan tiba lebih cepat dan kosnya lebih rendah. Mati mematikan pemikiran jika model membenarkannya. Model tanpa kawalan penaakulan mengabaikan tetapan ini.';
 $string['settings:reasoning_effort_off'] = 'Mati (sesedikit yang dibenarkan model)';
 $string['settings:reasoning_effort_low'] = 'Rendah (disyorkan)';
 $string['settings:reasoning_effort_medium'] = 'Sederhana';
@@ -3375,3 +3375,8 @@ $string['savereport:empty'] = 'kosong';
 $string['check:primary_name'] = 'Pembekal utama AI Course Assistant';
 $string['check:primary_ok'] = 'Tiada kegagalan daripada pembekal sembang utama dalam 24 jam yang lalu.';
 $string['check:primary_failing'] = 'Pembekal sembang utama ({$a->model}) gagal sebanyak {$a->failures} kali dalam 24 jam yang lalu. Pembekal sandaran menjawab {$a->rescued} daripada permintaan tersebut, jadi pelajar mungkin tidak perasan. Ralat terakhir: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Penyedia maklum balas esei';
+$string['settings:essay_provider_desc'] = 'ID penyedia (cth. <code>claude</code>, <code>openai</code>) untuk maklum balas esei. Mesti sepadan dengan satu baris dalam Penyedia perbandingan. Biarkan kosong untuk menggunakan penyedia sembang. Kedua-dua medan ini dan model mesti ditetapkan supaya penggantian berkuat kuasa.';
+$string['settings:essay_model'] = 'Model maklum balas esei';
+$string['settings:essay_model_desc'] = 'Nama model untuk maklum balas esei, cth. <code>claude-haiku-4-5</code>. Dalam penanda aras Oktober 2026, model Claude memberikan maklum balas esei yang jelas lebih baik daripada Gemini 2.5 Flash atau GPT-4o mini. Biarkan kosong untuk menggunakan model sembang.';

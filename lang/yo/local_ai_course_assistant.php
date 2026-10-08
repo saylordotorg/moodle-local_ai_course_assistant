@@ -1741,7 +1741,7 @@ $string['settings:provider_heading_desc'] = 'Ṣàtúnṣe pẹpẹ AI, àwòṣ
 $string['settings:claude_temperature_allow_prefixes'] = 'Àwọn àwòṣe Claude tí ó gba àtòjọ temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Ìbẹ̀rẹ̀ orúkọ àwòṣe kan ní ìlà kọ̀ọ̀kan. Àwọn àwòṣe Anthropic tí orúkọ wọn bẹ̀rẹ̀ pẹ̀lú ọ̀kan nínú ìwọ̀nyí ṣì ń gba àtòjọ ìṣàyẹ̀wò <code>temperature</code>. Fún àwòṣe Claude kankan tí kò bá ìbẹ̀rẹ̀ kankan mu, a fi temperature sílẹ̀ (àwọn àwòṣe ìrònú láti Opus 4.7 lọ ń kọ̀ ọ́ pẹ̀lú àṣìṣe HTTP 400). Fi sílẹ̀ ní òfìfo láti lo iye àbáyanjẹ tí ó wá pẹ̀lú àfikún náà.';
 $string['settings:max_tokens'] = 'Ìgùn ìdáhùn tí ó pọ̀ jùlọ (tokens)';
-$string['settings:max_tokens_desc'] = 'Iye tokens tí ó pọ̀ jùlọ fún ìdáhùn AI kọ̀ọ̀kan. Iye kékeré ń fún ní ìdáhùn kúkúrú àti kíákíá. 512 = ó tó gbólóhùn 2-3, 1024 = ó tó ìpínrọ̀ 1-2, 2048 = àlàyé gígùn. Fi 0 sí i láti má ní ààlà (iye àbáyanjẹ olùpèsè ni yóò ṣiṣẹ́).';
+$string['settings:max_tokens_desc'] = 'Iye awọn tokens to pọ julọ fun idahun AI kọọkan. Awọn iye kekere n fun ni awọn idahun kukuru ati iyara. 512 = bii gbolohun 2-3, 1024 = bii ìpínrọ̀ 1-2, 2048 = alaye gigun. Ṣeto 0 fun ko si opin (aiyipada olupese). Awọn awoṣe ti o n ronu ṣaaju didahun (Gemini 2.5 ati 3, GPT-5 ati eyi ti o tẹle, Claude 5.5) gba aaye afikun fun ironu wọn lori nọmba yii, nitorina nigbati ironu ba wa ni titan, idahun gigun le de bii ìlọ́po mẹta; nigbati ironu ba wa ni pipa, a ge idahun naa ni deede ni nọmba yii.';
 $string['settings:profile_update_interval'] = 'Àsìkò ìmúdójúìwọ̀n àkọọ́lẹ̀ akẹ́kọ̀ọ́';
 $string['settings:profile_update_interval_desc'] = 'Lẹ́yìn iye ìránṣẹ́ yìí láti ọwọ́ akẹ́kọ̀ọ́ nínú ìdálẹ́kọ̀ọ́, olùrànlọ́wọ́ ń kọ (tàbí sọ di tuntun) àkọọ́lẹ̀ ìkẹ́kọ̀ọ́ tí ó ṣàkópọ̀ agbára, àìlera, ọ̀nà ìkẹ́kọ̀ọ́, àti ìfẹ́. A fi àkọọ́lẹ̀ yìí sínú àṣẹ ẹ̀rọ fún ìdáhùn tí ó bá ẹni mu. Fi 0 sí i láti pa á. Àbáyanjẹ: 10.';
 $string['settings:enable_thinking'] = 'Ìrònú tí a gbòòrò (Claude nìkan)';
@@ -3184,7 +3184,7 @@ $string['settings:int_range'] = 'Tẹ nọ́mbà odidi láti {$a->min} sí {$a->
 
 $string['cachedef_modelcaps'] = 'Àwọn òtítọ́ nípa agbára awoṣe tí a kọ́ láti inú ìkọ̀sílẹ̀ olùpèsè';
 $string['settings:reasoning_effort'] = 'Ìpele ìrònú';
-$string['settings:reasoning_effort_desc'] = 'Iye ìrònú tí a ní kí àwọn awoṣe tí ń ronú kí wọ́n tó dáhùn ṣe. Ó kan àwọn awoṣe ìrònú OpenAI (GPT-5, GPT-6, ẹ̀ka o) gẹ́gẹ́ bí <code>reasoning_effort</code>, àti àwọn awoṣe ìrònú Gemini gẹ́gẹ́ bí ìnáwó ìrònú. Gbogbo awoṣe ìrònú tún ń gba àyè fún ìrònú rẹ̀ lórí ìgùn ìdáhùn tí ó wà lókè, nítorí náà ìrònú kò lè gé ìdáhùn kúrú mọ́. Kékeré bá olùkọ́ mu: àwọn ìdáhùn ń dé kíákíá, wọn kò sì wọ́n tó bẹ́ẹ̀. Pa á ń pa ìrònú níbi tí awoṣe bá gbà á láàyè. Àwọn awoṣe tí kò ní ìṣàkóso ìrònú kò ní ka ètò yìí sí.';
+$string['settings:reasoning_effort_desc'] = 'Iye ironu ti a beere lọwọ awọn awoṣe ti o n ronu ṣaaju didahun. O kan awọn awoṣe ironu OpenAI (GPT-5, GPT-6, jara o) gẹgẹ bi <code>reasoning_effort</code>, awọn awoṣe ironu Gemini gẹgẹ bi isuna ironu, ati Claude Sonnet 5.5 ati Opus 5.5 gẹgẹ bi ipele akitiyan (Pa n lo eto to kere julọ; Opus 5.5 ko le pa ironu). Gbogbo awoṣe ironu tun gba aaye fun ironu lori gigun idahun ti o wa loke, nitorina ironu ko le ge idahun mọ. Kekere baamu olukọni: awọn idahun de ni kiakia ati pe o din owo. Pa n pa ironu nibiti awoṣe ba gba laaye. Awọn awoṣe ti ko ni iṣakoso ironu kọ eto yii silẹ.';
 $string['settings:reasoning_effort_off'] = 'Pa á (díẹ̀ jùlọ tí awoṣe gbà láàyè)';
 $string['settings:reasoning_effort_low'] = 'Kékeré (a dámọ̀ràn)';
 $string['settings:reasoning_effort_medium'] = 'Àárín';
@@ -3353,3 +3353,8 @@ $string['savereport:empty'] = 'ofo';
 $string['check:primary_name'] = 'Olupese akọkọ ti AI Course Assistant';
 $string['check:primary_ok'] = 'Ko si ikuna kankan lati ọdọ olupese ifọrọranṣẹ akọkọ ni wakati 24 sẹhin.';
 $string['check:primary_failing'] = 'Olupese ifọrọranṣẹ akọkọ ({$a->model}) kuna ni igba {$a->failures} ni wakati 24 sẹhin. Olupese afẹyinti dahun si {$a->rescued} ninu awọn ibeere wọnyẹn, nitorinaa o ṣee ṣe ki awọn akẹkọọ ma ṣe akiyesi. Aṣiṣe ikẹhin: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Olupese esi lori aroko';
+$string['settings:essay_provider_desc'] = 'ID olupese (fun apẹẹrẹ <code>claude</code>, <code>openai</code>) fun esi lori aroko. Gbọdọ baamu ọkan ninu awọn ila ni Awọn olupese ifiwera. Fi silẹ ni ofo lati lo olupese iwiregbe. Aaye yii ati awoṣe gbọdọ jẹ ti a ṣeto mejeeji fun rirọpo lati ṣiṣẹ.';
+$string['settings:essay_model'] = 'Awoṣe esi lori aroko';
+$string['settings:essay_model_desc'] = 'Orukọ awoṣe fun esi lori aroko, fun apẹẹrẹ <code>claude-haiku-4-5</code>. Ninu idanwo ifiwera Oṣu Kẹwa 2026, awọn awoṣe Claude fun ni esi aroko to dara julọ ni gbangba ju Gemini 2.5 Flash tabi GPT-4o mini lọ. Fi silẹ ni ofo lati lo awoṣe iwiregbe.';

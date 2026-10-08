@@ -2072,9 +2072,9 @@ $string['settings:provider_heading_desc'] = 'Configure the AI backend, model, an
 $string['settings:claude_temperature_allow_prefixes'] = 'Claude models accepting temperature';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'One model-name prefix per line. Anthropic models whose name starts with one of these still accept the <code>temperature</code> sampling parameter. Any Claude model NOT matching a prefix has temperature omitted (reasoning-class models since Opus 4.7 reject it with an HTTP 400). Leave blank to use the shipped default.';
 $string['settings:max_tokens'] = 'Max Response Length (tokens)';
-$string['settings:max_tokens_desc'] = 'Maximum number of tokens per AI response. Lower values produce shorter, faster responses. 512 = ~2-3 sentences, 1024 = ~1-2 paragraphs, 2048 = longer explanations. Set to 0 for no limit (provider default).';
+$string['settings:max_tokens_desc'] = 'Maximum number of tokens per AI response. Lower values produce shorter, faster responses. 512 = ~2-3 sentences, 1024 = ~1-2 paragraphs, 2048 = longer explanations. Set to 0 for no limit (provider default). Models that reason before answering (Gemini 2.5 and 3, GPT-5 and later, Claude 5.5) get extra room for their thinking on top of this number, so with thinking on a long answer can run to roughly three times it; with thinking off an answer is cut at exactly this number.';
 $string['settings:reasoning_effort'] = 'Reasoning effort';
-$string['settings:reasoning_effort_desc'] = 'How much models that reason before answering are asked to think. Applies to OpenAI reasoning models (GPT-5, GPT-6, o-series) as <code>reasoning_effort</code> and to Gemini thinking models as a thinking budget. Every reasoning model also gets room for its thinking on top of the response length above, so thinking can no longer cut an answer short. Low suits a tutor: answers arrive sooner and cost less. Off turns thinking off where the model allows it. Models without a reasoning control ignore this setting.';
+$string['settings:reasoning_effort_desc'] = 'How much models that reason before answering are asked to think. Applies to OpenAI reasoning models (GPT-5, GPT-6, o-series) as <code>reasoning_effort</code> to Gemini thinking models as a thinking budget, and to Claude Sonnet 5.5 and Opus 5.5 as effort (Off uses the lowest setting; Opus 5.5 cannot turn thinking off). Every reasoning model also gets room for its thinking on top of the response length above, so thinking can no longer cut an answer short. Low suits a tutor: answers arrive sooner and cost less. Off turns thinking off where the model allows it. Models without a reasoning control ignore this setting.';
 $string['settings:reasoning_effort_off'] = 'Off (as little as the model allows)';
 $string['settings:reasoning_effort_low'] = 'Low (recommended)';
 $string['settings:reasoning_effort_medium'] = 'Medium';
@@ -3623,3 +3623,9 @@ $string['savereport:empty'] = 'empty';
 $string['check:primary_name'] = 'AI Course Assistant main provider';
 $string['check:primary_ok'] = 'No failures from the main chat provider in the last 24 hours.';
 $string['check:primary_failing'] = 'The main chat provider ({$a->model}) failed {$a->failures} times in the last 24 hours. The failover provider answered {$a->rescued} of those turns, so learners may not have noticed. Last error: {$a->reason}';
+
+// Essay feedback model and the other 7.8.2 admin strings.
+$string['settings:essay_provider'] = 'Essay feedback provider';
+$string['settings:essay_provider_desc'] = 'Provider id (e.g. <code>claude</code>, <code>openai</code>) for essay feedback. Must match a row in Comparison providers. Leave empty to use the chat provider. Both this and the model must be set for the override to apply.';
+$string['settings:essay_model'] = 'Essay feedback model';
+$string['settings:essay_model_desc'] = 'Model name for essay feedback, e.g. <code>claude-haiku-4-5</code>. In the October 2026 benchmark Claude models gave clearly better essay feedback than Gemini 2.5 Flash or GPT-4o mini. Leave empty to use the chat model.';

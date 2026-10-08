@@ -358,6 +358,9 @@ abstract class openai_compatible_provider extends base_provider implements batch
     public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
         $url = $this->baseurl . $this->get_endpoint();
         $this->begin_call();
+        // A call that fails must not leave the PREVIOUS call's usage behind: a caller that
+        // records usage after a failure (generate_quiz's repair call) would bill it twice.
+        $this->last_token_usage = null;
         $body = $this->build_body($systemprompt, $messages, false, $options);
         $this->last_finish_reason = null;
         try {

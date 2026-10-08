@@ -139,6 +139,13 @@ class token_cost_manager {
         // The bare 'claude-sonnet' prefix deliberately stays at 3.00/15.00: it is
         // the fallback for sonnet-4/4-5/4-6, which really are that price, and
         // longest-prefix means no claude-sonnet-5* string ever reaches it.
+        // claude-haiku-5-5 is $0.10/$0.50 for prompts up to 100k tokens (verified
+        // 2026-10-08), a tenth of Haiku 4.5. With no row it fell through to the
+        // bare 'claude-haiku' $1/$5 and priced every call 10x too high. Its price is
+        // also below the auto-upgrade's 0.2x band against a Haiku 4.5 incumbent, so
+        // discovery still offers it only to a role whose model is in that price range.
+        // The long-prompt tier is not modelled; SOLA prompts sit far below 100k.
+        'claude-haiku-5-5'  => ['input' => 0.10, 'output' => 0.50],
         'claude-haiku-4-5'  => ['input' => 1.00, 'output' => 5.00],
         'claude-haiku'      => ['input' => 1.00, 'output' => 5.00],
         'claude-sonnet-5'   => ['input' => 2.00, 'output' => 10.00],
@@ -208,7 +215,11 @@ class token_cost_manager {
         // ── OpenRouter (routed open-weight) ───────────────────────────────────
         // Non-turbo llama-3.1-8b-instruct via OpenRouter default routing. Live
         // rate from OpenRouter /api/v1/models (2026-06-03): $0.02 in / $0.05 out.
-        'meta-llama/llama-3.1-8b-instruct'         => ['input' => 0.02, 'output' => 0.05],
+        // Re-read from the same endpoint 2026-10-08: now $0.05 in / $0.08 out.
+        'meta-llama/llama-3.1-8b-instruct'         => ['input' => 0.05, 'output' => 0.08],
+        // gpt-oss-120b as Together serves it: $0.15 in / $0.60 out (together.ai/pricing,
+        // 2026-10-08). Thinking is inside completion tokens. It had no row at all.
+        'openai/gpt-oss-120b'                      => ['input' => 0.15, 'output' => 0.60],
 
         // ── Groq (open-source models) ─────────────────────────────────────────
         // Groq charges vary by model; these are approximate hosted rates.

@@ -1732,7 +1732,7 @@ $string['settings:provider_heading_desc'] = '配置 AI 后端、模型以及对�
 $string['settings:claude_temperature_allow_prefixes'] = '接受 temperature 参数的 Claude 模型';
 $string['settings:claude_temperature_allow_prefixes_desc'] = '每行一个模型名称前缀。名称以其中任一前缀开头的 Anthropic 模型仍然接受 <code>temperature</code> 采样参数。任何与前缀不匹配的 Claude 模型都会省略 temperature（自 Opus 4.7 起的推理类模型会以 HTTP 400 拒绝该参数）。留空则使用随插件提供的默认值。';
 $string['settings:max_tokens'] = '最大回复长度（令牌数）';
-$string['settings:max_tokens_desc'] = '每次 AI 回复的最大令牌数。数值越低，回复越短、越快。512 约为 2-3 句话，1024 约为 1-2 段，2048 可容纳更长的解释。设为 0 表示不限制（使用提供方默认值）。';
+$string['settings:max_tokens_desc'] = '每条 AI 回复的最大 token 数。数值越低,回复越短、越快。512 = 约 2-3 句话,1024 = 约 1-2 段,2048 = 更长的解释。设为 0 表示不限制(提供商默认值)。先推理再作答的模型(Gemini 2.5 和 3、GPT-5 及更高版本、Claude 5.5)会在此数值之外获得额外的思考空间,因此开启思考时,较长的回答可达到此数值的约三倍;关闭思考时,回答会恰好在此数值处被截断。';
 $string['settings:profile_update_interval'] = '学生画像更新间隔';
 $string['settings:profile_update_interval_desc'] = '当学生在某门课程中发送达到此数量的消息后，助手会生成（或刷新）一份学习画像，概括其优势、薄弱环节、学习风格和兴趣。该画像会被注入系统提示词，用于生成个性化回复。设为 0 可停用。默认值：10。';
 $string['settings:enable_thinking'] = '扩展思考（仅限 Claude）';
@@ -3199,7 +3199,7 @@ $string['settings:int_range'] = '请输入 {$a->min} 到 {$a->max} 之间的整�
 
 $string['cachedef_modelcaps'] = '从服务商拒绝中学到的模型能力信息';
 $string['settings:reasoning_effort'] = '推理强度';
-$string['settings:reasoning_effort_desc'] = '设定先推理再回答的模型需要投入多少思考。对 OpenAI 推理模型（GPT-5、GPT-6、o 系列）以 <code>reasoning_effort</code> 生效，对 Gemini 思考模型以思考预算生效。每个推理模型还会在上方回复长度之外获得额外的思考空间，因此思考不会再截断回答。低适合辅导场景：回答更快，成本更低。关闭会在模型允许时关闭思考。没有推理控制的模型会忽略此设置。';
+$string['settings:reasoning_effort_desc'] = '要求先推理再作答的模型思考多少。对 OpenAI 推理模型(GPT-5、GPT-6、o 系列)以 <code>reasoning_effort</code> 形式生效,对 Gemini 思考模型以思考预算形式生效,对 Claude Sonnet 5.5 和 Opus 5.5 以努力程度形式生效(关闭使用最低设置;Opus 5.5 无法关闭思考)。每个推理模型还会在上述回复长度之外获得思考空间,因此思考不会再把回答截断。低适合辅导场景:回答更快、成本更低。关闭会在模型允许时关闭思考。没有推理控制的模型会忽略此设置。';
 $string['settings:reasoning_effort_off'] = '关闭（模型允许的最低程度）';
 $string['settings:reasoning_effort_low'] = '低（推荐）';
 $string['settings:reasoning_effort_medium'] = '中';
@@ -3368,3 +3368,8 @@ $string['savereport:empty'] = '空';
 $string['check:primary_name'] = 'AI Course Assistant 主要提供商';
 $string['check:primary_ok'] = '过去 24 小时内主聊天提供商没有出现故障。';
 $string['check:primary_failing'] = '主聊天提供商 ({$a->model}) 在过去 24 小时内失败了 {$a->failures} 次。备用提供商应答了其中 {$a->rescued} 次请求,因此学习者可能没有察觉。最近一次错误:{$a->reason}';
+
+$string['settings:essay_provider'] = '作文反馈提供商';
+$string['settings:essay_provider_desc'] = '作文反馈使用的提供商 ID(例如 <code>claude</code>、<code>openai</code>)。必须与对比提供商中的某一行一致。留空则使用聊天提供商。必须同时设置此项和模型,覆盖才会生效。';
+$string['settings:essay_model'] = '作文反馈模型';
+$string['settings:essay_model_desc'] = '作文反馈使用的模型名称,例如 <code>claude-haiku-4-5</code>。在 2026 年 10 月的基准测试中,Claude 模型给出的作文反馈明显优于 Gemini 2.5 Flash 或 GPT-4o mini。留空则使用聊天模型。';

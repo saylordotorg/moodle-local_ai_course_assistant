@@ -326,7 +326,7 @@ class page {
      * @return array{level: string, message: string}
      */
     public static function discover_now(): array {
-        $summary = (new discovery())->run();
+        $summary = discovery::live()->run();
         $marked = 0;
         foreach ($summary['candidates'] as $list) {
             $marked += count($list);

@@ -116,6 +116,7 @@ class model_capabilities {
         'thinking_off'       => ['allowed', 'forbidden'],
         'max_output_tokens'  => null,
         'forced_tool_choice' => ['0', '1'],
+        'claude_effort'      => ['0', '1'],
     ];
 
     /** @var string[] reasoning_effort values from least to most thinking. */
@@ -179,6 +180,11 @@ class model_capabilities {
         'max_output_tokens'         => null,
         'billed_outside_completion' => false,
         'forced_tool_choice'        => true,
+        // Claude 5.5 models: output_config.effort is accepted, and (Sonnet 5.5
+        // only) {type: between_tools} is the lowest thinking setting, because
+        // "disabled" is a 400 on a model that thinks by default.
+        'claude_effort'             => false,
+        'claude_thinking_off'       => '',
     ];
 
     /**
@@ -767,6 +773,13 @@ class model_capabilities {
                 foreach (self::CLAUDE_FORCED_TOOL_CHOICE_DENY as $key) {
                     $rules[$key] = ['forced_tool_choice' => false];
                 }
+                // Claude 5.5: thinking is on unless asked otherwise, and the
+                // reasoning level is output_config.effort. Sonnet 5.5 can go to the
+                // lowest setting with {type: between_tools}; Opus 5.5 always thinks.
+                $rules['claude-sonnet-5-5'] = array_merge($rules['claude-sonnet-5-5'] ?? [], [
+                    'thinks' => true, 'claude_effort' => true, 'claude_thinking_off' => 'between_tools']);
+                $rules['claude-opus-5-5'] = array_merge($rules['claude-opus-5-5'] ?? [], [
+                    'thinks' => true, 'claude_effort' => true]);
                 return $rules;
             default:
                 return [];
@@ -929,6 +942,7 @@ class model_capabilities {
             case 'max_output_tokens':
                 return (int) $value;
             case 'forced_tool_choice':
+            case 'claude_effort':
                 return $value === '1';
             case 'reasoning_efforts':
                 return array_values(array_filter(array_map('trim', explode(',', $value))));

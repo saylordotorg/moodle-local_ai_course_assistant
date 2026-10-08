@@ -115,6 +115,19 @@ final class model_registry_test extends \advanced_testcase {
         $this->assertEqualsWithDelta(5.00, model_registry::rate_for('claude-haiku-4-5')['output'], 1e-9);
     }
 
+    public function test_prices_found_missing_in_the_october_2026_benchmark(): void {
+        // Haiku 5.5 is a tenth of Haiku 4.5. With no row it fell to the bare
+        // 'claude-haiku' $1/$5 and every call was priced 10x too high.
+        $this->assertEqualsWithDelta(0.10, model_registry::rate_for('claude-haiku-5-5')['input'], 1e-9);
+        $this->assertEqualsWithDelta(0.50, model_registry::rate_for('claude-haiku-5-5')['output'], 1e-9);
+        $this->assertEqualsWithDelta(0.10, model_registry::rate_for('claude-haiku-5-5-20261001')['input'], 1e-9);
+        $this->assertEqualsWithDelta(0.15, model_registry::rate_for('openai/gpt-oss-120b')['input'], 1e-9);
+        $this->assertEqualsWithDelta(0.60, model_registry::rate_for('openai/gpt-oss-120b')['output'], 1e-9);
+        $this->assertEqualsWithDelta(0.05, model_registry::rate_for('meta-llama/llama-3.1-8b-instruct')['input'], 1e-9);
+        $this->assertEqualsWithDelta(0.08, model_registry::rate_for('meta-llama/llama-3.1-8b-instruct')['output'], 1e-9);
+        $this->assertEqualsWithDelta(0.18, model_registry::rate_for('meta-llama/llama-3.1-8b-instruct-turbo')['input'], 1e-9);
+    }
+
     // ------------------------------------------------------------------
     // Layer precedence.
     // ------------------------------------------------------------------

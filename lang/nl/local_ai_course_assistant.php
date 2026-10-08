@@ -1737,7 +1737,7 @@ $string['settings:provider_heading_desc'] = 'Configureer de AI-backend, het mode
 $string['settings:claude_temperature_allow_prefixes'] = 'Claude-modellen die temperature accepteren';
 $string['settings:claude_temperature_allow_prefixes_desc'] = 'Eén modelnaamprefix per regel. Anthropic-modellen waarvan de naam met een van deze prefixen begint, accepteren nog steeds de samplingparameter <code>temperature</code>. Bij elk Claude-model dat niet met een prefix overeenkomt, wordt temperature weggelaten (redeneermodellen vanaf Opus 4.7 weigeren de parameter met een HTTP 400). Laat leeg om de meegeleverde standaardwaarde te gebruiken.';
 $string['settings:max_tokens'] = 'Maximale antwoordlengte (tokens)';
-$string['settings:max_tokens_desc'] = 'Maximaal aantal tokens per AI-antwoord. Lagere waarden geven kortere, snellere antwoorden. 512 = ongeveer 2-3 zinnen, 1024 = ongeveer 1-2 alinea\'s, 2048 = langere uitleg. Stel in op 0 voor geen limiet (standaardwaarde van de provider).';
+$string['settings:max_tokens_desc'] = 'Maximaal aantal tokens per AI-antwoord. Lagere waarden geven kortere, snellere antwoorden. 512 = ca. 2-3 zinnen, 1024 = ca. 1-2 alinea\'s, 2048 = langere uitleg. Stel in op 0 voor geen limiet (standaard van de provider). Modellen die redeneren voordat ze antwoorden (Gemini 2.5 en 3, GPT-5 en nieuwer, Claude 5.5) krijgen bovenop dit aantal extra ruimte om na te denken. Met denken aan kan een lang antwoord dus ongeveer drie keer zo lang worden; met denken uit wordt een antwoord precies bij dit aantal afgekapt.';
 $string['settings:profile_update_interval'] = 'Interval voor bijwerken studentprofiel';
 $string['settings:profile_update_interval_desc'] = 'Na dit aantal berichten van de student in een cursus maakt de assistent een leerprofiel aan (of werkt het bij) met een samenvatting van sterke punten, zwakke punten, leerstijl en interesses. Het profiel wordt in de systeemprompt opgenomen voor gepersonaliseerde antwoorden. Stel in op 0 om uit te schakelen. Standaard: 10.';
 $string['settings:enable_thinking'] = 'Uitgebreid redeneren (alleen Claude)';
@@ -3186,7 +3186,7 @@ $string['settings:int_range'] = 'Voer een geheel getal in van {$a->min} tot {$a-
 
 $string['cachedef_modelcaps'] = 'Feiten over modelmogelijkheden geleerd uit afwijzingen door providers';
 $string['settings:reasoning_effort'] = 'Redeneerinspanning';
-$string['settings:reasoning_effort_desc'] = 'Hoeveel modellen die redeneren voordat ze antwoorden, wordt gevraagd na te denken. Geldt voor OpenAI-redeneermodellen (GPT-5, GPT-6, o-serie) als <code>reasoning_effort</code> en voor Gemini-denkmodellen als denkbudget. Elk redeneermodel krijgt bovendien ruimte voor het denken bovenop de antwoordlengte hierboven, zodat het denken een antwoord niet meer kan afkappen. Laag past bij een tutor: antwoorden komen sneller en kosten minder. Uit schakelt het denken uit waar het model dat toestaat. Modellen zonder redeneerinstelling negeren deze instelling.';
+$string['settings:reasoning_effort_desc'] = 'Hoeveel modellen die redeneren voordat ze antwoorden moeten nadenken. Geldt voor OpenAI-redeneermodellen (GPT-5, GPT-6, o-serie) als <code>reasoning_effort</code>, voor Gemini-denkmodellen als denkbudget en voor Claude Sonnet 5.5 en Opus 5.5 als inspanningsniveau (Uit gebruikt de laagste instelling; bij Opus 5.5 kan denken niet worden uitgezet). Elk redeneermodel krijgt bovenop de hierboven ingestelde antwoordlengte ook ruimte om na te denken, zodat denken een antwoord niet meer kan afkappen. Laag past bij een tutor: antwoorden komen sneller en kosten minder. Uit schakelt denken uit waar het model dat toestaat. Modellen zonder redeneerinstelling negeren deze instelling.';
 $string['settings:reasoning_effort_off'] = 'Uit (zo weinig als het model toestaat)';
 $string['settings:reasoning_effort_low'] = 'Laag (aanbevolen)';
 $string['settings:reasoning_effort_medium'] = 'Gemiddeld';
@@ -3355,3 +3355,8 @@ $string['savereport:empty'] = 'leeg';
 $string['check:primary_name'] = 'Primaire provider van AI Course Assistant';
 $string['check:primary_ok'] = 'Geen storingen bij de primaire chatprovider in de afgelopen 24 uur.';
 $string['check:primary_failing'] = 'De primaire chatprovider ({$a->model}) is de afgelopen 24 uur {$a->failures} keer uitgevallen. De reserveprovider heeft {$a->rescued} van die verzoeken beantwoord, dus cursisten hebben het mogelijk niet gemerkt. Laatste fout: {$a->reason}';
+
+$string['settings:essay_provider'] = 'Provider voor essayfeedback';
+$string['settings:essay_provider_desc'] = 'Provider-id (bijv. <code>claude</code>, <code>openai</code>) voor essayfeedback. Moet overeenkomen met een rij onder Vergelijkingsproviders. Laat leeg om de chatprovider te gebruiken. Zowel dit veld als het model moet zijn ingesteld om de overschrijving toe te passen.';
+$string['settings:essay_model'] = 'Model voor essayfeedback';
+$string['settings:essay_model_desc'] = 'Modelnaam voor essayfeedback, bijv. <code>claude-haiku-4-5</code>. In de benchmark van oktober 2026 gaven Claude-modellen duidelijk betere essayfeedback dan Gemini 2.5 Flash of GPT-4o mini. Laat leeg om het chatmodel te gebruiken.';

@@ -1710,7 +1710,7 @@ $string['settings:provider_heading_desc'] = 'AIバックエンド、モデル、
 $string['settings:claude_temperature_allow_prefixes'] = 'temperature を受け付ける Claude モデル';
 $string['settings:claude_temperature_allow_prefixes_desc'] = '1行につき1つのモデル名プレフィックスを指定します。名前がいずれかのプレフィックスで始まる Anthropic のモデルは、引き続きサンプリングパラメータ <code>temperature</code> を受け付けます。プレフィックスに一致しない Claude モデルでは temperature が省略されます（Opus 4.7 以降の推論系モデルは HTTP 400 で拒否します）。空欄のままにすると同梱の既定値が使用されます。';
 $string['settings:max_tokens'] = '最大応答長（トークン）';
-$string['settings:max_tokens_desc'] = 'AIの1回の応答あたりの最大トークン数です。値を小さくすると応答が短く速くなります。512 は約2〜3文、1024 は約1〜2段落、2048 はより長い説明に相当します。0 を指定すると制限なし（プロバイダの既定値）になります。';
+$string['settings:max_tokens_desc'] = 'AI の 1 回の応答あたりの最大トークン数。値が小さいほど、応答は短く高速になります。512 = 約 2〜3 文、1024 = 約 1〜2 段落、2048 = より長い説明。0 にすると上限なし(プロバイダーの既定値)になります。回答の前に推論を行うモデル(Gemini 2.5 および 3、GPT-5 以降、Claude 5.5)には、この数値に加えて思考用の余裕が与えられます。そのため思考がオンの場合、長い回答はおよそ 3 倍に達することがあります。思考がオフの場合は、ちょうどこの数値で回答が切れます。';
 $string['settings:profile_update_interval'] = '学習者プロファイルの更新間隔';
 $string['settings:profile_update_interval_desc'] = 'コース内で学習者がこの数のメッセージを送信すると、アシスタントは強み・弱み・学習スタイル・興味関心をまとめた学習プロファイルを生成（または更新）します。このプロファイルは応答を個別化するためシステムプロンプトに挿入されます。0 を指定すると無効になります。既定値：10。';
 $string['settings:enable_thinking'] = '拡張思考（Claude のみ）';
@@ -3161,7 +3161,7 @@ $string['settings:int_range'] = '{$a->min} から {$a->max} までの整数を�
 
 $string['cachedef_modelcaps'] = 'プロバイダーの拒否から学習したモデル機能情報';
 $string['settings:reasoning_effort'] = '推論の強度';
-$string['settings:reasoning_effort_desc'] = '回答前に推論するモデルに、どの程度考えさせるかを指定します。OpenAI の推論モデル（GPT-5、GPT-6、o シリーズ）には <code>reasoning_effort</code> として、Gemini の思考モデルには思考予算として適用されます。すべての推論モデルには、上記の応答長に加えて思考用の余裕も与えられるため、思考によって回答が途中で切れることはなくなります。チューターには「低」が適しています。回答が早く届き、コストも抑えられます。「オフ」は、モデルが許す範囲で思考をオフにします。推論の制御がないモデルはこの設定を無視します。';
+$string['settings:reasoning_effort_desc'] = '回答の前に推論を行うモデルに、どの程度考えるよう求めるかを指定します。OpenAI の推論モデル(GPT-5、GPT-6、o シリーズ)には <code>reasoning_effort</code> として、Gemini の思考モデルには思考バジェットとして、Claude Sonnet 5.5 と Opus 5.5 には努力レベルとして適用されます(オフは最も低い設定を使用します。Opus 5.5 は思考をオフにできません)。すべての推論モデルには、上の応答の長さに加えて思考用の余裕も与えられるため、思考によって回答が途中で切れることはなくなりました。低は家庭教師型に適しており、回答が早く届き、コストも抑えられます。オフは、モデルが許す場合に思考をオフにします。推論の制御がないモデルは、この設定を無視します。';
 $string['settings:reasoning_effort_off'] = 'オフ（モデルが許す最小限）';
 $string['settings:reasoning_effort_low'] = '低（推奨）';
 $string['settings:reasoning_effort_medium'] = '中';
@@ -3330,3 +3330,8 @@ $string['savereport:empty'] = '空';
 $string['check:primary_name'] = 'AI Course Assistant のメインプロバイダー';
 $string['check:primary_ok'] = '過去 24 時間に、メインのチャットプロバイダーでの失敗はありません。';
 $string['check:primary_failing'] = 'メインのチャットプロバイダー ({$a->model}) は、過去 24 時間に {$a->failures} 回失敗しました。そのうち {$a->rescued} 件のやり取りはバックアップのプロバイダーが応答したため、学習者は気づいていない可能性があります。直近のエラー: {$a->reason}';
+
+$string['settings:essay_provider'] = '小論文フィードバックのプロバイダー';
+$string['settings:essay_provider_desc'] = '小論文フィードバックに使うプロバイダー ID(例: <code>claude</code>、<code>openai</code>)。比較プロバイダーの行と一致している必要があります。空欄にするとチャットのプロバイダーを使用します。上書きを有効にするには、この項目とモデルの両方を設定する必要があります。';
+$string['settings:essay_model'] = '小論文フィードバックのモデル';
+$string['settings:essay_model_desc'] = '小論文フィードバックに使うモデル名(例: <code>claude-haiku-4-5</code>)。2026 年 10 月のベンチマークでは、Claude モデルは Gemini 2.5 Flash や GPT-4o mini より明らかに優れた小論文フィードバックを返しました。空欄にするとチャットのモデルを使用します。';

@@ -94,9 +94,13 @@ final class autoupgrade_discovery_test extends \advanced_testcase {
         $this->price('claude-haiku', 1.0, 5.0);
         $this->price('gpt-5-mini', 0.25, 2.0);
         $this->price('gemini/gemini-3.5-flash-lite', 0.30, 2.50);
+        // claude-haiku-5-5 has its own row ($0.10/$0.50) since v7.8.2. Before that the
+        // bare 'claude-haiku' catch-all priced it at ten times its real rate, and the
+        // catch-all must still never answer for a model nobody has priced.
+        $this->assertSame(0.10, discovery::known_price('claude', 'claude-haiku-5-5')['input']);
         $this->assertNull(
-            discovery::known_price('claude', 'claude-haiku-5-5'),
-            'A family catch-all priced claude-haiku-5-5 at ten times its real rate.'
+            discovery::known_price('claude', 'claude-haiku-9-9'),
+            'A family catch-all priced an unpriced Haiku at a rate that is not its own.'
         );
         $this->assertSame(
             'gpt-5-mini',
@@ -109,6 +113,78 @@ final class autoupgrade_discovery_test extends \advanced_testcase {
             discovery::known_price('gemini', 'gemini-3.5-flash-lite')['key'],
             'The LiteLLM spelling counts for the provider that uses it.'
         );
+    }
+
+    public function test_a_listed_model_that_cannot_be_called_is_not_a_candidate(): void {
+        set_config('model', 'gemini-2.5-flash', 'local_ai_course_assistant');
+        set_config('provider', 'gemini', 'local_ai_course_assistant');
+        set_config('comparison_providers', "gemini|AIzaSECRETKEY1234567890|gemini-2.5-flash", 'local_ai_course_assistant');
+        $this->price('gemini/gemini-2.5-flash', 0.30, 2.50);
+        $this->price('gemini/gemini-3.5-flash-lite', 0.30, 2.50);
+        $this->price('gemini/gemini-3.6-flash', 0.30, 2.50);
+        $probed = [];
+        $probe = function (string $provider, string $model) use (&$probed): bool {
+            $probed[] = $model;
+            return $model !== 'gemini-3.5-flash-lite';
+        };
+        $seen = [];
+        $http = $this->http([
+            'generativelanguage' => ['models' => array_map(function ($id) {
+                return ['name' => 'models/' . $id, 'supportedGenerationMethods' => ['generateContent']];
+            }, ['gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.6-flash'])],
+        ], $seen);
+        $summary = (new discovery($http, $probe))->run();
+        $chat = $summary['candidates'][roles::CHAT];
+        $this->assertNotContains('gemini-3.5-flash-lite', $chat, 'A model the API refuses is not offered.');
+        $this->assertContains('gemini-3.6-flash', $chat);
+        $this->assertContains('gemini-3.5-flash-lite', $probed);
+        $this->assertNotContains('gemini-2.5-flash', $probed, 'The current model is never probed.');
+    }
+
+    public function test_the_real_probe_rejects_only_a_missing_model(): void {
+        $client = static function ($throw) {
+            return static function () use ($throw) {
+                return new class($throw) {
+                    /** @var \Throwable|null */
+                    private $throw;
+
+                    public function __construct($throw) {
+                        $this->throw = $throw;
+                    }
+
+                    public function chat_completion(string $s, array $m, array $o = []): string {
+                        if ($this->throw) {
+                            throw $this->throw;
+                        }
+                        return 'OK';
+                    }
+                };
+            };
+        };
+        $nf = new \local_ai_course_assistant\provider\model_not_found_exception('no such model');
+        $this->assertFalse(discovery::probe('gemini', 'm', $client($nf)));
+        $this->assertTrue(discovery::probe('gemini', 'm', $client(null)));
+        $this->assertTrue(discovery::probe('gemini', 'm', $client(new \local_ai_course_assistant\provider\provider_http_exception(400, 'bad'))));
+        $this->assertTrue(discovery::probe('gemini', 'm', $client(new \RuntimeException('timeout'))), 'Inconclusive keeps the candidate.');
+        $this->assertTrue(discovery::probe('gemini', 'm', $client(new \moodle_exception('chat:error_auth', 'local_ai_course_assistant'))));
+    }
+
+    public function test_a_404_from_the_provider_is_the_model_not_found_type(): void {
+        $p = new \local_ai_course_assistant\provider\openai_provider(['apikey' => 'k-test', 'model' => 'gpt-nope']);
+        $m = new \ReflectionMethod($p, 'check_http_error');
+        $m->setAccessible(true);
+        try {
+            $m->invoke($p, 404, '{}');
+            $this->fail('A 404 must throw.');
+        } catch (\local_ai_course_assistant\provider\model_not_found_exception $e) {
+            $this->assertStringContainsString('gpt-nope', (string) $e->debuginfo);
+        }
+        try {
+            $m->invoke($p, 400, '{}');
+            $this->fail('A 400 must throw.');
+        } catch (\local_ai_course_assistant\provider\provider_http_exception $e) {
+            $this->assertSame(400, $e->status);
+        }
     }
 
     public function test_run_registers_marks_and_never_leaks_a_key(): void {
