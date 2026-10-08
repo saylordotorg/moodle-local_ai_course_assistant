@@ -268,12 +268,39 @@ final class model_capabilities_test extends \advanced_testcase {
      * profile is chosen by provider id, so it got the generic shape.
      */
     public function test_a_subclass_keeps_its_vendors_profile(): void {
-        $double = new class(['apikey' => 'x', 'model' => 'claude-opus-5-5']) extends claude_provider {
+        $double = new class (['apikey' => 'x', 'model' => 'claude-opus-5-5']) extends claude_provider {
         };
         $this->assertSame('claude', $double->provider_id());
         $body = $this->body($double, ['response_schema' => ['name' => 'g', 'schema' => ['type' => 'object']]]);
-        $this->assertSame(['type' => 'auto'], $body['tool_choice'],
-            'The double was given another vendor\'s request shape.');
+        $this->assertSame(
+            ['type' => 'auto'],
+            $body['tool_choice'],
+            'The double was given another vendor\'s request shape.'
+        );
+    }
+
+    /**
+     * The gpt-5.x chat snapshots are not caught by the gpt-5.x reasoning rule.
+     */
+    public function test_chat_snapshots_are_not_reasoning_models(): void {
+        foreach (['gpt-5-chat-latest', 'gpt-5.1-chat-latest', 'gpt-5.3-chat-latest'] as $model) {
+            $body = $this->body($this->openai($model), ['max_tokens' => 1024]);
+            $this->assertArrayNotHasKey('reasoning_effort', $body, $model);
+            $this->assertSame(1024, $body['max_completion_tokens'], $model);
+        }
+    }
+
+    /**
+     * Forgetting a fact is audited with the administrator who did it.
+     */
+    public function test_forgetting_a_fact_is_audited(): void {
+        global $DB;
+        model_capabilities::learn('openai', 'gpt-x', 'temperature', 'omit', 'x');
+        $id = (int) $DB->get_field(model_capabilities::TABLE, 'id', ['modelkey' => 'gpt-x']);
+        $this->assertTrue(model_capabilities::forget($id, 2));
+        $row = $DB->get_record('local_ai_course_assistant_audit', ['action' => 'model_capability_forgotten']);
+        $this->assertSame(2, (int) $row->userid);
+        $this->assertSame(model_capabilities::TEMP_ANY, model_capabilities::profile('openai', 'gpt-x')['temperature']);
     }
 
     /**

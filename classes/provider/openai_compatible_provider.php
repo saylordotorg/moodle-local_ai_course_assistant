@@ -370,6 +370,7 @@ abstract class openai_compatible_provider extends base_provider implements batch
             }
             $body = $this->build_body($systemprompt, $messages, false, $options);
             $response = $this->http_post($url, $this->get_headers(), $body);
+            $this->commit_heal();
         }
 
         $data = json_decode($response, true);
@@ -410,6 +411,7 @@ abstract class openai_compatible_provider extends base_provider implements batch
             }
             $body = $this->build_body($systemprompt, $messages, true, $options);
             $this->stream_once($url, $body, $callback, $forwarded);
+            $this->commit_heal();
         }
     }
 

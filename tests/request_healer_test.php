@@ -169,6 +169,23 @@ final class request_healer_test extends \advanced_testcase {
     }
 
     /**
+     * A bad VALUE is not an unsupported parameter: nothing is learned from it.
+     *
+     * An admin typing 7 for 0.7 would otherwise teach SOLA that the model takes
+     * no temperature, for every course, after the typo was corrected; and a
+     * long conversation overflowing a self-hosted model's context would teach
+     * it the wrong token parameter.
+     */
+    public function test_value_and_size_errors_are_never_learned(): void {
+        $this->assertNull($this->diagnose($this->openai_error("Invalid 'temperature': decimal above maximum value. "
+            . 'Expected a value <= 2, but got 7 instead.', 'temperature'), ['temperature' => 7]));
+        $vllm = json_encode(['object' => 'error', 'message' => "'max_tokens' or 'max_completion_tokens' is too large: "
+            . "1024. This model's maximum context length is 4096 tokens and your request has 3500 input tokens "
+            . '(1024 > 4096 - 3500).']);
+        $this->assertNull($this->diagnose($vllm, ['max_tokens' => 1024], 'custom', 'local-model'));
+    }
+
+    /**
      * A message naming a parameter the request did not carry is not acted on.
      */
     public function test_parameter_must_have_been_sent(): void {

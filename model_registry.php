@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else if ($action === 'deletesource') {
         $result = model_registry_page::delete_source(optional_param('sourceid', 0, PARAM_INT));
     } else if ($action === 'forgetcap') {
-        $result = model_registry_page::forget_capability(optional_param('capid', 0, PARAM_INT));
+        $result = model_registry_page::forget_capability(optional_param('capid', 0, PARAM_INT), (int) $USER->id);
     } else if ($action === 'driftnow') {
         $result = model_registry_page::run_drift();
     } else if ($action === 'queuebench') {

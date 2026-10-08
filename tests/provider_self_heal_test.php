@@ -204,6 +204,12 @@ final class provider_self_heal_test extends \advanced_testcase {
             $this->assertStringContainsString('temperature', $e->debuginfo);
         }
         $this->assertCount(2, $p->sent, 'One retry, never a second.');
+        global $DB;
+        $this->assertSame(
+            0,
+            $DB->count_records(model_capabilities::TABLE),
+            'A fix whose retry failed is not remembered: the 400 may not have been about the model.'
+        );
     }
 
     /**

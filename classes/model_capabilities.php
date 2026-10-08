@@ -182,6 +182,19 @@ class model_capabilities {
     ];
 
     /**
+     * Profile of OpenAI's non-reasoning chat snapshots (gpt-5.x-chat-latest).
+     *
+     * @var array<string, mixed>
+     */
+    private const OPENAI_CHAT_SNAPSHOT = [
+        'token_param' => self::TOKENS_MAX_COMPLETION,
+        'temperature' => self::TEMP_OMIT,
+        'reasoning' => self::REASONING_NONE,
+        'thinks' => false,
+        'max_output_tokens' => 16384,
+    ];
+
+    /**
      * OpenAI model rules, shared by OpenAI's API and by OpenAI-compatible
      * endpoints (LiteLLM, Azure-style proxies and vLLM front OpenAI models under
      * the same names and reject the same parameters).
@@ -210,7 +223,14 @@ class model_capabilities {
             'thinks' => true,
             'max_output_tokens' => 128000,
         ],
-        // The non-reasoning chat snapshot of the same generation.
+        // The non-reasoning chat snapshots. Each later generation names its own
+        // (gpt-5.1-chat-latest), which the 'gpt-5.' reasoning rule would
+        // otherwise catch.
+        'gpt-5.1-chat' => self::OPENAI_CHAT_SNAPSHOT,
+        'gpt-5.2-chat' => self::OPENAI_CHAT_SNAPSHOT,
+        'gpt-5.3-chat' => self::OPENAI_CHAT_SNAPSHOT,
+        'gpt-5.4-chat' => self::OPENAI_CHAT_SNAPSHOT,
+        'gpt-5.5-chat' => self::OPENAI_CHAT_SNAPSHOT,
         'gpt-5-chat' => [
             'token_param' => self::TOKENS_MAX_COMPLETION,
             'temperature' => self::TEMP_OMIT,
@@ -609,15 +629,26 @@ class model_capabilities {
      * Remove one learned fact, so the next call uses the rules again.
      *
      * @param int $id Row id.
+     * @param int $userid Administrator who removed it.
      * @return bool True when a row was removed.
      */
-    public static function forget(int $id): bool {
+    public static function forget(int $id, int $userid = 0): bool {
         global $DB;
-        if ($id <= 0 || !$DB->record_exists(self::TABLE, ['id' => $id])) {
+        $row = $id > 0 ? $DB->get_record(self::TABLE, ['id' => $id]) : false;
+        if (!$row) {
             return false;
         }
         $DB->delete_records(self::TABLE, ['id' => $id]);
         self::reset_cache();
+        // Forgetting changes request shape just as learning does, so it is
+        // audited the same way, with the administrator who did it.
+        try {
+            audit_logger::log('model_capability_forgotten', $userid, 0, [
+                'provider' => $row->provider, 'model' => $row->modelkey, 'field' => $row->field, 'value' => $row->value,
+            ]);
+        } catch (\Throwable $e) {
+            unset($e);
+        }
         return true;
     }
 

@@ -58,6 +58,23 @@ class request_healer {
     ];
 
     /**
+     * Wording of a value or size problem, not of an unsupported parameter.
+     *
+     * "Expected a value <= 2, but got 7" names temperature and says invalid,
+     * but the parameter is fine and the value is an admin's typo; "is too
+     * large ... maximum context length" names max_tokens because this one
+     * request is long. Learning from either would change every later request
+     * to the model, so a message with this wording never yields a fix, except
+     * from the output-limit rule, which reads exactly these numbers.
+     *
+     * @var string[]
+     */
+    private const VALUE_PHRASES = [
+        'maximum value', 'minimum value', 'expected a value', 'less than', 'greater than', '<=', '>=',
+        'too large', 'too small', 'context length', 'context window', 'out of range', 'must be between',
+    ];
+
+    /**
      * Diagnose a rejected request.
      *
      * @param int $status HTTP status.
@@ -76,17 +93,19 @@ class request_healer {
         }
         $lower = strtolower($message);
 
-        foreach (
-            [
-            'output_limit',
-            'token_param',
-            'temperature',
-            'reasoning_effort',
-            'gemini_thinking',
-            'claude_thinking',
-            'tool_choice',
-            ] as $rule
-        ) {
+        $valueproblem = false;
+        foreach (self::VALUE_PHRASES as $phrase) {
+            if (str_contains($lower, $phrase)) {
+                $valueproblem = true;
+                break;
+            }
+        }
+        $rules = ['output_limit', 'token_param', 'temperature', 'reasoning_effort', 'gemini_thinking', 'claude_thinking',
+            'tool_choice'];
+        foreach ($rules as $rule) {
+            if ($valueproblem && $rule !== 'output_limit') {
+                continue;
+            }
             $fix = self::{'rule_' . $rule}($lower, $sent, $profile);
             if ($fix !== null) {
                 $fix['note'] = \core_text::substr($message, 0, 300);
@@ -165,7 +184,7 @@ class request_healer {
                 break;
             }
         }
-        if ($param === null) {
+        if ($param === null || str_contains($msg, 'context length') || str_contains($msg, 'context window')) {
             return null;
         }
         $limit = null;

@@ -1651,10 +1651,11 @@ class model_registry_page {
      * Forget one learned capability fact.
      *
      * @param int $id
+     * @param int $userid Administrator who asked.
      * @return array ['level' => string, 'message' => string]
      */
-    public static function forget_capability(int $id): array {
-        if (!model_capabilities::forget($id)) {
+    public static function forget_capability(int $id, int $userid = 0): array {
+        if (!model_capabilities::forget($id, $userid)) {
             return self::result(self::ERROR, get_string('modelregistry:forget_missing', 'local_ai_course_assistant'));
         }
         return self::result(self::OK, get_string('modelregistry:forget_done', 'local_ai_course_assistant'));

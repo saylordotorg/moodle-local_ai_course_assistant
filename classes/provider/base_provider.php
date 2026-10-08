@@ -618,8 +618,10 @@ abstract class base_provider implements provider_interface {
      * fails again after its one fix surfaces the second error instead of
      * looping.
      *
-     * The fix is applied to this instance first and stored second, so the
-     * retry carries it even if the database write fails.
+     * The fix is applied to this instance only. It is stored for later calls
+     * by {@see commit_heal()} once the retry has SUCCEEDED, so a fix that did
+     * not help (a 400 caused by the request rather than the model) is never
+     * remembered.
      *
      * @param \Throwable $e What the send threw.
      * @param string $sentjson The body that was rejected.
@@ -638,14 +640,28 @@ abstract class base_provider implements provider_interface {
         }
         $this->healed[$fix['field']] = $fix['value'];
         $this->lastheal = $fix;
+        return true;
+    }
+
+    /**
+     * Remember the fix the healer applied, now that the retry succeeded.
+     *
+     * Learned facts are keyed by provider and model for the whole site, so
+     * only a fix that demonstrably worked is stored.
+     *
+     * @return void
+     */
+    protected function commit_heal(): void {
+        if ($this->lastheal === null) {
+            return;
+        }
         \local_ai_course_assistant\model_capabilities::learn(
             $this->provider_id(),
             $this->model,
-            $fix['field'],
-            $fix['value'],
-            $fix['note']
+            $this->lastheal['field'],
+            $this->lastheal['value'],
+            $this->lastheal['note']
         );
-        return true;
     }
 
     /**

@@ -347,6 +347,7 @@ class claude_provider extends base_provider {
             }
             $body = $this->build_body($systemprompt, $messages, false, $options);
             $response = $this->http_post($url, $this->get_headers($options), $body);
+            $this->commit_heal();
         }
 
         $data = json_decode($response, true);
@@ -495,6 +496,7 @@ class claude_provider extends base_provider {
             }
             $body = $this->build_body($systemprompt, $messages, true, $options);
             $this->stream_once($url, $body, $counting, $options);
+            $this->commit_heal();
         }
     }
 
