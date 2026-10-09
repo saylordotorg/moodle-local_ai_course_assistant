@@ -30,7 +30,7 @@ final class quiz_balance_wiring_test extends \advanced_testcase {
     /**
      * A stand-in provider that answers the repair call.
      *
-     * @param string|\Throwable $reply
+     * @param string|\Throwable|array $reply One reply, or a list returned call by call.
      * @return object
      */
     private function fake($reply) {
@@ -46,10 +46,11 @@ final class quiz_balance_wiring_test extends \advanced_testcase {
 
             public function chat_completion(string $system, array $messages, array $options = []): string {
                 $this->calls++;
-                if ($this->reply instanceof \Throwable) {
-                    throw $this->reply;
+                $reply = is_array($this->reply) ? $this->reply[min($this->calls, count($this->reply)) - 1] : $this->reply;
+                if ($reply instanceof \Throwable) {
+                    throw $reply;
                 }
-                return $this->reply;
+                return $reply;
             }
 
             public function get_last_token_usage(): ?array {
@@ -97,6 +98,62 @@ final class quiz_balance_wiring_test extends \advanced_testcase {
         $key = $q['choices'][strpos('ABCD', $q['correct'])];
         $this->assertSame($q['correct'] . ') a much longer and more specific correct answer', $key);
         $this->assertSame([], quiz_choice_balancer::flag_long_keys([$q]));
+    }
+
+    public function test_a_hard_case_gets_a_second_ask_and_a_better_first_answer_is_kept(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $partial = json_encode(['items' => [['id' => 0, 'distractors' => [
+            'a wrong claim with some real content', 'another plausible but wrong claim here', 'one more wrong claim of middling size',
+        ]]]]);
+        $good = json_encode(['items' => [['id' => 0, 'distractors' => [
+            'a similar sized but plainly wrong claim made here', 'another plausible yet wrong answer of this size',
+            'yet one more wrong answer of equal length too',
+        ]]]]);
+        $provider = $this->fake([$partial, $good]);
+        $out = $this->balance($provider, [$this->longkey()]);
+        $this->assertSame(2, $provider->calls, 'Still flagged after the first answer, so asked again.');
+        $this->assertSame([], quiz_choice_balancer::flag_long_keys([$out[0]]));
+    }
+
+    public function test_a_first_answer_that_is_better_but_not_enough_is_kept_when_the_second_fails(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $partial = json_encode(['items' => [['id' => 0, 'distractors' => [
+            'a wrong claim with some real content', 'another plausible but wrong claim here', 'one more wrong claim of middling size',
+        ]]]]);
+        $out = $this->balance($this->fake([$partial, 'not json']), [$this->longkey()]);
+        $texts = array_map([quiz_choice_balancer::class, 'strip_label'], $out[0]['choices']);
+        $this->assertContains('a wrong claim with some real content', $texts);
+    }
+
+    public function test_the_second_ask_carries_the_previous_lengths(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $systems = [];
+        $provider = new class($systems) {
+            /** @var array */
+            public $systems;
+
+            public function __construct(&$systems) {
+                $this->systems = &$systems;
+            }
+
+            public function chat_completion(string $system, array $messages, array $options = []): string {
+                $this->systems[] = [$system, $messages[0]['content']];
+                return '{}';
+            }
+
+            public function get_last_token_usage(): ?array {
+                return null;
+            }
+        };
+        $this->balance($provider, [$this->longkey()]);
+        $this->assertCount(2, $systems);
+        $this->assertStringNotContainsString('previous distractors were too short', $systems[0][0]);
+        $this->assertStringContainsString('previous distractors were too short', $systems[1][0]);
+        $this->assertStringContainsString('"current_distractor_lengths":[9,9,7]', $systems[1][1]);
+        $this->assertStringContainsString('"correct_answer_length":46', $systems[0][1]);
     }
 
     public function test_rejected_replacements_keep_the_originals_but_still_shuffle(): void {
@@ -201,7 +258,8 @@ final class quiz_balance_wiring_test extends \advanced_testcase {
         $this->setAdminUser();
         $before = $DB->count_records('local_ai_course_assistant_msgs');
         $this->balance($this->fake('{"items":[]}'), [$this->longkey()]);
-        $this->assertSame($before + 1, $DB->count_records('local_ai_course_assistant_msgs'));
+        // An empty reply fixes nothing, so the question is asked about a second time: two billed calls, two rows.
+        $this->assertSame($before + 2, $DB->count_records('local_ai_course_assistant_msgs'));
         $this->assertTrue($DB->record_exists_select(
             'local_ai_course_assistant_msgs',
             $DB->sql_like('message', ':m'),

@@ -409,7 +409,12 @@ class generate_quiz extends external_api {
     }
 
     /**
-     * Ask the model for replacement distractors on the flagged questions, keeping the key.
+     * Rewrite the distractors of flagged questions, in at most two calls.
+     *
+     * The first call usually fixes most of them. A key far longer than its
+     * distractors (173 characters against 114) is the hard case: the model
+     * writes distractors that are better but still short, so those questions get
+     * one more call that says how short the last attempt was.
      *
      * @param mixed $provider
      * @param array $questions
@@ -420,6 +425,27 @@ class generate_quiz extends external_api {
      * @return array Questions with accepted replacements applied.
      */
     private static function repair_long_keys($provider, array $questions, array $flagged, int $courseid, string $topic, int $cmid): array {
+        $pending = $flagged;
+        for ($round = 1; $round <= 2 && $pending; $round++) {
+            $questions = self::rewrite_round($provider, $questions, $pending, $courseid, $topic, $cmid, $round);
+            $pending = array_values(array_intersect($pending, quiz_choice_balancer::flag_long_keys($questions)));
+        }
+        return $questions;
+    }
+
+    /**
+     * One request for replacement distractors on the listed questions, keeping each key.
+     *
+     * @param mixed $provider
+     * @param array $questions
+     * @param int[] $flagged Keys into $questions.
+     * @param int $courseid
+     * @param string $topic
+     * @param int $cmid
+     * @param int $round 1 for the first ask, 2 for the follow-up on what is still too short.
+     * @return array Questions with accepted replacements applied.
+     */
+    private static function rewrite_round($provider, array $questions, array $flagged, int $courseid, string $topic, int $cmid, int $round): array {
         $items = [];
         foreach ($flagged as $i) {
             $q = $questions[$i];
@@ -430,21 +456,32 @@ class generate_quiz extends external_api {
                     $distractors[] = quiz_choice_balancer::strip_label((string) $choice);
                 }
             }
-            $items[] = [
+            $key = quiz_choice_balancer::strip_label((string) $q['choices'][$k]);
+            $item = [
                 'id' => $i,
                 'question' => $q['question'],
-                'correct_answer' => quiz_choice_balancer::strip_label((string) $q['choices'][$k]),
+                'correct_answer' => $key,
                 // Why the key is right, so a rewritten distractor is not accidentally also right.
                 'why_correct' => $q['explanation'],
+                'correct_answer_length' => \core_text::strlen($key),
                 'current_distractors' => $distractors,
             ];
+            if ($round > 1) {
+                $item['current_distractor_lengths'] = array_map(static fn($d) => \core_text::strlen($d), $distractors);
+            }
+            $items[] = $item;
         }
         $system = "You rewrite the wrong answer choices (distractors) of multiple-choice questions.\n"
             . "For each item, return the same number of new distractors as current_distractors.\n"
             . "Rules:\n"
             . "- Do not change the question or the correct answer.\n"
-            . "- Each new distractor must be within 10% of the correct answer's length in characters, "
-            . "so the correct answer does not stand out by being longer.\n"
+            . "- LENGTH MATTERS MOST. Each new distractor must be between 90% and 110% of correct_answer_length "
+            . "characters, and at least one must be as long as the correct answer. Count characters. "
+            . "The correct answer must not stand out by being longer than every wrong choice.\n"
+            . ($round > 1
+                ? "- Your previous distractors were too short (see current_distractor_lengths). Make them longer by adding "
+                    . "real content (a condition, a reason or a consequence), never filler.\n"
+                : '')
             . "- Each must be a plausible misconception, common mistake or near-miss, and clearly wrong.\n"
             . "- Same grammatical form as the correct answer; no \"all of the above\" or \"none of the above\".\n"
             . "- No absolute words (always, never, only, exclusively, obviously, certainly).\n"
@@ -498,9 +535,19 @@ class generate_quiz extends external_api {
                 continue;
             }
             $q = $questions[$i];
-            $key = quiz_choice_balancer::strip_label((string) $q['choices'][strpos('ABCD', strtoupper(substr(trim($q['correct']), 0, 1)))]);
+            $k = strpos('ABCD', strtoupper(substr(trim($q['correct']), 0, 1)));
+            $key = quiz_choice_balancer::strip_label((string) $q['choices'][$k]);
+            $old = [];
+            foreach ($q['choices'] as $n => $choice) {
+                if ($n !== $k) {
+                    $old[] = quiz_choice_balancer::strip_label((string) $choice);
+                }
+            }
             $new = array_values(array_map('strval', $item['distractors']));
-            if (count($new) === count($q['choices']) - 1 && quiz_choice_balancer::distractors_acceptable($key, $new)) {
+            if (
+                count($new) === count($old)
+                && (quiz_choice_balancer::distractors_acceptable($key, $new) || quiz_choice_balancer::closes_the_gap($key, $old, $new))
+            ) {
                 $questions[$i] = quiz_choice_balancer::with_distractors($q, $new);
             }
         }

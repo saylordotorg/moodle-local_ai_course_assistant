@@ -160,6 +160,15 @@ final class quiz_choice_balancer_test extends \basic_testcase {
         $this->assertFalse(quiz_choice_balancer::distractors_acceptable($key, ['', 'a', 'b']));
     }
 
+    public function test_a_set_that_closes_half_the_gap_counts_as_better(): void {
+        $key = str_repeat('k', 100);
+        $old = [str_repeat('o', 50), str_repeat('o', 45), str_repeat('o', 40)];
+        $this->assertTrue(quiz_choice_balancer::closes_the_gap($key, $old, [str_repeat('a', 75), 'bb', 'cc']));
+        $this->assertFalse(quiz_choice_balancer::closes_the_gap($key, $old, [str_repeat('a', 60), 'bb', 'cc']), 'Not half.');
+        $this->assertFalse(quiz_choice_balancer::closes_the_gap($key, $old, [str_repeat('a', 80), $key, 'cc']), 'Equal to the key.');
+        $this->assertFalse(quiz_choice_balancer::closes_the_gap('short', ['longer one'], ['x']), 'No lead to close.');
+    }
+
     public function test_with_distractors_keeps_the_key_in_place(): void {
         $q = $this->q();
         $q['correct'] = 'C';

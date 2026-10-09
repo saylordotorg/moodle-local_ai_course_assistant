@@ -42,10 +42,10 @@ namespace local_ai_course_assistant;
 class quiz_choice_balancer {
 
     /** @var float A key longer than the longest distractor by more than this share is flagged. */
-    public const LONG_KEY_RATIO = 1.2;
+    public const LONG_KEY_RATIO = 1.1;
 
     /** @var int Keys this much longer in characters are flagged even when the ratio is small. Below this, ignore. */
-    public const MIN_GAP = 6;
+    public const MIN_GAP = 4;
 
     /** @var string Letters, in order. */
     private const LETTERS = 'ABCD';
@@ -107,6 +107,44 @@ class quiz_choice_balancer {
      * @return bool
      */
     public static function distractors_acceptable(string $key, array $distractors): bool {
+        if (!self::distinct_and_nonempty($key, $distractors)) {
+            return false;
+        }
+        $keylen = \core_text::strlen($key);
+        $longest = self::longest_length($distractors);
+        return !($keylen > $longest * self::LONG_KEY_RATIO && $keylen - $longest >= self::MIN_GAP);
+    }
+
+    /**
+     * Whether a replacement set closes at least half of the key's length lead, even if it falls short of acceptable.
+     *
+     * A model asked to match a 173-character key may produce 120-character
+     * distractors: still flagged, but far better than the 114 it replaced. Taking
+     * the better set beats keeping the worse one.
+     *
+     * @param string $key Correct choice text, unlabelled.
+     * @param string[] $old Distractors being replaced, unlabelled.
+     * @param string[] $new Replacement distractors, unlabelled.
+     * @return bool
+     */
+    public static function closes_the_gap(string $key, array $old, array $new): bool {
+        if (!self::distinct_and_nonempty($key, $new)) {
+            return false;
+        }
+        $keylen = \core_text::strlen($key);
+        $oldgap = $keylen - self::longest_length($old);
+        $newgap = $keylen - self::longest_length($new);
+        return $oldgap > 0 && $newgap <= $oldgap / 2;
+    }
+
+    /**
+     * Distractors that are non-empty, distinct from each other and from the key.
+     *
+     * @param string $key
+     * @param string[] $distractors
+     * @return bool
+     */
+    private static function distinct_and_nonempty(string $key, array $distractors): bool {
         $distractors = array_values(array_map(static fn($d) => trim((string) $d), $distractors));
         if (count($distractors) < 1 || count($distractors) > 3) {
             return false;
@@ -119,9 +157,17 @@ class quiz_choice_balancer {
             }
             $seen[$norm($d)] = true;
         }
-        $keylen = \core_text::strlen($key);
-        $longest = max(array_map(static fn($d) => \core_text::strlen($d), $distractors));
-        return !($keylen > $longest * self::LONG_KEY_RATIO && $keylen - $longest >= self::MIN_GAP);
+        return true;
+    }
+
+    /**
+     * Length of the longest text in a list.
+     *
+     * @param string[] $texts
+     * @return int
+     */
+    private static function longest_length(array $texts): int {
+        return max(array_map(static fn($t) => \core_text::strlen(trim((string) $t)), $texts));
     }
 
     /**
