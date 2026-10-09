@@ -149,6 +149,53 @@ final class protocol_markers {
     }
 
     /**
+     * The source pill an answer shows, from the RAW reply, as a short storable string.
+     *
+     * strip() removes every marker from the copy that is stored, so without this
+     * a reloaded answer could not show the "From: ..." pill the live one did
+     * (#310). Mirrors what the browser decides while streaming: the first
+     * [SOURCE:page|course|general|activity[:id]] tag in the closed vocabulary
+     * wins; otherwise a [[c:N]] citation of a retrieved passage that belongs to a
+     * visible activity gives that activity; otherwise the course, but only when
+     * passages were retrieved at all. A free-form [SOURCE:Some label] is not a
+     * source type and is ignored, as in the browser.
+     *
+     * @param string $raw The reply before strip().
+     * @param array $citations The turn's citation entries, each with 'index' and 'cmid'.
+     * @param array $modules Visible activities this turn, keyed by cmid.
+     * @return string|null page, course, general, activity:CMID, or null when no pill applies.
+     */
+    public static function derive_source(string $raw, array $citations = [], array $modules = []): ?string {
+        // Exactly the browser's SOURCE_TAG_RE (chat.js), so the stored pill is the one the live answer drew. The
+        // id is bounded: msgs.source is 24 characters and a longer value would make the insert throw.
+        if (preg_match('/\[SOURCE:(page|course|general|activity)(?::(\d{1,10}))?\]/', $raw, $m)) {
+            $type = $m[1];
+            if ($type !== 'activity') {
+                return $type;
+            }
+            return !empty($m[2]) ? 'activity:' . (int) $m[2] : 'course';
+        }
+        if (!$citations) {
+            return null;
+        }
+        if (preg_match_all('/\[\[c:(\d+)\]\]/', $raw, $cited)) {
+            foreach ($cited[1] as $idx) {
+                foreach ($citations as $entry) {
+                    if ((int) ($entry['index'] ?? -1) !== (int) $idx) {
+                        continue;
+                    }
+                    $cmid = (int) ($entry['cmid'] ?? 0);
+                    if ($cmid > 0 && isset($modules[(string) $cmid])) {
+                        return 'activity:' . $cmid;
+                    }
+                    break;
+                }
+            }
+        }
+        return 'course';
+    }
+
+    /**
      * Remove course-module ids the model copied out of the structure block.
      *
      * The structure block annotates every activity as "Name (id:20057)" so the

@@ -289,7 +289,7 @@ class backup_local_ai_course_assistant_plugin extends backup_local_plugin {
                 'userid', 'role', 'message', 'tokens_used', 'prompt_tokens',
                 'completion_tokens', 'model_name', 'provider', 'interaction_type',
                 'cmid', 'rag_latency_ms', 'cached_tokens', 'stream_outcome',
-                'chunk_count', 'top_score', 'timecreated',
+                'chunk_count', 'top_score', 'source', 'timecreated',
             ]);
             $conv->add_child($msgs);
             $msgs->add_child($msg);

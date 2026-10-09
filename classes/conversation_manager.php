@@ -89,6 +89,7 @@ class conversation_manager {
      * @param int|null $chunkcount Passages retrieved this turn; 0 means retrieval ran and found none.
      * @param float|null $topscore Similarity of the best retrieved passage.
      * @param int|null $reasoningtokens Thinking tokens the provider reported, as reported; null when it reported none.
+     * @param string|null $source Source pill the answer showed (see protocol_markers::derive_source()); assistant rows only.
      * @return int The message ID.
      */
     public static function add_message(
@@ -109,7 +110,8 @@ class conversation_manager {
         ?string $streamoutcome = null,
         ?int $chunkcount = null,
         ?float $topscore = null,
-        ?int $reasoningtokens = null
+        ?int $reasoningtokens = null,
+        ?string $source = null
     ): int {
         global $DB;
 
@@ -135,6 +137,11 @@ class conversation_manager {
         $record->provider          = ($role !== 'user' && $provider !== '') ? $provider : null;
         $record->interaction_type  = $interactiontype ?: 'chat';
         $record->cmid              = $cmid ?: null;
+        // v7.8.4: the source pill, so a reloaded answer can show it again (#310).
+        // The column is 24 characters; an over-long value would make the insert throw and cost the turn its
+        // usage row, so anything longer is dropped rather than stored.
+        $record->source            = ($role === 'assistant' && $source !== null && $source !== '' && strlen($source) <= 24)
+            ? $source : null;
         // v5.4.6: only attach RAG latency to assistant messages — user messages
         // pre-date the retrieve call, so attributing it there would be misleading.
         $record->rag_latency_ms    = ($role === 'assistant') ? $rag_latency_ms : null;

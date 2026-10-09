@@ -1,0 +1,5 @@
+Version 7.8.4 (build 2026100901)
+
+A reloaded chat answer now shows the same "From: ..." source link it showed while it streamed. The link was never kept: the saved copy of an answer has every internal marker removed, including the one that named its source, so reopening the chat made a grounded answer look ungrounded. The source is now saved with the message (a new nullable column, added by the upgrade) and drawn again when history loads. The link is worked out for the learner reading it, so an activity that was deleted or has since been hidden from them links to the course instead and its name is never shown. Answers written before this version have no saved source and show no link, as before. Course backup and restore carry the new field.
+
+Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.

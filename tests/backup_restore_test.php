@@ -356,6 +356,41 @@ final class backup_restore_test extends \advanced_testcase {
     }
 
     /**
+     * An answer's activity pill follows the restored module (v7.8.4).
+     */
+    public function test_an_activity_source_pill_is_remapped_to_the_restored_module(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+        $page = $this->getDataGenerator()->create_module('page', ['course' => $course->id, 'name' => 'Economic Systems']);
+
+        $conv = conversation_manager::get_or_create_conversation($user->id, $course->id);
+        conversation_manager::add_message(
+            $conv->id, $user->id, $course->id, 'assistant', 'A grounded answer.',
+            0, 'openai', 100, 20, 'gpt-4o-mini', 'chat', null, null, null, 'complete', 3, 0.81, null, 'activity:' . $page->cmid);
+
+        $newid = $this->duplicate_course((int) $course->id, true);
+
+        $newpage = $DB->get_record_sql(
+            "SELECT cm.id FROM {course_modules} cm JOIN {modules} m ON m.id = cm.module
+              WHERE cm.course = :c AND m.name = 'page'",
+            ['c' => $newid]
+        );
+        $this->assertNotFalse($newpage);
+        $msg = $DB->get_record_select(
+            'local_ai_course_assistant_msgs',
+            "courseid = :c AND role = 'assistant'",
+            ['c' => $newid]
+        );
+        $this->assertSame('activity:' . $newpage->id, $msg->source, 'The pill must name the NEW module, not the old course\'s id.');
+        $this->assertNotSame('activity:' . $page->cmid, $msg->source);
+    }
+
+    /**
      * Learner conversations come across when users are included.
      */
     public function test_conversations_and_messages_survive_with_users(): void {
@@ -372,7 +407,7 @@ final class backup_restore_test extends \advanced_testcase {
             $conv->id, $user->id, $course->id, 'user', 'What is a balance sheet?');
         conversation_manager::add_message(
             $conv->id, $user->id, $course->id, 'assistant', 'A statement of position.',
-            0, 'openai', 100, 20, 'gpt-4o-mini', 'chat', null, null, null, 'complete', 3, 0.81);
+            0, 'openai', 100, 20, 'gpt-4o-mini', 'chat', null, null, null, 'complete', 3, 0.81, null, 'course');
 
         $newid = $this->duplicate_course((int) $course->id, true);
 
@@ -388,6 +423,8 @@ final class backup_restore_test extends \advanced_testcase {
         $assistant = array_values(array_filter($msgs, fn($m) => $m->role === 'assistant'))[0];
         $this->assertSame('complete', $assistant->stream_outcome);
         $this->assertSame(3, (int) $assistant->chunk_count);
+        // v7.8.4: the source pill travels too, so a restored course keeps the attribution.
+        $this->assertSame('course', $assistant->source);
     }
 
     /**
