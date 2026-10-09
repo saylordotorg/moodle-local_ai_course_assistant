@@ -42,10 +42,22 @@ namespace local_ai_course_assistant;
 class quiz_choice_balancer {
 
     /** @var float A key longer than the longest distractor by more than this share is flagged. */
-    public const LONG_KEY_RATIO = 1.2;
+    public const LONG_KEY_RATIO = 1.1;
 
     /** @var int Keys this much longer in characters are flagged even when the ratio is small. Below this, ignore. */
-    public const MIN_GAP = 6;
+    public const MIN_GAP = 4;
+
+    /**
+     * Absolute and extreme wording that gives a wrong choice away.
+     *
+     * The prompt bans a short list; models used "only", "exact", "all" and
+     * "eliminate" instead (issue #309), so the list here is the forms actually
+     * seen plus their neighbours. Matched as whole words, case-insensitively.
+     */
+    private const ABSOLUTES = '/\b(?:always|never|only|solely|exclusively|entirely|completely|totally|purely|absolutely|'
+        . 'definitely|certainly|obviously|invariably|impossible|guarantee[sd]?|exact(?:ly)?|eliminat(?:e|es|ed|ing)|'
+        . 'all|every|everyone|everything|everybody|none|nothing|no one|must|at all times|in all cases|any and all)\b'
+        . '|(?<!\w)100\s*%/iu';
 
     /** @var string Letters, in order. */
     private const LETTERS = 'ABCD';
@@ -100,6 +112,57 @@ class quiz_choice_balancer {
     }
 
     /**
+     * The absolute words a text contains.
+     *
+     * @param string $text
+     * @return string[] Lower-cased, in order of appearance, without repeats.
+     */
+    public static function absolutes_in(string $text): array {
+        if (preg_match_all(self::ABSOLUTES, $text, $m) === 0) {
+            return [];
+        }
+        return array_values(array_unique(array_map('mb_strtolower', $m[0])));
+    }
+
+    /**
+     * Indexes of questions with an absolute word in a wrong choice.
+     *
+     * Only distractors count. An absolute in the key is a different problem, and
+     * rewriting the key would change what the question tests.
+     *
+     * @param array $questions
+     * @return int[] Keys into $questions.
+     */
+    public static function flag_absolutes(array $questions): array {
+        $flagged = [];
+        foreach ($questions as $i => $q) {
+            $k = self::key_index($q);
+            if ($k === null) {
+                continue;
+            }
+            foreach ($q['choices'] as $n => $choice) {
+                if ($n !== $k && self::absolutes_in(self::strip_label((string) $choice))) {
+                    $flagged[] = $i;
+                    break;
+                }
+            }
+        }
+        return $flagged;
+    }
+
+    /**
+     * Every question that needs its distractors rewritten, for either reason.
+     *
+     * @param array $questions
+     * @return int[] Keys into $questions, ascending.
+     */
+    public static function needs_repair(array $questions): array {
+        $all = array_unique(array_merge(self::flag_long_keys($questions), self::flag_absolutes($questions)));
+        sort($all);
+        return $all;
+    }
+
+    /**
      * Whether a replacement distractor set leaves the key unremarkable by length.
      *
      * @param string $key Correct choice text, unlabelled.
@@ -107,6 +170,59 @@ class quiz_choice_balancer {
      * @return bool
      */
     public static function distractors_acceptable(string $key, array $distractors): bool {
+        if (!self::distinct_and_nonempty($key, $distractors) || self::any_absolute($distractors)) {
+            return false;
+        }
+        $keylen = \core_text::strlen($key);
+        $longest = self::longest_length($distractors);
+        return !($keylen > $longest * self::LONG_KEY_RATIO && $keylen - $longest >= self::MIN_GAP);
+    }
+
+    /**
+     * Whether a replacement set closes at least half of the key's length lead, even if it falls short of acceptable.
+     *
+     * A model asked to match a 173-character key may produce 120-character
+     * distractors: still flagged, but far better than the 114 it replaced. Taking
+     * the better set beats keeping the worse one.
+     *
+     * @param string $key Correct choice text, unlabelled.
+     * @param string[] $old Distractors being replaced, unlabelled.
+     * @param string[] $new Replacement distractors, unlabelled.
+     * @return bool
+     */
+    public static function closes_the_gap(string $key, array $old, array $new): bool {
+        if (!self::distinct_and_nonempty($key, $new) || self::any_absolute($new)) {
+            return false;
+        }
+        $keylen = \core_text::strlen($key);
+        $oldgap = $keylen - self::longest_length($old);
+        $newgap = $keylen - self::longest_length($new);
+        return $oldgap > 0 && $newgap <= $oldgap / 2;
+    }
+
+    /**
+     * Whether any text in a list contains an absolute word.
+     *
+     * @param string[] $texts
+     * @return bool
+     */
+    private static function any_absolute(array $texts): bool {
+        foreach ($texts as $t) {
+            if (self::absolutes_in((string) $t)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Distractors that are non-empty, distinct from each other and from the key.
+     *
+     * @param string $key
+     * @param string[] $distractors
+     * @return bool
+     */
+    private static function distinct_and_nonempty(string $key, array $distractors): bool {
         $distractors = array_values(array_map(static fn($d) => trim((string) $d), $distractors));
         if (count($distractors) < 1 || count($distractors) > 3) {
             return false;
@@ -119,9 +235,17 @@ class quiz_choice_balancer {
             }
             $seen[$norm($d)] = true;
         }
-        $keylen = \core_text::strlen($key);
-        $longest = max(array_map(static fn($d) => \core_text::strlen($d), $distractors));
-        return !($keylen > $longest * self::LONG_KEY_RATIO && $keylen - $longest >= self::MIN_GAP);
+        return true;
+    }
+
+    /**
+     * Length of the longest text in a list.
+     *
+     * @param string[] $texts
+     * @return int
+     */
+    private static function longest_length(array $texts): int {
+        return max(array_map(static fn($t) => \core_text::strlen(trim((string) $t)), $texts));
     }
 
     /**

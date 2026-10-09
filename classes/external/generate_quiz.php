@@ -398,7 +398,7 @@ class generate_quiz extends external_api {
      */
     private static function balance_questions($provider, array $questions, int $courseid, string $topic, int $cmid): array {
         try {
-            $flagged = quiz_choice_balancer::flag_long_keys($questions);
+            $flagged = quiz_choice_balancer::needs_repair($questions);
             if ($flagged) {
                 $questions = self::repair_long_keys($provider, $questions, $flagged, $courseid, $topic, $cmid);
             }
@@ -409,7 +409,12 @@ class generate_quiz extends external_api {
     }
 
     /**
-     * Ask the model for replacement distractors on the flagged questions, keeping the key.
+     * Rewrite the distractors of flagged questions, in at most two calls.
+     *
+     * The first call usually fixes most of them. A key far longer than its
+     * distractors (173 characters against 114) is the hard case: the model
+     * writes distractors that are better but still short, so those questions get
+     * one more call that says how short the last attempt was.
      *
      * @param mixed $provider
      * @param array $questions
@@ -420,6 +425,27 @@ class generate_quiz extends external_api {
      * @return array Questions with accepted replacements applied.
      */
     private static function repair_long_keys($provider, array $questions, array $flagged, int $courseid, string $topic, int $cmid): array {
+        $pending = $flagged;
+        for ($round = 1; $round <= 2 && $pending; $round++) {
+            $questions = self::rewrite_round($provider, $questions, $pending, $courseid, $topic, $cmid, $round);
+            $pending = array_values(array_intersect($pending, quiz_choice_balancer::needs_repair($questions)));
+        }
+        return $questions;
+    }
+
+    /**
+     * One request for replacement distractors on the listed questions, keeping each key.
+     *
+     * @param mixed $provider
+     * @param array $questions
+     * @param int[] $flagged Keys into $questions.
+     * @param int $courseid
+     * @param string $topic
+     * @param int $cmid
+     * @param int $round 1 for the first ask, 2 for the follow-up on what is still too short.
+     * @return array Questions with accepted replacements applied.
+     */
+    private static function rewrite_round($provider, array $questions, array $flagged, int $courseid, string $topic, int $cmid, int $round): array {
         $items = [];
         foreach ($flagged as $i) {
             $q = $questions[$i];
@@ -430,24 +456,45 @@ class generate_quiz extends external_api {
                     $distractors[] = quiz_choice_balancer::strip_label((string) $choice);
                 }
             }
-            $items[] = [
+            $key = quiz_choice_balancer::strip_label((string) $q['choices'][$k]);
+            $item = [
                 'id' => $i,
                 'question' => $q['question'],
-                'correct_answer' => quiz_choice_balancer::strip_label((string) $q['choices'][$k]),
+                'correct_answer' => $key,
                 // Why the key is right, so a rewritten distractor is not accidentally also right.
                 'why_correct' => $q['explanation'],
+                'correct_answer_length' => \core_text::strlen($key),
                 'current_distractors' => $distractors,
             ];
+            $found = array_values(array_unique(array_merge(...array_map(
+                [quiz_choice_balancer::class, 'absolutes_in'],
+                $distractors
+            ))));
+            if ($found) {
+                $item['absolute_words_in_current_distractors'] = $found;
+            }
+            if ($round > 1) {
+                $item['current_distractor_lengths'] = array_map(static fn($d) => \core_text::strlen($d), $distractors);
+            }
+            $items[] = $item;
         }
         $system = "You rewrite the wrong answer choices (distractors) of multiple-choice questions.\n"
             . "For each item, return the same number of new distractors as current_distractors.\n"
             . "Rules:\n"
             . "- Do not change the question or the correct answer.\n"
-            . "- Each new distractor must be within 10% of the correct answer's length in characters, "
-            . "so the correct answer does not stand out by being longer.\n"
+            . "- LENGTH MATTERS MOST. Each new distractor must be between 90% and 110% of correct_answer_length "
+            . "characters, and at least one must be as long as the correct answer. Count characters. "
+            . "The correct answer must not stand out by being longer than every wrong choice.\n"
+            . ($round > 1
+                ? "- Your previous distractors were too short (see current_distractor_lengths). Make them longer by adding "
+                    . "real content (a condition, a reason or a consequence), never filler.\n"
+                : '')
             . "- Each must be a plausible misconception, common mistake or near-miss, and clearly wrong.\n"
             . "- Same grammatical form as the correct answer; no \"all of the above\" or \"none of the above\".\n"
-            . "- No absolute words (always, never, only, exclusively, obviously, certainly).\n"
+            . "- NO absolute or extreme words in any distractor: always, never, only, solely, exclusively, entirely, "
+            . "completely, all, every, none, nothing, must, exact, exactly, eliminate, guarantee, impossible, "
+            . "absolutely, definitely, certainly, obviously, 100%. A distractor that contains one is wrong the moment a "
+            . "learner reads it; items listing absolute_words_in_current_distractors must lose those words.\n"
             . "- Never equal to the correct answer or to each other, and clearly wrong given why_correct.\n"
             . "Return ONLY JSON of exactly this shape, with one entry per item and the item's id: "
             . '{"items":[{"id":0,"distractors":["...","...","..."]}]}';
@@ -498,9 +545,19 @@ class generate_quiz extends external_api {
                 continue;
             }
             $q = $questions[$i];
-            $key = quiz_choice_balancer::strip_label((string) $q['choices'][strpos('ABCD', strtoupper(substr(trim($q['correct']), 0, 1)))]);
+            $k = strpos('ABCD', strtoupper(substr(trim($q['correct']), 0, 1)));
+            $key = quiz_choice_balancer::strip_label((string) $q['choices'][$k]);
+            $old = [];
+            foreach ($q['choices'] as $n => $choice) {
+                if ($n !== $k) {
+                    $old[] = quiz_choice_balancer::strip_label((string) $choice);
+                }
+            }
             $new = array_values(array_map('strval', $item['distractors']));
-            if (count($new) === count($q['choices']) - 1 && quiz_choice_balancer::distractors_acceptable($key, $new)) {
+            if (
+                count($new) === count($old)
+                && (quiz_choice_balancer::distractors_acceptable($key, $new) || quiz_choice_balancer::closes_the_gap($key, $old, $new))
+            ) {
                 $questions[$i] = quiz_choice_balancer::with_distractors($q, $new);
             }
         }
@@ -694,7 +751,7 @@ Quality rules (strict — apply to every question):
 - The four choices MUST be similar in length (within 25% of each other) and grammatical form. Do not let the correct answer stand out by being noticeably longer or more specific than the distractors.
 - Each distractor MUST reflect a plausible misconception, common mistake, or a near-miss restatement of the correct answer. Random or absurd distractors are not acceptable.
 - Do NOT include the choices "All of the above", "None of the above", or "Both A and B" as either correct answers or distractors.
-- Do NOT use absolute clue words ("always", "never", "exclusively", "obviously", "certainly", "the only") in either the question stem or the answer choices, since these telegraph correctness or wrongness.
+- Do NOT use absolute or extreme clue words ("always", "never", "only", "exclusively", "entirely", "completely", "all", "every", "none", "must", "exact", "eliminate", "guarantee", "impossible", "obviously", "certainly", "100%") in either the question stem or the answer choices, since these telegraph correctness or wrongness. Hedged wording ("most", "often", "typically", "tends to") is the right register for every choice.
 - Do NOT include the correct answer's exact phrasing inside the question stem.
 - In "explanation", never refer to a choice by its letter (no "option B", "(C)" or "A is correct"); describe the answer in words, because the choices are shuffled after you write them.
 
