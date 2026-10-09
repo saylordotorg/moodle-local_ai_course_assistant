@@ -166,8 +166,10 @@ final class protocol_markers {
      * @return string|null page, course, general, activity:CMID, or null when no pill applies.
      */
     public static function derive_source(string $raw, array $citations = [], array $modules = []): ?string {
-        if (preg_match('/\[{1,3}\s*SOURCE\s*:\s*(page|course|general|activity)(?:\s*:\s*(\d+))?\s*\]{1,3}/i', $raw, $m)) {
-            $type = strtolower($m[1]);
+        // Exactly the browser's SOURCE_TAG_RE (chat.js), so the stored pill is the one the live answer drew. The
+        // id is bounded: msgs.source is 24 characters and a longer value would make the insert throw.
+        if (preg_match('/\[SOURCE:(page|course|general|activity)(?::(\d{1,10}))?\]/', $raw, $m)) {
+            $type = $m[1];
             if ($type !== 'activity') {
                 return $type;
             }

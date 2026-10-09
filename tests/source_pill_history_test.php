@@ -36,6 +36,40 @@ final class source_pill_history_test extends \advanced_testcase {
         $this->assertSame('course', protocol_markers::derive_source('Answer. [SOURCE:activity]'), 'An activity with no id links to the course.');
     }
 
+    public function test_a_long_id_never_overflows_the_column(): void {
+        // msgs.source is 24 characters. A learner can ask the model to emit any id.
+        $this->assertNull(protocol_markers::derive_source('Ans [SOURCE:activity:1234567890123456]'));
+        $this->assertSame('activity:1234567890', protocol_markers::derive_source('Ans [SOURCE:activity:1234567890]'));
+        $this->assertLessThanOrEqual(24, strlen((string) protocol_markers::derive_source('[SOURCE:activity:9999999999]')));
+    }
+
+    public function test_add_message_drops_a_value_that_would_not_fit(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $conv = conversation_manager::get_or_create_conversation($user->id, $course->id);
+        $id = conversation_manager::add_message(
+            $conv->id, $user->id, $course->id, 'assistant', 'hi', 0, '', null, null, null, 'chat',
+            null, null, null, null, null, null, null, 'activity:' . str_repeat('9', 30)
+        );
+        $this->assertNull($DB->get_field('local_ai_course_assistant_msgs', 'source', ['id' => $id]));
+    }
+
+    public function test_the_browsers_exact_marker_form_is_what_is_stored(): void {
+        // chat.js SOURCE_TAG_RE is case-sensitive with no spaces; the stored pill must match the live one.
+        $this->assertNull(protocol_markers::derive_source('Ans [source: page]'));
+        $this->assertSame('page', protocol_markers::derive_source('Ans [[SOURCE:page]]'), 'Inside double brackets, as the browser reads it.');
+    }
+
+    public function test_an_activity_name_with_an_ampersand_is_not_double_escaped(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $page = $this->getDataGenerator()->create_module('page', ['course' => $course->id, 'name' => 'Q&A Review']);
+        $pill = get_history::source_pill((int) $course->id, 'activity:' . $page->cmid, 0);
+        $this->assertSame('Q&A Review', $pill['source_title'], 'The client sets it with textContent, so it must arrive raw.');
+    }
+
     public function test_a_free_form_label_is_not_a_source_type(): void {
         $this->assertNull(protocol_markers::derive_source('Answer. [SOURCE:Unit 1: Computer Programming]'));
     }

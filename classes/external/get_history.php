@@ -136,7 +136,7 @@ class get_history extends external_api {
                 if ($cm->uservisible && $cm->has_view() && !empty($cm->name)) {
                     $out['source_cmid'] = (int) $cm->id;
                     $out['source_url'] = (new \moodle_url('/mod/' . $cm->modname . '/view.php', ['id' => $cm->id]))->out(false);
-                    $out['source_title'] = format_string($cm->name, true, ['context' => \context_module::instance($cm->id)]);
+                    $out['source_title'] = format_string($cm->name, true, ['context' => \context_module::instance($cm->id), 'escape' => false]);
                     return $out;
                 }
             } catch (\Throwable $e) {

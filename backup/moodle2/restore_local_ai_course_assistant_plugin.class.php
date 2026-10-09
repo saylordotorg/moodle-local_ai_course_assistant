@@ -143,6 +143,9 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
     /** @var array [table => [[newid, oldcmid], ...]] rows needing a cmid fix-up. */
     private $deferredcmids = [];
 
+    /** @var array [new msgs id, old cmid] for answers whose source pill names an activity (v7.8.4). */
+    private $deferredsources = [];
+
     /**
      * A per-course override stored in config_plugins as "<setting>_course_<id>".
      *
@@ -477,10 +480,20 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
         $data->courseid = $this->task->get_courseid();
         $oldcmid = !empty($data->cmid) ? (int) $data->cmid : 0;
         $data->cmid = null;
+        // v7.8.4: an 'activity:CMID' source names a course module of the OLD course. Keep the
+        // pill's type now and point it at the new module once the mapping exists.
+        $oldsourcecmid = 0;
+        if (isset($data->source) && preg_match('/^activity:(\d{1,10})$/', (string) $data->source, $sm)) {
+            $oldsourcecmid = (int) $sm[1];
+            $data->source = 'course';
+        }
         unset($data->id);
         $newid = $DB->insert_record('local_ai_course_assistant_msgs', $data);
         if ($oldcmid) {
             $this->deferredcmids['local_ai_course_assistant_msgs'][] = [(int) $newid, $oldcmid];
+        }
+        if ($oldsourcecmid) {
+            $this->deferredsources[] = [(int) $newid, $oldsourcecmid];
         }
         $this->set_mapping('aica_msg', $oldid, $newid);
     }
@@ -870,6 +883,15 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
             }
         }
         $this->deferredcmids = [];
+
+        // v7.8.4: an answer's activity pill follows the restored module, or stays a course link.
+        foreach ($this->deferredsources as [$newid, $oldcmid]) {
+            $cmid = $this->get_mappingid('course_module', $oldcmid);
+            if ($cmid) {
+                $DB->set_field('local_ai_course_assistant_msgs', 'source', 'activity:' . $cmid, ['id' => $newid]);
+            }
+        }
+        $this->deferredsources = [];
     }
 
     /**
