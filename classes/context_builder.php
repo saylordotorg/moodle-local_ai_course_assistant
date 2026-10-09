@@ -189,6 +189,8 @@ class context_builder {
      * @param int    $pageid          Current Moodle page id when available.
      * @param string $pagetitle       Current Moodle page title when available.
      * @param string $quizmode        v5.2.0: 'coach' to inject coach-mode SAFETY block; '' otherwise.
+     * @param string $langsource      Where $lang came from: 'saved', 'pinned', 'locked' or ''/'default' (see language_support).
+     * @param string $langhold        Comma-separated languages the learner declined to switch to this session.
      * @return string The complete system prompt.
      */
     public static function build_system_prompt(
@@ -198,7 +200,9 @@ class context_builder {
         array $retrieved_chunks = [],
         int $pageid = 0,
         string $pagetitle = '',
-        string $quizmode = ''
+        string $quizmode = '',
+        string $langsource = '',
+        string $langhold = ''
     ): string {
         global $DB;
 
@@ -246,8 +250,11 @@ class context_builder {
             // the prompt but was absent here, so a title from one request was
             // cached under (course, user, page) and served to later turns.
             $titlefp = substr(sha1($pagetitle), 0, 8);
+            // The language section depends on where the language came from and on
+            // which languages the learner declined, not only on the code.
+            $langfp = substr(sha1($langsource . '|' . $langhold), 0, 8);
             $cachekey = "prompt_{$courseid}_{$userid}_{$pageid}_" . ($lang ?: 'auto')
-                . "_{$togglefp}_{$qmkey}_{$persfp}_{$titlefp}";
+                . "_{$togglefp}_{$qmkey}_{$persfp}_{$titlefp}_{$langfp}";
             $cached = $cache->get($cachekey);
             if ($cached !== false) {
                 return $cached;
@@ -623,7 +630,7 @@ class context_builder {
         // learner courses do not lose this section under default budget
         // pressure. Section is small (~600 chars) and matters for the ESL
         // population SOLA serves heavily.
-        $sections[] = new section('multilingual', section::CAT_BEHAVIOR, 70, self::get_multilingual_instructions($lang), 0);
+        $sections[] = new section('multilingual', section::CAT_BEHAVIOR, 70, self::get_multilingual_instructions($lang, $langsource, $langhold), 0);
         $sections[] = new section('widget_features', section::CAT_BEHAVIOR, 30, self::get_widget_feature_instructions(), 0);
         if (self::external_resources_enabled_for_course($courseid)) {
             $sections[] = new section(
@@ -2702,54 +2709,16 @@ class context_builder {
     /**
      * Get multilingual support instructions.
      *
-     * If an explicit language preference is provided (ISO 639-1), the prompt
-     * instructs the AI to respond in that language rather than auto-detecting.
+     * The reply language follows the question, then the learner's saved SOLA
+     * language, then the browser default; see language_support for the rule.
      *
-     * @param string $lang ISO 639-1 code from student preference, or empty for auto-detect.
+     * @param string $lang ISO 639-1 code of the effective language, or '' for none.
+     * @param string $source Where that code came from (language_support::SOURCE_*).
+     * @param string $hold Language the learner declined to switch to this session.
      * @return string
      */
-    private static function get_multilingual_instructions(string $lang = ''): string {
-        $base = "\n\n## Multilingual Support\n"
-            . "You are fluent in the top 100 world languages and support students in their preferred language.\n"
-            . "If course content is in English but the student communicates in another language, respond in their "
-            . "language while keeping technical terms and course-specific vocabulary in the original when helpful.\n"
-            . "If a student explicitly asks you to switch to a particular language, do so and continue in that language.";
-
-        if (!empty($lang)) {
-            // Map common ISO 639-1 codes to readable names for the prompt.
-            $langnames = [
-                // Original set.
-                'ar' => 'Arabic', 'zh' => 'Chinese', 'cs' => 'Czech', 'da' => 'Danish',
-                'nl' => 'Dutch', 'fi' => 'Finnish', 'fr' => 'French', 'de' => 'German',
-                'el' => 'Greek', 'hi' => 'Hindi', 'hu' => 'Hungarian', 'id' => 'Indonesian',
-                'it' => 'Italian', 'ja' => 'Japanese', 'ko' => 'Korean', 'nb' => 'Norwegian',
-                'pl' => 'Polish', 'pt' => 'Portuguese', 'ro' => 'Romanian', 'ru' => 'Russian',
-                'sk' => 'Slovak', 'es' => 'Spanish', 'sv' => 'Swedish', 'th' => 'Thai',
-                'tr' => 'Turkish', 'uk' => 'Ukrainian', 'vi' => 'Vietnamese',
-                // Extended set.
-                'am' => 'Amharic', 'bm' => 'Bambara', 'bn' => 'Bengali',
-                'ha' => 'Hausa', 'ig' => 'Igbo', 'ms' => 'Malay',
-                'ne' => 'Nepali', 'om' => 'Oromo', 'pa' => 'Punjabi',
-                'so' => 'Somali', 'sw' => 'Swahili', 'ta' => 'Tamil',
-                'tl' => 'Filipino', 'wo' => 'Wolof', 'yo' => 'Yoruba', 'zu' => 'Zulu',
-            ];
-            $langname = $langnames[$lang] ?? strtoupper($lang);
-            // v5.0.0 patch (Thelma UT re-audit): explicit override beats history.
-            // The earlier directive said "regardless of what the student writes
-            // in" but the model still reverted to a prior conversation-history
-            // language when the user asked an off-topic question. Adding the
-            // "history-override" sentence so the current preference wins even
-            // when prior turns were in a different language.
-            $base .= "\n\n**IMPORTANT: The student has set their preferred language to {$langname} ({$lang}). "
-                . "You MUST respond in {$langname} for every message in this conversation. "
-                . "This applies regardless of what language the student writes in, AND regardless of what language any earlier turn in the conversation history was answered in. "
-                . "If the conversation history shows responses in a different language (because the preference changed mid-session), ignore that — the current preference is {$langname}. "
-                . "Translate course-specific technical terms as needed; do not switch back.**";
-        } else {
-            $base .= "\nIf a student writes in a language other than English, detect their language and respond in that same language.";
-        }
-
-        return $base;
+    private static function get_multilingual_instructions(string $lang = '', string $source = '', string $hold = ''): string {
+        return language_support::prompt_section($lang, $source, $hold);
     }
 
 }

@@ -279,6 +279,7 @@ define(['core/ajax'], function(Ajax) {
             pageid: parseInt(ctx.pageId || ctx.pageid, 10) || 0,
             pagetitle: ctx.pageTitle || ctx.pagetitle || '',
             lang: ctx.lang || '',
+            langsource: ctx.langsource || '',
             // v7.0.5: the server assembles the voice-mode augmentation now, so
             // it needs the mode and its inputs. Previously the browser built the
             // text and pushed it with session.update, which replaced the

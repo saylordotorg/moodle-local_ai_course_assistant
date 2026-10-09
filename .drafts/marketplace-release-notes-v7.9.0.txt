@@ -1,0 +1,5 @@
+Version 7.9.0 (build 2026100902)
+
+SOLA now chooses the language of each reply by this order: the language the question is written in, then the language saved in SOLA's language picker, then the browser's language. It answers in 46 languages. When a learner who saved a language writes in a different one, SOLA asks in chat, in the language they wrote in, whether to switch, with a button for each language named in its own script; the saved setting changes only if they agree, and a refusal is remembered for the rest of the session. A learner who never chose a language is simply answered in the language they write in, with no question. The browser's language is no longer written into the saved setting on a first visit, because that made a guess look like a choice. English-locked courses never ask.
+
+Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.

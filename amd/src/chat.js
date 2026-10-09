@@ -126,6 +126,15 @@ define([
      */
     const NEXT_BLOCK_RE = /\n*\[\s*SOLA_NEXT\s*\]((?:(?!\[\s*SOLA_NEXT\s*\])[\s\S])*?)\[\s*\/\s*SOLA_NEXT\s*\]/i;
     /**
+     * @type {RegExp} The language-switch question the model asks, with a
+     * two-letter code and an optional closer, mirroring protocol_markers.php.
+     */
+    const LANG_SWITCH_RE = /\n*\[\s*SOLA_LANG_SWITCH\s*\]\s*([a-z]{2,3})(?![a-z])(?:\s*\[\s*\/\s*SOLA_LANG_SWITCH\s*\])?[ \t]*\n?/i;
+    /** @type {RegExp} Any language-switch tag left behind after the match above. */
+    const LANG_SWITCH_STRAY_RE = /\n*\[\s*\/?\s*SOLA_LANG_SWITCH\s*\]\s*/ig;
+    /** @type {RegExp} A language-switch tag still arriving while streaming. */
+    const LANG_SWITCH_OPEN_RE = /\n*\[\s*SOLA_LANG_SWITCH\s*\]\s*[a-z]{0,3}\s*(?:\[\s*\/?[A-Z_]*)?$/i;
+    /**
      * @type {RegExp} Unterminated follow-up marker — the model opened [SOLA_NEXT]
      * but never emitted a closing tag (observed in production on BUS101). The
      * streaming path already hid this form; without it here the open tag
@@ -245,6 +254,23 @@ define([
             }).slice(0, 4);
         };
 
+        // The language-switch question comes first: when the model asks it, the
+        // reply is only the question, and what the learner picks decides what
+        // happens next.
+        let langSwitch = null;
+        let langAsked = false;
+        const langMatch = cleanText.match(LANG_SWITCH_RE);
+        if (langMatch) {
+            // Asked, even if the code is one SOLA does not support: the reply is
+            // then only a question with nothing to click, so the caller must
+            // send the learner's message again rather than leave it unanswered.
+            langAsked = true;
+            const raw = langMatch[1].toLowerCase();
+            const code = raw === 'fil' ? 'tl' : raw;
+            langSwitch = (Speech.getLangInfo && Speech.getLangInfo(code)) ? code : null;
+        }
+        cleanText = cleanText.replace(LANG_SWITCH_RE, '').replace(LANG_SWITCH_STRAY_RE, '').trimStart();
+
         const nextMatch = cleanText.match(NEXT_BLOCK_RE);
         if (nextMatch) {
             suggestions = harvestChips(nextMatch[1]);
@@ -343,6 +369,8 @@ define([
             sourceType: sourceType,
             sourceCmid: sourceCmid,
             scoreData: scoreData,
+            langSwitch: langSwitch,
+            langAsked: langAsked || /SOLA_LANG_SWITCH/i.test(((text || '') + '')),
         };
     };
 
@@ -361,6 +389,9 @@ define([
      */
     const stripStreamingDecorators = function(fullText) {
         let displayText = ((fullText || '') + '')
+            .replace(LANG_SWITCH_OPEN_RE, '')
+            .replace(LANG_SWITCH_RE, '')
+            .replace(LANG_SWITCH_STRAY_RE, '')
             .replace(NEXT_BLOCK_RE, '')
             .replace(SOURCE_STRIP_RE, '')
             .replace(SCORE_BLOCK_RE, '')
@@ -1332,6 +1363,8 @@ define([
 
         return {
             lang: Speech.getLang() || '',
+            // Voice cannot ask a question in chat, so a saved language is pinned.
+            langsource: Speech.getLangSource() === 'saved' ? 'pinned' : '',
             pageId: currentPageId || 0,
             pageTitle: currentPageTitle || '',
             pageHeading: getContextDebugHeading() || (root ? (root.dataset.serverPageHeading || '') : ''),
@@ -1597,13 +1630,13 @@ define([
     };
 
     /**
-     * Auto-set language from browser on first visit; update label on subsequent visits.
+     * Show the language SOLA will use: the saved one, else the browser's.
      */
     const initLanguage = function() {
         // English Lock: if active, force English and skip auto-detection.
         var rootEl = document.getElementById('local-ai-course-assistant');
         if (rootEl && rootEl.dataset.englishLock === '1') {
-            Speech.setLang('en');
+            Speech.setForcedLang('en');
             UI.setLangLabel('English (Locked)');
             return;
         }
@@ -1620,12 +1653,14 @@ define([
             return;
         }
 
-        // Auto-detect and silently apply browser language.
-        const detected = Speech.detectBrowserLang();
+        // Nothing saved: follow the browser's language for the label and the
+        // starters, but do not save it. Saving made the browser's guess look
+        // like a choice the learner had made, which SOLA then asked them to
+        // confirm changing.
+        const detected = Speech.getLang();
         if (detected) {
             const info = Speech.getLangInfo(detected);
             if (info) {
-                Speech.setLang(detected);
                 UI.setLangLabel(info.name);
                 updateStarterTexts(detected);
                 return;
@@ -3640,6 +3675,7 @@ define([
                     sessKey:  sessKey,
                     sseUrl:   sseUrl,
                     lang:     Speech.getLang(),
+                    langsource: Speech.getLangSource() === 'saved' ? 'pinned' : '',
                     greeting: buildPracticeSpeakingGreeting(selectionLabel),
                     pageId: currentPageId || 0,
                     pageTitle: currentPageTitle || '',
@@ -5601,14 +5637,118 @@ define([
         });
     };
 
+    /** @type {string} sessionStorage key for languages the learner declined to switch to. */
+    const LANG_HOLD_KEY = 'aica_lang_hold';
+
+    /**
+     * Languages the learner said "keep my language" to during this browser session.
+     *
+     * @returns {Array<string>}
+     */
+    const getLangHold = function() {
+        try {
+            return (sessionStorage.getItem(LANG_HOLD_KEY) || '').split(',').filter(function(c) {
+                return c && Speech.getLangInfo(c);
+            });
+        } catch (e) {
+            return [];
+        }
+    };
+
+    /**
+     * Remember that the learner does not want SOLA to ask again about a language.
+     *
+     * @param {string} code
+     */
+    const addLangHold = function(code) {
+        const held = getLangHold();
+        if (held.indexOf(code) === -1) {
+            held.push(code);
+        }
+        try {
+            sessionStorage.setItem(LANG_HOLD_KEY, held.join(','));
+        } catch (e) { /**/ }
+    };
+
+    /**
+     * Change SOLA's saved language and everything that shows it.
+     *
+     * @param {string} code ISO 639-1 code.
+     */
+    const applyLanguageChoice = function(code) {
+        const info = Speech.getLangInfo(code);
+        if (!info) {
+            return;
+        }
+        Speech.setLang(code);
+        UI.setLangLabel(info.name);
+        updateStarterTexts(code);
+        updateUiTextsForLang(code);
+    };
+
+    /**
+     * Offer the two answers to "switch SOLA to the language you wrote in?".
+     *
+     * The buttons carry each language's own name, so they read correctly
+     * whatever language the learner can read and need no translations. Yes
+     * saves the new language and asks the question again in it; No keeps the
+     * saved language, remembers the refusal so SOLA does not ask again this
+     * session, and asks the question again in the saved language.
+     *
+     * @param {string} code Language the learner wrote in.
+     * @param {string} originalText The question that prompted the ask.
+     */
+    const showLangSwitchChoice = function(code, originalText) {
+        const wrote = Speech.getLangInfo(code);
+        const savedCode = Speech.getSavedLang() || Speech.getLang();
+        const saved = savedCode ? Speech.getLangInfo(savedCode) : null;
+        if (!wrote || !saved || savedCode === code || getLangHold().indexOf(code) !== -1) {
+            // Nothing sensible to offer, or the learner already said no to this
+            // language: answer the question in the saved language. Deferred
+            // because the stream that asked has not released the send lock yet.
+            askAgainPinned(originalText);
+            return;
+        }
+        UI.showSuggestions([wrote.native, saved.native], function(label) {
+            if (sending) {
+                // A reply is already streaming (the learner typed something
+                // else). Changing the language now would save it and then lose
+                // the question, so leave the choice for the next ask.
+                return;
+            }
+            UI.clearSuggestions();
+            if (label === wrote.native) {
+                applyLanguageChoice(code);
+                handleSend({text: originalText, lang: code});
+            } else {
+                addLangHold(code);
+                handleSend({text: originalText, pinned: true});
+            }
+        });
+    };
+
+    /**
+     * Send a question again, this time answered in the saved language without
+     * another ask.
+     *
+     * @param {string} text The learner's original question.
+     */
+    const askAgainPinned = function(text) {
+        setTimeout(function() {
+            handleSend({text: text, pinned: true});
+        }, 0);
+    };
+
     /**
      * Handle sending a message.
      */
-    const handleSend = function() {
+    const handleSend = function(opts) {
         if (quizLocked || attemptLocked) {
             return;
         }
-        const text = UI.getInputValue();
+        // A click handler passes its Event here; only our own resend carries text.
+        const resend = (opts && typeof opts.text === 'string') ? opts : null;
+        const text = resend ? resend.text : UI.getInputValue();
         if (!text || sending) {
             return;
         }
@@ -5641,6 +5781,8 @@ define([
         }
 
         setBottomMode('chat', {force: true});
+        // A pending language question is answered by sending something else.
+        UI.clearSuggestions();
         sending = true;
         sessionMessageCount++;
         UI.hideStarters();
@@ -5652,8 +5794,11 @@ define([
         // Track last session topic for personalized welcome-back.
         updateLastSession();
 
-        // Add user message.
-        addUserMsg(text, null);
+        // Add user message. A resend after the language question is the same
+        // question again, so it does not get a second bubble.
+        if (!resend) {
+            addUserMsg(text, null);
+        }
         UI.showTyping(true);
 
         // Accumulated response text.
@@ -5665,9 +5810,21 @@ define([
             courseid: courseId,
             message: text,
         };
-        const currentLang = Speech.getLang();
+        // Reply language: the question's own language outranks the saved SOLA
+        // language, which outranks the browser's. The server decides per
+        // message; it is told the language to fall back on, whether the learner
+        // saved it, and any language they already said no to this session.
+        const currentLang = resend && resend.lang ? resend.lang : Speech.getLang();
         if (currentLang) {
             postData.lang = currentLang;
+            postData.langsource = (resend && resend.lang) ? 'saved' : Speech.getLangSource();
+            if (resend && resend.pinned && postData.langsource === 'saved') {
+                postData.langsource = 'pinned';
+            }
+        }
+        const heldLangs = getLangHold();
+        if (heldLangs.length) {
+            postData.langhold = heldLangs.join(',');
         }
         if (currentPageId) {
             postData.pageid = currentPageId;
@@ -5818,7 +5975,12 @@ define([
                     if (parsed.scoreData && practiceSessionType) {
                         handleScoreData(parsed.scoreData, practiceSessionType);
                     }
-                    if (parsed.suggestions.length) {
+                    if (parsed.langAsked) {
+                        // The model asked whether to switch language instead of
+                        // answering; the buttons are the answer. With no usable
+                        // language to offer, the question is simply answered.
+                        showLangSwitchChoice(parsed.langSwitch || '', text);
+                    } else if (parsed.suggestions.length) {
                         UI.showSuggestions(parsed.suggestions, handleSuggestionClick);
                     } else if (parsed.text.trim().length > 0) {
                         // Smart fallback chips: comprehension-focused for long responses.

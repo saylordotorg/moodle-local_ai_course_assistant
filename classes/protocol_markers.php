@@ -126,6 +126,14 @@ final class protocol_markers {
             $text = self::replace('/\n*\[\s*\/\s*' . $m . '\s*\]\s*/i', '', $text);
         }
 
+        // Language-switch question marker. The sentence after it is the learner's
+        // question and is kept; only the tag goes. Closed form first, then an
+        // opener whose closer never came (keep the sentence, take the code), then
+        // any stray tag left over.
+        $text = self::replace('/\n*\[\s*SOLA_LANG_SWITCH\s*\][^\[\]\n]{0,12}\[\s*\/\s*SOLA_LANG_SWITCH\s*\][ \t]*\n?/i', '', $text);
+        $text = self::replace('/\n*\[\s*SOLA_LANG_SWITCH\s*\]\s*[a-z]{2,3}(?![a-z])[ \t]*\n?/i', '', $text);
+        $text = self::replace('/\n*\[\s*\/?\s*SOLA_LANG_SWITCH\s*\]\s*/i', '', $text);
+
         // SOURCE citations: [SOURCE:page], [[SOURCE:activity:86467]], any depth
         // of brackets, with or without an id.
         $text = self::replace('/\n*\[{1,3}\s*SOURCE\s*:[^\[\]]*\]{1,3}\s*/i', '', $text);
@@ -258,6 +266,25 @@ final class protocol_markers {
         );
 
         return $text;
+    }
+
+    /**
+     * The language SOLA is asking the learner about switching to, from the RAW reply.
+     *
+     * The reply carries [SOLA_LANG_SWITCH]xx[/SOLA_LANG_SWITCH] when the learner
+     * wrote in a supported language other than the one they saved. The closer is
+     * optional, matching how strip() treats every other marker. Only a supported
+     * code counts: a model that invents one gets no confirmation buttons.
+     *
+     * @param string $raw The reply before strip().
+     * @return string|null Two-letter code, or null when the reply asks nothing.
+     */
+    public static function lang_switch(string $raw): ?string {
+        if (!preg_match('/\[\s*SOLA_LANG_SWITCH\s*\]\s*([a-z]{2,3})(?![a-z])/i', $raw, $m)) {
+            return null;
+        }
+        $code = language_support::normalise($m[1] === 'fil' ? 'tl' : $m[1]);
+        return $code === '' ? null : $code;
     }
 
     /**

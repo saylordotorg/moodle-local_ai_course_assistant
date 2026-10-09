@@ -28,6 +28,10 @@ define([], function() {
 
     /** localStorage key for persisting language preference */
     const LANG_KEY = 'aica_lang';
+    /** Set to '1' only when the learner picked the language (picker or "yes, switch"). */
+    const LANG_CHOICE_KEY = 'aica_lang_choice';
+    /** @type {string|null} Language an English-locked course forces; never saved. */
+    let forcedLang = null;
 
     /**
      * Supported languages for STT/TTS.
@@ -35,56 +39,56 @@ define([], function() {
      */
     const SUPPORTED_LANGS = {
         // English (default)
-        'en': {name: 'English',     locale: 'en-US'},
+        'en': {name: 'English',     locale: 'en-US', native: 'English'},
         // Tier A — excellent browser STT/TTS support
-        'ar': {name: 'Arabic',      locale: 'ar-SA'},
-        'zh': {name: 'Chinese',     locale: 'zh-CN'},
-        'cs': {name: 'Czech',       locale: 'cs-CZ'},
-        'da': {name: 'Danish',      locale: 'da-DK'},
-        'nl': {name: 'Dutch',       locale: 'nl-NL'},
-        'fi': {name: 'Finnish',     locale: 'fi-FI'},
-        'fr': {name: 'French',      locale: 'fr-FR'},
-        'de': {name: 'German',      locale: 'de-DE'},
-        'bg': {name: 'Bulgarian',   locale: 'bg-BG'},
-        'el': {name: 'Greek',       locale: 'el-GR'},
-        'he': {name: 'Hebrew',      locale: 'he-IL'},
-        'hi': {name: 'Hindi',       locale: 'hi-IN'},
-        'hu': {name: 'Hungarian',   locale: 'hu-HU'},
-        'id': {name: 'Indonesian',  locale: 'id-ID'},
-        'it': {name: 'Italian',     locale: 'it-IT'},
-        'ja': {name: 'Japanese',    locale: 'ja-JP'},
-        'ko': {name: 'Korean',      locale: 'ko-KR'},
-        'nb': {name: 'Norwegian',   locale: 'nb-NO'},
-        'pl': {name: 'Polish',      locale: 'pl-PL'},
-        'pt': {name: 'Portuguese',  locale: 'pt-BR'},
-        'ro': {name: 'Romanian',    locale: 'ro-RO'},
-        'ru': {name: 'Russian',     locale: 'ru-RU'},
-        'sk': {name: 'Slovak',      locale: 'sk-SK'},
-        'es': {name: 'Spanish',     locale: 'es-ES'},
-        'sv': {name: 'Swedish',     locale: 'sv-SE'},
-        'ta': {name: 'Tamil',       locale: 'ta-IN'},
-        'th': {name: 'Thai',        locale: 'th-TH'},
-        'tr': {name: 'Turkish',     locale: 'tr-TR'},
-        'uk': {name: 'Ukrainian',   locale: 'uk-UA'},
-        'vi': {name: 'Vietnamese',  locale: 'vi-VN'},
+        'ar': {name: 'Arabic',      locale: 'ar-SA', native: 'العربية'},
+        'zh': {name: 'Chinese',     locale: 'zh-CN', native: '中文'},
+        'cs': {name: 'Czech',       locale: 'cs-CZ', native: 'Čeština'},
+        'da': {name: 'Danish',      locale: 'da-DK', native: 'Dansk'},
+        'nl': {name: 'Dutch',       locale: 'nl-NL', native: 'Nederlands'},
+        'fi': {name: 'Finnish',     locale: 'fi-FI', native: 'Suomi'},
+        'fr': {name: 'French',      locale: 'fr-FR', native: 'Français'},
+        'de': {name: 'German',      locale: 'de-DE', native: 'Deutsch'},
+        'bg': {name: 'Bulgarian',   locale: 'bg-BG', native: 'Български'},
+        'el': {name: 'Greek',       locale: 'el-GR', native: 'Ελληνικά'},
+        'he': {name: 'Hebrew',      locale: 'he-IL', native: 'עברית'},
+        'hi': {name: 'Hindi',       locale: 'hi-IN', native: 'हिन्दी'},
+        'hu': {name: 'Hungarian',   locale: 'hu-HU', native: 'Magyar'},
+        'id': {name: 'Indonesian',  locale: 'id-ID', native: 'Bahasa Indonesia'},
+        'it': {name: 'Italian',     locale: 'it-IT', native: 'Italiano'},
+        'ja': {name: 'Japanese',    locale: 'ja-JP', native: '日本語'},
+        'ko': {name: 'Korean',      locale: 'ko-KR', native: '한국어'},
+        'nb': {name: 'Norwegian',   locale: 'nb-NO', native: 'Norsk'},
+        'pl': {name: 'Polish',      locale: 'pl-PL', native: 'Polski'},
+        'pt': {name: 'Portuguese',  locale: 'pt-BR', native: 'Português'},
+        'ro': {name: 'Romanian',    locale: 'ro-RO', native: 'Română'},
+        'ru': {name: 'Russian',     locale: 'ru-RU', native: 'Русский'},
+        'sk': {name: 'Slovak',      locale: 'sk-SK', native: 'Slovenčina'},
+        'es': {name: 'Spanish',     locale: 'es-ES', native: 'Español'},
+        'sv': {name: 'Swedish',     locale: 'sv-SE', native: 'Svenska'},
+        'ta': {name: 'Tamil',       locale: 'ta-IN', native: 'தமிழ்'},
+        'th': {name: 'Thai',        locale: 'th-TH', native: 'ไทย'},
+        'tr': {name: 'Turkish',     locale: 'tr-TR', native: 'Türkçe'},
+        'uk': {name: 'Ukrainian',   locale: 'uk-UA', native: 'Українська'},
+        'vi': {name: 'Vietnamese',  locale: 'vi-VN', native: 'Tiếng Việt'},
         // Tier B — good/moderate browser STT/TTS support
-        'bn': {name: 'Bengali',     locale: 'bn-BD'},
-        'tl': {name: 'Filipino',    locale: 'fil-PH'},
-        'ms': {name: 'Malay',       locale: 'ms-MY'},
-        'pa': {name: 'Punjabi',     locale: 'pa-IN'},
+        'bn': {name: 'Bengali',     locale: 'bn-BD', native: 'বাংলা'},
+        'tl': {name: 'Filipino',    locale: 'fil-PH', native: 'Filipino'},
+        'ms': {name: 'Malay',       locale: 'ms-MY', native: 'Bahasa Melayu'},
+        'pa': {name: 'Punjabi',     locale: 'pa-IN', native: 'ਪੰਜਾਬੀ'},
         // Tier C — limited browser STT/TTS support (UI translation still works)
-        'am': {name: 'Amharic',     locale: 'am-ET'},
-        'ne': {name: 'Nepali',      locale: 'ne-NP'},
-        'sw': {name: 'Swahili',     locale: 'sw-KE'},
-        'zu': {name: 'Zulu',        locale: 'zu-ZA'},
+        'am': {name: 'Amharic',     locale: 'am-ET', native: 'አማርኛ'},
+        'ne': {name: 'Nepali',      locale: 'ne-NP', native: 'नेपाली'},
+        'sw': {name: 'Swahili',     locale: 'sw-KE', native: 'Kiswahili'},
+        'zu': {name: 'Zulu',        locale: 'zu-ZA', native: 'isiZulu'},
         // Tier D — very limited/no browser STT/TTS support (UI translation still works)
-        'bm': {name: 'Bambara',     locale: 'bm-ML'},
-        'ha': {name: 'Hausa',       locale: 'ha-NG'},
-        'ig': {name: 'Igbo',        locale: 'ig-NG'},
-        'om': {name: 'Oromo',       locale: 'om-ET'},
-        'so': {name: 'Somali',      locale: 'so-SO'},
-        'wo': {name: 'Wolof',       locale: 'wo-SN'},
-        'yo': {name: 'Yoruba',      locale: 'yo-NG'},
+        'bm': {name: 'Bambara',     locale: 'bm-ML', native: 'Bamanankan'},
+        'ha': {name: 'Hausa',       locale: 'ha-NG', native: 'Hausa'},
+        'ig': {name: 'Igbo',        locale: 'ig-NG', native: 'Igbo'},
+        'om': {name: 'Oromo',       locale: 'om-ET', native: 'Afaan Oromoo'},
+        'so': {name: 'Somali',      locale: 'so-SO', native: 'Soomaali'},
+        'wo': {name: 'Wolof',       locale: 'wo-SN', native: 'Wolof'},
+        'yo': {name: 'Yoruba',      locale: 'yo-NG', native: 'Yorùbá'},
     };
 
     /** @type {SpeechRecognition|null} */
@@ -99,26 +103,56 @@ define([], function() {
     // -----------------------------------------------------------------------
 
     /**
-     * Get the stored language code (ISO 639-1), or null if none set.
+     * Get the language the learner chose in SOLA's language picker, or null.
      *
-     * v5.0.0: when no explicit user preference exists, fall back to the
-     * Moodle session language (`M.cfg.language`) before the browser
-     * language. Addresses the Thelma v3.4.7 UT finding where a learner
-     * with their Moodle UI in English saw SOLA respond in Spanish because
-     * navigator.language was es-* on their device.
+     * Only an explicit choice counts: a code derived from the browser is not a
+     * saved setting, so SOLA never asks the learner to confirm a change away
+     * from it.
+     *
+     * @returns {string|null}
+     */
+    const getSavedLang = function() {
+        try {
+            const stored = localStorage.getItem(LANG_KEY);
+            if (stored && SUPPORTED_LANGS[stored]) {
+                // Before 7.9.0 the browser's language was written here on a first
+                // visit, so every existing learner has one. A value the picker
+                // wrote carries the choice flag. An older one counts as a choice
+                // only when it differs from the browser's language, because a
+                // difference cannot have come from the browser.
+                if (localStorage.getItem(LANG_CHOICE_KEY) === '1' || stored !== detectBrowserLang()) {
+                    return stored;
+                }
+            }
+        } catch (e) {
+            // localStorage unavailable -- fall through.
+        }
+        return null;
+    };
+
+    /**
+     * Get the language SOLA should use, by priority:
+     *   1. the language the learner saved in SOLA's language picker;
+     *   2. the browser's language;
+     *   3. the Moodle session language, when the browser's is not supported.
+     * (The language a question is written in outranks all three, but that is
+     * decided per message by the server, which is told this value and where
+     * it came from.)
      *
      * @returns {string|null}
      */
     const getLang = function() {
-        try {
-            const stored = localStorage.getItem(LANG_KEY);
-            if (stored) {
-                return stored;
-            }
-        } catch (e) {
-            // localStorage unavailable — fall through.
+        if (forcedLang) {
+            return forcedLang;
         }
-        // Prefer Moodle session language over browser language.
+        const saved = getSavedLang();
+        if (saved) {
+            return saved;
+        }
+        const browser = detectBrowserLang();
+        if (browser) {
+            return browser;
+        }
         try {
             if (typeof M !== 'undefined' && M.cfg && M.cfg.language) {
                 const moodleLang = String(M.cfg.language).split('_')[0].split('-')[0].toLowerCase();
@@ -127,9 +161,30 @@ define([], function() {
                 }
             }
         } catch (e) {
-            // M not available — fall through.
+            // M not available -- fall through.
         }
         return null;
+    };
+
+    /**
+     * Where getLang()'s answer came from, as the server expects it:
+     * 'saved' when the learner chose it, 'default' otherwise.
+     *
+     * @returns {string}
+     */
+    const getLangSource = function() {
+        return getSavedLang() ? 'saved' : 'default';
+    };
+
+    /**
+     * Force the language for this page (English-locked courses) without saving it.
+     * Saving it made one visit to a locked course look like a language choice in
+     * every other course, because localStorage is shared by the whole site.
+     *
+     * @param {string|null} code ISO 639-1 code, or null to release.
+     */
+    const setForcedLang = function(code) {
+        forcedLang = (code && SUPPORTED_LANGS[code]) ? code : null;
     };
 
     /**
@@ -140,6 +195,7 @@ define([], function() {
     const setLang = function(code) {
         try {
             localStorage.setItem(LANG_KEY, code);
+            localStorage.setItem(LANG_CHOICE_KEY, '1');
         } catch (e) {
             // localStorage unavailable — silently ignore.
         }
@@ -151,6 +207,7 @@ define([], function() {
     const clearLang = function() {
         try {
             localStorage.removeItem(LANG_KEY);
+            localStorage.removeItem(LANG_CHOICE_KEY);
         } catch (e) {
             // Ignore.
         }
@@ -174,9 +231,18 @@ define([], function() {
      * @returns {string|null}
      */
     const detectBrowserLang = function() {
-        const raw = (navigator.language || (navigator.languages && navigator.languages[0]) || 'en');
-        const code = raw.split('-')[0].toLowerCase();
-        return (SUPPORTED_LANGS[code]) ? code : null;
+        const list = (navigator.languages && navigator.languages.length)
+            ? Array.prototype.slice.call(navigator.languages)
+            : [navigator.language || 'en'];
+        for (let i = 0; i < list.length; i++) {
+            const code = String(list[i] || '').split('-')[0].toLowerCase();
+            // The old ISO code for Hebrew and the legacy Norwegian codes.
+            const mapped = {iw: 'he', no: 'nb', nn: 'nb', fil: 'tl'}[code] || code;
+            if (SUPPORTED_LANGS[mapped]) {
+                return mapped;
+            }
+        }
+        return null;
     };
 
     /**
@@ -877,6 +943,9 @@ define([], function() {
         SUPPORTED_LANGS:   SUPPORTED_LANGS,
         LANG_KEY:          LANG_KEY,
         getLang:           getLang,
+        getSavedLang:      getSavedLang,
+        setForcedLang:     setForcedLang,
+        getLangSource:     getLangSource,
         setLang:           setLang,
         clearLang:         clearLang,
         getLocale:         getLocale,

@@ -63,6 +63,7 @@ class get_realtime_token extends external_api {
             'mode' => new external_value(PARAM_ALPHA, 'Voice mode: conversation|ell', VALUE_DEFAULT, 'conversation'),
             'topic' => new external_value(PARAM_TEXT, 'Chosen speaking topic, if any', VALUE_DEFAULT, ''),
             'phrase' => new external_value(PARAM_TEXT, 'Pronunciation phrase for ELL mode, if any', VALUE_DEFAULT, ''),
+            'langsource' => new external_value(PARAM_ALPHA, "'pinned' when the learner saved the language, else ''", VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -77,16 +78,18 @@ class get_realtime_token extends external_api {
      *      augmentation block appended to the grounded prompt server-side.
      * @param string $topic Chosen speaking topic, if the learner picked one.
      * @param string $phrase Pronunciation phrase for ELL mode, if any.
+     * @param string $langsource 'pinned' when the learner saved the language, else empty.
      * @return array
      */
     public static function execute(int $courseid, int $pageid = 0, string $pagetitle = '', string $lang = '',
-            string $mode = 'conversation', string $topic = '', string $phrase = ''): array {
+            string $mode = 'conversation', string $topic = '', string $phrase = '', string $langsource = ''): array {
         global $USER;
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid,
             'pageid' => $pageid,
             'pagetitle' => $pagetitle,
             'lang' => $lang,
+            'langsource' => $langsource,
             'mode' => $mode,
             'topic' => $topic,
             'phrase' => $phrase,
@@ -128,15 +131,21 @@ class get_realtime_token extends external_api {
         // append a small voice-mode tail (no SOLA_NEXT markers, prefer
         // shorter spoken responses, no markdown). The realtime session will
         // pick this up on the first session.update from the client.
+        $langlocked = (bool) get_config('local_ai_course_assistant', 'english_lock_course_' . (int)$params['courseid']);
         try {
             $systemprompt = \local_ai_course_assistant\context_builder::build_system_prompt(
                 (int)$params['courseid'],
                 (int)$USER->id,
-                (string)$params['lang'],
+                $langlocked ? 'en' : (string)$params['lang'],
                 [],
                 (int)$params['pageid'],
                 (string)$params['pagetitle'],
-                ''
+                '',
+                // Voice cannot ask a question in chat: a saved language is pinned, and an
+                // English-locked course stays English whatever the browser says.
+                $langlocked
+                    ? \local_ai_course_assistant\language_support::SOURCE_LOCKED
+                    : \local_ai_course_assistant\language_support::normalise_source((string)$params['langsource'])
             );
             $hascurrentpage = ((int)$params['pageid'] > 0 && (string)$params['pagetitle'] !== '');
             $pagetitleq = (string)$params['pagetitle'];

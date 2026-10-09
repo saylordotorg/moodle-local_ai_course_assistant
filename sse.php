@@ -109,6 +109,10 @@ $courseid   = required_param('courseid', PARAM_INT);
 // and rendered client-side through the markdown renderer, never as raw HTML.
 $message    = required_param('message', PARAM_RAW);
 $lang       = optional_param('lang', '', PARAM_ALPHA);      // ISO 639-1 language preference.
+// Where that language came from ('saved' = the learner chose it in SOLA, anything else = a
+// browser default) and a language the learner already declined to switch to this session.
+$langsource = optional_param('langsource', '', PARAM_ALPHA);
+$langhold   = optional_param('langhold', '', PARAM_TEXT);  // Comma-separated codes.
 $pageid     = optional_param('pageid', 0, PARAM_INT);       // Course-module ID of the current page.
 $pagetitle  = optional_param('pagetitle', '', PARAM_TEXT);  // Title of the current resource/activity.
 $coachstyle = optional_param('coachingstyle', '', PARAM_ALPHA); // Coaching style: coach, buddy, tutor.
@@ -166,9 +170,13 @@ if ($logonly) {
 
 // English lock: force English for ELL courses regardless of student language preference.
 $englishlock = get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid);
+$langsource = \local_ai_course_assistant\language_support::normalise_source($langsource);
 if ($englishlock) {
     $lang = 'en';
+    $langsource = \local_ai_course_assistant\language_support::SOURCE_LOCKED;
 }
+$lang       = \local_ai_course_assistant\language_support::normalise($lang);
+$langhold   = \local_ai_course_assistant\language_support::normalise_list($langhold);
 
 // Validate context and capability.
 $context = context_course::instance($courseid);
@@ -581,7 +589,9 @@ try {
         $retrievedchunks,
         $pageid,
         $pagetitle,
-        $quizmode
+        $quizmode,
+        $langsource,
+        $langhold
     );
 
     // Accessibility: reading-level adjustment (v3.9.21). Appended after the
