@@ -233,6 +233,52 @@ final class quiz_balance_wiring_test extends \advanced_testcase {
         $this->assertNull($provider->get_last_token_usage(), 'A failed call must not leave the previous usage behind.');
     }
 
+    public function test_a_question_with_an_absolute_distractor_is_repaired_even_when_lengths_match(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $q = [
+            'id' => 1, 'question' => 'Q?', 'correct' => 'B', 'explanation' => 'Because.',
+            'choices' => ['A) rules for every firm', 'B) a framework for markets', 'C) tools of use to few', 'D) ideas of mixed value'],
+        ];
+        $reply = json_encode(['items' => [['id' => 0, 'distractors' => [
+            'rules for most large firms', 'tools of use to some', 'ideas of mixed value',
+        ]]]]);
+        $provider = $this->fake($reply);
+        $out = $this->balance($provider, [$q]);
+        $this->assertSame(1, $provider->calls);
+        $this->assertSame([], quiz_choice_balancer::flag_absolutes([$out[0]]));
+        $this->assertContains('rules for most large firms', array_map([quiz_choice_balancer::class, 'strip_label'], $out[0]['choices']));
+    }
+
+    public function test_the_request_names_the_absolute_words_it_found(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $seen = (object) ['user' => ''];
+        $provider = new class($seen) {
+            /** @var object */
+            private $seen;
+
+            public function __construct($seen) {
+                $this->seen = $seen;
+            }
+
+            public function chat_completion(string $system, array $messages, array $options = []): string {
+                $this->seen->user = $messages[0]['content'];
+                return '{}';
+            }
+
+            public function get_last_token_usage(): ?array {
+                return null;
+            }
+        };
+        $q = [
+            'id' => 1, 'question' => 'Q?', 'correct' => 'B', 'explanation' => 'Because.',
+            'choices' => ['A) rules for every firm', 'B) a framework for markets', 'C) tools used only by few', 'D) ideas of mixed value'],
+        ];
+        $this->balance($provider, [$q]);
+        $this->assertStringContainsString('"absolute_words_in_current_distractors":["every","only"]', $seen->user);
+    }
+
     public function test_garbage_reply_is_ignored(): void {
         $this->resetAfterTest();
         $this->setAdminUser();

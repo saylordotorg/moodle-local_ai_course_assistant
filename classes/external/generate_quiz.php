@@ -398,7 +398,7 @@ class generate_quiz extends external_api {
      */
     private static function balance_questions($provider, array $questions, int $courseid, string $topic, int $cmid): array {
         try {
-            $flagged = quiz_choice_balancer::flag_long_keys($questions);
+            $flagged = quiz_choice_balancer::needs_repair($questions);
             if ($flagged) {
                 $questions = self::repair_long_keys($provider, $questions, $flagged, $courseid, $topic, $cmid);
             }
@@ -428,7 +428,7 @@ class generate_quiz extends external_api {
         $pending = $flagged;
         for ($round = 1; $round <= 2 && $pending; $round++) {
             $questions = self::rewrite_round($provider, $questions, $pending, $courseid, $topic, $cmid, $round);
-            $pending = array_values(array_intersect($pending, quiz_choice_balancer::flag_long_keys($questions)));
+            $pending = array_values(array_intersect($pending, quiz_choice_balancer::needs_repair($questions)));
         }
         return $questions;
     }
@@ -466,6 +466,13 @@ class generate_quiz extends external_api {
                 'correct_answer_length' => \core_text::strlen($key),
                 'current_distractors' => $distractors,
             ];
+            $found = array_values(array_unique(array_merge(...array_map(
+                [quiz_choice_balancer::class, 'absolutes_in'],
+                $distractors
+            ))));
+            if ($found) {
+                $item['absolute_words_in_current_distractors'] = $found;
+            }
             if ($round > 1) {
                 $item['current_distractor_lengths'] = array_map(static fn($d) => \core_text::strlen($d), $distractors);
             }
@@ -484,7 +491,10 @@ class generate_quiz extends external_api {
                 : '')
             . "- Each must be a plausible misconception, common mistake or near-miss, and clearly wrong.\n"
             . "- Same grammatical form as the correct answer; no \"all of the above\" or \"none of the above\".\n"
-            . "- No absolute words (always, never, only, exclusively, obviously, certainly).\n"
+            . "- NO absolute or extreme words in any distractor: always, never, only, solely, exclusively, entirely, "
+            . "completely, all, every, none, nothing, must, exact, exactly, eliminate, guarantee, impossible, "
+            . "absolutely, definitely, certainly, obviously, 100%. A distractor that contains one is wrong the moment a "
+            . "learner reads it; items listing absolute_words_in_current_distractors must lose those words.\n"
             . "- Never equal to the correct answer or to each other, and clearly wrong given why_correct.\n"
             . "Return ONLY JSON of exactly this shape, with one entry per item and the item's id: "
             . '{"items":[{"id":0,"distractors":["...","...","..."]}]}';
@@ -741,7 +751,7 @@ Quality rules (strict — apply to every question):
 - The four choices MUST be similar in length (within 25% of each other) and grammatical form. Do not let the correct answer stand out by being noticeably longer or more specific than the distractors.
 - Each distractor MUST reflect a plausible misconception, common mistake, or a near-miss restatement of the correct answer. Random or absurd distractors are not acceptable.
 - Do NOT include the choices "All of the above", "None of the above", or "Both A and B" as either correct answers or distractors.
-- Do NOT use absolute clue words ("always", "never", "exclusively", "obviously", "certainly", "the only") in either the question stem or the answer choices, since these telegraph correctness or wrongness.
+- Do NOT use absolute or extreme clue words ("always", "never", "only", "exclusively", "entirely", "completely", "all", "every", "none", "must", "exact", "eliminate", "guarantee", "impossible", "obviously", "certainly", "100%") in either the question stem or the answer choices, since these telegraph correctness or wrongness. Hedged wording ("most", "often", "typically", "tends to") is the right register for every choice.
 - Do NOT include the correct answer's exact phrasing inside the question stem.
 - In "explanation", never refer to a choice by its letter (no "option B", "(C)" or "A is correct"); describe the answer in words, because the choices are shuffled after you write them.
 

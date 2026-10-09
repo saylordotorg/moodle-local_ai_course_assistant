@@ -169,6 +169,46 @@ final class quiz_choice_balancer_test extends \basic_testcase {
         $this->assertFalse(quiz_choice_balancer::closes_the_gap('short', ['longer one'], ['x']), 'No lead to close.');
     }
 
+    public function test_absolute_words_are_found_as_whole_words(): void {
+        $this->assertSame(['only', 'exact'], quiz_choice_balancer::absolutes_in('Relevant only to firms with an exact margin'));
+        $this->assertSame(['all', 'eliminate'], quiz_choice_balancer::absolutes_in('They ALL eliminate the need for research'));
+        $this->assertSame([], quiz_choice_balancer::absolutes_in('Overall, an allocation of resources typically helps'));
+        $this->assertSame([], quiz_choice_balancer::absolutes_in('Most firms often rely on market research'));
+        $this->assertSame(['100%'], quiz_choice_balancer::absolutes_in('Delivers 100% of the benefit'));
+    }
+
+    public function test_only_distractors_are_flagged_for_absolutes(): void {
+        $dirty = [
+            'choices' => ['A) Frameworks that explain markets', 'B) Rules that apply to all firms', 'C) Tools of use to few', 'D) Ideas of mixed value'],
+            'correct' => 'A',
+        ];
+        $keyabsolute = [
+            'choices' => ['A) Applies to all firms', 'B) Tools of use to few', 'C) Ideas of mixed value', 'D) Rules for some cases'],
+            'correct' => 'A',
+        ];
+        $this->assertSame([0], quiz_choice_balancer::flag_absolutes([0 => $dirty, 1 => $keyabsolute]));
+    }
+
+    public function test_needs_repair_unites_both_reasons_without_repeats(): void {
+        $longkey = [
+            'choices' => ['A) a much longer and more specific correct answer', 'B) short one', 'C) short two', 'D) short 3'],
+            'correct' => 'A',
+        ];
+        $absolute = ['choices' => ['A) alpha text', 'B) bravo only', 'C) charlie tx', 'D) delta text'], 'correct' => 'A'];
+        $both = $longkey;
+        $both['choices'][1] = 'B) never short';
+        $this->assertSame([0, 1, 2], quiz_choice_balancer::needs_repair([0 => $longkey, 1 => $absolute, 2 => $both, 3 => $this->q()]));
+    }
+
+    public function test_a_replacement_with_an_absolute_is_never_accepted(): void {
+        $key = 'a correct answer of some length';
+        $this->assertFalse(quiz_choice_balancer::distractors_acceptable(
+            $key,
+            ['another answer of some size', 'one more answer applying to all cases', 'a third plausible choice here']
+        ));
+        $this->assertFalse(quiz_choice_balancer::closes_the_gap(str_repeat('k', 100), [str_repeat('o', 50)], ['only ' . str_repeat('a', 80)]));
+    }
+
     public function test_with_distractors_keeps_the_key_in_place(): void {
         $q = $this->q();
         $q['correct'] = 'C';
