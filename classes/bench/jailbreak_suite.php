@@ -407,9 +407,12 @@ class jailbreak_suite {
      *
      * @param int $courseid
      * @param int $userid
+     * @param string $lang Reply language the browser would send ('' = none, as the suite has always run).
+     * @param string $langsource Where that language came from: saved, pinned or default (v7.8.5, so the
+     *                           saved-language ask and the pinned directive can be put through the suite).
      * @return string
      */
-    public static function build_prompt(int $courseid, int $userid): string {
-        return context_builder::build_system_prompt($courseid, $userid, '', self::HOSTILE_CHUNK, 0, '');
+    public static function build_prompt(int $courseid, int $userid, string $lang = '', string $langsource = ''): string {
+        return context_builder::build_system_prompt($courseid, $userid, $lang, self::HOSTILE_CHUNK, 0, '', '', $langsource);
     }
 }

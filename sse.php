@@ -109,6 +109,12 @@ $courseid   = required_param('courseid', PARAM_INT);
 // and rendered client-side through the markdown renderer, never as raw HTML.
 $message    = required_param('message', PARAM_RAW);
 $lang       = optional_param('lang', '', PARAM_ALPHA);      // ISO 639-1 language preference.
+// Where that language came from ('saved' = the learner chose it in SOLA, anything else = a
+// browser default) and a language the learner already declined to switch to this session.
+$langsource = optional_param('langsource', '', PARAM_ALPHA);
+$langhold   = optional_param('langhold', '', PARAM_TEXT);  // Comma-separated codes.
+// 1 when the browser sends the same question again after the language question: it is already stored once.
+$resend     = optional_param('resend', 0, PARAM_BOOL);
 $pageid     = optional_param('pageid', 0, PARAM_INT);       // Course-module ID of the current page.
 $pagetitle  = optional_param('pagetitle', '', PARAM_TEXT);  // Title of the current resource/activity.
 $coachstyle = optional_param('coachingstyle', '', PARAM_ALPHA); // Coaching style: coach, buddy, tutor.
@@ -166,9 +172,13 @@ if ($logonly) {
 
 // English lock: force English for ELL courses regardless of student language preference.
 $englishlock = get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid);
+$langsource = \local_ai_course_assistant\language_support::normalise_source($langsource);
 if ($englishlock) {
     $lang = 'en';
+    $langsource = \local_ai_course_assistant\language_support::SOURCE_LOCKED;
 }
+$lang       = \local_ai_course_assistant\language_support::normalise($lang);
+$langhold   = \local_ai_course_assistant\language_support::normalise_list($langhold);
 
 // Validate context and capability.
 $context = context_course::instance($courseid);
@@ -423,8 +433,9 @@ try {
         exit;
     }
 
-    // Save user message with interaction context.
-    $usermsgid = conversation_manager::add_message(
+    // Save user message with interaction context. A resend after the language
+    // question is the question the history already holds, so it is not stored twice.
+    $usermsgid = $resend ? 0 : conversation_manager::add_message(
         $conv->id,
         $userid,
         $courseid,
@@ -581,7 +592,9 @@ try {
         $retrievedchunks,
         $pageid,
         $pagetitle,
-        $quizmode
+        $quizmode,
+        $langsource,
+        $langhold
     );
 
     // Accessibility: reading-level adjustment (v3.9.21). Appended after the
@@ -671,6 +684,11 @@ try {
     // so stale off-topic history does not inflate cost or invite drift; in
     // recency mode it is the long-standing last-N-pairs behaviour.
     $history = \local_ai_course_assistant\history_selector::select_for_api($conv->id, $message);
+    if ($resend && (!$history || (end($history)['role'] ?? '') !== 'user')) {
+        // The stored copy of this question is followed by the language question, so it
+        // no longer closes the history; the model still has to answer it.
+        $history[] = ['role' => 'user', 'content' => $message];
+    }
 
     // Create provider. Admin LLM picker can override the provider/model for
     // side-by-side comparison. Requires the manage capability; students always
@@ -1105,6 +1123,12 @@ try {
         $citations ?? [],
         $modulesmap ?? []
     );
+    // A reply that is the language question keeps the language it offered, so a
+    // reloaded history can draw the two buttons again.
+    $langask = \local_ai_course_assistant\protocol_markers::lang_switch((string) $fullresponse);
+    if ($langask !== null) {
+        $sourcetag = 'langask:' . $langask;
+    }
     $assistantmsgid = conversation_manager::add_message(
         $conv->id,
         $userid,

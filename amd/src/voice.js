@@ -459,6 +459,9 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         if (cfg.lang) {
             postBody.lang = cfg.lang;
         }
+        if (cfg.langsource) {
+            postBody.langsource = cfg.langsource;
+        }
         if (cfg.pageId) {
             postBody.pageid = cfg.pageId;
         }
@@ -814,6 +817,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
             sessKey:  config.sessKey  || '',
             sseUrl:   config.sseUrl   || '',
             lang:     config.lang     || 'en-US',
+            langsource: config.langsource || '',
             voice:    voice || 'shimmer',
             pageId:   config.pageId   || 0,
             pageTitle: config.pageTitle || '',

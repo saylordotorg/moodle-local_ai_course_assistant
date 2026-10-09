@@ -126,6 +126,24 @@ define([
      */
     const NEXT_BLOCK_RE = /\n*\[\s*SOLA_NEXT\s*\]((?:(?!\[\s*SOLA_NEXT\s*\])[\s\S])*?)\[\s*\/\s*SOLA_NEXT\s*\]/i;
     /**
+     * @type {RegExp} The language-switch question the model asks, with a
+     * two-letter code and an optional closer, mirroring protocol_markers.php.
+     */
+    const LANG_SWITCH_RE = /\n*\[\s*SOLA_LANG_SWITCH\s*\]\s*([a-z]{2,3})(?![a-z])(?:\s*\[\s*\/\s*SOLA_LANG_SWITCH\s*\])?[ \t]*\n?/i;
+    /** @type {RegExp} Any language-switch tag left behind after the match above. */
+    const LANG_SWITCH_STRAY_RE = /\n*\[\s*\/?\s*SOLA_LANG_SWITCH\s*\]\s*/ig;
+    /**
+     * @type {RegExp} The model's confirmation of a typed answer to the language
+     * question: SET (they agreed) or KEEP (they did not), plus the language code.
+     */
+    const LANG_ANSWER_RE = /\n*\[\s*SOLA_LANG_(SET|KEEP)\s*\]\s*([a-z]{2,3})(?![a-z])(?:\s*\[\s*\/\s*SOLA_LANG_(?:SET|KEEP)\s*\])?[ \t]*\n?/i;
+    /** @type {RegExp} Any set/keep tag left behind after the match above. */
+    const LANG_ANSWER_STRAY_RE = /\n*\[\s*\/?\s*SOLA_LANG_(?:SET|KEEP)\s*\]\s*/ig;
+    /** @type {RegExp} A set/keep tag still arriving while streaming. */
+    const LANG_ANSWER_OPEN_RE = /\n*\[\s*SOLA_LANG_(?:SET|KEEP)\s*\]\s*[a-z]{0,3}\s*(?:\[\s*\/?[A-Z_]*)?$/i;
+    /** @type {RegExp} A language-switch tag still arriving while streaming. */
+    const LANG_SWITCH_OPEN_RE = /\n*\[\s*SOLA_LANG_SWITCH\s*\]\s*[a-z]{0,3}\s*(?:\[\s*\/?[A-Z_]*)?$/i;
+    /**
      * @type {RegExp} Unterminated follow-up marker — the model opened [SOLA_NEXT]
      * but never emitted a closing tag (observed in production on BUS101). The
      * streaming path already hid this form; without it here the open tag
@@ -245,6 +263,35 @@ define([
             }).slice(0, 4);
         };
 
+        // The language-switch question comes first: when the model asks it, the
+        // reply is only the question, and what the learner picks decides what
+        // happens next.
+        let langSwitch = null;
+        let langAsked = false;
+        const langMatch = cleanText.match(LANG_SWITCH_RE);
+        if (langMatch) {
+            // Asked, even if the code is one SOLA does not support: the reply is
+            // then only a question with nothing to click, so the caller must
+            // send the learner's message again rather than leave it unanswered.
+            langAsked = true;
+            const raw = langMatch[1].toLowerCase();
+            const code = raw === 'fil' ? 'tl' : raw;
+            langSwitch = (Speech.getLangInfo && Speech.getLangInfo(code)) ? code : null;
+        }
+        cleanText = cleanText.replace(LANG_SWITCH_RE, '').replace(LANG_SWITCH_STRAY_RE, '').trimStart();
+
+        // The learner typed their answer instead of pressing a button.
+        let langAnswer = null;
+        const answerMatch = cleanText.match(LANG_ANSWER_RE);
+        if (answerMatch) {
+            const rawCode = answerMatch[2].toLowerCase();
+            const answerCode = rawCode === 'fil' ? 'tl' : rawCode;
+            if (Speech.getLangInfo && Speech.getLangInfo(answerCode)) {
+                langAnswer = {verdict: answerMatch[1].toLowerCase(), code: answerCode};
+            }
+        }
+        cleanText = cleanText.replace(LANG_ANSWER_RE, '').replace(LANG_ANSWER_STRAY_RE, '').trimEnd();
+
         const nextMatch = cleanText.match(NEXT_BLOCK_RE);
         if (nextMatch) {
             suggestions = harvestChips(nextMatch[1]);
@@ -343,6 +390,9 @@ define([
             sourceType: sourceType,
             sourceCmid: sourceCmid,
             scoreData: scoreData,
+            langSwitch: langSwitch,
+            langAnswer: langAnswer,
+            langAsked: langAsked || /SOLA_LANG_SWITCH/i.test(((text || '') + '')),
         };
     };
 
@@ -361,6 +411,12 @@ define([
      */
     const stripStreamingDecorators = function(fullText) {
         let displayText = ((fullText || '') + '')
+            .replace(LANG_ANSWER_OPEN_RE, '')
+            .replace(LANG_ANSWER_RE, '')
+            .replace(LANG_ANSWER_STRAY_RE, '')
+            .replace(LANG_SWITCH_OPEN_RE, '')
+            .replace(LANG_SWITCH_RE, '')
+            .replace(LANG_SWITCH_STRAY_RE, '')
             .replace(NEXT_BLOCK_RE, '')
             .replace(SOURCE_STRIP_RE, '')
             .replace(SCORE_BLOCK_RE, '')
@@ -1332,6 +1388,8 @@ define([
 
         return {
             lang: Speech.getLang() || '',
+            // Voice cannot ask a question in chat, so a saved language is pinned.
+            langsource: Speech.getLangSource() === 'saved' ? 'pinned' : '',
             pageId: currentPageId || 0,
             pageTitle: currentPageTitle || '',
             pageHeading: getContextDebugHeading() || (root ? (root.dataset.serverPageHeading || '') : ''),
@@ -1373,6 +1431,23 @@ define([
         });
     };
 
+    /** @type {string[]} Custom chips from the most recent reply, shown again on return to chat. */
+    let lastChatChips = [];
+
+    /**
+     * Show the conversation starters and, below the last message, the custom
+     * chips the most recent reply offered. Used whenever the learner comes back
+     * to the chat from another part of SOLA (voice, history, progress, a quiz or
+     * study panel, reset), so the default chips and the latest custom chips are
+     * both there.
+     */
+    const showStartersWithChips = function() {
+        UI.showStarters();
+        if (lastChatChips.length && !sending) {
+            UI.showSuggestions(lastChatChips, handleSuggestionClick);
+        }
+    };
+
     /**
      * Switch the footer mode and clean up conflicting UI state.
      *
@@ -1391,7 +1466,7 @@ define([
             }
             // Re-clicking Chat tab shows conversation starters.
             if (normalized === 'chat') {
-                UI.showStarters();
+                showStartersWithChips();
             }
             return;
         }
@@ -1422,7 +1497,7 @@ define([
 
         // Re-clicking Chat tab (force=true) shows conversation starters.
         if (normalized === 'chat' && options.force) {
-            UI.showStarters();
+            showStartersWithChips();
         }
         if (normalized === 'voice') {
             syncVoicePanel();
@@ -1597,13 +1672,13 @@ define([
     };
 
     /**
-     * Auto-set language from browser on first visit; update label on subsequent visits.
+     * Show the language SOLA will use: the saved one, else the browser's.
      */
     const initLanguage = function() {
         // English Lock: if active, force English and skip auto-detection.
         var rootEl = document.getElementById('local-ai-course-assistant');
         if (rootEl && rootEl.dataset.englishLock === '1') {
-            Speech.setLang('en');
+            Speech.setForcedLang('en');
             UI.setLangLabel('English (Locked)');
             return;
         }
@@ -1620,12 +1695,14 @@ define([
             return;
         }
 
-        // Auto-detect and silently apply browser language.
-        const detected = Speech.detectBrowserLang();
+        // Nothing saved: follow the browser's language for the label and the
+        // starters, but do not save it. Saving made the browser's guess look
+        // like a choice the learner had made, which SOLA then asked them to
+        // confirm changing.
+        const detected = Speech.getLang();
         if (detected) {
             const info = Speech.getLangInfo(detected);
             if (info) {
-                Speech.setLang(detected);
                 UI.setLangLabel(info.name);
                 updateStarterTexts(detected);
                 return;
@@ -2774,7 +2851,7 @@ define([
                 },
                 function onCancel() {
                     UI.hideTopicPicker();
-                    UI.showStarters();
+                    showStartersWithChips();
                 }
             );
             return;
@@ -2810,7 +2887,7 @@ define([
         UI.clearSuggestions();
         setBottomMode('chat', {force: true});
         syncVoicePanel();
-        UI.showStarters();
+        showStartersWithChips();
     };
 
     /**
@@ -3119,7 +3196,6 @@ define([
         if (text === 'Start something new' || text === 'Start fresh') {
             UI.clearSuggestions();
             setBottomMode('chat', {force: true});
-            UI.showStarters();
             return;
         }
         UI.clearSuggestions();
@@ -3269,7 +3345,7 @@ define([
         UI.clearSuggestions();
         UI.hideVoiceOverlay();
         syncVoicePanel();
-        UI.showStarters();
+        showStartersWithChips();
     };
 
     /**
@@ -3640,6 +3716,7 @@ define([
                     sessKey:  sessKey,
                     sseUrl:   sseUrl,
                     lang:     Speech.getLang(),
+                    langsource: Speech.getLangSource() === 'saved' ? 'pinned' : '',
                     greeting: buildPracticeSpeakingGreeting(selectionLabel),
                     pageId: currentPageId || 0,
                     pageTitle: currentPageTitle || '',
@@ -4641,7 +4718,7 @@ define([
                     }, function onExit() {
                         quizModeActive = false;
                         setQuizBtnActive(quizBtn, false);
-                        UI.showStarters();
+                        showStartersWithChips();
                         if (pendingQuizChips) {
                             const chips = pendingQuizChips;
                             pendingQuizChips = null;
@@ -4664,7 +4741,7 @@ define([
                 quizModeActive = false;
                 setQuizBtnActive(quizBtn, false);
                 UI.hideQuizSetup();
-                UI.showStarters();
+                showStartersWithChips();
             }
         );
     };
@@ -4793,7 +4870,7 @@ define([
         const existing = drawer.querySelector('.aica-study-setup');
         if (existing) {
             existing.remove();
-            UI.showStarters();
+            showStartersWithChips();
             return;
         }
 
@@ -5012,7 +5089,7 @@ define([
         cancelBtn.addEventListener('click', function() {
             panel.remove();
             drawer.classList.remove('local-ai-course-assistant__drawer--quiz-setup');
-            UI.showStarters();
+            showStartersWithChips();
         });
         panel.appendChild(cancelBtn);
 
@@ -5420,6 +5497,8 @@ define([
             setConversationHistory(result && result.messages ? result.messages : []);
             if (result.messages && result.messages.length > 0) {
                 let lastSuggestions = [];
+                let pendingLangAsk = '';
+                let lastUserText = '';
                 let prevDateKey = null;
                 const today = new Date();
                 const yesterday = new Date(today);
@@ -5451,6 +5530,8 @@ define([
                         const parsed = parseAssistantDecorators(text);
                         text = parsed.text;
                         lastSuggestions = parsed.suggestions;
+                        lastChatChips = parsed.suggestions.slice();
+                        pendingLangAsk = msg.lang_ask ? msg.lang_ask : '';
                         addAssistantMsg(text, msg.timecreated ? msg.timecreated * 1000 : null, {
                             skipHistory: true,
                             // The stored copy has its markers stripped, so the pill comes from
@@ -5462,6 +5543,7 @@ define([
                             alreadyClean: true,
                         });
                     } else {
+                        lastUserText = text;
                         addUserMsg(text, msg.timecreated ? msg.timecreated * 1000 : null, {
                             skipHistory: true,
                         });
@@ -5478,6 +5560,9 @@ define([
                         ['Continue our conversation', 'Quiz me on what we covered', 'What should I focus on next?'],
                         handleSuggestionClick
                     );
+                } else if (pendingLangAsk && lastMsg.role === 'assistant' && lastUserText) {
+                    // The last thing SOLA did was ask about switching language: put the buttons back.
+                    showLangSwitchChoice(pendingLangAsk, lastUserText, true);
                 } else if (lastSuggestions.length) {
                     // Re-show chips from the last assistant message that had them.
                     UI.showSuggestions(lastSuggestions, handleSuggestionClick);
@@ -5601,14 +5686,122 @@ define([
         });
     };
 
+    /** @type {string} sessionStorage key for languages the learner declined to switch to. */
+    const LANG_HOLD_KEY = 'aica_lang_hold';
+
+    /**
+     * Languages the learner said "keep my language" to during this browser session.
+     *
+     * @returns {Array<string>}
+     */
+    const getLangHold = function() {
+        try {
+            return (sessionStorage.getItem(LANG_HOLD_KEY) || '').split(',').filter(function(c) {
+                return c && Speech.getLangInfo(c);
+            });
+        } catch (e) {
+            return [];
+        }
+    };
+
+    /**
+     * Remember that the learner does not want SOLA to ask again about a language.
+     *
+     * @param {string} code
+     */
+    const addLangHold = function(code) {
+        const held = getLangHold();
+        if (held.indexOf(code) === -1) {
+            held.push(code);
+        }
+        try {
+            sessionStorage.setItem(LANG_HOLD_KEY, held.join(','));
+        } catch (e) { /**/ }
+    };
+
+    /**
+     * Change SOLA's saved language and everything that shows it.
+     *
+     * @param {string} code ISO 639-1 code.
+     */
+    const applyLanguageChoice = function(code) {
+        const info = Speech.getLangInfo(code);
+        if (!info) {
+            return;
+        }
+        Speech.setLang(code);
+        UI.setLangLabel(info.name);
+        updateStarterTexts(code);
+        updateUiTextsForLang(code);
+    };
+
+    /**
+     * Offer the two answers to "switch SOLA to the language you wrote in?".
+     *
+     * The buttons carry each language's own name, so they read correctly
+     * whatever language the learner can read and need no translations. Yes
+     * saves the new language and asks the question again in it; No keeps the
+     * saved language, remembers the refusal so SOLA does not ask again this
+     * session, and asks the question again in the saved language.
+     *
+     * @param {string} code Language the learner wrote in.
+     * @param {string} originalText The question that prompted the ask.
+     * @param {boolean} [quiet] True when redrawing the buttons from saved history: offer them if they still
+     *                          make sense, and never send anything on the learner's behalf.
+     */
+    const showLangSwitchChoice = function(code, originalText, quiet) {
+        const wrote = Speech.getLangInfo(code);
+        const savedCode = Speech.getSavedLang() || Speech.getLang();
+        const saved = savedCode ? Speech.getLangInfo(savedCode) : null;
+        if (!wrote || !saved || savedCode === code || getLangHold().indexOf(code) !== -1) {
+            // Nothing sensible to offer, or the learner already said no to this
+            // language: answer the question in the saved language. Deferred
+            // because the stream that asked has not released the send lock yet.
+            if (!quiet) {
+                askAgainPinned(originalText);
+            }
+            return;
+        }
+        UI.showSuggestions([wrote.native, saved.native], function(label) {
+            if (sending) {
+                // A reply is already streaming (the learner typed something
+                // else). Changing the language now would save it and then lose
+                // the question, so leave the choice for the next ask.
+                return;
+            }
+            UI.clearSuggestions();
+            if (label === wrote.native) {
+                applyLanguageChoice(code);
+                handleSend({text: originalText, lang: code});
+            } else {
+                addLangHold(code);
+                handleSend({text: originalText, pinned: true});
+            }
+        });
+    };
+
+    /**
+     * Send a question again, this time answered in the saved language without
+     * another ask.
+     *
+     * @param {string} text The learner's original question.
+     */
+    const askAgainPinned = function(text) {
+        setTimeout(function() {
+            handleSend({text: text, pinned: true});
+        }, 0);
+    };
+
     /**
      * Handle sending a message.
      */
-    const handleSend = function() {
+    const handleSend = function(opts) {
         if (quizLocked || attemptLocked) {
             return;
         }
-        const text = UI.getInputValue();
+        // A click handler passes its Event here; only our own resend carries text.
+        const resend = (opts && typeof opts.text === 'string') ? opts : null;
+        const text = resend ? resend.text : UI.getInputValue();
         if (!text || sending) {
             return;
         }
@@ -5641,6 +5834,8 @@ define([
         }
 
         setBottomMode('chat', {force: true});
+        // A pending language question is answered by sending something else.
+        UI.clearSuggestions();
         sending = true;
         sessionMessageCount++;
         UI.hideStarters();
@@ -5652,8 +5847,11 @@ define([
         // Track last session topic for personalized welcome-back.
         updateLastSession();
 
-        // Add user message.
-        addUserMsg(text, null);
+        // Add user message. A resend after the language question is the same
+        // question again, so it does not get a second bubble.
+        if (!resend) {
+            addUserMsg(text, null);
+        }
         UI.showTyping(true);
 
         // Accumulated response text.
@@ -5665,9 +5863,24 @@ define([
             courseid: courseId,
             message: text,
         };
-        const currentLang = Speech.getLang();
+        // Reply language: the question's own language outranks the saved SOLA
+        // language, which outranks the browser's. The server decides per
+        // message; it is told the language to fall back on, whether the learner
+        // saved it, and any language they already said no to this session.
+        const currentLang = resend && resend.lang ? resend.lang : Speech.getLang();
         if (currentLang) {
             postData.lang = currentLang;
+            postData.langsource = (resend && resend.lang) ? 'saved' : Speech.getLangSource();
+            if (resend && resend.pinned && postData.langsource === 'saved') {
+                postData.langsource = 'pinned';
+            }
+        }
+        if (resend) {
+            postData.resend = 1;
+        }
+        const heldLangs = getLangHold();
+        if (heldLangs.length) {
+            postData.langhold = heldLangs.join(',');
         }
         if (currentPageId) {
             postData.pageid = currentPageId;
@@ -5818,7 +6031,21 @@ define([
                     if (parsed.scoreData && practiceSessionType) {
                         handleScoreData(parsed.scoreData, practiceSessionType);
                     }
-                    if (parsed.suggestions.length) {
+                    if (parsed.langAnswer) {
+                        // The learner typed yes or no to the language question.
+                        if (parsed.langAnswer.verdict === 'set') {
+                            applyLanguageChoice(parsed.langAnswer.code);
+                        } else {
+                            addLangHold(parsed.langAnswer.code);
+                        }
+                    }
+                    if (parsed.langAsked) {
+                        // The model asked whether to switch language instead of
+                        // answering; the buttons are the answer. With no usable
+                        // language to offer, the question is simply answered.
+                        showLangSwitchChoice(parsed.langSwitch || '', text);
+                    } else if (parsed.suggestions.length) {
+                        lastChatChips = parsed.suggestions.slice();
                         UI.showSuggestions(parsed.suggestions, handleSuggestionClick);
                     } else if (parsed.text.trim().length > 0) {
                         // Smart fallback chips: comprehension-focused for long responses.
@@ -5829,6 +6056,7 @@ define([
                             .filter(function(c) {
                                 return isQuizEnabled() || c !== 'Quiz me on this';
                             });
+                        lastChatChips = chips.slice();
                         UI.showSuggestions(chips, handleSuggestionClick);
                     }
                 } else if (doneData && doneData.truncated && doneData.truncatednote) {
