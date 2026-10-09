@@ -81,6 +81,7 @@ class get_history extends external_api {
             ];
             if ($msg->role === 'assistant') {
                 $entry += self::source_pill((int) $params['courseid'], (string) ($msg->source ?? ''), (int) ($msg->cmid ?? 0));
+                $entry['lang_ask'] = preg_match('/^langask:([a-z]{2,3})$/', (string) ($msg->source ?? ''), $lm) ? $lm[1] : '';
             }
             $result[] = $entry;
         }
@@ -100,6 +101,7 @@ class get_history extends external_api {
                     'source_cmid' => new external_value(PARAM_INT, 'Activity the pill links to, 0 when none', VALUE_DEFAULT, 0),
                     'source_url' => new external_value(PARAM_URL, 'Where the pill links, empty when it does not', VALUE_DEFAULT, ''),
                     'source_title' => new external_value(PARAM_TEXT, 'Activity name for the pill label', VALUE_DEFAULT, ''),
+                    'lang_ask' => new external_value(PARAM_ALPHA, 'Language this reply asked about switching to, empty when it asked nothing', VALUE_DEFAULT, ''),
                 ])
             ),
         ]);

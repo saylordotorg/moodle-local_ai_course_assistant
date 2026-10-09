@@ -54,7 +54,7 @@ const loadSpeech = ({stored, languages, moodle, choice}) => {
 
 console.log('priority');
 {
-    // Before 7.9.0 the browser's language was written to aica_lang on first visit.
+    // Before 7.8.5 the browser's language was written to aica_lang on first visit.
     const guess = loadSpeech({stored: 'es', languages: ['es-MX']});
     check('an old stored value equal to the browser language is not a choice',
         guess.getSavedLang() === null && guess.getLangSource() === 'default');
@@ -194,12 +194,23 @@ check('a question with nothing to click is answered in the saved language',
     /askAgainPinned\(originalText\)/.test(chatSrc) && /resend\.pinned/.test(chatSrc));
 check('voice sends the language as pinned', /langsource: Speech\.getLangSource\(\) === 'saved' \? 'pinned' : ''/.test(chatSrc));
 
+console.log('typed answer, reload and return to chat');
+check('a typed yes saves the language', /verdict === 'set'\) \{\s*applyLanguageChoice\(parsed\.langAnswer\.code\)/.test(chatSrc));
+check('a typed no is remembered', /addLangHold\(parsed\.langAnswer\.code\)/.test(chatSrc));
+check('the set/keep tags are stripped while streaming', /\.replace\(LANG_ANSWER_RE, ''\)/.test(chatSrc) && /LANG_ANSWER_OPEN_RE/.test(chatSrc));
+check('a resend says so, so the server does not store the question twice', /postData\.resend = 1/.test(chatSrc));
+check('reloaded history redraws the buttons without sending anything',
+    /showLangSwitchChoice\(pendingLangAsk, lastUserText, true\)/.test(chatSrc) && /if \(!quiet\)/.test(chatSrc));
+check('coming back to chat shows the starters and the last custom chips',
+    /const showStartersWithChips = function/.test(chatSrc) && !/UI\.showStarters\(\);\s*\n\s*return;\s*\n\s*\}\s*\n\s*\/\/ Special/.test(chatSrc) && /lastChatChips = parsed\.suggestions\.slice\(\)/.test(chatSrc));
+
 // ---- the built bundles ----------------------------------------------------------------
 console.log('build');
 const chatBuild = read('amd', 'build', 'chat.min.js');
 const speechBuild = read('amd', 'build', 'speech.min.js');
 check('chat.min.js has the language question', chatBuild.includes('SOLA_LANG_SWITCH') && chatBuild.includes('langsource'),
     'rebuild with terser; Moodle serves amd/build');
+check('chat.min.js has the typed-answer tags', chatBuild.includes('SOLA_LANG_(SET|KEEP)') || chatBuild.includes('SOLA_LANG_(?:SET|KEEP)'));
 check('speech.min.js has the new priority', speechBuild.includes('getSavedLang') && speechBuild.includes('Afaan Oromoo'));
 
 if (failures) {

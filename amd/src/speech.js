@@ -115,7 +115,7 @@ define([], function() {
         try {
             const stored = localStorage.getItem(LANG_KEY);
             if (stored && SUPPORTED_LANGS[stored]) {
-                // Before 7.9.0 the browser's language was written here on a first
+                // Before 7.8.5 the browser's language was written here on a first
                 // visit, so every existing learner has one. A value the picker
                 // wrote carries the choice flag. An older one counts as a choice
                 // only when it differs from the browser's language, because a

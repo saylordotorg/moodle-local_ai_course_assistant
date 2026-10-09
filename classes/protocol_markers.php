@@ -134,6 +134,15 @@ final class protocol_markers {
         $text = self::replace('/\n*\[\s*SOLA_LANG_SWITCH\s*\]\s*[a-z]{2,3}(?![a-z])[ \t]*\n?/i', '', $text);
         $text = self::replace('/\n*\[\s*\/?\s*SOLA_LANG_SWITCH\s*\]\s*/i', '', $text);
 
+        // The learner's typed answer to that question: the model confirms it with
+        // SET (they agreed) or KEEP (they did not). Both are tags for the browser
+        // only, never shown or stored.
+        foreach (['SOLA_LANG_SET', 'SOLA_LANG_KEEP'] as $tag) {
+            $text = self::replace('/\n*\[\s*' . $tag . '\s*\][^\[\]\n]{0,12}\[\s*\/\s*' . $tag . '\s*\][ \t]*\n?/i', '', $text);
+            $text = self::replace('/\n*\[\s*' . $tag . '\s*\]\s*[a-z]{2,3}(?![a-z])[ \t]*\n?/i', '', $text);
+            $text = self::replace('/\n*\[\s*\/?\s*' . $tag . '\s*\]\s*/i', '', $text);
+        }
+
         // SOURCE citations: [SOURCE:page], [[SOURCE:activity:86467]], any depth
         // of brackets, with or without an id.
         $text = self::replace('/\n*\[{1,3}\s*SOURCE\s*:[^\[\]]*\]{1,3}\s*/i', '', $text);
@@ -285,6 +294,21 @@ final class protocol_markers {
         }
         $code = language_support::normalise($m[1] === 'fil' ? 'tl' : $m[1]);
         return $code === '' ? null : $code;
+    }
+
+    /**
+     * The learner's typed answer to the language question, from the RAW reply.
+     *
+     * @param string $raw The reply before strip().
+     * @return array|null [verdict, code] with verdict 'set' (switch SOLA to code) or 'keep'
+     *                    (stay in the saved language and do not ask about code again), or null.
+     */
+    public static function lang_answer(string $raw): ?array {
+        if (!preg_match('/\[\s*SOLA_LANG_(SET|KEEP)\s*\]\s*([a-z]{2,3})(?![a-z])/i', $raw, $m)) {
+            return null;
+        }
+        $code = language_support::normalise(strtolower($m[2]) === 'fil' ? 'tl' : $m[2]);
+        return $code === '' ? null : [strtolower($m[1]), $code];
     }
 
     /**

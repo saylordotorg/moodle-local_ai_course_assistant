@@ -210,7 +210,13 @@ final class language_support {
                 . "Do NOT ask when the student is translating, quoting, practicing a language, asking what a word "
                 . "means, or asking you to write in a language for an assignment: those are about the language, "
                 . "not a request to change it. Do the same when the student explicitly asks you to switch language "
-                . "(ask once to confirm, using the same reply).\n";
+                . "(ask once to confirm, using the same reply).\n"
+                . "\n**When the student answers that question in their own words** (your previous reply was the "
+                . "switch question and their latest message is a short yes, no, or the name of a language, in any language): "
+                . "answer the question they asked BEFORE it, then add on the last line "
+                . "[SOLA_LANG_SET]xx[/SOLA_LANG_SET] if they agreed (answer in that language, xx its code) or "
+                . "[SOLA_LANG_KEEP]xx[/SOLA_LANG_KEEP] if they did not (answer in {$langname}, xx the code you asked about). "
+                . "Add these tags only in that situation, never otherwise.\n";
             return $out;
         }
 

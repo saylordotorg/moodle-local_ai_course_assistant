@@ -208,4 +208,36 @@ final class language_support_test extends \advanced_testcase {
         $this->assertNull(protocol_markers::lang_switch('Plain answer.'));
         $this->assertSame('Plain answer.', protocol_markers::strip('Plain answer. [SOLA_NEXT]a||b[/SOLA_NEXT]'));
     }
+
+    /**
+     * A typed yes or no is confirmed by SET or KEEP, which the browser reads and the learner never sees.
+     *
+     * @return void
+     */
+    public function test_typed_answer_markers_are_read_and_stripped(): void {
+        $set = "Claro, aquí está la respuesta.\n[SOLA_LANG_SET]es[/SOLA_LANG_SET]";
+        $this->assertSame(['set', 'es'], protocol_markers::lang_answer($set));
+        $this->assertSame('Claro, aquí está la respuesta.', protocol_markers::strip($set));
+
+        $keep = "Here is the answer.\n[SOLA_LANG_KEEP]fr";
+        $this->assertSame(['keep', 'fr'], protocol_markers::lang_answer($keep));
+        $this->assertSame('Here is the answer.', protocol_markers::strip($keep));
+
+        $this->assertNull(protocol_markers::lang_answer("[SOLA_LANG_SET]xx[/SOLA_LANG_SET]\nHi"));
+        $this->assertNull(protocol_markers::lang_answer('Plain answer.'));
+        $this->assertSame('Hi', protocol_markers::strip("[SOLA_LANG_SET]xx[/SOLA_LANG_SET]\nHi"));
+    }
+
+    /**
+     * The saved-language prompt tells the model how to read a typed answer.
+     *
+     * @return void
+     */
+    public function test_saved_prompt_covers_typed_answers(): void {
+        $prompt = language_support::prompt_section('en', language_support::SOURCE_SAVED);
+        $this->assertStringContainsString('SOLA_LANG_SET', $prompt);
+        $this->assertStringContainsString('SOLA_LANG_KEEP', $prompt);
+        $pinned = language_support::prompt_section('en', language_support::SOURCE_PINNED);
+        $this->assertStringNotContainsString('SOLA_LANG_SET', $pinned);
+    }
 }
