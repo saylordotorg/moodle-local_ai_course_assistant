@@ -79,6 +79,9 @@ class get_history extends external_api {
                 'message' => $text,
                 'timecreated' => (int) $msg->timecreated,
             ];
+            if ($msg->role === 'assistant') {
+                $entry += self::source_pill((int) $params['courseid'], (string) ($msg->source ?? ''), (int) ($msg->cmid ?? 0));
+            }
             $result[] = $entry;
         }
 
@@ -93,8 +96,56 @@ class get_history extends external_api {
                     'role' => new external_value(PARAM_ALPHA, 'Message role'),
                     'message' => new external_value(PARAM_RAW, 'Message content'),
                     'timecreated' => new external_value(PARAM_INT, 'Timestamp'),
+                    'source_type' => new external_value(PARAM_ALPHA, 'Source pill type: page, course, general, activity or empty', VALUE_DEFAULT, ''),
+                    'source_cmid' => new external_value(PARAM_INT, 'Activity the pill links to, 0 when none', VALUE_DEFAULT, 0),
+                    'source_url' => new external_value(PARAM_URL, 'Where the pill links, empty when it does not', VALUE_DEFAULT, ''),
+                    'source_title' => new external_value(PARAM_TEXT, 'Activity name for the pill label', VALUE_DEFAULT, ''),
                 ])
             ),
         ]);
+    }
+
+    /**
+     * What the learner's history needs to draw an answer's source pill again.
+     *
+     * The stored value only says which pill the answer showed. Whether it can
+     * link is decided now, for this learner: an activity that was deleted, hidden
+     * since, or never visible to them gives a pill that links to the course
+     * instead, and never discloses the name of an activity they cannot open.
+     *
+     * @param int $courseid
+     * @param string $source Stored msgs.source.
+     * @param int $viewedcmid msgs.cmid, the activity the learner was on, used by a 'page' pill.
+     * @return array{source_type: string, source_cmid: int, source_url: string, source_title: string}
+     */
+    public static function source_pill(int $courseid, string $source, int $viewedcmid): array {
+        $none = ['source_type' => '', 'source_cmid' => 0, 'source_url' => '', 'source_title' => ''];
+        if (!preg_match('/^(page|course|general|activity)(?::(\d+))?$/', $source, $m)) {
+            return $none;
+        }
+        $type = $m[1];
+        $cmid = $type === 'activity' ? (int) ($m[2] ?? 0) : ($type === 'page' ? $viewedcmid : 0);
+        $out = ['source_type' => $type, 'source_cmid' => 0, 'source_url' => '', 'source_title' => ''];
+        if ($type === 'general') {
+            return $out;
+        }
+        $courseurl = (new \moodle_url('/course/view.php', ['id' => $courseid]))->out(false);
+        if ($cmid > 0) {
+            try {
+                $cm = get_fast_modinfo($courseid)->get_cm($cmid);
+                if ($cm->uservisible && $cm->has_view() && !empty($cm->name)) {
+                    $out['source_cmid'] = (int) $cm->id;
+                    $out['source_url'] = (new \moodle_url('/mod/' . $cm->modname . '/view.php', ['id' => $cm->id]))->out(false);
+                    $out['source_title'] = format_string($cm->name, true, ['context' => \context_module::instance($cm->id)]);
+                    return $out;
+                }
+            } catch (\Throwable $e) {
+                // Deleted, or in another course: fall through to the course link.
+                unset($e);
+            }
+        }
+        $out['source_type'] = $type === 'page' ? 'course' : $type;
+        $out['source_url'] = $courseurl;
+        return $out;
     }
 }

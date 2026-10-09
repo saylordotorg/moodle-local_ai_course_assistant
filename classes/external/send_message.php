@@ -272,6 +272,8 @@ class send_message extends external_api {
         // run actually caught -- went to the learner verbatim, and the raw row
         // went on to the teacher-facing transcript CSV. Cleaning here fixes both
         // consumers at once, and the stored text stops being a liability.
+        // v7.8.4: take the source pill from the raw reply first (#310).
+        $sourcetag = \local_ai_course_assistant\protocol_markers::derive_source((string) $response);
         $response = \local_ai_course_assistant\protocol_markers::strip($response);
 
         // Save assistant response.
@@ -314,7 +316,8 @@ class send_message extends external_api {
             // indistinguishable from a provider that genuinely does not. The
             // two chat paths had already drifted once over token capture; the
             // comment above says these arguments are deliberately matched.
-            isset($tokenusage['reasoning_tokens']) ? (int) $tokenusage['reasoning_tokens'] : null
+            isset($tokenusage['reasoning_tokens']) ? (int) $tokenusage['reasoning_tokens'] : null,
+            $sourcetag
         );
 
         return [

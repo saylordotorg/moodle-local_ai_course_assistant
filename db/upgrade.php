@@ -2303,5 +2303,20 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100701, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026100901) {
+        // v7.8.4: remember which source pill an answer showed. The copy stored in
+        // msgs.message has every protocol marker removed (so the teacher CSV and
+        // the history are clean), which also removed the [SOURCE:] marker, so a
+        // reloaded answer lost the "From: ..." link the live one showed (#310).
+        // Nullable: rows written before this release honestly do not know.
+        $table = new xmldb_table('local_ai_course_assistant_msgs');
+        $field = new xmldb_field('source', XMLDB_TYPE_CHAR, '24', null, null, null, null, 'top_score');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026100901, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

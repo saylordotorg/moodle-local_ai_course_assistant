@@ -372,7 +372,7 @@ final class backup_restore_test extends \advanced_testcase {
             $conv->id, $user->id, $course->id, 'user', 'What is a balance sheet?');
         conversation_manager::add_message(
             $conv->id, $user->id, $course->id, 'assistant', 'A statement of position.',
-            0, 'openai', 100, 20, 'gpt-4o-mini', 'chat', null, null, null, 'complete', 3, 0.81);
+            0, 'openai', 100, 20, 'gpt-4o-mini', 'chat', null, null, null, 'complete', 3, 0.81, null, 'course');
 
         $newid = $this->duplicate_course((int) $course->id, true);
 
@@ -388,6 +388,8 @@ final class backup_restore_test extends \advanced_testcase {
         $assistant = array_values(array_filter($msgs, fn($m) => $m->role === 'assistant'))[0];
         $this->assertSame('complete', $assistant->stream_outcome);
         $this->assertSame(3, (int) $assistant->chunk_count);
+        // v7.8.4: the source pill travels too, so a restored course keeps the attribution.
+        $this->assertSame('course', $assistant->source);
     }
 
     /**

@@ -4468,7 +4468,7 @@ define([
      *
      * @param {string}      text  Message text
      * @param {number|null} ts    Optional Unix timestamp (ms)
-     * @param {{skipHistory?:boolean,sourceType?:string|null,alreadyClean?:boolean}=} options
+     * @param {{skipHistory?:boolean,sourceType?:string|null,sourceCmid?:string|null,sourceUrl?:string,sourceTitle?:string,alreadyClean?:boolean}=} options
      * @returns {HTMLElement}
      */
     const addAssistantMsg = function(text, ts, options) {
@@ -4495,6 +4495,20 @@ define([
                 pageurl: '',
                 pagetitle: ''
             };
+            // v7.8.4: the server stores which pill the answer showed and says, for
+            // this learner, where it can link (#310). An activity pill gets its name
+            // and link back; a page pill links to that page.
+            if (options.sourceUrl) {
+                if (sourceType === 'activity' && sourceCmid) {
+                    histMeta.modules = {};
+                    histMeta.modules[sourceCmid] = {url: options.sourceUrl, title: options.sourceTitle || ''};
+                } else if (sourceType === 'page') {
+                    histMeta.pageurl = options.sourceUrl;
+                    histMeta.pagetitle = options.sourceTitle || '';
+                } else {
+                    histMeta.courseurl = options.sourceUrl;
+                }
+            }
             el.appendChild(createSourcePill(sourceType, histMeta, sourceCmid));
         }
         return el;
@@ -5439,8 +5453,12 @@ define([
                         lastSuggestions = parsed.suggestions;
                         addAssistantMsg(text, msg.timecreated ? msg.timecreated * 1000 : null, {
                             skipHistory: true,
-                            sourceType: parsed.sourceType,
-                            sourceCmid: parsed.sourceCmid,
+                            // The stored copy has its markers stripped, so the pill comes from
+                            // what the server saved with the message (v7.8.4, #310).
+                            sourceType: msg.source_type || parsed.sourceType,
+                            sourceCmid: msg.source_cmid ? String(msg.source_cmid) : parsed.sourceCmid,
+                            sourceUrl: msg.source_url || '',
+                            sourceTitle: msg.source_title || '',
                             alreadyClean: true,
                         });
                     } else {

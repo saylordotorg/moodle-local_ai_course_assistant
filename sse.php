@@ -1098,6 +1098,13 @@ try {
     // provider reported neither, so analytics can distinguish "no cache
     // support" from "cache missed" (0).
     $cachedtokens = $tokenusage['cached_tokens'] ?? $tokenusage['cache_read_tokens'] ?? null;
+    // v7.8.4: remember the source pill this answer showed, from the raw reply
+    // (the stored copy has the markers stripped), so history can show it again.
+    $sourcetag = \local_ai_course_assistant\protocol_markers::derive_source(
+        (string) $fullresponse,
+        $citations ?? [],
+        $modulesmap ?? []
+    );
     $assistantmsgid = conversation_manager::add_message(
         $conv->id,
         $userid,
@@ -1122,7 +1129,8 @@ try {
         // billing thinking as output. Folding it in would double-count OpenAI;
         // dropping it under-counts Gemini, which is the chat tier at Saylor
         // and so the bulk of this table. The consumer knows the provider.
-        isset($tokenusage['reasoning_tokens']) ? (int) $tokenusage['reasoning_tokens'] : null
+        isset($tokenusage['reasoning_tokens']) ? (int) $tokenusage['reasoning_tokens'] : null,
+        $sourcetag
     );
 
     // Queue the conversation-mastery classifier as an adhoc task so it runs

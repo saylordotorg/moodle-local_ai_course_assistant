@@ -45,6 +45,7 @@
         <FIELD NAME="stream_outcome" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="How the turn ended: complete, client_aborted, provider_error, truncated, refused (v7.8.0). Null on rows written before v7.1.1."/>
         <FIELD NAME="chunk_count" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Number of RAG passages retrieved for this turn; 0 means retrieval ran and found nothing."/>
         <FIELD NAME="top_score" TYPE="number" LENGTH="10" DECIMALS="6" NOTNULL="false" SEQUENCE="false" COMMENT="Similarity score of the best retrieved passage."/>
+        <FIELD NAME="source" TYPE="char" LENGTH="24" NOTNULL="false" SEQUENCE="false" COMMENT="v7.8.4: the source attribution pill this answer showed: page, course, general or activity:CMID. Null on rows written before v7.8.4 and on non-assistant rows."/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
