@@ -630,7 +630,12 @@ class context_builder {
         // learner courses do not lose this section under default budget
         // pressure. Section is small (~600 chars) and matters for the ESL
         // population SOLA serves heavily.
-        $sections[] = new section('multilingual', section::CAT_BEHAVIOR, 70, self::get_multilingual_instructions($lang, $langsource, $langhold), 0);
+        // v7.8.7: the reply-language rule is the LAST thing the model reads (CAT_SAFETY,
+        // below the page-grounding reminder at 50). Mid-prompt (offset ~10.6k of ~19.7k)
+        // gemini-3.1-flash-lite never asked before switching (0 of 6); with the section
+        // last it asked on 3 of 3 Spanish questions. CAT_SAFETY is also exempt from the
+        // drop-on-overflow loop, so the section can no longer be dropped under budget pressure.
+        $sections[] = new section('multilingual', section::CAT_SAFETY, 40, self::get_multilingual_instructions($lang, $langsource, $langhold), 0);
         $sections[] = new section('widget_features', section::CAT_BEHAVIOR, 30, self::get_widget_feature_instructions(), 0);
         if (self::external_resources_enabled_for_course($courseid)) {
             $sections[] = new section(
