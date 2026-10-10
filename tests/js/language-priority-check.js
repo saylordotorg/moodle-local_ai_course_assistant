@@ -203,6 +203,8 @@ check('reloaded history redraws the buttons without sending anything',
     /showLangSwitchChoice\(pendingLangAsk, lastUserText, true\)/.test(chatSrc) && /if \(!quiet\)/.test(chatSrc));
 check('coming back to chat shows the starters and the last custom chips',
     /const showStartersWithChips = function/.test(chatSrc) && !/UI\.showStarters\(\);\s*\n\s*return;\s*\n\s*\}\s*\n\s*\/\/ Special/.test(chatSrc) && /lastChatChips = parsed\.suggestions\.slice\(\)/.test(chatSrc));
+check('switching to chat from voice, history or progress shows them too, not only a re-click',
+    /const previousMode = activeBottomMode;/.test(chatSrc) && /normalized === 'chat' && \(options\.force \|\| previousMode !== 'chat'\)/.test(chatSrc));
 
 // ---- the built bundles ----------------------------------------------------------------
 console.log('build');

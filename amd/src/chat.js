@@ -1492,11 +1492,13 @@ define([
             setQuizBtnActive(quizBtn, false);
         }
 
+        const previousMode = activeBottomMode;
         activeBottomMode = normalized;
         UI.setBottomMode(normalized);
 
-        // Re-clicking Chat tab (force=true) shows conversation starters.
-        if (normalized === 'chat' && options.force) {
+        // Re-clicking the Chat tab (force=true) and coming back to it from voice,
+        // history or progress both show the starters and the latest custom chips.
+        if (normalized === 'chat' && (options.force || previousMode !== 'chat')) {
             showStartersWithChips();
         }
         if (normalized === 'voice') {
