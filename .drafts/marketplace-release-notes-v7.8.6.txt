@@ -1,0 +1,7 @@
+Version 7.8.6 (build 2026100904)
+
+Coming back to the chat tab from Voice, History or Progress now shows SOLA's usual starter chips together with the follow-up chips from the most recent reply. In 7.8.5 they only returned when the learner clicked the Chat tab while already on it, so the tab switch left the chip area empty.
+
+Also in this release (from 7.8.5): SOLA chooses the language of each reply by the language the question is written in, then the language saved in SOLA's language picker, then the browser's language, in 46 languages. When a learner who saved a language writes in a different one, SOLA asks in chat whether to switch, with a button for each language, and changes the saved setting only if they agree. Typing "yes" or "no" works too. A reloaded chat shows the buttons again.
+
+Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.
