@@ -185,8 +185,8 @@ final class language_support {
 
         if ($source === self::SOURCE_SAVED && $lang !== '') {
             $out .= "\n**Reply language. The student saved {$langname} ({$lang}) as their SOLA language.** "
-                . "Before answering, work out what language the student's LATEST message is written in, "
-                . "and ignore the language of earlier turns.\n"
+                . "Before you write anything, decide what language the student's LATEST message is written in. "
+                . "Ignore the language of earlier turns and of the course material.\n"
                 . "1. If it is {$langname}, or you cannot tell (a very short message, a name, a number, code, "
                 . "or text mixing languages), answer in {$langname}.\n";
             if ($hold !== '') {
@@ -195,7 +195,15 @@ final class language_support {
                     . "this session. Do NOT ask about {$heldlist} again: answer in {$langname}.\n"
                     . "3. If it is clearly written in some OTHER supported language, ask before switching, as below.\n";
             } else {
-                $out .= "2. If it is clearly written in a different supported language, ask before switching, as below.\n";
+                $out .= "2. If it is a full sentence or question clearly written in a different supported language, "
+                    . "do not answer it yet: ask before switching, as below.\n";
+            }
+            if ($lang !== 'en') {
+                // Models treated English as "the default" and quietly answered in the saved
+                // language instead of asking (measured on gemini-3.1-flash-lite, 2026-10-10).
+                $out .= "English is a supported language like any other. When {$langname} is saved and the student "
+                    . "writes a full English sentence or question, that is a different language: ask. "
+                    . "Do not quietly answer in {$langname}, and do not answer in English.\n";
             }
             $out .= "\n**Asking before switching.** When the student's latest message is a full sentence or question "
                 . "clearly written in a supported language other than {$langname}, do NOT answer it yet. "

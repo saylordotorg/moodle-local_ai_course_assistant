@@ -240,4 +240,46 @@ final class language_support_test extends \advanced_testcase {
         $pinned = language_support::prompt_section('en', language_support::SOURCE_PINNED);
         $this->assertStringNotContainsString('SOLA_LANG_SET', $pinned);
     }
+
+    /**
+     * English is named as a language worth asking about when another language is saved.
+     *
+     * Measured on gemini-3.1-flash-lite: without this, an English question under a saved
+     * French setting was answered in French and the switch question never appeared.
+     *
+     * @return void
+     */
+    public function test_saved_non_english_language_names_english_as_askable(): void {
+        $fr = language_support::prompt_section('fr', language_support::SOURCE_SAVED);
+        $this->assertStringContainsString('English is a supported language like any other', $fr);
+        $this->assertStringContainsString('When French is saved', $fr);
+        // With English itself saved there is no English special case.
+        $en = language_support::prompt_section('en', language_support::SOURCE_SAVED);
+        $this->assertStringNotContainsString('English is a supported language like any other', $en);
+    }
+
+    /**
+     * The reply-language rule is the last thing in the built prompt, after the chips rule.
+     *
+     * Mid-prompt, gemini-3.1-flash-lite ignored the switch question on 6 of 6 runs; last, it
+     * asked on every Spanish and German run.
+     *
+     * @return void
+     */
+    public function test_reply_language_section_is_last_in_the_built_prompt(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+
+        $prompt = context_builder::build_system_prompt(
+            $course->id, $student->id, 'fr', [], 0, '', '', language_support::SOURCE_SAVED, ''
+        );
+        $multi = strrpos($prompt, '## Multilingual Support');
+        $chips = strrpos($prompt, 'ALWAYS finish your response with this exact marker');
+        $this->assertNotFalse($multi);
+        $this->assertNotFalse($chips);
+        $this->assertGreaterThan($chips, $multi, 'The language rule must come after the chips rule.');
+        // Nothing but the language section follows the heading: no later "## " section.
+        $this->assertSame(0, preg_match('/\n## /', substr($prompt, $multi + 5)));
+    }
 }

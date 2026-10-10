@@ -1,0 +1,7 @@
+Version 7.8.7 (build 2026100905)
+
+When a learner has saved a SOLA language and writes in a different one, SOLA asks in chat whether to switch. This release makes that question appear reliably on lighter models. The language rule now sits at the end of the instructions the model reads and names English as a language like any other. In direct tests with Gemini 3.1 Flash-Lite it went from asking on none of six Spanish and English questions to asking on every Spanish and German question, without asking on questions already in the saved language, short replies, or translation questions. Claude Sonnet 5.5 asked correctly every time. Known limit: on Flash-Lite an English question under a saved non-English language is still answered in the saved language without asking.
+
+Also in recent releases: SOLA chooses the language of each reply by the language the question is written in, then the saved language, then the browser's language, in 46 languages (7.8.5), and the starter chips return on any switch back to Chat (7.8.6).
+
+Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.
