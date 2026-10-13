@@ -1,0 +1,7 @@
+Version 7.8.8 (build 2026101300)
+
+When the main AI provider refuses a request, SOLA now records what the provider actually said, with any credential-shaped text removed and the length capped, instead of only the error type. Reports > Status shows it, and so do the two failover rows in the audit log.
+
+SOLA also handles one common cause of refusals better. If a provider rejects a request as malformed (an HTTP 400, 413 or 422) while the conversation is long, SOLA asks the same provider once more with just the newest exchange. If that works, the learner gets that provider's answer, the backup model is not used, and the provider is not marked as down for fifteen minutes, which used to switch every course on that provider to the backup. Each retry is logged with whether it worked, so an administrator can see how often long histories were the cause. Rate limits, outages, bad keys and unknown models are not retried this way.
+
+Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.
