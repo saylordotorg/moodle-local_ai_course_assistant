@@ -104,7 +104,9 @@ class primary_provider extends check {
             if ($out['primary'] === '') {
                 $out['primary'] = (string) $d['primary'];
                 $out['model'] = (string) ($d['failed_model'] ?? '');
-                $out['reason'] = self::clean((string) ($d['reason'] ?? ''));
+                // v7.8.8: prefer the provider's own words ('detail') over the
+                // exception's message, which reads the same for every failure.
+                $out['reason'] = self::clean((string) ($d['detail'] ?? $d['reason'] ?? ''));
             }
         }
         $out['rescued'] = $DB->count_records_select(
@@ -122,7 +124,9 @@ class primary_provider extends check {
      * @return string
      */
     private static function clean(string $reason): string {
-        $reason = preg_replace('/[A-Za-z0-9_\-\.]{24,}/', '[hidden]', $reason);
+        // No '.' in the class: a path such as messages.13.content.0.text is the useful
+        // part of a request rejection, and a credential is blanked by its long run anyway.
+        $reason = preg_replace('/[A-Za-z0-9_\-]{24,}/', '[hidden]', $reason);
         return \core_text::substr(trim($reason), 0, 160);
     }
 }

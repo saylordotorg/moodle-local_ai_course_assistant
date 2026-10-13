@@ -252,6 +252,373 @@ final class failover_chain_test extends \advanced_testcase {
     }
 
     /**
+     * A provider that refuses any request holding more than $maxmessages turns
+     * with an HTTP rejection, as a strict API does for a history it dislikes.
+     *
+     * @param string $output Returned when the request is small enough.
+     * @param int $maxmessages Most turns it accepts.
+     * @param int $status HTTP status it rejects with.
+     * @param int $slowretryus Microseconds a short (retry-sized) request takes before it answers or fails.
+     * @return object Anonymous provider_interface with public $callcount and $sizes.
+     */
+    private static function picky_provider(string $output, int $maxmessages, int $status = 400, int $slowretryus = 0): object {
+        return new class ($output, $maxmessages, $status, $slowretryus) implements provider_interface {
+            public int $callcount = 0;
+            /** @var int[] Turns in each request received. */
+            public array $sizes = [];
+            public function __construct(
+                private string $output,
+                private int $max,
+                private int $status,
+                private int $slowretryus
+            ) {
+            }
+            public function model_id(): string {
+                return 'picky-model';
+            }
+            private function check(array $messages): void {
+                $this->callcount++;
+                $this->sizes[] = count($messages);
+                if ($this->slowretryus > 0 && count($messages) <= 4) {
+                    usleep($this->slowretryus);
+                }
+                if (count($messages) > $this->max) {
+                    throw new provider_http_exception($this->status, 'invalid_request_error: messages are too many');
+                }
+            }
+            public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
+                $this->check($messages);
+                return $this->output;
+            }
+            public function chat_completion_stream(string $systemprompt, array $messages, callable $cb, array $options = []): void {
+                $this->check($messages);
+                $cb($this->output);
+            }
+            public function get_last_token_usage(): ?array {
+                return null;
+            }
+            public function get_last_finish_reason(): ?string {
+                return null;
+            }
+        };
+    }
+
+    /**
+     * Alternating turns ending on a user turn.
+     *
+     * @param int $pairs Finished exchanges before the final question.
+     * @return array
+     */
+    private static function long_history(int $pairs = 6): array {
+        $messages = [];
+        for ($i = 1; $i <= $pairs; $i++) {
+            $messages[] = ['role' => 'user', 'content' => "question $i"];
+            $messages[] = ['role' => 'assistant', 'content' => "answer $i"];
+        }
+        $messages[] = ['role' => 'user', 'content' => 'the current question'];
+        return $messages;
+    }
+
+    /**
+     * Rows of one audit action, details decoded.
+     *
+     * @param string $action
+     * @return array[]
+     */
+    private static function audit_details(string $action): array {
+        global $DB;
+        return array_values(array_map(
+            fn($row) => json_decode($row->details, true),
+            $DB->get_records('local_ai_course_assistant_audit', ['action' => $action], 'id ASC')
+        ));
+    }
+
+    /**
+     * v7.8.8: a provider that rejects a long history with a 400 is asked once
+     * more with a short one. When that works the provider answered, no fallback
+     * runs, and its circuit stays closed, so the next long conversation is not
+     * diverted for fifteen minutes because of this one.
+     */
+    public function test_a_long_history_refused_with_a_400_is_retried_short_and_the_circuit_stays_closed(): void {
+        $this->resetAfterTest();
+        $primary = self::picky_provider('PRIMARY-OUT', 4);
+        $fallback = self::fake_provider('FALLBACK-OUT', false);
+        $chain = new failover_chain($primary, 'trim-primary', [
+            ['provider' => $fallback, 'label' => 'trim-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+
+        $history = self::long_history(6);
+        $this->assertSame('PRIMARY-OUT', $chain->chat_completion('sys', $history));
+        $this->assertSame([count($history), 3], $primary->sizes);
+        $this->assertSame(0, $fallback->callcount);
+
+        $rows = self::audit_details(failover_chain::AUDIT_EVENT_TRIMMED);
+        $this->assertCount(1, $rows);
+        $this->assertSame('rescued', $rows[0]['outcome']);
+        $this->assertSame('trim-primary', $rows[0]['label']);
+        $this->assertSame(count($history), $rows[0]['messages_before']);
+        $this->assertSame(3, $rows[0]['messages_kept']);
+        $this->assertSame('picky-model', $rows[0]['failed_model'], 'the row names the model that needed the shorter history');
+        $this->assertStringContainsString('HTTP 400', $rows[0]['detail']);
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH));
+
+        // The circuit is closed: the primary is asked again, not skipped.
+        $this->assertSame('PRIMARY-OUT', $chain->chat_completion('sys', $history));
+        $this->assertSame(4, $primary->callcount);
+        $this->assertSame(0, $fallback->callcount);
+    }
+
+    /**
+     * The same rescue on the streaming path, which is the one a learner uses.
+     */
+    public function test_a_long_history_refused_before_the_first_token_is_retried_short_when_streaming(): void {
+        $this->resetAfterTest();
+        $primary = self::picky_provider('PRIMARY-STREAM', 4, 422);
+        $fallback = self::fake_streaming_provider(['fallback-text'], false);
+        $chain = new failover_chain($primary, 'trim-stream-primary', [
+            ['provider' => $fallback, 'label' => 'trim-stream-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+
+        $captured = [];
+        $chain->chat_completion_stream('sys', self::long_history(6), function (string $chunk) use (&$captured) {
+            $captured[] = $chunk;
+        });
+        $this->assertSame(['PRIMARY-STREAM'], $captured);
+        $this->assertSame(2, $primary->callcount);
+        $this->assertSame(0, $fallback->callcount);
+        $this->assertSame('rescued', self::audit_details(failover_chain::AUDIT_EVENT_TRIMMED)[0]['outcome']);
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+    }
+
+    /**
+     * When the short request is refused too the long history was not the
+     * problem: the chain behaves exactly as it did before, circuit and all, and
+     * the audit says the retry failed and why.
+     */
+    public function test_a_retry_that_is_refused_too_falls_over_and_opens_the_circuit(): void {
+        $this->resetAfterTest();
+        $primary = self::picky_provider('never', 0);
+        $fallback = self::fake_provider('FALLBACK-OUT', false);
+        $chain = new failover_chain($primary, 'trim2-primary', [
+            ['provider' => $fallback, 'label' => 'trim2-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+
+        $this->assertSame('FALLBACK-OUT', $chain->chat_completion('sys', self::long_history(6)));
+        $this->assertSame(2, $primary->callcount, 'one try, one shorter retry, no third');
+        $this->assertSame(1, $fallback->callcount);
+
+        $trimmed = self::audit_details(failover_chain::AUDIT_EVENT_TRIMMED);
+        $this->assertCount(1, $trimmed);
+        $this->assertSame('failed', $trimmed[0]['outcome']);
+        $this->assertStringContainsString('HTTP 400', $trimmed[0]['retry_detail']);
+        $this->assertCount(1, self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+        $this->assertCount(1, self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH));
+
+        // The circuit is open now, so the primary is skipped.
+        $chain->chat_completion('sys', self::long_history(6));
+        $this->assertSame(2, $primary->callcount);
+    }
+
+    /**
+     * The fall-through row's latency is the FIRST attempt's: it is the number
+     * the Learn diagnosis was built on, and a slow retry must not inflate it.
+     */
+    public function test_the_fall_through_latency_is_the_first_attempts_not_the_retrys(): void {
+        $this->resetAfterTest();
+        $primary = self::picky_provider('never', 0, 400, 600000);
+        $chain = new failover_chain($primary, 'latency-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'latency-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        $chain->chat_completion('sys', self::long_history(6));
+        $this->assertSame(2, $primary->callcount);
+        $latency = self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH)[0]['latency_ms'];
+        $this->assertLessThan(400, $latency, 'the 600 ms retry must not be counted');
+    }
+
+    /**
+     * Only a request the provider called malformed is retried short. A rate
+     * limit, an outage, a bad key or a model that does not exist says nothing
+     * about the history, and a short history does not cure them.
+     */
+    public function test_only_a_400_413_or_422_rejection_of_a_long_history_is_retried(): void {
+        $this->resetAfterTest();
+        foreach ([429, 500, 401, 404] as $status) {
+            $primary = self::picky_provider('never', 0, $status);
+            $chain = new failover_chain($primary, 'status-' . $status, [
+                ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'status-fb-' . $status],
+            ], ['audit' => false]);
+            $this->assertSame('FALLBACK-OUT', $chain->chat_completion('sys', self::long_history(6)));
+            $this->assertSame(1, $primary->callcount, "HTTP $status must not be retried with a short history");
+        }
+        foreach ([400, 413, 422] as $status) {
+            $primary = self::picky_provider('PRIMARY-OUT', 4, $status);
+            $chain = new failover_chain($primary, 'retried-' . $status, [
+                ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'retried-fb-' . $status],
+            ], ['audit' => false]);
+            $this->assertSame('PRIMARY-OUT', $chain->chat_completion('sys', self::long_history(6)));
+            $this->assertSame(2, $primary->callcount, "HTTP $status is retried once with a short history");
+        }
+    }
+
+    /**
+     * An ordinary provider failure that is not an HTTP rejection (a network
+     * error, say) is not retried either, and a history already as short as the
+     * retry would send is not worth a second call.
+     */
+    public function test_other_failures_and_short_histories_are_not_retried(): void {
+        $this->resetAfterTest();
+        $plain = self::failing_provider('curl error 28');
+        $chain = new failover_chain($plain, 'plain-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'plain-fallback'],
+        ], ['audit' => false]);
+        $chain->chat_completion('sys', self::long_history(6));
+        $this->assertSame(1, $plain->callcount);
+
+        $primary = self::picky_provider('never', 0);
+        $chain = new failover_chain($primary, 'short-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'short-fallback'],
+        ], ['audit' => false]);
+        $chain->chat_completion('sys', self::long_history(1));
+        $this->assertSame(1, $primary->callcount, 'three turns are already shorter than the retry');
+    }
+
+    /**
+     * v7.8.8: the circuit-open and fall-through rows carry what the provider
+     * said (its debuginfo, not the generic exception message), with credentials
+     * replaced and the length bounded, so an admin can finally tell why a
+     * circuit opened.
+     */
+    public function test_the_audit_rows_carry_the_providers_words_redacted_and_bounded(): void {
+        $this->resetAfterTest();
+        $key = 'sk-ant-api03-' . str_repeat('A1b2', 12);
+        $debuginfo = "HTTP 400: {\n  \"error\": \"invalid_request_error\",\n  \"detail\": \"bad key $key rejected\"\n} "
+            . str_repeat('padding ', 100);
+        $failing = new class ($debuginfo) implements provider_interface {
+            public function __construct(private string $debuginfo) {
+            }
+            public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
+                throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $this->debuginfo);
+            }
+            public function chat_completion_stream(string $systemprompt, array $messages, callable $cb, array $options = []): void {
+                throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $this->debuginfo);
+            }
+            public function get_last_token_usage(): ?array {
+                return null;
+            }
+            public function get_last_finish_reason(): ?string {
+                return null;
+            }
+        };
+        $chain = new failover_chain($failing, 'detail-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'detail-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+
+        foreach ([failover_chain::AUDIT_EVENT_CIRCUIT_OPEN, failover_chain::AUDIT_EVENT_FALLTHROUGH] as $action) {
+            $rows = self::audit_details($action);
+            $this->assertCount(1, $rows, $action);
+            $detail = $rows[0]['detail'];
+            $this->assertStringStartsWith('HTTP 400: { "error": "invalid_request_error"', $detail, $action);
+            $this->assertStringNotContainsString('A1b2A1b2', $detail, "$action must not keep the key");
+            $this->assertStringContainsString('[redacted-key]', $detail, $action);
+            $this->assertLessThanOrEqual(failover_chain::DETAIL_LIMIT, \core_text::strlen($detail), $action);
+            $this->assertStringNotContainsString("\n", $detail, $action);
+        }
+        // The fall-through row still carries the exception message as 'reason'.
+        $this->assertArrayHasKey('reason', self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH)[0]);
+    }
+
+    /**
+     * Without debuginfo the message is what there is to keep.
+     */
+    public function test_describe_failure_falls_back_to_the_message(): void {
+        $this->assertSame('plain failure', failover_chain::describe_failure(new \RuntimeException('plain failure')));
+        $this->assertSame('', failover_chain::describe_failure(new \RuntimeException('')));
+    }
+
+    /**
+     * A streaming provider that refuses a long history with a 400, then behaves
+     * oddly on the shorter retry.
+     *
+     * @param string $retry 'partial' streams one chunk then throws; 'silent' returns without a token.
+     * @return object Anonymous provider_interface with public $callcount.
+     */
+    private static function odd_retry_provider(string $retry): object {
+        return new class ($retry) implements provider_interface {
+            public int $callcount = 0;
+            public function __construct(private string $retry) {
+            }
+            public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
+                throw new \coding_exception('streaming only');
+            }
+            public function chat_completion_stream(string $systemprompt, array $messages, callable $cb, array $options = []): void {
+                $this->callcount++;
+                if (count($messages) > 4) {
+                    throw new provider_http_exception(400, 'invalid_request_error: too long');
+                }
+                if ($this->retry === 'partial') {
+                    $cb('half an answer');
+                    throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, 'connection reset');
+                }
+            }
+            public function get_last_token_usage(): ?array {
+                return null;
+            }
+            public function get_last_finish_reason(): ?string {
+                return null;
+            }
+        };
+    }
+
+    /**
+     * If the shorter request starts to answer and then fails, the learner has
+     * already seen text: the error propagates and no fallback runs, exactly as
+     * for any other mid-stream failure.
+     */
+    public function test_a_retry_that_fails_after_its_first_token_does_not_fall_over(): void {
+        $this->resetAfterTest();
+        $primary = self::odd_retry_provider('partial');
+        $fallback = self::fake_streaming_provider(['fallback-text'], false);
+        $chain = new failover_chain($primary, 'odd1-primary', [
+            ['provider' => $fallback, 'label' => 'odd1-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        $captured = [];
+        try {
+            $chain->chat_completion_stream('sys', self::long_history(6), function (string $chunk) use (&$captured) {
+                $captured[] = $chunk;
+            });
+            $this->fail('The mid-stream failure of the retry must propagate.');
+        } catch (\moodle_exception $e) {
+            $this->assertStringContainsString('connection reset', (string) $e->debuginfo);
+        }
+        $this->assertSame(['half an answer'], $captured);
+        $this->assertSame(2, $primary->callcount);
+        $this->assertSame(0, $fallback->callcount);
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_TRIMMED), 'no outcome row for a turn already on screen');
+    }
+
+    /**
+     * A retry that returns without producing a token is a failure: the chain
+     * records it, opens the circuit and falls over.
+     */
+    public function test_a_retry_that_produces_no_token_is_a_failure(): void {
+        $this->resetAfterTest();
+        $primary = self::odd_retry_provider('silent');
+        $fallback = self::fake_streaming_provider(['fallback-text'], false);
+        $chain = new failover_chain($primary, 'odd2-primary', [
+            ['provider' => $fallback, 'label' => 'odd2-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        $captured = [];
+        $chain->chat_completion_stream('sys', self::long_history(6), function (string $chunk) use (&$captured) {
+            $captured[] = $chunk;
+        });
+        $this->assertSame(['fallback-text'], $captured);
+        $this->assertSame('failed', self::audit_details(failover_chain::AUDIT_EVENT_TRIMMED)[0]['outcome']);
+        $this->assertCount(1, self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+    }
+
+    /**
      * Build an in-memory provider_interface implementation for tests.
      * If $shouldfail is true, every chat_completion call throws.
      *

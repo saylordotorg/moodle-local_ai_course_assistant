@@ -157,9 +157,23 @@ class watcher {
             'to' => $to,
             'needle' => '%' . $DB->sql_like_escape('"failed_model":' . json_encode($model)) . '%']
         );
+        // v7.8.8: a turn this model answered only after a retry with a shorter
+        // history is also a failure of it: the learner got an answer from this
+        // model, so the turn is already counted above, but the model refused
+        // the request as sent and the answer lost the older conversation. Counted
+        // as an error only (never as a second turn).
+        $trimmed = (int) $DB->count_records_select(
+            'local_ai_course_assistant_audit',
+            'action = :action AND timecreated >= :from AND timecreated < :to AND '
+                . $DB->sql_like('details', ':model', false) . ' AND ' . $DB->sql_like('details', ':outcome', false),
+            ['action' => \local_ai_course_assistant\provider\failover_chain::AUDIT_EVENT_TRIMMED, 'from' => $from,
+            'to' => $to,
+            'model' => '%' . $DB->sql_like_escape('"failed_model":' . json_encode($model)) . '%',
+            'outcome' => '%' . $DB->sql_like_escape('"outcome":"rescued"') . '%']
+        );
         return [
             'turns' => (int) ($counts->turns ?? 0) + $rescued,
-            'error' => (int) ($counts->errors ?? 0) + $rescued,
+            'error' => (int) ($counts->errors ?? 0) + $rescued + $trimmed,
             'truncated' => (int) ($counts->truncated ?? 0),
             'refused' => (int) ($counts->refused ?? 0),
             'cost_cents' => (!$unknown && $answered > 0) ? $cents / $answered : null,

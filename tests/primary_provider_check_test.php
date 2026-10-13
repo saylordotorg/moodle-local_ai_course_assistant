@@ -94,6 +94,28 @@ final class primary_provider_check_test extends \advanced_testcase {
         $this->assertStringNotContainsString('abcdefghijklmnop', $text);
     }
 
+    /**
+     * v7.8.8: a row that carries the provider's own words ('detail') shows those,
+     * not the exception's generic message; an older row without it still shows
+     * its reason.
+     */
+    public function test_the_providers_own_words_are_shown_when_the_row_has_them(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $DB->insert_record('local_ai_course_assistant_audit', (object) [
+            'action' => 'failover_fallthrough', 'userid' => 0, 'courseid' => 0, 'ipaddress' => '', 'useragent' => '',
+            'details' => json_encode([
+                'failed_label' => 'claude', 'primary' => 'claude', 'failed_model' => 'claude-haiku-4-5',
+                'reason' => 'Sorry, something went wrong.', 'detail' => 'HTTP 400: messages.13.content.0.text: text content blocks must be non-empty',
+            ]),
+            'timecreated' => time() - 60,
+        ]);
+        $text = (new primary_provider())->get_result()->get_summary();
+        $this->assertStringContainsString('messages.13.content.0.text', $text, 'the turn index is the useful part');
+        $this->assertStringContainsString('must be non-empty', $text);
+        $this->assertStringNotContainsString('Sorry, something went wrong', $text);
+    }
+
     public function test_error_html_is_escaped(): void {
         $this->resetAfterTest();
         $this->fallthrough('gemini', 'gemini', 60, '<b onmouseover=x>502</b> bad');

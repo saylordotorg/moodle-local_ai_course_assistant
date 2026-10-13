@@ -76,6 +76,12 @@ class failover_chain implements provider_interface {
     /** @var string v7.8.0: one row per turn a fallback answered after the primary failed. */
     public const AUDIT_EVENT_RESCUED = 'failover_rescued';
 
+    /** @var string v7.8.8: one row per retry with a shortened history (outcome rescued or failed). */
+    public const AUDIT_EVENT_TRIMMED = 'failover_history_trimmed';
+
+    /** @var int v7.8.8: longest provider error text a failover audit row keeps. */
+    public const DETAIL_LIMIT = 300;
+
     /**
      * @param provider_interface $primary
      * @param string $primarylabel Label of the primary, used for circuit-state lookups.
@@ -130,8 +136,27 @@ class failover_chain implements provider_interface {
                 }
                 return $result;
             } catch (\Throwable $e) {
+                // The first attempt's own time: a retry below must not inflate it.
+                $elapsed = microtime(true) - $start;
+                // v7.8.8: a provider that refused this request outright is not
+                // necessarily broken; ask once more with a shorter history.
+                $trimmed = self::trimmed_history_for_retry($e, $messages);
+                if ($trimmed) {
+                    try {
+                        $result = $entry['provider']->chat_completion($systemprompt, $trimmed, $options);
+                        $this->record_success($entry['label']);
+                        $this->lastused = $entry['provider'];
+                        $this->audit_trimmed($entry, 'rescued', count($messages), count($trimmed), $e);
+                        if ($primaryfailed) {
+                            $this->audit_rescued($entry);
+                        }
+                        return $result;
+                    } catch (\Throwable $retryerror) {
+                        $this->audit_trimmed($entry, 'failed', count($messages), count($trimmed), $e, $retryerror);
+                    }
+                }
                 $this->open_circuit($entry['label'], $e);
-                $this->audit_fallthrough($entry, (string) $e->getMessage(), microtime(true) - $start);
+                $this->audit_fallthrough($entry, $e, $elapsed);
                 $primaryfailed = $primaryfailed || $i === 0;
                 $firsterr = $firsterr ?? $e;
                 $attempts[] = $entry['label'] . ': ' . $e->getMessage();
@@ -203,8 +228,39 @@ class failover_chain implements provider_interface {
                     $this->lastused = $entry['provider'];
                     throw $e;
                 }
+                // The first attempt's own time: a retry below must not inflate it.
+                $elapsed = microtime(true) - $start;
+                // v7.8.8: as in chat_completion(): one retry with a shorter
+                // history, still before anything has reached the learner.
+                $trimmed = self::trimmed_history_for_retry($e, $messages);
+                if ($trimmed) {
+                    try {
+                        $entry['provider']->chat_completion_stream($systemprompt, $trimmed, $wrappedcb, $options);
+                        if (!$firsttokenreceived) {
+                            throw new \moodle_exception(
+                                'error',
+                                'local_ai_course_assistant',
+                                '',
+                                'No tokens received from ' . $entry['label']
+                            );
+                        }
+                        $this->record_success($entry['label']);
+                        $this->lastused = $entry['provider'];
+                        $this->audit_trimmed($entry, 'rescued', count($messages), count($trimmed), $e);
+                        if ($primaryfailed) {
+                            $this->audit_rescued($entry);
+                        }
+                        return;
+                    } catch (\Throwable $retryerror) {
+                        if ($firsttokenreceived) {
+                            $this->lastused = $entry['provider'];
+                            throw $retryerror;
+                        }
+                        $this->audit_trimmed($entry, 'failed', count($messages), count($trimmed), $e, $retryerror);
+                    }
+                }
                 $this->open_circuit($entry['label'], $e);
-                $this->audit_fallthrough($entry, (string) $e->getMessage(), microtime(true) - $start);
+                $this->audit_fallthrough($entry, $e, $elapsed);
                 $primaryfailed = $primaryfailed || $i === 0;
                 $firsterr = $firsterr ?? $e;
                 $attempts[] = $entry['label'] . ': ' . $e->getMessage();
@@ -325,6 +381,11 @@ class failover_chain implements provider_interface {
                     [
                         'label'      => $label,
                         'error_class' => get_class($error),
+                        // v7.8.8: what the provider said, redacted and bounded.
+                        // The class alone is 'moodle_exception' for every
+                        // failure, which is why a Claude circuit that opened
+                        // ten times a day could not be diagnosed from the log.
+                        'detail'     => self::describe_failure($error),
                     ]
                 );
             } catch (\Throwable $ignore) {
@@ -387,13 +448,14 @@ class failover_chain implements provider_interface {
      * Emit the audit row for a fall-through event.
      *
      * @param array $failed The failed chain entry: ['provider' => provider_interface, 'label' => string].
-     * @param string $reason
+     * @param \Throwable $error What the provider threw.
      * @param float $elapsedseconds
      */
-    private function audit_fallthrough(array $failed, string $reason, float $elapsedseconds): void {
+    private function audit_fallthrough(array $failed, \Throwable $error, float $elapsedseconds): void {
         if (empty($this->options['audit'])) {
             return;
         }
+        $reason = (string) $error->getMessage();
         try {
             audit_logger::log(
                 self::AUDIT_EVENT_FALLTHROUGH,
@@ -408,11 +470,114 @@ class failover_chain implements provider_interface {
                         ? (string) $failed['provider']->model_id() : '',
                     'primary'      => $this->primarylabel,
                     'reason'       => mb_substr($reason, 0, 500),
+                    // v7.8.8: the provider's own words. 'reason' is the
+                    // exception's message, which for a provider failure is the
+                    // same "Sorry, something went wrong" every time.
+                    'detail'       => self::describe_failure($error),
                     'latency_ms'   => (int) round($elapsedseconds * 1000),
                 ]
             );
         } catch (\Throwable $ignore) {
             // Audit must never break the chain.
+        }
+    }
+
+    /**
+     * What a failure said, safe to keep in the audit log.
+     *
+     * A moodle_exception's message is the learner-facing string; the provider's
+     * actual answer ("HTTP 400: ...", a quota message, a transient flag) is in
+     * its debuginfo. Credential-shaped text is replaced
+     * ({@see \local_ai_course_assistant\security::redact_secrets()}), whitespace
+     * is collapsed to one line, and the result is cut to DETAIL_LIMIT because a
+     * rejection body can quote part of the request, which is learner text.
+     *
+     * @param \Throwable $error
+     * @return string
+     */
+    public static function describe_failure(\Throwable $error): string {
+        if ($error instanceof \moodle_exception && is_string($error->debuginfo) && trim($error->debuginfo) !== '') {
+            $text = $error->debuginfo;
+        } else {
+            $text = (string) $error->getMessage();
+        }
+        $text = \local_ai_course_assistant\security::redact_secrets($text);
+        // The /u form returns null on invalid UTF-8, which a vendor body can be.
+        $oneline = preg_replace('/\s+/u', ' ', $text) ?? preg_replace('/\s+/', ' ', $text) ?? '';
+        return \core_text::substr(trim($oneline), 0, self::DETAIL_LIMIT);
+    }
+
+    /**
+     * The shortened history to retry with, or [] when a retry would not help.
+     *
+     * Only a request the provider rejected as malformed (HTTP 400, 413 or 422)
+     * qualifies: the provider is up and answered, and the one part of the
+     * request that grows with the conversation is its history. Rate limits,
+     * outages, bad keys and unknown models say nothing about the history, so
+     * they are never retried here.
+     *
+     * @param \Throwable $error What the provider threw.
+     * @param array $messages The history that was sent.
+     * @return array
+     */
+    private static function trimmed_history_for_retry(\Throwable $error, array $messages): array {
+        if (!($error instanceof provider_http_exception) || !in_array($error->status, [400, 413, 422], true)) {
+            return [];
+        }
+        return \local_ai_course_assistant\history_trimmer::retry_candidate($messages);
+    }
+
+    /**
+     * Record a retry with a shortened history and how it ended.
+     *
+     * 'rescued' means the provider answered the shorter request, so the long
+     * history was what it objected to, and its circuit stays closed: the
+     * provider is healthy, one conversation was not. 'failed' means the
+     * shorter request was refused too and the chain carries on as before.
+     *
+     * @param array $entry The chain entry that was retried.
+     * @param string $outcome 'rescued' or 'failed'.
+     * @param int $before Messages in the rejected request.
+     * @param int $kept Messages in the retry.
+     * @param \Throwable $first Why the first request was refused.
+     * @param \Throwable|null $second Why the retry was refused, when it was.
+     */
+    private function audit_trimmed(
+        array $entry,
+        string $outcome,
+        int $before,
+        int $kept,
+        \Throwable $first,
+        ?\Throwable $second = null
+    ): void {
+        if (empty($this->options['audit'])) {
+            return;
+        }
+        try {
+            $details = [
+                'label'           => $entry['label'],
+                // The model that refused the long request, as the fall-through
+                // row names it: the answer row of a rescued turn names the same
+                // model, so only this row can say it needed a shorter history.
+                'failed_model'    => method_exists($entry['provider'], 'model_id')
+                    ? (string) $entry['provider']->model_id() : '',
+                'outcome'         => $outcome,
+                'messages_before' => $before,
+                'messages_kept'   => $kept,
+                'detail'          => self::describe_failure($first),
+            ];
+            if ($second !== null) {
+                $details['retry_detail'] = self::describe_failure($second);
+            }
+            audit_logger::log(
+                self::AUDIT_EVENT_TRIMMED,
+                (int) $this->options['userid'],
+                (int) $this->options['courseid'],
+                $details
+            );
+        } catch (\Throwable $ignore) {
+            // Audit must never break the chain.
+            unset($ignore);
         }
     }
 }

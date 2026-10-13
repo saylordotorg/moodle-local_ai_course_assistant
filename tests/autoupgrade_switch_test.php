@@ -265,6 +265,31 @@ final class autoupgrade_switch_test extends \advanced_testcase {
         $this->assertSame('rolledback', watcher::check_one($DB->get_record(switcher::TABLE, ['id' => $id]), $now + 3600));
     }
 
+    /**
+     * v7.8.8: a turn the new model answered only after a retry with a shorter
+     * history is an error of that model but not a second turn (the answer row
+     * already names it); a retry that failed too is not counted again, because
+     * the fallback's own rescued row carries that turn.
+     */
+    public function test_a_turn_answered_only_after_a_shorter_history_counts_as_an_error_not_a_turn(): void {
+        global $DB;
+        $now = time();
+        $this->traffic('gemini-3.5-flash-lite', 10, 0, $now);
+        $row = function (string $outcome, string $model) use ($DB, $now) {
+            $DB->insert_record('local_ai_course_assistant_audit', (object) ['action' => 'failover_history_trimmed',
+                'userid' => 0, 'courseid' => 0, 'ipaddress' => '', 'useragent' => '',
+                'details' => json_encode(['label' => 'gemini-primary', 'failed_model' => $model, 'outcome' => $outcome,
+                    'messages_before' => 12, 'messages_kept' => 3, 'detail' => 'HTTP 400']), 'timecreated' => $now]);
+        };
+        $row('rescued', 'gemini-3.5-flash-lite');
+        $row('rescued', 'gemini-3.5-flash-lite');
+        $row('failed', 'gemini-3.5-flash-lite');
+        $row('rescued', 'some-other-model');
+        $m = watcher::metrics('gemini', 'gemini-3.5-flash-lite', $now - 10, $now + 10);
+        $this->assertSame(10, $m['turns']);
+        $this->assertSame(2, $m['error']);
+    }
+
     public function test_a_turn_the_whole_chain_failed_counts_once(): void {
         global $DB;
         $now = time();
