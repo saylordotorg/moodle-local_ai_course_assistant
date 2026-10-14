@@ -3379,3 +3379,11 @@ $string['check:failover_ok'] = 'Dɛmɛbaga {$a} bɛɛ ye jaabi di u ka laban sɛ
 $string['check:failover_failing'] = 'Dɛmɛbaga {$a->label} ({$a->model}) ma se ka laban sɛgɛsɛgɛli kɛ: {$a->detail}';
 $string['check:failover_none'] = 'Dɛmɛbaga si ma labɛn chat kama.';
 $string['check:failover_unverified'] = 'Dɛmɛbagaw ma sɛgɛsɛgɛ fɔlɔ. Don o don baara bɛna u sɛgɛsɛgɛ, walima php local/ai_course_assistant/admin/cli/verify_failover.php baara kɛ.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Jaabi minnu ma ɲɛ minnu bɛ yɛlɛmali lakana ni';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Yɛlɛmali lakana fana ci ni kalan kɛlaw ka ɲininkaliw hakɛ in banna ni errɛri ye waati kɔnɔ, o sabara dugukolo bɛɛ kan. Jaabi hakɛ sɛgɛsɛgɛli bɛ kuraw ye minnu ye ka jaabili jɔ kɛrɛnkɛrɛnnenw; dɛmɛbaga min bɛ kuncɛ mesɛn duuru la kelen, o t\'a lawuli abada. 0 sigi walasa ka jaabi hakɛ sɛgɛsɛgɛli dɔrɔn baara kɛ.';
+$string['coursesettings:key_rejected'] = 'Kili min i ye don, a bɛ i n\'a fɔ {$a->owner} kili, nka nin kalan bɛ {$a->provider} baara kɛ, o la a ma mara.';
+$string['coursesettings:key_removed'] = 'Kili min marala nin kalan kama, a bɛ i n\'a fɔ {$a->owner} kili, nka kalan bɛ {$a->provider} baara kɛ sisan, o la kili marala bɛ bɔ a la, kalan bɛ dugukolo kili baara kɛ. {$a->provider} kili don ni kalan mago bɛ a yɔrɔ kili la.';
+$string['check:coursekeys_name'] = 'AI Course Assistant kalan kiliw';
+$string['check:coursekeys_ok'] = 'Kalan si tɛ yen min kili marala bɛ i n\'a fɔ dɛmɛbaga wɛrɛ ta.';
+$string['check:coursekeys_bad'] = 'Kalan {$a->count} bɛ kili marala la min bɛ i n\'a fɔ dɛmɛbaga wɛrɛ ta, min tɛ u bɛ min baara kɛ: {$a->list}. Kalan o kalan AI labɛnw da, kili ɲuman don walima a bɔ.';

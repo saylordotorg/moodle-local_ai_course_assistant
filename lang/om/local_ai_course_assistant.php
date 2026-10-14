@@ -3382,3 +3382,11 @@ $string['check:failover_ok'] = 'Dhiyeessitoonni deeggarsa {$a} hundi sakatta\'ii
 $string['check:failover_failing'] = 'Dhiyeessaan deeggarsa {$a->label} ({$a->model}) sakatta\'iinsa isa dhumaa irratti kufe: {$a->detail}';
 $string['check:failover_none'] = 'Haasaa (chat) keessaaf dhiyeessaan deeggarsaa tokko illee hin qindaa\'in.';
 $string['check:failover_unverified'] = 'Dhiyeessitoonni deeggarsaa ammallee hin sakatta\'amne. Hojiin guyyaa guyyaa isaan sakatta\'a, yookaan php local/ai_course_assistant/admin/cli/verify_failover.php hojjechiisi.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Deebiiwwan hin milkoofne akeekkachiisa kakaasan';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Yeroo gaaffileen baratootaa lakkoofsa kana qabdu yeroo keessatti dogoggoraan xumuraman akeekkachiisa ni ergi; marsaa saayitii guutuutti lakkaa\'ama. Qorannoon sadarkaa deebii kos\'aa deebii kennuu dhiise qofa arga; dhiyeessaan ergaa shan keessaa tokko irratti kufu isa kakaasuu hin danda\'u. Qorannoo sadarkaa deebii qofa fayyadamuuf 0 godhi.';
+$string['coursesettings:key_rejected'] = 'Furtuun galchite furtuu {$a->owner} fakkaata, garuu koorsiin kun {$a->provider} fayyadama, kanaaf hin kuufamne.';
+$string['coursesettings:key_removed'] = 'Furtuun koorsii kanaaf kuufame furtuu {$a->owner} fakkaata, garuu koorsiin amma {$a->provider} fayyadama, kanaaf furtuun kuufame ni ba\'e, koorsiinis furtuu saayitii fayyadama. Koorsiin kun kan ofii isaa barbaadu yoo ta\'e furtuu {$a->provider} galchi.';
+$string['check:coursekeys_name'] = 'Furtuuwwan koorsii AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Koorsiin furtuu dhiyeessaa biraa fakkaatu kuufame qabu hin jiru.';
+$string['check:coursekeys_bad'] = 'Koorsiin {$a->count} furtuu dhiyeessaa isaan fayyadaman irraa adda ta\'e fakkaatu kuufame qabu: {$a->list}. Qindaa\'ina AI koorsii tokkoon tokkoo bani furtuu sirrii galchi yookaan haqi.';

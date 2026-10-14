@@ -3377,3 +3377,11 @@ $string['check:failover_ok'] = 'ሁሉም {$a} ምትኬ አቅራቢዎች ለ�
 $string['check:failover_failing'] = 'የምትኬ አቅራቢው {$a->label} ({$a->model}) የመጨረሻ ፍተሻውን አልፏል አልተሳካም፦ {$a->detail}';
 $string['check:failover_none'] = 'ለቻት ምንም የምትኬ አቅራቢ አልተዋቀረም።';
 $string['check:failover_unverified'] = 'የምትኬ አቅራቢዎቹ እስካሁን አልተፈተሹም። ዕለታዊው ተግባር ይፈትሻቸዋል፣ ወይም php local/ai_course_assistant/admin/cli/verify_failover.php ን ያሂዱ።';
+
+$string['settings:unanswered_min_failed_turns'] = 'ማንቂያውን የሚያስነሱ ያልተሳኩ ምላሾች';
+$string['settings:unanswered_min_failed_turns_desc'] = 'በመስኮቱ ውስጥ ይህን ያህል የተማሪ ጥያቄዎች በስህተት ሲያልቁ ማንቂያውንም ይላኩ፤ በጠቅላላው ጣቢያ ላይ ይቆጠራል። የምላሽ-መጠን ፈተና አብዛኛውን ጊዜ መልስ መስጠት ያቆመ ኮርስ ብቻ ያያል፤ ከአምስት መልዕክት አንዱን የሚያከሽፍ አቅራቢ ፈጽሞ አያነሳሳውም። የምላሽ-መጠን ፈተናውን ብቻ ለመጠቀም 0 ያዘጋጁ።';
+$string['coursesettings:key_rejected'] = 'ያስገቡት ቁልፍ የ{$a->owner} ቁልፍ ይመስላል፣ ነገር ግን ይህ ኮርስ {$a->provider}ን ይጠቀማል፤ ስለዚህ አልተቀመጠም።';
+$string['coursesettings:key_removed'] = 'ለዚህ ኮርስ የተቀመጠው ቁልፍ የ{$a->owner} ቁልፍ ይመስላል፣ ነገር ግን ኮርሱ አሁን {$a->provider}ን ይጠቀማል፤ ስለዚህ የተቀመጠው ቁልፍ ተወግዷል እና ኮርሱ የጣቢያውን ቁልፍ ይጠቀማል። ኮርሱ የራሱ ቁልፍ ከፈለገ የ{$a->provider} ቁልፍ ያስገቡ።';
+$string['check:coursekeys_name'] = 'የ AI Course Assistant የኮርስ ቁልፎች';
+$string['check:coursekeys_ok'] = 'የተቀመጠ ቁልፍ የሌላ አቅራቢ የሆነ የሚመስል ኮርስ የለም።';
+$string['check:coursekeys_bad'] = '{$a->count} ኮርስ(ሶች) ከሚጠቀሙት አቅራቢ የተለየ የሌላ አቅራቢ የሆነ የሚመስል የተቀመጠ ቁልፍ አላቸው፦ {$a->list}። የእያንዳንዱን ኮርስ AI ቅንብሮች ይክፈቱ እና ትክክለኛውን ቁልፍ ያስገቡ ወይም ያጽዱ።';

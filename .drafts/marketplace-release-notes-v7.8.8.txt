@@ -1,7 +1,15 @@
-Version 7.8.8 (build 2026101300)
+Version 7.8.8 (build 2026101402)
 
-When the main AI provider refuses a request, SOLA now records what the provider actually said, with any credential-shaped text removed and the length capped, instead of only the error type. Reports > Status shows it, and so do the two failover rows in the audit log.
+This release makes SOLA's backup providers and error handling much easier to trust and to diagnose.
 
-SOLA also handles one common cause of refusals better. If a provider rejects a request as malformed (an HTTP 400, 413 or 422) while the conversation is long, SOLA asks the same provider once more with just the newest exchange. If that works, the learner gets that provider's answer, the backup model is not used, and the provider is not marked as down for fifteen minutes, which used to switch every course on that provider to the backup. Each retry is logged with whether it worked, so an administrator can see how often long histories were the cause. Rate limits, outages, bad keys and unknown models are not retried this way.
+Backups are checked. A daily task, a command-line check and the settings page now test each chat backup provider with a tiny real request, using the same settings a real failover would use, and flag problems such as a backup with no key or a model written as a display name. Results appear under Reports > Status and as a notice after you save the settings.
+
+Failures explain themselves. When a provider fails, the audit log now records what the provider actually said (with any credentials removed). If a provider refuses a long or malformed conversation, SOLA first retries with the conversation repaired, then with only the newest exchange, remembers which worked for that learner for a few minutes, and keeps the provider available instead of switching every course to the backup.
+
+One course can no longer block the others. A provider is now paused only for the key and model that actually failed, a malformed request never pauses it, and a passing hiccup needs two failures in a row. A course that saved one provider's key and then switched to another provider is now caught when the settings are saved, and listed under Reports > Status if it already happened.
+
+Alerts that were silent now fire. The unanswered-question alert counted a failed reply as an answer, so it could not notice a provider that failed every call. It now counts failures separately and also alerts when a set number of replies fail anywhere on the site, naming the most common cause.
+
+Read-only audit access. A new permission lets a monitoring account read the audit log without being able to change settings.
 
 Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.

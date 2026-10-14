@@ -3377,3 +3377,11 @@ $string['check:failover_ok'] = 'Los {$a} proveedores de respaldo respondieron en
 $string['check:failover_failing'] = 'El proveedor de respaldo {$a->label} ({$a->model}) falló en su última comprobación: {$a->detail}';
 $string['check:failover_none'] = 'No hay ningún proveedor de respaldo configurado para el chat.';
 $string['check:failover_unverified'] = 'Los proveedores de respaldo aún no se han comprobado. La tarea diaria los comprobará, o ejecute php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Respuestas fallidas que activan la alerta';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Enviar también la alerta cuando tantas preguntas de estudiantes en la ventana terminaron en error, contadas en todo el sitio. La prueba de tasa de respuesta solo detecta un curso que casi ha dejado de responder; un proveedor que falla en uno de cada cinco mensajes nunca la activa. Use 0 para emplear solo la prueba de tasa de respuesta.';
+$string['coursesettings:key_rejected'] = 'La clave que introdujo parece una clave de {$a->owner}, pero este curso usa {$a->provider}, así que no se guardó.';
+$string['coursesettings:key_removed'] = 'La clave guardada para este curso parece una clave de {$a->owner}, pero el curso ahora usa {$a->provider}, así que se eliminó la clave guardada y el curso usa la clave del sitio. Introduzca una clave de {$a->provider} si el curso necesita la suya.';
+$string['check:coursekeys_name'] = 'Claves de curso de AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Ningún curso tiene una clave guardada que parezca de otro proveedor.';
+$string['check:coursekeys_bad'] = '{$a->count} curso(s) tienen una clave guardada que parece de un proveedor distinto del que usan: {$a->list}. Abra la configuración de IA de cada curso e introduzca la clave correcta o bórrela.';

@@ -3394,3 +3394,11 @@ $string['check:failover_ok'] = 'Sumagot ang lahat ng {$a} backup provider sa hul
 $string['check:failover_failing'] = 'Pumalya ang backup provider na {$a->label} ({$a->model}) sa huling pagsusuri nito: {$a->detail}';
 $string['check:failover_none'] = 'Walang naka-configure na backup provider para sa chat.';
 $string['check:failover_unverified'] = 'Hindi pa nasusuri ang mga backup provider. Susuriin sila ng pang-araw-araw na gawain, o patakbuhin ang php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Mga nabigong sagot na nagti-trigger ng alerto';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Magpadala rin ng alerto kapag ganito karaming tanong ng mga mag-aaral sa loob ng window ang nauwi sa error, binibilang sa buong site. Ang pagsubok sa antas ng sagot ay nakikita lamang ang kursong halos huminto nang sumagot; ang provider na pumapalya sa isa sa limang mensahe ay hindi kailanman nagti-trigger nito. Itakda sa 0 para gamitin lamang ang pagsubok sa antas ng sagot.';
+$string['coursesettings:key_rejected'] = 'Ang key na inilagay mo ay mukhang key ng {$a->owner}, ngunit gumagamit ang kursong ito ng {$a->provider}, kaya hindi ito na-save.';
+$string['coursesettings:key_removed'] = 'Ang key na naka-save para sa kursong ito ay mukhang key ng {$a->owner}, ngunit gumagamit na ngayon ang kurso ng {$a->provider}, kaya inalis ang naka-save na key at ginagamit ng kurso ang key ng site. Maglagay ng key ng {$a->provider} kung kailangan ng kurso ng sarili nito.';
+$string['check:coursekeys_name'] = 'Mga key ng kurso ng AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Walang kursong may naka-save na key na mukhang pag-aari ng ibang provider.';
+$string['check:coursekeys_bad'] = '{$a->count} kurso ang may naka-save na key na mukhang pag-aari ng ibang provider kaysa sa ginagamit nila: {$a->list}. Buksan ang mga setting ng AI ng bawat kurso at ilagay ang tamang key o i-clear ito.';

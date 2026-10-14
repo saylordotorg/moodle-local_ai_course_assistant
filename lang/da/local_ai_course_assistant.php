@@ -3350,3 +3350,11 @@ $string['check:failover_ok'] = 'Alle {$a} backup-udbydere svarede ved seneste ko
 $string['check:failover_failing'] = 'Backup-udbyderen {$a->label} ({$a->model}) fejlede ved seneste kontrol: {$a->detail}';
 $string['check:failover_none'] = 'Der er ikke konfigureret nogen backup-udbyder til chat.';
 $string['check:failover_unverified'] = 'Backup-udbyderne er endnu ikke kontrolleret. Den daglige opgave kontrollerer dem, eller kør php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Mislykkede svar der udløser advarslen';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Send også advarslen, når så mange elevspørgsmål i vinduet endte med en fejl, talt på hele sitet. Svarprocent-testen ser kun et kursus, der for det meste er holdt op med at svare; en udbyder der fejler på én besked ud af fem udløser den aldrig. Sæt til 0 for kun at bruge svarprocent-testen.';
+$string['coursesettings:key_rejected'] = 'Den indtastede nøgle ligner en {$a->owner}-nøgle, men dette kursus bruger {$a->provider}, så den blev ikke gemt.';
+$string['coursesettings:key_removed'] = 'Den gemte nøgle til dette kursus ligner en {$a->owner}-nøgle, men kurset bruger nu {$a->provider}, så den gemte nøgle blev fjernet, og kurset bruger sitets nøgle. Indtast en {$a->provider}-nøgle, hvis kurset skal have sin egen.';
+$string['check:coursekeys_name'] = 'AI Course Assistant kursusnøgler';
+$string['check:coursekeys_ok'] = 'Intet kursus har en gemt nøgle, der ligner en anden udbyders.';
+$string['check:coursekeys_bad'] = '{$a->count} kursus(ser) har en gemt nøgle, der ligner en anden udbyders end den, de bruger: {$a->list}. Åbn hvert kursus\' AI-indstillinger og indtast den rigtige nøgle eller ryd den.';

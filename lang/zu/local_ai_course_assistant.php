@@ -3395,3 +3395,11 @@ $string['check:failover_ok'] = 'Bonke abahlinzeki abangaphezulu abangu-{$a} baph
 $string['check:failover_failing'] = 'Umhlinzeki ongaphezulu {$a->label} ({$a->model}) wehlulekile ekuhloleni kwakhe kokugcina: {$a->detail}';
 $string['check:failover_none'] = 'Akukho mhlinzeki ongaphezulu osethwe ye-chat.';
 $string['check:failover_unverified'] = 'Abahlinzeki abangaphezulu abakahlolwa okwamanje. Umsebenzi wansuku zonke uzobahlola, noma gijima php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Izimpendulo ezehlulekile ezivusa isexwayiso';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Thumela nesexwayiso lapho imibuzo yabafundi eyingako ewindini iphela ngephutha, ibalwe kuso lonke isayithi. Ukuhlolwa kwezinga lokuphendula kubona kuphela isifundo esiyekile ukuphendula kakhulu; umhlinzeki ehluleka komunye emiyalezweni emihlanu akaze akuvuse. Setha ku-0 ukusebenzisa ukuhlolwa kwezinga lokuphendula kuphela.';
+$string['coursesettings:key_rejected'] = 'Ukhiye owufakile ubonakala unjengokhiye we-{$a->owner}, kodwa lesi sifundo sisebenzisa i-{$a->provider}, ngakho akugcinwanga.';
+$string['coursesettings:key_removed'] = 'Ukhiye ogcinelwe lesi sifundo ubonakala unjengokhiye we-{$a->owner}, kodwa isifundo manje sisebenzisa i-{$a->provider}, ngakho ukhiye ogciniwe ususiwe futhi isifundo sisebenzisa ukhiye wesayithi. Faka ukhiye we-{$a->provider} uma isifundo sidinga owaso.';
+$string['check:coursekeys_name'] = 'Okhiye bezifundo be-AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Asikho isifundo esinokhiye ogciniwe obonakala ungowomunye umhlinzeki.';
+$string['check:coursekeys_bad'] = 'Izifundo ezingu-{$a->count} zinokhiye ogciniwe obonakala ungowomhlinzeki ohlukile kunalowo abamsebenzisayo: {$a->list}. Vula amasethingi e-AI esifundo ngasinye bese ufaka ukhiye ofanele noma umsuse.';

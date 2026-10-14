@@ -3394,3 +3394,11 @@ $string['check:failover_ok'] = 'Watoa huduma mbadala wote {$a} walijibu ukaguzi 
 $string['check:failover_failing'] = 'Mtoa huduma mbadala {$a->label} ({$a->model}) alishindwa katika ukaguzi wake wa mwisho: {$a->detail}';
 $string['check:failover_none'] = 'Hakuna mtoa huduma mbadala aliyesanidiwa kwa gumzo.';
 $string['check:failover_unverified'] = 'Watoa huduma mbadala bado hawajakaguliwa. Kazi ya kila siku itawakagua, au endesha php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Majibu yaliyoshindwa yanayowasha tahadhari';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Tuma tahadhari pia wakati maswali mengi hivi ya wanafunzi ndani ya dirisha yameisha kwa hitilafu, yakihesabiwa kwenye tovuti nzima. Jaribio la kiwango cha majibu huona tu kozi iliyoacha kujibu kwa kiasi kikubwa; mtoa huduma anayeshindwa kwenye ujumbe mmoja kati ya tano hauwashi kamwe. Weka 0 kutumia jaribio la kiwango cha majibu pekee.';
+$string['coursesettings:key_rejected'] = 'Ufunguo ulioingiza unaonekana kama ufunguo wa {$a->owner}, lakini kozi hii inatumia {$a->provider}, kwa hivyo haukuhifadhiwa.';
+$string['coursesettings:key_removed'] = 'Ufunguo uliohifadhiwa kwa kozi hii unaonekana kama ufunguo wa {$a->owner}, lakini kozi sasa inatumia {$a->provider}, kwa hivyo ufunguo uliohifadhiwa uliondolewa na kozi inatumia ufunguo wa tovuti. Ingiza ufunguo wa {$a->provider} ikiwa kozi inahitaji wake yenyewe.';
+$string['check:coursekeys_name'] = 'Funguo za kozi za AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Hakuna kozi yenye ufunguo uliohifadhiwa unaoonekana kuwa wa mtoa huduma mwingine.';
+$string['check:coursekeys_bad'] = 'Kozi {$a->count} zina ufunguo uliohifadhiwa unaoonekana kuwa wa mtoa huduma tofauti na anayetumika: {$a->list}. Fungua mipangilio ya AI ya kila kozi na uingize ufunguo sahihi au uufute.';

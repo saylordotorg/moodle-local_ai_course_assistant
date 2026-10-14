@@ -3643,3 +3643,14 @@ $string['check:failover_ok'] = 'All {$a} backup providers answered their last ch
 $string['check:failover_failing'] = 'The backup provider {$a->label} ({$a->model}) failed its last check: {$a->detail}';
 $string['check:failover_none'] = 'No backup provider is configured for chat.';
 $string['check:failover_unverified'] = 'The backup providers have not been checked yet. The daily task will check them, or run php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+// Failed-reply trigger for the unanswered-question alert (v7.8.8).
+$string['settings:unanswered_min_failed_turns'] = 'Failed replies that raise the alert';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Also send the alert when this many learner questions in the window ended in an error, counted across the whole site. The answer-rate test only sees a course that has mostly stopped answering; a provider that fails one message in five never trips it. Set 0 to use the answer-rate test alone.';
+
+// Course key guardrails (v7.8.8).
+$string['coursesettings:key_rejected'] = 'The key you entered looks like a {$a->owner} key, but this course uses {$a->provider}, so it was not saved.';
+$string['coursesettings:key_removed'] = 'The key saved for this course looks like a {$a->owner} key, but the course now uses {$a->provider}, so the saved key was removed and the course uses the site key. Enter a {$a->provider} key if the course needs its own.';
+$string['check:coursekeys_name'] = 'AI Course Assistant course keys';
+$string['check:coursekeys_ok'] = 'No course has a saved key that looks like it belongs to another provider.';
+$string['check:coursekeys_bad'] = '{$a->count} course(s) have a saved key that looks like it belongs to a different provider than the one they use: {$a->list}. Open each course\'s AI settings and enter the right key or clear it.';

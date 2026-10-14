@@ -3393,3 +3393,11 @@ $string['check:failover_ok'] = 'Kesemua {$a} pembekal sandaran menjawab pada sem
 $string['check:failover_failing'] = 'Pembekal sandaran {$a->label} ({$a->model}) gagal pada semakan terakhirnya: {$a->detail}';
 $string['check:failover_none'] = 'Tiada pembekal sandaran dikonfigurasikan untuk sembang.';
 $string['check:failover_unverified'] = 'Pembekal sandaran belum disemak. Tugas harian akan menyemaknya, atau jalankan php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Balasan gagal yang mencetuskan amaran';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Hantar amaran juga apabila sebilangan soalan pelajar dalam tetingkap berakhir dengan ralat, dikira merentasi seluruh tapak. Ujian kadar jawapan hanya melihat kursus yang kebanyakannya berhenti menjawab; pembekal yang gagal pada satu daripada lima mesej tidak pernah mencetuskannya. Tetapkan 0 untuk menggunakan ujian kadar jawapan sahaja.';
+$string['coursesettings:key_rejected'] = 'Kunci yang anda masukkan kelihatan seperti kunci {$a->owner}, tetapi kursus ini menggunakan {$a->provider}, jadi ia tidak disimpan.';
+$string['coursesettings:key_removed'] = 'Kunci yang disimpan untuk kursus ini kelihatan seperti kunci {$a->owner}, tetapi kursus kini menggunakan {$a->provider}, jadi kunci tersimpan telah dibuang dan kursus menggunakan kunci tapak. Masukkan kunci {$a->provider} jika kursus memerlukan kuncinya sendiri.';
+$string['check:coursekeys_name'] = 'Kunci kursus AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Tiada kursus yang mempunyai kunci tersimpan yang kelihatan milik pembekal lain.';
+$string['check:coursekeys_bad'] = '{$a->count} kursus mempunyai kunci tersimpan yang kelihatan milik pembekal yang berbeza daripada yang digunakan: {$a->list}. Buka tetapan AI setiap kursus dan masukkan kunci yang betul atau kosongkannya.';

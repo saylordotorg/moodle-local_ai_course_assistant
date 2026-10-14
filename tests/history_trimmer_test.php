@@ -102,17 +102,53 @@ final class history_trimmer_test extends \advanced_testcase {
         $this->assertSame([], history_trimmer::trim([['role' => 'assistant', 'content' => 'orphan']]));
     }
 
-    public function test_a_retry_is_offered_only_when_it_would_send_less(): void {
-        $this->assertSame([], history_trimmer::retry_candidate(self::conversation(1)), 'three turns: nothing to cut');
-        $this->assertSame([], history_trimmer::retry_candidate([]));
-        $long = self::conversation(12);
-        $candidate = history_trimmer::retry_candidate($long);
-        $this->assertNotEmpty($candidate);
-        $this->assertLessThan(count($long), count($candidate));
+    public function test_tidy_repairs_structure_and_cuts_nothing(): void {
+        $messages = [
+            ['role' => 'assistant', 'content' => 'orphan'],
+            ['role' => 'user', 'content' => 'one'],
+            ['role' => 'assistant', 'content' => ''],
+            ['role' => 'user', 'content' => 'two'],
+            ['role' => 'assistant', 'content' => 'reply'],
+            ['role' => 'user', 'content' => 'three'],
+        ];
+        $this->assertSame(
+            [
+                ['role' => 'user', 'content' => "one\n\ntwo"],
+                ['role' => 'assistant', 'content' => 'reply'],
+                ['role' => 'user', 'content' => 'three'],
+            ],
+            history_trimmer::tidy($messages)
+        );
     }
 
-    public function test_a_long_history_that_is_already_clean_still_shrinks(): void {
-        $candidate = history_trimmer::retry_candidate(self::conversation(30));
-        $this->assertLessThanOrEqual(history_trimmer::KEEP_MESSAGES, count($candidate));
+    public function test_a_well_formed_history_is_returned_unchanged_by_tidy(): void {
+        $long = self::conversation(30);
+        $this->assertSame($long, history_trimmer::tidy($long));
+    }
+
+    public function test_variants_come_tidied_first_then_trimmed_and_only_when_they_differ(): void {
+        // Clean and long: nothing to repair, so only the cut is offered.
+        $clean = history_trimmer::retry_variants(self::conversation(12));
+        $this->assertSame(['trimmed'], array_column($clean, 'name'));
+        $this->assertLessThanOrEqual(history_trimmer::KEEP_MESSAGES, count($clean[0]['messages']));
+
+        // Malformed and long: both, the repaired history first and whole.
+        $messy = self::conversation(12);
+        $messy[3]['content'] = '';
+        $variants = history_trimmer::retry_variants($messy);
+        $this->assertSame(['tidied', 'trimmed'], array_column($variants, 'name'));
+        $this->assertGreaterThan(history_trimmer::KEEP_MESSAGES, count($variants[0]['messages']));
+
+        // Malformed and short: the repair alone.
+        $short = [
+            ['role' => 'user', 'content' => 'a'],
+            ['role' => 'assistant', 'content' => ' '],
+            ['role' => 'user', 'content' => 'b'],
+        ];
+        $this->assertSame(['tidied'], array_column(history_trimmer::retry_variants($short), 'name'));
+
+        // Clean and short: nothing to offer.
+        $this->assertSame([], history_trimmer::retry_variants(self::conversation(1)));
+        $this->assertSame([], history_trimmer::retry_variants([]));
     }
 }

@@ -971,6 +971,29 @@ class conversation_manager {
     }
 
     /**
+     * What to store as stream_outcome for a turn that ended in an exception.
+     *
+     * 'provider_error' means the provider (or the setup that should have reached one) failed, and is what
+     * the unanswered-question alert and the model-switch watcher count as a failure. A chat that was
+     * stopped on purpose (the emergency pause) or refused by a guard before any provider was reached
+     * (spend cap, quiz lock, rate limit, off-topic lock) is 'blocked': the learner did not get an answer
+     * and was told why, but nothing is broken.
+     *
+     * @param bool $paused Chat was stopped by the emergency control.
+     * @param bool $providerbuilt A provider object had been created when the exception arrived.
+     * @param string $errorcode The exception's error code.
+     * @return string 'provider_error' or 'blocked'
+     */
+    public static function failed_turn_outcome(bool $paused, bool $providerbuilt, string $errorcode): string {
+        if ($paused) {
+            return 'blocked';
+        }
+        // chat:error, chat:error_auth, chat:error_notconfigured, chat:error_unavailable... are provider or
+        // setup faults. A guard refuses with the generic 'error' code and a message for the learner.
+        return ($providerbuilt || str_starts_with($errorcode, 'chat:error')) ? 'provider_error' : 'blocked';
+    }
+
+    /**
      * What a stored assistant turn should say when it is replayed to a learner.
      *
      * failed_turn_text() fixed what gets WRITTEN from v7.2.4 on. This is the

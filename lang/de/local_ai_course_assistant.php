@@ -3350,3 +3350,11 @@ $string['check:failover_ok'] = 'Alle {$a} Backup-Anbieter haben bei der letzten 
 $string['check:failover_failing'] = 'Der Backup-Anbieter {$a->label} ({$a->model}) ist bei der letzten Prüfung fehlgeschlagen: {$a->detail}';
 $string['check:failover_none'] = 'Für den Chat ist kein Backup-Anbieter konfiguriert.';
 $string['check:failover_unverified'] = 'Die Backup-Anbieter wurden noch nicht geprüft. Die tägliche Aufgabe prüft sie, oder führen Sie php local/ai_course_assistant/admin/cli/verify_failover.php aus.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Fehlgeschlagene Antworten, die den Alarm auslösen';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Den Alarm auch senden, wenn so viele Lernendenfragen im Zeitfenster mit einem Fehler endeten, gezählt über die gesamte Website. Der Antwortquoten-Test erkennt nur einen Kurs, der größtenteils nicht mehr antwortet; ein Anbieter, der bei einer von fünf Nachrichten ausfällt, löst ihn nie aus. Mit 0 wird nur der Antwortquoten-Test verwendet.';
+$string['coursesettings:key_rejected'] = 'Der eingegebene Schlüssel sieht wie ein {$a->owner}-Schlüssel aus, aber dieser Kurs verwendet {$a->provider}; er wurde daher nicht gespeichert.';
+$string['coursesettings:key_removed'] = 'Der für diesen Kurs gespeicherte Schlüssel sieht wie ein {$a->owner}-Schlüssel aus, aber der Kurs verwendet jetzt {$a->provider}; der gespeicherte Schlüssel wurde daher entfernt, und der Kurs verwendet den Schlüssel der Website. Geben Sie einen {$a->provider}-Schlüssel ein, falls der Kurs einen eigenen braucht.';
+$string['check:coursekeys_name'] = 'Kurs-Schlüssel des AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Kein Kurs hat einen gespeicherten Schlüssel, der zu einem anderen Anbieter zu gehören scheint.';
+$string['check:coursekeys_bad'] = '{$a->count} Kurs(e) haben einen gespeicherten Schlüssel, der zu einem anderen Anbieter als dem verwendeten zu gehören scheint: {$a->list}. Öffnen Sie die KI-Einstellungen jedes Kurses und geben Sie den richtigen Schlüssel ein oder löschen Sie ihn.';

@@ -3373,3 +3373,11 @@ $string['check:failover_ok'] = 'Alle {$a} back-upproviders hebben bij de laatste
 $string['check:failover_failing'] = 'De back-upprovider {$a->label} ({$a->model}) is mislukt bij de laatste controle: {$a->detail}';
 $string['check:failover_none'] = 'Er is geen back-upprovider geconfigureerd voor chat.';
 $string['check:failover_unverified'] = 'De back-upproviders zijn nog niet gecontroleerd. De dagelijkse taak controleert ze, of voer php local/ai_course_assistant/admin/cli/verify_failover.php uit.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Mislukte antwoorden die de waarschuwing activeren';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Stuur de waarschuwing ook wanneer zoveel leerlingvragen in het venster op een fout eindigden, geteld over de hele site. De antwoordpercentagetest ziet alleen een cursus die grotendeels is opgehouden met antwoorden; een provider die bij één op de vijf berichten faalt, activeert hem nooit. Stel 0 in om alleen de antwoordpercentagetest te gebruiken.';
+$string['coursesettings:key_rejected'] = 'De ingevoerde sleutel lijkt op een {$a->owner}-sleutel, maar deze cursus gebruikt {$a->provider}, dus hij is niet opgeslagen.';
+$string['coursesettings:key_removed'] = 'De voor deze cursus opgeslagen sleutel lijkt op een {$a->owner}-sleutel, maar de cursus gebruikt nu {$a->provider}, dus de opgeslagen sleutel is verwijderd en de cursus gebruikt de sitesleutel. Voer een {$a->provider}-sleutel in als de cursus een eigen sleutel nodig heeft.';
+$string['check:coursekeys_name'] = 'Cursussleutels van AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Geen enkele cursus heeft een opgeslagen sleutel die van een andere provider lijkt te zijn.';
+$string['check:coursekeys_bad'] = '{$a->count} cursus(sen) hebben een opgeslagen sleutel die van een andere provider lijkt te zijn dan die ze gebruiken: {$a->list}. Open de AI-instellingen van elke cursus en voer de juiste sleutel in of wis hem.';

@@ -3389,3 +3389,11 @@ $string['check:failover_ok'] = 'כל {$a} ספקי הגיבוי השיבו בב�
 $string['check:failover_failing'] = 'ספק הגיבוי {$a->label} ({$a->model}) נכשל בבדיקה האחרונה: {$a->detail}';
 $string['check:failover_none'] = 'לא הוגדר ספק גיבוי לצ\'אט.';
 $string['check:failover_unverified'] = 'ספקי הגיבוי טרם נבדקו. המשימה היומית תבדוק אותם, או הריצו את php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'תשובות שנכשלו שמפעילות את ההתראה';
+$string['settings:unanswered_min_failed_turns_desc'] = 'שלחו את ההתראה גם כאשר כך וכך שאלות של לומדים בחלון הזמן הסתיימו בשגיאה, בספירה בכל האתר. בדיקת שיעור התשובות מזהה רק קורס שהפסיק לענות ברובו; ספק שנכשל בהודעה אחת מכל חמש לעולם אינו מפעיל אותה. הגדירו 0 כדי להשתמש בבדיקת שיעור התשובות בלבד.';
+$string['coursesettings:key_rejected'] = 'המפתח שהזנתם נראה כמפתח של {$a->owner}, אך הקורס הזה משתמש ב-{$a->provider}, ולכן הוא לא נשמר.';
+$string['coursesettings:key_removed'] = 'המפתח ששמור לקורס הזה נראה כמפתח של {$a->owner}, אך הקורס משתמש כעת ב-{$a->provider}, ולכן המפתח השמור הוסר והקורס משתמש במפתח האתר. הזינו מפתח של {$a->provider} אם הקורס זקוק למפתח משלו.';
+$string['check:coursekeys_name'] = 'מפתחות הקורסים של AI Course Assistant';
+$string['check:coursekeys_ok'] = 'אין קורס עם מפתח שמור שנראה כשייך לספק אחר.';
+$string['check:coursekeys_bad'] = 'ל-{$a->count} קורסים יש מפתח שמור שנראה כשייך לספק שונה מזה שבו הם משתמשים: {$a->list}. פתחו את הגדרות ה-AI של כל קורס והזינו את המפתח הנכון או נקו אותו.';
