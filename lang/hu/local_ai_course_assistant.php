@@ -3377,3 +3377,16 @@ $string['settings:essay_provider'] = 'Esszévisszajelzés szolgáltatója';
 $string['settings:essay_provider_desc'] = 'A szolgáltató azonosítója (pl. <code>claude</code>, <code>openai</code>) az esszévisszajelzéshez. Egyeznie kell az Összehasonlító szolgáltatók egyik sorával. Hagyja üresen a csevegés szolgáltatójának használatához. A felülbíráláshoz ennek a mezőnek és a modellnek is be kell lennie állítva.';
 $string['settings:essay_model'] = 'Esszévisszajelzés modellje';
 $string['settings:essay_model_desc'] = 'A modell neve az esszévisszajelzéshez, pl. <code>claude-haiku-4-5</code>. A 2026. októberi összehasonlító tesztben a Claude modellek egyértelműen jobb esszévisszajelzést adtak, mint a Gemini 2.5 Flash vagy a GPT-4o mini. Hagyja üresen a csevegés modelljének használatához.';
+
+$string['ai_course_assistant:viewaudit'] = 'Az AI-oktató auditnaplójának megtekintése';
+$string['task:verify_failover'] = 'A tartalék szolgáltatók ellenőrzése átváltáshoz';
+$string['verify:missing_row'] = 'Az átváltási lánc tartalmazza a chat:{$a} bejegyzést, de a(z) Összehasonlító szolgáltatók nem tartalmaz {$a} nevű sort, ezért a bejegyzés kimarad.';
+$string['verify:missing_key'] = 'A(z) Összehasonlító szolgáltatók {$a} sorához nem tartozik API-kulcs, ezért a chat:{$a} átváltási bejegyzés kimarad.';
+$string['verify:model_case'] = 'A(z) {$a->label} modellje így van megadva: "{$a->model}". A modellazonosítók kisbetűsek és szóköz nélküliek (próbálja ezt: {$a->suggest}); a megjelenített név minden valódi átváltást meghiúsíthat, miközben az adminisztrátori LLM-választó továbbra is működik.';
+$string['verify:no_backup'] = 'A hívásonkénti átváltás be van kapcsolva, de a(z) Tartaléklánc egyik chat-bejegyzése sem vezet szolgáltatóhoz, ezért nincs tartalék.';
+$string['verify:saved_warning'] = 'Ellenőrizze az átváltási beállításokat:';
+$string['check:failover_name'] = 'Az AI Course Assistant tartalék szolgáltatói';
+$string['check:failover_ok'] = 'Mind a(z) {$a} tartalék szolgáltató válaszolt az utolsó ellenőrzésnél.';
+$string['check:failover_failing'] = 'A(z) {$a->label} ({$a->model}) tartalék szolgáltató megbukott az utolsó ellenőrzésen: {$a->detail}';
+$string['check:failover_none'] = 'A csevegéshez nincs tartalék szolgáltató beállítva.';
+$string['check:failover_unverified'] = 'A tartalék szolgáltatókat még nem ellenőrizték. A napi feladat ellenőrzi őket, vagy futtassa: php local/ai_course_assistant/admin/cli/verify_failover.php.';

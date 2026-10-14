@@ -64,6 +64,7 @@ $string['ai_course_assistant:use'] = 'Use AI tutor chat';
 $string['ai_course_assistant:viewanalytics'] = 'View AI tutor chat analytics';
 $string['ai_course_assistant:usesupport'] = 'Use the assistant outside a course';
 $string['ai_course_assistant:manage'] = 'Manage AI tutor chat settings (Administrator role)';
+$string['ai_course_assistant:viewaudit'] = 'View the AI tutor audit log';
 
 // Settings.
 $string['settings:enabled'] = 'Enable AI Course Assistant';
@@ -3629,3 +3630,16 @@ $string['settings:essay_provider'] = 'Essay feedback provider';
 $string['settings:essay_provider_desc'] = 'Provider id (e.g. <code>claude</code>, <code>openai</code>) for essay feedback. Must match a row in Comparison providers. Leave empty to use the chat provider. Both this and the model must be set for the override to apply.';
 $string['settings:essay_model'] = 'Essay feedback model';
 $string['settings:essay_model_desc'] = 'Model name for essay feedback, e.g. <code>claude-haiku-4-5</code>. In the October 2026 benchmark Claude models gave clearly better essay feedback than Gemini 2.5 Flash or GPT-4o mini. Leave empty to use the chat model.';
+
+// Failover backup verification (v7.8.8).
+$string['task:verify_failover'] = 'Check the failover backup providers';
+$string['verify:missing_row'] = 'The failover chain lists chat:{$a}, but Comparison providers has no row called {$a}, so that entry is skipped.';
+$string['verify:missing_key'] = 'The Comparison providers row {$a} has no API key, so the failover entry chat:{$a} is skipped.';
+$string['verify:model_case'] = 'The model for {$a->label} is written as "{$a->model}". Model ids are lowercase with no spaces (try {$a->suggest}); a display name can fail every real failover while the admin LLM picker still works.';
+$string['verify:no_backup'] = 'Per-call failover is on, but no chat entry in the failover chain resolves to a provider, so there is no backup.';
+$string['verify:saved_warning'] = 'Check your failover settings:';
+$string['check:failover_name'] = 'AI Course Assistant backup providers';
+$string['check:failover_ok'] = 'All {$a} backup providers answered their last check.';
+$string['check:failover_failing'] = 'The backup provider {$a->label} ({$a->model}) failed its last check: {$a->detail}';
+$string['check:failover_none'] = 'No backup provider is configured for chat.';
+$string['check:failover_unverified'] = 'The backup providers have not been checked yet. The daily task will check them, or run php local/ai_course_assistant/admin/cli/verify_failover.php.';

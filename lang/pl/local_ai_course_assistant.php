@@ -3337,3 +3337,16 @@ $string['settings:essay_provider'] = 'Dostawca opinii o wypracowaniach';
 $string['settings:essay_provider_desc'] = 'Identyfikator dostawcy (np. <code>claude</code>, <code>openai</code>) dla opinii o wypracowaniach. Musi odpowiadać wierszowi w sekcji Dostawcy porównawczy. Pozostaw puste, aby użyć dostawcy czatu. Aby zastąpienie zadziałało, muszą być ustawione zarówno to pole, jak i model.';
 $string['settings:essay_model'] = 'Model opinii o wypracowaniach';
 $string['settings:essay_model_desc'] = 'Nazwa modelu dla opinii o wypracowaniach, np. <code>claude-haiku-4-5</code>. W teście porównawczym z października 2026 r. modele Claude dawały wyraźnie lepsze opinie o wypracowaniach niż Gemini 2.5 Flash czy GPT-4o mini. Pozostaw puste, aby użyć modelu czatu.';
+
+$string['ai_course_assistant:viewaudit'] = 'Wyświetl dziennik audytu tutora AI';
+$string['task:verify_failover'] = 'Sprawdź zapasowych dostawców przełączania awaryjnego';
+$string['verify:missing_row'] = 'Łańcuch przełączania awaryjnego zawiera chat:{$a}, ale Dostawcy do porównania nie ma wiersza o nazwie {$a}, więc ten wpis jest pomijany.';
+$string['verify:missing_key'] = 'Wiersz {$a} w Dostawcy do porównania nie ma klucza API, więc wpis chat:{$a} jest pomijany.';
+$string['verify:model_case'] = 'Model dla {$a->label} jest zapisany jako "{$a->model}". Identyfikatory modeli piszemy małymi literami bez spacji (spróbuj {$a->suggest}); nazwa wyświetlana może spowodować niepowodzenie każdego rzeczywistego przełączenia, podczas gdy selektor LLM administratora nadal działa.';
+$string['verify:no_backup'] = 'Przełączanie awaryjne dla każdego wywołania jest włączone, ale żaden wpis chat w Łańcuch awaryjny nie prowadzi do dostawcy, więc nie ma kopii zapasowej.';
+$string['verify:saved_warning'] = 'Sprawdź ustawienia przełączania awaryjnego:';
+$string['check:failover_name'] = 'Zapasowi dostawcy AI Course Assistant';
+$string['check:failover_ok'] = 'Wszyscy zapasowi dostawcy ({$a}) odpowiedzieli podczas ostatniego sprawdzenia.';
+$string['check:failover_failing'] = 'Zapasowy dostawca {$a->label} ({$a->model}) nie przeszedł ostatniego sprawdzenia: {$a->detail}';
+$string['check:failover_none'] = 'Dla czatu nie skonfigurowano zapasowego dostawcy.';
+$string['check:failover_unverified'] = 'Zapasowi dostawcy nie zostali jeszcze sprawdzeni. Zrobi to zadanie dzienne, albo uruchom php local/ai_course_assistant/admin/cli/verify_failover.php.';

@@ -3338,3 +3338,16 @@ $string['settings:essay_provider'] = 'Kompozisyon geri bildirimi sağlayıcısı
 $string['settings:essay_provider_desc'] = 'Kompozisyon geri bildirimi için sağlayıcı kimliği (ör. <code>claude</code>, <code>openai</code>). Karşılaştırma sağlayıcıları içindeki bir satırla eşleşmelidir. Sohbet sağlayıcısını kullanmak için boş bırakın. Geçersiz kılmanın uygulanması için hem bu alan hem de model ayarlanmış olmalıdır.';
 $string['settings:essay_model'] = 'Kompozisyon geri bildirimi modeli';
 $string['settings:essay_model_desc'] = 'Kompozisyon geri bildirimi için model adı, ör. <code>claude-haiku-4-5</code>. Ekim 2026 karşılaştırmasında Claude modelleri, Gemini 2.5 Flash veya GPT-4o mini\'ye göre belirgin biçimde daha iyi kompozisyon geri bildirimi verdi. Sohbet modelini kullanmak için boş bırakın.';
+
+$string['ai_course_assistant:viewaudit'] = 'Yapay zekâ eğitmeninin denetim günlüğünü görüntüle';
+$string['task:verify_failover'] = 'Yük devretme yedek sağlayıcılarını denetle';
+$string['verify:missing_row'] = 'Yük devretme zinciri chat:{$a} girdisini listeliyor, ancak Karşılaştırma sağlayıcıları içinde {$a} adlı bir satır yok; bu nedenle girdi atlanıyor.';
+$string['verify:missing_key'] = 'Karşılaştırma sağlayıcıları içindeki {$a} satırında API anahtarı yok; bu nedenle chat:{$a} yük devretme girdisi atlanıyor.';
+$string['verify:model_case'] = '{$a->label} için model "{$a->model}" olarak yazılmış. Model kimlikleri küçük harfle ve boşluksuz yazılır ({$a->suggest} deneyin); görünen ad, yöneticinin LLM seçicisi çalışırken bile her gerçek yük devretmeyi başarısız kılabilir.';
+$string['verify:no_backup'] = 'Çağrı başına yük devretme açık, ancak Yedek zinciri içindeki hiçbir sohbet girdisi bir sağlayıcıya çıkmıyor; bu nedenle yedek yok.';
+$string['verify:saved_warning'] = 'Yük devretme ayarlarınızı kontrol edin:';
+$string['check:failover_name'] = 'AI Course Assistant yedek sağlayıcıları';
+$string['check:failover_ok'] = '{$a} yedek sağlayıcının tümü son denetime yanıt verdi.';
+$string['check:failover_failing'] = '{$a->label} ({$a->model}) yedek sağlayıcısı son denetiminde başarısız oldu: {$a->detail}';
+$string['check:failover_none'] = 'Sohbet için yapılandırılmış bir yedek sağlayıcı yok.';
+$string['check:failover_unverified'] = 'Yedek sağlayıcılar henüz denetlenmedi. Günlük görev onları denetleyecek veya php local/ai_course_assistant/admin/cli/verify_failover.php komutunu çalıştırın.';

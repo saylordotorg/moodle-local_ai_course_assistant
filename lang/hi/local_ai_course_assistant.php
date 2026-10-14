@@ -3365,3 +3365,16 @@ $string['settings:essay_provider'] = 'निबंध फ़ीडबैक प�
 $string['settings:essay_provider_desc'] = 'निबंध फ़ीडबैक के लिए प्रदाता आईडी (जैसे <code>claude</code>, <code>openai</code>)। यह तुलना प्रदाता की किसी पंक्ति से मेल खाना चाहिए। चैट प्रदाता का उपयोग करने के लिए खाली छोड़ें। ओवरराइड लागू होने के लिए यह और मॉडल दोनों सेट होने चाहिए।';
 $string['settings:essay_model'] = 'निबंध फ़ीडबैक मॉडल';
 $string['settings:essay_model_desc'] = 'निबंध फ़ीडबैक के लिए मॉडल का नाम, जैसे <code>claude-haiku-4-5</code>। अक्टूबर 2026 के बेंचमार्क में Claude मॉडल ने Gemini 2.5 Flash या GPT-4o mini की तुलना में स्पष्ट रूप से बेहतर निबंध फ़ीडबैक दिया। चैट मॉडल का उपयोग करने के लिए खाली छोड़ें।';
+
+$string['ai_course_assistant:viewaudit'] = 'AI ट्यूटर का ऑडिट लॉग देखें';
+$string['task:verify_failover'] = 'फेलओवर बैकअप प्रदाताओं की जाँच करें';
+$string['verify:missing_row'] = 'फेलओवर शृंखला में chat:{$a} सूचीबद्ध है, लेकिन तुलना प्रदाता में {$a} नाम की कोई पंक्ति नहीं है, इसलिए वह प्रविष्टि छोड़ दी जाती है।';
+$string['verify:missing_key'] = 'तुलना प्रदाता की पंक्ति {$a} में कोई API कुंजी नहीं है, इसलिए फेलओवर प्रविष्टि chat:{$a} छोड़ दी जाती है।';
+$string['verify:model_case'] = '{$a->label} का मॉडल "{$a->model}" के रूप में लिखा गया है। मॉडल आईडी छोटे अक्षरों में और बिना रिक्त स्थान के होते हैं ({$a->suggest} आज़माएँ); प्रदर्शन नाम हर असली फेलओवर को विफल कर सकता है, जबकि एडमिन LLM पिकर काम करता रहता है।';
+$string['verify:no_backup'] = 'प्रति-कॉल फेलओवर चालू है, लेकिन फ़ेलओवर शृंखला की कोई भी चैट प्रविष्टि किसी प्रदाता तक नहीं पहुँचती, इसलिए कोई बैकअप नहीं है।';
+$string['verify:saved_warning'] = 'अपनी फेलओवर सेटिंग्स जाँचें:';
+$string['check:failover_name'] = 'AI Course Assistant बैकअप प्रदाता';
+$string['check:failover_ok'] = 'सभी {$a} बैकअप प्रदाताओं ने अपनी पिछली जाँच का उत्तर दिया।';
+$string['check:failover_failing'] = 'बैकअप प्रदाता {$a->label} ({$a->model}) अपनी पिछली जाँच में विफल रहा: {$a->detail}';
+$string['check:failover_none'] = 'चैट के लिए कोई बैकअप प्रदाता कॉन्फ़िगर नहीं है।';
+$string['check:failover_unverified'] = 'बैकअप प्रदाताओं की अभी तक जाँच नहीं हुई है। दैनिक कार्य उनकी जाँच करेगा, या php local/ai_course_assistant/admin/cli/verify_failover.php चलाएँ।';

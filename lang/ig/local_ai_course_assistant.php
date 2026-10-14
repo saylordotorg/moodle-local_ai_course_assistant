@@ -3352,3 +3352,16 @@ $string['settings:essay_provider'] = 'Onye na-eweta nzaghachi edemede';
 $string['settings:essay_provider_desc'] = 'ID onye na-eweta ọrụ (dịka <code>claude</code>, <code>openai</code>) maka nzaghachi edemede. Ọ ga-agbakọ otu ahịrị n\'ime Ndị na-eweta ntụnyere. Hapụ ya efu iji jiri onye na-eweta ọrụ nke mkparịta ụka. Ọ dị mkpa ka e tọọ ngalaba a na ụdị ahụ abụọ ka mgbanwe ahụ rụọ ọrụ.';
 $string['settings:essay_model'] = 'Ụdị nzaghachi edemede';
 $string['settings:essay_model_desc'] = 'Aha ụdị maka nzaghachi edemede, dịka <code>claude-haiku-4-5</code>. N\'ule ntụnyere nke Ọktoba 2026, ụdị Claude nyere nzaghachi edemede ka mma n\'ụzọ doro anya karịa Gemini 2.5 Flash ma ọ bụ GPT-4o mini. Hapụ ya efu iji jiri ụdị mkparịta ụka.';
+
+$string['ai_course_assistant:viewaudit'] = 'Lee ndekọ nyocha nke onye nkuzi AI';
+$string['task:verify_failover'] = 'Lelee ndị na-enye nkwado maka mgbanwe ọdịda';
+$string['verify:missing_row'] = 'Yinye mgbanwe ọdịda na-edepụta chat:{$a}, mana Ndị na-enye ọsọ ntụnyere enweghị ahịrị a na-akpọ {$a}, ya mere a na-agabiga ntinye ahụ.';
+$string['verify:missing_key'] = 'Ahịrị {$a} dị na Ndị na-enye ọsọ ntụnyere enweghị igodo API, ya mere a na-agabiga ntinye chat:{$a}.';
+$string['verify:model_case'] = 'E dere ụdị maka {$a->label} dị ka "{$a->model}". Njirimara ụdị bụ mkpụrụedemede nta na-enweghị oghere (nwaa {$a->suggest}); aha ngosi nwere ike ime ka mgbanwe ọdịda ọ bụla bụ eziokwu daa mgbe onye nhọrọ LLM nke onye nchịkwa na-arụ ọrụ.';
+$string['verify:no_backup'] = 'Mgbanwe ọdịda maka oku ọ bụla na-agba, mana enweghị ntinye chat dị na Agbụ nkwado na-eduga n\'onye na-enye ọrụ, ya mere enweghị nkwado.';
+$string['verify:saved_warning'] = 'Lelee ntọala mgbanwe ọdịda gị:';
+$string['check:failover_name'] = 'Ndị na-enye nkwado AI Course Assistant';
+$string['check:failover_ok'] = 'Ndị na-enye nkwado niile {$a} zara na nlele ikpeazụ.';
+$string['check:failover_failing'] = 'Onye na-enye nkwado {$a->label} ({$a->model}) dara na nlele ikpeazụ ya: {$a->detail}';
+$string['check:failover_none'] = 'Echepụtaghị onye na-enye nkwado maka mkparịta ụka.';
+$string['check:failover_unverified'] = 'Elebeghị ndị na-enye nkwado anya. Ọrụ kwa ụbọchị ga-elele ha, ma ọ bụ gbaa php local/ai_course_assistant/admin/cli/verify_failover.php.';

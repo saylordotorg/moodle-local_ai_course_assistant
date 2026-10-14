@@ -3335,3 +3335,16 @@ $string['settings:essay_provider'] = 'রচনা ফিডব্যাক প�
 $string['settings:essay_provider_desc'] = 'রচনা ফিডব্যাকের জন্য প্রদানকারীর আইডি (যেমন <code>claude</code>, <code>openai</code>)। এটি তুলনামূলক প্রদানকারীর কোনো সারির সঙ্গে মিলতে হবে। চ্যাট প্রদানকারী ব্যবহার করতে ফাঁকা রাখুন। ওভাররাইড কার্যকর হতে এই ঘর ও মডেল দুটোই সেট করা থাকতে হবে।';
 $string['settings:essay_model'] = 'রচনা ফিডব্যাক মডেল';
 $string['settings:essay_model_desc'] = 'রচনা ফিডব্যাকের জন্য মডেলের নাম, যেমন <code>claude-haiku-4-5</code>। ২০২৬ সালের অক্টোবরের বেঞ্চমার্কে Claude মডেল Gemini 2.5 Flash বা GPT-4o mini-র চেয়ে স্পষ্টভাবে ভালো রচনা ফিডব্যাক দিয়েছে। চ্যাট মডেল ব্যবহার করতে ফাঁকা রাখুন।';
+
+$string['ai_course_assistant:viewaudit'] = 'AI টিউটর অডিট লগ দেখুন';
+$string['task:verify_failover'] = 'ফেইলওভার ব্যাকআপ প্রদানকারীদের যাচাই করুন';
+$string['verify:missing_row'] = 'ফেইলওভার চেইনে chat:{$a} আছে, কিন্তু তুলনামূলক প্রদানকারী-এ {$a} নামে কোনো সারি নেই, তাই ওই এন্ট্রিটি বাদ দেওয়া হচ্ছে।';
+$string['verify:missing_key'] = 'তুলনামূলক প্রদানকারী-এর {$a} সারিতে কোনো API কী নেই, তাই ফেইলওভার এন্ট্রি chat:{$a} বাদ দেওয়া হচ্ছে।';
+$string['verify:model_case'] = '{$a->label}-এর মডেল "{$a->model}" হিসেবে লেখা হয়েছে। মডেল আইডি ছোট হাতের অক্ষরে এবং ফাঁকা ছাড়া হয় ({$a->suggest} চেষ্টা করুন); প্রদর্শনের নাম অ্যাডমিন LLM পিকার কাজ করলেও প্রতিটি আসল ফেইলওভার ব্যর্থ করতে পারে।';
+$string['verify:no_backup'] = 'প্রতি-কলে ফেইলওভার চালু আছে, কিন্তু বিকল্প শৃঙ্খল-এর কোনো চ্যাট এন্ট্রি কোনো প্রদানকারীতে পৌঁছায় না, তাই কোনো ব্যাকআপ নেই।';
+$string['verify:saved_warning'] = 'আপনার ফেইলওভার সেটিংস পরীক্ষা করুন:';
+$string['check:failover_name'] = 'AI Course Assistant ব্যাকআপ প্রদানকারী';
+$string['check:failover_ok'] = 'সব {$a}টি ব্যাকআপ প্রদানকারী তাদের শেষ পরীক্ষায় সাড়া দিয়েছে।';
+$string['check:failover_failing'] = 'ব্যাকআপ প্রদানকারী {$a->label} ({$a->model}) তার শেষ পরীক্ষায় ব্যর্থ হয়েছে: {$a->detail}';
+$string['check:failover_none'] = 'চ্যাটের জন্য কোনো ব্যাকআপ প্রদানকারী কনফিগার করা নেই।';
+$string['check:failover_unverified'] = 'ব্যাকআপ প্রদানকারীদের এখনও পরীক্ষা করা হয়নি। দৈনিক টাস্ক সেগুলো পরীক্ষা করবে, অথবা php local/ai_course_assistant/admin/cli/verify_failover.php চালান।';

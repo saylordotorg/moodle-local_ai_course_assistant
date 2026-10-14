@@ -3381,3 +3381,16 @@ $string['settings:essay_provider'] = 'Provider ng feedback sa sanaysay';
 $string['settings:essay_provider_desc'] = 'Provider id (hal. <code>claude</code>, <code>openai</code>) para sa feedback sa sanaysay. Dapat tumugma sa isang hilera sa Mga provider ng paghahambing. Iwanang walang laman para gamitin ang provider ng chat. Kailangang nakatakda ang field na ito at ang modelo para mailapat ang override.';
 $string['settings:essay_model'] = 'Modelo ng feedback sa sanaysay';
 $string['settings:essay_model_desc'] = 'Pangalan ng modelo para sa feedback sa sanaysay, hal. <code>claude-haiku-4-5</code>. Sa benchmark noong Oktubre 2026, mas mahusay nang malinaw ang feedback sa sanaysay ng mga modelong Claude kaysa sa Gemini 2.5 Flash o GPT-4o mini. Iwanang walang laman para gamitin ang modelo ng chat.';
+
+$string['ai_course_assistant:viewaudit'] = 'Tingnan ang audit log ng AI tutor';
+$string['task:verify_failover'] = 'Suriin ang mga backup provider para sa failover';
+$string['verify:missing_row'] = 'Nakalista sa failover chain ang chat:{$a}, ngunit walang row na tinatawag na {$a} sa Mga provider ng paghahambing, kaya nilalaktawan ang entry na iyon.';
+$string['verify:missing_key'] = 'Walang API key ang row na {$a} sa Mga provider ng paghahambing, kaya nilalaktawan ang failover entry na chat:{$a}.';
+$string['verify:model_case'] = 'Ang model para sa {$a->label} ay nakasulat bilang "{$a->model}". Maliliit na titik at walang espasyo ang mga model ID (subukan ang {$a->suggest}); maaaring pumalya ang bawat totoong failover dahil sa display name habang gumagana pa rin ang LLM picker ng admin.';
+$string['verify:no_backup'] = 'Naka-on ang failover bawat tawag, ngunit walang chat entry sa Failover chain na humahantong sa provider, kaya walang backup.';
+$string['verify:saved_warning'] = 'Suriin ang iyong mga setting ng failover:';
+$string['check:failover_name'] = 'Mga backup provider ng AI Course Assistant';
+$string['check:failover_ok'] = 'Sumagot ang lahat ng {$a} backup provider sa huling pagsusuri.';
+$string['check:failover_failing'] = 'Pumalya ang backup provider na {$a->label} ({$a->model}) sa huling pagsusuri nito: {$a->detail}';
+$string['check:failover_none'] = 'Walang naka-configure na backup provider para sa chat.';
+$string['check:failover_unverified'] = 'Hindi pa nasusuri ang mga backup provider. Susuriin sila ng pang-araw-araw na gawain, o patakbuhin ang php local/ai_course_assistant/admin/cli/verify_failover.php.';

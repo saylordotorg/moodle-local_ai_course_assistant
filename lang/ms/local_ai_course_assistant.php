@@ -3380,3 +3380,16 @@ $string['settings:essay_provider'] = 'Penyedia maklum balas esei';
 $string['settings:essay_provider_desc'] = 'ID penyedia (cth. <code>claude</code>, <code>openai</code>) untuk maklum balas esei. Mesti sepadan dengan satu baris dalam Penyedia perbandingan. Biarkan kosong untuk menggunakan penyedia sembang. Kedua-dua medan ini dan model mesti ditetapkan supaya penggantian berkuat kuasa.';
 $string['settings:essay_model'] = 'Model maklum balas esei';
 $string['settings:essay_model_desc'] = 'Nama model untuk maklum balas esei, cth. <code>claude-haiku-4-5</code>. Dalam penanda aras Oktober 2026, model Claude memberikan maklum balas esei yang jelas lebih baik daripada Gemini 2.5 Flash atau GPT-4o mini. Biarkan kosong untuk menggunakan model sembang.';
+
+$string['ai_course_assistant:viewaudit'] = 'Lihat log audit tutor AI';
+$string['task:verify_failover'] = 'Semak pembekal sandaran failover';
+$string['verify:missing_row'] = 'Rantaian failover menyenaraikan chat:{$a}, tetapi Pembekal perbandingan tiada baris bernama {$a}, jadi entri itu dilangkau.';
+$string['verify:missing_key'] = 'Baris {$a} dalam Pembekal perbandingan tiada kunci API, jadi entri failover chat:{$a} dilangkau.';
+$string['verify:model_case'] = 'Model untuk {$a->label} ditulis sebagai "{$a->model}". ID model ialah huruf kecil tanpa ruang (cuba {$a->suggest}); nama paparan boleh menggagalkan setiap failover sebenar sementara pemilih LLM pentadbir masih berfungsi.';
+$string['verify:no_backup'] = 'Failover bagi setiap panggilan dihidupkan, tetapi tiada entri chat dalam Rantaian sandaran yang menuju ke pembekal, jadi tiada sandaran.';
+$string['verify:saved_warning'] = 'Semak tetapan failover anda:';
+$string['check:failover_name'] = 'Pembekal sandaran AI Course Assistant';
+$string['check:failover_ok'] = 'Kesemua {$a} pembekal sandaran menjawab pada semakan terakhir.';
+$string['check:failover_failing'] = 'Pembekal sandaran {$a->label} ({$a->model}) gagal pada semakan terakhirnya: {$a->detail}';
+$string['check:failover_none'] = 'Tiada pembekal sandaran dikonfigurasikan untuk sembang.';
+$string['check:failover_unverified'] = 'Pembekal sandaran belum disemak. Tugas harian akan menyemaknya, atau jalankan php local/ai_course_assistant/admin/cli/verify_failover.php.';

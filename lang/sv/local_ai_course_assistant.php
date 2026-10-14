@@ -3336,3 +3336,16 @@ $string['settings:essay_provider'] = 'Leverantör för uppsatsåterkoppling';
 $string['settings:essay_provider_desc'] = 'Leverantörs-id (t.ex. <code>claude</code>, <code>openai</code>) för uppsatsåterkoppling. Måste matcha en rad under Jämförelseleverantörer. Lämna tomt för att använda chattens leverantör. Både detta fält och modellen måste anges för att åsidosättningen ska gälla.';
 $string['settings:essay_model'] = 'Modell för uppsatsåterkoppling';
 $string['settings:essay_model_desc'] = 'Modellnamn för uppsatsåterkoppling, t.ex. <code>claude-haiku-4-5</code>. I jämförelsetestet i oktober 2026 gav Claude-modeller tydligt bättre uppsatsåterkoppling än Gemini 2.5 Flash eller GPT-4o mini. Lämna tomt för att använda chattens modell.';
+
+$string['ai_course_assistant:viewaudit'] = 'Visa AI-handledarens granskningslogg';
+$string['task:verify_failover'] = 'Kontrollera reservleverantörer för failover';
+$string['verify:missing_row'] = 'Failover-kedjan innehåller chat:{$a}, men Jämförelseleverantörer har ingen rad med namnet {$a}, så posten hoppas över.';
+$string['verify:missing_key'] = 'Raden {$a} i Jämförelseleverantörer saknar API-nyckel, så failover-posten chat:{$a} hoppas över.';
+$string['verify:model_case'] = 'Modellen för {$a->label} är skriven som "{$a->model}". Modell-id:n skrivs med små bokstäver utan mellanslag (testa {$a->suggest}); ett visningsnamn kan få varje verklig failover att misslyckas medan administratörens LLM-väljare fortfarande fungerar.';
+$string['verify:no_backup'] = 'Failover per anrop är aktiverad, men ingen chat-post i Reservkedja leder till en leverantör, så det finns ingen reserv.';
+$string['verify:saved_warning'] = 'Kontrollera dina failover-inställningar:';
+$string['check:failover_name'] = 'Reservleverantörer för AI Course Assistant';
+$string['check:failover_ok'] = 'Alla {$a} reservleverantörer svarade vid den senaste kontrollen.';
+$string['check:failover_failing'] = 'Reservleverantören {$a->label} ({$a->model}) misslyckades vid den senaste kontrollen: {$a->detail}';
+$string['check:failover_none'] = 'Ingen reservleverantör är konfigurerad för chatten.';
+$string['check:failover_unverified'] = 'Reservleverantörerna har inte kontrollerats ännu. Det dagliga jobbet kontrollerar dem, eller kör php local/ai_course_assistant/admin/cli/verify_failover.php.';

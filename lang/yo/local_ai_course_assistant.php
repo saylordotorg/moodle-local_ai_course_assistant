@@ -3358,3 +3358,16 @@ $string['settings:essay_provider'] = 'Olupese esi lori aroko';
 $string['settings:essay_provider_desc'] = 'ID olupese (fun apẹẹrẹ <code>claude</code>, <code>openai</code>) fun esi lori aroko. Gbọdọ baamu ọkan ninu awọn ila ni Awọn olupese ifiwera. Fi silẹ ni ofo lati lo olupese iwiregbe. Aaye yii ati awoṣe gbọdọ jẹ ti a ṣeto mejeeji fun rirọpo lati ṣiṣẹ.';
 $string['settings:essay_model'] = 'Awoṣe esi lori aroko';
 $string['settings:essay_model_desc'] = 'Orukọ awoṣe fun esi lori aroko, fun apẹẹrẹ <code>claude-haiku-4-5</code>. Ninu idanwo ifiwera Oṣu Kẹwa 2026, awọn awoṣe Claude fun ni esi aroko to dara julọ ni gbangba ju Gemini 2.5 Flash tabi GPT-4o mini lọ. Fi silẹ ni ofo lati lo awoṣe iwiregbe.';
+
+$string['ai_course_assistant:viewaudit'] = 'Wo àkọsílẹ̀ àyẹ̀wò olùkọ́ AI';
+$string['task:verify_failover'] = 'Ṣàyẹ̀wò àwọn olùpèsè àtìlẹ́yìn fún failover';
+$string['verify:missing_row'] = 'Ẹ̀wọ̀n failover ṣe àkójọ chat:{$a}, ṣùgbọ́n Awọn olupese afiwe kò ní ìlà tí a pè ní {$a}, nítorí náà a fo ìtẹ̀síwájú yẹn.';
+$string['verify:missing_key'] = 'Ìlà {$a} nínú Awọn olupese afiwe kò ní kọ́kọ́rọ́ API, nítorí náà a fo ìtẹ̀síwájú failover chat:{$a}.';
+$string['verify:model_case'] = 'A kọ àwòṣe fún {$a->label} gẹ́gẹ́ bí "{$a->model}". Àwọn ID àwòṣe jẹ́ lẹ́tà kékeré láìsí àlàfo (gbìyànjú {$a->suggest}); orúkọ ìfihàn lè mú gbogbo failover gidi kùnà nígbà tí olùyàn LLM alábòójútó ṣì ń ṣiṣẹ́.';
+$string['verify:no_backup'] = 'Failover fún ìpè kọ̀ọ̀kan ti wà ní títàn, ṣùgbọ́n kò sí ìtẹ̀síwájú chat nínú Ẹ̀wọ̀n ìdúró tí ó lọ sí olùpèsè, nítorí náà kò sí àtìlẹ́yìn.';
+$string['verify:saved_warning'] = 'Ṣàyẹ̀wò àwọn ètò failover rẹ:';
+$string['check:failover_name'] = 'Àwọn olùpèsè àtìlẹ́yìn AI Course Assistant';
+$string['check:failover_ok'] = 'Gbogbo àwọn olùpèsè àtìlẹ́yìn {$a} dáhùn sí àyẹ̀wò ìkẹyìn.';
+$string['check:failover_failing'] = 'Olùpèsè àtìlẹ́yìn {$a->label} ({$a->model}) kùnà nínú àyẹ̀wò ìkẹyìn rẹ̀: {$a->detail}';
+$string['check:failover_none'] = 'A kò tíì ṣètò olùpèsè àtìlẹ́yìn kankan fún ìjíròrò.';
+$string['check:failover_unverified'] = 'A kò tíì ṣàyẹ̀wò àwọn olùpèsè àtìlẹ́yìn. Iṣẹ́ ojoojúmọ́ yóò ṣàyẹ̀wò wọn, tàbí ṣiṣẹ́ php local/ai_course_assistant/admin/cli/verify_failover.php.';

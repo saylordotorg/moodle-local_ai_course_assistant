@@ -3382,3 +3382,16 @@ $string['settings:essay_provider'] = 'Umhlinzeki wempendulo yesihloko';
 $string['settings:essay_provider_desc'] = 'I-ID yomhlinzeki (isb. <code>claude</code>, <code>openai</code>) yempendulo yesihloko. Kumele ifane nomugqa oku-Abahlinzeki bokuqhathanisa. Yidedele ize ukuze kusetshenziswe umhlinzeki wengxoxo. Kokubili le nkambu nemodeli kumele kusethwe ukuze ukubhala phezulu kusebenze.';
 $string['settings:essay_model'] = 'Imodeli yempendulo yesihloko';
 $string['settings:essay_model_desc'] = 'Igama lemodeli yempendulo yesihloko, isb. <code>claude-haiku-4-5</code>. Kuhlolo lokuqhathanisa lika-Okthoba 2026, amamodeli e-Claude anikeze impendulo yesihloko engcono ngokusobala kune-Gemini 2.5 Flash noma i-GPT-4o mini. Yidedele ize ukuze kusetshenziswe imodeli yengxoxo.';
+
+$string['ai_course_assistant:viewaudit'] = 'Buka irekhodi lokucwaninga lothisha we-AI';
+$string['task:verify_failover'] = 'Hlola abahlinzeki bokuhlinzeka okungaphezulu kwe-failover';
+$string['verify:missing_row'] = 'Uchungechunge lwe-failover luhlu chat:{$a}, kodwa i-Abahlinzeki bokuqhathanisa ayinayo irowu ebizwa ngokuthi {$a}, ngakho lokho okufakiwe kweqiwa.';
+$string['verify:missing_key'] = 'Irowu {$a} ku-Abahlinzeki bokuqhathanisa ayinayo ukhiye we-API, ngakho okufakiwe kwe-failover chat:{$a} kweqiwa.';
+$string['verify:model_case'] = 'Imodeli ye-{$a->label} ibhalwe ngokuthi "{$a->model}". Ama-ID emodeli abhalwa ngezinhlamvu ezincane ngaphandle kwezikhala (zama {$a->suggest}); igama lokubonisa lingenza wonke ama-failover angempela behluleke ngenkathi isikhethi se-LLM somlawuli sisasebenza.';
+$string['verify:no_backup'] = 'I-failover yekholi ngayinye ivuliwe, kodwa awukho umbhalo we-chat ku-Uchungechunge lokusekela oholela kumhlinzeki, ngakho akukho okungaphezulu.';
+$string['verify:saved_warning'] = 'Hlola amasethingi akho e-failover:';
+$string['check:failover_name'] = 'Abahlinzeki abangaphezulu be-AI Course Assistant';
+$string['check:failover_ok'] = 'Bonke abahlinzeki abangaphezulu abangu-{$a} baphendule ekuhloleni kokugcina.';
+$string['check:failover_failing'] = 'Umhlinzeki ongaphezulu {$a->label} ({$a->model}) wehlulekile ekuhloleni kwakhe kokugcina: {$a->detail}';
+$string['check:failover_none'] = 'Akukho mhlinzeki ongaphezulu osethwe ye-chat.';
+$string['check:failover_unverified'] = 'Abahlinzeki abangaphezulu abakahlolwa okwamanje. Umsebenzi wansuku zonke uzobahlola, noma gijima php local/ai_course_assistant/admin/cli/verify_failover.php.';

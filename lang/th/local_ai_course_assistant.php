@@ -3336,3 +3336,16 @@ $string['settings:essay_provider'] = 'ผู้ให้บริการข้
 $string['settings:essay_provider_desc'] = 'รหัสผู้ให้บริการ (เช่น <code>claude</code>, <code>openai</code>) สำหรับข้อเสนอแนะเรียงความ ต้องตรงกับหนึ่งแถวใน ผู้ให้บริการเปรียบเทียบ เว้นว่างไว้เพื่อใช้ผู้ให้บริการของแชท ต้องตั้งทั้งช่องนี้และโมเดลจึงจะแทนที่ได้';
 $string['settings:essay_model'] = 'โมเดลข้อเสนอแนะเรียงความ';
 $string['settings:essay_model_desc'] = 'ชื่อโมเดลสำหรับข้อเสนอแนะเรียงความ เช่น <code>claude-haiku-4-5</code> ในการทดสอบเปรียบเทียบเดือนตุลาคม 2026 โมเดล Claude ให้ข้อเสนอแนะเรียงความที่ดีกว่า Gemini 2.5 Flash หรือ GPT-4o mini อย่างชัดเจน เว้นว่างไว้เพื่อใช้โมเดลของแชท';
+
+$string['ai_course_assistant:viewaudit'] = 'ดูบันทึกการตรวจสอบของติวเตอร์ AI';
+$string['task:verify_failover'] = 'ตรวจสอบผู้ให้บริการสำรองสำหรับ failover';
+$string['verify:missing_row'] = 'สายโซ่ failover ระบุ chat:{$a} แต่ ผู้ให้บริการเปรียบเทียบ ไม่มีแถวชื่อ {$a} จึงข้ามรายการนั้น';
+$string['verify:missing_key'] = 'แถว {$a} ใน ผู้ให้บริการเปรียบเทียบ ไม่มีคีย์ API จึงข้ามรายการ failover chat:{$a}';
+$string['verify:model_case'] = 'โมเดลของ {$a->label} ถูกเขียนเป็น "{$a->model}" รหัสโมเดลเป็นตัวพิมพ์เล็กและไม่มีช่องว่าง (ลอง {$a->suggest}) ชื่อที่ใช้แสดงอาจทำให้ failover จริงล้มเหลวทุกครั้ง ขณะที่ตัวเลือก LLM ของผู้ดูแลระบบยังทำงานได้';
+$string['verify:no_backup'] = 'failover ต่อการเรียกเปิดอยู่ แต่ไม่มีรายการ chat ใน สายสำรอง ที่ไปถึงผู้ให้บริการ จึงไม่มีตัวสำรอง';
+$string['verify:saved_warning'] = 'ตรวจสอบการตั้งค่า failover ของคุณ:';
+$string['check:failover_name'] = 'ผู้ให้บริการสำรองของ AI Course Assistant';
+$string['check:failover_ok'] = 'ผู้ให้บริการสำรองทั้ง {$a} รายตอบสนองในการตรวจสอบครั้งล่าสุด';
+$string['check:failover_failing'] = 'ผู้ให้บริการสำรอง {$a->label} ({$a->model}) ล้มเหลวในการตรวจสอบครั้งล่าสุด: {$a->detail}';
+$string['check:failover_none'] = 'ยังไม่ได้กำหนดผู้ให้บริการสำรองสำหรับแชท';
+$string['check:failover_unverified'] = 'ยังไม่ได้ตรวจสอบผู้ให้บริการสำรอง งานรายวันจะตรวจสอบให้ หรือรัน php local/ai_course_assistant/admin/cli/verify_failover.php';

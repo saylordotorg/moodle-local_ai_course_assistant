@@ -3357,3 +3357,16 @@ $string['settings:essay_provider'] = 'Nhà cung cấp nhận xét bài luận';
 $string['settings:essay_provider_desc'] = 'ID nhà cung cấp (ví dụ <code>claude</code>, <code>openai</code>) cho nhận xét bài luận. Phải khớp với một dòng trong Nhà cung cấp so sánh. Để trống để dùng nhà cung cấp của cuộc trò chuyện. Cả trường này và mô hình đều phải được đặt thì phần ghi đè mới có hiệu lực.';
 $string['settings:essay_model'] = 'Mô hình nhận xét bài luận';
 $string['settings:essay_model_desc'] = 'Tên mô hình cho nhận xét bài luận, ví dụ <code>claude-haiku-4-5</code>. Trong bài đánh giá chuẩn tháng 10 năm 2026, các mô hình Claude cho nhận xét bài luận tốt hơn rõ rệt so với Gemini 2.5 Flash hoặc GPT-4o mini. Để trống để dùng mô hình của cuộc trò chuyện.';
+
+$string['ai_course_assistant:viewaudit'] = 'Xem nhật ký kiểm toán của gia sư AI';
+$string['task:verify_failover'] = 'Kiểm tra các nhà cung cấp dự phòng cho failover';
+$string['verify:missing_row'] = 'Chuỗi failover liệt kê chat:{$a}, nhưng Nhà cung cấp so sánh không có hàng nào tên {$a}, nên mục đó bị bỏ qua.';
+$string['verify:missing_key'] = 'Hàng {$a} trong Nhà cung cấp so sánh không có khóa API, nên mục failover chat:{$a} bị bỏ qua.';
+$string['verify:model_case'] = 'Mô hình của {$a->label} được viết là "{$a->model}". ID mô hình là chữ thường, không có khoảng trắng (hãy thử {$a->suggest}); tên hiển thị có thể làm mọi failover thực tế thất bại trong khi bộ chọn LLM của quản trị viên vẫn hoạt động.';
+$string['verify:no_backup'] = 'Failover theo từng lệnh gọi đang bật, nhưng không có mục chat nào trong Chuỗi dự phòng dẫn tới nhà cung cấp, nên không có dự phòng.';
+$string['verify:saved_warning'] = 'Hãy kiểm tra cài đặt failover của bạn:';
+$string['check:failover_name'] = 'Nhà cung cấp dự phòng của AI Course Assistant';
+$string['check:failover_ok'] = 'Cả {$a} nhà cung cấp dự phòng đều phản hồi ở lần kiểm tra gần nhất.';
+$string['check:failover_failing'] = 'Nhà cung cấp dự phòng {$a->label} ({$a->model}) đã thất bại ở lần kiểm tra gần nhất: {$a->detail}';
+$string['check:failover_none'] = 'Chưa cấu hình nhà cung cấp dự phòng nào cho trò chuyện.';
+$string['check:failover_unverified'] = 'Các nhà cung cấp dự phòng chưa được kiểm tra. Tác vụ hằng ngày sẽ kiểm tra chúng, hoặc chạy php local/ai_course_assistant/admin/cli/verify_failover.php.';

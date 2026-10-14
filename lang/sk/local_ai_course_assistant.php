@@ -3337,3 +3337,16 @@ $string['settings:essay_provider'] = 'Poskytovateľ spätnej väzby k esejam';
 $string['settings:essay_provider_desc'] = 'ID poskytovateľa (napr. <code>claude</code>, <code>openai</code>) pre spätnú väzbu k esejam. Musí zodpovedať riadku v časti Porovnávací poskytovatelia. Nechajte prázdne, ak chcete použiť poskytovateľa chatu. Aby sa prepísanie uplatnilo, musí byť nastavené toto pole aj model.';
 $string['settings:essay_model'] = 'Model spätnej väzby k esejam';
 $string['settings:essay_model_desc'] = 'Názov modelu pre spätnú väzbu k esejam, napr. <code>claude-haiku-4-5</code>. V porovnávacom teste z októbra 2026 dávali modely Claude zreteľne lepšiu spätnú väzbu k esejam než Gemini 2.5 Flash alebo GPT-4o mini. Nechajte prázdne, ak chcete použiť model chatu.';
+
+$string['ai_course_assistant:viewaudit'] = 'Zobraziť protokol auditu AI tútora';
+$string['task:verify_failover'] = 'Skontrolovať záložných poskytovateľov pre prevzatie služieb';
+$string['verify:missing_row'] = 'Reťazec prevzatia služieb uvádza chat:{$a}, ale v Poskytovatelia na porovnanie nie je žiadny riadok s názvom {$a}, preto sa táto položka preskočí.';
+$string['verify:missing_key'] = 'Riadok {$a} v Poskytovatelia na porovnanie nemá kľúč API, preto sa položka chat:{$a} preskočí.';
+$string['verify:model_case'] = 'Model pre {$a->label} je zapísaný ako "{$a->model}". ID modelov sa píšu malými písmenami bez medzier (skúste {$a->suggest}); zobrazovaný názov môže zlyhať pri každom skutočnom prevzatí služieb, zatiaľ čo výber LLM pre správcu stále funguje.';
+$string['verify:no_backup'] = 'Prevzatie služieb pre každé volanie je zapnuté, ale žiadna položka chat v Záložný reťazec nevedie k poskytovateľovi, takže nie je žiadna záloha.';
+$string['verify:saved_warning'] = 'Skontrolujte nastavenia prevzatia služieb:';
+$string['check:failover_name'] = 'Záložní poskytovatelia AI Course Assistant';
+$string['check:failover_ok'] = 'Všetci záloční poskytovatelia ({$a}) odpovedali pri poslednej kontrole.';
+$string['check:failover_failing'] = 'Záložný poskytovateľ {$a->label} ({$a->model}) pri poslednej kontrole zlyhal: {$a->detail}';
+$string['check:failover_none'] = 'Pre chat nie je nastavený žiadny záložný poskytovateľ.';
+$string['check:failover_unverified'] = 'Záložní poskytovatelia ešte neboli skontrolovaní. Skontroluje ich denná úloha, alebo spustite php local/ai_course_assistant/admin/cli/verify_failover.php.';

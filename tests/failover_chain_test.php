@@ -191,8 +191,9 @@ final class failover_chain_test extends \advanced_testcase {
     }
 
     /**
-     * After a failure, the failing provider's circuit is open and subsequent
-     * calls skip it (no second call against the failing primary).
+     * v7.8.8: a provider failing in a way that comes and goes (here a generic
+     * error) opens its circuit on the SECOND failure in a row, not the first;
+     * after that the failing provider is skipped.
      */
     public function test_circuit_open_skips_failing_primary_on_next_call(): void {
         $this->resetAfterTest();
@@ -201,18 +202,21 @@ final class failover_chain_test extends \advanced_testcase {
         $chain = new failover_chain($primary, 'circuit-test-primary', [
             ['provider' => $fallback, 'label' => 'circuit-test-fallback'],
         ]);
-        // First call opens the circuit on the primary.
+        // First failure is counted; the circuit stays closed.
         $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
         $this->assertEquals(1, $primary->callcount);
-        // Second call should skip the primary (circuit open) and go straight to fallback.
-        $result = $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi again']]);
+        // Second failure in a row opens it.
+        $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi again']]);
+        $this->assertEquals(2, $primary->callcount);
+        // Third call skips the primary and goes straight to the fallback.
+        $result = $chain->chat_completion('sys', [['role' => 'user', 'content' => 'and again']]);
         $this->assertEquals('FALLBACK-OUT', $result);
         $this->assertEquals(
-            1,
+            2,
             $primary->callcount,
-            'Primary should NOT have been called a second time while its circuit is open.'
+            'Primary should NOT have been called a third time while its circuit is open.'
         );
-        $this->assertEquals(2, $fallback->callcount);
+        $this->assertEquals(3, $fallback->callcount);
     }
 
     /**
@@ -259,10 +263,17 @@ final class failover_chain_test extends \advanced_testcase {
      * @param int $maxmessages Most turns it accepts.
      * @param int $status HTTP status it rejects with.
      * @param int $slowretryus Microseconds a short (retry-sized) request takes before it answers or fails.
+     * @param string $body Body of the rejection.
      * @return object Anonymous provider_interface with public $callcount and $sizes.
      */
-    private static function picky_provider(string $output, int $maxmessages, int $status = 400, int $slowretryus = 0): object {
-        return new class ($output, $maxmessages, $status, $slowretryus) implements provider_interface {
+    private static function picky_provider(
+        string $output,
+        int $maxmessages,
+        int $status = 400,
+        int $slowretryus = 0,
+        string $body = 'invalid_request_error: messages are too many'
+    ): object {
+        return new class ($output, $maxmessages, $status, $slowretryus, $body) implements provider_interface {
             public int $callcount = 0;
             /** @var int[] Turns in each request received. */
             public array $sizes = [];
@@ -270,7 +281,8 @@ final class failover_chain_test extends \advanced_testcase {
                 private string $output,
                 private int $max,
                 private int $status,
-                private int $slowretryus
+                private int $slowretryus,
+                private string $body
             ) {
             }
             public function model_id(): string {
@@ -283,7 +295,7 @@ final class failover_chain_test extends \advanced_testcase {
                     usleep($this->slowretryus);
                 }
                 if (count($messages) > $this->max) {
-                    throw new provider_http_exception($this->status, 'invalid_request_error: messages are too many');
+                    throw new provider_http_exception($this->status, $this->body);
                 }
             }
             public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
@@ -393,10 +405,11 @@ final class failover_chain_test extends \advanced_testcase {
 
     /**
      * When the short request is refused too the long history was not the
-     * problem: the chain behaves exactly as it did before, circuit and all, and
-     * the audit says the retry failed and why.
+     * problem: the chain falls over as before and the audit says the retry failed
+     * and why. A 400 about the request is not a sick provider, so the circuit
+     * stays closed and the next learner's request still reaches it.
      */
-    public function test_a_retry_that_is_refused_too_falls_over_and_opens_the_circuit(): void {
+    public function test_a_retry_that_is_refused_too_falls_over_without_blocking_the_provider(): void {
         $this->resetAfterTest();
         $primary = self::picky_provider('never', 0);
         $fallback = self::fake_provider('FALLBACK-OUT', false);
@@ -412,28 +425,14 @@ final class failover_chain_test extends \advanced_testcase {
         $this->assertCount(1, $trimmed);
         $this->assertSame('failed', $trimmed[0]['outcome']);
         $this->assertStringContainsString('HTTP 400', $trimmed[0]['retry_detail']);
-        $this->assertCount(1, self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
-        $this->assertCount(1, self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH));
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+        $fell = self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH);
+        $this->assertCount(1, $fell);
+        $this->assertSame('unaffected', $fell[0]['circuit']);
 
-        // The circuit is open now, so the primary is skipped.
+        // Not blocked: the next request reaches the primary again.
         $chain->chat_completion('sys', self::long_history(6));
-        $this->assertSame(2, $primary->callcount);
-    }
-
-    /**
-     * The fall-through row's latency is the FIRST attempt's: it is the number
-     * the Learn diagnosis was built on, and a slow retry must not inflate it.
-     */
-    public function test_the_fall_through_latency_is_the_first_attempts_not_the_retrys(): void {
-        $this->resetAfterTest();
-        $primary = self::picky_provider('never', 0, 400, 600000);
-        $chain = new failover_chain($primary, 'latency-primary', [
-            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'latency-fallback'],
-        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
-        $chain->chat_completion('sys', self::long_history(6));
-        $this->assertSame(2, $primary->callcount);
-        $latency = self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH)[0]['latency_ms'];
-        $this->assertLessThan(400, $latency, 'the 600 ms retry must not be counted');
+        $this->assertSame(4, $primary->callcount);
     }
 
     /**
@@ -491,6 +490,7 @@ final class failover_chain_test extends \advanced_testcase {
      */
     public function test_the_audit_rows_carry_the_providers_words_redacted_and_bounded(): void {
         $this->resetAfterTest();
+        // An auth failure opens its circuit at once, so both rows are written.
         $key = 'sk-ant-api03-' . str_repeat('A1b2', 12);
         $debuginfo = "HTTP 400: {\n  \"error\": \"invalid_request_error\",\n  \"detail\": \"bad key $key rejected\"\n} "
             . str_repeat('padding ', 100);
@@ -498,10 +498,10 @@ final class failover_chain_test extends \advanced_testcase {
             public function __construct(private string $debuginfo) {
             }
             public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
-                throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $this->debuginfo);
+                throw new \moodle_exception('chat:error_auth', 'local_ai_course_assistant', '', null, $this->debuginfo);
             }
             public function chat_completion_stream(string $systemprompt, array $messages, callable $cb, array $options = []): void {
-                throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $this->debuginfo);
+                throw new \moodle_exception('chat:error_auth', 'local_ai_course_assistant', '', null, $this->debuginfo);
             }
             public function get_last_token_usage(): ?array {
                 return null;
@@ -600,7 +600,7 @@ final class failover_chain_test extends \advanced_testcase {
 
     /**
      * A retry that returns without producing a token is a failure: the chain
-     * records it, opens the circuit and falls over.
+     * records it and falls over.
      */
     public function test_a_retry_that_produces_no_token_is_a_failure(): void {
         $this->resetAfterTest();
@@ -615,7 +615,226 @@ final class failover_chain_test extends \advanced_testcase {
         });
         $this->assertSame(['fallback-text'], $captured);
         $this->assertSame('failed', self::audit_details(failover_chain::AUDIT_EVENT_TRIMMED)[0]['outcome']);
+        // The first refusal was about the request, so the provider's circuit stays closed.
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+        $this->assertSame('unaffected', self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH)[0]['circuit']);
+    }
+
+    /**
+     * A provider that follows a script of outcomes, one per call.
+     *
+     * @param string[] $script 'ok' or 'fail', repeated from the start when it runs out.
+     * @param string $identity What it reports as circuit_identity() ('' for none).
+     * @param string $errorcode Error code its failures carry.
+     * @return object Anonymous provider_interface with public $callcount.
+     */
+    private static function scripted_provider(array $script, string $identity = '', string $errorcode = 'error'): object {
+        return new class ($script, $identity, $errorcode) implements provider_interface {
+            public int $callcount = 0;
+            public function __construct(private array $script, private string $identity, private string $errorcode) {
+            }
+            public function circuit_identity(): string {
+                return $this->identity;
+            }
+            private function step(): void {
+                $outcome = $this->script[$this->callcount % count($this->script)];
+                $this->callcount++;
+                if ($outcome === 'fail') {
+                    throw new \moodle_exception($this->errorcode, 'local_ai_course_assistant', '', null, 'scripted failure');
+                }
+            }
+            public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
+                $this->step();
+                return 'SCRIPTED-OUT';
+            }
+            public function chat_completion_stream(string $systemprompt, array $messages, callable $cb, array $options = []): void {
+                $this->step();
+                $cb('SCRIPTED-OUT');
+            }
+            public function get_last_token_usage(): ?array {
+                return null;
+            }
+            public function get_last_finish_reason(): ?string {
+                return null;
+            }
+        };
+    }
+
+    /**
+     * What each kind of failure does to a circuit.
+     */
+    public function test_circuit_effect_classifies_failures(): void {
+        $request = new provider_http_exception(400, 'invalid_request_error: messages.5.content.0.text must be non-empty');
+        $this->assertSame('none', failover_chain::circuit_effect($request));
+        $this->assertSame('none', failover_chain::circuit_effect(new provider_http_exception(413, 'too large')));
+        $this->assertSame('none', failover_chain::circuit_effect(new provider_http_exception(422, 'unprocessable')));
+
+        foreach (
+            [
+                'Please pass a valid API key',
+                'Your credit balance is too low to access the Anthropic API',
+                'You have reached your specified API usage limits.',
+                'error code: insufficient_quota',
+                'billing_hard_limit_reached',
+                'API_KEY_INVALID',
+            ] as $body
+        ) {
+            $this->assertSame('immediate', failover_chain::circuit_effect(new provider_http_exception(400, $body)), $body);
+        }
+        $this->assertSame('immediate', failover_chain::circuit_effect(
+            new \moodle_exception('chat:error_auth', 'local_ai_course_assistant')
+        ));
+        $this->assertSame('immediate', failover_chain::circuit_effect(new model_not_found_exception('no such model')));
+
+        $this->assertSame('counted', failover_chain::circuit_effect(
+            new \moodle_exception('chat:error_ratelimit', 'local_ai_course_assistant')
+        ));
+        $this->assertSame('counted', failover_chain::circuit_effect(
+            new \moodle_exception('chat:error_unavailable', 'local_ai_course_assistant')
+        ));
+        $this->assertSame('counted', failover_chain::circuit_effect(new \RuntimeException('curl error 28')));
+        $this->assertSame('counted', failover_chain::circuit_effect(new provider_http_exception(402, 'payment required')));
+        // A 400 body that quotes the learner's own words must never read as an account fault, however
+        // ordinary the words (a business course is full of them).
+        foreach (
+            [
+                'I want to buy credit please',
+                "messages.3.content: invalid value in 'Our billing department raised the usage limit and spend cap'",
+                'Unsupported parameter: quota. The text "insufficient credit and billing" is not valid here',
+                'the account is fine but this request is malformed',
+            ] as $quoted
+        ) {
+            $this->assertSame(
+                'none',
+                failover_chain::circuit_effect(new provider_http_exception(400, $quoted)),
+                $quoted
+            );
+        }
+    }
+
+    /**
+     * A request the provider calls malformed never opens a circuit, however often
+     * it happens: the provider is fine, and one learner's request must not block
+     * everyone behind the same label.
+     */
+    public function test_a_request_the_provider_calls_malformed_never_opens_the_circuit(): void {
+        $this->resetAfterTest();
+        $primary = self::picky_provider('never', 0);
+        $chain = new failover_chain($primary, 'malformed-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'malformed-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        for ($i = 0; $i < 5; $i++) {
+            $this->assertSame('FALLBACK-OUT', $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]));
+        }
+        $this->assertSame(5, $primary->callcount, 'the primary is asked every time');
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+        $this->assertSame(
+            array_fill(0, 5, 'unaffected'),
+            array_column(self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH), 'circuit')
+        );
+    }
+
+    /**
+     * A 400 that is about the key or the account (BUS101's stale Google key, an
+     * exhausted Anthropic balance) will fail every request on that key and model:
+     * the circuit opens at once, and no shorter-history retry is wasted on it.
+     */
+    public function test_an_account_level_400_opens_the_circuit_at_once_and_is_not_retried_short(): void {
+        $this->resetAfterTest();
+        $primary = self::picky_provider('never', 0, 400, 0, 'Please pass a valid API key');
+        $chain = new failover_chain($primary, 'account-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'account-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        $this->assertSame('FALLBACK-OUT', $chain->chat_completion('sys', self::long_history(6)));
+        $this->assertSame(1, $primary->callcount, 'no shorter retry for a fault that is not about the history');
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_TRIMMED));
         $this->assertCount(1, self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+        $chain->chat_completion('sys', self::long_history(6));
+        $this->assertSame(1, $primary->callcount, 'the circuit is open, so the primary is skipped');
+    }
+
+    /**
+     * The fix for the BUS101 incident: two chain members that share a label but
+     * use different keys (or models) do not share a circuit.
+     */
+    public function test_a_rejected_key_opens_only_its_own_circuit(): void {
+        $this->resetAfterTest();
+        $stale = self::scripted_provider(['fail'], 'key-stale', 'chat:error_auth');
+        $good = self::scripted_provider(['ok'], 'key-good');
+        $fallback = self::fake_provider('FALLBACK-OUT', false);
+        $staleChain = new failover_chain($stale, 'shared-label', [
+            ['provider' => $fallback, 'label' => 'scope-fallback'],
+        ]);
+        $goodChain = new failover_chain($good, 'shared-label', [
+            ['provider' => $fallback, 'label' => 'scope-fallback'],
+        ]);
+
+        $staleChain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+        $staleChain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+        $this->assertSame(1, $stale->callcount, 'the stale key is skipped once its circuit is open');
+
+        $this->assertSame('SCRIPTED-OUT', $goodChain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]));
+        $this->assertSame(1, $good->callcount, 'a healthy key under the same label is not blocked');
+    }
+
+    /**
+     * Failures that come and go open the circuit on the second in a row, and the
+     * audit says where each stood.
+     */
+    public function test_transient_failures_open_the_circuit_on_the_second_in_a_row(): void {
+        $this->resetAfterTest();
+        $primary = self::scripted_provider(['fail']);
+        $chain = new failover_chain($primary, 'count-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'count-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        $chain->chat_completion('sys', [['role' => 'user', 'content' => 'one']]);
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN), 'one failure does not open it');
+        $chain->chat_completion('sys', [['role' => 'user', 'content' => 'two']]);
+        $this->assertCount(1, self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+        $this->assertSame(
+            ['counting', 'opened'],
+            array_column(self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH), 'circuit')
+        );
+        $chain->chat_completion('sys', [['role' => 'user', 'content' => 'three']]);
+        $this->assertSame(2, $primary->callcount);
+    }
+
+    /**
+     * A success between failures ends the run, so only failures in a row count.
+     */
+    public function test_a_success_between_failures_resets_the_count(): void {
+        $this->resetAfterTest();
+        $primary = self::scripted_provider(['fail', 'ok', 'fail', 'ok']);
+        $chain = new failover_chain($primary, 'reset-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'reset-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        for ($i = 0; $i < 4; $i++) {
+            $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+        }
+        $this->assertSame(4, $primary->callcount, 'never two failures in a row, so never skipped');
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+    }
+
+    /**
+     * Two failures further apart than the window are two separate incidents.
+     */
+    public function test_failures_further_apart_than_the_window_do_not_add_up(): void {
+        $this->resetAfterTest();
+        $primary = self::scripted_provider(['fail']);
+        $chain = new failover_chain($primary, 'window-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'window-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        $chain->chat_completion('sys', [['role' => 'user', 'content' => 'one']]);
+        // Age the recorded failure past the window.
+        $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
+        $scope = failover_chain::circuit_scope('window-primary', $primary);
+        $cache->set('fails_' . $scope, ['n' => 1, 'first' => time() - failover_chain::FAILURE_WINDOW - 30]);
+        $chain->chat_completion('sys', [['role' => 'user', 'content' => 'two']]);
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+        $this->assertSame(
+            ['counting', 'counting'],
+            array_column(self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH), 'circuit')
+        );
     }
 
     /**

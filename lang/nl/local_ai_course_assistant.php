@@ -3360,3 +3360,16 @@ $string['settings:essay_provider'] = 'Provider voor essayfeedback';
 $string['settings:essay_provider_desc'] = 'Provider-id (bijv. <code>claude</code>, <code>openai</code>) voor essayfeedback. Moet overeenkomen met een rij onder Vergelijkingsproviders. Laat leeg om de chatprovider te gebruiken. Zowel dit veld als het model moet zijn ingesteld om de overschrijving toe te passen.';
 $string['settings:essay_model'] = 'Model voor essayfeedback';
 $string['settings:essay_model_desc'] = 'Modelnaam voor essayfeedback, bijv. <code>claude-haiku-4-5</code>. In de benchmark van oktober 2026 gaven Claude-modellen duidelijk betere essayfeedback dan Gemini 2.5 Flash of GPT-4o mini. Laat leeg om het chatmodel te gebruiken.';
+
+$string['ai_course_assistant:viewaudit'] = 'Het auditlogboek van de AI-tutor bekijken';
+$string['task:verify_failover'] = 'Back-upproviders voor failover controleren';
+$string['verify:missing_row'] = 'De failoverketen vermeldt chat:{$a}, maar Vergelijkingsproviders heeft geen rij met de naam {$a}, dus die invoer wordt overgeslagen.';
+$string['verify:missing_key'] = 'De rij {$a} in Vergelijkingsproviders heeft geen API-sleutel, dus de failover-invoer chat:{$a} wordt overgeslagen.';
+$string['verify:model_case'] = 'Het model voor {$a->label} is geschreven als "{$a->model}". Model-id\'s zijn kleine letters zonder spaties (probeer {$a->suggest}); een weergavenaam kan elke echte failover laten mislukken terwijl de LLM-kiezer van de beheerder blijft werken.';
+$string['verify:no_backup'] = 'Failover per aanroep staat aan, maar geen enkele chat-invoer in Failoverketen leidt naar een provider, dus er is geen back-up.';
+$string['verify:saved_warning'] = 'Controleer uw failover-instellingen:';
+$string['check:failover_name'] = 'Back-upproviders van AI Course Assistant';
+$string['check:failover_ok'] = 'Alle {$a} back-upproviders hebben bij de laatste controle geantwoord.';
+$string['check:failover_failing'] = 'De back-upprovider {$a->label} ({$a->model}) is mislukt bij de laatste controle: {$a->detail}';
+$string['check:failover_none'] = 'Er is geen back-upprovider geconfigureerd voor chat.';
+$string['check:failover_unverified'] = 'De back-upproviders zijn nog niet gecontroleerd. De dagelijkse taak controleert ze, of voer php local/ai_course_assistant/admin/cli/verify_failover.php uit.';

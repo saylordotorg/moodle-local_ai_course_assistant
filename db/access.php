@@ -73,4 +73,14 @@ $capabilities = [
         ],
         'riskbitmask' => RISK_CONFIG,
     ],
+    // v7.8.8: read the audit log (audit_log.php) without being a site administrator.
+    // The page lists every audit row with user ids and IP addresses, so it carries
+    // RISK_PERSONAL and no role holds it by default; an administrator grants it to a
+    // monitoring account. Holding moodle/site:config still opens the page, as before.
+    'local/ai_course_assistant:viewaudit' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [],
+        'riskbitmask' => RISK_PERSONAL,
+    ],
 ];

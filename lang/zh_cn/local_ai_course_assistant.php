@@ -3373,3 +3373,16 @@ $string['settings:essay_provider'] = '作文反馈提供商';
 $string['settings:essay_provider_desc'] = '作文反馈使用的提供商 ID(例如 <code>claude</code>、<code>openai</code>)。必须与对比提供商中的某一行一致。留空则使用聊天提供商。必须同时设置此项和模型,覆盖才会生效。';
 $string['settings:essay_model'] = '作文反馈模型';
 $string['settings:essay_model_desc'] = '作文反馈使用的模型名称,例如 <code>claude-haiku-4-5</code>。在 2026 年 10 月的基准测试中,Claude 模型给出的作文反馈明显优于 Gemini 2.5 Flash 或 GPT-4o mini。留空则使用聊天模型。';
+
+$string['ai_course_assistant:viewaudit'] = '查看 AI 导师审计日志';
+$string['task:verify_failover'] = '检查故障转移备用提供商';
+$string['verify:missing_row'] = '故障转移链中列出了 chat:{$a}，但 对比供应商 中没有名为 {$a} 的行，因此该条目被跳过。';
+$string['verify:missing_key'] = '对比供应商 中的 {$a} 行没有 API 密钥，因此故障转移条目 chat:{$a} 被跳过。';
+$string['verify:model_case'] = '{$a->label} 的模型被写成“{$a->model}”。模型 ID 为小写且不含空格（请尝试 {$a->suggest}）；显示名称可能导致每一次真实的故障转移都失败，而管理员的 LLM 选择器仍然正常工作。';
+$string['verify:no_backup'] = '已开启按调用的故障转移，但 故障转移链 中没有任何 chat 条目能解析到提供商，因此没有备用。';
+$string['verify:saved_warning'] = '请检查您的故障转移设置：';
+$string['check:failover_name'] = 'AI Course Assistant 备用提供商';
+$string['check:failover_ok'] = '全部 {$a} 个备用提供商都响应了最近一次检查。';
+$string['check:failover_failing'] = '备用提供商 {$a->label}（{$a->model}）在最近一次检查中失败：{$a->detail}';
+$string['check:failover_none'] = '尚未为聊天配置备用提供商。';
+$string['check:failover_unverified'] = '尚未检查备用提供商。每日任务会检查它们，或运行 php local/ai_course_assistant/admin/cli/verify_failover.php。';

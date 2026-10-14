@@ -3337,3 +3337,16 @@ $string['settings:essay_provider'] = 'Furnizor pentru feedbackul la eseuri';
 $string['settings:essay_provider_desc'] = 'ID-ul furnizorului (de ex. <code>claude</code>, <code>openai</code>) pentru feedbackul la eseuri. Trebuie să corespundă unui rând din Furnizori de comparație. Lăsați gol pentru a folosi furnizorul de chat. Atât acest câmp, cât și modelul trebuie setate pentru ca înlocuirea să se aplice.';
 $string['settings:essay_model'] = 'Model pentru feedbackul la eseuri';
 $string['settings:essay_model_desc'] = 'Numele modelului pentru feedbackul la eseuri, de ex. <code>claude-haiku-4-5</code>. În testul comparativ din octombrie 2026, modelele Claude au oferit un feedback la eseuri clar mai bun decât Gemini 2.5 Flash sau GPT-4o mini. Lăsați gol pentru a folosi modelul de chat.';
+
+$string['ai_course_assistant:viewaudit'] = 'Vizualizați jurnalul de audit al tutorelui AI';
+$string['task:verify_failover'] = 'Verificați furnizorii de rezervă pentru failover';
+$string['verify:missing_row'] = 'Lanțul de failover include chat:{$a}, dar Furnizori de comparare nu are niciun rând numit {$a}, așa că intrarea este omisă.';
+$string['verify:missing_key'] = 'Rândul {$a} din Furnizori de comparare nu are cheie API, așa că intrarea de failover chat:{$a} este omisă.';
+$string['verify:model_case'] = 'Modelul pentru {$a->label} este scris ca "{$a->model}". ID-urile modelelor se scriu cu litere mici și fără spații (încercați {$a->suggest}); un nume afișat poate face ca orice failover real să eșueze, în timp ce selectorul LLM al administratorului continuă să funcționeze.';
+$string['verify:no_backup'] = 'Failover-ul per apel este activat, dar nicio intrare chat din Lanț de rezervă nu duce la un furnizor, deci nu există rezervă.';
+$string['verify:saved_warning'] = 'Verificați setările de failover:';
+$string['check:failover_name'] = 'Furnizori de rezervă pentru AI Course Assistant';
+$string['check:failover_ok'] = 'Toți cei {$a} furnizori de rezervă au răspuns la ultima verificare.';
+$string['check:failover_failing'] = 'Furnizorul de rezervă {$a->label} ({$a->model}) a eșuat la ultima verificare: {$a->detail}';
+$string['check:failover_none'] = 'Nu este configurat niciun furnizor de rezervă pentru chat.';
+$string['check:failover_unverified'] = 'Furnizorii de rezervă nu au fost încă verificați. Sarcina zilnică îi va verifica, sau rulați php local/ai_course_assistant/admin/cli/verify_failover.php.';

@@ -3366,3 +3366,16 @@ $string['settings:essay_provider'] = 'Sɛbɛn lamɔni jaabi baarakɛla';
 $string['settings:essay_provider_desc'] = 'Baarakɛla ID (misali la <code>claude</code>, <code>openai</code>) sɛbɛn lamɔni jaabi kama. A ka kan ka bɛn Baarakɛlaw ka suman ɲɔgɔn na dogo kelen ma. A to lankolon ka baarakɛla min be baro la baara kɛ. Nin yɔrɔ ni modɛli bɛɛ ka kan ka da walasa laban ka baara kɛ.';
 $string['settings:essay_model'] = 'Sɛbɛn lamɔni jaabi modɛli';
 $string['settings:essay_model_desc'] = 'Modɛli tɔgɔ sɛbɛn lamɔni jaabi kama, misali la <code>claude-haiku-4-5</code>. Ɔkutɔburu 2026 suman na, Claude modɛliw ye sɛbɛn lamɔni jaabi ɲuman di ka tɛmɛ Gemini 2.5 Flash walima GPT-4o mini kan. A to lankolon ka baro modɛli baara kɛ.';
+
+$string['ai_course_assistant:viewaudit'] = 'AI karamɔgɔ ka sɛgɛsɛgɛli sɛbɛnni lajɛ';
+$string['task:verify_failover'] = 'Fɛn wɛrɛ dɛmɛbaga minnu bɛ ka ɲɛnɛ ni fɔlɔ tinɛna, olu sɛgɛsɛgɛ';
+$string['verify:missing_row'] = 'Failover ɲɛnɛbɔ b\'a la chat:{$a} lisi kɔnɔ, nka Baarakɛlaw danfaraw kɔnɔ, {$a} filɛ tɛ yen, o la o lamini be tɛmɛ.';
+$string['verify:missing_key'] = 'Baarakɛlaw danfaraw kɔnɔ, {$a} filɛ ma API kili di, o la failover donni chat:{$a} be tɛmɛ.';
+$string['verify:model_case'] = '{$a->label} ka modɛli sɛbɛnna ten: "{$a->model}". Modɛli tɔgɔw bɛ sɛbɛn sɛbɛnni fitinw la, ka sigi-sigi tɛ yen ({$a->suggest} lajɛ); jira tɔgɔ bɛ se ka failover tilennin bɛɛ tiɲɛ k\'a sɔrɔ admin LLM suuru bɛ ka baara kɛ.';
+$string['verify:no_backup'] = 'Wele-wele failover bɛ da, nka chat donni si tɛ Nɔfɛ jɔlen kɔnɔ min bɛ ta dɛmɛbaga ma, o la dɛmɛ tɛ yen.';
+$string['verify:saved_warning'] = 'I ka failover labɛnw lajɛ:';
+$string['check:failover_name'] = 'AI Course Assistant dɛmɛbagaw';
+$string['check:failover_ok'] = 'Dɛmɛbaga {$a} bɛɛ ye jaabi di u ka laban sɛgɛsɛgɛli la.';
+$string['check:failover_failing'] = 'Dɛmɛbaga {$a->label} ({$a->model}) ma se ka laban sɛgɛsɛgɛli kɛ: {$a->detail}';
+$string['check:failover_none'] = 'Dɛmɛbaga si ma labɛn chat kama.';
+$string['check:failover_unverified'] = 'Dɛmɛbagaw ma sɛgɛsɛgɛ fɔlɔ. Don o don baara bɛna u sɛgɛsɛgɛ, walima php local/ai_course_assistant/admin/cli/verify_failover.php baara kɛ.';

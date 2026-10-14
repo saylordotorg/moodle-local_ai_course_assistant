@@ -3337,3 +3337,16 @@ $string['settings:essay_provider'] = 'Anbieter für Aufsatz-Feedback';
 $string['settings:essay_provider_desc'] = 'Anbieter-ID (z. B. <code>claude</code>, <code>openai</code>) für das Aufsatz-Feedback. Muss mit einer Zeile unter Vergleichsanbieter übereinstimmen. Leer lassen, um den Chat-Anbieter zu verwenden. Sowohl dieses Feld als auch das Modell müssen gesetzt sein, damit die Überschreibung greift.';
 $string['settings:essay_model'] = 'Modell für Aufsatz-Feedback';
 $string['settings:essay_model_desc'] = 'Modellname für das Aufsatz-Feedback, z. B. <code>claude-haiku-4-5</code>. Im Benchmark vom Oktober 2026 lieferten Claude-Modelle deutlich besseres Aufsatz-Feedback als Gemini 2.5 Flash oder GPT-4o mini. Leer lassen, um das Chat-Modell zu verwenden.';
+
+$string['ai_course_assistant:viewaudit'] = 'Das Audit-Protokoll des KI-Tutors ansehen';
+$string['task:verify_failover'] = 'Failover-Backup-Anbieter prüfen';
+$string['verify:missing_row'] = 'Die Failover-Kette führt chat:{$a} auf, aber Vergleichsanbieter hat keine Zeile namens {$a}; der Eintrag wird daher übersprungen.';
+$string['verify:missing_key'] = 'Die Zeile {$a} in Vergleichsanbieter hat keinen API-Schlüssel; der Failover-Eintrag chat:{$a} wird daher übersprungen.';
+$string['verify:model_case'] = 'Das Modell für {$a->label} ist als "{$a->model}" geschrieben. Modell-IDs werden kleingeschrieben und ohne Leerzeichen angegeben (versuchen Sie {$a->suggest}); ein Anzeigename kann jeden echten Failover scheitern lassen, während die LLM-Auswahl der Administration weiterhin funktioniert.';
+$string['verify:no_backup'] = 'Failover pro Aufruf ist aktiviert, aber kein Chat-Eintrag in Ausfallkette führt zu einem Anbieter, es gibt also kein Backup.';
+$string['verify:saved_warning'] = 'Prüfen Sie Ihre Failover-Einstellungen:';
+$string['check:failover_name'] = 'Backup-Anbieter des AI Course Assistant';
+$string['check:failover_ok'] = 'Alle {$a} Backup-Anbieter haben bei der letzten Prüfung geantwortet.';
+$string['check:failover_failing'] = 'Der Backup-Anbieter {$a->label} ({$a->model}) ist bei der letzten Prüfung fehlgeschlagen: {$a->detail}';
+$string['check:failover_none'] = 'Für den Chat ist kein Backup-Anbieter konfiguriert.';
+$string['check:failover_unverified'] = 'Die Backup-Anbieter wurden noch nicht geprüft. Die tägliche Aufgabe prüft sie, oder führen Sie php local/ai_course_assistant/admin/cli/verify_failover.php aus.';

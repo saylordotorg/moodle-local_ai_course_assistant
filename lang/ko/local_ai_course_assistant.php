@@ -3335,3 +3335,16 @@ $string['settings:essay_provider'] = '에세이 피드백 제공업체';
 $string['settings:essay_provider_desc'] = '에세이 피드백에 사용할 제공업체 ID입니다(예: <code>claude</code>, <code>openai</code>). 비교 제공업체의 행 중 하나와 일치해야 합니다. 비워 두면 채팅 제공업체를 사용합니다. 재정의가 적용되려면 이 항목과 모델을 모두 설정해야 합니다.';
 $string['settings:essay_model'] = '에세이 피드백 모델';
 $string['settings:essay_model_desc'] = '에세이 피드백에 사용할 모델 이름입니다(예: <code>claude-haiku-4-5</code>). 2026년 10월 벤치마크에서 Claude 모델은 Gemini 2.5 Flash나 GPT-4o mini보다 확연히 더 나은 에세이 피드백을 제공했습니다. 비워 두면 채팅 모델을 사용합니다.';
+
+$string['ai_course_assistant:viewaudit'] = 'AI 튜터 감사 로그 보기';
+$string['task:verify_failover'] = '장애 조치 백업 공급자 확인';
+$string['verify:missing_row'] = '장애 조치 체인에 chat:{$a}이(가) 있지만 비교 공급자에 {$a}라는 행이 없어 해당 항목은 건너뜁니다.';
+$string['verify:missing_key'] = '비교 공급자의 {$a} 행에 API 키가 없어 장애 조치 항목 chat:{$a}은(는) 건너뜁니다.';
+$string['verify:model_case'] = '{$a->label}의 모델이 "{$a->model}"(으)로 입력되어 있습니다. 모델 ID는 소문자이며 공백이 없습니다({$a->suggest}을(를) 시도해 보세요). 표시 이름은 관리자 LLM 선택기가 작동해도 실제 장애 조치를 모두 실패하게 만들 수 있습니다.';
+$string['verify:no_backup'] = '호출별 장애 조치가 켜져 있지만 대체 체인의 어떤 chat 항목도 공급자로 연결되지 않아 백업이 없습니다.';
+$string['verify:saved_warning'] = '장애 조치 설정을 확인하세요:';
+$string['check:failover_name'] = 'AI Course Assistant 백업 공급자';
+$string['check:failover_ok'] = '{$a}개의 백업 공급자가 모두 마지막 점검에 응답했습니다.';
+$string['check:failover_failing'] = '백업 공급자 {$a->label}({$a->model})이(가) 마지막 점검에 실패했습니다: {$a->detail}';
+$string['check:failover_none'] = '채팅용 백업 공급자가 구성되어 있지 않습니다.';
+$string['check:failover_unverified'] = '백업 공급자를 아직 점검하지 않았습니다. 매일 실행되는 작업이 점검하거나 php local/ai_course_assistant/admin/cli/verify_failover.php 를 실행하세요.';

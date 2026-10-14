@@ -3389,3 +3389,16 @@ $string['settings:essay_provider'] = 'Penyedia umpan balik esai';
 $string['settings:essay_provider_desc'] = 'ID penyedia (mis. <code>claude</code>, <code>openai</code>) untuk umpan balik esai. Harus cocok dengan salah satu baris di Penyedia pembanding. Biarkan kosong untuk memakai penyedia obrolan. Kolom ini dan model sama-sama harus diatur agar penggantian berlaku.';
 $string['settings:essay_model'] = 'Model umpan balik esai';
 $string['settings:essay_model_desc'] = 'Nama model untuk umpan balik esai, mis. <code>claude-haiku-4-5</code>. Dalam benchmark Oktober 2026, model Claude memberikan umpan balik esai yang jelas lebih baik daripada Gemini 2.5 Flash atau GPT-4o mini. Biarkan kosong untuk memakai model obrolan.';
+
+$string['ai_course_assistant:viewaudit'] = 'Lihat log audit tutor AI';
+$string['task:verify_failover'] = 'Periksa penyedia cadangan failover';
+$string['verify:missing_row'] = 'Rantai failover mencantumkan chat:{$a}, tetapi Penyedia perbandingan tidak memiliki baris bernama {$a}, sehingga entri itu dilewati.';
+$string['verify:missing_key'] = 'Baris {$a} di Penyedia perbandingan tidak memiliki kunci API, sehingga entri failover chat:{$a} dilewati.';
+$string['verify:model_case'] = 'Model untuk {$a->label} ditulis sebagai "{$a->model}". ID model berupa huruf kecil tanpa spasi (coba {$a->suggest}); nama tampilan dapat menggagalkan setiap failover sungguhan sementara pemilih LLM admin tetap berfungsi.';
+$string['verify:no_backup'] = 'Failover per panggilan aktif, tetapi tidak ada entri chat di Rantai cadangan yang mengarah ke penyedia, sehingga tidak ada cadangan.';
+$string['verify:saved_warning'] = 'Periksa pengaturan failover Anda:';
+$string['check:failover_name'] = 'Penyedia cadangan AI Course Assistant';
+$string['check:failover_ok'] = 'Semua {$a} penyedia cadangan menjawab pada pemeriksaan terakhir.';
+$string['check:failover_failing'] = 'Penyedia cadangan {$a->label} ({$a->model}) gagal pada pemeriksaan terakhir: {$a->detail}';
+$string['check:failover_none'] = 'Belum ada penyedia cadangan yang dikonfigurasi untuk chat.';
+$string['check:failover_unverified'] = 'Penyedia cadangan belum diperiksa. Tugas harian akan memeriksanya, atau jalankan php local/ai_course_assistant/admin/cli/verify_failover.php.';

@@ -3338,3 +3338,16 @@ $string['settings:essay_provider'] = 'Fournisseur pour les commentaires sur les 
 $string['settings:essay_provider_desc'] = 'Identifiant du fournisseur (p. ex. <code>claude</code>, <code>openai</code>) pour les commentaires sur les dissertations. Il doit correspondre à une ligne de Fournisseurs de comparaison. Laissez vide pour utiliser le fournisseur du chat. Ce champ et le modèle doivent tous deux être renseignés pour que la substitution s\'applique.';
 $string['settings:essay_model'] = 'Modèle pour les commentaires sur les dissertations';
 $string['settings:essay_model_desc'] = 'Nom du modèle pour les commentaires sur les dissertations, p. ex. <code>claude-haiku-4-5</code>. Lors du test comparatif d\'octobre 2026, les modèles Claude ont fourni des commentaires nettement meilleurs que Gemini 2.5 Flash ou GPT-4o mini. Laissez vide pour utiliser le modèle du chat.';
+
+$string['ai_course_assistant:viewaudit'] = 'Consulter le journal d\'audit du tuteur IA';
+$string['task:verify_failover'] = 'Vérifier les fournisseurs de secours du basculement';
+$string['verify:missing_row'] = 'La chaîne de basculement mentionne chat:{$a}, mais Fournisseurs de comparaison n\'a aucune ligne nommée {$a} ; cette entrée est donc ignorée.';
+$string['verify:missing_key'] = 'La ligne {$a} de Fournisseurs de comparaison n\'a pas de clé API ; l\'entrée de basculement chat:{$a} est donc ignorée.';
+$string['verify:model_case'] = 'Le modèle de {$a->label} est écrit « {$a->model} ». Les identifiants de modèle sont en minuscules et sans espaces (essayez {$a->suggest}) ; un nom d\'affichage peut faire échouer chaque basculement réel alors que le sélecteur LLM de l\'administrateur fonctionne toujours.';
+$string['verify:no_backup'] = 'Le basculement par appel est activé, mais aucune entrée chat de Chaîne de secours ne mène à un fournisseur ; il n\'y a donc pas de secours.';
+$string['verify:saved_warning'] = 'Vérifiez vos paramètres de basculement :';
+$string['check:failover_name'] = 'Fournisseurs de secours d\'AI Course Assistant';
+$string['check:failover_ok'] = 'Les {$a} fournisseurs de secours ont répondu lors de la dernière vérification.';
+$string['check:failover_failing'] = 'Le fournisseur de secours {$a->label} ({$a->model}) a échoué lors de sa dernière vérification : {$a->detail}';
+$string['check:failover_none'] = 'Aucun fournisseur de secours n\'est configuré pour le chat.';
+$string['check:failover_unverified'] = 'Les fournisseurs de secours n\'ont pas encore été vérifiés. La tâche quotidienne les vérifiera, ou exécutez php local/ai_course_assistant/admin/cli/verify_failover.php.';

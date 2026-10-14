@@ -3337,3 +3337,16 @@ $string['settings:essay_provider'] = 'Esseepalautteen palveluntarjoaja';
 $string['settings:essay_provider_desc'] = 'Palveluntarjoajan tunnus (esim. <code>claude</code>, <code>openai</code>) esseepalautteelle. Sen on vastattava jotakin Vertailupalveluntarjoajat-kohdan riviä. Jätä tyhjäksi, niin käytetään keskustelun palveluntarjoajaa. Sekä tämän kentän että mallin on oltava asetettuja, jotta ohitus tulee voimaan.';
 $string['settings:essay_model'] = 'Esseepalautteen malli';
 $string['settings:essay_model_desc'] = 'Mallin nimi esseepalautteelle, esim. <code>claude-haiku-4-5</code>. Lokakuun 2026 vertailussa Claude-mallit antoivat selvästi parempaa esseepalautetta kuin Gemini 2.5 Flash tai GPT-4o mini. Jätä tyhjäksi, niin käytetään keskustelun mallia.';
+
+$string['ai_course_assistant:viewaudit'] = 'Näytä tekoälyvalmentajan auditointiloki';
+$string['task:verify_failover'] = 'Tarkista vikasiirron varapalveluntarjoajat';
+$string['verify:missing_row'] = 'Vikasiirtoketju sisältää kohteen chat:{$a}, mutta Vertailuntarjoajat ei sisällä riviä nimeltä {$a}, joten kohta ohitetaan.';
+$string['verify:missing_key'] = 'Rivillä {$a} kohdassa Vertailuntarjoajat ei ole API-avainta, joten vikasiirtokohta chat:{$a} ohitetaan.';
+$string['verify:model_case'] = 'Mallin {$a->label} nimi on kirjoitettu muodossa "{$a->model}". Mallitunnisteet kirjoitetaan pienillä kirjaimilla ilman välilyöntejä (kokeile {$a->suggest}); näyttönimi voi epäonnistua jokaisessa todellisessa vikasiirrossa, vaikka ylläpitäjän LLM-valitsin toimii.';
+$string['verify:no_backup'] = 'Kutsukohtainen vikasiirto on päällä, mutta mikään chat-kohta kohdassa Varajärjestelyketju ei johda palveluntarjoajaan, joten varajärjestelmää ei ole.';
+$string['verify:saved_warning'] = 'Tarkista vikasiirtoasetuksesi:';
+$string['check:failover_name'] = 'AI Course Assistantin varapalveluntarjoajat';
+$string['check:failover_ok'] = 'Kaikki {$a} varapalveluntarjoajaa vastasivat viimeisimmässä tarkistuksessa.';
+$string['check:failover_failing'] = 'Varapalveluntarjoaja {$a->label} ({$a->model}) epäonnistui viimeisimmässä tarkistuksessa: {$a->detail}';
+$string['check:failover_none'] = 'Chatille ei ole määritetty varapalveluntarjoajaa.';
+$string['check:failover_unverified'] = 'Varapalveluntarjoajia ei ole vielä tarkistettu. Päivittäinen tehtävä tarkistaa ne, tai suorita php local/ai_course_assistant/admin/cli/verify_failover.php.';

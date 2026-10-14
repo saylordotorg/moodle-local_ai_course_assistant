@@ -3357,3 +3357,16 @@ $string['settings:essay_provider'] = 'ਲੇਖ ਫੀਡਬੈਕ ਪ੍ਰਦ�
 $string['settings:essay_provider_desc'] = 'ਲੇਖ ਫੀਡਬੈਕ ਲਈ ਪ੍ਰਦਾਤਾ ਆਈਡੀ (ਜਿਵੇਂ <code>claude</code>, <code>openai</code>)। ਇਹ ਤੁਲਨਾ ਪ੍ਰਦਾਤਾਵਾਂ ਦੀ ਕਿਸੇ ਕਤਾਰ ਨਾਲ ਮੇਲ ਖਾਣੀ ਚਾਹੀਦੀ ਹੈ। ਚੈਟ ਪ੍ਰਦਾਤਾ ਵਰਤਣ ਲਈ ਖਾਲੀ ਛੱਡੋ। ਓਵਰਰਾਈਡ ਲਾਗੂ ਹੋਣ ਲਈ ਇਹ ਖੇਤਰ ਅਤੇ ਮਾਡਲ ਦੋਵੇਂ ਸੈੱਟ ਹੋਣੇ ਚਾਹੀਦੇ ਹਨ।';
 $string['settings:essay_model'] = 'ਲੇਖ ਫੀਡਬੈਕ ਮਾਡਲ';
 $string['settings:essay_model_desc'] = 'ਲੇਖ ਫੀਡਬੈਕ ਲਈ ਮਾਡਲ ਦਾ ਨਾਮ, ਜਿਵੇਂ <code>claude-haiku-4-5</code>। ਅਕਤੂਬਰ 2026 ਦੇ ਬੈਂਚਮਾਰਕ ਵਿੱਚ Claude ਮਾਡਲਾਂ ਨੇ Gemini 2.5 Flash ਜਾਂ GPT-4o mini ਨਾਲੋਂ ਸਪੱਸ਼ਟ ਤੌਰ \'ਤੇ ਬਿਹਤਰ ਲੇਖ ਫੀਡਬੈਕ ਦਿੱਤਾ। ਚੈਟ ਮਾਡਲ ਵਰਤਣ ਲਈ ਖਾਲੀ ਛੱਡੋ।';
+
+$string['ai_course_assistant:viewaudit'] = 'AI ਟਿਊਟਰ ਦਾ ਆਡਿਟ ਲੌਗ ਵੇਖੋ';
+$string['task:verify_failover'] = 'ਫੇਲਓਵਰ ਬੈਕਅੱਪ ਪ੍ਰਦਾਤਿਆਂ ਦੀ ਜਾਂਚ ਕਰੋ';
+$string['verify:missing_row'] = 'ਫੇਲਓਵਰ ਲੜੀ ਵਿੱਚ chat:{$a} ਦਰਜ ਹੈ, ਪਰ ਤੁਲਨਾ ਪ੍ਰਦਾਤਾ ਵਿੱਚ {$a} ਨਾਮ ਦੀ ਕੋਈ ਕਤਾਰ ਨਹੀਂ ਹੈ, ਇਸ ਲਈ ਉਹ ਐਂਟਰੀ ਛੱਡ ਦਿੱਤੀ ਜਾਂਦੀ ਹੈ।';
+$string['verify:missing_key'] = 'ਤੁਲਨਾ ਪ੍ਰਦਾਤਾ ਦੀ ਕਤਾਰ {$a} ਵਿੱਚ ਕੋਈ API ਕੁੰਜੀ ਨਹੀਂ ਹੈ, ਇਸ ਲਈ ਫੇਲਓਵਰ ਐਂਟਰੀ chat:{$a} ਛੱਡ ਦਿੱਤੀ ਜਾਂਦੀ ਹੈ।';
+$string['verify:model_case'] = '{$a->label} ਦਾ ਮਾਡਲ "{$a->model}" ਵਜੋਂ ਲਿਖਿਆ ਗਿਆ ਹੈ। ਮਾਡਲ ਆਈਡੀ ਛੋਟੇ ਅੱਖਰਾਂ ਵਿੱਚ ਅਤੇ ਖਾਲੀ ਥਾਂ ਤੋਂ ਬਿਨਾਂ ਹੁੰਦੇ ਹਨ ({$a->suggest} ਅਜ਼ਮਾਓ); ਡਿਸਪਲੇ ਨਾਮ ਹਰ ਅਸਲੀ ਫੇਲਓਵਰ ਨੂੰ ਫੇਲ੍ਹ ਕਰ ਸਕਦਾ ਹੈ, ਜਦਕਿ ਐਡਮਿਨ LLM ਪਿਕਰ ਕੰਮ ਕਰਦਾ ਰਹਿੰਦਾ ਹੈ।';
+$string['verify:no_backup'] = 'ਪ੍ਰਤੀ-ਕਾਲ ਫੇਲਓਵਰ ਚਾਲੂ ਹੈ, ਪਰ ਬਦਲਵੀਂ ਲੜੀ ਦੀ ਕੋਈ ਵੀ ਚੈਟ ਐਂਟਰੀ ਕਿਸੇ ਪ੍ਰਦਾਤਾ ਤੱਕ ਨਹੀਂ ਪਹੁੰਚਦੀ, ਇਸ ਲਈ ਕੋਈ ਬੈਕਅੱਪ ਨਹੀਂ ਹੈ।';
+$string['verify:saved_warning'] = 'ਆਪਣੀਆਂ ਫੇਲਓਵਰ ਸੈਟਿੰਗਾਂ ਦੀ ਜਾਂਚ ਕਰੋ:';
+$string['check:failover_name'] = 'AI Course Assistant ਬੈਕਅੱਪ ਪ੍ਰਦਾਤੇ';
+$string['check:failover_ok'] = 'ਸਾਰੇ {$a} ਬੈਕਅੱਪ ਪ੍ਰਦਾਤਿਆਂ ਨੇ ਆਪਣੀ ਪਿਛਲੀ ਜਾਂਚ ਦਾ ਜਵਾਬ ਦਿੱਤਾ।';
+$string['check:failover_failing'] = 'ਬੈਕਅੱਪ ਪ੍ਰਦਾਤਾ {$a->label} ({$a->model}) ਆਪਣੀ ਪਿਛਲੀ ਜਾਂਚ ਵਿੱਚ ਫੇਲ੍ਹ ਹੋ ਗਿਆ: {$a->detail}';
+$string['check:failover_none'] = 'ਚੈਟ ਲਈ ਕੋਈ ਬੈਕਅੱਪ ਪ੍ਰਦਾਤਾ ਕੌਂਫਿਗਰ ਨਹੀਂ ਕੀਤਾ ਗਿਆ।';
+$string['check:failover_unverified'] = 'ਬੈਕਅੱਪ ਪ੍ਰਦਾਤਿਆਂ ਦੀ ਅਜੇ ਜਾਂਚ ਨਹੀਂ ਹੋਈ। ਰੋਜ਼ਾਨਾ ਕਾਰਜ ਉਹਨਾਂ ਦੀ ਜਾਂਚ ਕਰੇਗਾ, ਜਾਂ php local/ai_course_assistant/admin/cli/verify_failover.php ਚਲਾਓ।';
