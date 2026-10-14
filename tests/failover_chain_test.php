@@ -1017,6 +1017,9 @@ final class failover_chain_test extends \advanced_testcase {
         $this->assertSame('FALLBACK-OUT', $chain->chat_completion('sys', self::long_history(6)));
         $this->assertSame([3], $primary->sizes, 'one request, the remembered one, and no retries after it');
         $this->assertSame(1, $fallback->callcount);
+        $this->assertFalse($cache->get(
+            'history_' . md5(failover_chain::circuit_scope('rem-fail-primary', $primary)) . '_5_7'
+        ), 'the provider refused the remembered variant itself, so it is forgotten');
     }
 
     /**
@@ -1053,6 +1056,24 @@ final class failover_chain_test extends \advanced_testcase {
         $this->assertSame('PRIMARY-OUT', $chain->chat_completion('sys', self::messy_history()));
         $this->assertSame([11, 3], $primary->sizes, 'the remembered 11-turn history is refused, then the newest exchange works');
         $this->assertSame('trimmed', $cache->get($key)['variant'], 'what worked is remembered instead');
+    }
+
+    /**
+     * A passing fault (here a generic error, counted as transient) says nothing about the history, so it
+     * must not make the chain forget a variant that was working.
+     */
+    public function test_a_transient_failure_leaves_the_remembered_variant_alone(): void {
+        $this->resetAfterTest();
+        $primary = self::fake_provider('never', true);
+        $chain = new failover_chain($primary, 'keep-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'keep-fallback'],
+        ], ['audit' => true, 'courseid' => 7, 'userid' => 5]);
+        $chain->enable_history_memory();
+        $key = 'history_' . md5(failover_chain::circuit_scope('keep-primary', $primary)) . '_5_7';
+        $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
+        $cache->set($key, ['variant' => 'trimmed', 'at' => time()]);
+        $this->assertSame('FALLBACK-OUT', $chain->chat_completion('sys', self::long_history(6)));
+        $this->assertIsArray($cache->get($key), 'still remembered');
     }
 
     /**

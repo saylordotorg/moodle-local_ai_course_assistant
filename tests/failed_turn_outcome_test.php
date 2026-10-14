@@ -42,4 +42,21 @@ final class failed_turn_outcome_test extends \basic_testcase {
         $this->assertSame('provider_error', conversation_manager::failed_turn_outcome(false, false, 'chat:error_auth'));
         $this->assertSame('provider_error', conversation_manager::failed_turn_outcome(false, false, 'chat:error_unavailable'));
     }
+
+    /**
+     * sse.php is a script and cannot be loaded by a test, so pin the call site by its source (whitespace
+     * collapsed): the classification must be given the pause flag, whether a provider exists and the error
+     * code; a blocked turn must not be audited as an sse_error; and the result must reach the stored row.
+     */
+    public function test_sse_classifies_a_failed_turn_before_it_audits_and_stores_it(): void {
+        global $CFG;
+        $source = preg_replace('/\s+/', ' ', file_get_contents($CFG->dirroot . '/local/ai_course_assistant/sse.php'));
+        $classify = '$failedoutcome = \\local_ai_course_assistant\\conversation_manager::failed_turn_outcome( '
+            . '$auditaction === \'chat_paused\', is_object($provider ?? null), (string) ($e->errorcode ?? \'\') );';
+        $this->assertStringContainsString($classify, $source);
+        $this->assertStringContainsString('$auditaction = \'chat_blocked\';', $source);
+        $audit = '\\local_ai_course_assistant\\audit_logger::log( $auditaction,';
+        $this->assertGreaterThan(strpos($source, '$failedoutcome = '), strpos($source, $audit), 'classified before audited');
+        $this->assertStringContainsString('$learnernotice ?? \'\', $provider ?? null, $failedoutcome );', $source);
+    }
 }

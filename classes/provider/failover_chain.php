@@ -186,8 +186,12 @@ class failover_chain implements provider_interface {
                 // only the newest exchange, before calling it a failure.
                 $variants = self::history_variants_for_retry($e, $messages, $entry);
                 if ($remembered) {
-                    // The remembered variant was refused: forget it, and try the others.
-                    $this->forget_variant($entry);
+                    // The provider refused the remembered variant itself: forget it, and try the
+                    // others. A rate limit, outage or timeout says nothing about the history, so
+                    // it leaves the memory alone.
+                    if (self::circuit_effect($e) === 'none') {
+                        $this->forget_variant($entry);
+                    }
                     $variants = array_values(array_filter(
                         $variants,
                         static fn($v) => $v['name'] !== $remembered['name']
@@ -308,8 +312,12 @@ class failover_chain implements provider_interface {
                 // exchange only, still before anything has reached the learner.
                 $variants = self::history_variants_for_retry($e, $messages, $entry);
                 if ($remembered) {
-                    // The remembered variant was refused: forget it, and try the others.
-                    $this->forget_variant($entry);
+                    // The provider refused the remembered variant itself: forget it, and try the
+                    // others. A rate limit, outage or timeout says nothing about the history, so
+                    // it leaves the memory alone.
+                    if (self::circuit_effect($e) === 'none') {
+                        $this->forget_variant($entry);
+                    }
                     $variants = array_values(array_filter(
                         $variants,
                         static fn($v) => $v['name'] !== $remembered['name']

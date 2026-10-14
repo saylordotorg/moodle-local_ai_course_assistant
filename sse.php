@@ -1319,6 +1319,18 @@ try {
     $auditaction = \local_ai_course_assistant\spend_guard::emergency_chat_stopped()
         ? 'chat_paused'
         : 'sse_error';
+    // v7.8.8: whether this turn is a failure or a refusal. A guard that refused the chat before any
+    // provider was reached (rate limit, quiz lock, spend cap with no failover) is not a provider
+    // failure either, so it gets its own audit action; otherwise it would sit in the sse_error rows
+    // that the failure alert and the dashboards read as "what the provider said".
+    $failedoutcome = \local_ai_course_assistant\conversation_manager::failed_turn_outcome(
+        $auditaction === 'chat_paused',
+        is_object($provider ?? null),
+        (string) ($e->errorcode ?? '')
+    );
+    if ($failedoutcome === 'blocked' && $auditaction === 'sse_error') {
+        $auditaction = 'chat_blocked';
+    }
     try {
         // The provider layer throws moodle_exception with the real cause in
         // debuginfo -- "HTTP 429: ...", a curl error, a vendor error type --
@@ -1366,11 +1378,7 @@ try {
         $conv ?? null, (int)($USER->id ?? 0), (int)($courseid ?? 0),
         $fullresponse ?? '', get_class($e), $pageid ?? null, $interactiontype ?? 'chat',
         $learnernotice ?? '', $provider ?? null,
-        \local_ai_course_assistant\conversation_manager::failed_turn_outcome(
-            $auditaction === 'chat_paused',
-            is_object($provider ?? null),
-            (string) ($e->errorcode ?? '')
-        )
+        $failedoutcome
     );
     local_ai_course_assistant_sse_send(['error' => $errmsg]);
 } catch (\Throwable $e) {
