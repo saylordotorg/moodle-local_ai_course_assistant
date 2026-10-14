@@ -276,8 +276,10 @@ class unanswered_monitor {
             ? "Learners are asking SOLA questions and not getting answers.\n\n"
             : "SOLA replies are failing for learners.\n\n";
         $body .= sprintf("Window:            last %d hours\n", $eval['window_hours']);
-        $body .= sprintf("Alert threshold:   answer rate below %.0f%% with at least %d questions\n",
-            $eval['min_rate'] * 100, $eval['min_questions']);
+        if ($worst !== null) {
+            $body .= sprintf("Alert threshold:   answer rate below %.0f%% with at least %d questions\n",
+                $eval['min_rate'] * 100, $eval['min_questions']);
+        }
         $body .= sprintf("Courses checked:   %d\n\n", $eval['checked']);
 
         if (!empty($eval['failed_total'])) {

@@ -72,12 +72,20 @@ class course_key_guard {
      * @param string $provider The course's own provider ('' = use the site's).
      * @param string $model The course's own model ('' = the site's).
      * @param string $siteprovider The site's provider setting.
+     * @param string $sitemodel The site's model setting, used when the provider is 'auto' and the course names no model.
      * @return string Provider id, or '' when it cannot be told.
      */
-    public static function effective_provider(string $provider, string $model, string $siteprovider): string {
+    public static function effective_provider(
+        string $provider,
+        string $model,
+        string $siteprovider,
+        string $sitemodel = ''
+    ): string {
         $effective = $provider !== '' ? $provider : $siteprovider;
         if ($effective === 'auto' || $effective === '') {
-            $effective = $model !== '' ? \local_ai_course_assistant\autoupgrade\roles::infer_provider($model) : '';
+            // 'auto' follows the model name: the course's own, else the site's.
+            $named = $model !== '' ? $model : $sitemodel;
+            $effective = $named !== '' ? \local_ai_course_assistant\autoupgrade\roles::infer_provider($named) : '';
         }
         return strtolower($effective);
     }
@@ -112,6 +120,7 @@ class course_key_guard {
      * @param string $baseurl Base URL submitted for the course.
      * @param string $typed Key typed in the form ('' = left blank).
      * @param string $stored Plain-text key already stored for the course.
+     * @param string $sitemodel The site's model setting (for a provider of 'auto').
      * @return array{apikey: string, notices: array[]} The key to store, and notices as [type, lang key, $a].
      */
     public static function resolve(
@@ -120,9 +129,10 @@ class course_key_guard {
         string $siteprovider,
         string $baseurl,
         string $typed,
-        string $stored
+        string $stored,
+        string $sitemodel = ''
     ): array {
-        $effective = self::effective_provider($provider, $model, $siteprovider);
+        $effective = self::effective_provider($provider, $model, $siteprovider, $sitemodel);
         $notices = [];
         $key = $typed !== '' ? $typed : $stored;
 
@@ -147,14 +157,16 @@ class course_key_guard {
     public static function mismatched_courses(): array {
         global $DB;
         $siteprovider = (string) (get_config('local_ai_course_assistant', 'provider') ?: '');
+        $sitemodel = (string) (get_config('local_ai_course_assistant', 'model') ?: '');
+        $hasakey = $DB->sql_isnotempty('local_ai_course_assistant_course_cfg', 'cfg.apikey', true, true);
         $sql = "SELECT cfg.id, cfg.provider, cfg.model, cfg.apikey, cfg.apibaseurl, c.shortname
                   FROM {local_ai_course_assistant_course_cfg} cfg
              LEFT JOIN {course} c ON c.id = cfg.courseid
-                 WHERE cfg.enabled = 1 AND cfg.apikey <> ''
+                 WHERE cfg.enabled = 1 AND $hasakey
               ORDER BY c.shortname";
         $found = [];
         foreach ($DB->get_records_sql($sql) as $row) {
-            $effective = self::effective_provider((string) $row->provider, (string) $row->model, $siteprovider);
+            $effective = self::effective_provider((string) $row->provider, (string) $row->model, $siteprovider, $sitemodel);
             $owner = self::conflict($effective, secrets::reveal((string) $row->apikey), (string) $row->apibaseurl);
             if ($owner !== '') {
                 $found[] = ['shortname' => (string) $row->shortname, 'provider' => $effective, 'owner' => $owner];

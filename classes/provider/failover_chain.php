@@ -118,7 +118,22 @@ class failover_chain implements provider_interface {
             'audit'           => true,
             'courseid'        => 0,
             'userid'          => 0,
+            'history_memory'  => false,
         ];
+    }
+
+    /**
+     * Let this chain remember, for a few minutes, which repaired or shortened history a learner's
+     * conversation needed, and send it that way first.
+     *
+     * Off unless a chat caller asks for it. The chain wraps every provider call while per-call
+     * failover is on (quiz, essay scoring, insights...), and a shortened history is right for a chat
+     * turn but would silently cut a prompt another feature built on purpose.
+     *
+     * @return void
+     */
+    public function enable_history_memory(): void {
+        $this->options['history_memory'] = true;
     }
 
     /**
@@ -169,7 +184,15 @@ class failover_chain implements provider_interface {
                 // v7.8.8: a provider that refused this request as malformed is not
                 // necessarily broken. Ask again with the history repaired, then with
                 // only the newest exchange, before calling it a failure.
-                $variants = $remembered ? [] : self::history_variants_for_retry($e, $messages);
+                $variants = self::history_variants_for_retry($e, $messages, $entry);
+                if ($remembered) {
+                    // The remembered variant was refused: forget it, and try the others.
+                    $this->forget_variant($entry);
+                    $variants = array_values(array_filter(
+                        $variants,
+                        static fn($v) => $v['name'] !== $remembered['name']
+                    ));
+                }
                 foreach ($variants as $variant) {
                     try {
                         $result = $entry['provider']->chat_completion($systemprompt, $variant['messages'], $options);
@@ -283,7 +306,15 @@ class failover_chain implements provider_interface {
                 $elapsed = microtime(true) - $start;
                 // v7.8.8: as in chat_completion(): the repaired history, then the newest
                 // exchange only, still before anything has reached the learner.
-                $variants = $remembered ? [] : self::history_variants_for_retry($e, $messages);
+                $variants = self::history_variants_for_retry($e, $messages, $entry);
+                if ($remembered) {
+                    // The remembered variant was refused: forget it, and try the others.
+                    $this->forget_variant($entry);
+                    $variants = array_values(array_filter(
+                        $variants,
+                        static fn($v) => $v['name'] !== $remembered['name']
+                    ));
+                }
                 foreach ($variants as $variant) {
                     try {
                         $entry['provider']->chat_completion_stream($systemprompt, $variant['messages'], $wrappedcb, $options);
@@ -679,24 +710,44 @@ class failover_chain implements provider_interface {
      *
      * @param \Throwable $error What the provider threw.
      * @param array $messages The history that was sent.
+     * @param array $entry The chain entry that refused it.
      * @return array<int, array{name: string, messages: array}>
      */
-    private static function history_variants_for_retry(\Throwable $error, array $messages): array {
+    private static function history_variants_for_retry(\Throwable $error, array $messages, array $entry): array {
         if (!($error instanceof provider_http_exception) || self::circuit_effect($error) !== 'none') {
             return [];
         }
-        return \local_ai_course_assistant\history_trimmer::retry_variants($messages);
+        return self::variants_for($entry, $messages);
+    }
+
+    /**
+     * The history variants worth sending to a chain member.
+     *
+     * A provider that repairs the history itself before every request (Claude does) was already
+     * sent the 'tidied' variant, so repeating it would only pay for the same refusal twice and
+     * log "repair did not help" when the repair had already been applied.
+     *
+     * @param array $entry Chain entry.
+     * @param array $messages The full history.
+     * @return array<int, array{name: string, messages: array}>
+     */
+    private static function variants_for(array $entry, array $messages): array {
+        $variants = \local_ai_course_assistant\history_trimmer::retry_variants($messages);
+        if (method_exists($entry['provider'], 'repairs_history') && $entry['provider']->repairs_history()) {
+            $variants = array_values(array_filter($variants, static fn($v) => $v['name'] !== 'tidied'));
+        }
+        return $variants;
     }
 
     /**
      * Cache key remembering which history variant a member needed for a learner's conversation.
      *
      * @param array $entry
-     * @return string|null Null when no learner is known (nothing to remember it by).
+     * @return string|null Null when memory is off or no learner is known (nothing to remember it by).
      */
     private function memory_key(array $entry): ?string {
         $userid = (int) $this->options['userid'];
-        if ($userid <= 0) {
+        if ($userid <= 0 || empty($this->options['history_memory'])) {
             return null;
         }
         $scope = self::circuit_scope($entry['label'], $entry['provider']);
@@ -721,12 +772,24 @@ class failover_chain implements provider_interface {
         if (!is_array($memory) || (time() - (int) ($memory['at'] ?? 0)) > self::HISTORY_MEMORY_SECONDS) {
             return [];
         }
-        foreach (\local_ai_course_assistant\history_trimmer::retry_variants($messages) as $variant) {
+        foreach (self::variants_for($entry, $messages) as $variant) {
             if ($variant['name'] === ($memory['variant'] ?? '')) {
                 return $variant;
             }
         }
         return [];
+    }
+
+    /**
+     * Forget the remembered variant for this learner's conversation on this member.
+     *
+     * @param array $entry
+     */
+    private function forget_variant(array $entry): void {
+        $key = $this->memory_key($entry);
+        if ($key !== null) {
+            \cache::make('local_ai_course_assistant', 'failover_circuit')->delete($key);
+        }
     }
 
     /**

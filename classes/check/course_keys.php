@@ -51,7 +51,8 @@ class course_keys extends check {
             return new result(result::OK, get_string('check:coursekeys_ok', 'local_ai_course_assistant'));
         }
         $names = array_map(
-            fn($b) => s($b['shortname'] ?: '?') . ' (' . s($b['provider']) . ', key looks like ' . s($b['owner']) . ')',
+            // 'uses &larr; key belongs to': provider names only, so the line needs no translation.
+            fn($b) => s($b['shortname'] ?: '?') . ' (' . s($b['provider']) . ' &larr; ' . s($b['owner']) . ')',
             array_slice($bad, 0, self::LIST_LIMIT)
         );
         $more = count($bad) > self::LIST_LIMIT ? ' ...' : '';

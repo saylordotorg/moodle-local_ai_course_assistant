@@ -842,13 +842,19 @@ final class failover_chain_test extends \advanced_testcase {
      * A provider that, like a strict API, refuses a malformed history: an empty turn,
      * two turns in a row from one role, or a first turn that is not the user's.
      *
+     * @param bool $repairs What it reports from repairs_history(): whether it repairs the history itself.
      * @return object Anonymous provider_interface with public $callcount and $sizes.
      */
-    private static function structure_picky_provider(): object {
-        return new class () implements provider_interface {
+    private static function structure_picky_provider(bool $repairs = false): object {
+        return new class ($repairs) implements provider_interface {
             public int $callcount = 0;
             /** @var int[] Turns in each request received. */
             public array $sizes = [];
+            public function __construct(private bool $repairs) {
+            }
+            public function repairs_history(): bool {
+                return $this->repairs;
+            }
             public function circuit_identity(): string {
                 return 'structure-picky';
             }
@@ -938,6 +944,7 @@ final class failover_chain_test extends \advanced_testcase {
         $chain = new failover_chain($primary, 'memory-primary', [
             ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'memory-fallback'],
         ], ['audit' => true, 'courseid' => 7, 'userid' => 5]);
+        $chain->enable_history_memory();
         $chain->chat_completion('sys', self::messy_history());
         $this->assertSame([13, 11], $primary->sizes);
         $chain->chat_completion('sys', self::messy_history());
@@ -950,9 +957,13 @@ final class failover_chain_test extends \advanced_testcase {
     public function test_another_learner_or_course_is_not_given_the_remembered_variant(): void {
         $this->resetAfterTest();
         $primary = self::structure_picky_provider();
-        $make = fn(int $user, int $course) => new failover_chain($primary, 'who-primary', [
-            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'who-fallback'],
-        ], ['audit' => false, 'courseid' => $course, 'userid' => $user]);
+        $make = function (int $user, int $course) use ($primary) {
+            $chain = new failover_chain($primary, 'who-primary', [
+                ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'who-fallback'],
+            ], ['audit' => false, 'courseid' => $course, 'userid' => $user]);
+            $chain->enable_history_memory();
+            return $chain;
+        };
         $make(5, 7)->chat_completion('sys', self::messy_history());
         $this->assertSame([13, 11], $primary->sizes);
         $make(6, 7)->chat_completion('sys', self::messy_history());
@@ -967,6 +978,7 @@ final class failover_chain_test extends \advanced_testcase {
         $anonymous = new failover_chain($primary, 'anon-primary', [
             ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'anon-fallback'],
         ], ['audit' => false, 'courseid' => 7, 'userid' => 0]);
+        $anonymous->enable_history_memory();
         $anonymous->chat_completion('sys', self::messy_history());
         $anonymous->chat_completion('sys', self::messy_history());
         $this->assertSame([13, 11, 13, 11], $primary->sizes);
@@ -974,6 +986,7 @@ final class failover_chain_test extends \advanced_testcase {
         $known = new failover_chain($primary, 'expire-primary', [
             ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'expire-fallback'],
         ], ['audit' => false, 'courseid' => 7, 'userid' => 5]);
+        $known->enable_history_memory();
         $known->chat_completion('sys', self::messy_history());
         $key = 'history_' . md5(failover_chain::circuit_scope('expire-primary', $primary)) . '_5_7';
         $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
@@ -995,6 +1008,7 @@ final class failover_chain_test extends \advanced_testcase {
         $chain = new failover_chain($primary, 'rem-fail-primary', [
             ['provider' => $fallback, 'label' => 'rem-fail-fallback'],
         ], ['audit' => true, 'courseid' => 7, 'userid' => 5]);
+        $chain->enable_history_memory();
         $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
         $cache->set(
             'history_' . md5(failover_chain::circuit_scope('rem-fail-primary', $primary)) . '_5_7',
@@ -1003,6 +1017,60 @@ final class failover_chain_test extends \advanced_testcase {
         $this->assertSame('FALLBACK-OUT', $chain->chat_completion('sys', self::long_history(6)));
         $this->assertSame([3], $primary->sizes, 'one request, the remembered one, and no retries after it');
         $this->assertSame(1, $fallback->callcount);
+    }
+
+    /**
+     * Memory belongs to chat. The chain wraps every provider call while per-call failover is on, so
+     * unless a chat caller opts in, a shortened history is never carried over to the next request.
+     */
+    public function test_memory_is_off_unless_a_chat_caller_enables_it(): void {
+        $this->resetAfterTest();
+        $primary = self::structure_picky_provider();
+        $chain = new failover_chain($primary, 'off-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'off-fallback'],
+        ], ['audit' => true, 'courseid' => 7, 'userid' => 5]);
+        $chain->chat_completion('sys', self::messy_history());
+        $chain->chat_completion('sys', self::messy_history());
+        $this->assertSame([13, 11, 13, 11], $primary->sizes, 'each request is tried in full first');
+        $outcomes = array_column(self::audit_details(failover_chain::AUDIT_EVENT_TRIMMED), 'outcome');
+        $this->assertSame(['rescued', 'rescued'], $outcomes, 'and nothing is ever "remembered"');
+    }
+
+    /**
+     * A remembered variant that is refused is forgotten and the other variants are tried.
+     */
+    public function test_a_refused_remembered_variant_is_forgotten_and_the_others_are_tried(): void {
+        $this->resetAfterTest();
+        $primary = self::picky_provider('PRIMARY-OUT', 4);
+        $chain = new failover_chain($primary, 'forget-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'forget-fallback'],
+        ], ['audit' => true, 'courseid' => 7, 'userid' => 5]);
+        $chain->enable_history_memory();
+        $key = 'history_' . md5(failover_chain::circuit_scope('forget-primary', $primary)) . '_5_7';
+        $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
+        $cache->set($key, ['variant' => 'tidied', 'at' => time()]);
+
+        $this->assertSame('PRIMARY-OUT', $chain->chat_completion('sys', self::messy_history()));
+        $this->assertSame([11, 3], $primary->sizes, 'the remembered 11-turn history is refused, then the newest exchange works');
+        $this->assertSame('trimmed', $cache->get($key)['variant'], 'what worked is remembered instead');
+    }
+
+    /**
+     * Claude repairs the history in every request it builds, so a "tidied" retry would only repeat the
+     * refusal: it is skipped for a provider that says it repairs its own history.
+     */
+    public function test_the_repaired_history_is_not_retried_for_a_provider_that_already_repairs_it(): void {
+        $this->resetAfterTest();
+        $primary = self::structure_picky_provider(true);
+        $chain = new failover_chain($primary, 'selfrepair-primary', [
+            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'selfrepair-fallback'],
+        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        $this->assertSame('PRIMARY-OUT', $chain->chat_completion('sys', self::messy_history()));
+        $this->assertSame([13, 3], $primary->sizes, 'straight to the newest exchange');
+        $this->assertSame(
+            ['trimmed'],
+            array_column(self::audit_details(failover_chain::AUDIT_EVENT_TRIMMED), 'variant')
+        );
     }
 
     /**

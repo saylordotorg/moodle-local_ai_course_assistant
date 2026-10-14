@@ -273,6 +273,9 @@ ob_implicit_flush(true);
  * @param object|null $provider The provider that failed, when one was built.
  *        v7.8.0: its id and model are recorded on the row, so the watcher of a
  *        model switch can count a model's failures; they were stored blank.
+ * @param string $outcome stream_outcome to store: 'provider_error' (the default) or 'blocked' for a pause
+ *        or a guard refusal, so those are not counted as failures (v7.8.8, see
+ *        conversation_manager::failed_turn_outcome()).
  * @return void
  */
 function local_ai_course_assistant_record_failed_turn(
@@ -284,7 +287,8 @@ function local_ai_course_assistant_record_failed_turn(
     ?int $pageid,
     string $interactiontype,
     string $learnertext = '',
-    $provider = null
+    $provider = null,
+    string $outcome = 'provider_error'
 ): void {
     $providerid = '';
     $modelname = null;
@@ -323,7 +327,7 @@ function local_ai_course_assistant_record_failed_turn(
             $pageid ?: null,
             null,
             null,
-            'provider_error'
+            $outcome
         );
     } catch (\Throwable $ignore) {
         // Deliberately swallowed: see the docblock.
@@ -990,6 +994,11 @@ try {
     };
 
     try {
+        // v7.8.8: this is a chat turn, so a repaired or shortened history that worked is remembered for
+        // the next message of the conversation (other features sharing the chain are left alone).
+        if ($provider instanceof \local_ai_course_assistant\provider\failover_chain) {
+            $provider->enable_history_memory();
+        }
         $provider->chat_completion_stream($systemprompt, $history, $streamfilter, $streamoptions);
         $streamflush();
     } catch (\moodle_exception $e) {
@@ -1356,7 +1365,12 @@ try {
     local_ai_course_assistant_record_failed_turn(
         $conv ?? null, (int)($USER->id ?? 0), (int)($courseid ?? 0),
         $fullresponse ?? '', get_class($e), $pageid ?? null, $interactiontype ?? 'chat',
-        $learnernotice ?? '', $provider ?? null
+        $learnernotice ?? '', $provider ?? null,
+        \local_ai_course_assistant\conversation_manager::failed_turn_outcome(
+            $auditaction === 'chat_paused',
+            is_object($provider ?? null),
+            (string) ($e->errorcode ?? '')
+        )
     );
     local_ai_course_assistant_sse_send(['error' => $errmsg]);
 } catch (\Throwable $e) {

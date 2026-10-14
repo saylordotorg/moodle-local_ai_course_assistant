@@ -50,6 +50,8 @@ final class course_key_guard_test extends \advanced_testcase {
         $this->assertSame('gemini', course_key_guard::effective_provider('', 'gemini-3.1-flash-lite', 'auto'));
         $this->assertSame('claude', course_key_guard::effective_provider('auto', 'claude-haiku-4-5', 'gemini'));
         $this->assertSame('', course_key_guard::effective_provider('', '', 'auto'), 'cannot be told');
+        $this->assertSame('gemini', course_key_guard::effective_provider('', '', 'auto', 'gemini-2.5-flash'), 'the site model decides');
+        $this->assertSame('claude', course_key_guard::effective_provider('', 'claude-haiku-4-5', 'auto', 'gemini-2.5-flash'), 'the course model wins');
     }
 
     public function test_only_a_clear_mismatch_is_a_conflict(): void {
@@ -75,6 +77,13 @@ final class course_key_guard_test extends \advanced_testcase {
         $this->assertSame('coursesettings:key_removed', $r['notices'][0][1]);
         $this->assertSame('claude', $r['notices'][0][2]->owner);
         $this->assertSame('gemini', $r['notices'][0][2]->provider);
+    }
+
+    public function test_on_an_auto_site_the_site_model_decides_which_key_fits(): void {
+        $r = course_key_guard::resolve('', '', 'auto', '', '', self::CLAUDE_KEY, 'gemini-2.5-flash');
+        $this->assertSame('', $r['apikey'], 'a Claude key under a Gemini site model is removed');
+        $r = course_key_guard::resolve('', '', 'auto', '', '', self::CLAUDE_KEY, 'claude-haiku-4-5');
+        $this->assertSame(self::CLAUDE_KEY, $r['apikey']);
     }
 
     public function test_a_blank_key_box_keeps_a_stored_key_that_still_fits(): void {
@@ -145,6 +154,7 @@ final class course_key_guard_test extends \advanced_testcase {
         $this->assertStringNotContainsString('GOOD101', $r->get_summary());
         $this->assertStringNotContainsString('OFF101', $r->get_summary(), 'a disabled override is not used');
         $this->assertStringContainsString('2 course(s)', $r->get_summary());
+        $this->assertStringContainsString('STALE101 (gemini &larr; claude)', $r->get_summary());
     }
 
     public function test_the_course_settings_page_asks_the_guard_before_it_saves_a_key(): void {

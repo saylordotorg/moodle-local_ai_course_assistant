@@ -145,11 +145,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         (string) $globalcfg['provider'],
         $data['apibaseurl'],
         $typedkey,
-        $storedkey
+        $storedkey,
+        (string) $globalcfg['model']
     );
     $data['apikey'] = $keydecision['apikey'];
-    if ($typedkey === '' && $storedkey === '' && $storedraw !== '') {
-        // A stored key this site cannot decrypt: leave it exactly as it is.
+    if ($data['apikey'] === '' && $storedkey === '' && $storedraw !== '') {
+        // A stored key this site cannot decrypt (a database restored onto another site): leave it exactly
+        // as it is, whatever was typed, so a rejected typed key cannot wipe it. The explicit clear box
+        // below still can.
         $data['apikey'] = $storedraw;
     }
     foreach ($keydecision['notices'] as [$noticetype, $noticekey, $noticea]) {

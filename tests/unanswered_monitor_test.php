@@ -249,6 +249,34 @@ final class unanswered_monitor_test extends \advanced_testcase {
         $this->assertSame('ok', $eval['status']);
     }
 
+    /**
+     * A chat stopped on purpose (the emergency pause) or refused by a guard is stored as 'blocked': the
+     * learner was told why and nothing is broken, so it must raise neither alert.
+     */
+    public function test_a_blocked_turn_is_neither_a_failure_nor_a_missing_answer(): void {
+        global $DB;
+        $a = $this->getDataGenerator()->create_course(['shortname' => 'PAUSE101']);
+        $this->seed($a->id, 20, 0);
+        for ($i = 0; $i < 20; $i++) {
+            $DB->insert_record('local_ai_course_assistant_msgs', (object) [
+                'courseid' => $a->id, 'userid' => 500 + $i, 'conversationid' => 500 + $i, 'role' => 'assistant',
+                'message' => 'Chat is paused.', 'stream_outcome' => 'blocked', 'timecreated' => time() - 600,
+            ]);
+        }
+        $eval = unanswered_monitor::evaluate();
+        $this->assertSame('ok', $eval['status']);
+        $this->assertSame(0, $eval['failed_total']);
+    }
+
+    public function test_the_alert_email_names_the_answer_rate_threshold_when_a_course_fails_it(): void {
+        $sink = $this->redirectEmails();
+        set_config('spend_notify_emails', 'ops@example.com', 'local_ai_course_assistant');
+        $a = $this->getDataGenerator()->create_course(['shortname' => 'RATE101']);
+        $this->seed($a->id, 20, 2);
+        $this->assertTrue(unanswered_monitor::maybe_send_alert(unanswered_monitor::evaluate()));
+        $this->assertStringContainsString('answer rate below', $sink->get_messages()[0]->body);
+    }
+
     public function test_failed_replies_older_than_the_window_are_ignored(): void {
         $a = $this->getDataGenerator()->create_course(['shortname' => 'OLD101']);
         $this->seed($a->id, 20, 20, 8 * HOURSECS);
@@ -283,6 +311,8 @@ final class unanswered_monitor_test extends \advanced_testcase {
         $this->assertStringContainsString('MAIL101', $messages[0]->body);
         $this->assertStringContainsString('Please pass a valid API key', $messages[0]->body);
         $this->assertStringNotContainsString('asking but not answering', $messages[0]->subject);
+        $this->assertStringNotContainsString('answer rate below', $messages[0]->body, 'no course failed the rate test, so it is not the reason');
+        $this->assertStringContainsString('Failed replies:', $messages[0]->body);
 
         $this->assertFalse(unanswered_monitor::maybe_send_alert($eval), 'one alert a day');
         $this->assertCount(1, $sink->get_messages());

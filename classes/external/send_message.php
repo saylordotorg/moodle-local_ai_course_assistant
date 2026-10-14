@@ -260,6 +260,10 @@ class send_message extends external_api {
             (int) $params['courseid']
         );
         $provider = base_provider::create_from_config((int) $params['courseid']);
+        if ($provider instanceof \local_ai_course_assistant\provider\failover_chain) {
+            // A chat turn: remember a repaired or shortened history that worked (v7.8.8).
+            $provider->enable_history_memory();
+        }
         $response = $provider->chat_completion($systemprompt, $history);
         $tokenusage = $provider->get_last_token_usage();
 

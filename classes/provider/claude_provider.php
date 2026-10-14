@@ -43,6 +43,16 @@ class claude_provider extends base_provider {
     private ?array $last_token_usage = null;
 
     /**
+     * This provider repairs a malformed history itself before every request (see build_body()), so a
+     * retry with the repaired history would repeat the request it just refused.
+     *
+     * @return bool
+     */
+    public function repairs_history(): bool {
+        return true;
+    }
+
+    /**
      * Get token usage from the last streaming call.
      *
      * @return array|null ['prompt_tokens', 'completion_tokens', 'model',
