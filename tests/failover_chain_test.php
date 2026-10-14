@@ -674,6 +674,9 @@ final class failover_chain_test extends \advanced_testcase {
                 'Please pass a valid API key',
                 'Your credit balance is too low to access the Anthropic API',
                 'You have reached your specified API usage limits.',
+                'error code: insufficient_quota',
+                'billing_hard_limit_reached',
+                'API_KEY_INVALID',
             ] as $body
         ) {
             $this->assertSame('immediate', failover_chain::circuit_effect(new provider_http_exception(400, $body)), $body);
@@ -691,9 +694,22 @@ final class failover_chain_test extends \advanced_testcase {
         ));
         $this->assertSame('counted', failover_chain::circuit_effect(new \RuntimeException('curl error 28')));
         $this->assertSame('counted', failover_chain::circuit_effect(new provider_http_exception(402, 'payment required')));
-        $this->assertSame('none', failover_chain::circuit_effect(
-            new provider_http_exception(400, 'I want to buy credit please'),
-        ), 'a common word quoted back is not an account fault');
+        // A 400 body that quotes the learner's own words must never read as an account fault, however
+        // ordinary the words (a business course is full of them).
+        foreach (
+            [
+                'I want to buy credit please',
+                "messages.3.content: invalid value in 'Our billing department raised the usage limit and spend cap'",
+                'Unsupported parameter: quota. The text "insufficient credit and billing" is not valid here',
+                'the account is fine but this request is malformed',
+            ] as $quoted
+        ) {
+            $this->assertSame(
+                'none',
+                failover_chain::circuit_effect(new provider_http_exception(400, $quoted)),
+                $quoted
+            );
+        }
     }
 
     /**

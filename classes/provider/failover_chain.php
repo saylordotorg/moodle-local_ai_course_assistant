@@ -89,13 +89,16 @@ class failover_chain implements provider_interface {
     public const FAILURE_WINDOW = 60;
 
     /**
-     * @var string v7.8.8: phrases a provider uses when a 400 is about the account or key and not the request.
-     * Kept specific on purpose: a provider can quote part of a request in an error, and a learner must not be
-     * able to open a circuit by typing a common word such as "credit".
+     * @var string v7.8.8: provider-specific phrases for a 400 that is about the account or key, not the request.
+     * Deliberately narrow. Some providers quote part of the rejected request in a 400 body, and a learner's
+     * message or a retrieved course passage can contain everyday words such as "billing" or "usage limit" (a
+     * business course is full of them), so bare words are never enough: each phrase is one a provider writes
+     * about its own account. A 429 never reaches this check (its body is dropped before it gets here), so an
+     * exhausted OpenAI quota is a counted failure, not an immediate one.
      */
-    private const ACCOUNT_LEVEL_BODY = '/valid api key|api key (?:not valid|is (?:invalid|missing|expired))|credit balance'
-        . '|insufficient (?:credit|quota|funds)|billing|usage limits?|spend(?:ing)? (?:limit|cap)'
-        . '|exceeded your (?:current )?quota|account (?:is )?(?:disabled|suspended|deactivated)/i';
+    private const ACCOUNT_LEVEL_BODY = '/valid api key|api[_ ]key[_ ](?:not valid|invalid|is invalid|is missing|is expired)'
+        . '|credit balance is too low|insufficient_quota|billing_hard_limit_reached'
+        . '|reached your specified api usage limits|account (?:is )?(?:disabled|suspended|deactivated)/i';
 
     /**
      * @param provider_interface $primary
@@ -442,6 +445,8 @@ class failover_chain implements provider_interface {
         if ($effect === 'counted') {
             $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
             $now = time();
+            // Not atomic (MUC has no increment): two failures at the same instant can both
+            // read n=0, so a burst may need one more failure to open. Acceptable for a back-off.
             $seen = $cache->get('fails_' . $scope);
             if (!is_array($seen) || ($now - (int) ($seen['first'] ?? 0)) > self::FAILURE_WINDOW) {
                 $seen = ['n' => 0, 'first' => $now];
@@ -506,7 +511,12 @@ class failover_chain implements provider_interface {
      */
     private function record_success(array $entry): void {
         $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
-        $cache->delete('fails_' . self::circuit_scope($entry['label'], $entry['provider']));
+        $key = 'fails_' . self::circuit_scope($entry['label'], $entry['provider']);
+        // Read before deleting: almost every successful turn has nothing to clear, and on a
+        // shared cache store a write per chat message is not free.
+        if ($cache->get($key) !== false) {
+            $cache->delete($key);
+        }
     }
 
     /**

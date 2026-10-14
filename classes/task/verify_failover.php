@@ -24,7 +24,8 @@ defined('MOODLE_INTERNAL') || die();
  * v7.8.8 daily check that each chat backup provider answers a tiny real request.
  *
  * Skipped while an emergency control is active (a stop means stop, including
- * calls nobody asked for). Each backup costs a few tokens a day.
+ * calls nobody asked for). Each backup costs a few tokens a day (a few hundred for a
+ * thinking model), outside token analytics and spend caps.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell / Saylor University

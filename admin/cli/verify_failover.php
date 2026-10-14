@@ -38,13 +38,25 @@ require_once($CFG->dirroot . '/lib/clilib.php');
 
 use local_ai_course_assistant\failover_verifier;
 
+[$options, $unrecognised] = cli_get_params(
+    ['help' => false, 'settings-only' => false],
+    ['h' => 'help']
+);
+if ($unrecognised) {
+    cli_error('Unknown option(s): ' . implode(', ', $unrecognised) . '. Try --help.');
+}
+if ($options['help']) {
+    cli_writeln("Checks the failover backups.\n\n  --settings-only   check the settings only, send no request\n  -h, --help        this help");
+    exit(0);
+}
+
 $problems = failover_verifier::static_problems();
 foreach ($problems as $line) {
     echo "SETTINGS: $line\n";
 }
 $failed = count($problems);
 
-if (!in_array('--settings-only', $argv, true)) {
+if (!$options['settings-only']) {
     foreach (failover_verifier::probe_all() as $r) {
         printf(
             "%s (%s): %s in %d ms%s\n",

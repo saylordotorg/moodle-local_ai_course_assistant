@@ -100,6 +100,37 @@ final class failover_verifier_test extends \advanced_testcase {
         $this->assertSame([], failover_verifier::static_problems());
     }
 
+    /**
+     * The runtime serves a label from the first row WITH a key; a keyless row listed before it is not the answer.
+     */
+    public function test_a_keyless_row_before_a_keyed_one_with_the_same_label_is_not_a_problem(): void {
+        $this->resetAfterTest();
+        $this->configure("openai||gpt-4o-mini||\nopenai|sk-test-key-1|gpt-4o-mini||", "chat:openai");
+        $this->assertSame([], failover_verifier::static_problems());
+        $this->configure("openai||gpt-4o-mini||\nopenai||gpt-4o-mini||", "chat:openai");
+        $this->assertCount(1, failover_verifier::static_problems(), 'no row has a key');
+    }
+
+    /**
+     * A fixed or removed backup must not keep showing its old failed probe.
+     */
+    public function test_results_for_a_removed_label_or_a_corrected_model_are_not_reported_as_current(): void {
+        $this->resetAfterTest();
+        $this->configure("openai|sk-test-key-1|gpt-4o-mini||", "chat:openai");
+        $this->probe_row('openai', false, 60);
+        $this->probe_row('gone', false, 60);
+        $all = array_keys(failover_verifier::latest_results());
+        sort($all);
+        $this->assertSame(['gone', 'openai'], $all, 'unfiltered: both');
+        $this->assertSame(['openai'], array_keys(failover_verifier::latest_results(null, true)), 'a removed label is dropped');
+
+        // The failed probe was for gpt-4o-mini; the admin has since corrected the row to another model.
+        $this->configure("openai|sk-test-key-1|gpt-4.1-mini||", "chat:openai");
+        $this->assertSame([], failover_verifier::latest_results(null, true));
+        $check = (new failover_providers())->get_result();
+        $this->assertSame(result::INFO, $check->get_status(), 'unverified, not an error, until the next probe');
+    }
+
     public function test_per_call_failover_with_no_resolvable_backup_is_reported(): void {
         $this->resetAfterTest();
         set_config('failover_per_call_enabled', 1, 'local_ai_course_assistant');

@@ -89,7 +89,9 @@ class failover_verifier {
             }
             $parts = array_map('trim', explode('|', $line));
             $key = strtolower($parts[0] ?? '');
-            if ($key === '' || isset($rows[$key])) {
+            // Same rule as spend_guard::lookup_chat_label(): the first row WITH a key serves the
+            // label, so a keyless row listed before a keyed one with the same label is not the answer.
+            if ($key === '' || (isset($rows[$key]) && ($rows[$key]['haskey'] || empty($parts[1])))) {
                 continue;
             }
             $models = array_values(array_filter(array_map('trim', explode(',', (string) ($parts[2] ?? '')))));
@@ -148,6 +150,10 @@ class failover_verifier {
     /**
      * Send one tiny real request to every chat backup and record the outcome.
      *
+     * Costs a few tokens a backup, more for a thinking model (the provider adds its reasoning headroom to the
+     * 16 requested). The call goes straight to the provider, so it is not in token analytics and does not count
+     * toward a spend cap.
+     *
      * @param callable|null $send fn(provider_interface): void, for tests; null sends a real request.
      * @return array[] One entry per backup: label, model, ok, status, detail, ms.
      */
@@ -198,9 +204,12 @@ class failover_verifier {
      * The latest recorded probe per backup, with how many probes in a row failed.
      *
      * @param int|null $now Time to measure freshness from; null for the present.
+     * @param bool $currentonly Keep only results that still describe the settings: for a label that is on the
+     *        chain now, with the model its row names now. A backup that was removed, or whose model was
+     *        corrected after a failed probe, is not reported until the next probe has run.
      * @return array<string, array{label: string, model: string, ok: bool, detail: string, failures: int, time: int}>
      */
-    public static function latest_results(?int $now = null): array {
+    public static function latest_results(?int $now = null, bool $currentonly = false): array {
         global $DB;
         $since = ($now ?? time()) - self::FRESH_WITHIN;
         $rows = $DB->get_records_select(
@@ -238,6 +247,18 @@ class failover_verifier {
                     $latest[$label]['failures']++;
                 }
             }
+        }
+        if ($currentonly) {
+            $onchain = array_map('strtolower', self::chat_labels());
+            $rows = self::rows();
+            $latest = array_filter($latest, function ($result) use ($onchain, $rows) {
+                $key = strtolower($result['label']);
+                if (!in_array($key, $onchain, true)) {
+                    return false;
+                }
+                $model = $rows[$key]['model'] ?? '';
+                return $model === '' || $result['model'] === '' || $model === $result['model'];
+            });
         }
         return $latest;
     }

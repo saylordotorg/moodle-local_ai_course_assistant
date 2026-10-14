@@ -54,7 +54,7 @@ class failover_providers extends check {
     public function get_result(): result {
         $problems = failover_verifier::static_problems();
         $labels = failover_verifier::chat_labels();
-        $results = failover_verifier::latest_results();
+        $results = failover_verifier::latest_results(null, true);
 
         $failing = array_filter($results, fn($r) => !$r['ok']);
         $lines = array_map('s', $problems);
