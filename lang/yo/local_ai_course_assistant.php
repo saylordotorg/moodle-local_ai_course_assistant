@@ -3371,3 +3371,11 @@ $string['check:failover_ok'] = 'Gbogbo àwọn olùpèsè àtìlẹ́yìn {$a} d
 $string['check:failover_failing'] = 'Olùpèsè àtìlẹ́yìn {$a->label} ({$a->model}) kùnà nínú àyẹ̀wò ìkẹyìn rẹ̀: {$a->detail}';
 $string['check:failover_none'] = 'A kò tíì ṣètò olùpèsè àtìlẹ́yìn kankan fún ìjíròrò.';
 $string['check:failover_unverified'] = 'A kò tíì ṣàyẹ̀wò àwọn olùpèsè àtìlẹ́yìn. Iṣẹ́ ojoojúmọ́ yóò ṣàyẹ̀wò wọn, tàbí ṣiṣẹ́ php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Àwọn ìdáhùn tí ó kùnà tí ń fa ìkìlọ̀';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Fi ìkìlọ̀ ránṣẹ́ pẹ̀lú nígbà tí iye àwọn ìbéèrè akẹ́kọ̀ọ́ yìí nínú àkókò bá parí pẹ̀lú àṣìṣe, tí a ń kà ní gbogbo ojúlé. Ìdánwò ìpín ìdáhùn máa ń rí ẹ̀kọ́ tí ó ti dáwọ́ ìdáhùn dúró ní pàtàkì nìkan; olùpèsè tí ó kùnà lórí ọ̀kan nínú ọ̀rọ̀ márùn-ún kì í fà á láéláé. Ṣètò 0 láti lo ìdánwò ìpín ìdáhùn nìkan.';
+$string['coursesettings:key_rejected'] = 'Kọ́kọ́rọ́ tí o fi sílẹ̀ dà bí kọ́kọ́rọ́ {$a->owner}, ṣùgbọ́n ẹ̀kọ́ yìí ń lo {$a->provider}, nítorí náà a kò fi pamọ́.';
+$string['coursesettings:key_removed'] = 'Kọ́kọ́rọ́ tí a fi pamọ́ fún ẹ̀kọ́ yìí dà bí kọ́kọ́rọ́ {$a->owner}, ṣùgbọ́n ẹ̀kọ́ náà ń lo {$a->provider} báyìí, nítorí náà a yọ kọ́kọ́rọ́ tí a fi pamọ́ kúrò, ẹ̀kọ́ náà sì ń lo kọ́kọ́rọ́ ojúlé. Fi kọ́kọ́rọ́ {$a->provider} sílẹ̀ bí ẹ̀kọ́ náà bá nílò tirẹ̀.';
+$string['check:coursekeys_name'] = 'Àwọn kọ́kọ́rọ́ ẹ̀kọ́ AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Kò sí ẹ̀kọ́ kankan tí ó ní kọ́kọ́rọ́ tí a fi pamọ́ tí ó dà bí ti olùpèsè mìíràn.';
+$string['check:coursekeys_bad'] = 'Àwọn ẹ̀kọ́ {$a->count} ní kọ́kọ́rọ́ tí a fi pamọ́ tí ó dà bí ti olùpèsè tí ó yàtọ̀ sí èyí tí wọ́n ń lò: {$a->list}. Ṣí àwọn ètò AI ẹ̀kọ́ kọ̀ọ̀kan kí o sì fi kọ́kọ́rọ́ tó tọ́ sílẹ̀ tàbí kí o pa á rẹ́.';

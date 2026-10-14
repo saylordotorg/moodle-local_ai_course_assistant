@@ -3348,3 +3348,11 @@ $string['check:failover_ok'] = '{$a} 件のバックアッププロバイダー�
 $string['check:failover_failing'] = 'バックアッププロバイダー {$a->label}（{$a->model}）は前回のチェックに失敗しました: {$a->detail}';
 $string['check:failover_none'] = 'チャット用のバックアッププロバイダーが設定されていません。';
 $string['check:failover_unverified'] = 'バックアッププロバイダーはまだ確認されていません。毎日のタスクが確認するか、php local/ai_course_assistant/admin/cli/verify_failover.php を実行してください。';
+
+$string['settings:unanswered_min_failed_turns'] = 'アラートを発生させる失敗した返信の数';
+$string['settings:unanswered_min_failed_turns_desc'] = 'ウィンドウ内でこの件数の学習者の質問がエラーで終わった場合にも、サイト全体で数えてアラートを送信します。回答率テストは、ほとんど回答しなくなったコースしか検出できず、5 件に 1 件失敗するプロバイダーでは作動しません。回答率テストだけを使うには 0 を設定してください。';
+$string['coursesettings:key_rejected'] = '入力したキーは {$a->owner} のキーのようですが、このコースは {$a->provider} を使用しているため、保存されませんでした。';
+$string['coursesettings:key_removed'] = 'このコースに保存されていたキーは {$a->owner} のキーのようですが、コースは現在 {$a->provider} を使用しているため、保存されていたキーは削除され、コースはサイトのキーを使用します。コース独自のキーが必要な場合は {$a->provider} のキーを入力してください。';
+$string['check:coursekeys_name'] = 'AI Course Assistant のコースキー';
+$string['check:coursekeys_ok'] = '別のプロバイダーのものと思われる保存済みキーを持つコースはありません。';
+$string['check:coursekeys_bad'] = '{$a->count} 件のコースに、使用中のプロバイダーとは別のプロバイダーのものと思われる保存済みキーがあります: {$a->list}。各コースの AI 設定を開き、正しいキーを入力するか、クリアしてください。';

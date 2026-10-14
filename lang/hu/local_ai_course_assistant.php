@@ -3390,3 +3390,11 @@ $string['check:failover_ok'] = 'Mind a(z) {$a} tartalék szolgáltató válaszol
 $string['check:failover_failing'] = 'A(z) {$a->label} ({$a->model}) tartalék szolgáltató megbukott az utolsó ellenőrzésen: {$a->detail}';
 $string['check:failover_none'] = 'A csevegéshez nincs tartalék szolgáltató beállítva.';
 $string['check:failover_unverified'] = 'A tartalék szolgáltatókat még nem ellenőrizték. A napi feladat ellenőrzi őket, vagy futtassa: php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'A riasztást kiváltó sikertelen válaszok';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Akkor is küldjön riasztást, ha ennyi tanulói kérdés végződött hibával az időablakban, az egész webhelyen számolva. A válaszarány-teszt csak azt a kurzust látja, amely nagyrészt abbahagyta a válaszolást; az a szolgáltató, amely az öt üzenetből egynél hibázik, sosem váltja ki. A 0 érték csak a válaszarány-tesztet használja.';
+$string['coursesettings:key_rejected'] = 'A megadott kulcs {$a->owner}-kulcsnak tűnik, de ez a kurzus a(z) {$a->provider} szolgáltatást használja, ezért nem lett elmentve.';
+$string['coursesettings:key_removed'] = 'A kurzushoz mentett kulcs {$a->owner}-kulcsnak tűnik, de a kurzus mostantól a(z) {$a->provider} szolgáltatást használja, ezért a mentett kulcsot eltávolítottuk, és a kurzus a webhely kulcsát használja. Adjon meg {$a->provider}-kulcsot, ha a kurzusnak saját kell.';
+$string['check:coursekeys_name'] = 'Az AI Course Assistant kurzuskulcsai';
+$string['check:coursekeys_ok'] = 'Egyetlen kurzusnak sincs olyan mentett kulcsa, amely másik szolgáltatóé lehetne.';
+$string['check:coursekeys_bad'] = '{$a->count} kurzusnak van olyan mentett kulcsa, amely az általuk használttól eltérő szolgáltatóé lehet: {$a->list}. Nyissa meg az egyes kurzusok MI-beállításait, és adja meg a helyes kulcsot, vagy törölje azt.';

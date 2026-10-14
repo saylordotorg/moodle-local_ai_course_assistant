@@ -3350,3 +3350,11 @@ $string['check:failover_ok'] = 'Wszyscy zapasowi dostawcy ({$a}) odpowiedzieli p
 $string['check:failover_failing'] = 'Zapasowy dostawca {$a->label} ({$a->model}) nie przeszedł ostatniego sprawdzenia: {$a->detail}';
 $string['check:failover_none'] = 'Dla czatu nie skonfigurowano zapasowego dostawcy.';
 $string['check:failover_unverified'] = 'Zapasowi dostawcy nie zostali jeszcze sprawdzeni. Zrobi to zadanie dzienne, albo uruchom php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Nieudane odpowiedzi uruchamiające alert';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Wyślij alert także wtedy, gdy tyle pytań uczących się w oknie zakończyło się błędem, liczonych dla całej witryny. Test odsetka odpowiedzi widzi tylko kurs, który w większości przestał odpowiadać; dostawca zawodzący przy jednej wiadomości na pięć nigdy go nie uruchomi. Ustaw 0, aby używać wyłącznie testu odsetka odpowiedzi.';
+$string['coursesettings:key_rejected'] = 'Wprowadzony klucz wygląda na klucz {$a->owner}, ale ten kurs używa {$a->provider}, więc nie został zapisany.';
+$string['coursesettings:key_removed'] = 'Klucz zapisany dla tego kursu wygląda na klucz {$a->owner}, ale kurs używa teraz {$a->provider}, więc zapisany klucz został usunięty, a kurs używa klucza witryny. Wprowadź klucz {$a->provider}, jeśli kurs potrzebuje własnego.';
+$string['check:coursekeys_name'] = 'Klucze kursów AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Żaden kurs nie ma zapisanego klucza, który wyglądałby na klucz innego dostawcy.';
+$string['check:coursekeys_bad'] = 'Liczba kursów z zapisanym kluczem, który wygląda na klucz innego dostawcy niż używany: {$a->count} ({$a->list}). Otwórz ustawienia AI każdego kursu i wprowadź właściwy klucz lub go wyczyść.';

@@ -74,18 +74,47 @@ class history_trimmer {
     }
 
     /**
-     * Whether retrying with a trimmed history is worth a call: the history is
-     * longer than the retry would send, and trimming leaves something to send.
+     * The history with only its structure repaired: no empty turns, no two turns
+     * in a row from one role, starting on a user turn. Nothing is cut. A well
+     * formed history comes back unchanged.
+     *
+     * @param array $messages Chronological ['role' => ..., 'content' => ...] entries.
+     * @return array
+     */
+    public static function tidy(array $messages): array {
+        return self::trim($messages, PHP_INT_MAX);
+    }
+
+    /**
+     * The histories to try, in order, after a provider refuses a request as malformed.
+     *
+     * First the whole conversation with its structure repaired ('tidied'), which
+     * keeps all the context when something malformed was the problem; then the
+     * newest exchange only ('trimmed'), for when length was. A variant is offered
+     * only if it differs from what was already sent and from the variant before.
      *
      * @param array $messages The history that was rejected.
-     * @param int $keep Messages the retry keeps.
-     * @return array The trimmed history to retry with, or [] when a retry would not help.
+     * @param int $keep Messages the 'trimmed' variant keeps.
+     * @return array<int, array{name: string, messages: array}>
      */
-    public static function retry_candidate(array $messages, int $keep = self::KEEP_MESSAGES): array {
-        if (count($messages) <= $keep) {
-            return [];
+    public static function retry_variants(array $messages, int $keep = self::KEEP_MESSAGES): array {
+        $variants = [];
+        $seen = [md5(serialize($messages))];
+        $candidates = [
+            ['tidied', self::tidy($messages)],
+            ['trimmed', count($messages) > $keep ? self::trim($messages, $keep) : []],
+        ];
+        foreach ($candidates as [$name, $candidate]) {
+            if (!$candidate) {
+                continue;
+            }
+            $fingerprint = md5(serialize($candidate));
+            if (in_array($fingerprint, $seen, true)) {
+                continue;
+            }
+            $seen[] = $fingerprint;
+            $variants[] = ['name' => $name, 'messages' => $candidate];
         }
-        $trimmed = self::trim($messages, $keep);
-        return (count($trimmed) < count($messages)) ? $trimmed : [];
+        return $variants;
     }
 }

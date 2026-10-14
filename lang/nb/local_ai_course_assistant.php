@@ -3348,3 +3348,11 @@ $string['check:failover_ok'] = 'Alle {$a} sikkerhetskopileverandører svarte ved
 $string['check:failover_failing'] = 'Sikkerhetskopileverandøren {$a->label} ({$a->model}) feilet ved siste kontroll: {$a->detail}';
 $string['check:failover_none'] = 'Ingen sikkerhetskopileverandør er konfigurert for chat.';
 $string['check:failover_unverified'] = 'Sikkerhetskopileverandørene er ikke kontrollert ennå. Den daglige oppgaven kontrollerer dem, eller kjør php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Mislykkede svar som utløser varselet';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Send også varselet når så mange elevspørsmål i vinduet endte med en feil, talt for hele nettstedet. Svarprosenttesten ser bare et kurs som for det meste har sluttet å svare; en leverandør som feiler på én av fem meldinger utløser den aldri. Sett til 0 for å bruke bare svarprosenttesten.';
+$string['coursesettings:key_rejected'] = 'Nøkkelen du skrev inn ligner en {$a->owner}-nøkkel, men dette kurset bruker {$a->provider}, så den ble ikke lagret.';
+$string['coursesettings:key_removed'] = 'Nøkkelen som var lagret for dette kurset ligner en {$a->owner}-nøkkel, men kurset bruker nå {$a->provider}, så den lagrede nøkkelen ble fjernet og kurset bruker nettstedets nøkkel. Skriv inn en {$a->provider}-nøkkel hvis kurset trenger sin egen.';
+$string['check:coursekeys_name'] = 'AI Course Assistant kursnøkler';
+$string['check:coursekeys_ok'] = 'Ingen kurs har en lagret nøkkel som ligner en annen leverandørs.';
+$string['check:coursekeys_bad'] = '{$a->count} kurs har en lagret nøkkel som ligner en annen leverandørs enn den de bruker: {$a->list}. Åpne AI-innstillingene for hvert kurs og skriv inn riktig nøkkel eller fjern den.';

@@ -3350,3 +3350,11 @@ $string['check:failover_ok'] = 'Kaikki {$a} varapalveluntarjoajaa vastasivat vii
 $string['check:failover_failing'] = 'Varapalveluntarjoaja {$a->label} ({$a->model}) epäonnistui viimeisimmässä tarkistuksessa: {$a->detail}';
 $string['check:failover_none'] = 'Chatille ei ole määritetty varapalveluntarjoajaa.';
 $string['check:failover_unverified'] = 'Varapalveluntarjoajia ei ole vielä tarkistettu. Päivittäinen tehtävä tarkistaa ne, tai suorita php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Epäonnistuneet vastaukset, jotka laukaisevat hälytyksen';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Lähetä hälytys myös, kun näin monta oppijan kysymystä aikaikkunassa päättyi virheeseen, laskettuna koko sivustolta. Vastausprosenttitesti huomaa vain kurssin, joka on lähes lakannut vastaamasta; palveluntarjoaja, joka epäonnistuu yhdessä viestissä viidestä, ei koskaan laukaise sitä. Aseta 0 käyttääksesi vain vastausprosenttitestiä.';
+$string['coursesettings:key_rejected'] = 'Syöttämäsi avain näyttää {$a->owner}-avaimelta, mutta tämä kurssi käyttää palvelua {$a->provider}, joten sitä ei tallennettu.';
+$string['coursesettings:key_removed'] = 'Tälle kurssille tallennettu avain näyttää {$a->owner}-avaimelta, mutta kurssi käyttää nyt palvelua {$a->provider}, joten tallennettu avain poistettiin ja kurssi käyttää sivuston avainta. Syötä {$a->provider}-avain, jos kurssi tarvitsee omansa.';
+$string['check:coursekeys_name'] = 'AI Course Assistantin kurssiavaimet';
+$string['check:coursekeys_ok'] = 'Millään kurssilla ei ole tallennettua avainta, joka näyttäisi toisen palveluntarjoajan avaimelta.';
+$string['check:coursekeys_bad'] = '{$a->count} kurssilla on tallennettu avain, joka näyttää toisen palveluntarjoajan avaimelta kuin se, jota kurssi käyttää: {$a->list}. Avaa kunkin kurssin tekoälyasetukset ja syötä oikea avain tai tyhjennä se.';

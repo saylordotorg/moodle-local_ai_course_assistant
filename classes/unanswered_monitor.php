@@ -65,6 +65,19 @@ class unanswered_monitor {
     public const MAX_COURSES_IN_EMAIL = 20;
 
     /**
+     * Default number of failed replies in the window, across the whole site, that
+     * raises the alert on its own. Below the answer-rate test's reach on purpose:
+     * on Learn 4% to 23% of student messages failed each day for days, which no
+     * course ever dropped below 50% for. 0 turns this test off.
+     *
+     * @var int
+     */
+    public const DEFAULT_MIN_FAILED_TURNS = 3;
+
+    /** @var string stream_outcome the chat stores on the row of a turn that failed at the provider. */
+    public const FAILED_OUTCOME = 'provider_error';
+
+    /**
      * Per-course question and answer counts inside the window.
      *
      * Counts assistant rows rather than absence of an error row, because a
@@ -73,8 +86,16 @@ class unanswered_monitor {
      * streaming path. A missing answer is the reliable signal; a recorded
      * error is not.
      *
+     * v7.8.8: but since failed turns began to be stored (v7.1.1) a turn that
+     * failed at the provider leaves an ASSISTANT row too, with stream_outcome
+     * 'provider_error' and the learner's "something went wrong" text. Counting
+     * every assistant row as an answer made a provider that failed every call
+     * look like 100% answered, so this alert could not fire on the very outage
+     * it was written for. Those rows are now counted as `failed`, never as
+     * answered.
+     *
      * @param int $windowhours How far back to look.
-     * @return array<int, array{courseid:int, shortname:string, asked:int, answered:int, rate:float}>
+     * @return array<int, array{courseid:int, shortname:string, asked:int, answered:int, failed:int, rate:float}>
      */
     public static function course_stats(int $windowhours): array {
         global $DB;
@@ -83,7 +104,9 @@ class unanswered_monitor {
         $sql = "SELECT m.courseid,
                        COALESCE(c.shortname, '') AS shortname,
                        SUM(CASE WHEN m.role = 'user' THEN 1 ELSE 0 END) AS asked,
-                       SUM(CASE WHEN m.role = 'assistant' THEN 1 ELSE 0 END) AS answered
+                       SUM(CASE WHEN m.role = 'assistant'
+                                 AND (m.stream_outcome IS NULL OR m.stream_outcome <> :failed1) THEN 1 ELSE 0 END) AS answered,
+                       SUM(CASE WHEN m.role = 'assistant' AND m.stream_outcome = :failed2 THEN 1 ELSE 0 END) AS failed
                   FROM {local_ai_course_assistant_msgs} m
              LEFT JOIN {course} c ON c.id = m.courseid
                  WHERE m.timecreated >= :since
@@ -93,7 +116,8 @@ class unanswered_monitor {
               ORDER BY asked DESC";
 
         $out = [];
-        foreach ($DB->get_records_sql($sql, ['since' => $since]) as $row) {
+        $params = ['since' => $since, 'failed1' => self::FAILED_OUTCOME, 'failed2' => self::FAILED_OUTCOME];
+        foreach ($DB->get_records_sql($sql, $params) as $row) {
             $asked = (int) $row->asked;
             $answered = (int) $row->answered;
             $out[] = [
@@ -101,8 +125,50 @@ class unanswered_monitor {
                 'shortname' => (string) $row->shortname,
                 'asked'     => $asked,
                 'answered'  => $answered,
+                'failed'    => (int) $row->failed,
                 'rate'      => $asked > 0 ? round($answered / $asked, 3) : 0.0,
             ];
+        }
+        return $out;
+    }
+
+    /**
+     * What the provider said when replies failed in the window: the most common
+     * `detail` of the sse_error audit rows (already redacted when written), so the
+     * alert can name a cause and not only a count.
+     *
+     * @param int $windowhours How far back to look.
+     * @param int $top Most causes to return.
+     * @return array<int, array{detail:string, count:int}>
+     */
+    public static function top_causes(int $windowhours, int $top = 3): array {
+        global $DB;
+        $rows = $DB->get_records_select(
+            'local_ai_course_assistant_audit',
+            'action = :a AND timecreated >= :t',
+            ['a' => 'sse_error', 't' => time() - ($windowhours * HOURSECS)],
+            'id DESC',
+            'id, details',
+            0,
+            300
+        );
+        $tally = [];
+        foreach ($rows as $row) {
+            $d = json_decode((string) $row->details, true);
+            if (!is_array($d)) {
+                continue;
+            }
+            $text = trim((string) preg_replace('/\s+/u', ' ', (string) ($d['detail'] ?? $d['msg'] ?? '')));
+            if ($text === '') {
+                continue;
+            }
+            $text = \core_text::substr($text, 0, 140);
+            $tally[$text] = ($tally[$text] ?? 0) + 1;
+        }
+        arsort($tally);
+        $out = [];
+        foreach (array_slice($tally, 0, $top, true) as $detail => $count) {
+            $out[] = ['detail' => (string) $detail, 'count' => $count];
         }
         return $out;
     }
@@ -111,7 +177,8 @@ class unanswered_monitor {
      * Evaluate the window and decide whether anything is wrong.
      *
      * @return array{status:string, window_hours:int, min_questions:int, min_rate:float,
-     *               failing:array, checked:int}
+     *               failing:array, checked:int, min_failed:int, failed_total:int,
+     *               failed_courses:array, too_many_failed:bool, causes:array}
      */
     public static function evaluate(): array {
         $window = (int) (get_config('local_ai_course_assistant', 'unanswered_window_hours')
@@ -137,13 +204,29 @@ class unanswered_monitor {
             return $a['rate'] <=> $b['rate'] ?: $b['asked'] <=> $a['asked'];
         });
 
+        // v7.8.8: failed replies across the whole site. The rate test above only
+        // sees a course that has mostly stopped answering; a provider that fails
+        // one message in five never trips it.
+        $rawfailed = get_config('local_ai_course_assistant', 'unanswered_min_failed_turns');
+        $minfailed = ($rawfailed === false || $rawfailed === '') ? self::DEFAULT_MIN_FAILED_TURNS : (int) $rawfailed;
+        $failedcourses = array_values(array_filter($stats, static fn($s) => $s['failed'] > 0));
+        usort($failedcourses, static fn($a, $b) => $b['failed'] <=> $a['failed']);
+        $failedtotal = array_sum(array_column($failedcourses, 'failed'));
+        $toomanyfailed = $minfailed > 0 && $failedtotal >= $minfailed;
+
+        $alert = $failing !== [] || $toomanyfailed;
         return [
-            'status'        => $failing === [] ? 'ok' : 'unanswered',
-            'window_hours'  => $window,
-            'min_questions' => $minquestions,
-            'min_rate'      => $minrate,
-            'failing'       => $failing,
-            'checked'       => count($stats),
+            'status'         => $alert ? 'unanswered' : 'ok',
+            'window_hours'   => $window,
+            'min_questions'  => $minquestions,
+            'min_rate'       => $minrate,
+            'failing'        => $failing,
+            'checked'        => count($stats),
+            'min_failed'     => $minfailed,
+            'failed_total'   => $failedtotal,
+            'failed_courses' => $failedcourses,
+            'too_many_failed' => $toomanyfailed,
+            'causes'         => $alert ? self::top_causes($window) : [],
         ];
     }
 
@@ -180,19 +263,50 @@ class unanswered_monitor {
         $failing = array_slice($eval['failing'], 0, self::MAX_COURSES_IN_EMAIL);
         $worst = $failing[0] ?? null;
 
-        $subject = '[SOLA] ' . count($eval['failing']) . ' course(s) asking but not answering';
         if ($worst !== null) {
+            $subject = '[SOLA] ' . count($eval['failing']) . ' course(s) asking but not answering';
             $subject .= ' — ' . ($worst['shortname'] ?: ('courseid ' . $worst['courseid']))
                 . ' answered ' . $worst['answered'] . '/' . $worst['asked'];
+        } else {
+            $subject = '[SOLA] ' . (int) ($eval['failed_total'] ?? 0) . ' failed repl'
+                . ((int) ($eval['failed_total'] ?? 0) === 1 ? 'y' : 'ies') . ' in the last ' . $eval['window_hours'] . ' hours';
         }
 
-        $body  = "Learners are asking SOLA questions and not getting answers.\n\n";
+        $body  = $worst !== null
+            ? "Learners are asking SOLA questions and not getting answers.\n\n"
+            : "SOLA replies are failing for learners.\n\n";
         $body .= sprintf("Window:            last %d hours\n", $eval['window_hours']);
         $body .= sprintf("Alert threshold:   answer rate below %.0f%% with at least %d questions\n",
             $eval['min_rate'] * 100, $eval['min_questions']);
         $body .= sprintf("Courses checked:   %d\n\n", $eval['checked']);
 
-        $body .= sprintf("%-24s %8s %9s %8s\n", 'COURSE', 'ASKED', 'ANSWERED', 'RATE');
+        if (!empty($eval['failed_total'])) {
+            $body .= sprintf(
+                "Failed replies:    %d in the window (alert at %d or more; the learner saw an error)\n",
+                $eval['failed_total'],
+                $eval['min_failed']
+            );
+            foreach (array_slice($eval['failed_courses'], 0, self::MAX_COURSES_IN_EMAIL) as $c) {
+                $body .= sprintf(
+                    "  %-24s %5d failed of %d asked   (courseid=%d)\n",
+                    substr($c['shortname'] ?: '<unknown>', 0, 24),
+                    $c['failed'],
+                    $c['asked'],
+                    $c['courseid']
+                );
+            }
+            if (!empty($eval['causes'])) {
+                $body .= "What the provider said, most common first:\n";
+                foreach ($eval['causes'] as $cause) {
+                    $body .= sprintf("  %3d x %s\n", $cause['count'], $cause['detail']);
+                }
+            }
+            $body .= "\n";
+        }
+
+        if ($worst !== null) {
+            $body .= sprintf("%-24s %8s %9s %8s\n", 'COURSE', 'ASKED', 'ANSWERED', 'RATE');
+        }
         foreach ($failing as $c) {
             $body .= sprintf(
                 "%-24s %8d %9d %7.0f%%   (courseid=%d)\n",

@@ -3394,3 +3394,11 @@ $string['check:failover_ok'] = 'Dhammaan {$a} bixiyeyaasha taageerada waxay ka j
 $string['check:failover_failing'] = 'Bixiyaha taageerada {$a->label} ({$a->model}) wuxuu ku guuldareystay hubintiisii ugu dambeysay: {$a->detail}';
 $string['check:failover_none'] = 'Bixiye taageero ah looma habeynin wada-sheekaysiga.';
 $string['check:failover_unverified'] = 'Bixiyeyaasha taageerada weli lama hubin. Hawsha maalinlaha ah ayaa hubin doonta, ama ku shaqeey php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Jawaabaha fashilmay ee kicinaya digniinta';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Dir digniinta sidoo kale marka tiradan su\'aalo ardayda ah oo daaqadda ku jirta ay ku dhammaadaan khalad, lagu tiriyo goobta oo dhan. Tijaabada heerka jawaabta waxay aragtaa koorso keliya oo inta badan joojisay jawaabista; bixiyaha ku guuldareysta hal fariin shanta ka mid ah weligiis ma kicin. Dhig 0 si loo isticmaalo tijaabada heerka jawaabta oo keliya.';
+$string['coursesettings:key_rejected'] = 'Furaha aad gelisay wuxuu u egyahay furaha {$a->owner}, laakiin koorsadan waxay isticmaashaa {$a->provider}, sidaas darteed lama kaydin.';
+$string['coursesettings:key_removed'] = 'Furaha loo kaydiyay koorsadan wuxuu u egyahay furaha {$a->owner}, laakiin koorsadu hadda waxay isticmaashaa {$a->provider}, sidaas darteed furihii la kaydiyay waa la saaray, koorsaduna waxay isticmaashaa furaha goobta. Geli furaha {$a->provider} haddii koorsadu u baahan tahay mid u gaar ah.';
+$string['check:coursekeys_name'] = 'Furayaasha koorsooyinka AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Koorso kaydsan furaha ma laha oo u eg mid bixiye kale.';
+$string['check:coursekeys_bad'] = '{$a->count} koorso waxay leeyihiin fure la kaydiyay oo u eg mid bixiye ka duwan kan ay isticmaalayaan: {$a->list}. Fur dejinta AI ee koorso kasta oo geli furaha saxda ah ama tirtir.';

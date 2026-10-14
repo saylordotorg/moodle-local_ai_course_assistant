@@ -130,9 +130,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // of an unrelated field -- the enable toggle, the model, the system prompt --
     // would silently clear the course's key and drop it back to the site key.
     // An explicit clear is available via the dedicated checkbox.
-    if ($data['apikey'] === '') {
-        $existingkey = course_config_manager::get($courseid);
-        $data['apikey'] = ($existingkey && isset($existingkey->apikey)) ? (string) $existingkey->apikey : '';
+    // v7.8.8: and a key that belongs to a different provider than the one the
+    // course will now call is never sent to it. BUS101 (2026-10-11) kept its Claude
+    // key through a switch to Gemini, Google answered HTTP 400 on every call, and
+    // 232 of 705 messages failed across 15 courses. A typed key of that kind is
+    // refused; a stored one is removed, so the course falls back to the site key.
+    $typedkey = $data['apikey'];
+    $existingkey = course_config_manager::get($courseid);
+    $storedraw = ($existingkey && isset($existingkey->apikey)) ? (string) $existingkey->apikey : '';
+    $storedkey = \local_ai_course_assistant\secrets::reveal($storedraw);
+    $keydecision = \local_ai_course_assistant\course_key_guard::resolve(
+        $data['provider'],
+        $data['model'],
+        (string) $globalcfg['provider'],
+        $data['apibaseurl'],
+        $typedkey,
+        $storedkey
+    );
+    $data['apikey'] = $keydecision['apikey'];
+    if ($typedkey === '' && $storedkey === '' && $storedraw !== '') {
+        // A stored key this site cannot decrypt: leave it exactly as it is.
+        $data['apikey'] = $storedraw;
+    }
+    foreach ($keydecision['notices'] as [$noticetype, $noticekey, $noticea]) {
+        \core\notification::add(
+            get_string($noticekey, 'local_ai_course_assistant', $noticea),
+            $noticetype === 'error' ? \core\notification::ERROR : \core\notification::WARNING
+        );
     }
     if (optional_param('apikey_clear', 0, PARAM_INT)) {
         $data['apikey'] = '';

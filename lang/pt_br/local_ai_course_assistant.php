@@ -3370,3 +3370,11 @@ $string['check:failover_ok'] = 'Todos os {$a} provedores de backup responderam n
 $string['check:failover_failing'] = 'O provedor de backup {$a->label} ({$a->model}) falhou na última verificação: {$a->detail}';
 $string['check:failover_none'] = 'Nenhum provedor de backup está configurado para o chat.';
 $string['check:failover_unverified'] = 'Os provedores de backup ainda não foram verificados. A tarefa diária os verificará, ou execute php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Respostas com falha que acionam o alerta';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Enviar o alerta também quando este número de perguntas de estudantes na janela terminou em erro, contadas em todo o site. O teste de taxa de resposta só enxerga um curso que praticamente parou de responder; um provedor que falha em uma de cada cinco mensagens nunca o aciona. Defina 0 para usar apenas o teste de taxa de resposta.';
+$string['coursesettings:key_rejected'] = 'A chave que você digitou parece uma chave da {$a->owner}, mas este curso usa {$a->provider}, então ela não foi salva.';
+$string['coursesettings:key_removed'] = 'A chave salva para este curso parece uma chave da {$a->owner}, mas o curso agora usa {$a->provider}, então a chave salva foi removida e o curso usa a chave do site. Digite uma chave da {$a->provider} se o curso precisar da sua própria.';
+$string['check:coursekeys_name'] = 'Chaves de curso do AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Nenhum curso tem uma chave salva que pareça pertencer a outro provedor.';
+$string['check:coursekeys_bad'] = '{$a->count} curso(s) têm uma chave salva que parece pertencer a um provedor diferente do que usam: {$a->list}. Abra as configurações de IA de cada curso e digite a chave correta ou apague-a.';

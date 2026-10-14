@@ -191,12 +191,18 @@ class claude_provider extends base_provider {
      * @return string JSON body.
      */
     private function build_body(string $systemprompt, array $messages, bool $stream, array $options): string {
+        // v7.8.8: Anthropic is strict about the shape of the history (no empty
+        // turns, the first turn from the user). A well formed history comes back
+        // from tidy() unchanged; a malformed one, which every other provider
+        // tolerates, is repaired here instead of failing the request. If nothing
+        // usable is left the history is sent as it was.
+        $tidy = \local_ai_course_assistant\history_trimmer::tidy($messages);
         $apimessages = array_map(function ($msg) {
             return [
                 'role' => $msg['role'],
                 'content' => $msg['content'],
             ];
-        }, $messages);
+        }, $tidy ?: $messages);
 
         // Multimodal: Claude accepts image content blocks on user messages.
         // Attach the student's image to the latest user turn as a base64

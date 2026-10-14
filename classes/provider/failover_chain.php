@@ -82,6 +82,9 @@ class failover_chain implements provider_interface {
     /** @var int v7.8.8: longest provider error text a failover audit row keeps. */
     public const DETAIL_LIMIT = 300;
 
+    /** @var int v7.8.8: seconds a learner's conversation is sent with its repaired or shortened history first. */
+    public const HISTORY_MEMORY_SECONDS = 300;
+
     /** @var int v7.8.8: counted failures in a row that open a circuit. */
     public const FAILURES_TO_OPEN = 2;
 
@@ -145,10 +148,17 @@ class failover_chain implements provider_interface {
                 continue;
             }
             $start = microtime(true);
+            // v7.8.8: a conversation this member already needed a shorter history for
+            // is sent that way at once, instead of paying a refused request first.
+            $remembered = $this->remembered_variant($entry, $messages);
+            $sent = $remembered ? $remembered['messages'] : $messages;
             try {
-                $result = $entry['provider']->chat_completion($systemprompt, $messages, $options);
+                $result = $entry['provider']->chat_completion($systemprompt, $sent, $options);
                 $this->record_success($entry);
                 $this->lastused = $entry['provider'];
+                if ($remembered) {
+                    $this->audit_trimmed($entry, 'remembered', count($messages), count($sent), null, null, $remembered['name']);
+                }
                 if ($primaryfailed) {
                     $this->audit_rescued($entry);
                 }
@@ -156,21 +166,39 @@ class failover_chain implements provider_interface {
             } catch (\Throwable $e) {
                 // The first attempt's own time: a retry below must not inflate it.
                 $elapsed = microtime(true) - $start;
-                // v7.8.8: a provider that refused this request outright is not
-                // necessarily broken; ask once more with a shorter history.
-                $trimmed = self::trimmed_history_for_retry($e, $messages);
-                if ($trimmed) {
+                // v7.8.8: a provider that refused this request as malformed is not
+                // necessarily broken. Ask again with the history repaired, then with
+                // only the newest exchange, before calling it a failure.
+                $variants = $remembered ? [] : self::history_variants_for_retry($e, $messages);
+                foreach ($variants as $variant) {
                     try {
-                        $result = $entry['provider']->chat_completion($systemprompt, $trimmed, $options);
+                        $result = $entry['provider']->chat_completion($systemprompt, $variant['messages'], $options);
                         $this->record_success($entry);
                         $this->lastused = $entry['provider'];
-                        $this->audit_trimmed($entry, 'rescued', count($messages), count($trimmed), $e);
+                        $this->remember_variant($entry, $variant['name']);
+                        $this->audit_trimmed(
+                            $entry,
+                            'rescued',
+                            count($messages),
+                            count($variant['messages']),
+                            $e,
+                            null,
+                            $variant['name']
+                        );
                         if ($primaryfailed) {
                             $this->audit_rescued($entry);
                         }
                         return $result;
                     } catch (\Throwable $retryerror) {
-                        $this->audit_trimmed($entry, 'failed', count($messages), count($trimmed), $e, $retryerror);
+                        $this->audit_trimmed(
+                            $entry,
+                            'failed',
+                            count($messages),
+                            count($variant['messages']),
+                            $e,
+                            $retryerror,
+                            $variant['name']
+                        );
                     }
                 }
                 $circuit = $this->note_failure($entry, $e);
@@ -223,8 +251,10 @@ class failover_chain implements provider_interface {
                 $callback($chunk);
             };
             $start = microtime(true);
+            $remembered = $this->remembered_variant($entry, $messages);
+            $sent = $remembered ? $remembered['messages'] : $messages;
             try {
-                $entry['provider']->chat_completion_stream($systemprompt, $messages, $wrappedcb, $options);
+                $entry['provider']->chat_completion_stream($systemprompt, $sent, $wrappedcb, $options);
                 if (!$firsttokenreceived) {
                     throw new \moodle_exception(
                         'error',
@@ -235,6 +265,9 @@ class failover_chain implements provider_interface {
                 }
                 $this->record_success($entry);
                 $this->lastused = $entry['provider'];
+                if ($remembered) {
+                    $this->audit_trimmed($entry, 'remembered', count($messages), count($sent), null, null, $remembered['name']);
+                }
                 if ($primaryfailed) {
                     $this->audit_rescued($entry);
                 }
@@ -248,12 +281,12 @@ class failover_chain implements provider_interface {
                 }
                 // The first attempt's own time: a retry below must not inflate it.
                 $elapsed = microtime(true) - $start;
-                // v7.8.8: as in chat_completion(): one retry with a shorter
-                // history, still before anything has reached the learner.
-                $trimmed = self::trimmed_history_for_retry($e, $messages);
-                if ($trimmed) {
+                // v7.8.8: as in chat_completion(): the repaired history, then the newest
+                // exchange only, still before anything has reached the learner.
+                $variants = $remembered ? [] : self::history_variants_for_retry($e, $messages);
+                foreach ($variants as $variant) {
                     try {
-                        $entry['provider']->chat_completion_stream($systemprompt, $trimmed, $wrappedcb, $options);
+                        $entry['provider']->chat_completion_stream($systemprompt, $variant['messages'], $wrappedcb, $options);
                         if (!$firsttokenreceived) {
                             throw new \moodle_exception(
                                 'error',
@@ -264,7 +297,16 @@ class failover_chain implements provider_interface {
                         }
                         $this->record_success($entry);
                         $this->lastused = $entry['provider'];
-                        $this->audit_trimmed($entry, 'rescued', count($messages), count($trimmed), $e);
+                        $this->remember_variant($entry, $variant['name']);
+                        $this->audit_trimmed(
+                            $entry,
+                            'rescued',
+                            count($messages),
+                            count($variant['messages']),
+                            $e,
+                            null,
+                            $variant['name']
+                        );
                         if ($primaryfailed) {
                             $this->audit_rescued($entry);
                         }
@@ -274,7 +316,15 @@ class failover_chain implements provider_interface {
                             $this->lastused = $entry['provider'];
                             throw $retryerror;
                         }
-                        $this->audit_trimmed($entry, 'failed', count($messages), count($trimmed), $e, $retryerror);
+                        $this->audit_trimmed(
+                            $entry,
+                            'failed',
+                            count($messages),
+                            count($variant['messages']),
+                            $e,
+                            $retryerror,
+                            $variant['name']
+                        );
                     }
                 }
                 $circuit = $this->note_failure($entry, $e);
@@ -618,23 +668,78 @@ class failover_chain implements provider_interface {
     }
 
     /**
-     * The shortened history to retry with, or [] when a retry would not help.
+     * The histories to retry with after a refusal, or [] when a retry would not help.
      *
-     * Only a request the provider rejected as malformed (HTTP 400, 413 or 422)
-     * qualifies: the provider is up and answered, and the one part of the
-     * request that grows with the conversation is its history. Rate limits,
-     * outages, bad keys and unknown models say nothing about the history, so
-     * they are never retried here.
+     * Only a request the provider rejected as malformed (HTTP 400, 413 or 422, and
+     * not about the account) qualifies: the provider is up and answered, and the
+     * one part of the request that grows with the conversation is its history.
+     * Rate limits, outages, bad keys and unknown models say nothing about the
+     * history, so they are never retried here. The variants come in order: the
+     * whole history with its structure repaired, then the newest exchange only.
      *
      * @param \Throwable $error What the provider threw.
      * @param array $messages The history that was sent.
-     * @return array
+     * @return array<int, array{name: string, messages: array}>
      */
-    private static function trimmed_history_for_retry(\Throwable $error, array $messages): array {
+    private static function history_variants_for_retry(\Throwable $error, array $messages): array {
         if (!($error instanceof provider_http_exception) || self::circuit_effect($error) !== 'none') {
             return [];
         }
-        return \local_ai_course_assistant\history_trimmer::retry_candidate($messages);
+        return \local_ai_course_assistant\history_trimmer::retry_variants($messages);
+    }
+
+    /**
+     * Cache key remembering which history variant a member needed for a learner's conversation.
+     *
+     * @param array $entry
+     * @return string|null Null when no learner is known (nothing to remember it by).
+     */
+    private function memory_key(array $entry): ?string {
+        $userid = (int) $this->options['userid'];
+        if ($userid <= 0) {
+            return null;
+        }
+        $scope = self::circuit_scope($entry['label'], $entry['provider']);
+        return 'history_' . md5($scope) . '_' . $userid . '_' . (int) $this->options['courseid'];
+    }
+
+    /**
+     * The history variant to send first, because the last request of this learner's
+     * conversation on this member needed it. Remembered for HISTORY_MEMORY_SECONDS only:
+     * if the cause was a passing fault the full conversation is tried again soon.
+     *
+     * @param array $entry
+     * @param array $messages The full history for this request.
+     * @return array{name: string, messages: array}|array{} Empty when nothing is remembered.
+     */
+    private function remembered_variant(array $entry, array $messages): array {
+        $key = $this->memory_key($entry);
+        if ($key === null) {
+            return [];
+        }
+        $memory = \cache::make('local_ai_course_assistant', 'failover_circuit')->get($key);
+        if (!is_array($memory) || (time() - (int) ($memory['at'] ?? 0)) > self::HISTORY_MEMORY_SECONDS) {
+            return [];
+        }
+        foreach (\local_ai_course_assistant\history_trimmer::retry_variants($messages) as $variant) {
+            if ($variant['name'] === ($memory['variant'] ?? '')) {
+                return $variant;
+            }
+        }
+        return [];
+    }
+
+    /**
+     * Remember that this member answered a learner's conversation only with a repaired or shortened history.
+     *
+     * @param array $entry
+     * @param string $name Variant name.
+     */
+    private function remember_variant(array $entry, string $name): void {
+        $key = $this->memory_key($entry);
+        if ($key !== null) {
+            \cache::make('local_ai_course_assistant', 'failover_circuit')->set($key, ['variant' => $name, 'at' => time()]);
+        }
     }
 
     /**
@@ -646,19 +751,21 @@ class failover_chain implements provider_interface {
      * shorter request was refused too and the chain carries on as before.
      *
      * @param array $entry The chain entry that was retried.
-     * @param string $outcome 'rescued' or 'failed'.
+     * @param string $outcome 'rescued', 'failed', or 'remembered' (sent shortened first because an earlier request needed it).
      * @param int $before Messages in the rejected request.
      * @param int $kept Messages in the retry.
-     * @param \Throwable $first Why the first request was refused.
+     * @param \Throwable|null $first Why the first request was refused (null when a remembered variant went first).
      * @param \Throwable|null $second Why the retry was refused, when it was.
+     * @param string $variant 'tidied' (structure repaired, nothing cut) or 'trimmed' (newest exchange only).
      */
     private function audit_trimmed(
         array $entry,
         string $outcome,
         int $before,
         int $kept,
-        \Throwable $first,
-        ?\Throwable $second = null
+        ?\Throwable $first,
+        ?\Throwable $second = null,
+        string $variant = ''
     ): void {
         if (empty($this->options['audit'])) {
             return;
@@ -672,9 +779,10 @@ class failover_chain implements provider_interface {
                 'failed_model'    => method_exists($entry['provider'], 'model_id')
                     ? (string) $entry['provider']->model_id() : '',
                 'outcome'         => $outcome,
+                'variant'         => $variant,
                 'messages_before' => $before,
                 'messages_kept'   => $kept,
-                'detail'          => self::describe_failure($first),
+                'detail'          => $first !== null ? self::describe_failure($first) : '',
             ];
             if ($second !== null) {
                 $details['retry_detail'] = self::describe_failure($second);

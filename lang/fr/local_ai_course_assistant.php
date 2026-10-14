@@ -3351,3 +3351,11 @@ $string['check:failover_ok'] = 'Les {$a} fournisseurs de secours ont répondu lo
 $string['check:failover_failing'] = 'Le fournisseur de secours {$a->label} ({$a->model}) a échoué lors de sa dernière vérification : {$a->detail}';
 $string['check:failover_none'] = 'Aucun fournisseur de secours n\'est configuré pour le chat.';
 $string['check:failover_unverified'] = 'Les fournisseurs de secours n\'ont pas encore été vérifiés. La tâche quotidienne les vérifiera, ou exécutez php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Réponses échouées qui déclenchent l\'alerte';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Envoyer aussi l\'alerte lorsque ce nombre de questions d\'apprenants dans la fenêtre se sont soldées par une erreur, comptées sur l\'ensemble du site. Le test du taux de réponse ne voit qu\'un cours qui a presque cessé de répondre ; un fournisseur qui échoue sur un message sur cinq ne le déclenche jamais. Indiquez 0 pour n\'utiliser que le test du taux de réponse.';
+$string['coursesettings:key_rejected'] = 'La clé saisie ressemble à une clé {$a->owner}, mais ce cours utilise {$a->provider} ; elle n\'a donc pas été enregistrée.';
+$string['coursesettings:key_removed'] = 'La clé enregistrée pour ce cours ressemble à une clé {$a->owner}, mais le cours utilise désormais {$a->provider} ; la clé enregistrée a donc été supprimée et le cours utilise la clé du site. Saisissez une clé {$a->provider} si le cours a besoin de la sienne.';
+$string['check:coursekeys_name'] = 'Clés de cours d\'AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Aucun cours n\'a de clé enregistrée qui semble appartenir à un autre fournisseur.';
+$string['check:coursekeys_bad'] = '{$a->count} cours ont une clé enregistrée qui semble appartenir à un autre fournisseur que celui qu\'ils utilisent : {$a->list}. Ouvrez les paramètres d\'IA de chaque cours et saisissez la bonne clé ou effacez-la.';

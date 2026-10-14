@@ -3351,3 +3351,11 @@ $string['check:failover_ok'] = '{$a} yedek sağlayıcının tümü son denetime 
 $string['check:failover_failing'] = '{$a->label} ({$a->model}) yedek sağlayıcısı son denetiminde başarısız oldu: {$a->detail}';
 $string['check:failover_none'] = 'Sohbet için yapılandırılmış bir yedek sağlayıcı yok.';
 $string['check:failover_unverified'] = 'Yedek sağlayıcılar henüz denetlenmedi. Günlük görev onları denetleyecek veya php local/ai_course_assistant/admin/cli/verify_failover.php komutunu çalıştırın.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Uyarıyı tetikleyen başarısız yanıtlar';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Pencere içinde bu kadar öğrenci sorusu hatayla sonuçlandığında da uyarı gönderin; sayım tüm site genelinde yapılır. Yanıt oranı testi yalnızca çoğunlukla yanıt vermeyi bırakmış bir dersi görür; beş mesajdan birinde başarısız olan bir sağlayıcı onu asla tetiklemez. Yalnızca yanıt oranı testini kullanmak için 0 girin.';
+$string['coursesettings:key_rejected'] = 'Girdiğiniz anahtar bir {$a->owner} anahtarına benziyor, ancak bu ders {$a->provider} kullanıyor; bu nedenle kaydedilmedi.';
+$string['coursesettings:key_removed'] = 'Bu ders için kaydedilen anahtar bir {$a->owner} anahtarına benziyor, ancak ders artık {$a->provider} kullanıyor; bu nedenle kayıtlı anahtar kaldırıldı ve ders sitenin anahtarını kullanıyor. Dersin kendi anahtarına ihtiyacı varsa bir {$a->provider} anahtarı girin.';
+$string['check:coursekeys_name'] = 'AI Course Assistant ders anahtarları';
+$string['check:coursekeys_ok'] = 'Hiçbir dersin, başka bir sağlayıcıya ait gibi görünen kayıtlı anahtarı yok.';
+$string['check:coursekeys_bad'] = '{$a->count} dersin, kullandıklarından farklı bir sağlayıcıya ait gibi görünen kayıtlı anahtarı var: {$a->list}. Her dersin yapay zekâ ayarlarını açın ve doğru anahtarı girin ya da temizleyin.';

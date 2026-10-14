@@ -1415,6 +1415,15 @@ if ($hassiteconfig) {
         '0.5',
         PARAM_FLOAT
     ));
+    // v7.8.8: also alert on failed replies across the site, which the rate test
+    // above cannot see when a provider fails one message in five.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/unanswered_min_failed_turns',
+        get_string('settings:unanswered_min_failed_turns', 'local_ai_course_assistant'),
+        get_string('settings:unanswered_min_failed_turns_desc', 'local_ai_course_assistant'),
+        '3',
+        PARAM_INT
+    ));
 
     // v6.4.0: signed policy bundle — behavior-as-data updates without a code
     // deploy. Daily task fetches a JSON envelope, verifies the Ed25519
@@ -3691,6 +3700,7 @@ if ($hassiteconfig) {
         ],
         'unanswered_check_enabled' => [
             'unanswered_window_hours', 'unanswered_min_questions', 'unanswered_min_answer_rate',
+            'unanswered_min_failed_turns',
         ],
         'anomaly_digest_enabled' => [
             'anomaly_digest_threshold_pct', 'anomaly_digest_floor_usd',

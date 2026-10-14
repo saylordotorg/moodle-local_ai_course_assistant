@@ -3370,3 +3370,11 @@ $string['check:failover_ok'] = 'Cả {$a} nhà cung cấp dự phòng đều ph�
 $string['check:failover_failing'] = 'Nhà cung cấp dự phòng {$a->label} ({$a->model}) đã thất bại ở lần kiểm tra gần nhất: {$a->detail}';
 $string['check:failover_none'] = 'Chưa cấu hình nhà cung cấp dự phòng nào cho trò chuyện.';
 $string['check:failover_unverified'] = 'Các nhà cung cấp dự phòng chưa được kiểm tra. Tác vụ hằng ngày sẽ kiểm tra chúng, hoặc chạy php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Số phản hồi thất bại kích hoạt cảnh báo';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Cũng gửi cảnh báo khi có chừng này câu hỏi của người học trong khoảng thời gian kết thúc bằng lỗi, tính trên toàn trang. Kiểm tra tỷ lệ trả lời chỉ thấy khóa học đã gần như ngừng trả lời; nhà cung cấp lỗi ở một trong năm tin nhắn thì không bao giờ kích hoạt nó. Đặt 0 để chỉ dùng kiểm tra tỷ lệ trả lời.';
+$string['coursesettings:key_rejected'] = 'Khóa bạn nhập trông giống khóa của {$a->owner}, nhưng khóa học này dùng {$a->provider}, nên nó chưa được lưu.';
+$string['coursesettings:key_removed'] = 'Khóa đã lưu cho khóa học này trông giống khóa của {$a->owner}, nhưng khóa học hiện dùng {$a->provider}, nên khóa đã lưu đã bị xóa và khóa học dùng khóa của trang. Hãy nhập khóa {$a->provider} nếu khóa học cần khóa riêng.';
+$string['check:coursekeys_name'] = 'Khóa của các khóa học AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Không có khóa học nào có khóa đã lưu trông giống khóa của nhà cung cấp khác.';
+$string['check:coursekeys_bad'] = '{$a->count} khóa học có khóa đã lưu trông giống khóa của nhà cung cấp khác với nhà cung cấp họ đang dùng: {$a->list}. Mở cài đặt AI của từng khóa học và nhập khóa đúng hoặc xóa nó.';

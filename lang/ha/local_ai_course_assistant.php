@@ -3377,3 +3377,11 @@ $string['check:failover_ok'] = 'Dukkan masu bayar da madadin {$a} sun amsa binci
 $string['check:failover_failing'] = 'Mai bayar da madadin {$a->label} ({$a->model}) ya gaza a binciken ƙarshe: {$a->detail}';
 $string['check:failover_none'] = 'Ba a saita wani mai bayar da madadin don taɗi ba.';
 $string['check:failover_unverified'] = 'Ba a duba masu bayar da madadin ba tukuna. Aikin yau da kullum zai duba su, ko gudanar da php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Amsoshin da suka gaza waɗanda ke tayar da faɗakarwa';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Aika faɗakarwa kuma idan irin wannan adadin tambayoyin ɗalibai a cikin taga ya ƙare da kuskure, ana ƙirga su a duk shafin. Gwajin ƙimar amsa yana ganin kwas da ya daina amsawa galibi kawai; mai bayarwa da ke gazawa a saƙo ɗaya cikin biyar ba ya taɓa tayar da shi. Saita 0 don amfani da gwajin ƙimar amsa kaɗai.';
+$string['coursesettings:key_rejected'] = 'Maɓallin da ka shigar yana kama da maɓallin {$a->owner}, amma wannan kwas yana amfani da {$a->provider}, don haka ba a adana shi ba.';
+$string['coursesettings:key_removed'] = 'Maɓallin da aka adana wa wannan kwas yana kama da maɓallin {$a->owner}, amma yanzu kwas ɗin yana amfani da {$a->provider}, don haka an cire maɓallin da aka adana kuma kwas ɗin yana amfani da maɓallin shafin. Shigar da maɓallin {$a->provider} idan kwas ɗin yana buƙatar nasa.';
+$string['check:coursekeys_name'] = 'Maɓallan kwas na AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Babu kwas da ke da maɓallin da aka adana wanda yake kama da na wani mai bayarwa.';
+$string['check:coursekeys_bad'] = 'Kwas {$a->count} suna da maɓallin da aka adana wanda yake kama da na wani mai bayarwa daban da wanda suke amfani da shi: {$a->list}. Buɗe saitunan AI na kowane kwas ka shigar da maɓallin da ya dace ko ka share shi.';

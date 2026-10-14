@@ -3350,3 +3350,11 @@ $string['check:failover_ok'] = 'Toți cei {$a} furnizori de rezervă au răspuns
 $string['check:failover_failing'] = 'Furnizorul de rezervă {$a->label} ({$a->model}) a eșuat la ultima verificare: {$a->detail}';
 $string['check:failover_none'] = 'Nu este configurat niciun furnizor de rezervă pentru chat.';
 $string['check:failover_unverified'] = 'Furnizorii de rezervă nu au fost încă verificați. Sarcina zilnică îi va verifica, sau rulați php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Răspunsuri eșuate care declanșează alerta';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Trimiteți alerta și atunci când atâtea întrebări ale cursanților din fereastră s-au încheiat cu o eroare, numărate pe întregul site. Testul ratei de răspuns vede doar un curs care a încetat în mare parte să răspundă; un furnizor care eșuează la un mesaj din cinci nu îl declanșează niciodată. Setați 0 pentru a folosi doar testul ratei de răspuns.';
+$string['coursesettings:key_rejected'] = 'Cheia introdusă pare o cheie {$a->owner}, dar acest curs folosește {$a->provider}, așa că nu a fost salvată.';
+$string['coursesettings:key_removed'] = 'Cheia salvată pentru acest curs pare o cheie {$a->owner}, dar cursul folosește acum {$a->provider}, așa că cheia salvată a fost eliminată, iar cursul folosește cheia site-ului. Introduceți o cheie {$a->provider} dacă cursul are nevoie de a lui.';
+$string['check:coursekeys_name'] = 'Cheile cursurilor din AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Niciun curs nu are o cheie salvată care să pară a aparține altui furnizor.';
+$string['check:coursekeys_bad'] = '{$a->count} curs(uri) au o cheie salvată care pare să aparțină altui furnizor decât cel folosit: {$a->list}. Deschideți setările AI ale fiecărui curs și introduceți cheia corectă sau ștergeți-o.';

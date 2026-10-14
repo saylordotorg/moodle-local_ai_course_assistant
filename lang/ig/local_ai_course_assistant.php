@@ -3365,3 +3365,11 @@ $string['check:failover_ok'] = 'Ndị na-enye nkwado niile {$a} zara na nlele ik
 $string['check:failover_failing'] = 'Onye na-enye nkwado {$a->label} ({$a->model}) dara na nlele ikpeazụ ya: {$a->detail}';
 $string['check:failover_none'] = 'Echepụtaghị onye na-enye nkwado maka mkparịta ụka.';
 $string['check:failover_unverified'] = 'Elebeghị ndị na-enye nkwado anya. Ọrụ kwa ụbọchị ga-elele ha, ma ọ bụ gbaa php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Azịza ndị dara na-akpalite ọkwa';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Zipụ ọkwa ọbụlagodi mgbe ọnụ ọgụgụ a nke ajụjụ ụmụ akwụkwọ n\'oge a gwụrụ n\'njehie, a na-agụta ha n\'ofe saịtị niile. Nnwale ọnụego azịza na-ahụ naanị ọmụmụ nke kwụsịrị ịza n\'ọtụtụ ọnọdụ; onye na-enye ọrụ nke na-adaba n\'ozi otu n\'ime ise anaghị akpalite ya. Tọọ 0 iji nnwale ọnụego azịza naanị.';
+$string['coursesettings:key_rejected'] = 'Igodo i tinyere yiri igodo {$a->owner}, mana ọmụmụ a na-eji {$a->provider}, ya mere echekwaghị ya.';
+$string['coursesettings:key_removed'] = 'Igodo echekwara maka ọmụmụ a yiri igodo {$a->owner}, mana ọmụmụ ahụ na-eji {$a->provider} ugbu a, ya mere ewepụrụ igodo echekwara, ọmụmụ ahụ na-ejikwa igodo saịtị. Tinye igodo {$a->provider} ma ọ bụrụ na ọmụmụ ahụ chọrọ nke ya.';
+$string['check:coursekeys_name'] = 'Igodo ọmụmụ nke AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Enweghị ọmụmụ nwere igodo echekwara nke yiri nke onye na-enye ọrụ ọzọ.';
+$string['check:coursekeys_bad'] = 'Ọmụmụ {$a->count} nwere igodo echekwara nke yiri nke onye na-enye ọrụ dị iche n\'ọ bụ nke ha na-eji: {$a->list}. Mepee ntọala AI nke ọmụmụ ọ bụla tinye igodo ziri ezi ma ọ bụ hichaa ya.';

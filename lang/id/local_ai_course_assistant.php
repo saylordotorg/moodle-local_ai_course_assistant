@@ -3402,3 +3402,11 @@ $string['check:failover_ok'] = 'Semua {$a} penyedia cadangan menjawab pada pemer
 $string['check:failover_failing'] = 'Penyedia cadangan {$a->label} ({$a->model}) gagal pada pemeriksaan terakhir: {$a->detail}';
 $string['check:failover_none'] = 'Belum ada penyedia cadangan yang dikonfigurasi untuk chat.';
 $string['check:failover_unverified'] = 'Penyedia cadangan belum diperiksa. Tugas harian akan memeriksanya, atau jalankan php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Balasan gagal yang memicu peringatan';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Kirim juga peringatan ketika sejumlah pertanyaan pelajar dalam jendela waktu berakhir dengan kesalahan, dihitung di seluruh situs. Uji tingkat jawaban hanya melihat kursus yang sebagian besar berhenti menjawab; penyedia yang gagal pada satu dari lima pesan tidak pernah memicunya. Atur 0 untuk hanya memakai uji tingkat jawaban.';
+$string['coursesettings:key_rejected'] = 'Kunci yang Anda masukkan tampak seperti kunci {$a->owner}, tetapi kursus ini memakai {$a->provider}, sehingga tidak disimpan.';
+$string['coursesettings:key_removed'] = 'Kunci yang tersimpan untuk kursus ini tampak seperti kunci {$a->owner}, tetapi kursus kini memakai {$a->provider}, sehingga kunci tersimpan dihapus dan kursus memakai kunci situs. Masukkan kunci {$a->provider} jika kursus memerlukan kuncinya sendiri.';
+$string['check:coursekeys_name'] = 'Kunci kursus AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Tidak ada kursus dengan kunci tersimpan yang tampak milik penyedia lain.';
+$string['check:coursekeys_bad'] = '{$a->count} kursus memiliki kunci tersimpan yang tampak milik penyedia yang berbeda dari yang mereka gunakan: {$a->list}. Buka pengaturan AI setiap kursus lalu masukkan kunci yang benar atau hapus.';

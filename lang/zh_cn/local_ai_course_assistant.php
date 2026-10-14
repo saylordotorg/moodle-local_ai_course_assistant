@@ -3386,3 +3386,11 @@ $string['check:failover_ok'] = '全部 {$a} 个备用提供商都响应了最近
 $string['check:failover_failing'] = '备用提供商 {$a->label}（{$a->model}）在最近一次检查中失败：{$a->detail}';
 $string['check:failover_none'] = '尚未为聊天配置备用提供商。';
 $string['check:failover_unverified'] = '尚未检查备用提供商。每日任务会检查它们，或运行 php local/ai_course_assistant/admin/cli/verify_failover.php。';
+
+$string['settings:unanswered_min_failed_turns'] = '触发警报的失败回复数';
+$string['settings:unanswered_min_failed_turns_desc'] = '当时间窗口内有这么多学习者的问题以错误结束（按整个站点统计）时，也发送警报。回答率检测只能发现已基本停止回答的课程；每五条消息失败一条的提供商永远不会触发它。设为 0 则仅使用回答率检测。';
+$string['coursesettings:key_rejected'] = '您输入的密钥看起来像 {$a->owner} 的密钥，但本课程使用的是 {$a->provider}，因此未保存。';
+$string['coursesettings:key_removed'] = '为本课程保存的密钥看起来像 {$a->owner} 的密钥，但课程现在使用 {$a->provider}，因此已删除保存的密钥，课程将使用站点密钥。如果课程需要自己的密钥，请输入 {$a->provider} 密钥。';
+$string['check:coursekeys_name'] = 'AI Course Assistant 课程密钥';
+$string['check:coursekeys_ok'] = '没有课程保存了看起来属于其他提供商的密钥。';
+$string['check:coursekeys_bad'] = '{$a->count} 门课程保存的密钥看起来属于与其所用提供商不同的提供商：{$a->list}。请打开每门课程的 AI 设置，输入正确的密钥或将其清除。';

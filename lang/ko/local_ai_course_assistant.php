@@ -3348,3 +3348,11 @@ $string['check:failover_ok'] = '{$a}개의 백업 공급자가 모두 마지막 
 $string['check:failover_failing'] = '백업 공급자 {$a->label}({$a->model})이(가) 마지막 점검에 실패했습니다: {$a->detail}';
 $string['check:failover_none'] = '채팅용 백업 공급자가 구성되어 있지 않습니다.';
 $string['check:failover_unverified'] = '백업 공급자를 아직 점검하지 않았습니다. 매일 실행되는 작업이 점검하거나 php local/ai_course_assistant/admin/cli/verify_failover.php 를 실행하세요.';
+
+$string['settings:unanswered_min_failed_turns'] = '경고를 발생시키는 실패한 응답 수';
+$string['settings:unanswered_min_failed_turns_desc'] = '창 안에서 이 수만큼의 학습자 질문이 오류로 끝나면(사이트 전체 기준) 경고도 보냅니다. 응답률 검사는 대부분 응답을 멈춘 과정만 감지하며, 메시지 5개 중 1개가 실패하는 공급자는 절대 작동시키지 않습니다. 응답률 검사만 사용하려면 0으로 설정하세요.';
+$string['coursesettings:key_rejected'] = '입력한 키는 {$a->owner} 키처럼 보이지만 이 과정은 {$a->provider}을(를) 사용하므로 저장되지 않았습니다.';
+$string['coursesettings:key_removed'] = '이 과정에 저장된 키는 {$a->owner} 키처럼 보이지만 과정이 이제 {$a->provider}을(를) 사용하므로 저장된 키가 제거되었고 과정은 사이트 키를 사용합니다. 과정에 자체 키가 필요하면 {$a->provider} 키를 입력하세요.';
+$string['check:coursekeys_name'] = 'AI Course Assistant 과정 키';
+$string['check:coursekeys_ok'] = '다른 공급자의 키로 보이는 저장된 키를 가진 과정이 없습니다.';
+$string['check:coursekeys_bad'] = '{$a->count}개 과정에 사용 중인 공급자와 다른 공급자의 키로 보이는 저장된 키가 있습니다: {$a->list}. 각 과정의 AI 설정을 열어 올바른 키를 입력하거나 지우세요.';

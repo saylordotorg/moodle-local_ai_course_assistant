@@ -3371,3 +3371,11 @@ $string['check:failover_ok'] = 'Ñi di jox ndimbal {$a} yépp tontu nañu ci see
 $string['check:failover_failing'] = 'Ki di jox ndimbal {$a->label} ({$a->model}) daa wéy ci seetlu bu mujj bi: {$a->detail}';
 $string['check:failover_none'] = 'Amul ki di jox ndimbal ñu setal ko ngir chat bi.';
 $string['check:failover_unverified'] = 'Ñi di jox ndimbal seetuñu leen ba tay. Liggéey bu bés bi dina leen seet, mbaa tàmbali php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Tontu yu ñàkk yiy tàmbali artu bi';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Yónnee artu bi it bu ay laaj yu ndongo yi ci biir bët bi jeex ak njuumte, ñuy ko lim ci sàmm bépp. Seetlu bu jëfandikoo ñaan tontu bi gisul lu dul kàrs bu baña tontu ci gëna bari; ki di jox ndimbal bu ñàkk ci bataaxal bu ñaar ci juroom, du ko tàmbali mukk. Tànnal 0 ngir jëfandikoo seetlu bu pas bu tontu rekk.';
+$string['coursesettings:key_rejected'] = 'Caabi bi nga dugal mel na ni caabi bu {$a->owner}, waaye kàrs bii dafay jëfandikoo {$a->provider}, moo tax duñu ko denc.';
+$string['coursesettings:key_removed'] = 'Caabi bi ñu denc ngir kàrs bii mel na ni caabi bu {$a->owner}, waaye kàrs bi léegi dafay jëfandikoo {$a->provider}, moo tax ñu jëlee caabi bi ñu denc te kàrs bi di jëfandikoo caabi bu sàmm bi. Dugal caabi bu {$a->provider} su kàrs bi soxlaa bu boppam.';
+$string['check:coursekeys_name'] = 'Caabi yu kàrs yu AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Amul kàrs bu am caabi bu ñu denc buy melni bu ku jox ndimbal bu ñaar.';
+$string['check:coursekeys_bad'] = 'Kàrs {$a->count} am nañu caabi bu ñu denc buy melni bu ku jox ndimbal bu wuute ak bi ñuy jëfandikoo: {$a->list}. Ubbil tànn-tànn yu AI yu kàrs bu nekk te dugal caabi bu baax walla far ko.';

@@ -3350,3 +3350,11 @@ $string['check:failover_ok'] = 'Všetci záloční poskytovatelia ({$a}) odpoved
 $string['check:failover_failing'] = 'Záložný poskytovateľ {$a->label} ({$a->model}) pri poslednej kontrole zlyhal: {$a->detail}';
 $string['check:failover_none'] = 'Pre chat nie je nastavený žiadny záložný poskytovateľ.';
 $string['check:failover_unverified'] = 'Záložní poskytovatelia ešte neboli skontrolovaní. Skontroluje ich denná úloha, alebo spustite php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'Neúspešné odpovede, ktoré spustia upozornenie';
+$string['settings:unanswered_min_failed_turns_desc'] = 'Odoslať upozornenie aj vtedy, keď toľko otázok študentov v okne skončilo chybou, počítané za celý web. Test podielu odpovedí vidí len kurz, ktorý väčšinou prestal odpovedať; poskytovateľ, ktorý zlyhá pri jednej správe z piatich, ho nikdy nespustí. Nastavením 0 použijete iba test podielu odpovedí.';
+$string['coursesettings:key_rejected'] = 'Zadaný kľúč vyzerá ako kľúč poskytovateľa {$a->owner}, ale tento kurz používa {$a->provider}, preto nebol uložený.';
+$string['coursesettings:key_removed'] = 'Kľúč uložený pre tento kurz vyzerá ako kľúč poskytovateľa {$a->owner}, ale kurz teraz používa {$a->provider}, preto bol uložený kľúč odstránený a kurz používa kľúč webu. Ak kurz potrebuje vlastný kľúč, zadajte kľúč pre {$a->provider}.';
+$string['check:coursekeys_name'] = 'Kľúče kurzov AI Course Assistant';
+$string['check:coursekeys_ok'] = 'Žiadny kurz nemá uložený kľúč, ktorý by vyzeral ako kľúč iného poskytovateľa.';
+$string['check:coursekeys_bad'] = 'Kurzy v počte {$a->count} majú uložený kľúč, ktorý vyzerá, že patrí inému poskytovateľovi, než aký používajú: {$a->list}. Otvorte nastavenia AI každého kurzu a zadajte správny kľúč alebo ho vymažte.';

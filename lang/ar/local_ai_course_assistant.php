@@ -3348,3 +3348,11 @@ $string['check:failover_ok'] = 'ردّ جميع مزوّدي النسخ الاح
 $string['check:failover_failing'] = 'فشل مزوّد النسخ الاحتياطي {$a->label} ({$a->model}) في آخر فحص: {$a->detail}';
 $string['check:failover_none'] = 'لم يتم إعداد أي مزوّد نسخ احتياطي للدردشة.';
 $string['check:failover_unverified'] = 'لم يتم فحص مزوّدي النسخ الاحتياطي بعد. ستفحصهم المهمة اليومية، أو شغّل php local/ai_course_assistant/admin/cli/verify_failover.php.';
+
+$string['settings:unanswered_min_failed_turns'] = 'الردود الفاشلة التي تُطلق التنبيه';
+$string['settings:unanswered_min_failed_turns_desc'] = 'أرسل التنبيه أيضًا عندما ينتهي هذا العدد من أسئلة المتعلمين في النافذة بخطأ، محسوبًا على مستوى الموقع كله. لا يرى اختبار معدل الإجابة إلا المقرر الذي توقف معظمه عن الإجابة؛ أما المزوّد الذي يفشل في رسالة واحدة من كل خمس فلا يُفعّله أبدًا. اضبط القيمة على 0 لاستخدام اختبار معدل الإجابة وحده.';
+$string['coursesettings:key_rejected'] = 'يبدو المفتاح الذي أدخلته مفتاح {$a->owner}، لكن هذا المقرر يستخدم {$a->provider}، لذا لم يُحفظ.';
+$string['coursesettings:key_removed'] = 'يبدو المفتاح المحفوظ لهذا المقرر مفتاح {$a->owner}، لكن المقرر يستخدم الآن {$a->provider}، لذا أُزيل المفتاح المحفوظ وصار المقرر يستخدم مفتاح الموقع. أدخل مفتاح {$a->provider} إذا كان المقرر يحتاج إلى مفتاحه الخاص.';
+$string['check:coursekeys_name'] = 'مفاتيح مقررات AI Course Assistant';
+$string['check:coursekeys_ok'] = 'لا يوجد مقرر لديه مفتاح محفوظ يبدو أنه يخص مزوّدًا آخر.';
+$string['check:coursekeys_bad'] = 'لدى {$a->count} مقرر(ات) مفتاح محفوظ يبدو أنه يخص مزوّدًا غير الذي تستخدمه: {$a->list}. افتح إعدادات الذكاء الاصطناعي لكل مقرر وأدخل المفتاح الصحيح أو امسحه.';
