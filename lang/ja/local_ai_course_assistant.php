@@ -3335,3 +3335,16 @@ $string['settings:essay_provider'] = '小論文フィードバックのプロバ
 $string['settings:essay_provider_desc'] = '小論文フィードバックに使うプロバイダー ID(例: <code>claude</code>、<code>openai</code>)。比較プロバイダーの行と一致している必要があります。空欄にするとチャットのプロバイダーを使用します。上書きを有効にするには、この項目とモデルの両方を設定する必要があります。';
 $string['settings:essay_model'] = '小論文フィードバックのモデル';
 $string['settings:essay_model_desc'] = '小論文フィードバックに使うモデル名(例: <code>claude-haiku-4-5</code>)。2026 年 10 月のベンチマークでは、Claude モデルは Gemini 2.5 Flash や GPT-4o mini より明らかに優れた小論文フィードバックを返しました。空欄にするとチャットのモデルを使用します。';
+
+$string['ai_course_assistant:viewaudit'] = 'AIチューターの監査ログを表示';
+$string['task:verify_failover'] = 'フェイルオーバー用バックアッププロバイダーを確認';
+$string['verify:missing_row'] = 'フェイルオーバーチェーンに chat:{$a} がありますが、比較プロバイダー に {$a} という行がないため、そのエントリはスキップされます。';
+$string['verify:missing_key'] = '比較プロバイダー の行 {$a} に API キーがないため、フェイルオーバーのエントリ chat:{$a} はスキップされます。';
+$string['verify:model_case'] = '{$a->label} のモデルが「{$a->model}」と記述されています。モデル ID は小文字で空白なしです（{$a->suggest} をお試しください）。表示名のままだと、管理者の LLM ピッカーは動作しても、実際のフェイルオーバーはすべて失敗する可能性があります。';
+$string['verify:no_backup'] = '呼び出しごとのフェイルオーバーは有効ですが、フェイルオーバーチェーン のどの chat エントリもプロバイダーに解決されないため、バックアップがありません。';
+$string['verify:saved_warning'] = 'フェイルオーバー設定を確認してください:';
+$string['check:failover_name'] = 'AI Course Assistant のバックアッププロバイダー';
+$string['check:failover_ok'] = '{$a} 件のバックアッププロバイダーすべてが前回のチェックに応答しました。';
+$string['check:failover_failing'] = 'バックアッププロバイダー {$a->label}（{$a->model}）は前回のチェックに失敗しました: {$a->detail}';
+$string['check:failover_none'] = 'チャット用のバックアッププロバイダーが設定されていません。';
+$string['check:failover_unverified'] = 'バックアッププロバイダーはまだ確認されていません。毎日のタスクが確認するか、php local/ai_course_assistant/admin/cli/verify_failover.php を実行してください。';

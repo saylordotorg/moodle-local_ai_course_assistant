@@ -3337,3 +3337,16 @@ $string['settings:essay_provider'] = 'Udbyder til opgavefeedback';
 $string['settings:essay_provider_desc'] = 'Udbyder-id (f.eks. <code>claude</code>, <code>openai</code>) til opgavefeedback. Skal matche en række under Sammenligningsudbydere. Lad feltet stå tomt for at bruge chatudbyderen. Både dette felt og modellen skal være angivet, for at tilsidesættelsen gælder.';
 $string['settings:essay_model'] = 'Model til opgavefeedback';
 $string['settings:essay_model_desc'] = 'Modelnavn til opgavefeedback, f.eks. <code>claude-haiku-4-5</code>. I benchmarken fra oktober 2026 gav Claude-modeller tydeligt bedre opgavefeedback end Gemini 2.5 Flash eller GPT-4o mini. Lad feltet stå tomt for at bruge chatmodellen.';
+
+$string['ai_course_assistant:viewaudit'] = 'Se revisionsloggen for AI-vejlederen';
+$string['task:verify_failover'] = 'Kontroller backup-udbydere til failover';
+$string['verify:missing_row'] = 'Failover-kæden indeholder chat:{$a}, men Sammenligningsudbydere har ingen række med navnet {$a}, så posten springes over.';
+$string['verify:missing_key'] = 'Rækken {$a} i Sammenligningsudbydere har ingen API-nøgle, så failover-posten chat:{$a} springes over.';
+$string['verify:model_case'] = 'Modellen for {$a->label} er skrevet som "{$a->model}". Model-id\'er er med små bogstaver og uden mellemrum (prøv {$a->suggest}); et visningsnavn kan få hver reel failover til at fejle, mens administratorens LLM-vælger stadig virker.';
+$string['verify:no_backup'] = 'Failover pr. kald er slået til, men ingen chat-post i Failover-kæde peger på en udbyder, så der er ingen backup.';
+$string['verify:saved_warning'] = 'Tjek dine failover-indstillinger:';
+$string['check:failover_name'] = 'AI Course Assistant backup-udbydere';
+$string['check:failover_ok'] = 'Alle {$a} backup-udbydere svarede ved seneste kontrol.';
+$string['check:failover_failing'] = 'Backup-udbyderen {$a->label} ({$a->model}) fejlede ved seneste kontrol: {$a->detail}';
+$string['check:failover_none'] = 'Der er ikke konfigureret nogen backup-udbyder til chat.';
+$string['check:failover_unverified'] = 'Backup-udbyderne er endnu ikke kontrolleret. Den daglige opgave kontrollerer dem, eller kør php local/ai_course_assistant/admin/cli/verify_failover.php.';

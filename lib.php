@@ -284,5 +284,8 @@ function local_ai_course_assistant_user_preferences(): array {
  * @return \core\check\check[]
  */
 function local_ai_course_assistant_status_checks(): array {
-    return [new \local_ai_course_assistant\check\primary_provider()];
+    return [
+        new \local_ai_course_assistant\check\primary_provider(),
+        new \local_ai_course_assistant\check\failover_providers(),
+    ];
 }

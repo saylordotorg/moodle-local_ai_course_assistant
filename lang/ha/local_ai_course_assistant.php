@@ -3364,3 +3364,16 @@ $string['settings:essay_provider'] = 'Mai samar da ra\'ayi kan muqala';
 $string['settings:essay_provider_desc'] = 'ID na mai samar da sabis (misali <code>claude</code>, <code>openai</code>) don ra\'ayi kan muqala. Dole ne ya dace da layi ɗaya a cikin Masu samar da kwatanta. Bar shi fanko don amfani da mai samar da sabis na tattaunawa. Dole ne a saita wannan filin da samfurin duka don a yi amfani da maye gurbin.';
 $string['settings:essay_model'] = 'Samfurin ra\'ayi kan muqala';
 $string['settings:essay_model_desc'] = 'Sunan samfuri don ra\'ayi kan muqala, misali <code>claude-haiku-4-5</code>. A gwajin kwatanta na Oktoba 2026, samfuran Claude sun ba da ra\'ayi kan muqala mafi kyau a fili fiye da Gemini 2.5 Flash ko GPT-4o mini. Bar shi fanko don amfani da samfurin tattaunawa.';
+
+$string['ai_course_assistant:viewaudit'] = 'Duba rajistar binciken malamin AI';
+$string['task:verify_failover'] = 'Duba masu bayar da madadin canja wuri';
+$string['verify:missing_row'] = 'Sarkar canja wuri ta lissafa chat:{$a}, amma Masu ba da sabis na kwatantawa ba shi da layi mai suna {$a}, don haka za a tsallake wannan shigarwa.';
+$string['verify:missing_key'] = 'Layin {$a} a Masu ba da sabis na kwatantawa ba shi da maɓallin API, don haka za a tsallake shigarwar chat:{$a}.';
+$string['verify:model_case'] = 'An rubuta samfurin {$a->label} a matsayin "{$a->model}". Sunayen samfura ana rubuta su da ƙananan haruffa ba tare da sarari ba (gwada {$a->suggest}); sunan nuni na iya sa kowane canja wuri na gaske ya gaza yayin da mai zaɓen LLM na mai gudanarwa yake aiki.';
+$string['verify:no_backup'] = 'Canja wuri na kowane kira yana kunne, amma babu wata shigarwar chat a Sarƙar madadi da ta kai ga mai bayarwa, don haka babu madadin.';
+$string['verify:saved_warning'] = 'Duba saitunan canja wuri naka:';
+$string['check:failover_name'] = 'Masu bayar da madadin AI Course Assistant';
+$string['check:failover_ok'] = 'Dukkan masu bayar da madadin {$a} sun amsa binciken ƙarshe.';
+$string['check:failover_failing'] = 'Mai bayar da madadin {$a->label} ({$a->model}) ya gaza a binciken ƙarshe: {$a->detail}';
+$string['check:failover_none'] = 'Ba a saita wani mai bayar da madadin don taɗi ba.';
+$string['check:failover_unverified'] = 'Ba a duba masu bayar da madadin ba tukuna. Aikin yau da kullum zai duba su, ko gudanar da php local/ai_course_assistant/admin/cli/verify_failover.php.';

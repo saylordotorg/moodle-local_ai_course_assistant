@@ -3375,3 +3375,16 @@ $string['settings:essay_provider'] = 'Provider per il feedback sui saggi';
 $string['settings:essay_provider_desc'] = 'ID del provider (ad es. <code>claude</code>, <code>openai</code>) per il feedback sui saggi. Deve corrispondere a una riga di Provider di confronto. Lasciare vuoto per usare il provider della chat. Per applicare la sostituzione devono essere impostati sia questo campo sia il modello.';
 $string['settings:essay_model'] = 'Modello per il feedback sui saggi';
 $string['settings:essay_model_desc'] = 'Nome del modello per il feedback sui saggi, ad es. <code>claude-haiku-4-5</code>. Nel benchmark di ottobre 2026 i modelli Claude hanno fornito un feedback sui saggi nettamente migliore rispetto a Gemini 2.5 Flash o GPT-4o mini. Lasciare vuoto per usare il modello della chat.';
+
+$string['ai_course_assistant:viewaudit'] = 'Visualizza il registro di audit del tutor IA';
+$string['task:verify_failover'] = 'Verifica i fornitori di backup del failover';
+$string['verify:missing_row'] = 'La catena di failover elenca chat:{$a}, ma Fornitori di confronto non ha nessuna riga chiamata {$a}, quindi la voce viene saltata.';
+$string['verify:missing_key'] = 'La riga {$a} di Fornitori di confronto non ha una chiave API, quindi la voce di failover chat:{$a} viene saltata.';
+$string['verify:model_case'] = 'Il modello per {$a->label} è scritto come "{$a->model}". Gli ID dei modelli sono in minuscolo e senza spazi (provi {$a->suggest}); un nome visualizzato può far fallire ogni failover reale mentre il selettore LLM dell\'amministratore continua a funzionare.';
+$string['verify:no_backup'] = 'Il failover per chiamata è attivo, ma nessuna voce chat in Catena di failover porta a un fornitore, quindi non c\'è alcun backup.';
+$string['verify:saved_warning'] = 'Controlli le impostazioni di failover:';
+$string['check:failover_name'] = 'Fornitori di backup di AI Course Assistant';
+$string['check:failover_ok'] = 'Tutti i {$a} fornitori di backup hanno risposto all\'ultimo controllo.';
+$string['check:failover_failing'] = 'Il fornitore di backup {$a->label} ({$a->model}) ha fallito l\'ultimo controllo: {$a->detail}';
+$string['check:failover_none'] = 'Nessun fornitore di backup è configurato per la chat.';
+$string['check:failover_unverified'] = 'I fornitori di backup non sono ancora stati controllati. L\'attività giornaliera li controllerà, oppure esegua php local/ai_course_assistant/admin/cli/verify_failover.php.';

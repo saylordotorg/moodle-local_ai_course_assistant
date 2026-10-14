@@ -3369,3 +3369,16 @@ $string['settings:essay_provider'] = 'Dhiyeessaa yaada barreeffama';
 $string['settings:essay_provider_desc'] = 'ID dhiyeessaa tajaajilaa (fkn. <code>claude</code>, <code>openai</code>) yaada barreeffamaaf. Sararoota Dhiyeessitoota wal-bira qabuu keessaa tokko wajjin wal simuu qaba. Dhiyeessaa haasaa fayyadamuuf duwwaa dhiisi. Bakka bu\'iinsi hojii irra oolfamuuf kutaan kun fi moodeliin lamaan isaanii kaa\'amuu qabu.';
 $string['settings:essay_model'] = 'Moodela yaada barreeffama';
 $string['settings:essay_model_desc'] = 'Maqaa moodelaa yaada barreeffamaaf, fkn. <code>claude-haiku-4-5</code>. Qorannoo wal-bira qabuu Onkololeessa 2026 keessatti moodeloonni Claude yaada barreeffamaa Gemini 2.5 Flash ykn GPT-4o mini caalaa ifatti gaarii kennan. Moodela haasaa fayyadamuuf duwwaa dhiisi.';
+
+$string['ai_course_assistant:viewaudit'] = 'Galmee sakatta\'iinsa barsiisaa AI ilaali';
+$string['task:verify_failover'] = 'Dhiyeessitoota deeggarsa ceesisaa (failover) mirkaneessi';
+$string['verify:missing_row'] = 'Sarara ceesisaa (failover) chat:{$a} tarreessa, garuu Kennitoota walbira keessa sararri maqaa {$a} jedhu hin jiru, kanaaf galmeen sun ni darbama.';
+$string['verify:missing_key'] = 'Sararri {$a} Kennitoota walbira keessa furtuun API hin qabu, kanaaf galmeen ceesisaa chat:{$a} ni darbama.';
+$string['verify:model_case'] = 'Moodeliin {$a->label} akka "{$a->model}" jedhutti barreeffameera. ID moodelii qubee xixiqqoon fi iddoo duwwaa malee ti (kana yaali: {$a->suggest}); maqaan agarsiisu filataan LLM bulchaa hojjetu yeroo jiruu ceesisaa dhugaa hundaa ni kuffisuu danda\'a.';
+$string['verify:no_backup'] = 'Ceesisni waamicha tokkoon tokkoon bante jira, garuu galmeen chat Foddaa bakka bu\'aa keessa dhiyeessaa tokkootti geessu hin jiru, kanaaf deeggarsi hin jiru.';
+$string['verify:saved_warning'] = 'Qindaa\'ina ceesisaa kee ilaali:';
+$string['check:failover_name'] = 'Dhiyeessitoota deeggarsa AI Course Assistant';
+$string['check:failover_ok'] = 'Dhiyeessitoonni deeggarsa {$a} hundi sakatta\'iinsa isa dhumaaf deebii kennan.';
+$string['check:failover_failing'] = 'Dhiyeessaan deeggarsa {$a->label} ({$a->model}) sakatta\'iinsa isa dhumaa irratti kufe: {$a->detail}';
+$string['check:failover_none'] = 'Haasaa (chat) keessaaf dhiyeessaan deeggarsaa tokko illee hin qindaa\'in.';
+$string['check:failover_unverified'] = 'Dhiyeessitoonni deeggarsaa ammallee hin sakatta\'amne. Hojiin guyyaa guyyaa isaan sakatta\'a, yookaan php local/ai_course_assistant/admin/cli/verify_failover.php hojjechiisi.';

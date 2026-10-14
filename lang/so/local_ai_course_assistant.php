@@ -3381,3 +3381,16 @@ $string['settings:essay_provider'] = 'Bixiyaha jawaab celinta qoraalka';
 $string['settings:essay_provider_desc'] = 'Aqoonsiga bixiyaha (tusaale ahaan <code>claude</code>, <code>openai</code>) ee jawaab celinta qoraalka. Waa inuu la mid noqdaa safka mid ka mid ah Bixiyeyaasha is-barbardhigga. U daa madhan si aad u isticmaasho bixiyaha sheekaysiga. Waa in goobtan iyo moodelka labaduba la dejiyaa si beddelku u shaqeeyo.';
 $string['settings:essay_model'] = 'Moodelka jawaab celinta qoraalka';
 $string['settings:essay_model_desc'] = 'Magaca moodelka ee jawaab celinta qoraalka, tusaale ahaan <code>claude-haiku-4-5</code>. Imtixaankii is-barbardhigga ee Oktoobar 2026, moodooyinka Claude waxay bixiyeen jawaab celin qoraal oo si cad uga wanaagsan Gemini 2.5 Flash ama GPT-4o mini. U daa madhan si aad u isticmaasho moodelka sheekaysiga.';
+
+$string['ai_course_assistant:viewaudit'] = 'Eeg diiwaanka hubinta macallinka AI';
+$string['task:verify_failover'] = 'Hubi bixiyeyaasha taageerada ee beddelka khaladka';
+$string['verify:missing_row'] = 'Silsiladda beddelka khaladka waxay taxaysaa chat:{$a}, laakiin Bixiyeyaasha isbarbardhigga ma laha safka la yiraahdo {$a}, sidaas darteed gelitaankaas waa la dhaafayaa.';
+$string['verify:missing_key'] = 'Safka {$a} ee Bixiyeyaasha isbarbardhigga ma laha furaha API, sidaas darteed gelitaanka chat:{$a} waa la dhaafayaa.';
+$string['verify:model_case'] = 'Qaabka {$a->label} waxaa loo qoray sida "{$a->model}". Aqoonsiyada qaabku waa xarfo yaryar oo aan godad lahayn (isku day {$a->suggest}); magac muuqaal ah ayaa dhaawici kara beddel kasta oo dhab ah halka doorashada LLM ee maamulaha ay wali shaqeyneyso.';
+$string['verify:no_backup'] = 'Beddelka khaladka ee wicitaan kasta waa shidan yahay, laakiin ma jiro gelitaan chat ah oo ku jira Silsiladda beddelka oo gaarsiiya bixiye, sidaas darteed taageero ma jirto.';
+$string['verify:saved_warning'] = 'Hubi dejinta beddelka khaladka:';
+$string['check:failover_name'] = 'Bixiyeyaasha taageerada ee AI Course Assistant';
+$string['check:failover_ok'] = 'Dhammaan {$a} bixiyeyaasha taageerada waxay ka jawaabeen hubintii ugu dambeysay.';
+$string['check:failover_failing'] = 'Bixiyaha taageerada {$a->label} ({$a->model}) wuxuu ku guuldareystay hubintiisii ugu dambeysay: {$a->detail}';
+$string['check:failover_none'] = 'Bixiye taageero ah looma habeynin wada-sheekaysiga.';
+$string['check:failover_unverified'] = 'Bixiyeyaasha taageerada weli lama hubin. Hawsha maalinlaha ah ayaa hubin doonta, ama ku shaqeey php local/ai_course_assistant/admin/cli/verify_failover.php.';

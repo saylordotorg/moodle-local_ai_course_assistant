@@ -102,6 +102,18 @@ class settings_save_report {
         }
         $pending = $SESSION->{self::SESSIONKEY};
         unset($SESSION->{self::SESSIONKEY});
+        // v7.8.8: a save that touched the backup providers gets their settings
+        // problems shown right away, not discovered on the day a failover needs them.
+        $backupsettings = ['comparison_providers' => 1, 'spend_failover_chain' => 1, 'failover_per_call_enabled' => 1];
+        if (array_intersect_key($pending, $backupsettings)) {
+            $problems = failover_verifier::static_problems();
+            if ($problems) {
+                \core\notification::add(
+                    get_string('verify:saved_warning', 'local_ai_course_assistant') . ' ' . implode(' ', array_map('s', $problems)),
+                    \core\notification::WARNING
+                );
+            }
+        }
         $report = self::describe($pending);
         if ($report['changed'] === 0) {
             return;

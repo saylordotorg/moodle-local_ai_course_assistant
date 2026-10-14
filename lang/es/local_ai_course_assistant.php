@@ -3364,3 +3364,16 @@ $string['settings:essay_provider'] = 'Proveedor para la retroalimentación de en
 $string['settings:essay_provider_desc'] = 'ID del proveedor (p. ej., <code>claude</code>, <code>openai</code>) para la retroalimentación de ensayos. Debe coincidir con una fila de Proveedores de comparación. Déjelo vacío para usar el proveedor del chat. Para que la sustitución se aplique, deben estar definidos tanto este campo como el modelo.';
 $string['settings:essay_model'] = 'Modelo para la retroalimentación de ensayos';
 $string['settings:essay_model_desc'] = 'Nombre del modelo para la retroalimentación de ensayos, p. ej., <code>claude-haiku-4-5</code>. En la prueba comparativa de octubre de 2026, los modelos de Claude dieron una retroalimentación de ensayos claramente mejor que Gemini 2.5 Flash o GPT-4o mini. Déjelo vacío para usar el modelo del chat.';
+
+$string['ai_course_assistant:viewaudit'] = 'Ver el registro de auditoría del tutor de IA';
+$string['task:verify_failover'] = 'Comprobar los proveedores de respaldo de conmutación por error';
+$string['verify:missing_row'] = 'La cadena de conmutación por error incluye chat:{$a}, pero Proveedores de comparación no tiene ninguna fila llamada {$a}, así que esa entrada se omite.';
+$string['verify:missing_key'] = 'La fila {$a} de Proveedores de comparación no tiene clave de API, así que la entrada chat:{$a} se omite.';
+$string['verify:model_case'] = 'El modelo de {$a->label} está escrito como "{$a->model}". Los identificadores de modelo van en minúsculas y sin espacios (pruebe {$a->suggest}); un nombre para mostrar puede hacer fallar cada conmutación real mientras el selector de LLM del administrador sigue funcionando.';
+$string['verify:no_backup'] = 'La conmutación por llamada está activada, pero ninguna entrada de chat en Cadena de conmutación por error conduce a un proveedor, así que no hay respaldo.';
+$string['verify:saved_warning'] = 'Revise la configuración de conmutación por error:';
+$string['check:failover_name'] = 'Proveedores de respaldo de AI Course Assistant';
+$string['check:failover_ok'] = 'Los {$a} proveedores de respaldo respondieron en la última comprobación.';
+$string['check:failover_failing'] = 'El proveedor de respaldo {$a->label} ({$a->model}) falló en su última comprobación: {$a->detail}';
+$string['check:failover_none'] = 'No hay ningún proveedor de respaldo configurado para el chat.';
+$string['check:failover_unverified'] = 'Los proveedores de respaldo aún no se han comprobado. La tarea diaria los comprobará, o ejecute php local/ai_course_assistant/admin/cli/verify_failover.php.';

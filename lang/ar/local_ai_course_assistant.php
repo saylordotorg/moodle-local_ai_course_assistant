@@ -3335,3 +3335,16 @@ $string['settings:essay_provider'] = 'مزوّد التعليقات على ال�
 $string['settings:essay_provider_desc'] = 'معرّف المزوّد (مثل <code>claude</code> أو <code>openai</code>) للتعليقات على المقالات. يجب أن يطابق صفًا في مزوّدي المقارنة. اتركه فارغًا لاستخدام مزوّد الدردشة. يجب ضبط هذا الحقل والنموذج معًا حتى يُطبَّق التجاوز.';
 $string['settings:essay_model'] = 'نموذج التعليقات على المقالات';
 $string['settings:essay_model_desc'] = 'اسم النموذج للتعليقات على المقالات، مثل <code>claude-haiku-4-5</code>. في اختبار المقارنة في أكتوبر 2026 قدّمت نماذج Claude تعليقات على المقالات أفضل بوضوح من Gemini 2.5 Flash أو GPT-4o mini. اتركه فارغًا لاستخدام نموذج الدردشة.';
+
+$string['ai_course_assistant:viewaudit'] = 'عرض سجل التدقيق الخاص بمدرّس الذكاء الاصطناعي';
+$string['task:verify_failover'] = 'فحص مزوّدي النسخ الاحتياطي للتحويل التلقائي';
+$string['verify:missing_row'] = 'تسرد سلسلة التحويل التلقائي chat:{$a}، لكن مزودو المقارنة لا يحتوي على صف باسم {$a}، لذا يتم تخطي هذا الإدخال.';
+$string['verify:missing_key'] = 'الصف {$a} في مزودو المقارنة بلا مفتاح API، لذا يتم تخطي إدخال التحويل التلقائي chat:{$a}.';
+$string['verify:model_case'] = 'تمت كتابة النموذج الخاص بـ {$a->label} على النحو "{$a->model}". معرّفات النماذج بأحرف صغيرة ودون مسافات (جرّب {$a->suggest})؛ فالاسم المعروض قد يُفشل كل تحويل تلقائي فعلي بينما يظل منتقي LLM الخاص بالمسؤول يعمل.';
+$string['verify:no_backup'] = 'التحويل التلقائي لكل استدعاء مفعّل، لكن لا يوجد إدخال دردشة في سلسلة التجاوز عند الفشل يشير إلى مزوّد، لذا لا توجد نسخة احتياطية.';
+$string['verify:saved_warning'] = 'راجع إعدادات التحويل التلقائي لديك:';
+$string['check:failover_name'] = 'مزوّدو النسخ الاحتياطي لـ AI Course Assistant';
+$string['check:failover_ok'] = 'ردّ جميع مزوّدي النسخ الاحتياطي ({$a}) على آخر فحص.';
+$string['check:failover_failing'] = 'فشل مزوّد النسخ الاحتياطي {$a->label} ({$a->model}) في آخر فحص: {$a->detail}';
+$string['check:failover_none'] = 'لم يتم إعداد أي مزوّد نسخ احتياطي للدردشة.';
+$string['check:failover_unverified'] = 'لم يتم فحص مزوّدي النسخ الاحتياطي بعد. ستفحصهم المهمة اليومية، أو شغّل php local/ai_course_assistant/admin/cli/verify_failover.php.';

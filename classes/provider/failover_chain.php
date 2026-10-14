@@ -82,6 +82,21 @@ class failover_chain implements provider_interface {
     /** @var int v7.8.8: longest provider error text a failover audit row keeps. */
     public const DETAIL_LIMIT = 300;
 
+    /** @var int v7.8.8: counted failures in a row that open a circuit. */
+    public const FAILURES_TO_OPEN = 2;
+
+    /** @var int v7.8.8: seconds inside which those failures must fall. */
+    public const FAILURE_WINDOW = 60;
+
+    /**
+     * @var string v7.8.8: phrases a provider uses when a 400 is about the account or key and not the request.
+     * Kept specific on purpose: a provider can quote part of a request in an error, and a learner must not be
+     * able to open a circuit by typing a common word such as "credit".
+     */
+    private const ACCOUNT_LEVEL_BODY = '/valid api key|api key (?:not valid|is (?:invalid|missing|expired))|credit balance'
+        . '|insufficient (?:credit|quota|funds)|billing|usage limits?|spend(?:ing)? (?:limit|cap)'
+        . '|exceeded your (?:current )?quota|account (?:is )?(?:disabled|suspended|deactivated)/i';
+
     /**
      * @param provider_interface $primary
      * @param string $primarylabel Label of the primary, used for circuit-state lookups.
@@ -123,13 +138,13 @@ class failover_chain implements provider_interface {
         $attempts = [];
         $primaryfailed = false;
         foreach ($chain as $i => $entry) {
-            if ($this->is_circuit_open($entry['label'])) {
+            if ($this->is_circuit_open($entry)) {
                 continue;
             }
             $start = microtime(true);
             try {
                 $result = $entry['provider']->chat_completion($systemprompt, $messages, $options);
-                $this->record_success($entry['label']);
+                $this->record_success($entry);
                 $this->lastused = $entry['provider'];
                 if ($primaryfailed) {
                     $this->audit_rescued($entry);
@@ -144,7 +159,7 @@ class failover_chain implements provider_interface {
                 if ($trimmed) {
                     try {
                         $result = $entry['provider']->chat_completion($systemprompt, $trimmed, $options);
-                        $this->record_success($entry['label']);
+                        $this->record_success($entry);
                         $this->lastused = $entry['provider'];
                         $this->audit_trimmed($entry, 'rescued', count($messages), count($trimmed), $e);
                         if ($primaryfailed) {
@@ -155,8 +170,8 @@ class failover_chain implements provider_interface {
                         $this->audit_trimmed($entry, 'failed', count($messages), count($trimmed), $e, $retryerror);
                     }
                 }
-                $this->open_circuit($entry['label'], $e);
-                $this->audit_fallthrough($entry, $e, $elapsed);
+                $circuit = $this->note_failure($entry, $e);
+                $this->audit_fallthrough($entry, $e, $elapsed, $circuit);
                 $primaryfailed = $primaryfailed || $i === 0;
                 $firsterr = $firsterr ?? $e;
                 $attempts[] = $entry['label'] . ': ' . $e->getMessage();
@@ -196,7 +211,7 @@ class failover_chain implements provider_interface {
         $attempts = [];
         $primaryfailed = false;
         foreach ($chain as $i => $entry) {
-            if ($this->is_circuit_open($entry['label'])) {
+            if ($this->is_circuit_open($entry)) {
                 continue;
             }
             $firsttokenreceived = false;
@@ -215,7 +230,7 @@ class failover_chain implements provider_interface {
                         'No tokens received from ' . $entry['label']
                     );
                 }
-                $this->record_success($entry['label']);
+                $this->record_success($entry);
                 $this->lastused = $entry['provider'];
                 if ($primaryfailed) {
                     $this->audit_rescued($entry);
@@ -244,7 +259,7 @@ class failover_chain implements provider_interface {
                                 'No tokens received from ' . $entry['label']
                             );
                         }
-                        $this->record_success($entry['label']);
+                        $this->record_success($entry);
                         $this->lastused = $entry['provider'];
                         $this->audit_trimmed($entry, 'rescued', count($messages), count($trimmed), $e);
                         if ($primaryfailed) {
@@ -259,8 +274,8 @@ class failover_chain implements provider_interface {
                         $this->audit_trimmed($entry, 'failed', count($messages), count($trimmed), $e, $retryerror);
                     }
                 }
-                $this->open_circuit($entry['label'], $e);
-                $this->audit_fallthrough($entry, $e, $elapsed);
+                $circuit = $this->note_failure($entry, $e);
+                $this->audit_fallthrough($entry, $e, $elapsed, $circuit);
                 $primaryfailed = $primaryfailed || $i === 0;
                 $firsterr = $firsterr ?? $e;
                 $attempts[] = $entry['label'] . ': ' . $e->getMessage();
@@ -343,32 +358,116 @@ class failover_chain implements provider_interface {
     }
 
     /**
-     * Check whether a circuit is currently open against the given label.
-     * Open == cache hit AND opened_at is within the back-off window.
+     * Which circuit a chain member belongs to: its label plus a fingerprint of
+     * the model, base URL and key it is using.
+     *
+     * v7.8.8. The circuit used to be keyed by label alone, so one course's stale
+     * key (BUS101, 2026-10-11) or one failing model opened the circuit for every
+     * course that shares the label and failed 232 of 705 messages across 15
+     * courses. A member now only shares a circuit with members that would fail
+     * the same way: same key, same model, same endpoint. Providers that do not
+     * describe themselves (test doubles) keep the label-only behaviour.
      *
      * @param string $label
-     * @return bool
+     * @param provider_interface $provider
+     * @return string
      */
-    private function is_circuit_open(string $label): bool {
-        $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
-        $entry = $cache->get('label_' . $label);
-        if (!is_array($entry) || empty($entry['opened_at'])) {
-            return false;
-        }
-        // TTL is 900s on the cache; a hit here means the back-off is still in effect.
-        return true;
+    public static function circuit_scope(string $label, provider_interface $provider): string {
+        $identity = method_exists($provider, 'circuit_identity') ? (string) $provider->circuit_identity() : '';
+        return $identity === '' ? $label : $label . '|' . $identity;
     }
 
     /**
-     * Open the circuit for a label. Stores the opened-at timestamp plus
+     * What a failure should do to its circuit.
+     *
+     *  - 'none': the provider answered and called THIS request malformed (HTTP
+     *    400, 413, 422). The provider is healthy; one conversation's history or
+     *    one learner's message must not block everyone behind it.
+     *  - 'immediate': a fault that will not clear on its own and applies to every
+     *    request on this key and model: a rejected key (401, 403), an unknown
+     *    model (404), or a 400 whose body speaks of the account (an invalid key,
+     *    exhausted credit, a usage or spend limit, a disabled project).
+     *  - 'counted': anything else (rate limits, 5xx, timeouts, empty streams).
+     *    These come and go, so the circuit opens only on the second in a row
+     *    inside FAILURE_WINDOW seconds.
+     *
+     * @param \Throwable $error
+     * @return string 'none', 'immediate' or 'counted'
+     */
+    public static function circuit_effect(\Throwable $error): string {
+        if ($error instanceof model_not_found_exception) {
+            return 'immediate';
+        }
+        if ($error instanceof \moodle_exception && $error->errorcode === 'chat:error_auth') {
+            return 'immediate';
+        }
+        if ($error instanceof provider_http_exception) {
+            if (preg_match(self::ACCOUNT_LEVEL_BODY, $error->body)) {
+                return 'immediate';
+            }
+            if (in_array($error->status, [400, 413, 422], true)) {
+                return 'none';
+            }
+        }
+        return 'counted';
+    }
+
+    /**
+     * Check whether a circuit is currently open for a chain member.
+     * Open == cache hit; the cache TTL is the back-off window.
+     *
+     * @param array $entry Chain entry: ['provider' => provider_interface, 'label' => string].
+     * @return bool
+     */
+    private function is_circuit_open(array $entry): bool {
+        $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
+        $scope = self::circuit_scope($entry['label'], $entry['provider']);
+        $found = $cache->get('circuit_' . $scope);
+        return is_array($found) && !empty($found['opened_at']);
+    }
+
+    /**
+     * Apply a failure to its circuit and say what happened.
+     *
+     * @param array $entry The failed chain member.
+     * @param \Throwable $error
+     * @return string 'opened', 'counting' (one failure so far, circuit still closed) or 'unaffected'.
+     */
+    private function note_failure(array $entry, \Throwable $error): string {
+        $effect = self::circuit_effect($error);
+        if ($effect === 'none') {
+            return 'unaffected';
+        }
+        $scope = self::circuit_scope($entry['label'], $entry['provider']);
+        if ($effect === 'counted') {
+            $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
+            $now = time();
+            $seen = $cache->get('fails_' . $scope);
+            if (!is_array($seen) || ($now - (int) ($seen['first'] ?? 0)) > self::FAILURE_WINDOW) {
+                $seen = ['n' => 0, 'first' => $now];
+            }
+            $seen['n']++;
+            if ($seen['n'] < self::FAILURES_TO_OPEN) {
+                $cache->set('fails_' . $scope, $seen);
+                return 'counting';
+            }
+            $cache->delete('fails_' . $scope);
+        }
+        $this->open_circuit($entry, $scope, $error);
+        return 'opened';
+    }
+
+    /**
+     * Open the circuit for a chain member. Stores the opened-at timestamp plus
      * the error class so the audit row can describe what tripped it.
      *
-     * @param string $label
+     * @param array $entry
+     * @param string $scope
      * @param \Throwable $error
      */
-    private function open_circuit(string $label, \Throwable $error): void {
+    private function open_circuit(array $entry, string $scope, \Throwable $error): void {
         $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
-        $cache->set('label_' . $label, [
+        $cache->set('circuit_' . $scope, [
             'opened_at' => time(),
             'error'     => get_class($error),
         ]);
@@ -379,7 +478,9 @@ class failover_chain implements provider_interface {
                     (int) $this->options['userid'],
                     (int) $this->options['courseid'],
                     [
-                        'label'      => $label,
+                        'label'      => $entry['label'],
+                        'failed_model' => method_exists($entry['provider'], 'model_id')
+                            ? (string) $entry['provider']->model_id() : '',
                         'error_class' => get_class($error),
                         // v7.8.8: what the provider said, redacted and bounded.
                         // The class alone is 'moodle_exception' for every
@@ -395,22 +496,17 @@ class failover_chain implements provider_interface {
     }
 
     /**
-     * Record a successful call. Currently a no-op for the circuit cache
-     * because Moodle MUC doesn't expose a "decrement and close on N hits"
-     * primitive that would let us implement the three-consecutive-successes
-     * closing rule without a race. The 900s TTL on the open-circuit entry
-     * is the floor on how long a label stays open; in practice this means
-     * an opened circuit stays open for the full 15-minute window, then is
-     * tried again on the next call.
+     * Record a successful call: it ends any run of failures being counted for
+     * this member, so only failures in a row open a circuit.
      *
-     * Leaving the hook here so a future iteration can use a counter table
-     * for fine-grained recovery.
+     * An OPEN circuit still closes only when its TTL runs out: Moodle MUC has no
+     * "decrement and close on N hits" primitive that avoids a race.
      *
-     * @param string $label
+     * @param array $entry
      */
-    private function record_success(string $label): void {
-        // Reserved for future fine-grained recovery. Today: rely on the
-        // cache TTL to close the circuit.
+    private function record_success(array $entry): void {
+        $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
+        $cache->delete('fails_' . self::circuit_scope($entry['label'], $entry['provider']));
     }
 
     /**
@@ -450,8 +546,9 @@ class failover_chain implements provider_interface {
      * @param array $failed The failed chain entry: ['provider' => provider_interface, 'label' => string].
      * @param \Throwable $error What the provider threw.
      * @param float $elapsedseconds
+     * @param string $circuit What the failure did to the circuit: opened, counting or unaffected.
      */
-    private function audit_fallthrough(array $failed, \Throwable $error, float $elapsedseconds): void {
+    private function audit_fallthrough(array $failed, \Throwable $error, float $elapsedseconds, string $circuit = ''): void {
         if (empty($this->options['audit'])) {
             return;
         }
@@ -474,6 +571,9 @@ class failover_chain implements provider_interface {
                     // exception's message, which for a provider failure is the
                     // same "Sorry, something went wrong" every time.
                     'detail'       => self::describe_failure($error),
+                    // v7.8.8: opened, counting (first failure of a run) or unaffected
+                    // (a request the provider called malformed).
+                    'circuit'      => $circuit,
                     'latency_ms'   => (int) round($elapsedseconds * 1000),
                 ]
             );
@@ -521,7 +621,7 @@ class failover_chain implements provider_interface {
      * @return array
      */
     private static function trimmed_history_for_retry(\Throwable $error, array $messages): array {
-        if (!($error instanceof provider_http_exception) || !in_array($error->status, [400, 413, 422], true)) {
+        if (!($error instanceof provider_http_exception) || self::circuit_effect($error) !== 'none') {
             return [];
         }
         return \local_ai_course_assistant\history_trimmer::retry_candidate($messages);

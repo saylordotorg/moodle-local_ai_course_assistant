@@ -3376,3 +3376,16 @@ $string['settings:essay_provider'] = 'ספק למשוב על חיבורים';
 $string['settings:essay_provider_desc'] = 'מזהה הספק (למשל <code>claude</code>, <code>openai</code>) למשוב על חיבורים. חייב להתאים לשורה בספקי השוואה. השאירו ריק כדי להשתמש בספק הצ\'אט. יש להגדיר גם שדה זה וגם את המודל כדי שההחלפה תחול.';
 $string['settings:essay_model'] = 'מודל למשוב על חיבורים';
 $string['settings:essay_model_desc'] = 'שם המודל למשוב על חיבורים, למשל <code>claude-haiku-4-5</code>. במבחן ההשוואה של אוקטובר 2026 מודלי Claude נתנו משוב טוב בבירור יותר על חיבורים מאשר Gemini 2.5 Flash או GPT-4o mini. השאירו ריק כדי להשתמש במודל הצ\'אט.';
+
+$string['ai_course_assistant:viewaudit'] = 'הצגת יומן הביקורת של מורה ה-AI';
+$string['task:verify_failover'] = 'בדיקת ספקי הגיבוי של מעבר הכשל';
+$string['verify:missing_row'] = 'שרשרת מעבר הכשל כוללת את chat:{$a}, אך ב-ספקי השוואה אין שורה בשם {$a}, ולכן הרשומה מדולגת.';
+$string['verify:missing_key'] = 'בשורה {$a} ב-ספקי השוואה אין מפתח API, ולכן רשומת מעבר הכשל chat:{$a} מדולגת.';
+$string['verify:model_case'] = 'המודל של {$a->label} נכתב כ-"{$a->model}". מזהי מודלים נכתבים באותיות קטנות וללא רווחים (נסו {$a->suggest}); שם תצוגה עלול לגרום לכל מעבר כשל אמיתי להיכשל בעוד בורר ה-LLM של המנהל ממשיך לעבוד.';
+$string['verify:no_backup'] = 'מעבר כשל לכל קריאה פעיל, אך אף רשומת צ\'אט ב-שרשרת גיבוי אינה מובילה לספק, ולכן אין גיבוי.';
+$string['verify:saved_warning'] = 'בדקו את הגדרות מעבר הכשל שלכם:';
+$string['check:failover_name'] = 'ספקי הגיבוי של AI Course Assistant';
+$string['check:failover_ok'] = 'כל {$a} ספקי הגיבוי השיבו בבדיקה האחרונה.';
+$string['check:failover_failing'] = 'ספק הגיבוי {$a->label} ({$a->model}) נכשל בבדיקה האחרונה: {$a->detail}';
+$string['check:failover_none'] = 'לא הוגדר ספק גיבוי לצ\'אט.';
+$string['check:failover_unverified'] = 'ספקי הגיבוי טרם נבדקו. המשימה היומית תבדוק אותם, או הריצו את php local/ai_course_assistant/admin/cli/verify_failover.php.';

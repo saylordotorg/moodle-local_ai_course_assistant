@@ -3335,3 +3335,16 @@ $string['settings:essay_provider'] = 'Leverandør for tilbakemelding på essay';
 $string['settings:essay_provider_desc'] = 'Leverandør-ID (f.eks. <code>claude</code>, <code>openai</code>) for tilbakemelding på essay. Må samsvare med en rad under Sammenligningsleverandører. La stå tomt for å bruke chat-leverandøren. Både dette feltet og modellen må settes for at overstyringen skal gjelde.';
 $string['settings:essay_model'] = 'Modell for tilbakemelding på essay';
 $string['settings:essay_model_desc'] = 'Modellnavn for tilbakemelding på essay, f.eks. <code>claude-haiku-4-5</code>. I referansetesten i oktober 2026 ga Claude-modeller tydelig bedre tilbakemelding på essay enn Gemini 2.5 Flash eller GPT-4o mini. La stå tomt for å bruke chat-modellen.';
+
+$string['ai_course_assistant:viewaudit'] = 'Vis revisjonsloggen for AI-veilederen';
+$string['task:verify_failover'] = 'Kontroller sikkerhetskopileverandører for failover';
+$string['verify:missing_row'] = 'Failover-kjeden inneholder chat:{$a}, men Sammenligningsleverandører har ingen rad som heter {$a}, så oppføringen hoppes over.';
+$string['verify:missing_key'] = 'Raden {$a} i Sammenligningsleverandører har ingen API-nøkkel, så failover-oppføringen chat:{$a} hoppes over.';
+$string['verify:model_case'] = 'Modellen for {$a->label} er skrevet som "{$a->model}". Modell-ID-er skrives med små bokstaver og uten mellomrom (prøv {$a->suggest}); et visningsnavn kan få hver reelle failover til å feile mens administratorens LLM-velger fortsatt fungerer.';
+$string['verify:no_backup'] = 'Failover per kall er slått på, men ingen chat-oppføring i Failover-kjede fører til en leverandør, så det finnes ingen sikkerhetskopi.';
+$string['verify:saved_warning'] = 'Kontroller failover-innstillingene dine:';
+$string['check:failover_name'] = 'AI Course Assistant sikkerhetskopileverandører';
+$string['check:failover_ok'] = 'Alle {$a} sikkerhetskopileverandører svarte ved siste kontroll.';
+$string['check:failover_failing'] = 'Sikkerhetskopileverandøren {$a->label} ({$a->model}) feilet ved siste kontroll: {$a->detail}';
+$string['check:failover_none'] = 'Ingen sikkerhetskopileverandør er konfigurert for chat.';
+$string['check:failover_unverified'] = 'Sikkerhetskopileverandørene er ikke kontrollert ennå. Den daglige oppgaven kontrollerer dem, eller kjør php local/ai_course_assistant/admin/cli/verify_failover.php.';

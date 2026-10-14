@@ -3364,3 +3364,16 @@ $string['settings:essay_provider'] = 'የጽሑፍ አስተያየት አቅራ�
 $string['settings:essay_provider_desc'] = 'ለጽሑፍ አስተያየት የአቅራቢ መታወቂያ (ለምሳሌ <code>claude</code>፣ <code>openai</code>)። በንጽጽር አቅራቢዎች ውስጥ ካለ አንድ ረድፍ ጋር መመሳሰል አለበት። የውይይት አቅራቢውን ለመጠቀም ባዶ ይተዉ። መተካቱ እንዲተገበር ይህ መስክና ሞዴሉ ሁለቱም መዘጋጀት አለባቸው።';
 $string['settings:essay_model'] = 'የጽሑፍ አስተያየት ሞዴል';
 $string['settings:essay_model_desc'] = 'ለጽሑፍ አስተያየት የሞዴል ስም፣ ለምሳሌ <code>claude-haiku-4-5</code>። በጥቅምት 2026 ንጽጽር ፈተና የClaude ሞዴሎች ከGemini 2.5 Flash ወይም ከGPT-4o mini በግልጽ የተሻለ የጽሑፍ አስተያየት ሰጥተዋል። የውይይት ሞዴሉን ለመጠቀም ባዶ ይተዉ።';
+
+$string['ai_course_assistant:viewaudit'] = 'የ AI አስተማሪ የኦዲት ምዝግብ ማስታወሻን ይመልከቱ';
+$string['task:verify_failover'] = 'የፋይልኦቨር ምትኬ አቅራቢዎችን ይፈትሹ';
+$string['verify:missing_row'] = 'የፋይልኦቨር ሰንሰለቱ chat:{$a}ን ይዘረዝራል፣ ነገር ግን የንጽጽር አቅራቢዎች ውስጥ {$a} የሚባል ረድፍ የለም፤ ስለዚህ ያ ግቤት ይዘለላል።';
+$string['verify:missing_key'] = 'በ የንጽጽር አቅራቢዎች ውስጥ ያለው ረድፍ {$a} የኤፒአይ ቁልፍ የለውም፤ ስለዚህ የፋይልኦቨር ግቤት chat:{$a} ይዘለላል።';
+$string['verify:model_case'] = 'የ{$a->label} ሞዴል "{$a->model}" ተብሎ ተጽፏል። የሞዴል መለያዎች ትንንሽ ፊደላት ሲሆኑ ክፍተት የላቸውም ({$a->suggest} ይሞክሩ)፤ የማሳያ ስም የአስተዳዳሪው LLM መራጭ እየሰራ ሳለ እያንዳንዱን እውነተኛ ፋይልኦቨር ሊያከሽፍ ይችላል።';
+$string['verify:no_backup'] = 'በእያንዳንዱ ጥሪ ፋይልኦቨር በርቷል፣ ነገር ግን በየመተኪያ ሰንሰለት ውስጥ ወደ አቅራቢ የሚደርስ የቻት ግቤት የለም፤ ስለዚህ ምትኬ የለም።';
+$string['verify:saved_warning'] = 'የፋይልኦቨር ቅንብሮችዎን ያረጋግጡ፦';
+$string['check:failover_name'] = 'የ AI Course Assistant ምትኬ አቅራቢዎች';
+$string['check:failover_ok'] = 'ሁሉም {$a} ምትኬ አቅራቢዎች ለመጨረሻው ፍተሻ ምላሽ ሰጥተዋል።';
+$string['check:failover_failing'] = 'የምትኬ አቅራቢው {$a->label} ({$a->model}) የመጨረሻ ፍተሻውን አልፏል አልተሳካም፦ {$a->detail}';
+$string['check:failover_none'] = 'ለቻት ምንም የምትኬ አቅራቢ አልተዋቀረም።';
+$string['check:failover_unverified'] = 'የምትኬ አቅራቢዎቹ እስካሁን አልተፈተሹም። ዕለታዊው ተግባር ይፈትሻቸዋል፣ ወይም php local/ai_course_assistant/admin/cli/verify_failover.php ን ያሂዱ።';

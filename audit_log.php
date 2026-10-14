@@ -37,7 +37,7 @@
 
 require_once(__DIR__ . '/../../config.php');
 require_login();
-require_capability('moodle/site:config', \context_system::instance());
+\local_ai_course_assistant\audit_access::require_view();
 
 use local_ai_course_assistant\audit_logger;
 use local_ai_course_assistant\branding;

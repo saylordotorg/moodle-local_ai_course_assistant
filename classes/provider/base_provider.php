@@ -845,45 +845,7 @@ abstract class base_provider implements provider_interface {
             try {
                 $chain = spend_guard::resolve_failover_chain('chat');
                 if (!empty($chain)) {
-                    $fallbacks = [];
-                    foreach ($chain as $entry) {
-                        $entryoverrides = $overrides;
-                        $entryoverrides['provider'] = $entry['provider'];
-                        $entryoverrides['apikey']   = $entry['apikey'];
-                        // v5.5.2: per-row base URL override flows from
-                        // comparison_providers through resolve_failover_chain.
-                        if (!empty($entry['apibaseurl'])) {
-                            $entryoverrides['apibaseurl'] = $entry['apibaseurl'];
-                        } else {
-                            // Make sure a parent override doesn't leak into
-                            // a row that didn't set one.
-                            unset($entryoverrides['apibaseurl']);
-                        }
-                        // v7.2.8: do not carry the primary's model onto a
-                        // different provider. $overrides (and, when it is empty,
-                        // the global `model` setting read in the constructor)
-                        // meant an openai fallback behind a gemini primary was
-                        // asked for "gemini-2.5-flash" and answered HTTP 404
-                        // "model not found" -- so the failover could never
-                        // succeed, and the error blamed a model name that was
-                        // correct. Prefer the model column of the
-                        // comparison_providers row; otherwise let the fallback
-                        // use its own default.
-                        if (!empty($entry['model'])) {
-                            $entryoverrides['model'] = $entry['model'];
-                        } else {
-                            unset($entryoverrides['model']);
-                        }
-                        $fallbackprovider = self::instantiate($entry['provider'], $entryoverrides);
-                        if (empty($entry['model'])
-                                && strtolower((string) $entry['provider']) !== strtolower((string) $provider)) {
-                            $fallbackprovider->use_default_model();
-                        }
-                        $fallbacks[] = [
-                            'provider' => $fallbackprovider,
-                            'label'    => $entry['label'],
-                        ];
-                    }
+                    $fallbacks = self::build_fallbacks($provider, $overrides, $chain);
                     global $USER;
                     $primarylabel = self::label_for_active_provider($provider, $overrides);
                     $rawtimeout = get_config('local_ai_course_assistant', 'failover_timeout_chat');
@@ -906,6 +868,77 @@ abstract class base_provider implements provider_interface {
         }
 
         return $primary;
+    }
+
+    /**
+     * A short fingerprint of what this instance would send: model, base URL and
+     * key. The failover chain scopes its circuits by it (v7.8.8), so a stale key
+     * on one course cannot open the circuit for every course sharing the label.
+     * One-way and truncated, so it is safe in a cache key and reveals nothing.
+     *
+     * @return string
+     */
+    public function circuit_identity(): string {
+        return substr(hash('sha256', $this->model . '|' . $this->baseurl . '|' . $this->apikey), 0, 12);
+    }
+
+    /**
+     * Instantiate the failover chain's fallback providers, exactly as a chat
+     * turn builds them.
+     *
+     * Shared by create_from_config() and by the failover verifier, so the check
+     * of a backup provider sends the same key, model string and base URL a real
+     * failover would. v7.8.8: before this the construction lived inline in
+     * create_from_config(), and the only way to test a fallback was the admin
+     * LLM picker, which does not send the row's model as typed (a capitalised
+     * "GPT-4o-mini" passed the picker and failed every real failover).
+     *
+     * @param string $provider The primary provider's id.
+     * @param array $overrides The primary's effective config.
+     * @param array $chain Entries from spend_guard::resolve_failover_chain('chat').
+     * @return array<int, array{provider: provider_interface, label: string}>
+     */
+    public static function build_fallbacks(string $provider, array $overrides, array $chain): array {
+        $fallbacks = [];
+        foreach ($chain as $entry) {
+            $entryoverrides = $overrides;
+            $entryoverrides['provider'] = $entry['provider'];
+            $entryoverrides['apikey']   = $entry['apikey'];
+            // v5.5.2: per-row base URL override flows from
+            // comparison_providers through resolve_failover_chain.
+            if (!empty($entry['apibaseurl'])) {
+                $entryoverrides['apibaseurl'] = $entry['apibaseurl'];
+            } else {
+                // Make sure a parent override doesn't leak into
+                // a row that didn't set one.
+                unset($entryoverrides['apibaseurl']);
+            }
+            // v7.2.8: do not carry the primary's model onto a
+            // different provider. $overrides (and, when it is empty,
+            // the global `model` setting read in the constructor)
+            // meant an openai fallback behind a gemini primary was
+            // asked for "gemini-2.5-flash" and answered HTTP 404
+            // "model not found" -- so the failover could never
+            // succeed, and the error blamed a model name that was
+            // correct. Prefer the model column of the
+            // comparison_providers row; otherwise let the fallback
+            // use its own default.
+            if (!empty($entry['model'])) {
+                $entryoverrides['model'] = $entry['model'];
+            } else {
+                unset($entryoverrides['model']);
+            }
+            $fallbackprovider = self::instantiate($entry['provider'], $entryoverrides);
+            if (empty($entry['model'])
+                    && strtolower((string) $entry['provider']) !== strtolower((string) $provider)) {
+                $fallbackprovider->use_default_model();
+            }
+            $fallbacks[] = [
+                'provider' => $fallbackprovider,
+                'label'    => $entry['label'],
+            ];
+        }
+        return $fallbacks;
     }
 
     /**

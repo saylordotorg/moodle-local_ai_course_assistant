@@ -328,4 +328,15 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        // v7.8.8: one tiny real request to each chat backup a day, so a backup that
+        // is misconfigured is found by this and not by the failover that needed it.
+        'classname' => \local_ai_course_assistant\task\verify_failover::class,
+        'blocking' => 0,
+        'minute' => '25',
+        'hour' => '4',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];

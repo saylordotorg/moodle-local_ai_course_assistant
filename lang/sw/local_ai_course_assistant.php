@@ -3381,3 +3381,16 @@ $string['settings:essay_provider'] = 'Mtoa huduma wa maoni kuhusu insha';
 $string['settings:essay_provider_desc'] = 'Kitambulisho cha mtoa huduma (mf. <code>claude</code>, <code>openai</code>) kwa maoni kuhusu insha. Lazima kilingane na safu katika Watoa huduma wa ulinganisho. Acha wazi ili kutumia mtoa huduma wa gumzo. Sehemu hii na muundo vyote lazima viwekwe ili ubatilishaji utumike.';
 $string['settings:essay_model'] = 'Muundo wa maoni kuhusu insha';
 $string['settings:essay_model_desc'] = 'Jina la muundo kwa maoni kuhusu insha, mf. <code>claude-haiku-4-5</code>. Katika jaribio la ulinganisho la Oktoba 2026, miundo ya Claude ilitoa maoni bora zaidi kuhusu insha kuliko Gemini 2.5 Flash au GPT-4o mini. Acha wazi ili kutumia muundo wa gumzo.';
+
+$string['ai_course_assistant:viewaudit'] = 'Tazama kumbukumbu ya ukaguzi ya mkufunzi wa AI';
+$string['task:verify_failover'] = 'Kagua watoa huduma mbadala wa failover';
+$string['verify:missing_row'] = 'Mnyororo wa failover unaorodhesha chat:{$a}, lakini Watoa huduma wa kulinganisha haina safu iitwayo {$a}, kwa hivyo ingizo hilo linarukwa.';
+$string['verify:missing_key'] = 'Safu {$a} katika Watoa huduma wa kulinganisha haina ufunguo wa API, kwa hivyo ingizo la failover chat:{$a} linarukwa.';
+$string['verify:model_case'] = 'Modeli ya {$a->label} imeandikwa kama "{$a->model}". Vitambulisho vya modeli ni herufi ndogo bila nafasi (jaribu {$a->suggest}); jina la kuonyesha linaweza kufanya kila failover halisi ishindwe huku kichagua LLM cha msimamizi kikiendelea kufanya kazi.';
+$string['verify:no_backup'] = 'Failover kwa kila simu imewashwa, lakini hakuna ingizo la gumzo katika Mnyororo wa akiba linaloongoza kwa mtoa huduma, kwa hivyo hakuna mbadala.';
+$string['verify:saved_warning'] = 'Angalia mipangilio yako ya failover:';
+$string['check:failover_name'] = 'Watoa huduma mbadala wa AI Course Assistant';
+$string['check:failover_ok'] = 'Watoa huduma mbadala wote {$a} walijibu ukaguzi wa mwisho.';
+$string['check:failover_failing'] = 'Mtoa huduma mbadala {$a->label} ({$a->model}) alishindwa katika ukaguzi wake wa mwisho: {$a->detail}';
+$string['check:failover_none'] = 'Hakuna mtoa huduma mbadala aliyesanidiwa kwa gumzo.';
+$string['check:failover_unverified'] = 'Watoa huduma mbadala bado hawajakaguliwa. Kazi ya kila siku itawakagua, au endesha php local/ai_course_assistant/admin/cli/verify_failover.php.';

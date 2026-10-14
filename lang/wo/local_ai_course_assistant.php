@@ -3358,3 +3358,16 @@ $string['settings:essay_provider'] = 'Jëfandikukat bu tontu ci bind';
 $string['settings:essay_provider_desc'] = 'ID bu jëfandikukat (misaal <code>claude</code>, <code>openai</code>) ngir tontu ci bind. War na àndak benn rëdd ci Jëfandikukat yu jubluñ. Bàyyil ko neen ngir jëfandikoo jëfandikukat bu waxtaan bi. War nañu def bërëb bii ak modèl bi ngir weccit bi mën a jëf.';
 $string['settings:essay_model'] = 'Modèl bu tontu ci bind';
 $string['settings:essay_model_desc'] = 'Tur modèl ngir tontu ci bind, misaal <code>claude-haiku-4-5</code>. Ci jéem bu Oktoobar 2026, modèl yu Claude jox nañu tontu ci bind bu gën a rafet ci Gemini 2.5 Flash walla GPT-4o mini. Bàyyil ko neen ngir jëfandikoo modèl bu waxtaan bi.';
+
+$string['ai_course_assistant:viewaudit'] = 'Xool jukki jaar-jaar bu jàngalekat AI bi';
+$string['task:verify_failover'] = 'Seetal ñi di jox ndimbal bu tëj ci failover';
+$string['verify:missing_row'] = 'Jéntu failover bi dafay lim chat:{$a}, waaye Yónent yi ñu mën a faral amul ligne bu tudd {$a}, moo tax ñuy jàllale ay yoon bi.';
+$string['verify:missing_key'] = 'Ligne {$a} bi ci Yónent yi ñu mën a faral amul caabi API, moo tax ñuy jàllale yoon bu failover chat:{$a}.';
+$string['verify:model_case'] = 'Modèle bu {$a->label} dañu ko bind niki "{$a->model}". ID yu modèle yi di ay araf yu ndaw te amul palaas (jéemal {$a->suggest}); tur bu ñuy wone mën na xañ ay failover yu dëgg ñepp ba tay, ak sax tànnkat LLM bu administratër bi di liggéey.';
+$string['verify:no_backup'] = 'Failover ci kaw woote ngi tàmbali, waaye amul dugg bu chat ci Cangu wutal buy yóbbu ci ku jox ndimbal, moo tax amul ndimbal.';
+$string['verify:saved_warning'] = 'Seetal sa failover yi:';
+$string['check:failover_name'] = 'Ñi di jox ndimbal ci AI Course Assistant';
+$string['check:failover_ok'] = 'Ñi di jox ndimbal {$a} yépp tontu nañu ci seetlu bu mujj bi.';
+$string['check:failover_failing'] = 'Ki di jox ndimbal {$a->label} ({$a->model}) daa wéy ci seetlu bu mujj bi: {$a->detail}';
+$string['check:failover_none'] = 'Amul ki di jox ndimbal ñu setal ko ngir chat bi.';
+$string['check:failover_unverified'] = 'Ñi di jox ndimbal seetuñu leen ba tay. Liggéey bu bés bi dina leen seet, mbaa tàmbali php local/ai_course_assistant/admin/cli/verify_failover.php.';
