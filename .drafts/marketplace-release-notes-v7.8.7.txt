@@ -5,3 +5,5 @@ When a learner has saved a SOLA language and writes in a different one, SOLA ask
 Also in recent releases: SOLA chooses the language of each reply by the language the question is written in, then the saved language, then the browser's language, in 46 languages (7.8.5), and the starter chips return on any switch back to Chat (7.8.6).
 
 Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.
+
+Tested on Moodle 5.3: SOLA is now also tested on Moodle 5.3 on a live site, and every release from here on will be tested there too.

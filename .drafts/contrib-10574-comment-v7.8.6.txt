@@ -1,0 +1,15 @@
+Hi Volodymyr,
+
+I have uploaded v7.8.6 (build 2026100904) as a new version on the Marketplace submission. It supersedes the versions uploaded since my last comment (v7.8.2), so this lists what changed in v7.8.3 to v7.8.6. Nothing in them changes the fixes for your findings.
+https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/tag/v7.8.6
+
+* **v7.8.3** rewrites practice quiz wrong answers that gave themselves away with an absolute word ("all", "only", "exact"), and evens out answer length so the longest choice is no longer the likely key.
+* **v7.8.4** keeps a chat answer's source link when the chat is reloaded. The link was stripped from the saved copy, so a grounded answer looked ungrounded. The source is now stored in a new nullable column added by the upgrade and is checked against the reader's access when it is drawn, so a hidden or deleted activity links to the course and its name is never shown. Course backup and restore carry the field.
+* **v7.8.5** makes SOLA reply in the language the question is written in, then the learner's saved language, then the browser's, in 46 languages. It asks in chat before changing a saved language, and the setting changes only if the learner agrees. A reloaded chat redraws the question buttons without storing the question twice.
+* **v7.8.6** fixes a defect I found testing v7.8.5 in a browser: the starter chips did not return when a learner switched to Chat from the Voice, History or Progress tabs.
+
+Verification: 2,320 tests, 0 failures, 7 skipped. CI covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on MariaDB and PostgreSQL.
+
+Thanks again,
+
+Tom

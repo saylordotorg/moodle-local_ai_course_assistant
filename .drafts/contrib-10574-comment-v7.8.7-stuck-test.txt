@@ -1,0 +1,18 @@
+Hi Volodymyr,
+
+The automated test for v7.8.6 (build 2026100904) on this submission has shown "Automated test in progress" since I uploaded it at 04:21 UTC on 10 October 2026. That's about 15 hours now. While it shows that, the "Add a new version" page sends me back to the tracker, so I can't upload the newer build.
+
+Could you check whether that test is stuck, and clear or re-run it? I'm happy to re-upload if that's easier.
+
+The build waiting to go up is v7.8.7 (build 2026100905). It supersedes v7.8.6, and nothing in it changes the fixes for your findings.
+https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/tag/v7.8.7
+
+* **v7.8.7** makes the in-chat question about switching a saved language appear reliably on lighter models. The language rule now sits at the end of the instructions the model reads and names English as a language like any other. It changes prompt text only, with no database or settings changes.
+
+Moodle 5.3: SOLA is now also tested on Moodle 5.3 on a live site (smoke tests of chat, quiz, voice and the admin pages), and every release from here on will be tested there too.
+
+Verification: 2,322 tests, 0 failures, 7 skipped. CI covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on MariaDB and PostgreSQL.
+
+Thanks,
+
+Tom
