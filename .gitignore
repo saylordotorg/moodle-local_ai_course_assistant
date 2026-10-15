@@ -50,3 +50,5 @@ secrets.json
 credentials.json
 service-account*.json
 .wiki/
+
+scripts/e2e_failover/mock.log

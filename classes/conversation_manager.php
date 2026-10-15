@@ -973,24 +973,21 @@ class conversation_manager {
     /**
      * What to store as stream_outcome for a turn that ended in an exception.
      *
-     * 'provider_error' means the provider (or the setup that should have reached one) failed, and is what
-     * the unanswered-question alert and the model-switch watcher count as a failure. A chat that was
-     * stopped on purpose (the emergency pause) or refused by a guard before any provider was reached
-     * (spend cap, quiz lock, rate limit, off-topic lock) is 'blocked': the learner did not get an answer
-     * and was told why, but nothing is broken.
+     * 'blocked' only for a turn refused ON PURPOSE before any provider was asked: the emergency pause, or
+     * a guard that threw provider\chat_refused_exception (quiz lock, request rate limit, a spend cap with no
+     * failover). The learner did not get an answer and was told why, but nothing is broken. Every other
+     * exception is 'provider_error', which the unanswered-question alert and the model-switch watcher count
+     * as a failure: a provider error, a setup fault, and also a database or coding error while building the
+     * prompt, because a site-wide fault of that kind must not look like a refusal.
      *
      * @param bool $paused Chat was stopped by the emergency control.
-     * @param bool $providerbuilt A provider object had been created when the exception arrived.
-     * @param string $errorcode The exception's error code.
+     * @param \Throwable $error What the turn ended in.
      * @return string 'provider_error' or 'blocked'
      */
-    public static function failed_turn_outcome(bool $paused, bool $providerbuilt, string $errorcode): string {
-        if ($paused) {
-            return 'blocked';
-        }
-        // chat:error, chat:error_auth, chat:error_notconfigured, chat:error_unavailable... are provider or
-        // setup faults. A guard refuses with the generic 'error' code and a message for the learner.
-        return ($providerbuilt || str_starts_with($errorcode, 'chat:error')) ? 'provider_error' : 'blocked';
+    public static function failed_turn_outcome(bool $paused, \Throwable $error): string {
+        return ($paused || $error instanceof \local_ai_course_assistant\provider\chat_refused_exception)
+            ? 'blocked'
+            : 'provider_error';
     }
 
     /**

@@ -88,8 +88,23 @@ class failover_chain implements provider_interface {
     /** @var int v7.8.8: counted failures in a row that open a circuit. */
     public const FAILURES_TO_OPEN = 2;
 
-    /** @var int v7.8.8: seconds inside which those failures must fall. */
-    public const FAILURE_WINDOW = 60;
+    /**
+     * @var int v7.8.8: seconds inside which those failures must fall. v7.8.9: 300, up from 60. A success between
+     * failures already ends the run, so on a busy site the window hardly matters; on a quiet one, failures a
+     * minute or two apart were never counted together and every learner waited out the primary's own timeout.
+     */
+    public const FAILURE_WINDOW = 300;
+
+    /**
+     * @var int v7.8.9: requests the provider refused as malformed, in a row with no success between, that
+     * open its circuit. One conversation's refusals are not the provider's fault (see circuit_effect()), but a
+     * provider that refuses EVERYTHING (a region block, a parameter error nobody has taught the healer) would
+     * otherwise cost every turn a refused request, up to two retries and a fallback, indefinitely.
+     */
+    public const REFUSALS_TO_OPEN = 6;
+
+    /** @var int v7.8.9: seconds inside which those refusals must fall. */
+    public const REFUSAL_WINDOW = 120;
 
     /**
      * @var string v7.8.8: provider-specific phrases for a 400 that is about the account or key, not the request.
@@ -474,7 +489,8 @@ class failover_chain implements provider_interface {
      *
      *  - 'none': the provider answered and called THIS request malformed (HTTP
      *    400, 413, 422). The provider is healthy; one conversation's history or
-     *    one learner's message must not block everyone behind it.
+     *    one learner's message must not block everyone behind it. Only REFUSALS_TO_OPEN
+     *    of them in a row with no success between (so nothing is getting through) open it.
      *  - 'immediate': a fault that will not clear on its own and applies to every
      *    request on this key and model: a rejected key (401, 403), an unknown
      *    model (404), or a 400 whose body speaks of the account (an invalid key,
@@ -523,32 +539,50 @@ class failover_chain implements provider_interface {
      *
      * @param array $entry The failed chain member.
      * @param \Throwable $error
-     * @return string 'opened', 'counting' (one failure so far, circuit still closed) or 'unaffected'.
+     * @return string 'opened', 'counting' (a passing fault still being counted) or 'unaffected' (a refused request still being counted).
      */
     private function note_failure(array $entry, \Throwable $error): string {
         $effect = self::circuit_effect($error);
-        if ($effect === 'none') {
-            return 'unaffected';
-        }
         $scope = self::circuit_scope($entry['label'], $entry['provider']);
-        if ($effect === 'counted') {
-            $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
-            $now = time();
-            // Not atomic (MUC has no increment): two failures at the same instant can both
-            // read n=0, so a burst may need one more failure to open. Acceptable for a back-off.
-            $seen = $cache->get('fails_' . $scope);
-            if (!is_array($seen) || ($now - (int) ($seen['first'] ?? 0)) > self::FAILURE_WINDOW) {
-                $seen = ['n' => 0, 'first' => $now];
+        if ($effect === 'none') {
+            // Not the provider's fault, unless it refuses everything: see REFUSALS_TO_OPEN.
+            if (!$this->count_in_a_row('refused_' . $scope, self::REFUSALS_TO_OPEN, self::REFUSAL_WINDOW)) {
+                return 'unaffected';
             }
-            $seen['n']++;
-            if ($seen['n'] < self::FAILURES_TO_OPEN) {
-                $cache->set('fails_' . $scope, $seen);
+        } else if ($effect === 'counted') {
+            if (!$this->count_in_a_row('fails_' . $scope, self::FAILURES_TO_OPEN, self::FAILURE_WINDOW)) {
                 return 'counting';
             }
-            $cache->delete('fails_' . $scope);
         }
         $this->open_circuit($entry, $scope, $error);
         return 'opened';
+    }
+
+    /**
+     * Count one more failure of a run, and say whether the run has reached its threshold.
+     *
+     * Not atomic (MUC has no increment): two failures at the same instant can both read n=0, so a burst may
+     * need one more failure to open. Acceptable for a back-off. A run older than $window starts again.
+     *
+     * @param string $key Cache key of the run.
+     * @param int $threshold Failures in a row that end the run.
+     * @param int $window Seconds the run may span.
+     * @return bool True when the threshold was reached (the run is cleared), false while still counting.
+     */
+    private function count_in_a_row(string $key, int $threshold, int $window): bool {
+        $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
+        $now = time();
+        $seen = $cache->get($key);
+        if (!is_array($seen) || ($now - (int) ($seen['first'] ?? 0)) > $window) {
+            $seen = ['n' => 0, 'first' => $now];
+        }
+        $seen['n']++;
+        if ($seen['n'] < $threshold) {
+            $cache->set($key, $seen);
+            return false;
+        }
+        $cache->delete($key);
+        return true;
     }
 
     /**
@@ -600,11 +634,13 @@ class failover_chain implements provider_interface {
      */
     private function record_success(array $entry): void {
         $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
-        $key = 'fails_' . self::circuit_scope($entry['label'], $entry['provider']);
+        $scope = self::circuit_scope($entry['label'], $entry['provider']);
         // Read before deleting: almost every successful turn has nothing to clear, and on a
         // shared cache store a write per chat message is not free.
-        if ($cache->get($key) !== false) {
-            $cache->delete($key);
+        foreach (['fails_', 'refused_'] as $run) {
+            if ($cache->get($run . $scope) !== false) {
+                $cache->delete($run . $scope);
+            }
         }
     }
 

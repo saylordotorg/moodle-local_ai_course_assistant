@@ -269,7 +269,7 @@ final class autoupgrade_switch_test extends \advanced_testcase {
      * v7.8.8: a turn the new model answered only after a retry with a shorter
      * history is an error of that model but not a second turn (the answer row
      * already names it); a retry that failed too is not counted again, because
-     * the fallback's own rescued row carries that turn.
+     * the fallback's own rescued row carries that turn. v7.8.9: a remembered turn is counted like a rescued one.
      */
     public function test_a_turn_answered_only_after_a_shorter_history_counts_as_an_error_not_a_turn(): void {
         global $DB;
@@ -283,11 +283,12 @@ final class autoupgrade_switch_test extends \advanced_testcase {
         };
         $row('rescued', 'gemini-3.5-flash-lite');
         $row('rescued', 'gemini-3.5-flash-lite');
+        $row('remembered', 'gemini-3.5-flash-lite');
         $row('failed', 'gemini-3.5-flash-lite');
         $row('rescued', 'some-other-model');
         $m = watcher::metrics('gemini', 'gemini-3.5-flash-lite', $now - 10, $now + 10);
         $this->assertSame(10, $m['turns']);
-        $this->assertSame(2, $m['error']);
+        $this->assertSame(3, $m['error'], 'a turn sent shortened at once because the last one needed it counts too');
     }
 
     public function test_a_turn_the_whole_chain_failed_counts_once(): void {

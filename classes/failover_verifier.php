@@ -164,7 +164,15 @@ class failover_verifier {
             return $results;
         }
         $effective = \local_ai_course_assistant\course_config_manager::get_effective_config(0);
-        $primary = (string) ($effective['provider'] ?? '');
+        // The primary exactly as create_from_config() resolves it: build_fallbacks() compares each backup's
+        // provider with it to decide whether a backup with no model of its own uses its provider's default,
+        // and 'auto' must have become a concrete provider by then.
+        $primary = !empty($effective['provider'])
+            ? (string) $effective['provider']
+            : (string) (get_config('local_ai_course_assistant', 'provider') ?: '');
+        if ($primary === 'auto' || $primary === '') {
+            $primary = base_provider::resolve_auto_provider($effective);
+        }
         $fallbacks = base_provider::build_fallbacks($primary, $effective, $chain);
         foreach ($fallbacks as $fallback) {
             $started = microtime(true);
