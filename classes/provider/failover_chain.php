@@ -103,7 +103,19 @@ class failover_chain implements provider_interface {
      */
     public const REFUSALS_TO_OPEN = 6;
 
-    /** @var int v7.8.9: seconds inside which those refusals must fall. */
+    /**
+     * @var int v7.8.9: how many of those refusals one learner can supply. A learner who can reliably get a 400
+     * (a prompt the provider flags, one huge pasted message) must not be able to move every course on the
+     * site key onto the fallback for 15 minutes, and the chat limit lets one learner send 20 messages a
+     * minute. With 2 of 6, the run needs at least three different learners; a provider that refuses
+     * everything reaches them within seconds.
+     */
+    public const REFUSALS_PER_LEARNER = 2;
+
+    /**
+     * @var int v7.8.9: seconds inside which those refusals must fall. Shorter than FAILURE_WINDOW on purpose:
+     * a refusal is a verdict on one request, so only a tight burst of them says anything about the provider.
+     */
     public const REFUSAL_WINDOW = 120;
 
     /**
@@ -539,18 +551,29 @@ class failover_chain implements provider_interface {
      *
      * @param array $entry The failed chain member.
      * @param \Throwable $error
-     * @return string 'opened', 'counting' (a passing fault still being counted) or 'unaffected' (a refused request still being counted).
+     * @return string 'opened', 'counting' (a passing fault still being counted) or 'unaffected' (a refused request
+     *         still being counted).
      */
     private function note_failure(array $entry, \Throwable $error): string {
         $effect = self::circuit_effect($error);
         $scope = self::circuit_scope($entry['label'], $entry['provider']);
+        $runs = self::runs_key($entry['label'], $entry['provider']);
         if ($effect === 'none') {
             // Not the provider's fault, unless it refuses everything: see REFUSALS_TO_OPEN.
-            if (!$this->count_in_a_row('refused_' . $scope, self::REFUSALS_TO_OPEN, self::REFUSAL_WINDOW)) {
+            $userid = (int) ($this->options['userid'] ?? 0);
+            $complete = $this->count_in_a_row(
+                $runs,
+                'refused',
+                self::REFUSALS_TO_OPEN,
+                self::REFUSAL_WINDOW,
+                $userid,
+                self::REFUSALS_PER_LEARNER
+            );
+            if (!$complete) {
                 return 'unaffected';
             }
         } else if ($effect === 'counted') {
-            if (!$this->count_in_a_row('fails_' . $scope, self::FAILURES_TO_OPEN, self::FAILURE_WINDOW)) {
+            if (!$this->count_in_a_row($runs, 'fails', self::FAILURES_TO_OPEN, self::FAILURE_WINDOW)) {
                 return 'counting';
             }
         }
@@ -559,30 +582,64 @@ class failover_chain implements provider_interface {
     }
 
     /**
+     * The cache key holding a member's runs of failures (both kinds, under one key so that a successful turn
+     * needs a single read to clear them).
+     *
+     * @param string $label
+     * @param provider_interface $provider
+     * @return string
+     */
+    public static function runs_key(string $label, provider_interface $provider): string {
+        return 'runs_' . self::circuit_scope($label, $provider);
+    }
+
+    /**
      * Count one more failure of a run, and say whether the run has reached its threshold.
      *
      * Not atomic (MUC has no increment): two failures at the same instant can both read n=0, so a burst may
      * need one more failure to open. Acceptable for a back-off. A run older than $window starts again.
      *
-     * @param string $key Cache key of the run.
+     * @param string $key The member's runs_key().
+     * @param string $run 'fails' (a passing fault) or 'refused' (a request refused as malformed).
      * @param int $threshold Failures in a row that end the run.
      * @param int $window Seconds the run may span.
-     * @return bool True when the threshold was reached (the run is cleared), false while still counting.
+     * @param int $userid The user this failure belongs to.
+     * @param int $perlearner Most failures one user can add to the run; 0 for no limit.
+     * @return bool True when the run is complete (it is cleared), false while still counting.
      */
-    private function count_in_a_row(string $key, int $threshold, int $window): bool {
+    private function count_in_a_row(
+        string $key,
+        string $run,
+        int $threshold,
+        int $window,
+        int $userid = 0,
+        int $perlearner = 0
+    ): bool {
         $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
         $now = time();
-        $seen = $cache->get($key);
+        $state = $cache->get($key);
+        $state = is_array($state) ? $state : [];
+        $seen = $state[$run] ?? null;
         if (!is_array($seen) || ($now - (int) ($seen['first'] ?? 0)) > $window) {
-            $seen = ['n' => 0, 'first' => $now];
+            $seen = ['n' => 0, 'first' => $now, 'users' => []];
         }
-        $seen['n']++;
-        if ($seen['n'] < $threshold) {
-            $cache->set($key, $seen);
-            return false;
+        $mine = (int) ($seen['users'][$userid] ?? 0);
+        if ($perlearner === 0 || $mine < $perlearner) {
+            $seen['users'][$userid] = $mine + 1;
+            $seen['n']++;
         }
-        $cache->delete($key);
-        return true;
+        if ($seen['n'] >= $threshold) {
+            unset($state[$run]);
+            if ($state) {
+                $cache->set($key, $state);
+            } else {
+                $cache->delete($key);
+            }
+            return true;
+        }
+        $state[$run] = $seen;
+        $cache->set($key, $state);
+        return false;
     }
 
     /**
@@ -634,13 +691,11 @@ class failover_chain implements provider_interface {
      */
     private function record_success(array $entry): void {
         $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
-        $scope = self::circuit_scope($entry['label'], $entry['provider']);
+        $key = self::runs_key($entry['label'], $entry['provider']);
         // Read before deleting: almost every successful turn has nothing to clear, and on a
         // shared cache store a write per chat message is not free.
-        foreach (['fails_', 'refused_'] as $run) {
-            if ($cache->get($run . $scope) !== false) {
-                $cache->delete($run . $scope);
-            }
+        if ($cache->get($key) !== false) {
+            $cache->delete($key);
         }
     }
 

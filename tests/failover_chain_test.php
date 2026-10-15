@@ -738,25 +738,68 @@ final class failover_chain_test extends \advanced_testcase {
     /**
      * A provider that refuses every request (a region block, a parameter error nobody has taught the healer)
      * is not healthy, whatever each refusal says. After REFUSALS_TO_OPEN in a row with nothing getting
-     * through, its circuit opens, so learners stop paying a refused request, retries and a fallback per turn.
+     * through, from several different learners, its circuit opens, so learners stop paying a refused
+     * request, retries and a fallback per turn.
      */
     public function test_a_provider_that_refuses_every_request_gets_its_circuit_opened_in_the_end(): void {
         $this->resetAfterTest();
         $primary = self::picky_provider('never', 0);
-        $chain = new failover_chain($primary, 'refuse-all-primary', [
-            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'refuse-all-fallback'],
-        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
+        $learners = self::learners($primary, 'refuse-all', [11, 12, 13]);
         for ($i = 1; $i < failover_chain::REFUSALS_TO_OPEN; $i++) {
-            $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+            $learners[$i % 3]->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
             $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN), "refusal $i");
         }
-        $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+        $learners[0]->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
         $this->assertCount(1, self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
         $calls = $primary->callcount;
-        $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+        $learners[1]->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
         $this->assertSame($calls, $primary->callcount, 'the open circuit skips the primary');
         $rows = array_column(self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH), 'circuit');
         $this->assertSame(array_merge(array_fill(0, failover_chain::REFUSALS_TO_OPEN - 1, 'unaffected'), ['opened']), $rows);
+    }
+
+    /**
+     * One learner who can reliably get a 400 (a prompt the provider flags, a huge pasted message) must not be
+     * able to move every course on the site key onto the fallback: the chat limit is 20 messages a minute, so
+     * REFUSALS_TO_OPEN of them take seconds. A learner supplies at most REFUSALS_PER_LEARNER of the run, and a
+     * single other learner's unlucky 400 on top of it does not complete it either.
+     */
+    public function test_one_learner_alone_can_never_open_the_circuit_by_being_refused(): void {
+        $this->resetAfterTest();
+        $primary = self::picky_provider('never', 0);
+        [$alone, $second, $third] = self::learners($primary, 'lone', [21, 22, 23]);
+        for ($i = 0; $i < 3 * failover_chain::REFUSALS_TO_OPEN; $i++) {
+            $alone->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+        }
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+        $this->assertSame(3 * failover_chain::REFUSALS_TO_OPEN, $primary->callcount, 'the primary is never skipped');
+        for ($i = 0; $i < failover_chain::REFUSALS_PER_LEARNER; $i++) {
+            $second->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+        }
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN), 'two learners are still not enough');
+        // A third learner refused as well: the provider is refusing everybody.
+        for ($i = 0; $i < failover_chain::REFUSALS_PER_LEARNER; $i++) {
+            $third->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+        }
+        $this->assertCount(1, self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+    }
+
+    /**
+     * One chain per learner, all in front of the same primary (so they share its circuit).
+     *
+     * @param object $primary
+     * @param string $name Prefix of the chain labels.
+     * @param int[] $userids
+     * @return failover_chain[]
+     */
+    private static function learners(object $primary, string $name, array $userids): array {
+        $chains = [];
+        foreach ($userids as $userid) {
+            $chains[] = new failover_chain($primary, $name . '-primary', [
+                ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => $name . '-fallback'],
+            ], ['audit' => true, 'courseid' => 0, 'userid' => $userid]);
+        }
+        return $chains;
     }
 
     /**
@@ -793,11 +836,9 @@ final class failover_chain_test extends \advanced_testcase {
                 return null;
             }
         };
-        $chain = new failover_chain($primary, 'reset-refusals-primary', [
-            ['provider' => self::fake_provider('FALLBACK-OUT', false), 'label' => 'reset-refusals-fallback'],
-        ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
-        foreach ($script as $unused) {
-            $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+        $learners = self::learners($primary, 'reset-refusals', [31, 32, 33]);
+        foreach ($script as $i => $unused) {
+            $learners[$i % 3]->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
         }
         $this->assertSame(count($script), $primary->callcount, 'never skipped: no run of refusals reached the threshold');
         $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
@@ -896,7 +937,10 @@ final class failover_chain_test extends \advanced_testcase {
         ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
         $chain->chat_completion('sys', [['role' => 'user', 'content' => 'one']]);
         $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
-        $cache->set('fails_' . failover_chain::circuit_scope('quiet-primary', $primary), ['n' => 1, 'first' => time() - 150]);
+        $cache->set(
+            failover_chain::runs_key('quiet-primary', $primary),
+            ['fails' => ['n' => 1, 'first' => time() - 150, 'users' => [0 => true]]]
+        );
         $chain->chat_completion('sys', [['role' => 'user', 'content' => 'two']]);
         $this->assertCount(1, self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
     }
@@ -913,8 +957,10 @@ final class failover_chain_test extends \advanced_testcase {
         $chain->chat_completion('sys', [['role' => 'user', 'content' => 'one']]);
         // Age the recorded failure past the window.
         $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
-        $scope = failover_chain::circuit_scope('window-primary', $primary);
-        $cache->set('fails_' . $scope, ['n' => 1, 'first' => time() - failover_chain::FAILURE_WINDOW - 30]);
+        $cache->set(
+            failover_chain::runs_key('window-primary', $primary),
+            ['fails' => ['n' => 1, 'first' => time() - failover_chain::FAILURE_WINDOW - 30, 'users' => [0 => true]]]
+        );
         $chain->chat_completion('sys', [['role' => 'user', 'content' => 'two']]);
         $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
         $this->assertSame(

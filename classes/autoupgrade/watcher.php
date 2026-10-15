@@ -158,20 +158,22 @@ class watcher {
             'needle' => '%' . $DB->sql_like_escape('"failed_model":' . json_encode($model)) . '%']
         );
         // v7.8.8: a turn this model answered only after a retry with a shorter
-        // history (v7.8.9: or sent that way at once because the last one needed it) is also a failure of it: the learner got an answer from this
+        // history is also a failure of it: the learner got an answer from this
         // model, so the turn is already counted above, but the model refused
         // the request as sent and the answer lost the older conversation. Counted
-        // as an error only (never as a second turn).
+        // as an error only (never as a second turn). Only the 'rescued' row counts:
+        // the 'remembered' rows that follow (the next messages of that conversation,
+        // sent shortened at once, for five minutes) are the same incident, and
+        // counting each would let one long conversation supply all the events a
+        // rollback needs.
         $trimmed = (int) $DB->count_records_select(
             'local_ai_course_assistant_audit',
             'action = :action AND timecreated >= :from AND timecreated < :to AND '
-                . $DB->sql_like('details', ':model', false) . ' AND ('
-                . $DB->sql_like('details', ':rescued', false) . ' OR ' . $DB->sql_like('details', ':remembered', false) . ')',
+                . $DB->sql_like('details', ':model', false) . ' AND ' . $DB->sql_like('details', ':outcome', false),
             ['action' => \local_ai_course_assistant\provider\failover_chain::AUDIT_EVENT_TRIMMED, 'from' => $from,
             'to' => $to,
             'model' => '%' . $DB->sql_like_escape('"failed_model":' . json_encode($model)) . '%',
-            'rescued' => '%' . $DB->sql_like_escape('"outcome":"rescued"') . '%',
-            'remembered' => '%' . $DB->sql_like_escape('"outcome":"remembered"') . '%']
+            'outcome' => '%' . $DB->sql_like_escape('"outcome":"rescued"') . '%']
         );
         return [
             'turns' => (int) ($counts->turns ?? 0) + $rescued,
