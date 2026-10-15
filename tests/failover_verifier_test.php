@@ -170,6 +170,24 @@ final class failover_verifier_test extends \advanced_testcase {
         $this->assertFalse($details['ok']);
     }
 
+    /**
+     * With the site provider on 'auto', a backup of the same provider that names no model of its own uses
+     * the site's model, as it does in a real failover. The probe used to pass 'auto' straight through, so it
+     * took the provider's default model instead and checked a model the failover would never send.
+     */
+    public function test_an_auto_site_provider_is_resolved_before_the_backups_are_built(): void {
+        $this->resetAfterTest();
+        set_config('provider', 'auto', 'local_ai_course_assistant');
+        set_config('model', 'gemini-2.5-pro', 'local_ai_course_assistant');
+        set_config('apikey', 'AIzaTestKeyForTheSiteProvider', 'local_ai_course_assistant');
+        $this->configure("gemini|AIzaTestKeyForTheBackup|||", "chat:gemini");
+        $models = [];
+        failover_verifier::probe_all(function ($provider) use (&$models) {
+            $models[] = $provider->model_id();
+        });
+        $this->assertSame(['gemini-2.5-pro'], $models, 'the site model, not the provider default gemini-2.5-flash');
+    }
+
     public function test_a_backup_that_answers_is_recorded_ok(): void {
         $this->resetAfterTest();
         $this->configure("openai|sk-test-key-1|gpt-4o-mini||\nclaude|sk-ant-test-2|claude-haiku-4-5||", "chat:openai\nchat:claude");

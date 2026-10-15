@@ -88,8 +88,35 @@ class failover_chain implements provider_interface {
     /** @var int v7.8.8: counted failures in a row that open a circuit. */
     public const FAILURES_TO_OPEN = 2;
 
-    /** @var int v7.8.8: seconds inside which those failures must fall. */
-    public const FAILURE_WINDOW = 60;
+    /**
+     * @var int v7.8.8: seconds inside which those failures must fall. v7.8.9: 300, up from 60. A success between
+     * failures already ends the run, so on a busy site the window hardly matters; on a quiet one, failures a
+     * minute or two apart were never counted together and every learner waited out the primary's own timeout.
+     */
+    public const FAILURE_WINDOW = 300;
+
+    /**
+     * @var int v7.8.9: requests the provider refused as malformed, in a row with no success between, that
+     * open its circuit. One conversation's refusals are not the provider's fault (see circuit_effect()), but a
+     * provider that refuses EVERYTHING (a region block, a parameter error nobody has taught the healer) would
+     * otherwise cost every turn a refused request, up to two retries and a fallback, indefinitely.
+     */
+    public const REFUSALS_TO_OPEN = 6;
+
+    /**
+     * @var int v7.8.9: how many of those refusals one learner can supply. A learner who can reliably get a 400
+     * (a prompt the provider flags, one huge pasted message) must not be able to move every course on the
+     * site key onto the fallback for 15 minutes, and the chat limit lets one learner send 20 messages a
+     * minute. With 2 of 6, the run needs at least three different learners; a provider that refuses
+     * everything reaches them within seconds.
+     */
+    public const REFUSALS_PER_LEARNER = 2;
+
+    /**
+     * @var int v7.8.9: seconds inside which those refusals must fall. Shorter than FAILURE_WINDOW on purpose:
+     * a refusal is a verdict on one request, so only a tight burst of them says anything about the provider.
+     */
+    public const REFUSAL_WINDOW = 120;
 
     /**
      * @var string v7.8.8: provider-specific phrases for a 400 that is about the account or key, not the request.
@@ -474,7 +501,8 @@ class failover_chain implements provider_interface {
      *
      *  - 'none': the provider answered and called THIS request malformed (HTTP
      *    400, 413, 422). The provider is healthy; one conversation's history or
-     *    one learner's message must not block everyone behind it.
+     *    one learner's message must not block everyone behind it. Only REFUSALS_TO_OPEN
+     *    of them in a row with no success between (so nothing is getting through) open it.
      *  - 'immediate': a fault that will not clear on its own and applies to every
      *    request on this key and model: a rejected key (401, 403), an unknown
      *    model (404), or a 400 whose body speaks of the account (an invalid key,
@@ -523,32 +551,95 @@ class failover_chain implements provider_interface {
      *
      * @param array $entry The failed chain member.
      * @param \Throwable $error
-     * @return string 'opened', 'counting' (one failure so far, circuit still closed) or 'unaffected'.
+     * @return string 'opened', 'counting' (a passing fault still being counted) or 'unaffected' (a refused request
+     *         still being counted).
      */
     private function note_failure(array $entry, \Throwable $error): string {
         $effect = self::circuit_effect($error);
-        if ($effect === 'none') {
-            return 'unaffected';
-        }
         $scope = self::circuit_scope($entry['label'], $entry['provider']);
-        if ($effect === 'counted') {
-            $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
-            $now = time();
-            // Not atomic (MUC has no increment): two failures at the same instant can both
-            // read n=0, so a burst may need one more failure to open. Acceptable for a back-off.
-            $seen = $cache->get('fails_' . $scope);
-            if (!is_array($seen) || ($now - (int) ($seen['first'] ?? 0)) > self::FAILURE_WINDOW) {
-                $seen = ['n' => 0, 'first' => $now];
+        $runs = self::runs_key($entry['label'], $entry['provider']);
+        if ($effect === 'none') {
+            // Not the provider's fault, unless it refuses everything: see REFUSALS_TO_OPEN.
+            $userid = (int) ($this->options['userid'] ?? 0);
+            $complete = $this->count_in_a_row(
+                $runs,
+                'refused',
+                self::REFUSALS_TO_OPEN,
+                self::REFUSAL_WINDOW,
+                $userid,
+                self::REFUSALS_PER_LEARNER
+            );
+            if (!$complete) {
+                return 'unaffected';
             }
-            $seen['n']++;
-            if ($seen['n'] < self::FAILURES_TO_OPEN) {
-                $cache->set('fails_' . $scope, $seen);
+        } else if ($effect === 'counted') {
+            if (!$this->count_in_a_row($runs, 'fails', self::FAILURES_TO_OPEN, self::FAILURE_WINDOW)) {
                 return 'counting';
             }
-            $cache->delete('fails_' . $scope);
         }
         $this->open_circuit($entry, $scope, $error);
         return 'opened';
+    }
+
+    /**
+     * The cache key holding a member's runs of failures (both kinds, under one key so that a successful turn
+     * needs a single read to clear them).
+     *
+     * @param string $label
+     * @param provider_interface $provider
+     * @return string
+     */
+    public static function runs_key(string $label, provider_interface $provider): string {
+        return 'runs_' . self::circuit_scope($label, $provider);
+    }
+
+    /**
+     * Count one more failure of a run, and say whether the run has reached its threshold.
+     *
+     * Not atomic (MUC has no increment): two failures at the same instant can both read n=0, so a burst may
+     * need one more failure to open. Acceptable for a back-off. A run older than $window starts again.
+     *
+     * @param string $key The member's runs_key().
+     * @param string $run 'fails' (a passing fault) or 'refused' (a request refused as malformed).
+     * @param int $threshold Failures in a row that end the run.
+     * @param int $window Seconds the run may span.
+     * @param int $userid The user this failure belongs to.
+     * @param int $perlearner Most failures one user can add to the run; 0 for no limit.
+     * @return bool True when the run is complete (it is cleared), false while still counting.
+     */
+    private function count_in_a_row(
+        string $key,
+        string $run,
+        int $threshold,
+        int $window,
+        int $userid = 0,
+        int $perlearner = 0
+    ): bool {
+        $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
+        $now = time();
+        $state = $cache->get($key);
+        $state = is_array($state) ? $state : [];
+        $seen = $state[$run] ?? null;
+        if (!is_array($seen) || ($now - (int) ($seen['first'] ?? 0)) > $window) {
+            $seen = ['n' => 0, 'first' => $now, 'users' => []];
+        }
+        $mine = (int) ($seen['users'][$userid] ?? 0);
+        if ($perlearner === 0 || $mine < $perlearner) {
+            $seen['users'][$userid] = $mine + 1;
+            $seen['n']++;
+        }
+        if ($seen['n'] >= $threshold) {
+            unset($state[$run]);
+            if ($state) {
+                $cache->set($key, $state);
+            } else {
+                $cache->delete($key);
+            }
+            return true;
+        }
+        $state[$run] = $seen;
+        $cache->set($key, $state);
+        return false;
     }
 
     /**
@@ -600,7 +691,7 @@ class failover_chain implements provider_interface {
      */
     private function record_success(array $entry): void {
         $cache = \cache::make('local_ai_course_assistant', 'failover_circuit');
-        $key = 'fails_' . self::circuit_scope($entry['label'], $entry['provider']);
+        $key = self::runs_key($entry['label'], $entry['provider']);
         // Read before deleting: almost every successful turn has nothing to clear, and on a
         // shared cache store a write per chat message is not free.
         if ($cache->get($key) !== false) {

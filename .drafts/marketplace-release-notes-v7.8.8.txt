@@ -2,7 +2,7 @@ Version 7.8.8 (build 2026101402)
 
 This release makes SOLA's backup providers and error handling much easier to trust and to diagnose.
 
-Backups are checked. A daily task, a command-line check and the settings page now test each chat backup provider with a tiny real request, using the same settings a real failover would use, and flag problems such as a backup with no key or a model written as a display name. Results appear under Reports > Status and as a notice after you save the settings.
+Backups are checked. A daily task and a command-line check test each chat backup provider with a tiny real request, using the same settings a real failover would use. The settings page checks, without any network call, for problems such as a backup with no key or a model written as a display name, and shows them as a notice after you save. Results appear under Reports > Status.
 
 Failures explain themselves. When a provider fails, the audit log now records what the provider actually said (with any credentials removed). If a provider refuses a long or malformed conversation, SOLA first retries with the conversation repaired, then with only the newest exchange, remembers which worked for that learner for a few minutes, and keeps the provider available instead of switching every course to the backup.
 

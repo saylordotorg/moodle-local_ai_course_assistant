@@ -161,7 +161,11 @@ class watcher {
         // history is also a failure of it: the learner got an answer from this
         // model, so the turn is already counted above, but the model refused
         // the request as sent and the answer lost the older conversation. Counted
-        // as an error only (never as a second turn).
+        // as an error only (never as a second turn). Only the 'rescued' row counts:
+        // the 'remembered' rows that follow (the next messages of that conversation,
+        // sent shortened at once, for five minutes) are the same incident, and
+        // counting each would let one long conversation supply all the events a
+        // rollback needs.
         $trimmed = (int) $DB->count_records_select(
             'local_ai_course_assistant_audit',
             'action = :action AND timecreated >= :from AND timecreated < :to AND '

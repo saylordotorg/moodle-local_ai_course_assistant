@@ -1,0 +1,11 @@
+Version 7.8.9 (build 2026101500)
+
+This patch fixes problems found by a review of 7.8.8.
+
+A failure in the server itself, such as a database error while preparing a chat turn, was recorded as a deliberate refusal, so the failed-reply alert could not see a site-wide outage of that kind. Only the guards that stop a turn on purpose (the emergency pause, the quiz lock, the request rate limit and a spend cap with no failover) are recorded as blocked now. Everything else counts as a failure.
+
+A provider that refuses every request as malformed, for a reason the plugin has not learned, is now paused after six refusals in a row with no success between, instead of costing every turn a refused request and a fallback. Failures that come and go now count together when they are up to five minutes apart (it was one minute), so a quiet site no longer makes every learner wait out the provider's timeout.
+
+The failover check resolves a site provider set to Auto the way chat does. The model-switch watcher also counts turns sent shortened because the previous turn needed it. The Bambara and Wolof translations of the 7.8.8 admin text are English again until a native speaker has reviewed them, because a check showed they were losing the meaning.
+
+Continuous integration covers PHP 8.1 through 8.3 against Moodle 4.5, 5.0 and 5.1, on both MariaDB and PostgreSQL.

@@ -796,10 +796,7 @@ abstract class base_provider implements provider_interface {
                 // provider is capped" and silently resolved by moving chat onto
                 // the failover provider, which is the opposite of stopping.
                 if (!$diagnostic && spend_guard::emergency_chat_stopped()) {
-                    throw new \moodle_exception(
-                        'error',
-                        'local_ai_course_assistant',
-                        '',
+                    throw new chat_refused_exception(
                         \local_ai_course_assistant\branding::str('emergency:chat_stopped')
                     );
                 }
@@ -809,10 +806,7 @@ abstract class base_provider implements provider_interface {
                     $overrides['apikey']   = $failover['apikey'];
                     $provider = $failover['provider'];
                 } else {
-                    throw new \moodle_exception(
-                        'error',
-                        'local_ai_course_assistant',
-                        '',
+                    throw new chat_refused_exception(
                         'SOLA spend cap reached for this period; no failover provider configured.'
                     );
                 }
@@ -1033,10 +1027,7 @@ abstract class base_provider implements provider_interface {
         // the backend as broken when the only thing wrong is the operator's own
         // switch. They report on the provider; they do not answer learners.
         if (!$diagnostic && spend_guard::emergency_chat_stopped()) {
-            throw new \moodle_exception(
-                'error',
-                'local_ai_course_assistant',
-                '',
+            throw new chat_refused_exception(
                 \local_ai_course_assistant\branding::str('emergency:chat_stopped')
             );
         }
@@ -1083,10 +1074,7 @@ abstract class base_provider implements provider_interface {
                 $lockedattempt,
                 'provider'
             );
-            throw new \moodle_exception(
-                'error',
-                'local_ai_course_assistant',
-                '',
+            throw new chat_refused_exception(
                 \local_ai_course_assistant\branding::str('quizlock:blocked')
             );
         }
@@ -1119,10 +1107,7 @@ abstract class base_provider implements provider_interface {
         // benchmark runs are unaffected.
         if (\local_ai_course_assistant\rate_limiter::is_rate_limited(
                 (int) $USER->id, 'provider_call', 120, 60)) {
-            throw new \moodle_exception(
-                'error',
-                'local_ai_course_assistant',
-                '',
+            throw new chat_refused_exception(
                 'Too many AI requests; please wait a moment and try again.'
             );
         }
@@ -1276,10 +1261,12 @@ abstract class base_provider implements provider_interface {
      *  - Otherwise fall back to openai, which surfaces the usual
      *    "configure a key" error, exactly as before 'auto' existed.
      *
+     * Public since v7.8.9 so the failover check resolves the site provider the same way a chat turn does.
+     *
      * @param array $overrides Effective config (may carry a per-course apikey).
      * @return string Concrete provider id.
      */
-    private static function resolve_auto_provider(array $overrides): string {
+    public static function resolve_auto_provider(array $overrides): string {
         $apikey = !empty($overrides['apikey'])
             ? $overrides['apikey']
             : (\local_ai_course_assistant\secrets::get('apikey') ?: '');
