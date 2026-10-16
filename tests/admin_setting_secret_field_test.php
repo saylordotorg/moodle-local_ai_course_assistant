@@ -56,6 +56,25 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
         $this->assertSame('desc', $field->description, 'the description is restored after rendering');
     }
 
+    /**
+     * The hint is built from the tail of a key, and the description is HTML. A tail that carries markup is
+     * escaped; a multibyte tail is cut by character.
+     */
+    public function test_the_hint_is_escaped_and_cut_by_character(): void {
+        $this->resetAfterTest();
+        $field = $this->field();
+
+        set_config('embed_apikey', secrets::conceal('sk-proj-HTML-TEST-0000-<b>X'), 'local_ai_course_assistant');
+        $html = $field->output_html($field->get_setting());
+        $this->assertStringContainsString('Saved key ends in &lt;b&gt;X.', $html);
+        $this->assertStringNotContainsString('<b>X', $html);
+
+        set_config('embed_apikey', secrets::conceal('sk-proj-ab12-日本語キ'), 'local_ai_course_assistant');
+        $html = $field->output_html($field->get_setting());
+        $this->assertStringContainsString('Saved key ends in 日本語キ.', $html);
+        $this->assertSame(1, preg_match('//u', $html), 'the page is valid UTF-8');
+    }
+
     public function test_rendering_twice_adds_the_hint_once(): void {
         $this->resetAfterTest();
         set_config('embed_apikey', secrets::conceal('sk-proj-EMBED-FIELD-0000-WXYZ'), 'local_ai_course_assistant');

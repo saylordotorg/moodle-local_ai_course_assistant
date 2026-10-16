@@ -85,6 +85,6 @@ class admin_setting_secret_field extends \admin_setting_encryptedpassword {
             return get_string('providerkeys:saved_url_hint', 'local_ai_course_assistant');
         }
         $last4 = provider_keys::last4($plain);
-        return $last4 === '' ? '' : get_string('providerkeys:last4_hint', 'local_ai_course_assistant', $last4);
+        return $last4 === '' ? '' : get_string('providerkeys:last4_hint', 'local_ai_course_assistant', s($last4));
     }
 }

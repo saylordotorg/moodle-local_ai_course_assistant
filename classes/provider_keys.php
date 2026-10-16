@@ -204,13 +204,14 @@ class provider_keys {
     }
 
     /**
-     * The last four characters of a key, for the "ends in" hint. A short key shows nothing.
+     * The last four characters of a key, for the "ends in" hint. A short key (under 12 characters) shows nothing.
+     * Counted and cut by character, so a multibyte tail is never split into invalid UTF-8.
      *
      * @param string $plain
      * @return string
      */
     public static function last4(string $plain): string {
-        return strlen($plain) >= 12 ? substr($plain, -4) : '';
+        return \core_text::strlen($plain) >= 12 ? \core_text::substr($plain, -4) : '';
     }
 
     /**

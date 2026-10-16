@@ -68,6 +68,24 @@ final class provider_keys_test extends \advanced_testcase {
         $this->assertSame('', provider_keys::last4(''));
     }
 
+    /**
+     * The cut is by character, not by byte: a multibyte tail is never split into invalid UTF-8, and "at least
+     * 12" counts characters.
+     */
+    public function test_last4_counts_and_cuts_characters_not_bytes(): void {
+        $this->assertSame('日本語キ', provider_keys::last4('sk-proj-ab12-日本語キ'));
+        $this->assertSame('ыйкл', provider_keys::last4('sk-proj-ключ-ыйкл'));
+        $this->assertSame('1é2ü', provider_keys::last4('sk-proj-ab-1é2ü'));
+        // 11 characters, but 15 bytes: too short to show any of it.
+        $this->assertSame(11, \core_text::strlen('abcdefghi日本'));
+        $this->assertSame('', provider_keys::last4('abcdefghi日本'));
+        // Exactly 12 characters shows the last four.
+        $this->assertSame('i日本語', provider_keys::last4('abcdefgh' . 'i日本語'));
+        foreach (['sk-proj-ab12-日本語キ', 'sk-proj-ab-1é2ü'] as $key) {
+            $this->assertSame(1, preg_match('//u', provider_keys::last4($key)), 'valid UTF-8');
+        }
+    }
+
     public function test_for_provider_takes_the_first_row_that_has_a_key(): void {
         $this->resetAfterTest();
         $this->seed("openai||gpt-4o-mini\nopenai|sk-proj-SECOND-ROW-KEY-1234|gpt-4o\nopenai|sk-proj-THIRD-ROW-KEY-5678|x");
