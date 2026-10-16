@@ -1,7 +1,7 @@
 # SOLA 7.9.0: one "Providers and keys" table, and no secret ever shown in settings
 
-Status: DRAFT for Tom's approval. Nothing in this spec is built yet.
-Written 2026-10-16. Requested by the AI Spend/MFA session on Tom's behalf, plus Tom's own addition (section 3).
+Status: APPROVED by Tom on 2026-10-16 (the written spec, and all four decisions in section 11 as recommended). Nothing is built yet.
+Amended the same day, during planning, to correct two things found while reading the code (the Voice providers table in sections 2, 3 and 5.7, and how the legacy key is kept in step in section 5.3). Both keep the approved behavior. Written 2026-10-16. Requested by the AI Spend/MFA session on Tom's behalf, plus Tom's own addition (section 3).
 
 ## 1. What we are building, and how we will know it worked
 
@@ -25,7 +25,7 @@ Checked on the code at main (7.8.9) and on the live dev settings page on 2026-10
 
 - Where things live: on the settings page "AI provider and models" (`local_ai_course_assistant_ai`): `provider` (13 options including `auto`), `apikey` (`admin_setting_encryptedpassword`), `model`, `apibaseurl`, and the `comparison_providers` table. The failover chain and `failover_per_call_enabled` are on the operations page.
 - `apikey` belongs to the site provider only. A different provider needs a `comparison_providers` row, stored as `provider|key|models|temperature|baseurl`. Other keys sit in `embed_apikey`, `rerank_apikey`, `realtime_apikey` ("OpenAI API Key (Voice & TTS)"), `stt_selfhosted_apikey` and the Voice providers table. The same OpenAI key can be pasted in four places.
-- **`comparison_providers` is stored in plain text** (not in `secrets::names()`, no `conceal_row_keys`). The main `apikey` is encrypted. The Voice providers table already encrypts per row (`secrets::conceal_row_keys`, `voice_registry::parse_rows`), which is the pattern to copy.
+- **`comparison_providers` is stored in plain text** (not in `secrets::names()`, no `conceal_row_keys`). The main `apikey` is encrypted. The Voice providers table already encrypts per row (`secrets::conceal_row_keys`, `voice_registry::parse_rows`), which is the pattern to copy for storage. Its renderer is not compliant, though: `voice_registry::parse_rows(false)` returns the stored ciphertext, and the form writes that into each row's password input and into a hidden field, so the page carries ciphertext whenever the table has rows. Dev has no voice rows, which is why the first audit missed it.
 - **Secrets are visible in the page today.** On dev, the comparison table renders 8 visible password inputs, each carrying a real key in its `value` attribute (lengths 50 to 164), and a hidden serialized field of 1,005 characters holding all eight rows with their keys. Every single-key field (`apikey`, embed, rerank, realtime, STT, avatar providers, Zendesk, Redash, spend export) renders empty, because Moodle's `admin_setting_encryptedpassword` outputs only a set/unset flag, never the value.
 - Two plain visible text inputs hold bearer secrets when set: `anomaly_digest_slack_webhook` and `anomaly_digest_teams_webhook` (empty on dev, but a webhook URL is a credential).
 - The table cannot save a keyless row (ollama, coreai) because the JS drops rows without a key.
@@ -47,7 +47,7 @@ Corrections to the request that prompted this work: Learn's failover chain is al
 | Single-key fields (`admin_setting_encryptedpassword`) | Compliant (empty input, set flag) | Unchanged, plus a masked last-four hint |
 | Comparison / provider rows | **Violates**: real key in password input and in a hidden field | New table never renders a key or ciphertext; see section 5.4 |
 | Slack and Teams webhook URLs | **Violates when set**: plain text input | Become encrypted password fields; upgrade encrypts existing values; readers use `secrets::get()` |
-| Voice providers table | Compliant | Unchanged |
+| Voice providers table | **Violates when it has rows**: stored ciphertext in each password input and in a hidden field | Moves onto the same row editor as the provider table; nothing is rendered (section 5.7) |
 | After a failed save | Moodle re-renders submitted values | Key inputs always come back empty with "re-enter the key" help |
 
 **How we prove it.** A new test renders every SOLA settings page with a known sentinel string seeded into every secret setting and every table row, runs a simulated save round trip and a failed save, and asserts that neither the sentinel nor any stored ciphertext appears in any output. A second test fails if a settings class that holds a credential is anything other than an encrypted or masked type. We also scan the real dev and alpha settings pages after the deploy.
@@ -75,7 +75,15 @@ New class `local_ai_course_assistant\provider_keys` is the only code that reads 
 Every current direct reader moves to it: `spend_guard` (`lookup_chat_label`, `resolve_failover_chain`), `failover_verifier::rows`, `base_provider` (`label_for_active_provider`, `lookup_comparison_row`, `create_for_comparison`, the constructor's site-key rule), the analytics and `hook_callbacks` LLM picker lists, `provider_benchmark`, `autoupgrade\discovery::credentials`, `run_model_benchmark`, and the `run_tutor_golden` CLI. `label_for_active_provider` currently compares the row key to the plain primary key, which would silently fail on encrypted rows, so it compares revealed values through the accessor. A guard test fails on any `get_config(..., 'comparison_providers')` outside the accessor, in the same spirit as `secrets_test::test_no_secret_is_read_around_the_helper`.
 
 ### 5.3 Key resolution and parity
-Order for provider P: keyed row for P, then legacy `apikey` if P is the site's provider (`auto` resolves from the model name as today), then none (keyless providers such as ollama are allowed). For a site that configures nothing new, the migration makes the result identical to today's (section 5.5). The legacy `apikey` setting stays declared and read as a fallback for one release, so `config.php` forced settings and CLI tools keep working.
+Order for provider P: keyed row for P, then the legacy `apikey` if P is the site's provider (`auto` resolves exactly as `base_provider::resolve_auto_provider()` does today), then none (keyless providers such as ollama are allowed).
+
+**How the legacy key is kept in step.** About eleven places read the legacy `apikey` through `secrets::get('apikey')` (the `base_provider` constructor, `create_for_comparison`, `resolve_auto_provider`, course config, the voice registry, benchmark tools). Rewriting all of them is the riskiest part of this work, so they stay untouched. Instead `apikey` becomes an automatic mirror of the default provider's row key: every save of the table, the default provider, the model or the base URL re-copies the key of the row for the site's provider into `apikey`, encrypted. Readers of `apikey` therefore see the key the table says, with no change to their code.
+
+Consequences, all wanted:
+- Editing the default provider's key in the table changes what chat uses. Nothing else needs touching.
+- Switching the default provider from Gemini to OpenAI picks OpenAI's row key, not the leftover Gemini key. If the new default has no keyed row (and is not keyless), the save shows a warning, and a key that clearly belongs to another vendor (`course_key_guard::owner_of_key`) is called out by name.
+- The `apikey` setting is no longer shown on the page (decision 4) but stays declared and encrypted. `config.php` forced values and CLI tools keep working.
+- A rollback to 7.8.x still has a working main key, because `apikey` holds it. Only the row keys (now encrypted) would need re-entering.
 
 ### 5.4 The admin UI
 - A new setting class `admin_setting_provider_keys` replaces `admin_setting_comparison_providers` on the AI page, under a heading **"Providers and keys"** placed above "Default chat AI provider", so the table is the place keys live and the dropdown only chooses which row is the default.
@@ -102,7 +110,10 @@ A parity test resolves the key for every provider before and after the step on s
 - **No new silent enablement.** `voice_registry::is_configured()` and `resolve()` are not changed to look at the table. An OpenAI failover row does not turn on TTS. Voice features follow an explicit "use the key from row X" choice or the existing behavior only.
 - Voice section help text states the existing behavior accurately: an OpenAI key (a Voice row, `realtime_apikey`, or the default provider being OpenAI with a key) also enables the TTS speak button, the per-course Speaking Practice chip, and the speech-to-text fallback, even with Voice Mode off. The exact chip names are checked against the lang strings and `starter_manager.php` at plan time.
 
-### 5.7 Single-key fields
+### 5.7 Voice providers table
+Same treatment as the provider table, because it breaks the display rule today. It moves onto the shared row editor (section 5.4): columns provider (openai or xai), label, realtime voice and TTS voice; the key cell is "Saved, ends in ab12" with Change; keys are never rendered; blank keeps the stored ciphertext through the row id; the stored format `provider|key|label|realtime_voice|tts_voice` and `voice_registry` do not change.
+
+### 5.8 Single-key fields
 They stay `admin_setting_encryptedpassword` (already compliant). A small subclass adds the masked last-four hint to the description. The Slack and Teams webhook fields change to the same class.
 
 ## 6. Security notes
@@ -135,7 +146,7 @@ Every new admin string needs all 45 locales (the `lang_completeness_test` parity
 - Moodle core could change how `admin_setting_encryptedpassword` renders. Mitigation: the no-leak render test runs on every supported Moodle in CI.
 - Size: roughly 15 files plus about 30 new strings in 45 locales. Mitigation: staged PRs (accessor and migration first, then the table UI, then the other key fields and help text).
 
-## 11. Decisions for Tom
+## 11. Decisions for Tom (all four approved as recommended on 2026-10-16)
 
 1. **Conflicting keys.** If the default provider's key and an existing row for the same provider differ, the upgrade makes the row use the default's key (what production chat uses today) and shows a notice. Alternative: leave both and only warn. Recommended: the first.
 2. **Last four characters.** Show them as a masked hint next to every stored key (the other session asked for this). It does reveal four characters of each key. Recommended: yes.
