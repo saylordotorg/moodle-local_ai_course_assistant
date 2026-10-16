@@ -334,7 +334,11 @@ class provider_keys {
      * line, a label's case and any column past the fifth stay exactly as the admin wrote them; only a key
      * field is ever encrypted or swapped, and a new row is one line appended at the end.
      *
-     * Nothing it writes or reports contains a key: the notice and the summary carry last-four values only.
+     * A key it overwrites in a row is first kept, concealed, in config provider_keys_displaced (one release,
+     * no screen) and recorded in the audit log as a provider_key_displaced row.
+     *
+     * Nothing it writes or reports in the clear contains a key: the notice, the audit row and the summary carry
+     * a provider id and last-four values only.
      *
      * @return array{encrypted:int, settings:int, row_added:string, conflict:string} conflict is the provider whose
      *         row took the default key ('' when none)
@@ -389,14 +393,48 @@ class provider_keys {
             $summary['conflict'] = $provider;
             // The notice first, so a crash between the two writes can't lose it (a re-run finds the same
             // conflict). Structured data, not a sentence: flush_notice() formats it with one lang string.
+            $rowlast4 = self::last4($rowkey);
+            $defaultlast4 = self::last4($legacy);
             set_config('provider_keys_notice', json_encode([
                 'provider'     => $provider,
-                'rowlast4'     => self::last4($rowkey),
-                'defaultlast4' => self::last4($legacy),
+                'rowlast4'     => $rowlast4,
+                'defaultlast4' => $defaultlast4,
             ]), self::PLUGIN);
+            // The row is about to lose its key. Keep the old one, still encrypted, for one release, and say so in
+            // the audit log (provider and last-four values only), both before the row is rewritten.
+            self::keep_displaced($provider, $rows[$found]['stored_key']);
+            audit_logger::log('provider_key_displaced', 0, 0, [
+                'provider'      => $provider,
+                'row_last4'     => $rowlast4,
+                'default_last4' => $defaultlast4,
+            ]);
             set_config(self::SETTING, self::with_row_key($concealed, $found, secrets::conceal($legacy)), self::PLUGIN);
         }
         return $summary;
+    }
+
+    /**
+     * Keep the key a conflict is about to overwrite, for one release (config provider_keys_displaced).
+     *
+     * The setting is a JSON map of provider => concealed key (\core\encryption ciphertext, never plain text).
+     * There is no screen for it; it exists so an admin who needed the older key can still be helped. An entry
+     * already there is the older, original credential, so a re-run never replaces it. A damaged value is
+     * treated as an empty map.
+     *
+     * @param string $provider lowercase provider id
+     * @param string $stored the row's stored key column
+     * @return void
+     */
+    private static function keep_displaced(string $provider, string $stored): void {
+        $map = json_decode((string) get_config(self::PLUGIN, 'provider_keys_displaced'), true);
+        if (!is_array($map)) {
+            $map = [];
+        }
+        if (isset($map[$provider])) {
+            return;
+        }
+        $map[$provider] = secrets::conceal($stored);
+        set_config('provider_keys_displaced', json_encode($map), self::PLUGIN);
     }
 
     /**
