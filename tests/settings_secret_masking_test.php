@@ -53,8 +53,15 @@ final class settings_secret_masking_test extends \advanced_testcase {
     // stayed readable in mdl_config_log.
     private const SECRET_HINTS = ['apikey', 'api_key', 'key', 'secret', 'token', 'password', 'webhook'];
 
-    /** The setting classes that store a credential encrypted: Moodle's own, and the one with the "ends in" hint. */
-    private const PASSWORD_TYPES = ['admin_setting_encryptedpassword', 'admin_setting_secret_field'];
+    /**
+     * The setting classes that store a credential encrypted: Moodle's own, the one with the "ends in" hint,
+     * and its webhook URL subclass (the same encrypted storage, with a URL check on save).
+     */
+    private const PASSWORD_TYPES = [
+        'admin_setting_encryptedpassword',
+        'admin_setting_secret_field',
+        'admin_setting_webhook_url',
+    ];
 
     /** The fewest credential settings the scan must see in settings.php (the real count, less one). */
     private const MIN_CHECKED = 14;
@@ -136,7 +143,7 @@ final class settings_secret_masking_test extends \advanced_testcase {
             [],
             $offenders,
             "Credential settings must be admin_setting_secret_field (Moodle's admin_setting_encryptedpassword "
-            . "with an \"ends in\" hint) and be listed in secrets::names(). Plain configtext records every "
+            . "with an \"ends in\" hint) or its webhook subclass, and be listed in secrets::names(). Plain configtext records every "
             . "historical value in mdl_config_log, and a masked password type is still plain text in the "
             . "database. Offenders: " . implode(', ', $offenders)
         );

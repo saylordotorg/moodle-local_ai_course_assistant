@@ -32,6 +32,16 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
         return new admin_setting_secret_field('local_ai_course_assistant/' . $name, 'A key', 'desc');
     }
 
+    private function webhook(string $name = 'anomaly_digest_slack_webhook'): admin_setting_webhook_url {
+        global $CFG;
+        require_once($CFG->libdir . '/adminlib.php');
+        return new admin_setting_webhook_url('local_ai_course_assistant/' . $name, 'Slack webhook URL', 'desc');
+    }
+
+    private function stored(string $name = 'anomaly_digest_slack_webhook') {
+        return get_config('local_ai_course_assistant', $name);
+    }
+
     public function test_it_shows_the_last_four_and_never_the_key(): void {
         $this->resetAfterTest();
         $stored = secrets::conceal('sk-proj-EMBED-FIELD-0000-WXYZ');
@@ -136,6 +146,104 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
         $this->assertStringNotContainsString($foreign, $html);
     }
 
+    public function test_a_valid_webhook_url_is_saved_encrypted(): void {
+        $this->resetAfterTest();
+        $field = $this->webhook();
+        $this->assertSame('', $field->write_setting('https://hooks.example/T000/B000/SENTINELWEBHOOK'));
+        $stored = (string) $this->stored();
+        $this->assertTrue(secrets::is_encrypted($stored));
+        $this->assertStringNotContainsString('SENTINEL', $stored);
+        $this->assertStringNotContainsString('hooks.example', $stored);
+        $this->assertSame('https://hooks.example/T000/B000/SENTINELWEBHOOK', secrets::get('anomaly_digest_slack_webhook'));
+
+        // http is accepted, any case, and a pasted line break or space at either end is trimmed away.
+        foreach (["  HTTP://hooks.example/T000/B000/SENTINELTWO\n", 'http://hooks.example/x'] as $url) {
+            $this->assertSame('', $field->write_setting($url), $url);
+            $this->assertSame(trim($url), secrets::get('anomaly_digest_slack_webhook'));
+        }
+    }
+
+    /**
+     * @return array[] typed values that aren't an http(s) URL without whitespace
+     */
+    public static function not_a_webhook_url(): array {
+        return [
+            'words' => ['not a url NOT-A-URL-SENTINEL'],
+            'one word' => ['NOT-A-URL-SENTINEL'],
+            'no scheme' => ['hooks.example/T000/NOT-A-URL-SENTINEL'],
+            'other scheme' => ['ftp://hooks.example/NOT-A-URL-SENTINEL'],
+            'script scheme' => ['javascript:NOT-A-URL-SENTINEL'],
+            'scheme only' => ['https://'],
+            'no host' => ['https:///NOT-A-URL-SENTINEL'],
+            'space in the path' => ['https://hooks.example/NOT-A-URL SENTINEL'],
+            'tab in the path' => ["https://hooks.example/NOT-A-URL\tSENTINEL"],
+            'line break in the path' => ["https://hooks.example/NOT-A-URL\nSENTINEL"],
+            'two urls' => ['https://hooks.example/one https://hooks.example/NOT-A-URL-SENTINEL'],
+            'a key pasted by mistake' => ['sk-proj-NOT-A-URL-SENTINEL-0000-ZZZZ'],
+        ];
+    }
+
+    /**
+     * @dataProvider not_a_webhook_url
+     * @param string $typed
+     */
+    public function test_a_value_that_is_not_a_url_is_refused_and_never_echoed(string $typed): void {
+        $this->resetAfterTest();
+        $field = $this->webhook();
+        $before = secrets::conceal('https://hooks.example/T000/B000/SENTINELWEBHOOK');
+        set_config('anomaly_digest_slack_webhook', $before, 'local_ai_course_assistant');
+
+        $error = $field->write_setting($typed);
+
+        $this->assertNotSame('', $error, 'a non-empty error string means nothing was saved');
+        $this->assertStringContainsString('Slack webhook URL', $error, 'it names the field');
+        foreach (['SENTINEL', 'hooks.example', 'sk-proj', 'ZZZZ'] as $part) {
+            $this->assertStringNotContainsString($part, $error, 'the error never repeats what was typed');
+        }
+        $this->assertSame($before, $this->stored(), 'the saved URL is untouched, byte for byte');
+
+        // Moodle hands the failed value back to output_html(): it never reaches the page.
+        $html = $field->output_html($typed);
+        $this->assertStringNotContainsString('SENTINEL', $html);
+        $this->assertStringNotContainsString('NOT-A-URL', $html);
+        $this->assertStringNotContainsString('ZZZZ', $html);
+    }
+
+    public function test_a_refused_value_saves_nothing_on_a_field_that_was_never_set(): void {
+        $this->resetAfterTest();
+        $before = $this->stored('anomaly_digest_teams_webhook');
+        $this->assertNotSame('', $this->webhook('anomaly_digest_teams_webhook')->write_setting('not a url'));
+        $this->assertSame($before, $this->stored('anomaly_digest_teams_webhook'));
+        $this->assertSame('', secrets::get('anomaly_digest_teams_webhook'), 'nothing is saved');
+    }
+
+    /**
+     * An empty value is the parent's business, exactly as before: it clears the setting.
+     */
+    public function test_an_empty_value_behaves_as_before(): void {
+        $this->resetAfterTest();
+        $field = $this->webhook();
+        foreach (['', '   ', "\n"] as $empty) {
+            set_config('anomaly_digest_slack_webhook', secrets::conceal('https://hooks.example/T000/B000/SENTINELWEBHOOK'),
+                'local_ai_course_assistant');
+            $this->assertSame('', $field->write_setting($empty));
+            $this->assertSame('', $this->stored(), 'it clears the saved URL, as the encrypted password field does');
+        }
+        // The same call on the parent class gives the same result, so nothing changed for an empty value.
+        set_config('anomaly_digest_slack_webhook', secrets::conceal('https://hooks.example/x'), 'local_ai_course_assistant');
+        $parent = new \admin_setting_encryptedpassword('local_ai_course_assistant/anomaly_digest_slack_webhook', 'x', 'x');
+        $this->assertSame('', $parent->write_setting(''));
+        $this->assertSame('', $this->stored());
+    }
+
+    public function test_only_the_webhook_fields_insist_on_a_url(): void {
+        $this->resetAfterTest();
+        $this->assertTrue(is_subclass_of(admin_setting_webhook_url::class, admin_setting_secret_field::class));
+        // A key field takes whatever is typed, as before.
+        $this->assertSame('', $this->field()->write_setting('not a url, it is a key'));
+        $this->assertSame('not a url, it is a key', secrets::get('embed_apikey'));
+    }
+
     /**
      * Every single-key field on the settings pages is this class, so none is left without the hint, and a
      * field added later with Moodle's plain encrypted password type fails here instead of going without it.
@@ -209,7 +317,7 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
         }
         $this->assertSame(array_keys($urls), array_keys($found), 'both webhook fields are on the settings page');
         foreach ($found as $name => $setting) {
-            $this->assertInstanceOf(admin_setting_secret_field::class, $setting);
+            $this->assertInstanceOf(admin_setting_webhook_url::class, $setting);
             $html = $setting->output_html($setting->get_setting());
             $this->assertStringContainsString('A URL is saved.', $html);
             $this->assertStringNotContainsString('ends in', $html);

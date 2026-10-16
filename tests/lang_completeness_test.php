@@ -292,6 +292,7 @@ final class lang_completeness_test extends \basic_testcase {
         // Masked last-four hint on every single-key field (Task 8).
         'providerkeys:last4_hint',
         'providerkeys:saved_url_hint',
+        'providerkeys:err_webhook_url',
     ];
 
     /**
