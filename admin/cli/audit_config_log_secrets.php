@@ -32,6 +32,14 @@
  * key writes the retired key into the next row's `oldvalue` -- run this again
  * after any rotation.
  *
+ * Settings are found by name: anything that sounds like a credential, and every
+ * setting this plugin lists as a secret (webhook URLs, the Soapbox access key id,
+ * the spend export key). The two provider tables, comparison_providers and
+ * voice_providers, are read line by line: before 7.9.0 their second column held a
+ * key in the clear or as ciphertext, and the admin form logged the whole table.
+ * Redacting one of those rows overwrites only the key column of each line, so the
+ * provider and model stay in the history; every other row is overwritten whole.
+ *
  * No key value is ever printed. Rows are identified by plugin, setting name,
  * column, length, and date, which is enough to decide what to rotate.
  *
@@ -40,8 +48,9 @@
  *   php admin/cli/audit_config_log_secrets.php --redact
  *   php admin/cli/audit_config_log_secrets.php --redact --ids=4750,4731
  *
- * Redaction overwrites the value and keeps the row: who changed what, and when,
- * is the question the config log exists to answer.
+ * Redaction overwrites the value (the key column, for the two tables) and keeps
+ * the row: who changed what, and when, is the question the config log exists to
+ * answer. Nothing is overwritten unless you pass --redact or --ids.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor Academy
@@ -67,12 +76,7 @@ if ($unrecognized) {
 }
 
 if ($options['help']) {
-    echo "Report credentials left in the clear in Moodle's config change log.\n\n"
-        . "Options:\n"
-        . "  -h, --help     Show this help.\n"
-        . "      --redact   Overwrite exposed values with asterisks, keeping the rows.\n"
-        . "      --ids=A,B  Redact only these row ids (implies --redact).\n\n"
-        . "No key value is printed by this script under any option.\n";
+    echo \local_ai_course_assistant\config_log_audit::help();
     exit(0);
 }
 
