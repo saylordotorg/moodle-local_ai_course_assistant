@@ -102,6 +102,60 @@ final class settings_save_report_test extends \advanced_testcase {
         settings_save_report::assume_web(null);
     }
 
+    public function test_a_key_only_change_to_the_voice_table_says_so_and_is_a_warning(): void {
+        // Same rule as the provider table: the log holds the table with every key blanked.
+        $same = 'openai|********|main|shimmer|nova';
+        $r = settings_save_report::describe(['voice_providers' => [$same, $same]]);
+        $this->assertStringContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $r['message']);
+        $this->assertStringNotContainsString(get_string('savereport:lineendings', 'local_ai_course_assistant'), $r['message']);
+        $this->assertTrue($r['warn'], 'a voice key change is worth a warning');
+    }
+
+    public function test_a_line_ending_rewrite_of_the_voice_table_is_still_labelled_as_that(): void {
+        $r = settings_save_report::describe(['voice_providers' =>
+            ["openai|********|main\r\nxai|********|grok", "openai|********|main\nxai|********|grok"]]);
+        $this->assertStringContainsString(get_string('savereport:lineendings', 'local_ai_course_assistant'), $r['message']);
+        $this->assertStringNotContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $r['message']);
+    }
+
+    public function test_a_real_change_to_the_voice_table_shows_the_redacted_difference(): void {
+        $r = settings_save_report::describe(['voice_providers' =>
+            ['openai|********|main|shimmer|nova', 'openai|********|main|alloy|nova']]);
+        $this->assertStringContainsString('&rarr;', $r['message']);
+        $this->assertStringContainsString('alloy', $r['message']);
+        $this->assertStringNotContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $r['message']);
+    }
+
+    public function test_a_real_voice_key_replacement_reaches_the_notice_without_a_key_or_ciphertext(): void {
+        global $CFG, $SESSION;
+        require_once($CFG->libdir . '/adminlib.php');
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        settings_save_report::assume_web(true);
+        $setting = new admin_setting_voice_providers('local_ai_course_assistant/voice_providers', 'Voice', 'd');
+        $row = ['provider' => 'openai', 'newkey' => 'sk-proj-OLD-VOICENOTICE-3030-XXXX', 'keepid' => '', 'label' => 'main',
+            'realtime_voice' => 'shimmer', 'tts_voice' => 'nova'];
+        $setting->write_setting(['rows' => [$row]]);
+        unset($SESSION->local_ai_course_assistant_savedchanges);
+        // Only the key changes.
+        $row['newkey'] = 'sk-proj-NEW-VOICENOTICE-4040-YYYY';
+        $setting->write_setting(['rows' => [$row]]);
+        $this->assertArrayHasKey('voice_providers', $SESSION->local_ai_course_assistant_savedchanges);
+
+        settings_save_report::flush();
+        $text = '';
+        $levels = [];
+        foreach (\core\notification::fetch() as $notice) {
+            $text .= $notice->get_message();
+            $levels[] = $notice->get_message_type();
+        }
+        $this->assertStringContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $text);
+        $this->assertStringNotContainsString('VOICENOTICE', $text);
+        $this->assertDoesNotMatchRegularExpression('~(sodium|openssl-aes-256-ctr):~', $text);
+        $this->assertContains(\core\output\notification::NOTIFY_WARNING, $levels);
+        settings_save_report::assume_web(null);
+    }
+
     public function test_values_are_escaped_and_shortened(): void {
         $r = settings_save_report::describe(['greeting' => ['<script>x</script>', str_repeat('z', 200)]]);
         $this->assertStringNotContainsString('<script>', $r['message']);
