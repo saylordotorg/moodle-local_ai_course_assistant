@@ -255,33 +255,55 @@ class provider_keys {
         if ($row === null || $row['key'] === '' || secrets::get('apikey') === $row['key']) {
             return false;
         }
+        // The site's apikey is sent to the site's apibaseurl, and a row's key to the row's base URL. Copy
+        // only between the same destination (both empty is the normal case), or a gateway site would be
+        // handed the vendor's key and send it to the gateway host.
+        if (trim($row['baseurl']) !== trim((string) get_config(self::PLUGIN, 'apibaseurl'))) {
+            return false;
+        }
         set_config('apikey', secrets::conceal($row['key']), self::PLUGIN);
         return true;
     }
 
     /**
-     * Admin updated-callback for provider, model, apibaseurl and the table: keep apikey in step and
-     * warn when the default provider has no key of its own. Idempotent, so it may run once per changed setting.
+     * Admin updated-callback for provider, model, apibaseurl and the table: keep apikey in step.
+     *
+     * Sync only, and idempotent, because Moodle runs it once per changed setting, interleaved with the
+     * writes, so the table or the provider may still be the old value. It raises no notices; the warnings
+     * come from default_provider_warnings(), read once the whole save is done.
      *
      * @param string $fullname unused; Moodle passes the changed setting's name
      * @return void
      */
     public static function after_settings_saved($fullname = ''): void {
         self::sync_default_key();
+    }
+
+    /**
+     * Warnings about the default provider's key, as finished sentences. Pure: reads settings, raises nothing.
+     *
+     * Empty when the default provider needs no key or has a keyed row. Otherwise one sentence when the
+     * saved key belongs to another vendor, or when no key is saved anywhere (a custom gateway with a base
+     * URL is allowed to have none).
+     *
+     * @return string[]
+     */
+    public static function default_provider_warnings(): array {
         $provider = self::site_provider();
         if ($provider === '' || in_array($provider, self::KEYLESS, true) || self::key_for($provider) !== '') {
-            return;
+            return [];
         }
+        $baseurl = trim((string) get_config(self::PLUGIN, 'apibaseurl'));
         $legacy = secrets::get('apikey');
-        $owner = $legacy === '' ? '' : course_key_guard::conflict($provider, $legacy,
-            (string) get_config(self::PLUGIN, 'apibaseurl'));
+        $owner = $legacy === '' ? '' : course_key_guard::conflict($provider, $legacy, $baseurl);
         if ($owner !== '') {
-            \core\notification::warning(get_string('providerkeys:default_vendor_mismatch', self::PLUGIN,
-                (object) ['provider' => $provider, 'owner' => $owner]));
-        } else if ($legacy === '') {
-            \core\notification::warning(get_string('providerkeys:default_no_key', self::PLUGIN,
-                (object) ['provider' => $provider]));
+            return [get_string('providerkeys:default_vendor_mismatch', self::PLUGIN,
+                (object) ['provider' => $provider, 'owner' => $owner])];
         }
+        if ($legacy === '' && !($provider === 'custom' && $baseurl !== '')) {
+            return [get_string('providerkeys:default_no_key', self::PLUGIN, (object) ['provider' => $provider])];
+        }
+        return [];
     }
 
     /**
