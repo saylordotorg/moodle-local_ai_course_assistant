@@ -52,6 +52,13 @@ defined('MOODLE_INTERNAL') || die();
  * anything else is exposed. Redacting such a row overwrites only the key column
  * of each line, so the history still shows which provider and model changed.
  *
+ * Two limits, on purpose. A line that starts with # is a comment line and is
+ * skipped, so a retired key kept in a comment line survives --redact: there is no
+ * guessing at what a comment holds (a header such as "# provider|key|models" would
+ * be reported on every row). And a credential in a table row's base URL column is
+ * neither found nor redacted here; the 7.9.0 editor masks it when it logs, and
+ * rows from before that are the operator's to check by hand.
+ *
  * This class never returns, prints, or logs a secret value. It reports where
  * the exposure is and, on request, overwrites it.
  *
@@ -258,8 +265,10 @@ class config_log_audit {
 
     /**
      * The value of one of the two key tables with the key column of every line replaced by the mask. Every
-     * other column, comment lines, blank lines, a line already masked or keyless, and the line endings
-     * are left exactly as they were.
+     * other column, comment lines (their keys are not touched, see the class docblock), blank lines, a
+     * keyless line and the line endings are left exactly as they were. A key column that is already a mask of
+     * another length (****) is normalised to the standard eight asterisks, and spaces around a key are dropped
+     * with it. Running it twice gives the same result as running it once.
      *
      * @param string $value
      * @return string
@@ -298,6 +307,9 @@ class config_log_audit {
             . "nor asterisks, whether it is in the clear or encrypted. --redact overwrites only the key column\n"
             . "of each line with asterisks, so the provider, model and other columns stay in the history.\n"
             . "Every other setting is overwritten whole.\n\n"
+            . "Two limits. A table line that starts with # is a comment and is skipped, so a retired key kept\n"
+            . "in a comment survives --redact (the script doesn't guess what a comment holds). And a credential\n"
+            . "in a table row's base URL column is neither found nor redacted: check those rows by hand.\n\n"
             . "No key value is printed by this script under any option.\n";
     }
 

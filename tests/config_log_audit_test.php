@@ -406,7 +406,26 @@ final class config_log_audit_test extends \advanced_testcase {
         $this->assertStringContainsString('--redact', $help);
         $this->assertStringContainsString('--ids', $help);
         $this->assertStringContainsString('No key value is printed', $help);
+        // The two limits, said out loud: a retired key kept in a comment line is skipped and so survives
+        // --redact (no guessing at what a comment holds), and a base URL credential in a table row is out of scope.
+        $this->assertStringContainsString('starts with #', $help);
+        $this->assertStringContainsString('comment', $help);
+        $this->assertStringContainsString('survives --redact', $help);
+        $this->assertStringContainsString('base URL', $help);
+        $docblock = (string) (new \ReflectionClass(config_log_audit::class))->getDocComment();
+        $this->assertStringContainsString('comment line', $docblock, 'the class docblock states the comment-line limit too');
+        $this->assertStringContainsString('survives', $docblock);
         $script = (string) file_get_contents(__DIR__ . '/../admin/cli/audit_config_log_secrets.php');
         $this->assertStringContainsString('config_log_audit::help()', $script, 'the script prints the help from the class');
+    }
+
+    /**
+     * What the mask does to a key column that isn't a plain key: a mask of another length becomes the
+     * standard eight asterisks, and spaces around a key are dropped with it. An empty key column stays empty.
+     */
+    public function test_masking_normalises_a_mask_of_another_length_and_drops_spaces_around_a_key(): void {
+        $this->assertSame("openai|********|m\nclaude|********|m\nollama||x\n# openai|SENTINEL-KEPT-0014|c",
+            config_log_audit::mask_table_keys("openai| **** |m\nclaude|  SENTINEL-SPACED-0013  |m\nollama||x\n# openai|SENTINEL-KEPT-0014|c"));
+        $this->assertSame('openai|********', config_log_audit::mask_table_keys('openai|********'), 'idempotent');
     }
 }
