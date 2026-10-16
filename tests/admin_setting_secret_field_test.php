@@ -327,6 +327,105 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
         }
     }
 
+    /**
+     * The newest config_log row id, to read only what a test writes after it.
+     *
+     * @return int
+     */
+    private function log_mark(): int {
+        global $DB;
+        return (int) $DB->get_field_sql('SELECT COALESCE(MAX(id), 0) FROM {config_log}');
+    }
+
+    /**
+     * The rows config_log holds for a setting after a mark, oldest first.
+     *
+     * @param string $name
+     * @param int $after a log_mark()
+     * @return \stdClass[]
+     */
+    private function log_rows(string $name, int $after): array {
+        global $DB;
+        return array_values($DB->get_records_select('config_log', 'plugin = ? AND name = ? AND id > ?',
+            ['local_ai_course_assistant', $name, $after], 'id ASC'));
+    }
+
+    /**
+     * Moodle's encrypted password field adds nothing to the config log, so the log got the full ciphertext of
+     * every key. This field logs '********' for a value that is set, as Moodle's own masked password type does,
+     * and leaves an empty one empty.
+     */
+    public function test_a_key_reaches_config_log_only_as_asterisks(): void {
+        $this->resetAfterTest();
+        $field = $this->field();
+        $mark = $this->log_mark();
+
+        $this->assertSame('', $field->write_setting('sk-proj-LOGGED-ONE-1111-AAAA'));
+        $this->assertSame('', $field->write_setting('sk-proj-LOGGED-TWO-2222-BBBB'));
+        $this->assertSame('', $field->write_setting(''));
+
+        $rows = $this->log_rows('embed_apikey', $mark);
+        $this->assertCount(3, $rows, 'a first save, a replacement and a clear are each logged');
+        foreach ($rows as $row) {
+            foreach ([(string) $row->value, (string) $row->oldvalue] as $logged) {
+                $this->assertStringNotContainsString('LOGGED', $logged);
+                $this->assertStringNotContainsString('sodium:', $logged);
+                $this->assertStringNotContainsString('openssl', $logged);
+                $this->assertContains($logged, ['', '********'], 'only a mask or nothing is ever logged');
+            }
+        }
+        $this->assertSame('********', $rows[0]->value, 'a saved key is logged as a mask');
+        $this->assertSame('********', $rows[1]->oldvalue);
+        $this->assertSame('********', $rows[1]->value, 'a replaced key is masked both sides');
+        $this->assertSame('', (string) $rows[2]->value, 'a cleared key stays empty, so a clear still reads as one');
+        $this->assertSame('********', $rows[2]->oldvalue);
+        // What was stored is untouched by the masking.
+        $this->assertSame('', secrets::get('embed_apikey'));
+    }
+
+    public function test_a_webhook_url_reaches_config_log_only_as_asterisks(): void {
+        $this->resetAfterTest();
+        $field = $this->webhook();
+        $mark = $this->log_mark();
+        $this->assertSame('', $field->write_setting('https://hooks.example/T000/B000/SENTINELWEBHOOK'));
+        $this->assertSame('', $field->write_setting('https://hooks.example/T000/B000/SENTINELTWO'));
+
+        $rows = $this->log_rows('anomaly_digest_slack_webhook', $mark);
+        $this->assertCount(2, $rows);
+        foreach ($rows as $row) {
+            $this->assertSame('********', $row->value);
+            $this->assertContains((string) $row->oldvalue, ['', '********']);
+        }
+        $this->assertSame('https://hooks.example/T000/B000/SENTINELTWO', secrets::get('anomaly_digest_slack_webhook'));
+    }
+
+    /**
+     * With old and new both logged as the same mask, a key rotation must still tell the next admin page that
+     * something changed.
+     */
+    public function test_a_changed_key_still_produces_a_changed_notice(): void {
+        global $SESSION;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        settings_save_report::assume_web(true);
+        $field = $this->field();
+        $field->write_setting('sk-proj-NOTICE-ONE-1111-AAAA');
+        unset($SESSION->local_ai_course_assistant_savedchanges);
+
+        $field->write_setting('sk-proj-NOTICE-TWO-2222-BBBB');
+        $this->assertArrayHasKey('embed_apikey', $SESSION->local_ai_course_assistant_savedchanges);
+        settings_save_report::flush();
+        $text = '';
+        foreach (\core\notification::fetch() as $notice) {
+            $text .= $notice->get_message();
+        }
+        $this->assertStringContainsString('embed_apikey', $text);
+        $this->assertStringContainsString(get_string('savereport:secret', 'local_ai_course_assistant'), $text);
+        $this->assertStringNotContainsString('NOTICE', $text);
+        $this->assertStringNotContainsString('sodium:', $text);
+        settings_save_report::assume_web(null);
+    }
+
     public function test_it_is_still_an_encrypted_password_setting(): void {
         $this->resetAfterTest();
         $this->assertTrue(is_subclass_of(admin_setting_secret_field::class, \admin_setting_encryptedpassword::class));

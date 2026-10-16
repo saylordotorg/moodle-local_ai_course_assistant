@@ -2220,12 +2220,13 @@ if ($hassiteconfig) {
         'soapbox/',
         PARAM_TEXT
     ));
-    // Password type, not configtext: this is half of an IAM credential pair, and
-    // Moodle only writes '********' into config_log for password settings. As
+    // Password type, not configtext: this is half of an IAM credential pair. As
     // configtext, every access key ID ever saved stayed readable in mdl_config_log,
-    // which is never purged. Its sibling soapbox_storage_secret was already
-    // declared correctly; this one was missed, the same way redash_api_key was.
-    // (encryptedpassword takes no paramtype argument; it stores \core\encryption output.)
+    // which is never purged. admin_setting_secret_field stores \core\encryption
+    // output and logs only '********' (Moodle's own encrypted password field logs
+    // the full ciphertext, so the log masking is the subclass's). Its sibling
+    // soapbox_storage_secret was already declared correctly; this one was missed,
+    // the same way redash_api_key was. (It takes no paramtype argument.)
     $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/soapbox_storage_key',
         get_string('settings:soapbox_storage_key', 'local_ai_course_assistant'),
@@ -3232,10 +3233,10 @@ if ($hassiteconfig) {
         get_string('redash_heading_desc', 'local_ai_course_assistant')
     ));
 
-    // Password type, not configtext: Moodle only writes '********' into
-    // config_log for password settings. A plain configtext credential has
-    // every historical value recorded in the clear in mdl_config_log, which is
-    // never purged and is readable by anything with DB or reporting access.
+    // Password type, not configtext: a plain configtext credential has every
+    // historical value recorded in the clear in mdl_config_log, which is never
+    // purged and is readable by anything with DB or reporting access. The
+    // secret field logs only '********' for a value that is set.
     // Confirmed on production 2026-08-03 -- a retired key was recoverable in
     // full from the log. Its siblings redash_user_api_key and github_token
     // were already declared correctly; this one was missed.

@@ -19,10 +19,12 @@ namespace local_ai_course_assistant;
 /**
  * Guards that credential settings are declared as password types.
  *
- * Moodle writes '********' into mdl_config_log for password settings only. A
- * credential declared as admin_setting_configtext has every historical value
- * recorded in the clear, in a table that is never purged and is readable by
- * anything with database or reporting access.
+ * Moodle's masked password type writes '********' into mdl_config_log, and
+ * admin_setting_secret_field does the same for the encrypted one (Moodle's own
+ * admin_setting_encryptedpassword logs the full ciphertext). A credential
+ * declared as admin_setting_configtext has every historical value recorded in
+ * the clear, in a table that is never purged and is readable by anything with
+ * database or reporting access.
  *
  * Found on production 2026-08-03: redash_api_key was a plain configtext, and a
  * retired key was recoverable in full from config_log. Its siblings

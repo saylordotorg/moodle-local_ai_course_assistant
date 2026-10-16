@@ -29,7 +29,11 @@ defined('MOODLE_INTERNAL') || die();
  * A saved value that is a URL (an incoming webhook, whose token sits in the path) gets no last four, because
  * the tail of a URL is part of its token: the field says only that a URL is saved.
  *
- * Saving is the parent's: a typed value is encrypted, a blank one clears the setting.
+ * Saving is the parent's: a typed value is encrypted, a blank one clears the setting. The config log is not:
+ * Moodle's encrypted password field adds nothing to it, so every key's full ciphertext was written into
+ * mdl_config_log (never purged, readable by anyone who can reach the report). This field logs '********' for
+ * a value that is set, as Moodle's masked password type does, and leaves an empty value empty so a clear
+ * still shows as one.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor University
@@ -55,6 +59,19 @@ class admin_setting_secret_field extends \admin_setting_encryptedpassword {
         } finally {
             $this->description = $original;
         }
+    }
+
+    /**
+     * Log that the setting changed, never what it changed from or to.
+     *
+     * @param string $name setting name
+     * @param mixed $oldvalue the stored value before (ciphertext), or null when there was none
+     * @param mixed $value the stored value after (ciphertext), or '' when cleared
+     * @return void
+     */
+    protected function add_to_config_log($name, $oldvalue, $value) {
+        $mask = static fn($v) => ($v === null || $v === '') ? $v : '********';
+        parent::add_to_config_log($name, $mask($oldvalue), $mask($value));
     }
 
     /**
