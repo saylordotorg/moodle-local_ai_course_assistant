@@ -419,8 +419,9 @@ class provider_keys {
      *    the site has a gateway base URL, which takes any key.
      *
      * Existing lines are edited as text, never rebuilt from the parsed rows. A one-column line, a comment
-     * line, a label's case and any column past the fifth stay exactly as the admin wrote them; only a key
-     * field is ever encrypted or swapped, and a new row is one line appended at the end.
+     * line, a label's case and any column past the fifth are kept. What does change: a key field is encrypted
+     * or swapped, the spaces around each field of a row line are trimmed (conceal_row_keys() rejoins the
+     * trimmed fields), and line endings become \n (a CR is dropped). A new row is one line appended at the end.
      *
      * A key it overwrites in a row is first kept, concealed, in config provider_keys_displaced (one release,
      * no screen) and recorded in the audit log as a provider_key_displaced row.
@@ -526,7 +527,11 @@ class provider_keys {
     }
 
     /**
-     * Replace the key field of one row in a stored table and leave every other character as it was.
+     * Replace the key field of one row in a stored table, touching no other row.
+     *
+     * Only that row's line is rebuilt: its fields are trimmed and rejoined with "|", every column kept, the
+     * key column replaced. Every other line comes back as it was, apart from line endings, which become \n (a
+     * CR is dropped, as conceal_row_keys() already did to the text passed in).
      *
      * The index counts rows the way stored_rows() does (blank lines, comment lines and lines with no
      * provider are not rows), so it is the index stored_rows() reports. Keep the two in step.
