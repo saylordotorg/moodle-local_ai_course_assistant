@@ -91,7 +91,7 @@ Consequences, all wanted:
 - The key cell for a saved row shows **"Saved, ends in ab12"** and a **Change** button that reveals an empty input. A new row has an empty input. Keyless providers can be saved without a key.
 - The form posts plain arrays (`provider[]`, `newkey[]`, `keepid[]`, `models[]`, `temp[]`, `baseurl[]`). The old hidden field that carried every key is removed. On save, a blank key with a `keepid` keeps the stored ciphertext for that row; a filled key replaces it. The server builds and encrypts the stored string. Keys are never sent to the browser.
 - The row `id` is a hash of the ciphertext. The encryption uses a random nonce, so the hash reveals nothing about the key.
-- Inline validation reuses `failover_verifier::static_problems()` strings: a failover line with no row, a row with no key (for a keyed provider), a model that looks like a display name. The display-name check is extended to the primary `model` setting. A duplicate provider is rejected in the new UI and tolerated if it already exists.
+- Inline validation reuses `failover_verifier::static_problems()` strings: a failover line with no row, a row with no key (for a keyed provider), a model that looks like a display name. The display-name check is extended to the primary `model` setting. A duplicate provider is allowed, with a warning on save (amended at plan time: `admin/cli/run_tutor_golden.php` deliberately reads two rows for one provider, so the UI must not remove that). The accessor keeps the existing rule, the first row that has a key serves the provider, which is why one provider and base URL can't hold two keys as a primary and a failover backup.
 - Config-log redaction (`redact_keys`) is updated so neither plain keys nor ciphertext land in the log.
 
 ### 5.5 Upgrade (`db/upgrade.php`, one idempotent step, version 2026101601, release 7.9.0)
@@ -124,7 +124,7 @@ They stay `admin_setting_encryptedpassword` (already compliant). A small subclas
 - The sola-reviewer security pass (IDOR, XSS, token leakage) is a required step before merge.
 
 ## 7. Testing and review plan
-- Unit and integration tests for: the accessor (reveal and no-reveal, ordering, duplicates), encryption of rows, the parity matrix, the upgrade step (idempotent, conflict case, forced settings), save semantics (blank keeps, filled replaces, keyless row, duplicate rejection, failed save echoes nothing), and the no-leak render test of section 3. A guard test for raw reads of the table.
+- Unit and integration tests for: the accessor (reveal and no-reveal, ordering, duplicates), encryption of rows, the parity matrix, the upgrade step (idempotent, conflict case, forced settings), save semantics (blank keeps, filled replaces, keyless row, a duplicate provider is allowed with a warning, failed save echoes nothing), and the no-leak render test of section 3. A guard test for raw reads of the table.
 - Mutation proofs through `scripts/prove_test.py` for the invariants that matter (key not rendered, blank-keep, encryption on write, accessor ordering). Read the test COUNT every run: a version bump makes the next phpunit run execute zero tests until `php admin/tool/phpunit/cli/init.php` is re-run, and several test paths in one command run only the first. Rsync the repo into the Moodle tree after test edits.
 - Full suite on PHP 8.1 to 8.3 through CI, plus the validators.
 - Browser smoke on dev and alpha after deploy: the table loads without any key in the DOM (scan names and lengths, never print values), add and edit a key without changing the default, save and reload twice.
