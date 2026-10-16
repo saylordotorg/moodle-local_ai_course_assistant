@@ -47,7 +47,8 @@ class settings_save_report {
     private const SHOWN = 48;
 
     /** @var string[] Settings whose change is worth a warning on its own. */
-    private const KEY_SETTINGS = ['provider', 'model', 'apikey', 'failover_per_call_enabled', 'support_enabled'];
+    private const KEY_SETTINGS = ['provider', 'model', 'apikey', 'comparison_providers', 'failover_per_call_enabled',
+        'support_enabled'];
 
     /** @var ?bool Tests set this; the PHPUnit runner is a CLI request. */
     private static ?bool $assumeweb = null;
@@ -198,6 +199,11 @@ class settings_save_report {
         }
         $norm = static fn(?string $v): string => trim(str_replace("\r\n", "\n", (string) $v));
         if ($norm($old) === $norm($new)) {
+            // The provider table reaches the log with every key blanked, so equal text there means only a
+            // key changed, unless the old value had Windows line endings.
+            if ($name === provider_keys::SETTING && strpos((string) $old, "\r") === false) {
+                return get_string('savereport:keychanged', 'local_ai_course_assistant');
+            }
             return get_string('savereport:lineendings', 'local_ai_course_assistant');
         }
         return self::show($old) . ' &rarr; ' . self::show($new);

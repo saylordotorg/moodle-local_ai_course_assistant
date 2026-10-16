@@ -278,6 +278,10 @@ final class lang_completeness_test extends \basic_testcase {
         'providerkeys:name_coreai',
         'providerkeys:name_custom',
         'providerkeys:name_voyage',
+        // Added or reworded in fix round 1 (settings:provider_desc keeps its old translations until Task 12 redoes them).
+        'providerkeys:err_baseurl_query',
+        'savereport:keychanged',
+        'settings:provider_desc',
     ];
 
     /**

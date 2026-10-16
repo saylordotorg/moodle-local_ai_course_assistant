@@ -33,6 +33,9 @@ class admin_setting_provider_keys extends admin_setting_keyed_rows {
     /** @var string Matches a base URL with a user name or password: anything before an @ in the authority. */
     private const CREDENTIALS = '~^(https?://)[^/?#\\\\]*@~i';
 
+    /** @var string[] Words that make a query-string parameter name a credential (ruling R22), matched per word. */
+    private const SECRET_PARAMS = ['key', 'token', 'secret', 'sig', 'signature', 'password', 'auth', 'apikey'];
+
     /**
      * The columns after the key.
      *
@@ -90,10 +93,88 @@ class admin_setting_provider_keys extends admin_setting_keyed_rows {
      * @return string
      */
     protected function display_value(string $column, string $value): string {
-        if ($column === 'baseurl') {
-            return preg_replace(self::CREDENTIALS, '$1***@', $value);
+        return $column === 'baseurl' ? self::mask_url($value) : $value;
+    }
+
+    /**
+     * Whether a query-string parameter name is a credential: one of its words (split on anything that isn't
+     * a letter or digit, and on camelCase) is key, token, secret, sig, signature, password, auth or apikey.
+     * "api_key", "X-Amz-Signature" and "accessToken" match; "monkey", "keyboard" and "api-version" don't.
+     *
+     * @param string $name
+     * @return bool
+     */
+    private static function secret_param(string $name): bool {
+        $words = preg_split('~[^A-Za-z0-9]+|(?<=[a-z0-9])(?=[A-Z])~', rawurldecode($name), -1, PREG_SPLIT_NO_EMPTY);
+        foreach ($words as $word) {
+            if (in_array(strtolower($word), self::SECRET_PARAMS, true)) {
+                return true;
+            }
         }
-        return $value;
+        return false;
+    }
+
+    /**
+     * Whether a URL's query string has a parameter named like a credential.
+     *
+     * @param string $url
+     * @return bool
+     */
+    private static function has_secret_query(string $url): bool {
+        if (!preg_match('~^[^?#]*\?([^#]*)~', $url, $m)) {
+            return false;
+        }
+        foreach (explode('&', $m[1]) as $part) {
+            $eq = strpos($part, '=');
+            if (self::secret_param($eq === false ? $part : substr($part, 0, $eq))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * A URL as it may appear on a page, in a notice or in the config log: the user name and password are
+     * replaced by *** and so is the value of any credential-named query parameter.
+     *
+     * @param string $url
+     * @return string
+     */
+    public static function mask_url(string $url): string {
+        $url = preg_replace(self::CREDENTIALS, '$1***@', $url);
+        return preg_replace_callback('~^([^?#]*\?)([^#]*)~', static function (array $m): string {
+            $parts = explode('&', $m[2]);
+            foreach ($parts as $i => $part) {
+                $eq = strpos($part, '=');
+                if ($eq !== false && self::secret_param(substr($part, 0, $eq))) {
+                    $parts[$i] = substr($part, 0, $eq) . '=***';
+                }
+            }
+            return $m[1] . implode('&', $parts);
+        }, $url);
+    }
+
+    /**
+     * The key column is blanked by the parent. A base URL can carry a credential too (a legacy saved one), so
+     * it is masked here, and the config log and the settings-changed notice never see it.
+     *
+     * @param mixed $raw
+     * @return mixed
+     */
+    public static function redact_keys($raw) {
+        $raw = parent::redact_keys($raw);
+        if (!is_string($raw) || $raw === '') {
+            return $raw;
+        }
+        $out = [];
+        foreach (explode("\n", $raw) as $line) {
+            $parts = explode('|', $line);
+            if (isset($parts[4]) && trim($parts[4]) !== '') {
+                $parts[4] = self::mask_url($parts[4]);
+            }
+            $out[] = implode('|', $parts);
+        }
+        return implode("\n", $out);
     }
 
     /**
@@ -110,7 +191,7 @@ class admin_setting_provider_keys extends admin_setting_keyed_rows {
         foreach ($rows as $r) {
             $p = $r['provider'];
             if (!in_array($p, $known, true)) {
-                $errors[] = get_string('providerkeys:err_provider', $plugin, s(self::safe_name($p)));
+                $errors[] = branding::str('providerkeys:err_provider', s(self::safe_name($p)));
                 continue;
             }
             if ($r['stored_key'] === '' && !in_array($p, provider_keys::KEYLESS, true)) {
@@ -138,6 +219,8 @@ class admin_setting_provider_keys extends admin_setting_keyed_rows {
                     $errors[] = get_string('providerkeys:err_baseurl', $plugin, $p);
                 } else if (preg_match(self::CREDENTIALS, $r['baseurl'])) {
                     $errors[] = get_string('providerkeys:err_baseurl_credentials', $plugin, $p);
+                } else if (self::has_secret_query($r['baseurl'])) {
+                    $errors[] = get_string('providerkeys:err_baseurl_query', $plugin, $p);
                 }
             }
         }

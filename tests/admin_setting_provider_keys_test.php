@@ -329,4 +329,171 @@ final class admin_setting_provider_keys_test extends \advanced_testcase {
         $this->assertStringNotContainsStringIgnoringCase('SENTINEL', $html);
         $this->assertStringNotContainsStringIgnoringCase('IN-THE-PROVIDER-COLUMN', $html);
     }
+
+    /**
+     * Names of query-string parameters that carry a credential (ruling R22).
+     *
+     * @return array
+     */
+    public static function secret_query_provider(): array {
+        $u = 'https://gw.example/v1?';
+        return [
+            'api_key' => [$u . 'api_key=QS-SENTINEL'],
+            'api-key' => [$u . 'api-key=QS-SENTINEL'],
+            'apikey' => [$u . 'apikey=QS-SENTINEL'],
+            'apiKey' => [$u . 'apiKey=QS-SENTINEL'],
+            'key' => [$u . 'key=QS-SENTINEL'],
+            'upper case' => [$u . 'KEY=QS-SENTINEL'],
+            'token' => [$u . 'token=QS-SENTINEL'],
+            'access_token after a harmless one' => [$u . 'model=x&access_token=QS-SENTINEL'],
+            'secret' => [$u . 'client_secret=QS-SENTINEL'],
+            'sig' => [$u . 'sig=QS-SENTINEL'],
+            'signature' => [$u . 'X-Amz-Signature=QS-SENTINEL'],
+            'password' => [$u . 'password=QS-SENTINEL'],
+            'auth' => [$u . 'auth=QS-SENTINEL'],
+            'percent-encoded name' => [$u . '%6Bey=QS-SENTINEL'],
+            'before a fragment' => [$u . 'key=QS-SENTINEL#top'],
+        ];
+    }
+
+    /**
+     * @dataProvider secret_query_provider
+     * @param string $url
+     */
+    public function test_a_base_url_with_a_secret_in_its_query_string_is_refused(string $url): void {
+        $this->resetAfterTest();
+        $err = $this->setting()->write_setting(['rows' => [
+            $this->row('custom', 'sk-custom-QS-URL-1616-RRRR', '', 'm', '', $url),
+        ]]);
+        $this->assertStringContainsString(
+            get_string('providerkeys:err_baseurl_query', 'local_ai_course_assistant', 'custom'), $err);
+        $this->assertStringNotContainsString('QS-SENTINEL', $err, 'the error never repeats the value');
+        $this->assertSame('', $this->stored(), 'nothing saved');
+    }
+
+    /**
+     * Query parameters that are not credentials, including names that only contain a risky word.
+     *
+     * @return array
+     */
+    public static function harmless_query_provider(): array {
+        $u = 'https://gw.example/v1?';
+        return [
+            'model' => [$u . 'model=x'],
+            'api-version' => [$u . 'api-version=2024-02-01'],
+            'two parameters' => [$u . 'deployment=gpt4&api-version=2024-02-01'],
+            'monkey is not key' => [$u . 'monkey=1'],
+            'keyboard is not key' => [$u . 'keyboard=1'],
+            'a value that says key' => [$u . 'mode=key'],
+        ];
+    }
+
+    /**
+     * @dataProvider harmless_query_provider
+     * @param string $url
+     */
+    public function test_a_harmless_query_string_is_accepted(string $url): void {
+        $this->resetAfterTest();
+        $this->assertSame('', $this->setting()->write_setting(['rows' => [
+            $this->row('custom', 'sk-custom-QS-URL-1616-RRRR', '', 'm', '', $url),
+        ]]));
+        $this->assertStringContainsString($url, $this->stored());
+    }
+
+    public function test_a_stored_query_secret_is_masked_on_the_page_and_refused_on_the_way_back(): void {
+        $this->resetAfterTest();
+        $enc = secrets::conceal('sk-custom-LEGACY-QS-1818-SSSS');
+        set_config('comparison_providers',
+            "custom|{$enc}|m||https://gw.example/v1?api-version=2024-02-01&key=QS-LEGACY-SECRET#top",
+            'local_ai_course_assistant');
+        $setting = $this->setting();
+        $html = $setting->output_html('');
+        $this->assertStringNotContainsString('QS-LEGACY-SECRET', $html);
+        $this->assertStringContainsString('api-version=2024-02-01', $html, 'harmless parameters stay visible');
+        $this->assertStringContainsString('key=***', $html);
+        $before = $this->stored();
+        $id = provider_keys::rows()[0]['id'];
+        $err = $setting->write_setting(['rows' => [
+            $this->row('custom', '', $id, 'm', '', 'https://gw.example/v1?api-version=2024-02-01&key=***#top'),
+        ]]);
+        $this->assertStringContainsString(
+            get_string('providerkeys:err_baseurl_query', 'local_ai_course_assistant', 'custom'), $err);
+        $this->assertSame($before, $this->stored());
+    }
+
+    public function test_the_config_log_and_the_notice_never_carry_a_url_credential_or_ciphertext(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->assertSame(
+            "custom|********|m||https://***@gw.example/v1?key=***&model=x",
+            admin_setting_provider_keys::redact_keys(
+                "custom|sodium:abcdef|m||https://u:PW-SENTINEL@gw.example/v1?key=QS-SENTINEL&model=x"));
+        // A real save over a legacy table: the old value is logged too.
+        $enc = secrets::conceal('sk-custom-LEGACY-LOG-1919-TTTT');
+        set_config('comparison_providers',
+            "custom|{$enc}|m||https://u:PW-LEGACY@gw.example/v1?key=QS-LEGACY", 'local_ai_course_assistant');
+        $this->assertSame('', $this->setting()->write_setting(['rows' => [
+            $this->row('custom', 'sk-custom-NEW-LOG-2020-UUUU', '', 'm', '', 'https://gw.example/v1'),
+        ]]));
+        $logged = $DB->get_records('config_log', ['plugin' => 'local_ai_course_assistant', 'name' => 'comparison_providers']);
+        $this->assertNotEmpty($logged);
+        foreach ($logged as $entry) {
+            foreach ([(string) $entry->value, (string) $entry->oldvalue] as $text) {
+                $this->assertStringNotContainsString('PW-LEGACY', $text);
+                $this->assertStringNotContainsString('QS-LEGACY', $text);
+                $this->assertDoesNotMatchRegularExpression('~(sodium|openssl-aes-256-ctr):~', $text);
+            }
+        }
+    }
+
+    public function test_changing_a_rows_provider_never_carries_its_key_to_the_new_provider(): void {
+        $this->resetAfterTest();
+        $setting = $this->setting();
+        $setting->write_setting(['rows' => [$this->row('openai', 'sk-proj-MOVES-NOT-2121-VVVV', '', 'gpt-4o-mini')]]);
+        $before = $this->stored();
+        $id = provider_keys::rows()[0]['id'];
+        // The admin picked another provider in the dropdown and typed no key.
+        $err = $setting->write_setting(['rows' => [$this->row('claude', '', $id, 'claude-haiku-4-5')]]);
+        $this->assertStringContainsString(
+            get_string('providerkeys:err_needs_key', 'local_ai_course_assistant', 'claude'), $err);
+        $this->assertSame($before, $this->stored(), 'nothing saved');
+        // A keyless provider doesn't need one, and the old key isn't copied across either.
+        $this->assertSame('', $setting->write_setting(['rows' => [$this->row('ollama', '', $id, 'llama3')]]));
+        $this->assertSame('ollama||llama3', $this->stored());
+        // The same provider with a blank key still keeps its key (see the byte-identical test).
+    }
+
+    public function test_the_unknown_provider_error_uses_the_configured_product_name(): void {
+        $this->resetAfterTest();
+        set_config('short_name', 'ACMEBOT', 'local_ai_course_assistant');
+        $err = $this->setting()->write_setting(['rows' => [$this->row('notaprovider', 'sk-x-1234567890-abcd')]]);
+        $this->assertStringContainsString('ACMEBOT', $err);
+        $this->assertStringNotContainsString('SOLA', $err);
+        $this->assertStringNotContainsString('[[', $err);
+    }
+
+    public function test_every_control_in_a_row_has_an_accessible_name(): void {
+        $this->resetAfterTest();
+        $setting = $this->setting();
+        $setting->write_setting(['rows' => [$this->row('openai', 'sk-proj-ARIA-2222-WWWW', '', 'gpt-4o-mini')]]);
+        $html = $setting->output_html('');
+        $this->assertGreaterThan(8, preg_match_all('~<(select|input|button)\b[^>]*>~', $html, $m));
+        $unnamed = [];
+        foreach ($m[0] as $i => $tag) {
+            $isbutton = $m[1][$i] === 'button';
+            $ishidden = preg_match('~type="hidden"~', $tag);
+            $isremove = str_contains($tag, 'sola-kr-remove');
+            // Hidden inputs aren't controls, and the Change and Add buttons carry their own text.
+            if ($ishidden || ($isbutton && !$isremove)) {
+                continue;
+            }
+            if (!preg_match('~aria-label="[^"]+"~', $tag)) {
+                $unnamed[] = $tag;
+            }
+        }
+        $this->assertSame([], $unnamed, 'controls with no aria-label');
+        foreach (['Provider', 'API key', 'Models (comma-separated)', 'Temp.', 'Base URL', 'Remove row'] as $label) {
+            $this->assertStringContainsString('aria-label="' . $label . '"', $html);
+        }
+    }
 }

@@ -52,6 +52,56 @@ final class settings_save_report_test extends \advanced_testcase {
         $this->assertStringNotContainsString('&rarr;', $r['message']);
     }
 
+    public function test_a_key_only_change_to_the_provider_table_says_so_and_is_a_warning(): void {
+        // The log holds the table with every key blanked, so a key-only change has equal old and new text.
+        $same = 'openai|********|gpt-4o-mini';
+        $r = settings_save_report::describe(['comparison_providers' => [$same, $same]]);
+        $this->assertStringContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $r['message']);
+        $this->assertStringNotContainsString(get_string('savereport:lineendings', 'local_ai_course_assistant'), $r['message']);
+        $this->assertTrue($r['warn'], 'a key change is worth a warning');
+    }
+
+    public function test_a_line_ending_rewrite_of_the_provider_table_is_still_labelled_as_that(): void {
+        $r = settings_save_report::describe(['comparison_providers' => ["a|********|b\r\nc||d", "a|********|b\nc||d"]]);
+        $this->assertStringContainsString(get_string('savereport:lineendings', 'local_ai_course_assistant'), $r['message']);
+        $this->assertStringNotContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $r['message']);
+    }
+
+    public function test_a_real_change_to_the_provider_table_shows_the_redacted_difference(): void {
+        $r = settings_save_report::describe(['comparison_providers' =>
+            ['openai|********|gpt-4o-mini', 'openai|********|gpt-4o']]);
+        $this->assertStringContainsString('&rarr;', $r['message']);
+        $this->assertStringContainsString('gpt-4o-mini', $r['message']);
+        $this->assertStringNotContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $r['message']);
+    }
+
+    public function test_a_real_key_replacement_reaches_the_notice_without_a_key_or_ciphertext(): void {
+        global $CFG, $SESSION;
+        require_once($CFG->libdir . '/adminlib.php');
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        settings_save_report::assume_web(true);
+        $setting = new admin_setting_provider_keys('local_ai_course_assistant/comparison_providers', 'Provider keys', 'd');
+        $row = ['provider' => 'openai', 'newkey' => 'sk-proj-OLD-NOTICE-3030-XXXX', 'keepid' => '', 'models' => 'm',
+            'temperature' => '', 'baseurl' => ''];
+        $setting->write_setting(['rows' => [$row]]);
+        unset($SESSION->local_ai_course_assistant_savedchanges);
+        // Only the key changes.
+        $row['newkey'] = 'sk-proj-NEW-NOTICE-4040-YYYY';
+        $setting->write_setting(['rows' => [$row]]);
+        $this->assertArrayHasKey('comparison_providers', $SESSION->local_ai_course_assistant_savedchanges);
+
+        settings_save_report::flush();
+        $text = '';
+        foreach (\core\notification::fetch() as $notice) {
+            $text .= $notice->get_message();
+        }
+        $this->assertStringContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $text);
+        $this->assertStringNotContainsString('NOTICE', $text);
+        $this->assertDoesNotMatchRegularExpression('~(sodium|openssl-aes-256-ctr):~', $text);
+        settings_save_report::assume_web(null);
+    }
+
     public function test_values_are_escaped_and_shortened(): void {
         $r = settings_save_report::describe(['greeting' => ['<script>x</script>', str_repeat('z', 200)]]);
         $this->assertStringNotContainsString('<script>', $r['message']);

@@ -131,7 +131,9 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
             $keepid = (string) ($p['keepid'] ?? '');
             if ($newkey !== '') {
                 $row['stored_key'] = secrets::conceal($newkey);
-            } else if ($keepid !== '' && isset($existing[$keepid])) {
+            } else if ($keepid !== '' && isset($existing[$keepid]) && $existing[$keepid][$first] === $row[$first]) {
+                // Only the same row (same identifying column) keeps its key. If the admin switched the row to
+                // another provider and typed no key, the old key doesn't follow it: the row needs a new one.
                 $row['stored_key'] = $existing[$keepid]['stored_key'];
             } else {
                 $row['stored_key'] = '';
@@ -227,6 +229,7 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
             $cell = [
                 'name' => $column['name'],
                 'inputname' => $fullname . '[rows][' . $idx . '][' . $column['name'] . ']',
+                'label' => get_string($column['label'], 'local_ai_course_assistant'),
                 'value' => $this->display_value($column['name'], $current),
                 'isselect' => $column['type'] === 'select',
                 'isnumber' => $column['type'] === 'number',
@@ -259,6 +262,7 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
                 ? get_string('providerkeys:saved_ends_in', 'local_ai_course_assistant', $last4)
                 : get_string('providerkeys:saved', 'local_ai_course_assistant'),
             'keyinput' => $fullname . '[rows][' . $idx . '][newkey]',
+            'keylabel' => get_string('providerkeys:col_key', 'local_ai_course_assistant'),
             'keepinput' => $fullname . '[rows][' . $idx . '][keepid]',
             'cells' => $cells,
             'changelabel' => get_string('providerkeys:change', 'local_ai_course_assistant'),
@@ -276,7 +280,7 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
      * @return void
      */
     protected function add_to_config_log($name, $oldvalue, $value) {
-        parent::add_to_config_log($name, self::redact_keys($oldvalue), self::redact_keys($value));
+        parent::add_to_config_log($name, static::redact_keys($oldvalue), static::redact_keys($value));
     }
 
     /**

@@ -25,31 +25,31 @@
 
     Example context (json):
     { "idx": "0", "rowid": "a1b2c3d4e5f6", "haskey": true, "savedlabel": "Saved, ends in ab12",
-      "keyinput": "x[rows][0][newkey]", "keepinput": "x[rows][0][keepid]", "changelabel": "Change",
+      "keyinput": "x[rows][0][newkey]", "keylabel": "API key", "keepinput": "x[rows][0][keepid]", "changelabel": "Change",
       "newkeyplaceholder": "Paste the API key", "removelabel": "Remove",
-      "cells": [ { "name": "provider", "inputname": "x[rows][0][provider]", "value": "openai", "isselect": true,
+      "cells": [ { "name": "provider", "label": "Provider", "inputname": "x[rows][0][provider]", "value": "openai", "isselect": true,
         "options": [ { "value": "openai", "label": "OpenAI", "selected": true } ], "iskeynext": true } ] }
 }}
 <tr data-row="{{idx}}">
     {{#cells}}
     <td>
-        {{#isselect}}<select class="form-control form-control-sm" name="{{inputname}}">{{#options}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/options}}</select>{{/isselect}}
-        {{#istext}}<input type="text" class="form-control form-control-sm" name="{{inputname}}" value="{{value}}" placeholder="{{placeholder}}">{{/istext}}
-        {{#isnumber}}<input type="number" step="0.1" min="0" max="2" class="form-control form-control-sm" name="{{inputname}}" value="{{value}}" placeholder="{{placeholder}}">{{/isnumber}}
+        {{#isselect}}<select class="form-control form-control-sm" name="{{inputname}}" aria-label="{{label}}">{{#options}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/options}}</select>{{/isselect}}
+        {{#istext}}<input type="text" class="form-control form-control-sm" name="{{inputname}}" value="{{value}}" placeholder="{{placeholder}}" aria-label="{{label}}">{{/istext}}
+        {{#isnumber}}<input type="number" step="0.1" min="0" max="2" class="form-control form-control-sm" name="{{inputname}}" value="{{value}}" placeholder="{{placeholder}}" aria-label="{{label}}">{{/isnumber}}
     </td>
     {{#iskeynext}}
     <td class="sola-kr-keycell">
         {{#haskey}}
         <span class="sola-kr-saved">{{savedlabel}}</span>
         <button type="button" class="btn btn-sm btn-link sola-kr-change">{{changelabel}}</button>
-        <input type="password" class="form-control form-control-sm sola-kr-newkey d-none" name="{{keyinput}}" value="" autocomplete="new-password" placeholder="{{newkeyplaceholder}}" disabled>
+        <input type="password" class="form-control form-control-sm sola-kr-newkey d-none" name="{{keyinput}}" value="" autocomplete="new-password" placeholder="{{newkeyplaceholder}}" aria-label="{{keylabel}}" disabled>
         {{/haskey}}
         {{^haskey}}
-        <input type="password" class="form-control form-control-sm sola-kr-newkey" name="{{keyinput}}" value="" autocomplete="new-password" placeholder="{{newkeyplaceholder}}">
+        <input type="password" class="form-control form-control-sm sola-kr-newkey" name="{{keyinput}}" value="" autocomplete="new-password" placeholder="{{newkeyplaceholder}}" aria-label="{{keylabel}}">
         {{/haskey}}
         <input type="hidden" name="{{keepinput}}" value="{{rowid}}">
     </td>
     {{/iskeynext}}
     {{/cells}}
-    <td><button type="button" class="btn btn-sm btn-outline-danger sola-kr-remove" title="{{removelabel}}">&times;</button></td>
+    <td><button type="button" class="btn btn-sm btn-outline-danger sola-kr-remove" title="{{removelabel}}" aria-label="{{removelabel}}">&times;</button></td>
 </tr>
