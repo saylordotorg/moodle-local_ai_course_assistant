@@ -105,6 +105,65 @@ final class settings_save_report_test extends \advanced_testcase {
         settings_save_report::assume_web(null);
     }
 
+    /** The four settings whose change can leave the default provider without a key. */
+    public static function default_provider_setting_provider(): array {
+        return [['provider'], ['model'], ['apibaseurl'], ['comparison_providers']];
+    }
+
+    /**
+     * @dataProvider default_provider_setting_provider
+     * @param string $name
+     */
+    public function test_a_change_to_a_default_provider_setting_raises_the_key_warning(string $name): void {
+        $this->resetAfterTest();
+        set_config('provider', 'claude', 'local_ai_course_assistant');
+        $expected = provider_keys::default_provider_warnings();
+        $this->assertCount(1, $expected, 'claude is the default and no row has a key');
+
+        $this->assertSame(1, settings_save_report::emit_default_provider_warnings([$name => ['a', 'b']]));
+        $notices = \core\notification::fetch();
+        $this->assertCount(1, $notices);
+        $this->assertSame($expected[0], $notices[0]->get_message());
+        $this->assertSame(\core\output\notification::NOTIFY_WARNING, $notices[0]->get_message_type());
+    }
+
+    public function test_other_changes_raise_no_key_warning(): void {
+        $this->resetAfterTest();
+        set_config('provider', 'claude', 'local_ai_course_assistant');
+        $this->assertNotEmpty(provider_keys::default_provider_warnings());
+
+        $this->assertSame(0, settings_save_report::emit_default_provider_warnings([]));
+        $this->assertSame(0, settings_save_report::emit_default_provider_warnings(
+            ['greeting' => ['hi', 'hello'], 'apikey' => ['a', 'b'], 'failover_per_call_enabled' => ['0', '1']]));
+        $this->assertSame([], \core\notification::fetch());
+    }
+
+    public function test_no_key_warning_when_the_default_provider_has_its_key(): void {
+        $this->resetAfterTest();
+        set_config('provider', 'claude', 'local_ai_course_assistant');
+        set_config('comparison_providers', 'claude|' . secrets::conceal('sk-ant-HAS-ITS-KEY-0001-ABCD') . '|m',
+            'local_ai_course_assistant');
+        $this->assertSame(0, settings_save_report::emit_default_provider_warnings(['provider' => ['auto', 'claude']]));
+        $this->assertSame([], \core\notification::fetch());
+    }
+
+    public function test_flush_raises_each_key_warning_once_however_many_settings_changed(): void {
+        global $SESSION;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        settings_save_report::assume_web(true);
+        set_config('provider', 'claude', 'local_ai_course_assistant');
+        $expected = provider_keys::default_provider_warnings();
+        $SESSION->local_ai_course_assistant_savedchanges = [
+            'provider' => ['auto', 'claude'], 'model' => ['x', 'y'], 'apibaseurl' => ['', 'https://gw.example'],
+            'comparison_providers' => ['a', 'b'],
+        ];
+        settings_save_report::flush();
+        $messages = array_map(static fn($n) => $n->get_message(), \core\notification::fetch());
+        $this->assertSame(1, count(array_keys($messages, $expected[0], true)), 'once, not once per setting');
+        settings_save_report::assume_web(null);
+    }
+
     public function test_cli_changes_are_not_collected(): void {
         global $SESSION;
         $this->resetAfterTest();

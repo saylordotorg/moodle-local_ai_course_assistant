@@ -114,6 +114,7 @@ class settings_save_report {
                 );
             }
         }
+        self::emit_default_provider_warnings($pending);
         $report = self::describe($pending);
         if ($report['changed'] === 0) {
             return;
@@ -122,6 +123,30 @@ class settings_save_report {
             $report['message'],
             $report['warn'] ? \core\notification::WARNING : \core\notification::INFO
         );
+    }
+
+    /**
+     * Warn when a save may have left the default provider without a key.
+     *
+     * Raised once per flush, and only when the save touched one of the four settings that decide which key
+     * chat uses (the default provider, its model, the gateway URL, or the provider table). The words come
+     * from provider_keys::default_provider_warnings(), which reads the settings as they are now. Moodle runs
+     * a setting's updated-callback while the save is still half done, so the warnings are read here instead,
+     * on the next page, when every value is final.
+     *
+     * @param array $pending Setting name => [old value, new value].
+     * @return int how many warnings were raised
+     */
+    public static function emit_default_provider_warnings(array $pending): int {
+        $names = ['provider', 'model', 'apibaseurl', 'comparison_providers'];
+        if (!array_intersect_key($pending, array_flip($names))) {
+            return 0;
+        }
+        $warnings = provider_keys::default_provider_warnings();
+        foreach ($warnings as $warning) {
+            \core\notification::warning($warning);
+        }
+        return count($warnings);
     }
 
     /**
