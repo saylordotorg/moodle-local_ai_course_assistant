@@ -40,9 +40,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider_benchmark {
-    /** @var string Key of the last full run in the ad-hoc application cache the admin page reads exports from. */
-    public const CACHE_KEY = 'provider_benchmark_last_payload';
-
     /**
      * Typical learner prompts. Short and zero-context — this is a cost /
      * latency / contract benchmark, not a tutoring-quality benchmark.
@@ -72,17 +69,6 @@ class provider_benchmark {
         'Supply and demand describes the relationship between the quantity of a good producers wish to sell and the quantity buyers wish to purchase, given a price.',
         'A binary search algorithm finds the position of a target value within a sorted array by repeatedly dividing the search interval in half.',
     ];
-
-    /**
-     * Drop the cached last run. Payloads cached before 7.9.0 hold each provider row's plain key, and the
-     * JSON export would go on serving them until the next run; the 7.9.0 upgrade calls this once.
-     *
-     * @return void
-     */
-    public static function forget_cached_payload(): void {
-        \cache::make_from_params(\cache_store::MODE_APPLICATION, 'local_ai_course_assistant', 'provider_benchmark')
-            ->delete(self::CACHE_KEY);
-    }
 
     /**
      * Run every benchmark and return the full result set.

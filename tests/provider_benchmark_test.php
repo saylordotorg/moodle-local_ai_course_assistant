@@ -107,21 +107,6 @@ final class provider_benchmark_test extends \advanced_testcase {
         $this->assertStringNotContainsString('SENTINEL', provider_benchmark::export_json(['voice' => $voice]));
     }
 
-    /**
-     * A payload cached by an earlier release holds plain row keys and the export would still serve it, so
-     * the 7.9.0 upgrade drops it.
-     */
-    public function test_a_stale_cached_payload_can_be_dropped(): void {
-        $this->resetAfterTest();
-        $cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, 'local_ai_course_assistant',
-            'provider_benchmark');
-        $cache->set(provider_benchmark::CACHE_KEY, ['chat' => ['providers' => [['id' => 'claude',
-            'apikey' => 'sk-ant-SENTINEL-STALE-KEY-0000']]]]);
-        $this->assertNotFalse($cache->get(provider_benchmark::CACHE_KEY));
-        provider_benchmark::forget_cached_payload();
-        $this->assertFalse($cache->get(provider_benchmark::CACHE_KEY));
-    }
-
     public function test_run_chat_runs_each_prompt_against_primary(): void {
         $this->resetAfterTest();
         $this->setup_stub_primary();
