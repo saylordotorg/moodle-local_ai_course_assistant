@@ -868,6 +868,18 @@ if ($hassiteconfig) {
         $embeddingproviders
     ));
 
+    // v7.9.0: "use the key from a provider row" instead of pasting it again. It sits above the key field it
+    // can replace, because its first choice reads "Use the key pasted below". Read once for the three selects
+    // (Embedding here, Rerank and Voice on their own pages below).
+    $keysources = \local_ai_course_assistant\provider_keys::from_choices();
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/embed_key_from',
+        get_string('settings:embed_key_from', 'local_ai_course_assistant'),
+        get_string('settings:embed_key_from_desc', 'local_ai_course_assistant'),
+        'own',
+        $keysources
+    ));
+
     $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/embed_apikey',
         get_string('settings:embed_apikey', 'local_ai_course_assistant'),
@@ -1077,6 +1089,14 @@ if ($hassiteconfig) {
         get_string('settings:rerank_enabled', 'local_ai_course_assistant'),
         get_string('settings:rerank_enabled_desc', 'local_ai_course_assistant'),
         0
+    ));
+
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/rerank_key_from',
+        get_string('settings:rerank_key_from', 'local_ai_course_assistant'),
+        get_string('settings:rerank_key_from_desc', 'local_ai_course_assistant'),
+        'own',
+        $keysources
     ));
 
     $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
@@ -1857,6 +1877,15 @@ if ($hassiteconfig) {
         get_string('settings:realtime_enabled', 'local_ai_course_assistant'),
         get_string('settings:realtime_enabled_desc', 'local_ai_course_assistant'),
         0
+    ));
+
+    // Voice talks to OpenAI's endpoints, so only an OpenAI row can be its key (voice_registry::legacy_realtime_key()).
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/realtime_key_from',
+        get_string('settings:realtime_key_from', 'local_ai_course_assistant'),
+        get_string('settings:realtime_key_from_desc', 'local_ai_course_assistant'),
+        'own',
+        array_intersect_key($keysources, ['own' => true, 'openai' => true])
     ));
 
     $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
@@ -3680,7 +3709,7 @@ if ($hassiteconfig) {
         // Retrieval. rag_enabled defaults on, so this hides nothing by default;
         // it matters for sites that deliberately run without retrieval.
         'rag_enabled' => [
-            'embed_provider', 'embed_apikey', 'embed_model', 'embed_apibaseurl',
+            'embed_provider', 'embed_key_from', 'embed_apikey', 'embed_model', 'embed_apibaseurl',
             'embed_dimensions', 'embed_query_model', 'embed_dtype', 'rag_topk', 'rag_min_similarity', 'rag_currentpage_boost',
             'rag_chunksize', 'rag_return_scope', 'rag_window_size', 'rag_parent_max_chars',
             'rag_scope', 'rag_auto_reindex_drifted',
@@ -3701,7 +3730,7 @@ if ($hassiteconfig) {
         'rag_extract_scorm' => ['rag_scorm_max_mb'],
         'rag_fetch_transcripts' => ['rag_iframe_host_patterns', 'rag_transcript_url_pattern'],
         'rerank_enabled' => [
-            'rerank_apikey', 'rerank_model', 'rerank_apibaseurl',
+            'rerank_key_from', 'rerank_apikey', 'rerank_model', 'rerank_apibaseurl',
             'rerank_candidates', 'rerank_margin_threshold', 'rerank_min_query_chars',
         ],
 
@@ -3734,7 +3763,7 @@ if ($hassiteconfig) {
         ],
 
         // Voice.
-        'realtime_enabled' => ['realtime_apikey', 'realtime_voice'],
+        'realtime_enabled' => ['realtime_key_from', 'realtime_apikey', 'realtime_voice'],
         'stt_selfhosted_enabled' => [
             'stt_selfhosted_url', 'stt_selfhosted_model',
             'stt_selfhosted_apikey', 'stt_selfhosted_warm',

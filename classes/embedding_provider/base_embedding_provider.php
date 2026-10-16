@@ -82,10 +82,41 @@ abstract class base_embedding_provider {
     }
 
     /**
+     * The key Embedding sends to its provider.
+     *
+     * A migration override of embed_apikey (embedding_migration builds the target provider with its own key)
+     * always wins. Otherwise an explicit "use the key from the X row" choice (embed_key_from) wins over the
+     * pasted key, and the pasted key is the fallback, so a choice naming a row that is gone or has no key
+     * changes nothing.
+     *
+     * Also the answer for status pages (rag_admin.php): outside create_from_config() no override is active,
+     * so it reads the live settings.
+     *
+     * @return string the plain key, or '' when none is configured
+     */
+    public static function resolve_apikey(): string {
+        $own = (string) (self::cfg('embed_apikey') ?: '');
+        if (array_key_exists('embed_apikey', self::$configoverrides)) {
+            return $own;
+        }
+        $fromrow = \local_ai_course_assistant\provider_keys::key_from_setting('embed_key_from');
+        return $fromrow !== '' ? $fromrow : $own;
+    }
+
+    /**
+     * The key this instance will send. Read-only, so a test can check the choice without a network call.
+     *
+     * @return string
+     */
+    public function resolved_key(): string {
+        return $this->apikey;
+    }
+
+    /**
      * Constructor — reads plugin RAG config.
      */
     public function __construct() {
-        $this->apikey     = (string) (self::cfg('embed_apikey') ?: '');
+        $this->apikey     = self::resolve_apikey();
         $this->model      = (string) (self::cfg('embed_model') ?: $this->get_default_model());
         // Query-side model. Empty (the default) means "same as the document
         // model", which is the only universally safe choice: vectors from

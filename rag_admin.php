@@ -287,7 +287,8 @@ $statusrows = [];
 // produces zero chunks. Show it first so a misconfiguration is obvious.
 $embedprovider = (string) (get_config('local_ai_course_assistant', 'embed_provider') ?: 'openai');
 $embedmodel    = (string) (get_config('local_ai_course_assistant', 'embed_model') ?: '');
-$embedkey      = (string) (\local_ai_course_assistant\secrets::get('embed_apikey') ?: '');
+// The key Embedding will really send: a chosen provider row, else the pasted key.
+$embedkey      = \local_ai_course_assistant\embedding_provider\base_embedding_provider::resolve_apikey();
 $embedneedskey = ($embedprovider !== 'ollama'); // Local Ollama needs no key.
 $embedok       = $embedneedskey ? ($embedkey !== '') : true;
 if ($embedok) {

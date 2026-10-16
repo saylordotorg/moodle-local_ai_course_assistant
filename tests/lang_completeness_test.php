@@ -295,6 +295,13 @@ final class lang_completeness_test extends \basic_testcase {
         'providerkeys:err_webhook_url',
         // Security pass fix wave 2: the note on a table forced in config.php.
         'providerkeys:forced_note',
+        // Embedding, Rerank and Voice can use a provider row's key (Task 10).
+        'settings:embed_key_from',
+        'settings:embed_key_from_desc',
+        'settings:rerank_key_from',
+        'settings:rerank_key_from_desc',
+        'settings:realtime_key_from',
+        'settings:realtime_key_from_desc',
     ];
 
     /**
