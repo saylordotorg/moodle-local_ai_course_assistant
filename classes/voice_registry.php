@@ -323,17 +323,19 @@ class voice_registry {
      * A row is used only when the admin chose it, so an OpenAI failover row alone never turns voice on. And only
      * a plain OpenAI row can be chosen: the single-key path always talks to api.openai.com, so another vendor's
      * key would be sent to OpenAI, and a row with its own base URL (Azure OpenAI, a gateway) holds a key for that
-     * destination, not for api.openai.com. A choice naming such a row, a row that is gone, one with no key or one
-     * that cannot be decrypted counts as no choice.
+     * destination, not for api.openai.com. The first plain keyed OpenAI row serves, wherever it sits in the table:
+     * a gateway row listed before it is skipped, not a stop, and so is a row with no key or one that cannot be
+     * decrypted. A choice with no such row, or one that is gone, counts as no choice.
      *
      * @return string
      */
     public static function legacy_realtime_key(): string {
         $from = strtolower(trim((string) get_config('local_ai_course_assistant', 'realtime_key_from')));
         if ($from === 'openai') {
-            $row = \local_ai_course_assistant\provider_keys::for_provider('openai');
-            if ($row !== null && trim($row['baseurl']) === '' && $row['key'] !== '') {
-                return $row['key'];
+            foreach (\local_ai_course_assistant\provider_keys::rows(true) as $row) {
+                if ($row['provider'] === 'openai' && $row['haskey'] && $row['key'] !== '' && trim($row['baseurl']) === '') {
+                    return $row['key'];
+                }
             }
         }
         return (string) \local_ai_course_assistant\secrets::get('realtime_apikey');

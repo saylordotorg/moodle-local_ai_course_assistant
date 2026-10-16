@@ -578,29 +578,63 @@ class provider_keys {
     }
 
     /**
-     * The key of the provider row an Embedding, Rerank or Voice field points at, or '' for "use my own".
+     * The provider row an Embedding or Rerank field points at, or null for "use my own" or a choice that can't be used.
      *
-     * With a target vendor, a row whose key the key's own prefix identifies as ANOTHER vendor's is skipped
-     * (course_key_guard::conflict(): unambiguous prefixes only, a bare sk- identifies nobody), because it would be
-     * sent to the wrong vendor's endpoint. That covers a choice that went stale when the admin switched the
-     * embedding provider after picking a row. A base URL for the target turns the check off: a gateway takes any
-     * key. The caller then falls back to the pasted key, silently.
+     * The row's key is sent to the target, so a row is passed over (null, and the caller falls back to the pasted
+     * key, silently) when:
+     * - it is gone, has no key, or its key cannot be decrypted;
+     * - it has a base URL of its own that is not the target's base URL: an Azure OpenAI or gateway key is for that
+     *   destination, not for the vendor's own endpoint (see row_reaches());
+     * - with a target vendor, the key's own prefix identifies it as ANOTHER vendor's (course_key_guard::conflict():
+     *   unambiguous prefixes only, a bare sk- identifies nobody). That covers a choice that went stale when the
+     *   admin switched the embedding provider after picking a row. A base URL for the target turns this check
+     *   off: a gateway takes any key.
      *
-     * @param string $setting one of embed_key_from, rerank_key_from, realtime_key_from
-     * @param string $vendor the provider the key will be sent to ('' = do not check)
-     * @param string $baseurl the target's own base URL, if any
-     * @return string
+     * @param string $setting one of embed_key_from, rerank_key_from
+     * @param string $vendor the provider the key will be sent to ('' = do not check the vendor)
+     * @param string $baseurl the base URL the key will be sent to ('' = the vendor's own endpoint)
+     * @return array|null the row, key revealed
      */
-    public static function key_from_setting(string $setting, string $vendor = '', string $baseurl = ''): string {
+    public static function chosen_row(string $setting, string $vendor = '', string $baseurl = ''): ?array {
         $from = strtolower(trim((string) get_config(self::PLUGIN, $setting)));
         if ($from === '' || $from === 'own') {
-            return '';
+            return null;
         }
-        $key = self::key_for($from);
-        if ($key !== '' && $vendor !== '' && course_key_guard::conflict(strtolower($vendor), $key, trim($baseurl)) !== '') {
-            return '';
+        $row = self::for_provider($from);
+        if ($row === null || $row['key'] === '' || !self::row_reaches($row['baseurl'], $baseurl)) {
+            return null;
         }
-        return $key;
+        if ($vendor !== '' && course_key_guard::conflict(strtolower($vendor), $row['key'], trim($baseurl)) !== '') {
+            return null;
+        }
+        return $row;
+    }
+
+    /**
+     * The key of the provider row an Embedding or Rerank field points at, or '' for "use my own".
+     *
+     * @param string $setting one of embed_key_from, rerank_key_from
+     * @param string $vendor the provider the key will be sent to ('' = do not check the vendor)
+     * @param string $baseurl the base URL the key will be sent to ('' = the vendor's own endpoint)
+     * @return string the plain key, or '' when the row is not to be used (see chosen_row())
+     */
+    public static function key_from_setting(string $setting, string $vendor = '', string $baseurl = ''): string {
+        $row = self::chosen_row($setting, $vendor, $baseurl);
+        return $row === null ? '' : $row['key'];
+    }
+
+    /**
+     * May a provider row's key be sent to this target? A row with no base URL is for the vendor's own endpoint and
+     * goes anywhere the caller already vetted (the vendor check); a row with a base URL of its own holds a
+     * credential for that destination, so it goes only to the same one. Compared trimmed.
+     *
+     * @param string $rowbaseurl the row's base URL column
+     * @param string $target the base URL the key would be sent to ('' = the vendor's own endpoint)
+     * @return bool
+     */
+    public static function row_reaches(string $rowbaseurl, string $target): bool {
+        $rowbaseurl = trim($rowbaseurl);
+        return $rowbaseurl === '' || $rowbaseurl === trim($target);
     }
 
     /**

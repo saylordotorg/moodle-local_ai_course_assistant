@@ -476,4 +476,156 @@ final class provider_key_sources_test extends \advanced_testcase {
         $this->cfg('embed_apibaseurl', 'https://gateway.example/v1');
         $this->assertSame('sk-proj-ROW-FOR-EMBED-4444-DDDD', (new voyage_reranker())->resolved_key(), 'base URL set: unchecked');
     }
+
+    // Fix wave 3.
+
+    /**
+     * F3.2: a row with its own base URL (Azure OpenAI, a gateway) holds a credential for THAT destination. Embedding
+     * and Rerank send to their own base URL, so a chosen row is used only when the URLs are the same.
+     */
+    public function test_embedding_skips_a_chosen_row_whose_base_url_differs_from_its_own(): void {
+        $this->resetAfterTest();
+        $this->cfg('embed_provider', 'openai');
+        $this->cfg('embed_apikey', secrets::conceal('sk-proj-OWN-EMBED-KEY-2222-BBBB'));
+        $this->cfg('comparison_providers', "openai|sk-proj-AZURE-ROW-KEY-1111-AAAA|m||https://example.openai.azure.com");
+        $this->cfg('embed_key_from', 'openai');
+        $this->assertSame('sk-proj-OWN-EMBED-KEY-2222-BBBB', (new openai_embedding_provider())->resolved_key(),
+            'Embedding goes to api.openai.com, so the Azure row key stays home');
+        $this->assertSame('sk-proj-OWN-EMBED-KEY-2222-BBBB', base_embedding_provider::resolve_apikey(), 'the status card agrees');
+        $this->cfg('embed_apibaseurl', 'https://other.example.test/v1');
+        $this->assertSame('sk-proj-OWN-EMBED-KEY-2222-BBBB', (new openai_embedding_provider())->resolved_key(),
+            'a different base URL is a different destination');
+        $this->cfg('embed_apibaseurl', ' https://example.openai.azure.com ');
+        $this->assertSame('sk-proj-AZURE-ROW-KEY-1111-AAAA', (new openai_embedding_provider())->resolved_key(),
+            'the same destination (compared trimmed)');
+        $this->assertSame('sk-proj-AZURE-ROW-KEY-1111-AAAA', base_embedding_provider::resolve_apikey());
+    }
+
+    public function test_embedding_with_a_gateway_row_and_no_pasted_key_has_no_key_rather_than_the_wrong_one(): void {
+        $this->resetAfterTest();
+        $this->cfg('comparison_providers', "openai|sk-proj-AZURE-ROW-KEY-1111-AAAA|m||https://example.openai.azure.com");
+        $this->cfg('embed_key_from', 'openai');
+        $this->assertSame('', (new openai_embedding_provider())->resolved_key());
+    }
+
+    public function test_a_chosen_row_with_no_base_url_is_used_whatever_the_embedding_base_url(): void {
+        $this->resetAfterTest();
+        $this->cfg('embed_apikey', secrets::conceal('sk-proj-OWN-EMBED-KEY-2222-BBBB'));
+        $this->cfg('comparison_providers', "openai|sk-proj-ROW-FOR-EMBED-3333-CCCC|m");
+        $this->cfg('embed_key_from', 'openai');
+        $this->assertSame('sk-proj-ROW-FOR-EMBED-3333-CCCC', (new openai_embedding_provider())->resolved_key());
+        $this->cfg('embed_apibaseurl', 'https://gateway.example/v1');
+        $this->assertSame('sk-proj-ROW-FOR-EMBED-3333-CCCC', (new openai_embedding_provider())->resolved_key(),
+            'as before: an empty row base URL still works');
+    }
+
+    public function test_rerank_skips_a_chosen_row_whose_base_url_differs_from_the_rerank_url(): void {
+        $this->resetAfterTest();
+        $this->cfg('rerank_apikey', secrets::conceal('pa-OWN-RERANK-KEY-5555-EEEE'));
+        $this->cfg('comparison_providers', "voyage|pa-GATEWAY-ROW-KEY-6666-FFFF|rerank-2.5||https://voyage-gw.example.test/v1");
+        $this->cfg('rerank_key_from', 'voyage');
+        $this->assertSame('pa-OWN-RERANK-KEY-5555-EEEE', (new voyage_reranker())->resolved_key(),
+            'the reranker goes to api.voyageai.com, so the gateway row key stays home');
+        $this->cfg('rerank_apibaseurl', 'https://elsewhere.example.test/v1');
+        $this->assertSame('pa-OWN-RERANK-KEY-5555-EEEE', (new voyage_reranker())->resolved_key(), 'another destination');
+        $this->cfg('rerank_apibaseurl', ' https://voyage-gw.example.test/v1 ');
+        $this->assertSame('pa-GATEWAY-ROW-KEY-6666-FFFF', (new voyage_reranker())->resolved_key(), 'the same destination');
+        // With no rerank URL the reranker uses the embedding URL, which counts as its target.
+        $this->cfg('rerank_apibaseurl', '');
+        $this->cfg('embed_apibaseurl', 'https://voyage-gw.example.test/v1');
+        $this->assertSame('pa-GATEWAY-ROW-KEY-6666-FFFF', (new voyage_reranker())->resolved_key(), 'the embedding URL is the target');
+    }
+
+    public function test_a_chosen_rerank_row_with_no_base_url_is_used_as_before(): void {
+        $this->resetAfterTest();
+        $this->cfg('rerank_apikey', secrets::conceal('pa-OWN-RERANK-KEY-5555-EEEE'));
+        $this->cfg('comparison_providers', "voyage|pa-VOYAGE-ROW-KEY-3333-CCCC|rerank-2.5");
+        $this->cfg('rerank_key_from', 'voyage');
+        $this->assertSame('pa-VOYAGE-ROW-KEY-3333-CCCC', (new voyage_reranker())->resolved_key());
+        $this->cfg('rerank_apibaseurl', 'https://rerank-gateway.example/v1');
+        $this->assertSame('pa-VOYAGE-ROW-KEY-3333-CCCC', (new voyage_reranker())->resolved_key());
+    }
+
+    /**
+     * Rerank falls onward to the key Embedding took from a chosen row. That row's base URL was right for Embedding's
+     * destination; Rerank applies the same rule against its own.
+     */
+    public function test_rerank_does_not_inherit_an_embedding_row_that_is_for_another_base_url(): void {
+        $this->resetAfterTest();
+        $this->cfg('embed_provider', 'openai');
+        $this->cfg('embed_apibaseurl', 'https://example.openai.azure.com');
+        $this->cfg('comparison_providers', "openai|sk-proj-AZURE-ROW-KEY-1111-AAAA|m||https://example.openai.azure.com");
+        $this->cfg('embed_key_from', 'openai');
+        $this->assertSame('sk-proj-AZURE-ROW-KEY-1111-AAAA', base_embedding_provider::resolve_apikey(), 'Embedding uses it');
+        $this->assertSame('sk-proj-AZURE-ROW-KEY-1111-AAAA', (new voyage_reranker())->resolved_key(),
+            'no rerank URL: the embedding URL is the same destination');
+        $this->cfg('rerank_apibaseurl', 'https://api.voyage-gateway.example.test/v1');
+        $reranker = new voyage_reranker();
+        $this->assertSame('', $reranker->resolved_key(), 'a different Rerank destination does not get the Azure key');
+        $this->assertFalse($reranker->is_configured());
+        $this->cfg('rerank_apikey', secrets::conceal('pa-OWN-RERANK-KEY-5555-EEEE'));
+        $this->assertSame('pa-OWN-RERANK-KEY-5555-EEEE', (new voyage_reranker())->resolved_key(), 'its own key still comes first');
+    }
+
+    public function test_rerank_still_inherits_an_embedding_row_with_no_base_url_under_a_rerank_gateway(): void {
+        $this->resetAfterTest();
+        $this->cfg('embed_provider', 'voyage');
+        $this->cfg('comparison_providers', "voyage|pa-VOYAGE-ROW-KEY-3333-CCCC|voyage-3.5");
+        $this->cfg('embed_key_from', 'voyage');
+        $this->cfg('rerank_apibaseurl', 'https://rerank-gateway.example/v1');
+        $this->assertSame('pa-VOYAGE-ROW-KEY-3333-CCCC', (new voyage_reranker())->resolved_key(), 'an empty row URL works as today');
+    }
+
+    public function test_key_from_setting_applies_the_base_url_rule_to_every_caller(): void {
+        $this->resetAfterTest();
+        $this->cfg('comparison_providers', "openai|sk-proj-AZURE-ROW-KEY-1111-AAAA|m||https://example.openai.azure.com\n"
+            . "claude|sk-ant-PLAIN-ROW-KEY-7777-GGGG|m");
+        $this->cfg('embed_key_from', 'openai');
+        $this->assertSame('', provider_keys::key_from_setting('embed_key_from'), 'no target URL given');
+        $this->assertSame('', provider_keys::key_from_setting('embed_key_from', 'openai', 'https://other.example.test'));
+        $this->assertSame('sk-proj-AZURE-ROW-KEY-1111-AAAA',
+            provider_keys::key_from_setting('embed_key_from', 'openai', ' https://example.openai.azure.com '));
+        $this->assertSame('sk-proj-AZURE-ROW-KEY-1111-AAAA',
+            provider_keys::key_from_setting('embed_key_from', '', 'https://example.openai.azure.com'));
+        $this->cfg('embed_key_from', 'claude');
+        $this->assertSame('sk-ant-PLAIN-ROW-KEY-7777-GGGG', provider_keys::key_from_setting('embed_key_from'),
+            'a row with no base URL is used as before');
+    }
+
+    /**
+     * F3.4: the Voice key is the first keyed OpenAI row for api.openai.com, which means the first PLAIN one. An
+     * Azure row listed first must not hide a plain row listed later.
+     */
+    public function test_voice_uses_the_first_plain_openai_row_when_a_gateway_row_is_listed_first(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'gemini');
+        $this->cfg('comparison_providers', "openai|sk-proj-GATEWAY-ROW-9090-HHHH|m||https://example.openai.azure.com\n"
+            . "openai|sk-proj-PLAIN-ROW-9191-JJJJ|m\nopenai|sk-proj-LATER-PLAIN-9292-KKKK|m");
+        $this->cfg('realtime_key_from', 'openai');
+        $this->assertSame('sk-proj-PLAIN-ROW-9191-JJJJ', voice_registry::legacy_realtime_key());
+        $this->assertTrue(voice_registry::is_configured());
+        $this->assertSame('sk-proj-PLAIN-ROW-9191-JJJJ', voice_registry::resolve(voice_registry::CAPABILITY_TTS)['apikey']);
+    }
+
+    public function test_voice_skips_a_keyless_or_unreadable_plain_row_for_a_later_plain_one(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'gemini');
+        $this->cfg('comparison_providers', "openai||m\n"
+            . "openai|sodium:AAAAnotarealciphertextAAAAAAAAAAAAAAAAAAAAAAAA|m\n"
+            . "openai|sk-proj-PLAIN-ROW-9191-JJJJ|m");
+        $this->cfg('realtime_key_from', 'openai');
+        $key = voice_registry::legacy_realtime_key();
+        $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
+        $this->assertSame('sk-proj-PLAIN-ROW-9191-JJJJ', $key);
+    }
+
+    public function test_voice_falls_back_to_its_own_key_when_every_keyed_openai_row_has_a_base_url(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'gemini');
+        $this->cfg('realtime_apikey', secrets::conceal('sk-proj-OWN-VOICE-KEY-1010-IIII'));
+        $this->cfg('comparison_providers', "openai|sk-proj-GATEWAY-ROW-9090-HHHH|m||https://example.openai.azure.com\n"
+            . "openai|sk-proj-GATEWAY-TWO-9393-LLLL|m||https://gw.example.test/v1");
+        $this->cfg('realtime_key_from', 'openai');
+        $this->assertSame('sk-proj-OWN-VOICE-KEY-1010-IIII', voice_registry::legacy_realtime_key());
+    }
 }
