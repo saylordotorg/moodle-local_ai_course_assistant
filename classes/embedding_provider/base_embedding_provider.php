@@ -95,9 +95,21 @@ abstract class base_embedding_provider {
      * @return string the plain key, or '' when none is configured
      */
     public static function resolve_apikey(): string {
+        return self::resolve_apikey_source()['key'];
+    }
+
+    /**
+     * The key Embedding sends, and whether it is a chosen provider row's key rather than a pasted one.
+     *
+     * voyage_reranker needs the difference: it falls onward to this key, and a key that came from a chosen row
+     * is vendor-checked against Voyage while a pasted one is passed on exactly as it always was.
+     *
+     * @return array{key: string, fromrow: bool}
+     */
+    public static function resolve_apikey_source(): array {
         $own = (string) (self::cfg('embed_apikey') ?: '');
         if (array_key_exists('embed_apikey', self::$configoverrides)) {
-            return $own;
+            return ['key' => $own, 'fromrow' => false];
         }
         // The row's key goes to THIS provider's endpoint, so a row the key identifies as another vendor's is skipped
         // (a choice made for the openai row, then Embedding switched to voyage, must not send the OpenAI key).
@@ -106,7 +118,7 @@ abstract class base_embedding_provider {
             (string) (self::cfg('embed_provider') ?: 'openai'),
             (string) self::cfg('embed_apibaseurl')
         );
-        return $fromrow !== '' ? $fromrow : $own;
+        return $fromrow !== '' ? ['key' => $fromrow, 'fromrow' => true] : ['key' => $own, 'fromrow' => false];
     }
 
     /**

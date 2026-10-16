@@ -424,4 +424,56 @@ final class provider_key_sources_test extends \advanced_testcase {
         $this->assertStringContainsString('cli_error(', $block);
         $this->assertStringContainsString('providerkeys:use_own_key', $block, 'it names the choice the operator must pick');
     }
+
+    // Fix round 2.
+
+    /**
+     * Rerank falls onward to the key Embedding uses. When that key is a CHOSEN ROW's, it is vendor-checked against
+     * Voyage like Rerank's own choice, so an OpenAI row chosen for Embedding never reaches Voyage that way.
+     */
+    public function test_rerank_does_not_inherit_an_openai_row_chosen_for_embedding(): void {
+        $this->resetAfterTest();
+        $this->cfg('embed_provider', 'openai');
+        $this->cfg('comparison_providers', "openai|sk-proj-ROW-FOR-EMBED-3333-CCCC|m");
+        $this->cfg('embed_key_from', 'openai');
+        $this->assertSame('sk-proj-ROW-FOR-EMBED-3333-CCCC', base_embedding_provider::resolve_apikey(), 'Embedding does use it');
+        $reranker = new voyage_reranker();
+        $this->assertSame('', $reranker->resolved_key(), 'but Voyage does not get it');
+        $this->assertFalse($reranker->is_configured());
+        // Its own key and its own row still come first, as before.
+        $this->cfg('rerank_apikey', secrets::conceal('pa-OWN-RERANK-KEY-5555-EEEE'));
+        $this->assertSame('pa-OWN-RERANK-KEY-5555-EEEE', (new voyage_reranker())->resolved_key());
+    }
+
+    /** "Same key for the same call" for a site that configures nothing new: a pasted embedding key falls through as always. */
+    public function test_rerank_still_inherits_a_pasted_embedding_key_whatever_its_prefix(): void {
+        $this->resetAfterTest();
+        $this->cfg('embed_provider', 'openai');
+        $this->cfg('embed_apikey', secrets::conceal('sk-proj-PASTED-EMBED-KEY-3333-CCCC'));
+        $this->assertSame('sk-proj-PASTED-EMBED-KEY-3333-CCCC', (new voyage_reranker())->resolved_key());
+        // A row exists for the same vendor but is not chosen: still the pasted key.
+        $this->cfg('comparison_providers', "openai|sk-proj-ROW-FOR-EMBED-4444-DDDD|m");
+        $this->cfg('embed_key_from', 'own');
+        $this->assertSame('sk-proj-PASTED-EMBED-KEY-3333-CCCC', (new voyage_reranker())->resolved_key());
+        // A chosen row that Embedding itself skips (another vendor's) leaves the pasted key, and that falls through.
+        $this->cfg('embed_provider', 'voyage');
+        $this->cfg('embed_key_from', 'openai');
+        $this->assertSame('sk-proj-PASTED-EMBED-KEY-3333-CCCC', base_embedding_provider::resolve_apikey());
+        $this->assertSame('sk-proj-PASTED-EMBED-KEY-3333-CCCC', (new voyage_reranker())->resolved_key());
+    }
+
+    public function test_rerank_inherits_a_voyage_row_chosen_for_embedding_and_a_base_url_lifts_the_check(): void {
+        $this->resetAfterTest();
+        $this->cfg('embed_provider', 'voyage');
+        $this->cfg('comparison_providers', "voyage|pa-VOYAGE-ROW-KEY-3333-CCCC|voyage-3.5");
+        $this->cfg('embed_key_from', 'voyage');
+        $this->assertSame('pa-VOYAGE-ROW-KEY-3333-CCCC', (new voyage_reranker())->resolved_key(), 'a voyage row falls through');
+        // A gateway takes any key: with a base URL the OpenAI row key is inherited, as the ruling says.
+        $this->cfg('embed_provider', 'openai');
+        $this->cfg('comparison_providers', "openai|sk-proj-ROW-FOR-EMBED-4444-DDDD|m");
+        $this->cfg('embed_key_from', 'openai');
+        $this->assertSame('', (new voyage_reranker())->resolved_key(), 'no base URL: skipped');
+        $this->cfg('embed_apibaseurl', 'https://gateway.example/v1');
+        $this->assertSame('sk-proj-ROW-FOR-EMBED-4444-DDDD', (new voyage_reranker())->resolved_key(), 'base URL set: unchecked');
+    }
 }
