@@ -131,11 +131,11 @@ class settings_save_report {
     }
 
     /**
-     * Warn when a save may have left the default provider without a key.
+     * Warn when a save may have left the default provider without a key, or with a model it will refuse.
      *
      * Raised once per flush, and only when the save touched one of the four settings that decide which key
-     * chat uses (the default provider, its model, the gateway URL, or the provider table). The words come
-     * from provider_keys::default_provider_warnings(), which reads the settings as they are now. Moodle runs
+     * and model chat uses (the default provider, its model, the gateway URL, or the provider table). The words
+     * come from provider_keys::default_provider_warnings(), which reads the settings as they are now. Moodle runs
      * a setting's updated-callback while the save is still half done, so the warnings are read here instead,
      * on the next page, when every value is final.
      *

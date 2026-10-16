@@ -213,6 +213,96 @@ final class provider_keys_sync_test extends \advanced_testcase {
         $this->assertSame([], \core\notification::fetch());
     }
 
+    /** The display-name check for the primary model lives in the pure function, not in the save callback (R13). */
+    public function test_the_default_warnings_flag_a_display_name_primary_model(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('model', 'GPT-4o-mini');
+        $this->cfg('comparison_providers', "openai|sk-proj-MODEL-WARN-0000-ABCD|m");
+        $warnings = provider_keys::default_provider_warnings();
+        $this->assertCount(1, $warnings, 'the key is fine; only the model is wrong');
+        $this->assertStringContainsString('gpt-4o-mini', $warnings[0]);
+        $this->assertStringNotContainsString('MODEL-WARN', $warnings[0]);
+        $this->assertSame([], \core\notification::fetch(), 'building the warnings raises nothing');
+    }
+
+    public function test_the_save_callback_raises_nothing_for_a_display_name_primary_model(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('model', 'GPT-4o-mini');
+        $this->cfg('comparison_providers', "openai|sk-proj-MODEL-WARN-0000-ABCD|m");
+        provider_keys::after_settings_saved();
+        $this->assertSame([], \core\notification::fetch(), 'a mid-save callback must not warn');
+    }
+
+    /** The primary model and a failover row are judged by the same function, so they say the same thing. */
+    public function test_the_primary_model_and_a_failover_row_get_the_same_sentence(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('model', 'GPT-4o-mini');
+        $this->cfg('comparison_providers', "openai|sk-proj-MODEL-WARN-0000-ABCD|GPT-4o-mini");
+        $this->cfg('spend_failover_chain', 'chat:openai');
+        $rowproblems = array_values(array_filter(failover_verifier::static_problems(),
+            static fn($p) => str_contains($p, 'GPT-4o-mini')));
+        $this->assertCount(1, $rowproblems);
+        $this->assertSame([s($rowproblems[0])], provider_keys::default_provider_warnings());
+    }
+
+    public function test_a_primary_model_that_is_not_a_display_name_adds_no_warning(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('comparison_providers', "openai|sk-proj-MODEL-OK-0000-ABCD|m");
+        $this->cfg('model', 'gpt-4o-mini');
+        $this->assertSame([], provider_keys::default_provider_warnings(), 'a lowercase id');
+        $this->cfg('model', '');
+        $this->assertSame([], provider_keys::default_provider_warnings(), 'no model set');
+        $this->cfg('model', 'GPT-4o-mini');
+        $this->cfg('apibaseurl', 'https://gateway.example/v1');
+        $this->assertSame([], provider_keys::default_provider_warnings(), 'a gateway takes any spelling');
+        $this->cfg('apibaseurl', '');
+        $this->cfg('provider', 'openrouter');
+        $this->cfg('comparison_providers', "openrouter|sk-or-MODEL-OK-0000-ABCD|m");
+        $this->cfg('model', 'Meta Llama');
+        $this->assertSame([], provider_keys::default_provider_warnings(), 'openrouter model ids are not lowercase');
+    }
+
+    public function test_the_model_warning_follows_the_key_warning_and_neither_changes_the_other(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('model', 'GPT-4o-mini');
+        $this->cfg('comparison_providers', '');
+        $warnings = provider_keys::default_provider_warnings();
+        $this->assertCount(2, $warnings);
+        $this->assertStringContainsString('no key is saved for it anywhere', $warnings[0]);
+        $this->assertStringContainsString('gpt-4o-mini', $warnings[1]);
+
+        $this->cfg('apikey', secrets::conceal('AIzaGEMINI-LEFTOVER-0000-1234'));
+        $warnings = provider_keys::default_provider_warnings();
+        $this->assertCount(2, $warnings);
+        $this->assertStringContainsString('gemini', $warnings[0]);
+        $this->assertStringContainsString('gpt-4o-mini', $warnings[1]);
+    }
+
+    public function test_a_site_with_no_default_provider_to_check_gets_no_model_warning(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'auto');
+        $this->cfg('model', 'GPT-4o-mini');
+        $this->cfg('comparison_providers', '');
+        $this->assertSame('', provider_keys::site_provider());
+        $this->assertSame([], provider_keys::default_provider_warnings(), 'core_ai with no key: nothing is sent to a vendor');
+    }
+
+    public function test_the_model_warning_escapes_what_the_admin_typed(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('model', 'GPT<script>x');
+        $this->cfg('comparison_providers', "openai|sk-proj-MODEL-WARN-0000-ABCD|m");
+        $warnings = provider_keys::default_provider_warnings();
+        $this->assertCount(1, $warnings);
+        $this->assertStringNotContainsString('<script>', $warnings[0]);
+        $this->assertStringContainsString('&lt;script&gt;', $warnings[0]);
+    }
+
     public function test_no_warning_when_the_default_provider_has_a_keyed_row(): void {
         $this->resetAfterTest();
         $this->cfg('provider', 'openai');

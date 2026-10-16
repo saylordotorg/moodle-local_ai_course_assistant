@@ -153,6 +153,30 @@ final class provider_key_sources_test extends \advanced_testcase {
         $this->assertSame('sk-proj-OWN-VOICE-KEY-1010-IIII', voice_registry::resolve(voice_registry::CAPABILITY_TTS)['apikey']);
     }
 
+    /**
+     * The help says what a voice key turns on, and the chip it names is the one the code gates on the same key
+     * (starter_manager shows a 'tts' starter only when voice_registry::is_configured()).
+     */
+    public function test_the_voice_help_names_what_a_key_turns_on(): void {
+        $this->resetAfterTest();
+        $chips = [];
+        foreach (starter_manager::get_global_starters() as $starter) {
+            if (($starter['conditional'] ?? '') === 'tts') {
+                $chips[] = (string) $starter['name'];
+            }
+        }
+        $this->assertNotEmpty($chips, 'a starter gated on TTS exists');
+        foreach (['settings:realtime_apikey_desc', 'settings:voice_providers_heading_desc'] as $key) {
+            $text = get_string($key, 'local_ai_course_assistant');
+            $this->assertStringContainsString('speak button', $text, $key);
+            $this->assertStringContainsString('speech-to-text', $text, $key);
+            $this->assertStringContainsString('even when Voice Mode is off', $text, $key);
+            foreach ($chips as $chip) {
+                $this->assertStringContainsString($chip, $text, $key);
+            }
+        }
+    }
+
     public function test_the_choices_list_own_plus_every_keyed_provider(): void {
         $this->resetAfterTest();
         $this->cfg('comparison_providers', "openai|sk-proj-CHOICE-ONE-6666-FFFF|m\nollama||x");

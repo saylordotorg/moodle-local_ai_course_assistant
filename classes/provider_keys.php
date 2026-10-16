@@ -290,17 +290,43 @@ class provider_keys {
     }
 
     /**
-     * Warnings about the default provider's key, as finished sentences. Pure: reads settings, raises nothing.
+     * Warnings about the default provider, as finished sentences. Pure: reads settings, raises nothing.
      *
-     * Empty when the default provider needs no key or has a keyed row. Otherwise one sentence when the
-     * saved key belongs to another vendor, or when no key is saved anywhere (a custom gateway with a base
-     * URL is allowed to have none).
+     * First the key, if it is a problem: one sentence when the default provider needs a key and has no keyed
+     * row, and either the saved key belongs to another vendor or no key is saved anywhere (a custom gateway
+     * with a base URL is allowed to have none). Then the model, if the primary model is a display name
+     * ("GPT-4o-mini") a hosted provider will refuse: the same check, failover_verifier::display_name_problem(),
+     * that judges a failover row's model. The model sentence carries what the admin typed, so it is escaped.
+     *
+     * Empty when there is no concrete default provider to judge ('auto' with no saved key is core_ai).
      *
      * @return string[]
      */
     public static function default_provider_warnings(): array {
         $provider = self::site_provider();
-        if ($provider === '' || in_array($provider, self::KEYLESS, true) || self::key_for($provider) !== '') {
+        if ($provider === '') {
+            return [];
+        }
+        $warnings = self::default_key_warnings($provider);
+        $problem = failover_verifier::display_name_problem(
+            $provider,
+            trim((string) get_config(self::PLUGIN, 'model')),
+            trim((string) get_config(self::PLUGIN, 'apibaseurl'))
+        );
+        if ($problem !== '') {
+            $warnings[] = s($problem);
+        }
+        return $warnings;
+    }
+
+    /**
+     * The key half of default_provider_warnings(): none when the provider needs no key or has a keyed row.
+     *
+     * @param string $provider the concrete default provider
+     * @return string[]
+     */
+    private static function default_key_warnings(string $provider): array {
+        if (in_array($provider, self::KEYLESS, true) || self::key_for($provider) !== '') {
             return [];
         }
         $baseurl = trim((string) get_config(self::PLUGIN, 'apibaseurl'));

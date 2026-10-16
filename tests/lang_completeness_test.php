@@ -302,6 +302,9 @@ final class lang_completeness_test extends \basic_testcase {
         'settings:rerank_key_from_desc',
         'settings:realtime_key_from',
         'settings:realtime_key_from_desc',
+        // Reworded in Task 11 (voice help text: what a key turns on). Their old translations are kept until Task 12.
+        'settings:realtime_apikey_desc',
+        'settings:voice_providers_heading_desc',
     ];
 
     /**

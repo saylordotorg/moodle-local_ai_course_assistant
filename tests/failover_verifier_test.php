@@ -100,6 +100,31 @@ final class failover_verifier_test extends \advanced_testcase {
         $this->assertSame([], failover_verifier::static_problems());
     }
 
+    public function test_display_name_problem_flags_a_capitalised_hosted_model_only(): void {
+        $this->assertStringContainsString('gpt-4o-mini', failover_verifier::display_name_problem('openai', 'GPT-4o-mini'));
+        $this->assertSame('', failover_verifier::display_name_problem('openai', 'gpt-4o-mini'));
+        $this->assertSame('', failover_verifier::display_name_problem('openrouter', 'Meta Llama'));
+        $this->assertSame('', failover_verifier::display_name_problem('openai', 'GPT-4o', 'https://gateway.example'));
+    }
+
+    public function test_display_name_problem_covers_every_hosted_provider_and_no_other(): void {
+        foreach (['openai', 'claude', 'gemini', 'mistral', 'deepseek', 'xai'] as $provider) {
+            $this->assertNotSame('', failover_verifier::display_name_problem($provider, 'Some Model'), $provider);
+        }
+        foreach (['ollama', 'openrouter', 'together', 'minimax', 'coreai', 'custom', ''] as $provider) {
+            $this->assertSame('', failover_verifier::display_name_problem($provider, 'Some Model'), "'{$provider}'");
+        }
+        $this->assertSame('', failover_verifier::display_name_problem('openai', ''), 'no model, nothing to check');
+    }
+
+    public function test_display_name_problem_names_the_provider_the_model_and_the_fix(): void {
+        $message = failover_verifier::display_name_problem('openai', 'GPT 4o mini');
+        $this->assertStringContainsString('openai', $message);
+        $this->assertStringContainsString('"GPT 4o mini"', $message);
+        $this->assertStringContainsString('gpt-4o-mini', $message);
+        $this->assertSame($message, failover_verifier::display_name_problem('OpenAI', 'GPT 4o mini'), 'case blind');
+    }
+
     /**
      * The runtime serves a label from the first row WITH a key; a keyless row listed before it is not the answer.
      */

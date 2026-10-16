@@ -120,18 +120,36 @@ class failover_verifier {
         }
 
         foreach ($rows as $key => $row) {
-            if ($row['model'] === '' || $row['baseurl'] !== '' || !in_array($key, self::HOSTED_LOWERCASE, true)) {
-                continue;
-            }
-            if (preg_match('/[A-Z\s]/', $row['model'])) {
-                $problems[] = get_string('verify:model_case', 'local_ai_course_assistant', (object) [
-                    'label' => $row['label'],
-                    'model' => $row['model'],
-                    'suggest' => strtolower((string) preg_replace('/\s+/', '-', $row['model'])),
-                ]);
+            $problem = self::display_name_problem($key, $row['model'], $row['baseurl']);
+            if ($problem !== '') {
+                $problems[] = $problem;
             }
         }
         return $problems;
+    }
+
+    /**
+     * A hosted provider's model written as a display name ("GPT-4o-mini") instead of its id.
+     *
+     * The one check behind both a backup row's model (static_problems()) and the site's primary model
+     * (provider_keys::default_provider_warnings()), so the two always say the same thing.
+     *
+     * @param string $provider provider id; compared in lowercase
+     * @param string $model the model as the admin typed it
+     * @param string $baseurl a gateway base URL turns the check off: a gateway names its models its own way
+     * @return string plain text (the verify:model_case message), or '' when there is no problem
+     */
+    public static function display_name_problem(string $provider, string $model, string $baseurl = ''): string {
+        $provider = strtolower($provider);
+        if ($model === '' || $baseurl !== '' || !in_array($provider, self::HOSTED_LOWERCASE, true)
+                || !preg_match('/[A-Z\s]/', $model)) {
+            return '';
+        }
+        return get_string('verify:model_case', 'local_ai_course_assistant', (object) [
+            'label' => $provider,
+            'model' => $model,
+            'suggest' => strtolower((string) preg_replace('/\s+/', '-', $model)),
+        ]);
     }
 
     /**
