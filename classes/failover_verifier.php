@@ -135,14 +135,15 @@ class failover_verifier {
      * (provider_keys::default_provider_warnings()), so the two always say the same thing.
      *
      * @param string $provider provider id; compared in lowercase
-     * @param string $model the model as the admin typed it
+     * @param string $model the model as the admin typed it. A fine-tune id (a leading "ft:", as OpenAI and
+     *                      Mistral write them) is never a display name: its organisation and suffix keep their case.
      * @param string $baseurl a gateway base URL turns the check off: a gateway names its models its own way
      * @return string plain text (the verify:model_case message), or '' when there is no problem
      */
     public static function display_name_problem(string $provider, string $model, string $baseurl = ''): string {
         $provider = strtolower($provider);
         if ($model === '' || $baseurl !== '' || !in_array($provider, self::HOSTED_LOWERCASE, true)
-                || !preg_match('/[A-Z\s]/', $model)) {
+                || str_starts_with($model, 'ft:') || !preg_match('/[A-Z\s]/', $model)) {
             return '';
         }
         return get_string('verify:model_case', 'local_ai_course_assistant', (object) [

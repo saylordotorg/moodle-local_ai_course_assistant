@@ -61,6 +61,11 @@
  * The single-arm path (no --judge, no --embed-provider, no --embed-apikey)
  * writes nothing and is the default.
  *
+ * Both paths refuse to run while the Embedding or Rerank key source (embed_key_from,
+ * rerank_key_from) points at a provider row: a chosen row would win over the key an
+ * arm sets, and the numbers would come from the wrong key. Set both to "Use the key
+ * pasted below" first.
+ *
  * WHICH INDEX IS SCORED: chunks are read for the model in `embed_model`, or
  * --embed-model=NAME. A migrated index holds two embedding generations of the
  * same corpus at once (content_indexer's shadow mode keeps the live one alive
@@ -237,6 +242,19 @@ Judge mode (--judge): LLM-judged relevance across pipeline configs.
 TXT;
         exit(0);
     }
+}
+
+// ---------- Key-source gate (7.9.0) ----------
+// The arms below hand each arm's key to the providers through set_config('embed_apikey' / 'rerank_apikey'),
+// and the providers read it from there only while "Use the key pasted below" is the choice. A chosen provider
+// row would win over the arm's key and could send, say, an OpenAI row key to Voyage. Refuse, so the numbers
+// are never produced with the wrong key. (--help above still works.)
+$chosenrows = \local_ai_course_assistant\provider_keys::chosen_row_sources(['embed_key_from', 'rerank_key_from']);
+if ($chosenrows) {
+    require_once($CFG->libdir . '/clilib.php');
+    cli_error('Refusing to run: ' . implode(' and ', $chosenrows) . ' point at a provider row, which would override the '
+        . 'key each benchmark arm sets. Set both the Embedding key source and the Rerank key source to "'
+        . get_string('providerkeys:use_own_key', 'local_ai_course_assistant') . '" in the plugin settings first.');
 }
 
 // ---------- Which embedding generation are we scoring? ----------

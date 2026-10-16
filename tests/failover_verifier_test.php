@@ -125,6 +125,29 @@ final class failover_verifier_test extends \advanced_testcase {
         $this->assertSame($message, failover_verifier::display_name_problem('OpenAI', 'GPT 4o mini'), 'case blind');
     }
 
+    /** OpenAI fine-tune ids carry the organisation and suffix in their own case, so capitals there are legitimate. */
+    public function test_a_fine_tune_id_is_not_a_display_name(): void {
+        $this->resetAfterTest();
+        $finetune = 'ft:gpt-4o-mini-2024-07-18:Acme-University::AbC123xYz';
+        $this->assertSame('', failover_verifier::display_name_problem('openai', $finetune));
+        $this->assertSame('', failover_verifier::display_name_problem('mistral', 'ft:open-mistral-7b:Acme:Tutor:9f8e7d'));
+        $this->assertNotSame('', failover_verifier::display_name_problem('openai', 'GPT ft:gpt-4o-mini'), 'leading ft: only');
+        $this->assertNotSame('', failover_verifier::display_name_problem('openai', 'Ft:gpt-4o-mini'), 'an id is lowercase');
+        $this->configure("openai|sk-test-key-1|{$finetune}||", "chat:openai");
+        $this->assertSame([], failover_verifier::static_problems());
+    }
+
+    /** The sentence is shown for a failover row AND for the primary model, so it must not talk about failover only. */
+    public function test_the_display_name_sentence_fits_a_row_and_the_primary_model(): void {
+        $message = failover_verifier::display_name_problem('openai', 'GPT-4o-mini');
+        $this->assertStringNotContainsString('failover', $message);
+        $this->assertStringContainsString('openai', $message);
+        $this->assertStringContainsString('"GPT-4o-mini"', $message);
+        $this->assertStringContainsString('try gpt-4o-mini', $message);
+        $this->assertStringContainsString('admin LLM picker', $message, 'still says why the picker did not catch it');
+        $this->assertStringNotContainsString('{$a', $message, 'every placeholder is filled');
+    }
+
     /**
      * The runtime serves a label from the first row WITH a key; a keyless row listed before it is not the answer.
      */

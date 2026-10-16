@@ -48,9 +48,21 @@ class voyage_reranker {
      * Constructor: reads rerank config. The key comes from, in order: the provider row chosen in
      * rerank_key_from, the pasted rerank_apikey (split-account deployments), then the key Embedding
      * resolves to (typical Voyage deployments share one key).
+     *
+     * A chosen row the key identifies as another vendor's is skipped, since the key goes to Voyage (unless a
+     * base URL is set: a gateway takes any key). The next source is used instead, silently.
      */
     public function __construct() {
-        $this->apikey = \local_ai_course_assistant\provider_keys::key_from_setting('rerank_key_from');
+        $configurl = get_config('local_ai_course_assistant', 'rerank_apibaseurl');
+        if ($configurl === false || $configurl === '') {
+            $configurl = get_config('local_ai_course_assistant', 'embed_apibaseurl');
+        }
+
+        $this->apikey = \local_ai_course_assistant\provider_keys::key_from_setting(
+            'rerank_key_from',
+            'voyage',
+            (string) $configurl
+        );
         if ($this->apikey === '') {
             $this->apikey = (string) (\local_ai_course_assistant\secrets::get('rerank_apikey') ?: '');
         }
@@ -60,10 +72,6 @@ class voyage_reranker {
         }
         $this->model = (string) (get_config('local_ai_course_assistant', 'rerank_model') ?: 'rerank-2.5');
 
-        $configurl = get_config('local_ai_course_assistant', 'rerank_apibaseurl');
-        if ($configurl === false || $configurl === '') {
-            $configurl = get_config('local_ai_course_assistant', 'embed_apibaseurl');
-        }
         $this->baseurl = !empty($configurl) ? rtrim($configurl, '/') : 'https://api.voyageai.com/v1';
     }
 

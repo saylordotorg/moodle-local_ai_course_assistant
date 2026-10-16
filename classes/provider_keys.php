@@ -539,12 +539,44 @@ class provider_keys {
     /**
      * The key of the provider row an Embedding, Rerank or Voice field points at, or '' for "use my own".
      *
+     * With a target vendor, a row whose key the key's own prefix identifies as ANOTHER vendor's is skipped
+     * (course_key_guard::conflict(): unambiguous prefixes only, a bare sk- identifies nobody), because it would be
+     * sent to the wrong vendor's endpoint. That covers a choice that went stale when the admin switched the
+     * embedding provider after picking a row. A base URL for the target turns the check off: a gateway takes any
+     * key. The caller then falls back to the pasted key, silently.
+     *
      * @param string $setting one of embed_key_from, rerank_key_from, realtime_key_from
+     * @param string $vendor the provider the key will be sent to ('' = do not check)
+     * @param string $baseurl the target's own base URL, if any
      * @return string
      */
-    public static function key_from_setting(string $setting): string {
+    public static function key_from_setting(string $setting, string $vendor = '', string $baseurl = ''): string {
         $from = strtolower(trim((string) get_config(self::PLUGIN, $setting)));
-        return ($from === '' || $from === 'own') ? '' : self::key_for($from);
+        if ($from === '' || $from === 'own') {
+            return '';
+        }
+        $key = self::key_for($from);
+        if ($key !== '' && $vendor !== '' && course_key_guard::conflict(strtolower($vendor), $key, trim($baseurl)) !== '') {
+            return '';
+        }
+        return $key;
+    }
+
+    /**
+     * Which of the given key-source settings point at a provider row instead of "own".
+     *
+     * @param string[] $settings setting names (embed_key_from, rerank_key_from, realtime_key_from)
+     * @return string[] the names whose value is a provider id
+     */
+    public static function chosen_row_sources(array $settings): array {
+        $chosen = [];
+        foreach ($settings as $setting) {
+            $from = strtolower(trim((string) get_config(self::PLUGIN, $setting)));
+            if ($from !== '' && $from !== 'own') {
+                $chosen[] = $setting;
+            }
+        }
+        return $chosen;
     }
 
     /**

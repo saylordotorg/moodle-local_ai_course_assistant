@@ -86,8 +86,8 @@ abstract class base_embedding_provider {
      *
      * A migration override of embed_apikey (embedding_migration builds the target provider with its own key)
      * always wins. Otherwise an explicit "use the key from the X row" choice (embed_key_from) wins over the
-     * pasted key, and the pasted key is the fallback, so a choice naming a row that is gone or has no key
-     * changes nothing.
+     * pasted key, and the pasted key is the fallback, so a choice naming a row that is gone, has no key, cannot
+     * be decrypted or belongs to another vendor than embed_provider (unless a base URL is set) changes nothing.
      *
      * Also the answer for status pages (rag_admin.php): outside create_from_config() no override is active,
      * so it reads the live settings.
@@ -99,7 +99,13 @@ abstract class base_embedding_provider {
         if (array_key_exists('embed_apikey', self::$configoverrides)) {
             return $own;
         }
-        $fromrow = \local_ai_course_assistant\provider_keys::key_from_setting('embed_key_from');
+        // The row's key goes to THIS provider's endpoint, so a row the key identifies as another vendor's is skipped
+        // (a choice made for the openai row, then Embedding switched to voyage, must not send the OpenAI key).
+        $fromrow = \local_ai_course_assistant\provider_keys::key_from_setting(
+            'embed_key_from',
+            (string) (self::cfg('embed_provider') ?: 'openai'),
+            (string) self::cfg('embed_apibaseurl')
+        );
         return $fromrow !== '' ? $fromrow : $own;
     }
 

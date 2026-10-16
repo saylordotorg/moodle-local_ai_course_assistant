@@ -305,6 +305,8 @@ final class lang_completeness_test extends \basic_testcase {
         // Reworded in Task 11 (voice help text: what a key turns on). Their old translations are kept until Task 12.
         'settings:realtime_apikey_desc',
         'settings:voice_providers_heading_desc',
+        // Fix round 1: reworded so it fits a failover row and the primary model (it said "every real failover").
+        'verify:model_case',
     ];
 
     /**

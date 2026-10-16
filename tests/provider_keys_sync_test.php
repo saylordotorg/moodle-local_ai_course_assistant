@@ -266,6 +266,14 @@ final class provider_keys_sync_test extends \advanced_testcase {
         $this->assertSame([], provider_keys::default_provider_warnings(), 'openrouter model ids are not lowercase');
     }
 
+    public function test_a_fine_tuned_primary_model_adds_no_warning(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('model', 'ft:gpt-4o-mini-2024-07-18:Acme-University::AbC123xYz');
+        $this->cfg('comparison_providers', "openai|sk-proj-MODEL-OK-0000-ABCD|m");
+        $this->assertSame([], provider_keys::default_provider_warnings());
+    }
+
     public function test_the_model_warning_follows_the_key_warning_and_neither_changes_the_other(): void {
         $this->resetAfterTest();
         $this->cfg('provider', 'openai');
