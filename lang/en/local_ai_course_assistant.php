@@ -3654,3 +3654,9 @@ $string['coursesettings:key_removed'] = 'The key saved for this course looks lik
 $string['check:coursekeys_name'] = 'AI Course Assistant course keys';
 $string['check:coursekeys_ok'] = 'No course has a saved key that looks like it belongs to another provider.';
 $string['check:coursekeys_bad'] = '{$a->count} course(s) have a saved key that looks like it belongs to a different provider than the one they use: {$a->list}. Open each course\'s AI settings and enter the right key or clear it.';
+
+// Provider keys (v7.9.0).
+$string['providerkeys:default_no_key'] = '{$a->provider} is the default provider, but the table has no key for it, so chat keeps using the key that was saved before. Add a key for {$a->provider} in "Providers and keys".';
+$string['providerkeys:default_vendor_mismatch'] = 'The saved key looks like a {$a->owner} key, but the default provider is {$a->provider}. Add a key for {$a->provider} in "Providers and keys" before students use chat.';
+$string['providerkeys:use_own_key'] = 'Use the key pasted below';
+$string['providerkeys:use_row_key'] = 'Use the key from the {$a} row';

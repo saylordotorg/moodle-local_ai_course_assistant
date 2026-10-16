@@ -212,4 +212,101 @@ class provider_keys {
     public static function last4(string $plain): string {
         return strlen($plain) >= 12 ? substr($plain, -4) : '';
     }
+
+    /**
+     * The concrete provider the site chats with, or '' when there is none to mirror.
+     *
+     * 'auto' only counts when a legacy key is saved: with no key, auto means core_ai, and mirroring a row
+     * key into apikey would flip the site onto a direct provider.
+     *
+     * @return string
+     */
+    public static function site_provider(): string {
+        $provider = strtolower((string) (get_config(self::PLUGIN, 'provider') ?: 'auto'));
+        if ($provider !== 'auto') {
+            return $provider;
+        }
+        $legacy = secrets::get('apikey');
+        if ($legacy === '') {
+            return '';
+        }
+        return strtolower(provider\base_provider::resolve_auto_provider([
+            'apikey'     => $legacy,
+            'model'      => (string) get_config(self::PLUGIN, 'model'),
+            'apibaseurl' => (string) get_config(self::PLUGIN, 'apibaseurl'),
+        ]));
+    }
+
+    /**
+     * Make apikey equal the key of the default provider's row. Idempotent.
+     *
+     * @return bool true when apikey was rewritten
+     */
+    public static function sync_default_key(): bool {
+        global $CFG;
+        if (array_key_exists('apikey', $CFG->forced_plugin_settings[self::PLUGIN] ?? [])) {
+            return false;
+        }
+        $provider = self::site_provider();
+        if ($provider === '' || in_array($provider, self::KEYLESS, true)) {
+            return false;
+        }
+        $row = self::for_provider($provider);
+        if ($row === null || $row['key'] === '' || secrets::get('apikey') === $row['key']) {
+            return false;
+        }
+        set_config('apikey', secrets::conceal($row['key']), self::PLUGIN);
+        return true;
+    }
+
+    /**
+     * Admin updated-callback for provider, model, apibaseurl and the table: keep apikey in step and
+     * warn when the default provider has no key of its own. Idempotent, so it may run once per changed setting.
+     *
+     * @param string $fullname unused; Moodle passes the changed setting's name
+     * @return void
+     */
+    public static function after_settings_saved($fullname = ''): void {
+        self::sync_default_key();
+        $provider = self::site_provider();
+        if ($provider === '' || in_array($provider, self::KEYLESS, true) || self::key_for($provider) !== '') {
+            return;
+        }
+        $legacy = secrets::get('apikey');
+        $owner = $legacy === '' ? '' : course_key_guard::conflict($provider, $legacy,
+            (string) get_config(self::PLUGIN, 'apibaseurl'));
+        if ($owner !== '') {
+            \core\notification::warning(get_string('providerkeys:default_vendor_mismatch', self::PLUGIN,
+                (object) ['provider' => $provider, 'owner' => $owner]));
+        } else if ($legacy === '') {
+            \core\notification::warning(get_string('providerkeys:default_no_key', self::PLUGIN,
+                (object) ['provider' => $provider]));
+        }
+    }
+
+    /**
+     * The key of the provider row an Embedding, Rerank or Voice field points at, or '' for "use my own".
+     *
+     * @param string $setting one of embed_key_from, rerank_key_from, realtime_key_from
+     * @return string
+     */
+    public static function key_from_setting(string $setting): string {
+        $from = strtolower(trim((string) get_config(self::PLUGIN, $setting)));
+        return ($from === '' || $from === 'own') ? '' : self::key_for($from);
+    }
+
+    /**
+     * Choices for an "use the key from a provider row" select: own key, then every provider that has a keyed row.
+     *
+     * @return array<string, string>
+     */
+    public static function from_choices(): array {
+        $choices = ['own' => get_string('providerkeys:use_own_key', self::PLUGIN)];
+        foreach (self::by_label() as $provider => $row) {
+            if ($row['haskey']) {
+                $choices[$provider] = get_string('providerkeys:use_row_key', self::PLUGIN, $provider);
+            }
+        }
+        return $choices;
+    }
 }
