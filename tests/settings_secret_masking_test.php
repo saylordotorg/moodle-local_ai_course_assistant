@@ -56,11 +56,11 @@ final class settings_secret_masking_test extends \advanced_testcase {
     private const SECRET_HINTS = ['apikey', 'api_key', 'key', 'secret', 'token', 'password', 'webhook'];
 
     /**
-     * The setting classes that store a credential encrypted: Moodle's own, the one with the "ends in" hint,
-     * and its webhook URL subclass (the same encrypted storage, with a URL check on save).
+     * The setting classes a credential may be declared with: the encrypted field that logs a mask and shows
+     * an "ends in" hint, and its webhook URL subclass. Moodle's own admin_setting_encryptedpassword is NOT
+     * accepted any more: it writes the full ciphertext of every save into mdl_config_log.
      */
     private const PASSWORD_TYPES = [
-        'admin_setting_encryptedpassword',
         'admin_setting_secret_field',
         'admin_setting_webhook_url',
     ];
@@ -144,10 +144,11 @@ final class settings_secret_masking_test extends \advanced_testcase {
         $this->assertSame(
             [],
             $offenders,
-            "Credential settings must be admin_setting_secret_field (Moodle's admin_setting_encryptedpassword "
-            . "with an \"ends in\" hint) or its webhook subclass, and be listed in secrets::names(). Plain configtext records every "
-            . "historical value in mdl_config_log, and a masked password type is still plain text in the "
-            . "database. Offenders: " . implode(', ', $offenders)
+            "Credential settings must be admin_setting_secret_field (an encrypted password field that logs a "
+            . "mask and shows an \"ends in\" hint) or its webhook subclass, and be listed in secrets::names(). "
+            . "Moodle's own admin_setting_encryptedpassword logs the full ciphertext of every save, plain "
+            . "configtext records every historical value in mdl_config_log, and a masked password type is "
+            . "still plain text in the database. Offenders: " . implode(', ', $offenders)
         );
     }
 

@@ -202,11 +202,24 @@ class settings_save_report {
         if (secrets::is_secret($name) || config_log_audit::is_secret_name($name)) {
             return get_string('savereport:secret', 'local_ai_course_assistant');
         }
+        $oldhadcr = false;
+        if (in_array($name, self::KEYED_TABLES, true)) {
+            // The two tables reach the log with every key blanked when an admin saves them, so this is normally
+            // a no-op. It is a second line of defence for any writer that logs a table whole (set_config() with
+            // logging on, say): the first 48 characters of a row are the provider and the start of its key.
+            // Blank the key column here as well, so no path to this notice can show one.
+            global $CFG;
+            require_once($CFG->libdir . '/adminlib.php');
+            $redact = $name === provider_keys::SETTING ? admin_setting_provider_keys::class : admin_setting_keyed_rows::class;
+            $oldhadcr = strpos((string) $old, "\r") !== false;
+            $old = $redact::redact_keys($old);
+            $new = $redact::redact_keys($new);
+        }
         $norm = static fn(?string $v): string => trim(str_replace("\r\n", "\n", (string) $v));
         if ($norm($old) === $norm($new)) {
             // The provider and voice tables reach the log with every key blanked, so equal text there means
             // only a key changed, unless the old value had Windows line endings.
-            if (in_array($name, self::KEYED_TABLES, true) && strpos((string) $old, "\r") === false) {
+            if (in_array($name, self::KEYED_TABLES, true) && !$oldhadcr) {
                 return get_string('savereport:keychanged', 'local_ai_course_assistant');
             }
             return get_string('savereport:lineendings', 'local_ai_course_assistant');
