@@ -134,6 +134,30 @@ final class provider_keys_sync_test extends \advanced_testcase {
         $this->assertSame('sk-proj-SITE-KEY-KEEP-3333-4444', secrets::get('apikey'));
     }
 
+    /** R15: the first keyed row for the provider is not always the row for this destination. */
+    public function test_a_keyed_vendor_row_listed_before_the_gateway_row_does_not_block_mirroring(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('apibaseurl', 'https://gateway.example.test/v1');
+        $this->cfg('apikey', secrets::conceal('old-gateway-key-AAAA-1111'));
+        $this->cfg('comparison_providers', "openai|sk-proj-REAL-VENDOR-KEY-9999-0000|gpt-4o-mini\n"
+            . "openai|new-gateway-key-BBBB-2222|m||https://gateway.example.test/v1");
+        $this->assertTrue(provider_keys::sync_default_key());
+        $this->assertSame('new-gateway-key-BBBB-2222', secrets::get('apikey'));
+        $this->assertFalse(provider_keys::sync_default_key(), 'second run changes nothing');
+    }
+
+    public function test_a_row_that_cannot_be_decrypted_does_not_block_a_later_row_with_a_good_key(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('apikey', secrets::conceal('sk-proj-OLD-KEY-OLD-KEY-1111'));
+        $this->cfg('comparison_providers', "openai|sodium:AAAAnotarealciphertextAAAAAAAAAAAAAAAAAAAAAAAA|o\n"
+            . "openai|sk-proj-GOOD-ROW-KEY-GOOD-2222|o");
+        $this->assertTrue(provider_keys::sync_default_key());
+        $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
+        $this->assertSame('sk-proj-GOOD-ROW-KEY-GOOD-2222', secrets::get('apikey'));
+    }
+
     public function test_a_key_forced_in_config_php_is_never_written(): void {
         global $CFG;
         $this->resetAfterTest();

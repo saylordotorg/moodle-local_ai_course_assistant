@@ -239,6 +239,7 @@ final class lang_completeness_test extends \basic_testcase {
         'providerkeys:default_vendor_mismatch',
         'providerkeys:use_own_key',
         'providerkeys:use_row_key',
+        'providerkeys:upgrade_conflict',
     ];
 
     /**

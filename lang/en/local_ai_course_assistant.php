@@ -3660,3 +3660,4 @@ $string['providerkeys:default_no_key'] = '{$a->provider} is the default provider
 $string['providerkeys:default_vendor_mismatch'] = 'The saved key looks like a {$a->owner} key, but the default provider is {$a->provider}. Add a key for {$a->provider} in "Providers and keys" before students use chat.';
 $string['providerkeys:use_own_key'] = 'Use the key pasted below';
 $string['providerkeys:use_row_key'] = 'Use the key from the {$a} row';
+$string['providerkeys:upgrade_conflict'] = 'On upgrade, SOLA found two different keys for one provider: {$a}. The row now uses the default provider key, the one chat was already using. Paste the other key again if it was the one you meant.';

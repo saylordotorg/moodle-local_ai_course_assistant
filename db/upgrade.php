@@ -2318,5 +2318,17 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100901, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026101601) {
+        // v7.9.0: provider keys move into one encrypted "Providers and keys" table. Encrypt the stored
+        // table and secrets, give the default provider a keyed row, and leave every other setting alone.
+        // Idempotent: a second run changes nothing. The trace names counts and provider ids, never a key.
+        $summary = \local_ai_course_assistant\provider_keys::upgrade();
+        mtrace('local_ai_course_assistant: provider keys: encrypted ' . $summary['settings'] . ' stored secret(s)'
+            . ($summary['encrypted'] ? ' and the provider table' : '')
+            . ($summary['row_added'] !== '' ? ', added a row for ' . $summary['row_added'] : '')
+            . ($summary['conflict'] !== '' ? ', resolved a key conflict (see the settings page notice)' : '') . '.');
+        upgrade_plugin_savepoint(true, 2026101601, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

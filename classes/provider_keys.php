@@ -251,14 +251,20 @@ class provider_keys {
         if ($provider === '' || in_array($provider, self::KEYLESS, true)) {
             return false;
         }
-        $row = self::for_provider($provider);
-        if ($row === null || $row['key'] === '' || secrets::get('apikey') === $row['key']) {
-            return false;
-        }
         // The site's apikey is sent to the site's apibaseurl, and a row's key to the row's base URL. Copy
-        // only between the same destination (both empty is the normal case), or a gateway site would be
-        // handed the vendor's key and send it to the gateway host.
-        if (trim($row['baseurl']) !== trim((string) get_config(self::PLUGIN, 'apibaseurl'))) {
+        // only from the first readable keyed row for the same destination (both empty is the normal case),
+        // or a gateway site would be handed the vendor's key and send it to the gateway host. A keyed row
+        // for another destination is skipped, not a stop: it can be listed before the right one.
+        $baseurl = trim((string) get_config(self::PLUGIN, 'apibaseurl'));
+        $row = null;
+        foreach (self::rows(true) as $candidate) {
+            if ($candidate['provider'] === $provider && $candidate['haskey'] && $candidate['key'] !== ''
+                    && trim($candidate['baseurl']) === $baseurl) {
+                $row = $candidate;
+                break;
+            }
+        }
+        if ($row === null || secrets::get('apikey') === $row['key']) {
             return false;
         }
         set_config('apikey', secrets::conceal($row['key']), self::PLUGIN);
@@ -304,6 +310,79 @@ class provider_keys {
             return [get_string('providerkeys:default_no_key', self::PLUGIN, (object) ['provider' => $provider])];
         }
         return [];
+    }
+
+    /**
+     * The 7.9.0 upgrade. Idempotent. Moves where keys live and never which key a call uses.
+     *
+     * 1. Encrypt every stored secret still in plain text (secrets::encrypt_stored_settings, which also
+     *    covers the voice table).
+     * 2. Encrypt every key in the provider table.
+     * 3. Make sure the default provider has a keyed row for the destination chat uses. If it has none, add
+     *    one from apikey, carrying the site's base URL so a failover never sends a gateway key to the real
+     *    vendor. If it has one for the same destination with a DIFFERENT key, chat was using apikey, so the
+     *    row takes apikey's value and a one-time notice names the two last-four values. A keyed row for the
+     *    same provider but another base URL is a different destination and is left alone.
+     *
+     * Nothing it writes or reports contains a key: the notice and the summary carry last-four values only.
+     *
+     * @return array{encrypted:int, settings:int, row_added:string, conflict:string}
+     */
+    public static function upgrade(): array {
+        global $CFG;
+        $forced = $CFG->forced_plugin_settings[self::PLUGIN] ?? [];
+        $summary = ['encrypted' => 0, 'settings' => secrets::encrypt_stored_settings(), 'row_added' => '', 'conflict' => ''];
+        if (array_key_exists(self::SETTING, $forced)) {
+            return $summary;
+        }
+        $raw = (string) (get_config(self::PLUGIN, self::SETTING) ?: '');
+        $concealed = secrets::conceal_row_keys($raw);
+        if ($raw !== '' && $concealed !== $raw) {
+            set_config(self::SETTING, $concealed, self::PLUGIN);
+            $summary['encrypted'] = 1;
+        }
+        $legacy = secrets::get('apikey');
+        $provider = self::site_provider();
+        if ($legacy === '' || $provider === '' || in_array($provider, self::KEYLESS, true)) {
+            return $summary;
+        }
+        $baseurl = trim((string) get_config(self::PLUGIN, 'apibaseurl'));
+        $rows = self::stored_rows();
+        $found = null;
+        foreach ($rows as $i => $row) {
+            if ($row['provider'] === $provider && $row['stored_key'] !== '' && trim($row['baseurl']) === $baseurl) {
+                $found = $i;
+                break;
+            }
+        }
+        $rowkey = $found === null ? '' : secrets::reveal($rows[$found]['stored_key']);
+        if ($found === null) {
+            $rows[] = ['provider' => $provider, 'stored_key' => secrets::conceal($legacy), 'models' => '',
+                'temperature' => '', 'baseurl' => $baseurl];
+            set_config(self::SETTING, self::serialize($rows), self::PLUGIN);
+            $summary['row_added'] = $provider;
+        } else if ($rowkey !== $legacy) {
+            $summary['conflict'] = $provider . ': the row ended in ' . self::last4($rowkey)
+                . ' and the default key ends in ' . self::last4($legacy);
+            $rows[$found]['stored_key'] = secrets::conceal($legacy);
+            set_config(self::SETTING, self::serialize($rows), self::PLUGIN);
+            set_config('provider_keys_notice', $summary['conflict'], self::PLUGIN);
+        }
+        return $summary;
+    }
+
+    /**
+     * Show the one-time upgrade notice, if there is one, then forget it.
+     *
+     * @return void
+     */
+    public static function flush_notice(): void {
+        $notice = (string) get_config(self::PLUGIN, 'provider_keys_notice');
+        if ($notice === '') {
+            return;
+        }
+        unset_config('provider_keys_notice', self::PLUGIN);
+        \core\notification::warning(get_string('providerkeys:upgrade_conflict', self::PLUGIN, s($notice)));
     }
 
     /**
