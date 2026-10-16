@@ -132,6 +132,55 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
     }
 
     /**
+     * A webhook field only ever holds a URL, so it never shows a tail: not even for a value saved before the
+     * save-time check existed, with no scheme or no URL shape at all.
+     */
+    public function test_a_webhook_field_never_shows_a_tail_whatever_is_saved_in_it(): void {
+        $this->resetAfterTest();
+        $field = $this->webhook();
+        $legacy = [
+            'hooks.example/T000/B000/SENTINELWEBHOOK',
+            'xoxb-0123456789-SENTINELTOKEN',
+            '//hooks.example/T000/B000/SENTINELWEBHOOK',
+            'ftp://hooks.example/T000/B000/SENTINELWEBHOOK',
+            'https://hooks.example/T000/B000/SENTINELWEBHOOK',
+        ];
+        foreach ($legacy as $saved) {
+            foreach ([secrets::conceal($saved), $saved] as $stored) {
+                set_config('anomaly_digest_slack_webhook', $stored, 'local_ai_course_assistant');
+                $html = $field->output_html($field->get_setting());
+                $this->assertStringContainsString('A URL is saved.', $html, $saved);
+                $this->assertStringNotContainsString('ends in', $html, $saved);
+                foreach (['HOOK', 'TOKEN', 'SENTINEL', 'T000', 'xoxb', 'sodium:'] as $part) {
+                    $this->assertStringNotContainsString($part, $html, $saved . ' shows no part of it: ' . $part);
+                }
+            }
+        }
+        // Nothing saved: nothing said.
+        set_config('anomaly_digest_slack_webhook', '', 'local_ai_course_assistant');
+        $this->assertStringNotContainsString('URL is saved', $field->output_html(''));
+        $this->assertStringNotContainsString('ends in', $field->output_html(''));
+        // A key field, by contrast, keeps its hint for a value with no scheme.
+        set_config('embed_apikey', secrets::conceal('hooks.example-key-ABCD'), 'local_ai_course_assistant');
+        $key = $this->field();
+        $this->assertStringContainsString('Saved key ends in ABCD.', $key->output_html($key->get_setting()));
+    }
+
+    /**
+     * A webhook value that won't decrypt on this site is treated as unset: no hint and no ciphertext.
+     */
+    public function test_a_webhook_value_that_will_not_decrypt_says_nothing(): void {
+        $this->resetAfterTest();
+        $foreign = 'sodium:' . base64_encode(random_bytes(80));
+        set_config('anomaly_digest_slack_webhook', $foreign, 'local_ai_course_assistant');
+        $field = $this->webhook();
+        $html = $field->output_html($field->get_setting());
+        $this->assertDebuggingCalled();
+        $this->assertStringNotContainsString('URL is saved', $html);
+        $this->assertStringNotContainsString($foreign, $html);
+    }
+
+    /**
      * Only a value that starts with http:// or https:// is a URL. A key that merely begins with those letters
      * is still a key and keeps its hint.
      */

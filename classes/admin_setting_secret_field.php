@@ -80,7 +80,7 @@ class admin_setting_secret_field extends \admin_setting_encryptedpassword {
      * @param string $plain the saved value, decrypted ('' when unset or undecryptable)
      * @return string '' when there is nothing to say
      */
-    private function saved_hint(string $plain): string {
+    protected function saved_hint(string $plain): string {
         if (preg_match('~^https?://~i', ltrim($plain))) {
             return get_string('providerkeys:saved_url_hint', 'local_ai_course_assistant');
         }

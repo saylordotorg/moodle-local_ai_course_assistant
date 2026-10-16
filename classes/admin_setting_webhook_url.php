@@ -44,6 +44,18 @@ class admin_setting_webhook_url extends admin_setting_secret_field {
         . '(?::\d{1,5})?(?:[/?#][^\x00-\x20\x7f]*)?$~iD';
 
     /**
+     * Whatever is saved here is a URL, so say only that, and never show a tail: a value saved before the
+     * save-time check existed may have no scheme at all, and the last four characters of any of it are part
+     * of the token.
+     *
+     * @param string $plain the saved value, decrypted ('' when unset or undecryptable)
+     * @return string '' when there is nothing to say
+     */
+    protected function saved_hint(string $plain): string {
+        return $plain === '' ? '' : get_string('providerkeys:saved_url_hint', 'local_ai_course_assistant');
+    }
+
+    /**
      * Save the URL, or say the field is wrong without saying what was typed.
      *
      * @param mixed $data the submitted value
