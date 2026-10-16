@@ -187,6 +187,43 @@ final class admin_setting_voice_providers_test extends \advanced_testcase {
         $this->assertSame($before, $this->stored(), 'nothing saved');
     }
 
+    /** Ruling R24: a typed key that holds a separator can't skip the column check by looking like ciphertext. */
+    public static function bad_typed_key_provider(): array {
+        return [
+            'sodium prefix with a pipe' => ['sodium:abc|evil'],
+            'openssl prefix with a pipe' => ['openssl-aes-256-ctr:abc|evil'],
+            'a pipe' => ['sk-proj-BAD|evil-1717-VVVV'],
+            'a line feed inside' => ["sk-proj-BAD-1717\nxai|evil|x"],
+            'a carriage return inside' => ["sk-proj-BAD-1717\revil"],
+        ];
+    }
+
+    /**
+     * @dataProvider bad_typed_key_provider
+     * @param string $typed
+     */
+    public function test_a_typed_key_with_a_pipe_or_line_break_is_refused(string $typed): void {
+        $this->resetAfterTest();
+        $setting = $this->setting();
+        $setting->write_setting(['rows' => [$this->row('openai', 'sk-proj-VOICE-GOOD-1515-TTTT', '', 'main')]]);
+        $before = $this->stored();
+        $id = $this->id_of_first_row();
+
+        $err = $setting->write_setting(['rows' => [$this->row('openai', $typed, $id, 'main')]]);
+        $this->assertStringContainsString(get_string('providerkeys:err_badchar', 'local_ai_course_assistant',
+            (object) ['field' => get_string('providerkeys:col_key', 'local_ai_course_assistant'), 'provider' => 'openai']), $err);
+        foreach (['evil', 'abc', 'BAD', 'sodium', 'openssl'] as $typedpart) {
+            $this->assertStringNotContainsString($typedpart, $err, 'the message never repeats the typed value');
+        }
+        $this->assertSame($before, $this->stored(), 'nothing saved');
+
+        // A normal key still saves.
+        $this->assertSame('', $setting->write_setting(['rows' => [
+            $this->row('openai', 'sk-proj-VOICE-NEW-1616-UUUU', $id, 'main'),
+        ]]));
+        $this->assertSame('sk-proj-VOICE-NEW-1616-UUUU', voice_registry::parse_rows(true)[0]['apikey']);
+    }
+
     /** The two voice_active_* selects only need each row's label and provider, so they never decrypt a key. */
     public function test_the_settings_page_never_decrypts_the_voice_keys(): void {
         $src = file_get_contents(__DIR__ . '/../settings.php');

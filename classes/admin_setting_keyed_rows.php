@@ -115,6 +115,7 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
         $columns = $this->columns();
         $first = $columns[0]['name'];
         $rows = [];
+        $keyerrors = [];
         foreach ($posted as $p) {
             if (!is_array($p)) {
                 continue;
@@ -129,6 +130,17 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
             }
             $newkey = trim((string) ($p['newkey'] ?? ''));
             $keepid = (string) ($p['keepid'] ?? '');
+            if ($newkey !== '' && preg_match('~[|\r\n]~', $newkey)) {
+                // The stored line is pipe-delimited, and secrets::conceal() passes a value that already starts
+                // with a ciphertext prefix straight through, so a typed "sodium:x|y" would skip both the
+                // encryption and the column check. A real key never holds these characters. The message names
+                // the column and a short provider id, never what was typed.
+                $keyerrors[] = get_string('providerkeys:err_badchar', 'local_ai_course_assistant', (object) [
+                    'field' => get_string('providerkeys:col_key', 'local_ai_course_assistant'),
+                    'provider' => self::safe_name($row[$first]),
+                ]);
+                continue;
+            }
             if ($newkey !== '') {
                 $row['stored_key'] = secrets::conceal($newkey);
             } else if ($keepid !== '' && isset($existing[$keepid]) && $existing[$keepid][$first] === $row[$first]) {
@@ -140,7 +152,7 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
             }
             $rows[] = $row;
         }
-        $errors = $this->validate($rows);
+        $errors = array_merge($keyerrors, $this->validate($rows));
         if ($errors) {
             return implode(' ', $errors) . ' ' . get_string('providerkeys:err_resubmit', 'local_ai_course_assistant');
         }
