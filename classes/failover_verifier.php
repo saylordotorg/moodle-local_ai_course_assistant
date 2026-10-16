@@ -80,26 +80,13 @@ class failover_verifier {
      * @return array<string, array{label: string, haskey: bool, model: string, baseurl: string}>
      */
     public static function rows(): array {
-        $raw = (string) (get_config('local_ai_course_assistant', 'comparison_providers') ?: '');
         $rows = [];
-        foreach (preg_split("/\r?\n/", $raw) as $line) {
-            $line = trim($line);
-            if ($line === '' || $line[0] === '#') {
-                continue;
-            }
-            $parts = array_map('trim', explode('|', $line));
-            $key = strtolower($parts[0] ?? '');
-            // Same rule as spend_guard::lookup_chat_label(): the first row WITH a key serves the
-            // label, so a keyless row listed before a keyed one with the same label is not the answer.
-            if ($key === '' || (isset($rows[$key]) && ($rows[$key]['haskey'] || empty($parts[1])))) {
-                continue;
-            }
-            $models = array_values(array_filter(array_map('trim', explode(',', (string) ($parts[2] ?? '')))));
+        foreach (provider_keys::by_label() as $key => $row) {
             $rows[$key] = [
-                'label' => $parts[0],
-                'haskey' => !empty($parts[1]),
-                'model' => $models[0] ?? '',
-                'baseurl' => $parts[4] ?? '',
+                'label'   => $row['label'],
+                'haskey'  => $row['haskey'],
+                'model'   => $row['model'],
+                'baseurl' => $row['baseurl'],
             ];
         }
         return $rows;

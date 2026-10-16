@@ -352,28 +352,16 @@ class provider_benchmark {
         }
 
         // 2. Comparison providers — multi-line config: provider|apikey|models|temperature
-        $raw = (string) (get_config('local_ai_course_assistant', 'comparison_providers') ?: '');
-        foreach (explode("\n", $raw) as $line) {
-            $line = trim($line);
-            if ($line === '' || $line[0] === '#') {
+        foreach (\local_ai_course_assistant\provider_keys::rows(true) as $row) {
+            if (in_array($row['provider'], \local_ai_course_assistant\provider_keys::KEY_ONLY_PROVIDERS, true)) {
                 continue;
             }
-            $parts = array_map('trim', explode('|', $line));
-            $id = strtolower($parts[0] ?? '');
-            if ($id === '') {
-                continue;
-            }
-            // For multiple-models rows, the first model is the one we test;
-            // the comparison setting allows comma-separated alternatives.
-            $models = array_filter(array_map('trim', explode(',', $parts[2] ?? '')));
-            $model = $models[0] ?? '';
             $rows[] = [
-                'id' => $id,
-                'label' => $id,
-                'model' => $model,
-                'apikey' => $parts[1] ?? '',
-                'temperature' => isset($parts[3]) && $parts[3] !== ''
-                    ? (float) $parts[3] : null,
+                'id' => $row['provider'],
+                'label' => $row['provider'],
+                'model' => $row['model'],
+                'apikey' => $row['key'],
+                'temperature' => $row['temperature'] !== '' ? (float) $row['temperature'] : null,
                 'is_primary' => false,
             ];
         }

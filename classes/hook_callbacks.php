@@ -736,29 +736,19 @@ class hook_callbacks {
                 ],
             ];
             $seen = [$configprovider => true];
-            $compraw = get_config('local_ai_course_assistant', 'comparison_providers') ?: '';
-            foreach (explode("\n", $compraw) as $line) {
-                $line = trim($line);
-                if ($line === '' || $line[0] === '#') {
+            foreach (\local_ai_course_assistant\provider_keys::rows() as $row) {
+                if ($row['columns'] < 2
+                        || in_array($row['provider'], \local_ai_course_assistant\provider_keys::KEY_ONLY_PROVIDERS, true)) {
                     continue;
                 }
-                $parts = array_map('trim', explode('|', $line));
-                if (count($parts) < 2) {
-                    continue;
-                }
-                $pid = strtolower($parts[0]);
+                $pid = $row['provider'];
                 if (!empty($seen[$pid])) {
                     continue;
                 }
                 $seen[$pid] = true;
                 $models = [];
-                if (!empty($parts[2])) {
-                    foreach (explode(',', $parts[2]) as $m) {
-                        $m = trim($m);
-                        if ($m !== '') {
-                            $models[] = ['id' => $m, 'label' => $m, 'status' => 'active'];
-                        }
-                    }
+                foreach (array_filter(array_map('trim', explode(',', $row['models']))) as $m) {
+                    $models[] = ['id' => $m, 'label' => $m, 'status' => 'active'];
                 }
                 $providers[] = [
                     'id' => $pid,

@@ -835,24 +835,18 @@ function local_ai_course_assistant_golden_load_prompts(string $path = ''): array
  * @return array<int, array{label: string, provider: string, models: string, apikey: string, temperature: string, apibaseurl: string}>
  */
 function local_ai_course_assistant_golden_parse_comparison_providers(): array {
-    $raw = (string) (get_config('local_ai_course_assistant', 'comparison_providers') ?: '');
     $out = [];
-    foreach (preg_split("/\r?\n/", $raw) as $line) {
-        $line = trim($line);
-        if ($line === '' || $line[0] === '#') {
-            continue;
-        }
-        $parts = array_map('trim', explode('|', $line));
-        if (count($parts) < 3 || empty($parts[1])) {
+    foreach (\local_ai_course_assistant\provider_keys::rows(true) as $row) {
+        if ($row['columns'] < 3 || !$row['haskey']) {
             continue;
         }
         $out[] = [
-            'label'       => strtolower($parts[0]),
-            'provider'    => strtolower($parts[0]),
-            'apikey'      => $parts[1],
-            'models'      => $parts[2],
-            'temperature' => $parts[3] ?? '',
-            'apibaseurl'  => $parts[4] ?? '',
+            'label'       => $row['provider'],
+            'provider'    => $row['provider'],
+            'apikey'      => $row['key'],
+            'models'      => $row['models'],
+            'temperature' => $row['temperature'],
+            'apibaseurl'  => $row['baseurl'],
         ];
     }
 

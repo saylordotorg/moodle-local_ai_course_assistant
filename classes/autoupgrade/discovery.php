@@ -291,18 +291,11 @@ class discovery {
      */
     public static function credentials(): array {
         $out = [];
-        $raw = (string) (get_config('local_ai_course_assistant', 'comparison_providers') ?: '');
-        foreach (preg_split("/\r?\n/", $raw) as $line) {
-            $line = trim($line);
-            if ($line === '' || $line[0] === '#') {
+        foreach (\local_ai_course_assistant\provider_keys::rows(true) as $row) {
+            if (!$row['haskey'] || $row['key'] === '' || isset($out[$row['provider']])) {
                 continue;
             }
-            $parts = array_map('trim', explode('|', $line));
-            $provider = strtolower($parts[0] ?? '');
-            if ($provider === '' || ($parts[1] ?? '') === '' || isset($out[$provider])) {
-                continue;
-            }
-            $out[$provider] = ['apikey' => $parts[1], 'baseurl' => $parts[4] ?? ''];
+            $out[$row['provider']] = ['apikey' => $row['key'], 'baseurl' => $row['baseurl']];
         }
         $siteprovider = strtolower((string) (get_config('local_ai_course_assistant', 'provider') ?: ''));
         $sitekey = (string) (\local_ai_course_assistant\secrets::get('apikey') ?: '');

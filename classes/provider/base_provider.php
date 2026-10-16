@@ -946,19 +946,10 @@ abstract class base_provider implements provider_interface {
      * @return string
      */
     private static function label_for_active_provider(string $providerid, array $overrides): string {
-        $raw = (string) (get_config('local_ai_course_assistant', 'comparison_providers') ?: '');
         $apikey = (string) ($overrides['apikey'] ?? '');
-        foreach (preg_split("/\r?\n/", $raw) as $line) {
-            $line = trim($line);
-            if ($line === '' || $line[0] === '#') {
-                continue;
-            }
-            $parts = array_map('trim', explode('|', $line));
-            if (
-                strtolower($parts[0] ?? '') === strtolower($providerid)
-                && ($apikey === '' || ($parts[1] ?? '') === $apikey)
-            ) {
-                return strtolower($parts[0]);
+        foreach (\local_ai_course_assistant\provider_keys::rows(true) as $row) {
+            if ($row['provider'] === strtolower($providerid) && ($apikey === '' || $row['key'] === $apikey)) {
+                return $row['provider'];
             }
         }
         return strtolower($providerid) . '-primary';
@@ -1229,23 +1220,16 @@ abstract class base_provider implements provider_interface {
      * @return array|null Row with apikey, models, temperature, apibaseurl keys, or null if not found.
      */
     private static function lookup_comparison_row(string $providerid): ?array {
-        $raw = get_config('local_ai_course_assistant', 'comparison_providers') ?: '';
-        foreach (explode("\n", $raw) as $line) {
-            $line = trim($line);
-            if ($line === '' || $line[0] === '#') {
-                continue;
-            }
-            $parts = array_map('trim', explode('|', $line));
-            if (count($parts) >= 2 && strtolower($parts[0]) === $providerid) {
-                return [
-                    'apikey'      => $parts[1] ?? '',
-                    'models'      => $parts[2] ?? '',
-                    'temperature' => $parts[3] ?? '',
-                    'apibaseurl'  => $parts[4] ?? '',
-                ];
-            }
+        $row = \local_ai_course_assistant\provider_keys::row_for($providerid, true);
+        if ($row === null) {
+            return null;
         }
-        return null;
+        return [
+            'apikey'      => $row['key'],
+            'models'      => $row['models'],
+            'temperature' => $row['temperature'],
+            'apibaseurl'  => $row['baseurl'],
+        ];
     }
 
     /**

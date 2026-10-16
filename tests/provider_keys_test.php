@@ -125,6 +125,15 @@ final class provider_keys_test extends \advanced_testcase {
         $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
     }
 
+    /** An undecryptable key counts as no key for a failover entry: no entry with an empty key is built. */
+    public function test_the_failover_lookup_skips_a_row_whose_key_cannot_be_decrypted(): void {
+        $this->resetAfterTest();
+        set_config('spend_failover_chain', 'chat:openai', 'local_ai_course_assistant');
+        $this->seed('openai|sodium:AAAAnotarealciphertextAAAAAAAAAAAAAAAAAAAAAAAA|gpt-4o-mini');
+        $this->assertSame([], \local_ai_course_assistant\spend_guard::resolve_failover_chain('chat'));
+        $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
+    }
+
     /** Review focus 5: keyless providers resolve with no key. */
     public function test_a_keyless_row_is_listed_and_has_no_key(): void {
         $this->resetAfterTest();
