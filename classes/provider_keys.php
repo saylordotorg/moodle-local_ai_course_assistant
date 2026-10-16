@@ -45,6 +45,8 @@ class provider_keys {
     public const KEY_ONLY_PROVIDERS = ['voyage'];
     /** @var string[] Providers that work without a key, so a row for them may have none. */
     public const KEYLESS = ['ollama', 'coreai'];
+    /** @var string[] Settings that decide which row's key apikey mirrors (the table is the fourth; its writers sync themselves). */
+    public const MIRROR_SETTINGS = ['provider', 'model', 'apibaseurl'];
 
     /**
      * Rows as stored. SERVER-SIDE ONLY: stored_key is ciphertext (or a legacy plain key). Never pass
@@ -311,6 +313,24 @@ class provider_keys {
      */
     public static function after_settings_saved($fullname = ''): void {
         self::sync_default_key();
+    }
+
+    /**
+     * Keep apikey in step after something OTHER than the admin settings page wrote settings (the signed policy
+     * bundle, the automatic model switcher and its rollback). The admin page has its updated-callback
+     * (after_settings_saved()); these writers go through set_config(), which fires no callback.
+     *
+     * Syncs once when any written setting is one the mirror reads (the default provider, its model or the
+     * gateway URL), and does nothing when none is: no write, no call. Idempotent, raises no notices.
+     *
+     * @param string[] $names the settings the caller actually wrote
+     * @return bool true when apikey was rewritten
+     */
+    public static function sync_after_writes(array $names): bool {
+        if (!array_intersect(self::MIRROR_SETTINGS, $names)) {
+            return false;
+        }
+        return self::sync_default_key();
     }
 
     /**

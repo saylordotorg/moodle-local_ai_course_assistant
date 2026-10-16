@@ -20,6 +20,7 @@ use local_ai_course_assistant\audit_logger;
 use local_ai_course_assistant\emergency_control;
 use local_ai_course_assistant\model_capabilities;
 use local_ai_course_assistant\policy_bundle;
+use local_ai_course_assistant\provider_keys;
 
 /**
  * Switches a role to a candidate that passed the gate, and rolls it back (v7.8.0).
@@ -304,6 +305,9 @@ class switcher {
             'timecreated' => $now,
             'timeresolved' => null,
         ]);
+        // A new site model can change which provider row's key apikey mirrors ('auto' follows the model name).
+        // After the switch is recorded, so a failure here can't lose the record the watcher rolls back from.
+        provider_keys::sync_after_writes(array_keys($writes));
         candidates::set_status((int) $cand->id, candidates::SWITCHED);
         $details = ['switch' => $id, 'role' => $role, 'from' => $current['provider'] . '/' . $current['model']
             . self::variant_suffix($current['variant']), 'to' => $cand->provider . '/' . $cand->model
@@ -340,6 +344,7 @@ class switcher {
                 'timeresolved' => time()]);
             return ['ok' => false, 'message' => get_string('autoupgrade:rollback_superseded', 'local_ai_course_assistant')];
         }
+        $restored = [];
         foreach ((json_decode((string) $row->prevconfig, true) ?: []) as $key => $value) {
             if (!in_array($key, policy_bundle::ALLOWED_KEYS, true)) {
                 continue;
@@ -349,7 +354,10 @@ class switcher {
             } else {
                 set_config($key, (string) $value, 'local_ai_course_assistant');
             }
+            $restored[] = $key;
         }
+        // Putting the old model back can change which provider row's key apikey mirrors, as switching did.
+        provider_keys::sync_after_writes($restored);
         $DB->update_record(self::TABLE, (object) [
             'id' => $row->id,
             'status' => self::ROLLEDBACK,

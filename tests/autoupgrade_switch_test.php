@@ -237,6 +237,53 @@ final class autoupgrade_switch_test extends \advanced_testcase {
         $this->assertSame(switcher::SUPERSEDED, $DB->get_field(switcher::TABLE, 'status', ['id' => $id]));
     }
 
+    /**
+     * Set up a site whose apikey is behind its default provider's row: the table holds the key chat should use,
+     * apikey still holds an older one. Any write of the model must leave them in step again (F3.5).
+     */
+    private function stale_mirror(): void {
+        set_config('comparison_providers', 'gemini|AIzaROW-GEMINI-KEY-NEW-1111|gemini-2.5-flash', 'local_ai_course_assistant');
+        set_config('apikey', secrets::conceal('AIzaSTALE-GEMINI-KEY-OLD-0000'), 'local_ai_course_assistant');
+    }
+
+    public function test_a_switch_that_writes_the_model_leaves_apikey_in_step_with_the_default_row(): void {
+        $this->stale_mirror();
+        [$cand, $eval] = $this->passed();
+        $this->assertTrue(switcher::switch_to($cand, $eval, 'auto', 0)['ok']);
+        $this->assertSame('gemini-3.5-flash-lite', get_config('local_ai_course_assistant', 'model'));
+        $this->assertSame('AIzaROW-GEMINI-KEY-NEW-1111', secrets::get('apikey'));
+        $this->assertTrue(secrets::is_encrypted(get_config('local_ai_course_assistant', 'apikey')));
+    }
+
+    public function test_a_switch_that_wrote_nothing_does_not_touch_apikey(): void {
+        $this->stale_mirror();
+        [$cand, $eval] = $this->passed();
+        emergency_control::disable([emergency_control::FLAG_RAG], 'test', 'test');
+        $this->assertFalse(switcher::switch_to($cand, $eval, 'auto', 0)['ok']);
+        $this->assertSame('AIzaSTALE-GEMINI-KEY-OLD-0000', secrets::get('apikey'), 'blocked: nothing written, nothing synced');
+    }
+
+    public function test_a_switch_of_another_role_does_not_touch_apikey(): void {
+        $this->stale_mirror();
+        set_config('premium_escalation_enabled', 1, 'local_ai_course_assistant');
+        set_config('premium_escalation_provider', 'claude', 'local_ai_course_assistant');
+        set_config('premium_escalation_model', 'claude-sonnet-5', 'local_ai_course_assistant');
+        [$cand, $eval] = $this->passed(roles::PREMIUM, 'claude', 'claude-sonnet-5-5', '', 'claude-sonnet-5');
+        $this->assertTrue(switcher::switch_to($cand, $eval, 'auto', 0)['ok']);
+        $this->assertSame('AIzaSTALE-GEMINI-KEY-OLD-0000', secrets::get('apikey'), 'the premium model is not the default');
+    }
+
+    public function test_a_rollback_that_restores_the_model_leaves_apikey_in_step(): void {
+        $sink = $this->redirectEmails();
+        [$cand, $eval] = $this->passed();
+        $id = switcher::switch_to($cand, $eval, 'auto', 0)['switchid'];
+        $this->stale_mirror();
+        $this->assertTrue(switcher::rollback($id, 'test', 2)['ok']);
+        $this->assertSame('gemini-2.5-flash', get_config('local_ai_course_assistant', 'model'));
+        $this->assertSame('AIzaROW-GEMINI-KEY-NEW-1111', secrets::get('apikey'));
+        $this->assertNotEmpty($sink->get_messages());
+    }
+
     public function test_the_watcher_rolls_back_an_error_spike(): void {
         global $DB;
         $now = time();
