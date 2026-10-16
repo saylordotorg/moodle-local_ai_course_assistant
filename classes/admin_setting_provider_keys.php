@@ -33,8 +33,15 @@ class admin_setting_provider_keys extends admin_setting_keyed_rows {
     /** @var string Matches a base URL with a user name or password: anything before an @ in the authority. */
     private const CREDENTIALS = '~^(https?://)[^/?#\\\\]*@~i';
 
-    /** @var string[] Words that make a query-string parameter name a credential (ruling R22), matched per word. */
-    private const SECRET_PARAMS = ['key', 'token', 'secret', 'sig', 'signature', 'password', 'auth', 'apikey'];
+    /** @var string[] Words that make a query-string parameter name a credential (rulings R22, R30), matched per word. */
+    private const SECRET_WORDS = ['key', 'token', 'secret', 'sig', 'signature', 'password', 'passwd', 'pwd', 'pass', 'auth',
+        'authorization', 'credential', 'credentials', 'code', 'apikey'];
+
+    /** @var string[] Endings that make a whole lower-case name a credential: apitoken, accesstoken, clientsecret, userpwd. */
+    private const SECRET_ENDINGS = ['token', 'secret', 'password', 'passwd', 'pwd', 'signature', 'credential', 'credentials'];
+
+    /** @var string[] Run-together names that are a credential. There is no bare "key" ending: monkey and turkey are fine. */
+    private const SECRET_NAMES = ['apikey', 'secretkey', 'accesskey', 'authkey', 'privatekey', 'subscriptionkey'];
 
     /**
      * The columns after the key.
@@ -97,17 +104,35 @@ class admin_setting_provider_keys extends admin_setting_keyed_rows {
     }
 
     /**
-     * Whether a query-string parameter name is a credential: one of its words (split on anything that isn't
-     * a letter or digit, and on camelCase) is key, token, secret, sig, signature, password, auth or apikey.
-     * "api_key", "X-Amz-Signature" and "accessToken" match; "monkey", "keyboard" and "api-version" don't.
+     * Whether a query-string parameter name is a credential. The name is decoded, then it is one when any of
+     * its words (split on anything that isn't a letter or digit, and on camelCase) is a credential word, when
+     * the whole lower-case name ends in token, secret, password, passwd, pwd, signature or credential(s), or
+     * when it is one of the run-together names (apikey, secretkey, accesskey and so on). "api_key",
+     * "X-Amz-Signature", "accessToken", "apitoken", "code" and "pwd" match; "monkey", "turkey",
+     * "keyboard", "region" and "api-version" don't.
+     *
+     * Fails closed: if the pattern engine can't split the name, it counts as a credential.
      *
      * @param string $name
      * @return bool
      */
     private static function secret_param(string $name): bool {
-        $words = preg_split('~[^A-Za-z0-9]+|(?<=[a-z0-9])(?=[A-Z])~', rawurldecode($name), -1, PREG_SPLIT_NO_EMPTY);
+        $decoded = rawurldecode($name);
+        $words = preg_split('~[^A-Za-z0-9]+|(?<=[a-z0-9])(?=[A-Z])~', $decoded, -1, PREG_SPLIT_NO_EMPTY);
+        if ($words === false) {
+            return true;
+        }
         foreach ($words as $word) {
-            if (in_array(strtolower($word), self::SECRET_PARAMS, true)) {
+            if (in_array(strtolower($word), self::SECRET_WORDS, true)) {
+                return true;
+            }
+        }
+        $whole = strtolower($decoded);
+        if (in_array($whole, self::SECRET_NAMES, true)) {
+            return true;
+        }
+        foreach (self::SECRET_ENDINGS as $ending) {
+            if (str_ends_with($whole, $ending)) {
                 return true;
             }
         }
@@ -115,16 +140,45 @@ class admin_setting_provider_keys extends admin_setting_keyed_rows {
     }
 
     /**
-     * Whether a URL's query string has a parameter named like a credential.
+     * What is wrong with a non-empty base URL, if anything. Judges only and calls nothing else in Moodle.
+     * Fails closed: when the pattern engine gives up on a test (preg_match() is false) the URL fails that test.
+     *
+     * @param string $url
+     * @return string '' when it is fine, else 'scheme' (not http or https), 'credentials' (a user name or
+     *                password in the address) or 'query' (a secret, a # part, or text that couldn't be judged)
+     */
+    private static function base_url_problem(string $url): string {
+        if (!preg_match('~^https?://~i', $url)) {
+            return 'scheme';
+        }
+        if (preg_match(self::CREDENTIALS, $url) !== 0) {
+            return 'credentials';
+        }
+        return self::carries_secret($url) ? 'query' : '';
+    }
+
+    /**
+     * Whether a base URL carries something that is a secret or can't be judged: a # part (a fragment is never
+     * sent to a server, so no API base URL has a use for one), a parameter named like a credential (the query
+     * is split on & and ;), or text the pattern engine gave up on (it fails closed). Walks the query one
+     * parameter at a time, so a query of several megabytes costs time but no extra memory.
      *
      * @param string $url
      * @return bool
      */
-    private static function has_secret_query(string $url): bool {
-        if (!preg_match('~^[^?#]*\?([^#]*)~', $url, $m)) {
+    private static function carries_secret(string $url): bool {
+        if (str_contains($url, '#')) {
+            return true;
+        }
+        $q = strpos($url, '?');
+        if ($q === false) {
             return false;
         }
-        foreach (explode('&', $m[1]) as $part) {
+        $query = substr($url, $q + 1);
+        $length = strlen($query);
+        for ($start = 0; $start <= $length; $start = $end + 1) {
+            $end = $start + strcspn($query, '&;', $start);
+            $part = substr($query, $start, $end - $start);
             $eq = strpos($part, '=');
             if (self::secret_param($eq === false ? $part : substr($part, 0, $eq))) {
                 return true;
@@ -135,23 +189,40 @@ class admin_setting_provider_keys extends admin_setting_keyed_rows {
 
     /**
      * A URL as it may appear on a page, in a notice or in the config log: the user name and password are
-     * replaced by *** and so is the value of any credential-named query parameter.
+     * replaced by ***, so is the value of any credential-named query parameter (the query is split on & and
+     * ;), and so is the whole fragment. Fails closed: a URL the pattern engine can't read comes back as ***.
      *
      * @param string $url
      * @return string
      */
     public static function mask_url(string $url): string {
         $url = preg_replace(self::CREDENTIALS, '$1***@', $url);
-        return preg_replace_callback('~^([^?#]*\?)([^#]*)~', static function (array $m): string {
-            $parts = explode('&', $m[2]);
-            foreach ($parts as $i => $part) {
-                $eq = strpos($part, '=');
-                if ($eq !== false && self::secret_param(substr($part, 0, $eq))) {
-                    $parts[$i] = substr($part, 0, $eq) . '=***';
-                }
+        if ($url === null) {
+            return '***';
+        }
+        $fragment = '';
+        $hash = strpos($url, '#');
+        if ($hash !== false) {
+            $fragment = $hash === strlen($url) - 1 ? '#' : '#***';
+            $url = substr($url, 0, $hash);
+        }
+        $q = strpos($url, '?');
+        if ($q === false) {
+            return $url . $fragment;
+        }
+        $query = substr($url, $q + 1);
+        $length = strlen($query);
+        $masked = '';
+        for ($start = 0; $start <= $length; $start = $end + 1) {
+            $end = $start + strcspn($query, '&;', $start);
+            $part = substr($query, $start, $end - $start);
+            $eq = strpos($part, '=');
+            $masked .= ($eq !== false && self::secret_param(substr($part, 0, $eq))) ? substr($part, 0, $eq) . '=***' : $part;
+            if ($end < $length) {
+                $masked .= $query[$end];
             }
-            return $m[1] . implode('&', $parts);
-        }, $url);
+        }
+        return substr($url, 0, $q + 1) . $masked . $fragment;
     }
 
     /**
@@ -215,11 +286,12 @@ class admin_setting_provider_keys extends admin_setting_keyed_rows {
                 $errors[] = get_string('providerkeys:err_temperature', $plugin, $p . $shown);
             }
             if ($r['baseurl'] !== '') {
-                if (!preg_match('~^https?://~i', $r['baseurl'])) {
+                $problem = self::base_url_problem($r['baseurl']);
+                if ($problem === 'scheme') {
                     $errors[] = get_string('providerkeys:err_baseurl', $plugin, $p);
-                } else if (preg_match(self::CREDENTIALS, $r['baseurl'])) {
+                } else if ($problem === 'credentials') {
                     $errors[] = get_string('providerkeys:err_baseurl_credentials', $plugin, $p);
-                } else if (self::has_secret_query($r['baseurl'])) {
+                } else if ($problem === 'query') {
                     $errors[] = get_string('providerkeys:err_baseurl_query', $plugin, $p);
                 }
             }

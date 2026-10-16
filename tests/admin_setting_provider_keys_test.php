@@ -27,6 +27,16 @@ namespace local_ai_course_assistant;
  */
 final class admin_setting_provider_keys_test extends \advanced_testcase {
 
+    /**
+     * The setting classes extend admin_setting, which only adminlib.php defines; static calls on them (the URL
+     * masking) must work when a test is run on its own.
+     */
+    protected function setUp(): void {
+        global $CFG;
+        parent::setUp();
+        require_once($CFG->libdir . '/adminlib.php');
+    }
+
     private function setting(): admin_setting_provider_keys {
         global $CFG;
         require_once($CFG->libdir . '/adminlib.php');
@@ -419,6 +429,232 @@ final class admin_setting_provider_keys_test extends \advanced_testcase {
         $this->assertStringContainsString(
             get_string('providerkeys:err_baseurl_query', 'local_ai_course_assistant', 'custom'), $err);
         $this->assertSame($before, $this->stored());
+    }
+
+    /**
+     * Base URLs that carry a credential the first matcher missed (ruling R30), and what each shows as when it
+     * is a value saved before 7.9.0: the credential's value, or the whole fragment, is ***. Every one has the
+     * marker LEAK in the secret, so a short cut of the text still gives it away.
+     *
+     * @return array [url, masked url]
+     */
+    public static function missed_credential_provider(): array {
+        $u = 'https://a.io/v1';
+        return [
+            'code' => [$u . '?code=LEAK-1', $u . '?code=***'],
+            'apitoken' => [$u . '?apitoken=LEAK-1', $u . '?apitoken=***'],
+            'accesstoken' => [$u . '?accesstoken=LEAK-1', $u . '?accesstoken=***'],
+            'authtoken' => [$u . '?authtoken=LEAK-1', $u . '?authtoken=***'],
+            'secretkey' => [$u . '?secretkey=LEAK-1', $u . '?secretkey=***'],
+            'pwd' => [$u . '?pwd=LEAK-1', $u . '?pwd=***'],
+            'passwd' => [$u . '?passwd=LEAK-1', $u . '?passwd=***'],
+            'pass' => [$u . '?pass=LEAK-1', $u . '?pass=***'],
+            'authorization' => [$u . '?authorization=LEAK-1', $u . '?authorization=***'],
+            'credential' => [$u . '?credential=LEAK-1', $u . '?credential=***'],
+            'credentials' => [$u . '?credentials=LEAK-1', $u . '?credentials=***'],
+            'accesskey' => [$u . '?accesskey=LEAK-1', $u . '?accesskey=***'],
+            'authkey' => [$u . '?authkey=LEAK-1', $u . '?authkey=***'],
+            'privatekey' => [$u . '?privatekey=LEAK-1', $u . '?privatekey=***'],
+            'subscriptionkey' => [$u . '?subscriptionkey=LEAK-1', $u . '?subscriptionkey=***'],
+            'a name that ends in token' => [$u . '?usertoken=LEAK-1', $u . '?usertoken=***'],
+            'a name that ends in secret' => [$u . '?clientsecret=LEAK-1', $u . '?clientsecret=***'],
+            'a name that ends in password' => [$u . '?dbpassword=LEAK-1', $u . '?dbpassword=***'],
+            'a name that ends in pwd' => [$u . '?userpwd=LEAK-1', $u . '?userpwd=***'],
+            'a name that ends in signature' => [$u . '?xsignature=LEAK-1', $u . '?xsignature=***'],
+            'a name that ends in credentials' => [$u . '?awscredentials=LEAK-1', $u . '?awscredentials=***'],
+            'upper case' => [$u . '?AUTHORIZATION=LEAK-1', $u . '?AUTHORIZATION=***'],
+            'camel case code' => [$u . '?authCode=LEAK-1', $u . '?authCode=***'],
+            'a percent-encoded name' => [$u . '?%61pitoken=LEAK-1', $u . '?%61pitoken=***'],
+            'a semicolon separator' => [$u . '?a=1;api_key=LEAK-1', $u . '?a=1;api_key=***'],
+            'a semicolon before a harmless one' => [$u . '?model=x;code=LEAK-1&api-version=1', $u . '?model=x;code=***&api-version=1'],
+            'two secrets' => [$u . '?key=LEAK-1&token=LEAK-2', $u . '?key=***&token=***'],
+            'a fragment that holds a secret' => [$u . '#api_key=LEAK-1', $u . '#***'],
+            'a fragment after a harmless query' => [$u . '?model=x#access_token=LEAK-1', $u . '?model=x#***'],
+            'a fragment after a secret query' => [$u . '?key=LEAK-1#top', $u . '?key=***#***'],
+            'a fragment with a query inside it' => [$u . '#x?key=LEAK-1', $u . '#***'],
+        ];
+    }
+
+    /**
+     * @dataProvider missed_credential_provider
+     * @param string $url
+     */
+    public function test_a_base_url_with_a_credential_the_first_check_missed_is_refused(string $url): void {
+        $this->resetAfterTest();
+        $err = $this->setting()->write_setting(['rows' => [
+            $this->row('custom', 'sk-custom-R30-URL-2323-WWWW', '', 'm', '', $url),
+        ]]);
+        $this->assertStringContainsString(
+            get_string('providerkeys:err_baseurl_query', 'local_ai_course_assistant', 'custom'), $err);
+        $this->assertStringNotContainsString('LEAK', $err, 'the error never repeats the URL');
+        $this->assertSame('', $this->stored(), 'nothing saved');
+    }
+
+    /**
+     * @dataProvider missed_credential_provider
+     * @param string $url
+     * @param string $masked
+     */
+    public function test_a_saved_base_url_with_such_a_credential_is_masked_on_the_page_the_log_and_the_notice(
+            string $url, string $masked): void {
+        $this->resetAfterTest();
+        $this->assertSame($masked, admin_setting_provider_keys::mask_url($url));
+        $line = 'custom|sodium:abcdef|m||' . $url;
+        $this->assertSame('custom|********|m||' . $masked, admin_setting_provider_keys::redact_keys($line));
+        // The settings-changed notice, which cuts a value to 48 characters AFTER redacting it.
+        $report = settings_save_report::describe([
+            'comparison_providers' => ['custom||m||' . $url, 'custom||m||https://a.io/v1'],
+        ]);
+        $this->assertStringNotContainsString('LEAK', strip_tags($report['message']));
+        // The page.
+        set_config('comparison_providers', 'custom|' . secrets::conceal('sk-custom-R30-LEGACY-2424-XXXX') . '|m||' . $url,
+            'local_ai_course_assistant');
+        $html = $this->setting()->output_html('');
+        $this->assertStringNotContainsString('LEAK', $html);
+        $this->assertStringContainsString(s($masked), $html, 'the rest of the address stays visible');
+    }
+
+    /** The whole of a legacy table with every one of them, through a real save: the config log keeps none. */
+    public function test_a_real_save_over_a_legacy_table_logs_none_of_these_credentials(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $enc = secrets::conceal('sk-custom-R30-LOG-2525-YYYY');
+        $lines = [];
+        foreach (self::missed_credential_provider() as [$url]) {
+            $lines[] = 'custom|' . $enc . '|m||' . $url;
+        }
+        set_config('comparison_providers', implode("\n", $lines), 'local_ai_course_assistant');
+        $this->assertSame('', $this->setting()->write_setting(['rows' => [
+            $this->row('custom', 'sk-custom-R30-NEW-2626-ZZZZ', '', 'm', '', 'https://a.io/v1'),
+        ]]));
+        $logged = $DB->get_records('config_log', ['plugin' => 'local_ai_course_assistant', 'name' => 'comparison_providers']);
+        $this->assertNotEmpty($logged);
+        foreach ($logged as $entry) {
+            foreach ([(string) $entry->value, (string) $entry->oldvalue] as $text) {
+                $this->assertStringNotContainsString('LEAK', $text);
+            }
+        }
+        $old = array_values(array_filter($logged, static fn($e) => $e->oldvalue !== null && $e->oldvalue !== ''));
+        $this->assertNotEmpty($old, 'the old table was logged, so the check above was not vacuous');
+        $this->assertStringContainsString('?code=***', (string) $old[0]->oldvalue);
+        $this->assertStringContainsString('#***', (string) $old[0]->oldvalue);
+    }
+
+    /**
+     * Query parameters that are not credentials, including names that merely contain a risky word.
+     *
+     * @return array
+     */
+    public static function legitimate_query_provider(): array {
+        $u = 'https://gw.example/v1?';
+        return [
+            'api-version' => [$u . 'api-version=2024-02-01'],
+            'model' => [$u . 'model=gpt-4o'],
+            'deployment-id' => [$u . 'deployment-id=gpt4-prod'],
+            'monkey' => [$u . 'monkey=1'],
+            'turkey' => [$u . 'turkey=1'],
+            'hockey' => [$u . 'hockey=1'],
+            'region' => [$u . 'region=eu-west-1'],
+            'passage' => [$u . 'passage=2'],
+            'zipcode' => [$u . 'zipcode=84101'],
+            'several of them with both separators' => [$u . 'api-version=1;model=x&region=us'],
+            'an empty query' => ['https://gw.example/v1?'],
+        ];
+    }
+
+    /**
+     * @dataProvider legitimate_query_provider
+     * @param string $url
+     */
+    public function test_a_legitimate_query_is_accepted_and_never_masked(string $url): void {
+        $this->resetAfterTest();
+        $this->assertSame($url, admin_setting_provider_keys::mask_url($url));
+        $this->assertSame('', $this->setting()->write_setting(['rows' => [
+            $this->row('custom', 'sk-custom-R30-OK-2727-AAAA', '', 'm', '', $url),
+        ]]));
+        $this->assertStringContainsString($url, $this->stored());
+        $this->assertStringContainsString(s($url), $this->setting()->output_html(''), 'and it shows as saved');
+    }
+
+    /** A 3 MB query string is neither slow nor an error: a credential at its end is still found and masked. */
+    public function test_a_huge_query_string_is_judged_without_hanging_or_erroring(): void {
+        $this->resetAfterTest();
+        $setting = $this->setting();
+        $many = 'https://a.io/v1?' . str_repeat('a=1&', 750000);
+        $started = microtime(true);
+        $err = $setting->write_setting(['rows' => [
+            $this->row('custom', 'sk-custom-R30-BIG-2828-BBBB', '', 'm', '', $many . 'api_key=LEAK'),
+        ]]);
+        $this->assertStringContainsString(
+            get_string('providerkeys:err_baseurl_query', 'local_ai_course_assistant', 'custom'), $err);
+        $masked = admin_setting_provider_keys::mask_url($many . 'api_key=LEAK');
+        $this->assertStringNotContainsString('LEAK', $masked);
+        $this->assertStringEndsWith('&api_key=***', $masked);
+        // One name of 3 MB with no separator at all, and a huge value: answered, never an exception.
+        $name = 'https://a.io/v1?' . str_repeat('a', 3000000);
+        $this->assertIsString($setting->write_setting(['rows' => [$this->row('custom', 'sk-custom-R30-BIG-2828-BBBB', '', 'm', '', $name)]]));
+        $this->assertSame(strlen($name), strlen(admin_setting_provider_keys::mask_url($name)));
+        $value = 'https://a.io/v1?model=' . str_repeat('v', 3000000);
+        $this->assertSame('', $setting->write_setting(['rows' => [$this->row('custom', 'sk-custom-R30-BIG-2828-BBBB', '', 'm', '', $value)]]));
+        $this->assertLessThan(20, microtime(true) - $started, 'three 3 MB URLs were judged in a few seconds');
+    }
+
+    /**
+     * When the pattern engine itself gives up, the answer is "unsafe": refused on save, hidden on display.
+     *
+     * The engine's backtrack limit is lowered only around the calls that judge the URL, because the rest of
+     * Moodle uses patterns too and would break under it. Which patterns fail at a given limit depends on the
+     * PHP build (and on whether it compiled them with JIT), so each limit from 1 to 5 is tried and every
+     * outcome is checked against what the engine actually did at that limit; the test is skipped if no limit
+     * made any of them fail.
+     */
+    public function test_when_the_pattern_engine_gives_up_the_url_is_refused_and_hidden(): void {
+        $this->resetAfterTest();
+        $problem = new \ReflectionMethod(admin_setting_provider_keys::class, 'base_url_problem');
+        $problem->setAccessible(true);
+        $carries = new \ReflectionMethod(admin_setting_provider_keys::class, 'carries_secret');
+        $carries->setAccessible(true);
+        $camelname = str_repeat('aA', 1500);
+        $camel = 'https://a.io/v1?' . $camelname . '=LEAK';
+        $userinfo = 'https://u:LEAK@h/v1';
+        $splitter = '~[^A-Za-z0-9]+|(?<=[a-z0-9])(?=[A-Z])~';
+        $usertest = '~^(https?://)[^/?#\\\\]*@~i';
+        $limit = ini_get('pcre.backtrack_limit');
+        $exercised = 0;
+        foreach ([1, 2, 3, 4, 5] as $lowered) {
+            ini_set('pcre.backtrack_limit', (string) $lowered);
+            try {
+                $splitfails = @preg_split($splitter, $camelname, -1, PREG_SPLIT_NO_EMPTY) === false;
+                $userfails = @preg_match($usertest, $userinfo) === false;
+                $schemeok = @preg_match('~^https?://~i', $userinfo) === 1;
+                $camelrefused = $carries->invoke(null, $camel);
+                $userinfoproblem = $problem->invoke(null, $userinfo);
+                $maskedcamel = admin_setting_provider_keys::mask_url($camel);
+                $maskeduserinfo = admin_setting_provider_keys::mask_url($userinfo);
+            } finally {
+                ini_set('pcre.backtrack_limit', (string) $limit);
+            }
+            if ($splitfails) {
+                $exercised++;
+                $this->assertTrue($camelrefused, "limit $lowered: a name the engine could not judge counts as a credential");
+                $this->assertStringNotContainsString('LEAK', $maskedcamel);
+                $this->assertStringContainsString('=***', $maskedcamel);
+            }
+            if ($userfails) {
+                $exercised++;
+                $this->assertNotSame('', $userinfoproblem, "limit $lowered: an address whose user-name test failed is refused");
+                if ($schemeok) {
+                    $this->assertSame('credentials', $userinfoproblem, "limit $lowered: and it counts as having a user name");
+                }
+                $this->assertSame('***', $maskeduserinfo, "limit $lowered: an address the engine could not read is hidden whole");
+            }
+        }
+        if ($exercised === 0) {
+            $this->markTestSkipped('This PHP build did not make the pattern engine fail at limits 1 to 5, so the fail-closed branches are not reachable here.');
+        }
+        // With the engine back, the same judging is exact again.
+        $this->assertSame('credentials', $problem->invoke(null, $userinfo));
+        $this->assertSame('', $problem->invoke(null, 'https://a.io/v1?model=x'));
     }
 
     public function test_the_config_log_and_the_notice_never_carry_a_url_credential_or_ciphertext(): void {
