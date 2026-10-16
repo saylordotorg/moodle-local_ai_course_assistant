@@ -244,7 +244,10 @@ class provider_keys {
      */
     public static function sync_default_key(): bool {
         global $CFG;
-        if (array_key_exists('apikey', $CFG->forced_plugin_settings[self::PLUGIN] ?? [])) {
+        $forced = $CFG->forced_plugin_settings[self::PLUGIN] ?? [];
+        // A forced apikey is not ours to write. A forced table keeps its keys out of the database on purpose,
+        // and the mirror would copy one in, where it goes stale when config.php is rotated.
+        if (array_key_exists('apikey', $forced) || array_key_exists(self::SETTING, $forced)) {
             return false;
         }
         $provider = self::site_provider();

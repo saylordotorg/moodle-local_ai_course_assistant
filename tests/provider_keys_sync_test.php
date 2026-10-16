@@ -168,6 +168,24 @@ final class provider_keys_sync_test extends \advanced_testcase {
         unset($CFG->forced_plugin_settings['local_ai_course_assistant']['apikey']);
     }
 
+    /** A table forced in config.php keeps its keys out of the database on purpose; the mirror must not copy one in. */
+    public function test_a_table_forced_in_config_php_is_never_mirrored_into_apikey(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('apikey', secrets::conceal('sk-proj-DB-APIKEY-STAY-1111'));
+        $CFG->forced_plugin_settings['local_ai_course_assistant']['comparison_providers'] =
+            'openai|sk-proj-FORCED-TABLE-KEY-2222|o';
+        try {
+            $this->assertSame('sk-proj-FORCED-TABLE-KEY-2222', provider_keys::key_for('openai'), 'the forced row is live');
+            $this->assertFalse(provider_keys::sync_default_key());
+            $this->assertSame('sk-proj-DB-APIKEY-STAY-1111', secrets::get('apikey'), 'apikey is left as it was');
+            $this->assertTrue(secrets::is_encrypted(get_config('local_ai_course_assistant', 'apikey')));
+        } finally {
+            unset($CFG->forced_plugin_settings['local_ai_course_assistant']['comparison_providers']);
+        }
+    }
+
     public function test_the_default_warning_names_the_providers_when_the_key_is_another_vendors(): void {
         $this->resetAfterTest();
         $this->cfg('provider', 'openai');
