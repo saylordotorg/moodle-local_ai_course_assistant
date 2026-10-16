@@ -47,9 +47,17 @@ final class provider_keys_test extends \advanced_testcase {
         $this->resetAfterTest();
         $enc = secrets::conceal('sk-proj-SENTINEL-KEY-9999-QRST');
         $this->seed("openai|{$enc}|gpt-4o-mini");
-        $json = json_encode(provider_keys::rows());
+        // Unescaped slashes: base64 ciphertext holds '/', which json_encode would otherwise write as '\/'
+        // and so hide a leak from a plain substring check.
+        $json = json_encode(provider_keys::rows(), JSON_UNESCAPED_SLASHES);
         $this->assertStringNotContainsString('SENTINEL', $json);
-        $this->assertStringNotContainsString(substr($enc, strpos($enc, ':') + 1, 24), $json);
+        $this->assertStringNotContainsString($enc, $json);
+        $this->assertStringNotContainsString(substr($enc, strpos($enc, ':') + 1), $json);
+        $this->assertSame(
+            ['id', 'provider', 'label', 'haskey', 'last4', 'key', 'models', 'model', 'temperature', 'baseurl', 'columns'],
+            array_keys(provider_keys::rows()[0])
+        );
+        $this->assertSame('', provider_keys::rows()[0]['key']);
         $this->assertTrue(provider_keys::rows()[0]['haskey']);
         $this->assertSame('QRST', provider_keys::rows()[0]['last4']);
     }
