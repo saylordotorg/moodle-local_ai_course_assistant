@@ -311,7 +311,7 @@ python3 -c "import subprocess,os; subprocess.run(['bash', 'ai_course_assistant/c
 
 ## Release Process
 
-Every tagged release must ship with a release-notes-and-walkthrough draft in `.drafts/`. The draft has three parts: a terse changelog headline + bullets, a "Key SOLA Features" snapshot, and a 20-minute conversational admin walkthrough script. These drafts become the source of truth for the GH release body, onboarding docs, and admin demo scripts.
+Every tagged release must ship with a release-notes-and-walkthrough draft in `.drafts/`. A minor release (x.y.0) carries the full three-part draft: a terse changelog headline + bullets, a "Key SOLA Features" snapshot, and a 20-minute conversational admin walkthrough script (see `v7.8.0-release-notes-and-walkthrough.md`). A patch release may use the short two-part form instead: the changelog entry plus a walkthrough of a few minutes covering only what changed, as every release from v7.8.1 to v7.8.9 does. These drafts become the source of truth for the GH release body, onboarding docs, and admin demo scripts.
 
 ### Seed the draft (first step of every release)
 ```bash
