@@ -46,6 +46,35 @@ final class settings_save_report_test extends \advanced_testcase {
         $this->assertStringContainsString('apikey', $r['message']);
     }
 
+    /**
+     * Every secret setting is hidden in the notice, whatever its name: a webhook URL, an access key id or an
+     * export key has no "key", "token" or "secret" for config_log_audit's name list to match, so the notice
+     * showed the first 48 characters of its ciphertext.
+     */
+    public function test_no_secret_setting_ever_shows_a_value_or_ciphertext_in_the_notice(): void {
+        $names = secrets::names();
+        $this->assertGreaterThanOrEqual(17, count($names));
+        $this->assertContains('anomaly_digest_slack_webhook', $names);
+        $this->assertContains('soapbox_storage_key', $names);
+        $this->assertContains('spend_export_key', $names);
+        // And a setting that isn't listed yet but is named like a credential stays hidden by its name.
+        $names[] = 'github_token';
+        $names[] = 'some_future_password';
+        foreach ($names as $name) {
+            $r = settings_save_report::describe([$name => [
+                'sodium:OLDCIPHERTEXTSENTINEL' . base64_encode(random_bytes(30)),
+                'sodium:NEWCIPHERTEXTSENTINEL' . base64_encode(random_bytes(30)),
+            ]]);
+            $this->assertSame(1, $r['changed'], $name);
+            $this->assertStringContainsString('<code>' . $name . '</code>', $r['message'], $name);
+            $this->assertStringContainsString(get_string('savereport:secret', 'local_ai_course_assistant'),
+                $r['message'], $name . ' says only that it changed');
+            $this->assertStringNotContainsString('sodium', $r['message'], $name);
+            $this->assertStringNotContainsString('CIPHERTEXTSENTINEL', $r['message'], $name);
+            $this->assertStringNotContainsString('&rarr;', $r['message'], $name);
+        }
+    }
+
     public function test_line_ending_only_rewrite_is_labelled(): void {
         $r = settings_save_report::describe(['comparison_providers' => ["a|b\r\nc|d", "a|b\nc|d"]]);
         $this->assertStringContainsString(get_string('savereport:lineendings', 'local_ai_course_assistant'), $r['message']);

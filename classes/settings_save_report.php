@@ -197,7 +197,9 @@ class settings_save_report {
      * @return string HTML
      */
     private static function change_text(string $name, ?string $old, ?string $new): string {
-        if (config_log_audit::is_secret_name($name)) {
+        // A secret by its listing in secrets::names() or by the look of its name: a webhook URL or an access
+        // key id has no "key", "token" or "secret" in a name the second test would match.
+        if (secrets::is_secret($name) || config_log_audit::is_secret_name($name)) {
             return get_string('savereport:secret', 'local_ai_course_assistant');
         }
         $norm = static fn(?string $v): string => trim(str_replace("\r\n", "\n", (string) $v));
