@@ -1158,7 +1158,18 @@ abstract class base_provider implements provider_interface {
 
         $row = self::lookup_comparison_row($providerid);
         if ($row !== null) {
-            if (!empty($row['apikey'])) {
+            // 7.9.0: the upgrade gives the default provider a row that MIRRORS the site key. Before that, a
+            // course with its own key for this provider kept it (and its own gateway) because no row existed,
+            // so a row whose key is just the site key must not take the course's credential over, or the site
+            // key would be billed and could be sent to the course's gateway. A row with a DISTINCT credential
+            // still wins, as it always did.
+            $sitekey = (string) (\local_ai_course_assistant\secrets::get('apikey') ?: '');
+            $coursekeepsown = strcasecmp($providerid, $keyowner) === 0
+                && (string) $effective['apikey'] !== ''
+                && (string) $effective['apikey'] !== $sitekey
+                && (string) $row['apikey'] !== ''
+                && (string) $row['apikey'] === $sitekey;
+            if (!$coursekeepsown && !empty($row['apikey'])) {
                 $overrides['apikey'] = $row['apikey'];
             }
             if ($row['temperature'] !== '') {
@@ -1166,7 +1177,7 @@ abstract class base_provider implements provider_interface {
             }
             // v5.5.2: per-row base URL override (5th column). Empty means
             // use the provider class's hardcoded default.
-            if (!empty($row['apibaseurl'])) {
+            if (!$coursekeepsown && !empty($row['apibaseurl'])) {
                 $overrides['apibaseurl'] = $row['apibaseurl'];
             }
         } else if (strcasecmp($providerid, $keyowner) !== 0) {
