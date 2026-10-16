@@ -457,4 +457,20 @@ final class admin_setting_voice_providers_test extends \advanced_testcase {
         }
         $this->assertStringNotContainsString(s(get_string('providerkeys:forced_note', 'local_ai_course_assistant')), $html);
     }
+
+    /** F2.4: the same for the voice table. */
+    public function test_admin_search_never_probes_a_stored_row(): void {
+        $this->resetAfterTest();
+        set_config('voice_providers',
+            "xai|xai-SEARCHPROBE-PLAIN-1111-ZZZZ|lbl-searchprobe|eve|eve\n"
+            . 'openai|' . secrets::conceal('sk-proj-SEARCHPROBE-ENC-2222-YYYY') . '|main|shimmer|nova',
+            'local_ai_course_assistant');
+        $setting = $this->setting();
+        foreach (['searchprobe', 'zzzz', 'sodium', 'lbl-search', 'shimmer', 'xai'] as $probe) {
+            $this->assertFalse($setting->is_related($probe), "a stored row is not searchable: $probe");
+        }
+        $this->assertTrue($setting->is_related('voice_providers'), 'the setting name');
+        $this->assertTrue($setting->is_related('voice'), 'the visible name');
+        $this->assertTrue($setting->is_related('desc'), 'the description');
+    }
 }

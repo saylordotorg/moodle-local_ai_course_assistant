@@ -879,4 +879,23 @@ final class admin_setting_provider_keys_test extends \advanced_testcase {
             $this->assertStringContainsString('aria-label="' . $label . '"', $html);
         }
     }
+
+    /**
+     * F2.4: admin search finds the table by its name, visible name and description, never by what a row holds
+     * (a model, a base URL, a key saved in plain text before 7.7.3, or ciphertext).
+     */
+    public function test_admin_search_never_probes_a_stored_row(): void {
+        $this->resetAfterTest();
+        set_config('comparison_providers',
+            "openai|sk-proj-SEARCHPROBE-PLAIN-1111-ZZZZ|m-searchprobe|0.3|https://gw-searchprobe.example/v1\n"
+            . 'claude|' . secrets::conceal('sk-ant-SEARCHPROBE-ENC-2222-YYYY') . '|c-model',
+            'local_ai_course_assistant');
+        $setting = $this->setting();
+        foreach (['searchprobe', 'zzzz', 'sodium', 'm-search', 'gw-search', 'c-model', 'openai'] as $probe) {
+            $this->assertFalse($setting->is_related($probe), "a stored row is not searchable: $probe");
+        }
+        $this->assertTrue($setting->is_related('comparison_providers'), 'the setting name');
+        $this->assertTrue($setting->is_related('provider keys'), 'the visible name');
+        $this->assertTrue($setting->is_related('desc'), 'the description');
+    }
 }

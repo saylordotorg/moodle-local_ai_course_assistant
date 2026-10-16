@@ -543,4 +543,48 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
         $this->assertStringNotContainsString('TYPED-FIELD', $stored);
         $this->assertSame('sk-proj-TYPED-FIELD-1111-ABCD', secrets::get('embed_apikey'));
     }
+
+    /**
+     * F2.4: admin search finds a field by its name, its visible name and its description. It must not look at
+     * what is stored in it: the search box would then answer "does the saved key contain these letters?", which
+     * is a way to guess a key one character at a time.
+     */
+    public function test_admin_search_never_probes_the_stored_value(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        $field = $this->field();
+        // A plain value (saved before 7.7.3), then a ciphertext, then one forced in config.php.
+        set_config('embed_apikey', 'sk-proj-SEARCHPROBE-PLAIN-1111-ZZZZ', 'local_ai_course_assistant');
+        $this->assertFalse($field->is_related('searchprobe'), 'a plain value is not searchable');
+        $this->assertFalse($field->is_related('zzzz'));
+        set_config('embed_apikey', secrets::conceal('sk-proj-SEARCHPROBE-ENC-2222-YYYY'), 'local_ai_course_assistant');
+        $this->assertFalse($field->is_related('sodium'), 'nor is its ciphertext');
+        $this->assertFalse($field->is_related('searchprobe'));
+        $CFG->forced_plugin_settings['local_ai_course_assistant']['embed_apikey'] = 'forced-SEARCHPROBE-3333';
+        try {
+            $this->assertFalse($field->is_related('searchprobe'), 'nor is a value forced in config.php');
+        } finally {
+            unset($CFG->forced_plugin_settings['local_ai_course_assistant']['embed_apikey']);
+        }
+        // What it should still match.
+        $this->assertTrue($field->is_related('embed_apikey'), 'the setting name');
+        $this->assertTrue($field->is_related('a key'), 'the visible name');
+        $this->assertTrue($field->is_related('desc'), 'the description');
+        $this->assertFalse($field->is_related('nothing-like-this-anywhere'));
+    }
+
+    /** F2.4: the webhook field inherits that, so a saved webhook URL is not searchable either. */
+    public function test_admin_search_never_probes_a_stored_webhook_url(): void {
+        $this->resetAfterTest();
+        $webhook = $this->webhook();
+        foreach (['https://hooks.search-sentinel.example/T000/B000/SEARCHPROBE',
+                secrets::conceal('https://hooks.search-sentinel.example/T000/B000/SEARCHPROBE')] as $saved) {
+            set_config('anomaly_digest_slack_webhook', $saved, 'local_ai_course_assistant');
+            $this->assertFalse($webhook->is_related('search-sentinel'));
+            $this->assertFalse($webhook->is_related('searchprobe'));
+            $this->assertFalse($webhook->is_related('hooks.'));
+        }
+        $this->assertTrue($webhook->is_related('slack webhook'), 'the visible name still matches');
+        $this->assertTrue($webhook->is_related('anomaly_digest_slack'), 'and so does the name');
+    }
 }

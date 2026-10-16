@@ -93,6 +93,24 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
     }
 
     /**
+     * Admin search matches this setting by its name, visible name and description only. Moodle's own test also
+     * reads the stored value, which would let the search box answer "does the saved key contain these
+     * letters?" for a value the page never shows.
+     *
+     * @param string $query the search text
+     * @return bool
+     */
+    public function is_related($query) {
+        $query = \core_text::strtolower((string) $query);
+        foreach ([$this->name, $this->visiblename, $this->description] as $text) {
+            if (strpos(\core_text::strtolower((string) $text), $query) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Save the posted rows.
      *
      * @param mixed $data array with 'rows' (and the 'present' marker) from the form

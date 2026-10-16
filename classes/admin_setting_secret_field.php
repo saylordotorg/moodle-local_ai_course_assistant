@@ -62,6 +62,24 @@ class admin_setting_secret_field extends \admin_setting_encryptedpassword {
     }
 
     /**
+     * Admin search matches this setting by its name, visible name and description only. Moodle's own test also
+     * reads the stored value, which would let the search box answer "does the saved key contain these
+     * letters?" for a value the page never shows.
+     *
+     * @param string $query the search text
+     * @return bool
+     */
+    public function is_related($query) {
+        $query = \core_text::strtolower((string) $query);
+        foreach ([$this->name, $this->visiblename, $this->description] as $text) {
+            if (strpos(\core_text::strtolower((string) $text), $query) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Log that the setting changed, never what it changed from or to.
      *
      * @param string $name setting name
