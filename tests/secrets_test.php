@@ -153,12 +153,16 @@ final class secrets_test extends \advanced_testcase {
         $this->resetAfterTest();
         $setting = new admin_setting_voice_providers('local_ai_course_assistant/voice_providers', 'v', 'd');
 
-        $setting->write_setting("# a comment stays as it is\nopenai|sk-voice-plain-789|openai-prod|shimmer|alloy");
+        // The form posts one array per row, and the key is typed once.
+        $setting->write_setting(['rows' => [[
+            'provider' => 'openai', 'newkey' => 'sk-voice-plain-789', 'keepid' => '', 'label' => 'openai-prod',
+            'realtime_voice' => 'shimmer', 'tts_voice' => 'alloy',
+        ]]]);
 
         $stored = $DB->get_field('config_plugins', 'value',
             ['plugin' => 'local_ai_course_assistant', 'name' => 'voice_providers']);
         $this->assertStringNotContainsString('sk-voice-plain-789', $stored);
-        $this->assertStringStartsWith("# a comment stays as it is\nopenai|sodium:", $stored);
+        $this->assertStringStartsWith('openai|sodium:', $stored);
         $this->assertStringEndsWith('|openai-prod|shimmer|alloy', $stored);
 
         $rows = voice_registry::parse_rows();
@@ -168,16 +172,17 @@ final class secrets_test extends \advanced_testcase {
         $html = $setting->output_html($setting->get_setting());
         $this->assertStringNotContainsString('sk-voice-plain-789', $html);
 
-        // Saving the form untouched posts the stored form back; it must not
-        // be encrypted a second time.
-        $setting->write_setting($stored);
-        $this->assertSame('sk-voice-plain-789', voice_registry::parse_rows()[0]['apikey']);
-
-        // The upgrade path encrypts a table written before this release.
-        set_config('voice_providers', 'xai|xai-plain-key|grok', 'local_ai_course_assistant');
+        // The upgrade path encrypts a table written before this release. Comment and blank lines stay as
+        // they are, and a key that is already ciphertext isn't encrypted a second time.
+        set_config('voice_providers', "# a comment stays as it is\n" . $stored . "\nxai|xai-plain-key|grok",
+            'local_ai_course_assistant');
         $this->assertSame(1, secrets::encrypt_stored_settings());
-        $this->assertStringNotContainsString('xai-plain-key', get_config('local_ai_course_assistant', 'voice_providers'));
-        $this->assertSame('xai-plain-key', voice_registry::parse_rows()[0]['apikey']);
+        $upgraded = get_config('local_ai_course_assistant', 'voice_providers');
+        $this->assertStringStartsWith("# a comment stays as it is\nopenai|sodium:", $upgraded);
+        $this->assertStringNotContainsString('xai-plain-key', $upgraded);
+        $this->assertSame('sk-voice-plain-789', voice_registry::parse_rows()[0]['apikey']);
+        $this->assertSame('xai-plain-key', voice_registry::parse_rows()[1]['apikey']);
+        $this->assertSame(0, secrets::encrypt_stored_settings(), 'a second run changes nothing');
     }
 
     /**

@@ -282,6 +282,13 @@ final class lang_completeness_test extends \basic_testcase {
         'providerkeys:err_baseurl_query',
         'savereport:keychanged',
         'settings:provider_desc',
+        // Voice providers table (Task 6). settings:voice_providers_desc keeps its old translations until Task 12 redoes them.
+        'providerkeys:col_label',
+        'providerkeys:col_rtvoice',
+        'providerkeys:col_ttsvoice',
+        'providerkeys:add_voice',
+        'providerkeys:err_voice_provider',
+        'settings:voice_providers_desc',
     ];
 
     /**
