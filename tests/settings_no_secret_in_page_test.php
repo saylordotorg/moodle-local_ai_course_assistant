@@ -23,7 +23,8 @@ namespace local_ai_course_assistant;
  * and both webhook fields, renders every SOLA settings page through Moodle's own page object, then repeats
  * that after a successful save, and after a failed one (where Moodle hands the submitted values back to
  * output_html through the admin root's error list). The page's JavaScript arguments are checked as well as
- * its HTML, because a key passed to js_call_amd is as readable as one in the markup.
+ * its HTML, because a key passed to js_call_amd, data_for_js or string_for_js is as readable as one in the markup.
+ * A table forced in config.php is covered too: it renders read-only and a save attempt writes nothing.
  *
  * The failed saves and the successful save go through admin_write_settings(), the function the settings
  * form posts to, so the path under test is Moodle's and not a copy of it.
@@ -50,8 +51,14 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
     /** @var string[] The settings that hold an incoming-webhook URL. */
     private const WEBHOOKS = ['anomaly_digest_slack_webhook', 'anomaly_digest_teams_webhook'];
 
+    /** @var int Length of the pieces of a plain sentinel that must not appear either (a key cut up is still a leak). */
+    private const WINDOW = 8;
+
     /** @var string[] Plain sentinels that must never appear. */
     private array $plains = [];
+
+    /** @var string[] Every WINDOW-character piece of the secret part of each plain sentinel => the sentinel it came from. */
+    private array $windows = [];
 
     /** @var string[] Ciphertext (whole, payload and pieces of it) that must never appear. */
     private array $cipherneedles = [];
@@ -79,19 +86,47 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
     private function remember(string $plain, string $stored = ''): void {
         $this->plains[$plain] = $plain;
         $this->endings[substr($plain, -6)] = $plain;
+        $this->remember_windows($plain);
         $this->remember_cipher($stored);
     }
 
     /**
-     * A plain sentinel secret for a label: the shared prefix, the label, and six characters that are the same
-     * every time for the same label and different for every other. Its last four are what the page's "ends in"
+     * Remember every 8-character piece of a plain sentinel, so a key cut down to a fragment (the first 24
+     * characters in a hint, a slice in a data attribute) is found by a needle that is not the whole key.
+     *
+     * Only the secret part counts: a webhook sentinel is a URL, and its scheme and path would be on any page.
+     * The intended hint ("Saved, ends in XXXX") shows the last four characters, so it must not contain any
+     * piece, and this says so for every sentinel as it is remembered; the four-character tail alone is
+     * shorter than a piece, so it is not a needle.
+     *
+     * @param string $plain
+     */
+    private function remember_windows(string $plain): void {
+        $core = str_contains($plain, '/') ? substr($plain, strrpos($plain, '/') + 1) : $plain;
+        $this->assertGreaterThan(self::WINDOW, strlen($core), 'a sentinel is longer than one piece');
+        $hints = [$this->row_hint($core), $this->field_hint($core)];
+        for ($i = 0; $i + self::WINDOW <= strlen($core); $i++) {
+            $window = substr($core, $i, self::WINDOW);
+            foreach ($hints as $hint) {
+                $this->assertTrue(str_contains($hint, substr($core, -4)), 'the hint carries the last four characters');
+                $this->assertFalse(str_contains($hint, $window), 'the intended hint can never match a piece of its key');
+            }
+            $this->windows[$window] = $plain;
+        }
+    }
+
+    /**
+     * A plain sentinel secret for a label: the shared prefix, ten characters of a hash of the label, and six
+     * characters that are the same every time for the same label and different for every other. Its last four are what the page's "ends in"
      * hint may show, so no two labels may end alike: a hint could then be satisfied by the wrong key.
      *
      * @param string $label
      * @return string
      */
     private function secret(string $label): string {
-        $plain = self::SENTINEL . '-' . $label . '-' . strtoupper(substr(md5($label), 0, 6));
+        // The label is hashed, not written out: a setting's name is on its own page, and a piece of the label
+        // inside the sentinel would then be found there without any leak.
+        $plain = self::SENTINEL . '-' . substr(md5('label:' . $label), 0, 10) . '-' . strtoupper(substr(md5($label), 0, 6));
         $tail = substr($plain, -4);
         $this->tails[$tail] = $this->tails[$tail] ?? $label;
         $this->assertSame($label, $this->tails[$tail], 'two sentinels end in the same four characters');
@@ -212,27 +247,47 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
      */
     private function reset_page_js(): void {
         global $PAGE;
-        foreach (['amdjscode' => [''], 'jsinitcode' => []] as $property => $empty) {
+        $empty = [
+            'amdjscode' => [''],
+            'jsinitcode' => [],
+            'jsinitvariables' => ['head' => [], 'footer' => []],
+            'stringsforjs' => [],
+            'stringsforjs_as' => [],
+        ];
+        foreach ($empty as $property => $value) {
             $prop = new \ReflectionProperty($PAGE->requires, $property);
             $prop->setAccessible(true);
-            $prop->setValue($PAGE->requires, $empty);
+            $prop->setValue($PAGE->requires, $value);
         }
     }
 
     /**
-     * The JavaScript the page has been asked to run (the arguments of every js_call_amd).
+     * What the page has been asked to hand to JavaScript, as text: the arguments of every js_call_amd and
+     * js_init_call, every data_for_js variable, and every string_for_js string with its parameter. Any of
+     * them is as readable in the page source as a key in the markup. The JSON keeps slashes and characters
+     * as they are, so a needle that holds one is not broken by escaping.
      *
      * @return string
      */
     private function page_js(): string {
         global $PAGE;
-        $js = '';
-        foreach (['amdjscode', 'jsinitcode'] as $property) {
+        $read = static function (string $property) use ($PAGE) {
             $prop = new \ReflectionProperty($PAGE->requires, $property);
             $prop->setAccessible(true);
-            $js .= "\n" . implode("\n", $prop->getValue($PAGE->requires));
+            return $prop->getValue($PAGE->requires);
+        };
+        $flags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR;
+        $js = '';
+        foreach (['amdjscode', 'jsinitcode'] as $property) {
+            $js .= "\n" . implode("\n", $read($property));
         }
-        return $js;
+        $js .= "\n" . json_encode($read('jsinitvariables'), $flags);
+        foreach ($read('stringsforjs') as $component => $strings) {
+            foreach ($strings as $identifier => $langstring) {
+                $js .= "\n$component:$identifier=" . $langstring->out();
+            }
+        }
+        return $js . "\n" . json_encode($read('stringsforjs_as'), $flags);
     }
 
     /**
@@ -310,6 +365,7 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $this->assertNotEmpty($this->cipherneedles, "no ciphertext was learned (is conceal() returning plain text?), so the "
             . "ciphertext checks would pass vacuously ($when)");
         $this->assertNotEmpty($this->endings, "no plain secret was remembered, so the plain checks would pass vacuously ($when)");
+        $this->assertNotEmpty($this->windows, "no piece of a plain secret was remembered, so the piece checks would pass vacuously ($when)");
         foreach ($texts as $label => $text) {
             $where = "$label ($when)";
             $this->assertNotSame('', trim($text), "$where rendered nothing, so this check would pass vacuously");
@@ -321,6 +377,12 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
             foreach ($this->endings as $ending => $plain) {
                 $this->assertFalse(str_contains($text, $ending), "the end of a plain secret is in $where");
             }
+            // One assertion per text, not per piece: there are a few thousand pieces. A piece is never printed whole.
+            $found = 0;
+            foreach ($this->windows as $window => $plain) {
+                $found += str_contains($text, (string) $window) ? 1 : 0;
+            }
+            $this->assertSame(0, $found, "$found pieces (" . self::WINDOW . " characters each) of plain secrets are in $where");
             foreach ($this->cipherneedles as $needle) {
                 $this->assertFalse(str_contains($text, $needle), "ciphertext is in $where");
             }
@@ -388,8 +450,10 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
      * @param string $when
      * @param string[] $rows table rows that must be on the pages (a model or label each shows)
      * @param bool $legacyurls whether the two legacy rows with a credential in their base URL are still saved
+     * @param bool $forced whether both tables are forced in config.php: they render read-only, with no Add button,
+     *                     no new-key input, no editor script, and the note that says why
      */
-    private function assert_rendered(array $rendered, string $when, array $rows, bool $legacyurls): void {
+    private function assert_rendered(array $rendered, string $when, array $rows, bool $legacyurls, bool $forced = false): void {
         $html = $rendered['html'];
         $has = fn(string $needle): bool => str_contains($html, $needle);
         $this->assertGreaterThanOrEqual(11, count($rendered['pages']), "the tree walk saw every SOLA settings page ($when)");
@@ -404,8 +468,18 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         }
         $this->assertTrue($has('s_local_ai_course_assistant_' . provider_keys::SETTING), "providers table is on a page ($when)");
         $this->assertTrue($has('s_local_ai_course_assistant_voice_providers'), "voice table is on a page ($when)");
-        $this->assertGreaterThanOrEqual(2, substr_count($html, 'sola-kr-add'), "both tables show their add button ($when)");
-        $this->assertTrue(str_contains($rendered['js'], 'local_ai_course_assistant/keyed_rows'), "the table script is loaded ($when)");
+        if ($forced) {
+            $note = s(get_string('providerkeys:forced_note', 'local_ai_course_assistant'));
+            $this->assertSame(2, substr_count($html, $note), "both forced tables say they are set in config.php ($when)");
+            $this->assertSame(0, substr_count($html, 'sola-kr-add'), "a forced table has no add button ($when)");
+            $this->assertSame(0, substr_count($html, 'sola-kr-change'), "a forced table has no change button ($when)");
+            $this->assertSame(0, substr_count($html, 'sola-kr-remove'), "a forced table has no remove button ($when)");
+            $this->assertFalse(str_contains($rendered['js'], 'local_ai_course_assistant/keyed_rows'),
+                "a forced table loads no editor script ($when)");
+        } else {
+            $this->assertGreaterThanOrEqual(2, substr_count($html, 'sola-kr-add'), "both tables show their add button ($when)");
+            $this->assertTrue(str_contains($rendered['js'], 'local_ai_course_assistant/keyed_rows'), "the table script is loaded ($when)");
+        }
         // The saved state is shown, and shown as a hint, not as a key.
         foreach ($rows as $shown) {
             $this->assertTrue($has($shown), "a saved row is on the page: $shown ($when)");
@@ -421,7 +495,11 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $inputs = $this->inspect_inputs($html);
         $singlekeys = count(secrets::names()) - count(secrets::NOT_ON_SETTINGS_PAGE);
         $this->assertGreaterThanOrEqual($singlekeys, $inputs['passwords'], "the password inputs were inspected ($when)");
-        $this->assertGreaterThanOrEqual(count($rows) - 1, $inputs['newkeys'], "the new-key inputs of the table rows were inspected ($when)");
+        if ($forced) {
+            $this->assertSame(0, $inputs['newkeys'], "a forced table has no new-key input ($when)");
+        } else {
+            $this->assertGreaterThanOrEqual(count($rows) - 1, $inputs['newkeys'], "the new-key inputs of the table rows were inspected ($when)");
+        }
     }
 
     /**
@@ -431,12 +509,13 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
      * @param string[] $rows table rows that must be on the pages
      * @param bool $legacyurls whether the legacy rows with a credential in their base URL are still saved
      * @param string[] $expecterrors see render_all_pages()
+     * @param bool $forced see assert_rendered()
      * @return array the render
      */
     private function render_and_check(string $when, array $rows = self::SEEDED_ROWS, bool $legacyurls = true,
-            array $expecterrors = []): array {
+            array $expecterrors = [], bool $forced = false): array {
         $rendered = $this->render_all_pages($expecterrors);
-        $this->assert_rendered($rendered, $when, $rows, $legacyurls);
+        $this->assert_rendered($rendered, $when, $rows, $legacyurls, $forced);
         $this->assert_clean($rendered['pages'] + ['the page JavaScript' => $rendered['js']], $when);
         return $rendered;
     }
@@ -674,6 +753,67 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $html = $voice->output_html($voicesubmitted);
         $this->assertTrue(str_contains($html, 'sola-kr-add'), 'the voice table rendered');
         $this->assert_clean(['voice table' => $html, 'the page JavaScript' => $this->page_js()], 'after a failed save');
+    }
+
+    /**
+     * A table forced in config.php holds its keys in the clear, and a save would keep them through keepid and
+     * write every one into config_plugins. Both tables render read-only (no key, no ciphertext, no editor
+     * controls), and a save attempt written exactly as the form posts it leaves the database as it was,
+     * through Moodle's own save function.
+     */
+    public function test_a_table_forced_in_config_php_is_read_only_and_a_save_cannot_write_it(): void {
+        global $CFG, $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $this->seed_every_secret();
+        $providerlines = [];
+        foreach (['openai', 'claude', 'gemini'] as $provider) {
+            $plain = $this->secret('forced-row-' . $provider);
+            $this->remember($plain);
+            $providerlines[] = $provider . '|' . $plain . '|f-' . $provider;
+        }
+        $voicelines = [];
+        foreach (['openai' => 'f-voice-a', 'xai' => 'f-voice-b'] as $provider => $label) {
+            $plain = $this->secret('forced-voice-' . $label);
+            $this->remember($plain);
+            $voicelines[] = $provider . '|' . $plain . '|' . $label . '|shimmer|nova';
+        }
+        $typedrow = $this->secret('typed-while-forced-row');
+        $typedvoice = $this->secret('typed-while-forced-voice');
+        $this->remember($typedrow);
+        $this->remember($typedvoice);
+        $rows = ['f-openai', 'f-claude', 'f-gemini', 'f-voice-a', 'f-voice-b'];
+        $CFG->forced_plugin_settings['local_ai_course_assistant'][provider_keys::SETTING] = implode("\n", $providerlines);
+        $CFG->forced_plugin_settings['local_ai_course_assistant']['voice_providers'] = implode("\n", $voicelines);
+        try {
+            $this->render_and_check('forced tables, first load', $rows, false, [], true);
+            $this->assertStringNotContainsString('m-openai', $this->render_all_pages()['html'],
+                'the database copy of a forced table is not shown');
+
+            $snapshot = $DB->get_records_menu('config_plugins', ['plugin' => 'local_ai_course_assistant'], 'name ASC', 'name, value');
+            $logged = $DB->count_records('config_log', ['plugin' => 'local_ai_course_assistant']);
+            $providerposted = $this->keep_all(provider_keys::stored_rows(), ['provider', 'models', 'temperature', 'baseurl']);
+            $providerposted[] = ['provider' => 'together', 'newkey' => $typedrow, 'keepid' => '', 'models' => 'm-together',
+                'temperature' => '', 'baseurl' => ''];
+            $voiceposted = $this->keep_all($this->voice_rows(), ['provider', 'label', 'realtime_voice', 'tts_voice']);
+            $voiceposted[] = ['provider' => 'xai', 'newkey' => $typedvoice, 'keepid' => '', 'label' => 'f-voice-c',
+                'realtime_voice' => 'eve', 'tts_voice' => 'eve'];
+            $this->assertCount(4, $providerposted, 'the save carries the forced rows, so keepid would have kept their plain keys');
+            $this->post([
+                provider_keys::SETTING => ['rows' => $providerposted, 'present' => '1'],
+                'voice_providers' => ['rows' => $voiceposted, 'present' => '1'],
+            ]);
+            $this->assertSame([], \admin_get_root()->errors, 'a save of a forced table is not an error, it just writes nothing');
+            $this->assertSame($snapshot,
+                $DB->get_records_menu('config_plugins', ['plugin' => 'local_ai_course_assistant'], 'name ASC', 'name, value'),
+                'a save attempt leaves config_plugins byte for byte as it was');
+            $this->assertSame($logged, $DB->count_records('config_log', ['plugin' => 'local_ai_course_assistant']),
+                'and logs nothing');
+            $this->render_and_check('forced tables, after a save attempt', $rows, false, [], true);
+        } finally {
+            unset($CFG->forced_plugin_settings['local_ai_course_assistant'][provider_keys::SETTING],
+                $CFG->forced_plugin_settings['local_ai_course_assistant']['voice_providers']);
+        }
     }
 
     /**
