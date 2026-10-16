@@ -160,6 +160,20 @@ final class admin_setting_voice_providers_test extends \advanced_testcase {
         $this->assertCount(2, voice_registry::parse_rows(false));
     }
 
+    /** A key that landed in the provider column (a tampered post) is named "unrecognized", never repeated. */
+    public function test_a_key_in_the_provider_column_is_never_repeated(): void {
+        $this->resetAfterTest();
+        $setting = $this->setting();
+        $err = $setting->write_setting(['rows' => [
+            $this->row('sk-proj-VOICE-WRONGFIELD-0101-PPPP', 'xai-VOICE-OTHER-0202-QQQQ'),
+        ]]);
+        $this->assertNotSame('', $err);
+        $this->assertStringNotContainsStringIgnoringCase('WRONGFIELD', $err);
+        $this->assertStringNotContainsStringIgnoringCase('OTHER', $err);
+        $this->assertStringContainsString('unrecognized', $err);
+        $this->assertSame('', $this->stored(), 'nothing saved');
+    }
+
     public function test_a_failed_save_echoes_nothing(): void {
         $this->resetAfterTest();
         $setting = $this->setting();
