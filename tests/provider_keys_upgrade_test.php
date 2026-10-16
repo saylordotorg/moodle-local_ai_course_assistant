@@ -132,6 +132,56 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
         $this->assertSame('AIzaAUTO-GEMINI-KEY-7777-GGGG', provider_keys::key_for('gemini'));
     }
 
+    /** Review finding M5: auto with an Anthropic key and no model resolves openai; the key must not be filed there. */
+    public function test_a_key_that_belongs_to_another_vendor_is_not_filed_under_the_default_provider(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'auto');
+        $this->cfg('model', '');
+        $this->cfg('apikey', secrets::conceal('sk-ant-ANTHROPIC-KEY-1357-AAAA'));
+        $this->cfg('comparison_providers', '');
+        $this->assertSame('openai', provider_keys::site_provider(), 'auto with no model name resolves openai');
+        $summary = provider_keys::upgrade();
+        $this->assertSame('', $summary['row_added']);
+        $this->assertSame('', $summary['conflict']);
+        $this->assertSame('', $this->stored(), 'no openai row holding an Anthropic key');
+        $this->assertNull(provider_keys::row_for('openai'));
+        $this->assertFalse(get_config('local_ai_course_assistant', 'provider_keys_notice'), 'and no notice');
+        $this->assertSame('sk-ant-ANTHROPIC-KEY-1357-AAAA', secrets::get('apikey'), 'apikey itself is untouched');
+    }
+
+    public function test_an_explicit_default_provider_with_another_vendors_key_gets_no_row_either(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'gemini');
+        $this->cfg('apikey', secrets::conceal('sk-ant-ANTHROPIC-KEY-1357-AAAA'));
+        $summary = provider_keys::upgrade();
+        $this->assertSame('', $summary['row_added']);
+        $this->assertSame('', $this->stored());
+    }
+
+    public function test_a_wrong_vendor_key_does_not_overwrite_an_existing_keyed_row_either(): void {
+        // Same mis-filing by the other door: the conflict rule would swap an Anthropic key into the openai row.
+        $this->resetAfterTest();
+        $this->cfg('provider', 'auto');
+        $this->cfg('apikey', secrets::conceal('sk-ant-ANTHROPIC-KEY-1357-AAAA'));
+        $this->cfg('comparison_providers', 'openai|sk-proj-REAL-OPENAI-KEY-2468-BBBB|gpt-4o-mini');
+        $summary = provider_keys::upgrade();
+        $this->assertSame('', $summary['conflict']);
+        $this->assertSame('', $summary['row_added']);
+        $this->assertSame('sk-proj-REAL-OPENAI-KEY-2468-BBBB', provider_keys::key_for('openai'));
+        $this->assertFalse(get_config('local_ai_course_assistant', 'provider_keys_notice'));
+    }
+
+    public function test_a_gateway_site_may_file_any_shaped_key_under_its_provider(): void {
+        // A gateway takes whatever key it is given, so the prefix check does not apply (the base URL is passed).
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('apibaseurl', self::GATEWAY);
+        $this->cfg('apikey', secrets::conceal('sk-ant-GATEWAY-TOKEN-1357-AAAA'));
+        $summary = provider_keys::upgrade();
+        $this->assertSame('openai', $summary['row_added']);
+        $this->assertSame('sk-ant-GATEWAY-TOKEN-1357-AAAA', provider_keys::key_for('openai'));
+    }
+
     public function test_a_keyless_default_provider_adds_no_row(): void {
         $this->resetAfterTest();
         $this->cfg('provider', 'ollama');

@@ -326,7 +326,9 @@ class provider_keys {
      *    vendor. If it has one for the same destination with a DIFFERENT key, chat was using apikey, so the
      *    row takes apikey's value and a one-time notice names the two last-four values. A keyed row for the
      *    same provider but another base URL is a different destination and is left alone. Skipped when
-     *    apikey is forced in config.php: that key is kept out of the database on purpose.
+     *    apikey is forced in config.php: that key is kept out of the database on purpose. Skipped too when
+     *    the key's own prefix says it belongs to another vendor than the provider (course_key_guard), unless
+     *    the site has a gateway base URL, which takes any key.
      *
      * Existing lines are edited as text, never rebuilt from the parsed rows. A one-column line, a comment
      * line, a label's case and any column past the fifth stay exactly as the admin wrote them; only a key
@@ -360,6 +362,13 @@ class provider_keys {
             return $summary;
         }
         $baseurl = trim((string) get_config(self::PLUGIN, 'apibaseurl'));
+        if (course_key_guard::conflict($provider, $legacy, $baseurl) !== '') {
+            // The saved key's own prefix says it belongs to another vendor (auto with an Anthropic key and no
+            // model name resolves openai, say). Filing it under this provider, as a new row or over an old
+            // one, would hand it to the wrong vendor on a failover. Leave everything as it is; the settings
+            // page warns about the mismatch (default_provider_warnings()).
+            return $summary;
+        }
         $rows = self::stored_rows();
         $found = null;
         foreach ($rows as $i => $row) {
