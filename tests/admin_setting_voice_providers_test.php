@@ -187,6 +187,13 @@ final class admin_setting_voice_providers_test extends \advanced_testcase {
         $this->assertSame($before, $this->stored(), 'nothing saved');
     }
 
+    /** The two voice_active_* selects only need each row's label and provider, so they never decrypt a key. */
+    public function test_the_settings_page_never_decrypts_the_voice_keys(): void {
+        $src = file_get_contents(__DIR__ . '/../settings.php');
+        $this->assertStringContainsString('voice_registry::parse_rows(false)', $src);
+        $this->assertDoesNotMatchRegularExpression('~voice_registry::parse_rows\(\s*(true)?\s*\)~', $src);
+    }
+
     public function test_only_openai_and_xai_are_accepted_and_a_key_is_required(): void {
         $this->resetAfterTest();
         $setting = $this->setting();

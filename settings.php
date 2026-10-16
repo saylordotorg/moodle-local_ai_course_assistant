@@ -1903,7 +1903,7 @@ if ($hassiteconfig) {
     ));
 
     $activechoices = ['' => get_string('settings:voice_active_default', 'local_ai_course_assistant')];
-    foreach (\local_ai_course_assistant\voice_registry::parse_rows() as $row) {
+    foreach (\local_ai_course_assistant\voice_registry::parse_rows(false) as $row) {
         $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
         $activechoices[$label] = $label . ' (' . $row['provider'] . ')';
     }
@@ -1928,7 +1928,7 @@ if ($hassiteconfig) {
     $sttchoices = ['' => get_string('settings:voice_active_stt_default', 'local_ai_course_assistant')];
     $sttchoices[\local_ai_course_assistant\voice_registry::SELFHOSTED_LABEL] =
         get_string('settings:voice_active_stt_selfhosted', 'local_ai_course_assistant');
-    foreach (\local_ai_course_assistant\voice_registry::parse_rows() as $row) {
+    foreach (\local_ai_course_assistant\voice_registry::parse_rows(false) as $row) {
         $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
         $sttchoices[$label] = $label . ' (' . $row['provider'] . ')';
     }
