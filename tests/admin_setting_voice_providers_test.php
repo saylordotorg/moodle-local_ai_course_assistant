@@ -142,6 +142,51 @@ final class admin_setting_voice_providers_test extends \advanced_testcase {
         $this->assertSame($before, $this->stored(), 'nothing saved');
     }
 
+    /**
+     * The voice row id includes the label, so renaming a row changes its id. The keepid the form round-trips
+     * (it was computed from the OLD label when the page was drawn) is what lets a rename keep the key.
+     */
+    public function test_renaming_a_row_with_no_key_typed_keeps_the_stored_key_and_changes_the_label(): void {
+        $this->resetAfterTest();
+        $setting = $this->setting();
+        $setting->write_setting(['rows' => [
+            $this->row('openai', 'sk-proj-VOICE-RENAME-1313-RRRR', '', 'main', 'shimmer', 'nova'),
+        ]]);
+        $storedkey = explode('|', $this->stored())[1];
+        $oldid = $this->id_of_first_row();
+
+        $this->assertSame('', $setting->write_setting(['rows' => [
+            $this->row('openai', '', $oldid, 'prod', 'shimmer', 'nova'),
+        ]]));
+
+        $parts = explode('|', $this->stored());
+        $this->assertSame($storedkey, $parts[1], 'the stored key is kept byte for byte');
+        $this->assertSame('prod', $parts[2]);
+        $this->assertSame('sk-proj-VOICE-RENAME-1313-RRRR', voice_registry::parse_rows(true)[0]['apikey']);
+        $this->assertNotSame($oldid, $this->id_of_first_row(), 'the id follows the label, so only the posted keepid can match');
+    }
+
+    /** Review focus 3, on the voice table. */
+    public function test_a_stale_or_unknown_keepid_never_attaches_another_rows_key(): void {
+        $this->resetAfterTest();
+        $setting = $this->setting();
+        $setting->write_setting(['rows' => [$this->row('xai', 'xai-VOICE-ONLY-ROW-1414-SSSS', '', 'grok')]]);
+        $before = $this->stored();
+        $xaiid = $this->id_of_first_row();
+
+        // An id nothing stored has (the row was removed by another admin).
+        $err = $setting->write_setting(['rows' => [$this->row('openai', '', 'deadbeef0000', 'main')]]);
+        $this->assertStringContainsString(
+            get_string('providerkeys:err_needs_key', 'local_ai_course_assistant', 'openai'), $err);
+        $this->assertSame($before, $this->stored(), 'nothing saved');
+
+        // Another row's id, with a different provider: the key doesn't follow.
+        $err = $setting->write_setting(['rows' => [$this->row('openai', '', $xaiid, 'main')]]);
+        $this->assertStringContainsString(
+            get_string('providerkeys:err_needs_key', 'local_ai_course_assistant', 'openai'), $err);
+        $this->assertSame($before, $this->stored(), 'nothing saved');
+    }
+
     public function test_only_openai_and_xai_are_accepted_and_a_key_is_required(): void {
         $this->resetAfterTest();
         $setting = $this->setting();
