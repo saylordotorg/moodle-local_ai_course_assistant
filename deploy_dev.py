@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Deploy SOLA plugin to Saylor dev Moodle sites via AWS SSM + S3 + rsync.
+"""RETIRED for dev.sylr.org and alpha.sylr.org: do not use this to deploy them.
+
+Since 2026-10-06 those two sites run as ECS containers with the plugin baked into the
+image. This script still rsyncs into the old EC2 installs, which no longer serve
+traffic, and its BUS101 smoke test curls the public hostname, so it can report success
+while changing nothing the site serves. dev405, dev500 and dev501 no longer exist.
+It now refuses to run unless --legacy-ec2 is passed. See step 7 of the release
+checklist in CLAUDE.md for the working deploy.
+
+Deploy SOLA plugin to Saylor dev Moodle sites via AWS SSM + S3 + rsync.
 
 This bypasses Moodle's plugin installer (which doesn't reliably extract all
 files) and copies the plugin directly to the server filesystem via AWS Systems
@@ -283,11 +292,33 @@ def parse_args():
         action="store_true",
         help="Restore the BUS101 fixture backup on the target(s) instead of deploying the plugin. Idempotent.",
     )
+    parser.add_argument(
+        "--legacy-ec2",
+        action="store_true",
+        help="Acknowledge that this only reaches the retired EC2 installs, not dev.sylr.org or alpha.sylr.org.",
+    )
     return parser.parse_args()
+
+
+RETIRED_MESSAGE = """\
+deploy_dev.py is RETIRED for dev.sylr.org and alpha.sylr.org.
+
+Both sites have run as ECS containers since 2026-10-06, with the plugin baked into the
+image. This script only rsyncs into the old EC2 installs, which no longer serve traffic,
+and its BUS101 smoke test curls the public hostname, so it can report success while
+changing nothing the site serves.
+
+Deploy the GitHub release zip with the ECS deploy tool instead. See step 7 of the release
+checklist in CLAUDE.md. If you really mean the old EC2 boxes, pass --legacy-ec2.
+"""
 
 
 def main():
     args = parse_args()
+
+    if not args.legacy_ec2:
+        print(RETIRED_MESSAGE, file=sys.stderr)
+        sys.exit(2)
 
     if args.target == "all":
         selected = list(TARGETS.keys())
