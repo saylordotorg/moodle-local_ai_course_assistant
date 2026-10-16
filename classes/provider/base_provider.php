@@ -1217,11 +1217,17 @@ abstract class base_provider implements provider_interface {
      * row. Blank or absent means "use the provider class's default base URL."
      *
      * @param string $providerid
-     * @return array|null Row with apikey, models, temperature, apibaseurl keys, or null if not found.
+     * @return array|null Row with apikey, models, temperature, apibaseurl keys, or null if not found or if its key can't be read.
      */
     private static function lookup_comparison_row(string $providerid): ?array {
         $row = \local_ai_course_assistant\provider_keys::row_for($providerid, true);
         if ($row === null) {
+            return null;
+        }
+        // A row that says it has a key but whose ciphertext can't be read (a database restored onto another
+        // site) is no row at all. Returning it would leave the apikey override empty, and the constructor
+        // would then fall back to the inherited site or course key, sending another vendor's key here.
+        if ($row['haskey'] && $row['key'] === '') {
             return null;
         }
         return [

@@ -83,6 +83,27 @@ final class comparison_provider_credentials_test extends \advanced_testcase {
         }
     }
 
+    public function test_a_row_whose_key_cannot_be_decrypted_never_gets_the_inherited_key(): void {
+        // The row exists and says it has a key, but the ciphertext can't be read (a database restored onto
+        // another site). It must count as no row at all: using it would build an OpenAI provider and send
+        // it the Anthropic key the course inherits.
+        set_config('provider', 'claude', 'local_ai_course_assistant');
+        set_config('apikey', 'sk-ant-SITE-KEY', 'local_ai_course_assistant');
+        set_config('comparison_providers',
+            "openai|sodium:AAAAnotarealciphertextAAAAAAAAAAAAAAAAAAAAAAAA|gpt-4o-mini",
+            'local_ai_course_assistant');
+
+        try {
+            base_provider::create_for_comparison('openai', 'gpt-4o-mini', $this->course->id);
+            $this->fail('Expected a refusal rather than sending an Anthropic key to OpenAI.');
+        } catch (\moodle_exception $e) {
+            $this->assertStringContainsString('openai', $e->debuginfo);
+            $this->assertStringContainsString('Comparison providers', $e->debuginfo);
+        }
+        // secrets::reveal() raises one developer notice for the ciphertext it can't read.
+        $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
+    }
+
     public function test_keyless_providers_are_not_broken_by_the_guard(): void {
         // Several providers legitimately need no SOLA key -- a stub in tests, a
         // local ollama, coreai via Moodle's AI subsystem. An earlier version of
