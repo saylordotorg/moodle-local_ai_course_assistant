@@ -40,14 +40,27 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
     /** @var string Host of the sentinel webhook URLs. */
     private const HOOKHOST = 'hooks.sentinel-noleak.example';
 
+    /** @var string The label of the seeded voice row that holds a legacy plain key (unique, so it can't appear by chance). */
+    private const LEGACY_VOICE = 'legacy-voice-q4z';
+
     /** @var string[] What the seeded table rows show on a page: their models and one voice label. */
-    private const SEEDED_ROWS = ['m-openai', 'm-claude', 'm-gemini', 'm-deepseek', 'm-mistral', 'm-openrouter', 'm-ollama', 'grok'];
+    private const SEEDED_ROWS = ['m-openai', 'm-claude', 'm-gemini', 'm-deepseek', 'm-mistral', 'm-openrouter', 'm-ollama',
+        self::LEGACY_VOICE];
+
+    /** @var string[] The settings that hold an incoming-webhook URL. */
+    private const WEBHOOKS = ['anomaly_digest_slack_webhook', 'anomaly_digest_teams_webhook'];
 
     /** @var string[] Plain sentinels that must never appear. */
     private array $plains = [];
 
     /** @var string[] Ciphertext (whole, payload and pieces of it) that must never appear. */
     private array $cipherneedles = [];
+
+    /** @var string[] The last six characters of each plain sentinel: a key cut down to its end is still a leak. */
+    private array $endings = [];
+
+    /** @var string[] Last four characters handed out => the label they belong to, so no two hints look alike. */
+    private array $tails = [];
 
     /**
      * A test that pretends to be a web request must not leave that on for the next one, however it ends.
@@ -65,7 +78,44 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
      */
     private function remember(string $plain, string $stored = ''): void {
         $this->plains[$plain] = $plain;
+        $this->endings[substr($plain, -6)] = $plain;
         $this->remember_cipher($stored);
+    }
+
+    /**
+     * A plain sentinel secret for a label: the shared prefix, the label, and six characters that are the same
+     * every time for the same label and different for every other. Its last four are what the page's "ends in"
+     * hint may show, so no two labels may end alike: a hint could then be satisfied by the wrong key.
+     *
+     * @param string $label
+     * @return string
+     */
+    private function secret(string $label): string {
+        $plain = self::SENTINEL . '-' . $label . '-' . strtoupper(substr(md5($label), 0, 6));
+        $tail = substr($plain, -4);
+        $this->tails[$tail] = $this->tails[$tail] ?? $label;
+        $this->assertSame($label, $this->tails[$tail], 'two sentinels end in the same four characters');
+        return $plain;
+    }
+
+    /**
+     * The "ends in" hint a table row shows for a key.
+     *
+     * @param string $plain
+     * @return string
+     */
+    private function row_hint(string $plain): string {
+        return get_string('providerkeys:saved_ends_in', 'local_ai_course_assistant', substr($plain, -4));
+    }
+
+    /**
+     * The "ends in" hint a single-key field shows for a key.
+     *
+     * @param string $plain
+     * @return string
+     */
+    private function field_hint(string $plain): string {
+        return get_string('providerkeys:last4_hint', 'local_ai_course_assistant', s(substr($plain, -4)));
     }
 
     /**
@@ -112,10 +162,8 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
      * @return string
      */
     private function plain_for(string $name): string {
-        $plain = self::SENTINEL . '-' . $name;
-        return str_contains($name, 'webhook') && !str_contains($name, 'secret')
-            ? 'https://' . self::HOOKHOST . '/T000/B000/' . $plain
-            : $plain;
+        $plain = $this->secret($name);
+        return in_array($name, self::WEBHOOKS, true) ? 'https://' . self::HOOKHOST . '/T000/B000/' . $plain : $plain;
     }
 
     /**
@@ -130,32 +178,32 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         }
         $rows = [];
         foreach (['openai', 'claude', 'gemini'] as $p) {
-            $plain = self::SENTINEL . '-row-' . $p;
+            $plain = $this->secret('row-' . $p);
             $this->remember($plain);
             $rows[] = $p . '|' . secrets::conceal($plain) . '|m-' . $p;
         }
         // Rows saved before 7.9.0: one holds its key in the clear, two hold a credential in the base URL (the
         // table refuses to save those until the admin moves the secret, so a save below drops them).
-        $legacykey = self::SENTINEL . '-row-legacy-plain';
-        $urlpass = self::SENTINEL . '-row-baseurl-password';
-        $urlparam = self::SENTINEL . '-row-baseurl-param';
-        foreach ([$legacykey, $urlpass, $urlparam, self::SENTINEL . '-row-mistral', self::SENTINEL . '-row-openrouter'] as $plain) {
+        $legacykey = $this->secret('row-legacy-plain');
+        $urlpass = $this->secret('row-baseurl-password');
+        $urlparam = $this->secret('row-baseurl-param');
+        $mistral = $this->secret('row-mistral');
+        $openrouter = $this->secret('row-openrouter');
+        foreach ([$legacykey, $urlpass, $urlparam, $mistral, $openrouter] as $plain) {
             $this->remember($plain);
         }
         $rows[] = 'deepseek|' . $legacykey . '|m-deepseek|0.3|https://api.deepseek.example/v1';
-        $rows[] = 'mistral|' . secrets::conceal(self::SENTINEL . '-row-mistral') . '|m-mistral|0.5|https://user:' . $urlpass
-            . '@gw.example/v1';
-        $rows[] = 'openrouter|' . secrets::conceal(self::SENTINEL . '-row-openrouter') . '|m-openrouter|0.3|https://gw.example/v1?api_key='
-            . $urlparam;
+        $rows[] = 'mistral|' . secrets::conceal($mistral) . '|m-mistral|0.5|https://user:' . $urlpass . '@gw.example/v1';
+        $rows[] = 'openrouter|' . secrets::conceal($openrouter) . '|m-openrouter|0.3|https://gw.example/v1?api_key=' . $urlparam;
         $rows[] = 'ollama||m-ollama|0.2|http://localhost:11434';
         set_config(provider_keys::SETTING, implode("\n", $rows), 'local_ai_course_assistant');
 
-        $voiceopenai = self::SENTINEL . '-voice-openai';
-        $voicexai = self::SENTINEL . '-voice-xai-legacy-plain';
+        $voiceopenai = $this->secret('voice-openai');
+        $voicexai = $this->secret('voice-xai-legacy-plain');
         $this->remember($voiceopenai);
         $this->remember($voicexai);
         set_config('voice_providers', 'openai|' . secrets::conceal($voiceopenai) . "|main|shimmer|nova\nxai|" . $voicexai
-            . '|grok|eve|eve', 'local_ai_course_assistant');
+            . '|' . self::LEGACY_VOICE . '|eve|eve', 'local_ai_course_assistant');
         $this->learn_stored_ciphertext();
     }
 
@@ -191,19 +239,24 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
      * Render every SOLA settings page, as Moodle does: the page's own output_html(), which gives each setting
      * the stored value, or the submitted one when the admin root holds an error for it.
      *
-     * @param bool $keeperrors keep the error list a failed save left in the admin root (its submitted values
-     *                         are what the form shows again); false starts from a clean root, as a reload does
+     * @param string[] $expecterrors the settings (without the s_local_ai_course_assistant_ prefix) a failed save
+     *                               refused: their submitted values must still be held in the admin root when
+     *                               the pages render, so the form shows them again. Empty starts from a clean
+     *                               root, as a reload does.
      * @return array{pages: string[], html: string, js: string} page name => html, all html, all page JavaScript
      */
-    private function render_all_pages(bool $keeperrors = false): array {
+    private function render_all_pages(array $expecterrors = []): array {
         global $CFG;
         require_once($CFG->libdir . '/adminlib.php');
         // No setAdminUser() here: changing user nulls the admin tree global, and with it the error list that
         // holds a failed save's submitted values. A test signs in once, before it saves anything.
         $this->reset_page_js();
         $root = \admin_get_root(true, true);
-        if ($keeperrors) {
-            $this->assertNotEmpty($root->errors, 'the failed save\'s submitted values are still held, so the re-render uses them');
+        if ($expecterrors) {
+            foreach ($expecterrors as $name) {
+                $this->assertArrayHasKey('s_local_ai_course_assistant_' . $name, $root->errors,
+                    "the refused $name has its submitted values held, so the re-render uses them");
+            }
         } else {
             $root->errors = [];
         }
@@ -254,6 +307,9 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
      */
     private function assert_clean(array $texts, string $when): void {
         $this->assertNotEmpty($texts, "nothing was rendered, so this test would pass vacuously ($when)");
+        $this->assertNotEmpty($this->cipherneedles, "no ciphertext was learned (is conceal() returning plain text?), so the "
+            . "ciphertext checks would pass vacuously ($when)");
+        $this->assertNotEmpty($this->endings, "no plain secret was remembered, so the plain checks would pass vacuously ($when)");
         foreach ($texts as $label => $text) {
             $where = "$label ($when)";
             $this->assertNotSame('', trim($text), "$where rendered nothing, so this check would pass vacuously");
@@ -261,6 +317,9 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
             $this->assertFalse(str_contains($text, self::HOOKHOST), "a webhook URL is in $where");
             foreach ($this->plains as $plain) {
                 $this->assertFalse(str_contains($text, $plain), "a plain secret is in $where");
+            }
+            foreach ($this->endings as $ending => $plain) {
+                $this->assertFalse(str_contains($text, $ending), "the end of a plain secret is in $where");
             }
             foreach ($this->cipherneedles as $needle) {
                 $this->assertFalse(str_contains($text, $needle), "ciphertext is in $where");
@@ -270,6 +329,55 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
             $inputs = $this->inspect_inputs($text);
             $this->assertSame([], $inputs['offenders'], "a password or new-key input carries a value in $where");
         }
+    }
+
+    /**
+     * Every saved key shows its OWN "ends in" hint, and every saved webhook says only that a URL is saved.
+     *
+     * What should show is worked out from what is stored now, one assertion per row or field, so a hint that
+     * belongs to another key (or one that is missing) fails by name. The last four are taken with substr()
+     * from the revealed key, not with provider_keys::last4() whose output is what is being checked.
+     *
+     * @param string $html all the rendered pages
+     * @param string $when
+     */
+    private function assert_hints(string $html, string $when): void {
+        $seen = ['provider rows' => 0, 'voice rows' => 0, 'single keys' => 0, 'webhooks' => 0];
+        foreach (provider_keys::stored_rows() as $i => $row) {
+            if ($row['stored_key'] === '') {
+                continue;
+            }
+            $seen['provider rows']++;
+            $this->assertTrue(str_contains($html, $this->row_hint(secrets::reveal($row['stored_key']))),
+                "provider row $i ({$row['provider']}) shows the last four of its own key ($when)");
+        }
+        foreach (voice_registry::parse_rows(false) as $i => $row) {
+            if ($row['apikey'] === '') {
+                continue;
+            }
+            $seen['voice rows']++;
+            $this->assertTrue(str_contains($html, $this->row_hint(secrets::reveal($row['apikey']))),
+                "voice row $i ({$row['label']}) shows the last four of its own key ($when)");
+        }
+        foreach (secrets::names() as $name) {
+            if (in_array($name, secrets::NOT_ON_SETTINGS_PAGE, true)) {
+                continue;
+            }
+            if (in_array($name, self::WEBHOOKS, true)) {
+                $seen['webhooks']++;
+                continue;
+            }
+            $seen['single keys']++;
+            $this->assertTrue(str_contains($html, $this->field_hint(secrets::get($name))),
+                "the field $name shows the last four of its own key ($when)");
+        }
+        $url = get_string('providerkeys:saved_url_hint', 'local_ai_course_assistant');
+        $this->assertGreaterThanOrEqual(count(self::WEBHOOKS), substr_count($html, $url),
+            "each webhook field says a URL is saved ($when)");
+        $this->assertGreaterThanOrEqual(3, $seen['provider rows'], "the provider rows with a key were checked ($when)");
+        $this->assertGreaterThanOrEqual(2, $seen['voice rows'], "the voice rows with a key were checked ($when)");
+        $this->assertGreaterThanOrEqual(10, $seen['single keys'], "the single-key fields were checked ($when)");
+        $this->assertSame(count(self::WEBHOOKS), $seen['webhooks'], "both webhook fields were checked ($when)");
     }
 
     /**
@@ -302,10 +410,7 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         foreach ($rows as $shown) {
             $this->assertTrue($has($shown), "a saved row is on the page: $shown ($when)");
         }
-        $this->assertTrue($has('Saved, ends in '), "saved table keys show a hint ($when)");
-        $this->assertTrue($has('Saved key ends in '), "saved single keys show a hint ($when)");
-        $this->assertGreaterThanOrEqual(2, substr_count($html, get_string('providerkeys:saved_url_hint', 'local_ai_course_assistant')),
-            "both webhook fields say a URL is saved ($when)");
+        $this->assert_hints($html, $when);
         if ($legacyurls) {
             // A legacy credential in a base URL is masked, not dropped: the row is there, the secret is not.
             $this->assertTrue($has('***@gw.example'), "a legacy credential in a base URL is masked ($when)");
@@ -325,12 +430,12 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
      * @param string $when
      * @param string[] $rows table rows that must be on the pages
      * @param bool $legacyurls whether the legacy rows with a credential in their base URL are still saved
-     * @param bool $keeperrors see render_all_pages()
+     * @param string[] $expecterrors see render_all_pages()
      * @return array the render
      */
     private function render_and_check(string $when, array $rows = self::SEEDED_ROWS, bool $legacyurls = true,
-            bool $keeperrors = false): array {
-        $rendered = $this->render_all_pages($keeperrors);
+            array $expecterrors = []): array {
+        $rendered = $this->render_all_pages($expecterrors);
         $this->assert_rendered($rendered, $when, $rows, $legacyurls);
         $this->assert_clean($rendered['pages'] + ['the page JavaScript' => $rendered['js']], $when);
         return $rendered;
@@ -393,15 +498,59 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $this->render_and_check('third load');
     }
 
+    /**
+     * The masking scan in settings_secret_masking_test reads settings.php for declarations with a literal name,
+     * so it can't see a secret declared in a loop with a built name (the eight avatar keys and webhook
+     * secrets). This walks the real admin tree instead: every listed secret on a page is the masking field
+     * (the webhook URLs are its subclass), so it logs a mask and shows only a last four.
+     */
+    public function test_every_listed_secret_on_a_page_is_the_masking_field(): void {
+        global $CFG;
+        require_once($CFG->libdir . '/adminlib.php');
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $category = \admin_get_root(true, true)->locate('local_ai_course_assistant');
+        $seen = [];
+        $wrong = [];
+        foreach ($category->children as $page) {
+            if (!$page instanceof \admin_settingpage) {
+                continue;
+            }
+            foreach ($page->settings as $setting) {
+                if ($setting->plugin !== 'local_ai_course_assistant' || !secrets::is_secret($setting->name)) {
+                    continue;
+                }
+                $seen[$setting->name] = $setting;
+                if (!$setting instanceof admin_setting_secret_field) {
+                    $wrong[] = $setting->name . ' (' . get_class($setting) . ')';
+                }
+            }
+        }
+        $this->assertSame([], $wrong, 'these listed secrets are not admin_setting_secret_field');
+        $expected = array_values(array_diff(secrets::names(), secrets::NOT_ON_SETTINGS_PAGE));
+        $this->assertSame([], array_values(array_diff($expected, array_keys($seen))), 'every listed secret is on a settings page');
+        $this->assertGreaterThanOrEqual(17, count($seen));
+        // The loop-built ones, by name, so the walk is known to have reached them.
+        foreach (secrets::AVATAR_PROVIDERS as $provider) {
+            $this->assertArrayHasKey($provider . '_api_key', $seen);
+            $this->assertArrayHasKey($provider . '_webhook_secret', $seen);
+        }
+        foreach (self::WEBHOOKS as $name) {
+            $this->assertInstanceOf(admin_setting_webhook_url::class, $seen[$name]);
+        }
+    }
+
     public function test_every_secret_is_absent_after_a_successful_save(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         $this->seed_every_secret();
         $columns = ['provider', 'models', 'temperature', 'baseurl'];
-        $typedrow = self::SENTINEL . '-typed-on-save';
-        $typedvoice = self::SENTINEL . '-typed-voice-on-save';
-        $typedsingle = self::SENTINEL . '-typed-single-on-save';
-        $typedhook = 'https://' . self::HOOKHOST . '/T000/B000/' . self::SENTINEL . '-typed-hook-on-save';
+        $typedrow = $this->secret('typed-on-save');
+        $typedvoice = $this->secret('typed-voice-on-save');
+        $typedsingle = $this->secret('typed-single-on-save');
+        $typedhook = 'https://' . self::HOOKHOST . '/T000/B000/' . $this->secret('typed-hook-on-save');
+        $voicelabel = 'new-voice-label-nl7x';
         foreach ([$typedrow, $typedvoice, $typedsingle, $typedhook] as $typed) {
             $this->remember($typed);
         }
@@ -414,7 +563,7 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $providerrows[] = ['provider' => 'together', 'newkey' => $typedrow, 'keepid' => '', 'models' => 'm-together',
             'temperature' => '', 'baseurl' => ''];
         $voicerows = $this->keep_all($this->voice_rows(), ['provider', 'label', 'realtime_voice', 'tts_voice']);
-        $voicerows[] = ['provider' => 'xai', 'newkey' => $typedvoice, 'keepid' => '', 'label' => 'second',
+        $voicerows[] = ['provider' => 'xai', 'newkey' => $typedvoice, 'keepid' => '', 'label' => $voicelabel,
             'realtime_voice' => 'eve', 'tts_voice' => 'eve'];
 
         $this->post([
@@ -428,13 +577,25 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $this->assertSame($typedsingle, secrets::get('embed_apikey'));
         $this->assertSame($typedhook, secrets::get('anomaly_digest_slack_webhook'));
         $this->assertCount(count($stored) + 1, provider_keys::stored_rows());
+        // The typed voice key was saved too: the new row is stored with its own key (read back decrypted).
+        $newvoice = array_values(array_filter(voice_registry::parse_rows(),
+            static fn(array $r): bool => $r['label'] === $voicelabel));
+        $this->assertCount(1, $newvoice, 'the new voice row was saved');
+        $this->assertSame('xai', $newvoice[0]['provider']);
+        $this->assertSame($typedvoice, $newvoice[0]['apikey'], 'the new voice row holds the typed key');
+        $this->assertCount(3, voice_registry::parse_rows(), 'the two seeded voice rows are still there');
         $this->learn_stored_ciphertext();
 
         // The saved rows are on the page (the two legacy rows with a credential in the URL were dropped), and
         // the new ones show as a hint and nothing else of their key.
-        $rows = ['m-openai', 'm-claude', 'm-gemini', 'm-deepseek', 'm-ollama', 'm-together', 'second'];
+        $rows = ['m-openai', 'm-claude', 'm-gemini', 'm-deepseek', 'm-ollama', 'm-together', self::LEGACY_VOICE, $voicelabel];
         $rendered = $this->render_and_check('after a successful save', $rows, false);
-        $this->assertTrue(str_contains($rendered['html'], 'Saved, ends in save'), 'the new row shows the last four of its key');
+        // Each typed key shows its own last four, and the four of one are not those of another.
+        $tails = [substr($typedrow, -4), substr($typedvoice, -4), substr($typedsingle, -4)];
+        $this->assertCount(3, array_unique($tails), 'the typed keys end differently');
+        $this->assertTrue(str_contains($rendered['html'], $this->row_hint($typedrow)), 'the new provider row shows the end of its key');
+        $this->assertTrue(str_contains($rendered['html'], $this->row_hint($typedvoice)), 'the new voice row shows the end of its key');
+        $this->assertTrue(str_contains($rendered['html'], $this->field_hint($typedsingle)), 'the saved single key shows the end of its key');
         $this->render_and_check('reload after a successful save', $rows, false);
     }
 
@@ -442,10 +603,10 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
         $this->seed_every_secret();
-        $typedrow = self::SENTINEL . '-typed-and-refused';
-        $typedvoice = self::SENTINEL . '-typed-voice-refused';
-        $typedhook = self::SENTINEL . '-typed-hook-refused-not-a-url';
-        $typedsingle = self::SENTINEL . '-typed-single-refused';
+        $typedrow = $this->secret('typed-and-refused');
+        $typedvoice = $this->secret('typed-voice-refused');
+        $typedhook = $this->secret('typed-hook-refused-not-a-url');
+        $typedsingle = $this->secret('typed-single-refused');
         foreach ([$typedrow, $typedvoice, $typedhook, $typedsingle] as $typed) {
             $this->remember($typed);
         }
@@ -478,7 +639,11 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
 
         // Moodle's own re-render: page->output_html() hands each failed setting the submitted array.
         $this->assertNotEmpty(\admin_get_root()->errors, 'the submitted values are still held for the re-render');
-        $this->render_and_check('failed save, re-rendered from the submitted values', self::SEEDED_ROWS, true, true);
+        $this->render_and_check('failed save, re-rendered from the submitted values', self::SEEDED_ROWS, true, [
+            provider_keys::SETTING,
+            'voice_providers',
+            'anomaly_digest_slack_webhook',
+        ]);
         // Then the page as it is on the next load, when the errors are gone.
         $this->render_and_check('reload after a failed save');
     }
@@ -489,7 +654,7 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
         $this->seed_every_secret();
-        $typed = self::SENTINEL . '-typed-and-refused-direct';
+        $typed = $this->secret('typed-and-refused-direct');
         $this->remember($typed);
 
         $table = new admin_setting_provider_keys('local_ai_course_assistant/comparison_providers', 'k', 'd');
@@ -523,10 +688,10 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $mark = (int) $DB->get_field_sql('SELECT COALESCE(MAX(id), 0) FROM {config_log}');
         unset($SESSION->local_ai_course_assistant_savedchanges);
 
-        $typedrow = self::SENTINEL . '-typed-log-row';
-        $typedvoice = self::SENTINEL . '-typed-log-voice';
-        $typedsingle = self::SENTINEL . '-typed-log-single';
-        $typedhook = 'https://' . self::HOOKHOST . '/T000/B000/' . self::SENTINEL . '-typed-log-hook';
+        $typedrow = $this->secret('typed-log-row');
+        $typedvoice = $this->secret('typed-log-voice');
+        $typedsingle = $this->secret('typed-log-single');
+        $typedhook = 'https://' . self::HOOKHOST . '/T000/B000/' . $this->secret('typed-log-hook');
         foreach ([$typedrow, $typedvoice, $typedsingle, $typedhook] as $typed) {
             $this->remember($typed);
         }
@@ -597,12 +762,13 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
      */
     public function test_the_save_report_notice_never_carries_a_key_even_if_it_is_handed_one(): void {
         $this->resetAfterTest();
-        $plain = self::SENTINEL . '-report';
-        $legacy = self::SENTINEL . '-report-legacy-plain';
+        $plain = $this->secret('report');
+        $legacy = $this->secret('report-legacy-plain');
+        $otherplain = $this->secret('report-other');
         $stored = secrets::conceal($plain);
-        $other = secrets::conceal($plain . '-other');
+        $other = secrets::conceal($otherplain);
         $this->remember($plain, $stored);
-        $this->remember($plain . '-other', $other);
+        $this->remember($otherplain, $other);
         $this->remember($legacy);
         $changes = [
             provider_keys::SETTING => ['openai|' . $stored . '|m', 'openai|' . $other . '|m'],
@@ -688,5 +854,54 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $this->assertStringContainsString('value=""', $input[0]);
         preg_match_all('~\{\{[^}]*\}\}~', $input[0], $variables);
         $this->assertSame(['{{apikeyplaceholder}}'], $variables[0], 'the only variable in the key input is the placeholder');
+    }
+
+    /**
+     * Every line of course_settings.php that touches a course key, whatever it is called, is one of the known
+     * safe ones: reading the typed key, reducing a stored key to a yes/no, the two fixed placeholder strings,
+     * the labels. A new line that reads or prints a key (a last four, a debug dump, the global key put back
+     * into the page) is not on the list, so it fails here and gets looked at before it ships.
+     */
+    public function test_every_line_in_course_settings_that_touches_a_course_key_is_a_known_safe_one(): void {
+        $script = (string) file_get_contents(__DIR__ . '/../course_settings.php');
+        $this->assertNotSame('', $script);
+        $safe = [
+            // The posted form: the typed key is read, judged by the guard and saved, never printed.
+            "'apikey'      => optional_param('apikey', '', PARAM_RAW_TRIMMED),",
+            "\$typedkey = \$data['apikey'];",
+            "\$existingkey = course_config_manager::get(\$courseid);",
+            "\$storedraw = (\$existingkey && isset(\$existingkey->apikey)) ? (string) \$existingkey->apikey : '';",
+            "\$storedkey = \\local_ai_course_assistant\\secrets::reveal(\$storedraw);",
+            "\$keydecision = \\local_ai_course_assistant\\course_key_guard::resolve(",
+            "\$typedkey,",
+            "\$storedkey,",
+            "\$data['apikey'] = \$keydecision['apikey'];",
+            "if (\$data['apikey'] === '' && \$storedkey === '' && \$storedraw !== '') {",
+            "\$data['apikey'] = \$storedraw;",
+            "foreach (\$keydecision['notices'] as [\$noticetype, \$noticekey, \$noticea]) {",
+            "if (optional_param('apikey_clear', 0, PARAM_INT)) {",
+            "\$data['apikey'] = '';",
+            // The page: a stored key becomes a yes/no and one of two fixed sentences, and the labels.
+            "\$haskey = \$current && \$current->apikey !== '';",
+            "\$keyph = \$haskey",
+            "? get_string('coursesettings:apikey_stored', 'local_ai_course_assistant')",
+            "'apikeylabel' => get_string('settings:apikey', 'local_ai_course_assistant'),",
+            "'apikeyplaceholder' => \$keyph,",
+            "'haskey' => (bool) \$haskey,",
+            "'apikeyclearlabel' => get_string('coursesettings:apikey_clear', 'local_ai_course_assistant'),",
+            "'apikeydesc' => get_string('settings:apikey_desc', 'local_ai_course_assistant'),",
+        ];
+        $found = [];
+        foreach (explode("\n", $script) as $line) {
+            $line = trim($line);
+            if (preg_match('~apikey|\$typedkey|\$existingkey|\$storedraw|\$storedkey|\$keydecision|\$haskey|\$keyph~i', $line)) {
+                $found[] = $line;
+            }
+        }
+        $this->assertGreaterThanOrEqual(20, count($found), 'the scan found the key lines');
+        $this->assertSame([], array_values(array_diff($found, $safe)),
+            'a line in course_settings.php that touches a course key is new: check it never reaches the page, then add it here');
+        $this->assertSame([], array_values(array_diff($safe, $found)),
+            'a known safe line is gone or changed: update this list so it keeps pinning the real lines');
     }
 }

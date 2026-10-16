@@ -308,4 +308,55 @@ final class settings_save_report_test extends \advanced_testcase {
         ]));
         $this->assertEmpty($SESSION->local_ai_course_assistant_savedchanges ?? []);
     }
+
+    /**
+     * Table values as a log row may hold them if a writer logs a table whole: a key in the clear (a row
+     * saved before 7.9.0), ciphertext, one line or many, with a trailing line break, with Windows line
+     * endings, with two-column lines, and with nothing on one side (the first write, a clear).
+     *
+     * @return array[] name => [setting, old value, new value]
+     */
+    public static function table_values_that_carry_a_key(): array {
+        $k1 = 'LEAKKEY-0001-AAAAAAAAAAAA';
+        $k2 = 'LEAKKEY-0002-BBBBBBBBBBBB';
+        $k3 = 'LEAKKEY-0003-CCCCCCCCCCCC';
+        $c1 = 'sodium:LEAKCIPHER' . str_repeat('A', 40);
+        $c2 = 'sodium:LEAKCIPHER' . str_repeat('B', 40);
+        return [
+            'a legacy plain key in the voice table' => ['voice_providers', "openai|$k1|main|shimmer|nova", "openai|$k2|main|shimmer|nova"],
+            'a legacy plain key in the provider table' => ['comparison_providers', "openai|$k1|gpt-4o", "claude|$k2|claude-haiku"],
+            'a key on every line of several' => ['comparison_providers', "openai|$k1|a\nclaude|$k2|b\ngemini|$k3|c",
+                "openai|$k2|a\nclaude|$k3|b\ngemini|$k1|c"],
+            'a key that starts inside the first 48 characters, on the second line' => ['comparison_providers',
+                "x||m\nclaude|$k1|b", "x||m\nclaude|$k2|b"],
+            'a trailing line break' => ['voice_providers', "openai|$k1|main\n", "openai|$k2|main\n"],
+            'Windows line endings with a key' => ['comparison_providers', "openai|$k1|a\r\nclaude|$k2|b\r\n",
+                "openai|$k2|a\r\nclaude|$k1|b\r\n"],
+            'Windows line endings, two-column lines' => ['voice_providers', "openai|$k1\r\nxai|$k2\r\n", "openai|$k2\r\nxai|$k1\r\n"],
+            'a first write (no old value)' => ['comparison_providers', null, "openai|$k1|m\nclaude|$k2|m"],
+            'a cleared table (no new value)' => ['voice_providers', "openai|$k1|main", null],
+            'ciphertext in the key column' => ['comparison_providers', "openai|$c1|m", "openai|$c2|m"],
+            'ciphertext in the voice table, several lines' => ['voice_providers', "openai|$c1|main|shimmer|nova\nxai|$c2|g",
+                "openai|$c2|main|shimmer|nova\nxai|$c1|g"],
+        ];
+    }
+
+    /**
+     * @dataProvider table_values_that_carry_a_key
+     * @param string $name the setting
+     * @param ?string $old
+     * @param ?string $new
+     */
+    public function test_a_table_change_never_prints_a_key_or_the_start_of_a_row_that_holds_one(string $name, ?string $old,
+            ?string $new): void {
+        $report = settings_save_report::describe([$name => [$old, $new]]);
+        $this->assertSame(1, $report['changed']);
+        $text = html_entity_decode(strip_tags($report['message']));
+        $this->assertStringContainsString($name, $text, 'the notice still names the setting');
+        // Every key here starts with LEAKKEY or is ciphertext starting sodium:LEAKCIPHER, so any piece of one
+        // longer than a few characters, and any part of a row's start that reaches into a key, is caught.
+        $this->assertStringNotContainsString('LEAKKEY', $text);
+        $this->assertStringNotContainsString('LEAKCIPHER', $text);
+        $this->assertStringNotContainsString('sodium', $text);
+    }
 }
