@@ -2327,6 +2327,13 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             . ($summary['encrypted'] ? ' and the provider table' : '')
             . ($summary['row_added'] !== '' ? ', added a row for ' . $summary['row_added'] : '')
             . ($summary['conflict'] !== '' ? ', resolved a key conflict (see the settings page notice)' : '') . '.');
+        // A benchmark run cached by an earlier release holds each provider row's plain key; its JSON export
+        // would keep serving it. Dropping the cached run is harmless (the next run rebuilds it).
+        try {
+            \local_ai_course_assistant\provider_benchmark::forget_cached_payload();
+        } catch (\Throwable $e) {
+            mtrace('local_ai_course_assistant: could not clear the cached benchmark run: ' . get_class($e));
+        }
         upgrade_plugin_savepoint(true, 2026101601, 'local', 'ai_course_assistant');
     }
 

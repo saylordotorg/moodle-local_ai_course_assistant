@@ -44,7 +44,7 @@ require_capability('moodle/site:config', $context);
 $run = optional_param('run', 0, PARAM_INT);
 $export = optional_param('export', '', PARAM_ALPHA);
 
-$cachekey = 'provider_benchmark_last_payload';
+$cachekey = provider_benchmark::CACHE_KEY;
 $cache = \cache::make_from_params(
     \cache_store::MODE_APPLICATION,
     'local_ai_course_assistant',

@@ -40,6 +40,9 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider_benchmark {
+    /** @var string Key of the last full run in the ad-hoc application cache the admin page reads exports from. */
+    public const CACHE_KEY = 'provider_benchmark_last_payload';
+
     /**
      * Typical learner prompts. Short and zero-context — this is a cost /
      * latency / contract benchmark, not a tutoring-quality benchmark.
@@ -69,6 +72,17 @@ class provider_benchmark {
         'Supply and demand describes the relationship between the quantity of a good producers wish to sell and the quantity buyers wish to purchase, given a price.',
         'A binary search algorithm finds the position of a target value within a sorted array by repeatedly dividing the search interval in half.',
     ];
+
+    /**
+     * Drop the cached last run. Payloads cached before 7.9.0 hold each provider row's plain key, and the
+     * JSON export would go on serving them until the next run; the 7.9.0 upgrade calls this once.
+     *
+     * @return void
+     */
+    public static function forget_cached_payload(): void {
+        \cache::make_from_params(\cache_store::MODE_APPLICATION, 'local_ai_course_assistant', 'provider_benchmark')
+            ->delete(self::CACHE_KEY);
+    }
 
     /**
      * Run every benchmark and return the full result set.
@@ -332,8 +346,11 @@ class provider_benchmark {
      * the primary provider plus every row in comparison_providers.
      * De-duplicated by (id, model).
      *
-     * @return array<int,array{id:string,label:string,model:string,apikey:string,
-     *     temperature:?float,is_primary:bool}>
+     * The entries go into the benchmark payload, which is cached and exported as plain JSON, so they carry
+     * no key. The run builds each provider through base_provider::create_for_comparison(), which looks its
+     * own key up server-side at the point of use.
+     *
+     * @return array<int,array{id:string,label:string,model:string,temperature:?float,is_primary:bool}>
      */
     public static function list_chat_providers(): array {
         $rows = [];
@@ -345,14 +362,13 @@ class provider_benchmark {
                 'id' => $primaryid,
                 'label' => $primaryid . ' (primary)',
                 'model' => (string) (get_config('local_ai_course_assistant', 'model') ?: ''),
-                'apikey' => '',
                 'temperature' => null,
                 'is_primary' => true,
             ];
         }
 
-        // 2. Comparison providers — multi-line config: provider|apikey|models|temperature
-        foreach (\local_ai_course_assistant\provider_keys::rows(true) as $row) {
+        // 2. Comparison providers: one entry per row of the provider table (keys are never revealed here).
+        foreach (\local_ai_course_assistant\provider_keys::rows() as $row) {
             if (in_array($row['provider'], \local_ai_course_assistant\provider_keys::KEY_ONLY_PROVIDERS, true)) {
                 continue;
             }
@@ -360,7 +376,6 @@ class provider_benchmark {
                 'id' => $row['provider'],
                 'label' => $row['provider'],
                 'model' => $row['model'],
-                'apikey' => $row['key'],
                 'temperature' => $row['temperature'] !== '' ? (float) $row['temperature'] : null,
                 'is_primary' => false,
             ];
