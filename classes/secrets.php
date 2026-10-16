@@ -68,6 +68,9 @@ class secrets {
             'redash_api_key',
             'redash_user_api_key',
             'spend_export_key',
+            // Incoming-webhook URLs carry their token in the path: whoever holds one can post to the channel.
+            'anomaly_digest_slack_webhook',
+            'anomaly_digest_teams_webhook',
         ];
         foreach (self::AVATAR_PROVIDERS as $p) {
             $names[] = $p . '_api_key';

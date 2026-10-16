@@ -126,6 +126,47 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
         $this->assertStringNotContainsString('TREE-FIELD', $html);
     }
 
+    /**
+     * The anomaly digest's webhook URLs carry a token in the path. On the settings page they show the same
+     * "ends in" hint as a key and never the URL, or its ciphertext.
+     */
+    public function test_the_anomaly_webhook_fields_show_the_hint_and_never_the_url(): void {
+        global $CFG;
+        require_once($CFG->libdir . '/adminlib.php');
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $urls = [
+            'anomaly_digest_slack_webhook' => 'https://hooks.example/T000/B000/SENTINELWEBHOOK',
+            'anomaly_digest_teams_webhook' => 'https://hooks.example/teams/T000/SENTINELTEAMS',
+        ];
+        foreach ($urls as $name => $url) {
+            set_config($name, secrets::conceal($url), 'local_ai_course_assistant');
+        }
+        $category = \admin_get_root(true, true)->locate('local_ai_course_assistant');
+        $found = [];
+        foreach ($category->children as $page) {
+            if (!$page instanceof \admin_settingpage) {
+                continue;
+            }
+            foreach ($page->settings as $setting) {
+                if (isset($urls[$setting->name])) {
+                    $found[$setting->name] = $setting;
+                }
+            }
+        }
+        $this->assertSame(array_keys($urls), array_keys($found), 'both webhook fields are on the settings page');
+        $ends = ['anomaly_digest_slack_webhook' => 'HOOK', 'anomaly_digest_teams_webhook' => 'EAMS'];
+        foreach ($found as $name => $setting) {
+            $this->assertInstanceOf(admin_setting_secret_field::class, $setting);
+            $html = $setting->output_html($setting->get_setting());
+            $this->assertStringContainsString('Saved key ends in ' . $ends[$name] . '.', $html);
+            $this->assertStringNotContainsString('SENTINEL', $html);
+            $this->assertStringNotContainsString('hooks.example', $html);
+            $this->assertStringNotContainsString('sodium:', $html);
+        }
+    }
+
     public function test_it_is_still_an_encrypted_password_setting(): void {
         $this->resetAfterTest();
         $this->assertTrue(is_subclass_of(admin_setting_secret_field::class, \admin_setting_encryptedpassword::class));

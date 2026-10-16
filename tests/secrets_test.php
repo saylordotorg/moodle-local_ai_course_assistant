@@ -186,6 +186,21 @@ final class secrets_test extends \advanced_testcase {
     }
 
     /**
+     * The anomaly digest's Slack and Teams webhook URLs carry a token in the path, so anyone holding one can
+     * post to the channel. They are secrets like any key: listed in names(), encrypted, read through get().
+     */
+    public function test_the_anomaly_webhook_urls_are_secrets_and_the_digest_reads_them_decrypted(): void {
+        $this->resetAfterTest();
+        $this->assertTrue(secrets::is_secret('anomaly_digest_slack_webhook'));
+        $this->assertTrue(secrets::is_secret('anomaly_digest_teams_webhook'));
+        set_config('anomaly_digest_slack_webhook', secrets::conceal('https://hooks.example/T000/B000/SENTINELWEBHOOK'),
+            'local_ai_course_assistant');
+        $this->assertSame('https://hooks.example/T000/B000/SENTINELWEBHOOK', secrets::get('anomaly_digest_slack_webhook'));
+        $this->assertStringNotContainsString('SENTINELWEBHOOK',
+            (string) get_config('local_ai_course_assistant', 'anomaly_digest_slack_webhook'));
+    }
+
+    /**
      * A value encrypted under another site's key reads as unset, never as the
      * ciphertext, which a provider would reject as a bad key.
      */

@@ -3213,20 +3213,16 @@ if ($hassiteconfig) {
         PARAM_EMAIL
     ));
 
-    $settings->add(new admin_setting_configtext(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/anomaly_digest_slack_webhook',
         get_string('settings:anomaly_digest_slack_webhook', 'local_ai_course_assistant'),
-        get_string('settings:anomaly_digest_slack_webhook_desc', 'local_ai_course_assistant'),
-        '',
-        PARAM_URL
+        get_string('settings:anomaly_digest_slack_webhook_desc', 'local_ai_course_assistant')
     ));
 
-    $settings->add(new admin_setting_configtext(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/anomaly_digest_teams_webhook',
         get_string('settings:anomaly_digest_teams_webhook', 'local_ai_course_assistant'),
-        get_string('settings:anomaly_digest_teams_webhook_desc', 'local_ai_course_assistant'),
-        '',
-        PARAM_URL
+        get_string('settings:anomaly_digest_teams_webhook_desc', 'local_ai_course_assistant')
     ));
 
     // Analytics export (Redash).

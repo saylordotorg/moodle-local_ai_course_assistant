@@ -17,6 +17,7 @@
 namespace local_ai_course_assistant\task;
 
 use local_ai_course_assistant\radar_delivery;
+use local_ai_course_assistant\secrets;
 
 /**
  * Daily anomaly digest. Compares rolling windows for the metrics that admins
@@ -128,12 +129,12 @@ class run_anomaly_digest extends \core\task\scheduled_task {
             mtrace('  Anomaly digest: emailing ' . $emailto);
             $delivered = radar_delivery::send_email($emailto, 'Anomaly digest', $body, 'text', 'Anomaly digest', $meta) || $delivered;
         }
-        $slack = (string) (get_config('local_ai_course_assistant', 'anomaly_digest_slack_webhook') ?: '');
+        $slack = secrets::get('anomaly_digest_slack_webhook');
         if ($slack !== '') {
             mtrace('  Anomaly digest: posting to Slack');
             $delivered = radar_delivery::send_slack($slack, 'Anomaly digest', $body, $meta) || $delivered;
         }
-        $teams = (string) (get_config('local_ai_course_assistant', 'anomaly_digest_teams_webhook') ?: '');
+        $teams = secrets::get('anomaly_digest_teams_webhook');
         if ($teams !== '') {
             mtrace('  Anomaly digest: posting to Teams');
             $delivered = radar_delivery::send_teams($teams, 'Anomaly digest', $body, $meta) || $delivered;

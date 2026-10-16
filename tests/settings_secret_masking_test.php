@@ -48,13 +48,16 @@ final class settings_secret_masking_test extends \advanced_testcase {
     // hints matched it, so the first version of this guard walked straight past a
     // credential it existed to catch. The bare hint flags exactly one non-secret,
     // policy_bundle_pubkey, which is already exempted below.
-    private const SECRET_HINTS = ['apikey', 'api_key', 'key', 'secret', 'token', 'password'];
+    // 'webhook' is there because an incoming-webhook URL carries its token in the path: anyone holding the
+    // anomaly digest's Slack or Teams URL can post to that channel, and as a configtext every old value
+    // stayed readable in mdl_config_log.
+    private const SECRET_HINTS = ['apikey', 'api_key', 'key', 'secret', 'token', 'password', 'webhook'];
 
     /** The setting classes that store a credential encrypted: Moodle's own, and the one with the "ends in" hint. */
     private const PASSWORD_TYPES = ['admin_setting_encryptedpassword', 'admin_setting_secret_field'];
 
     /** The fewest credential settings the scan must see in settings.php (the real count, less one). */
-    private const MIN_CHECKED = 12;
+    private const MIN_CHECKED = 14;
 
     /**
      * Names that match a hint but are NOT credentials, with the reason.
@@ -132,9 +135,9 @@ final class settings_secret_masking_test extends \advanced_testcase {
         $this->assertSame(
             [],
             $offenders,
-            "Credential settings must be admin_setting_encryptedpassword and be listed in "
-            . "secrets::names(). Plain configtext records every historical value in "
-            . "mdl_config_log, and a masked password type is still plain text in the "
+            "Credential settings must be admin_setting_secret_field (Moodle's admin_setting_encryptedpassword "
+            . "with an \"ends in\" hint) and be listed in secrets::names(). Plain configtext records every "
+            . "historical value in mdl_config_log, and a masked password type is still plain text in the "
             . "database. Offenders: " . implode(', ', $offenders)
         );
     }
