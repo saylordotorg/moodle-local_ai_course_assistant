@@ -255,24 +255,48 @@ class provider_keys {
         if ($provider === '' || in_array($provider, self::KEYLESS, true)) {
             return false;
         }
-        // The site's apikey is sent to the site's apibaseurl, and a row's key to the row's base URL. Copy
-        // only from the first readable keyed row for the same destination (both empty is the normal case),
-        // or a gateway site would be handed the vendor's key and send it to the gateway host. A keyed row
-        // for another destination is skipped, not a stop: it can be listed before the right one.
-        $baseurl = trim((string) get_config(self::PLUGIN, 'apibaseurl'));
-        $row = null;
-        foreach (self::rows(true) as $candidate) {
-            if ($candidate['provider'] === $provider && $candidate['haskey'] && $candidate['key'] !== ''
-                    && trim($candidate['baseurl']) === $baseurl) {
-                $row = $candidate;
-                break;
-            }
-        }
+        $row = self::mirror_lookup($provider, (string) get_config(self::PLUGIN, 'apibaseurl'))['row'];
         if ($row === null || secrets::get('apikey') === $row['key']) {
             return false;
         }
         set_config('apikey', secrets::conceal($row['key']), self::PLUGIN);
         return true;
+    }
+
+    /**
+     * Which row does the apikey mirror copy for a provider and the site's API Base URL?
+     *
+     * The site's apikey is sent to the site's apibaseurl, and a row's key to the row's base URL. Only the first
+     * readable keyed row for the same destination (both empty is the normal case) can stand in for apikey, or a
+     * gateway site would be handed the vendor's key and send it to the gateway host. A keyed row for another
+     * destination is skipped, not a stop: it can be listed before the right one. A row whose key cannot be
+     * decrypted is no keyed row at all.
+     *
+     * One pass over the table, so sync_default_key() and default_key_warnings() always agree on the row.
+     *
+     * @param string $provider lowercase provider id
+     * @param string $baseurl the site's API Base URL (compared trimmed)
+     * @return array{row: ?array, keyed: bool, elsewhere: bool} row: the row the mirror copies, key revealed, or
+     *         null; keyed: whether the provider has any readable keyed row, under any base URL; elsewhere: whether
+     *         one of them has a base URL of its own that is not the site's, which is a row the admin pointed
+     *         somewhere else on purpose
+     */
+    private static function mirror_lookup(string $provider, string $baseurl): array {
+        $baseurl = trim($baseurl);
+        $found = ['row' => null, 'keyed' => false, 'elsewhere' => false];
+        foreach (self::rows(true) as $candidate) {
+            if ($candidate['provider'] !== $provider || !$candidate['haskey'] || $candidate['key'] === '') {
+                continue;
+            }
+            $found['keyed'] = true;
+            $rowurl = trim($candidate['baseurl']);
+            if ($rowurl === $baseurl) {
+                $found['row'] = $found['row'] ?? $candidate;
+            } else if ($rowurl !== '') {
+                $found['elsewhere'] = true;
+            }
+        }
+        return $found;
     }
 
     /**
@@ -320,16 +344,33 @@ class provider_keys {
     }
 
     /**
-     * The key half of default_provider_warnings(): none when the provider needs no key or has a keyed row.
+     * The key half of default_provider_warnings(): none when the provider needs no key or has a keyed row (the
+     * mirror's row, under the site's API Base URL, or a plain one that is kept for failover).
+     *
+     * One sentence when none of the provider's keyed rows is under the site's base URL and one of them has a base
+     * URL of its own: the mirror copies none of them, so chat still uses the previous default key, and an admin
+     * who typed a new key into such a row (moving to an Azure or gateway endpoint) would otherwise see "Saved"
+     * and nothing else. A plain row on a gateway site is not that case: it has no base URL of its own, and the
+     * sentence would be untrue.
      *
      * @param string $provider the concrete default provider
      * @return string[]
      */
     private static function default_key_warnings(string $provider): array {
-        if (in_array($provider, self::KEYLESS, true) || self::key_for($provider) !== '') {
+        if (in_array($provider, self::KEYLESS, true)) {
             return [];
         }
         $baseurl = trim((string) get_config(self::PLUGIN, 'apibaseurl'));
+        $found = self::mirror_lookup($provider, $baseurl);
+        if ($found['row'] !== null) {
+            return [];
+        }
+        if ($found['elsewhere']) {
+            return [get_string('providerkeys:default_baseurl_mismatch', self::PLUGIN, (object) ['provider' => $provider])];
+        }
+        if ($found['keyed']) {
+            return [];
+        }
         $legacy = secrets::get('apikey');
         $owner = $legacy === '' ? '' : course_key_guard::conflict($provider, $legacy, $baseurl);
         if ($owner !== '') {
