@@ -156,11 +156,35 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
         $this->assertStringNotContainsString('hooks.example', $stored);
         $this->assertSame('https://hooks.example/T000/B000/SENTINELWEBHOOK', secrets::get('anomaly_digest_slack_webhook'));
 
-        // http is accepted, any case, and a pasted line break or space at either end is trimmed away.
-        foreach (["  HTTP://hooks.example/T000/B000/SENTINELTWO\n", 'http://hooks.example/x'] as $url) {
-            $this->assertSame('', $field->write_setting($url), $url);
-            $this->assertSame(trim($url), secrets::get('anomaly_digest_slack_webhook'));
+        // http is accepted, any case, and a pasted line break or space at either end is trimmed away. The
+        // scheme is stored in lower case (the send-time address check compares it as written); the rest of the
+        // URL is stored exactly as typed.
+        $cases = [
+            "  HTTP://hooks.example/T000/B000/SENTINELTWO\n" => 'http://hooks.example/T000/B000/SENTINELTWO',
+            'http://hooks.example/x' => 'http://hooks.example/x',
+            'HTTPS://Hooks.Example/T000/B000/SENTINELTHREE' => 'https://Hooks.Example/T000/B000/SENTINELTHREE',
+            'hTtPs://hooks.example/UPPER/Lower' => 'https://hooks.example/UPPER/Lower',
+            'https://hooks.example:8443/T000/B000/SENTINELFOUR' => 'https://hooks.example:8443/T000/B000/SENTINELFOUR',
+            'https://hooks.example?token=SENTINELFIVE' => 'https://hooks.example?token=SENTINELFIVE',
+            'https://hooks.example/a@b/HTTPS://x' => 'https://hooks.example/a@b/HTTPS://x',
+            'https://[::1]:8443/x' => 'https://[::1]:8443/x',
+        ];
+        foreach ($cases as $typed => $expected) {
+            $this->assertSame('', $field->write_setting($typed), $typed);
+            $this->assertSame($expected, secrets::get('anomaly_digest_slack_webhook'), $typed);
         }
+    }
+
+    /**
+     * The send-time check (security::is_safe_provider_url) compares the scheme as written, so a URL saved as
+     * HTTPS:// would be refused at send time. Saving it with the scheme in lower case is what makes the digest
+     * post to it.
+     */
+    public function test_an_upper_case_scheme_is_saved_in_a_form_the_send_time_check_accepts(): void {
+        $this->resetAfterTest();
+        set_config('ssrf_trusted_endpoints', 'https://hooks.example', 'local_ai_course_assistant');
+        $this->assertSame('', $this->webhook()->write_setting('HTTPS://hooks.example/T000/B000/SENTINELWEBHOOK'));
+        $this->assertTrue(security::is_safe_provider_url(secrets::get('anomaly_digest_slack_webhook')));
     }
 
     /**
@@ -180,6 +204,20 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
             'line break in the path' => ["https://hooks.example/NOT-A-URL\nSENTINEL"],
             'two urls' => ['https://hooks.example/one https://hooks.example/NOT-A-URL-SENTINEL'],
             'a key pasted by mistake' => ['sk-proj-NOT-A-URL-SENTINEL-0000-ZZZZ'],
+            'an at sign and nothing else' => ['https://@'],
+            'a port and no host' => ['https://:80'],
+            'a port and no host, then a path' => ['https://:80/NOT-A-URL-SENTINEL'],
+            'no host before a user' => ['https://@hooks.example/NOT-A-URL-SENTINEL'],
+            'a user name' => ['https://NOT-A-URL-SENTINEL@hooks.example/x'],
+            'a user name and password' => ['https://NOT-A-URL-SENTINEL:pw@hooks.example/x'],
+            'a host that is really a user' => ['https://hooks.example@evil.example/NOT-A-URL-SENTINEL'],
+            'a host and port that are really a user' => ['https://hooks.example:80@evil.example/NOT-A-URL-SENTINEL'],
+            'a port that is not a number' => ['https://hooks.example:NOT-A-URL-SENTINEL/x'],
+            'an empty port' => ['https://hooks.example:/NOT-A-URL-SENTINEL'],
+            'a back slash in the host' => ['https://hooks.example\\evil.example/NOT-A-URL-SENTINEL'],
+            'an unclosed address literal' => ['https://[::1/NOT-A-URL-SENTINEL'],
+            'a control character' => ["https://hooks.example/NOT-A-URL\x00SENTINEL"],
+            'a delete character in the host' => ["https://hooks\x7f.example/NOT-A-URL-SENTINEL"],
         ];
     }
 
@@ -197,7 +235,7 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
 
         $this->assertNotSame('', $error, 'a non-empty error string means nothing was saved');
         $this->assertStringContainsString('Slack webhook URL', $error, 'it names the field');
-        foreach (['SENTINEL', 'hooks.example', 'sk-proj', 'ZZZZ'] as $part) {
+        foreach (['SENTINEL', 'hooks.example', 'evil.example', 'sk-proj', 'ZZZZ', ':pw@'] as $part) {
             $this->assertStringNotContainsString($part, $error, 'the error never repeats what was typed');
         }
         $this->assertSame($before, $this->stored(), 'the saved URL is untouched, byte for byte');
