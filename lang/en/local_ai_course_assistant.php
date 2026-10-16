@@ -3707,3 +3707,4 @@ $string['providerkeys:col_ttsvoice'] = 'TTS voice';
 $string['providerkeys:add_voice'] = '+ Add voice provider';
 $string['providerkeys:err_voice_provider'] = '"{$a}" isn\'t a voice provider. Voice providers are openai or xai.';
 $string['providerkeys:last4_hint'] = 'Saved key ends in {$a}.';
+$string['providerkeys:saved_url_hint'] = 'A URL is saved.';

@@ -59,8 +59,60 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
         $this->resetAfterTest();
         $field = $this->field('rerank_apikey');
         $this->assertStringNotContainsString('ends in', $field->output_html(''));
+        $this->assertStringNotContainsString('URL is saved', $field->output_html(''));
         set_config('rerank_apikey', '', 'local_ai_course_assistant');
         $this->assertStringNotContainsString('ends in', $field->output_html(''));
+        $this->assertStringNotContainsString('URL is saved', $field->output_html(''));
+    }
+
+    /**
+     * A saved URL (an incoming webhook, whose token is in the path) never shows its last four characters,
+     * or any other part of it: the field says only that a URL is saved.
+     */
+    public function test_a_saved_url_shows_no_part_of_it_not_even_the_tail(): void {
+        $this->resetAfterTest();
+        $field = $this->field('anomaly_digest_slack_webhook');
+        $urls = [
+            'https://hooks.example/T000/B000/SENTINELWEBHOOK',
+            'http://hooks.example/T000/B000/SENTINELWEBHOOK',
+            'HTTPS://Hooks.Example/T000/B000/SENTINELWEBHOOK',
+            'hTtP://hooks.example/T000/B000/SENTINELWEBHOOK',
+        ];
+        foreach ($urls as $url) {
+            set_config('anomaly_digest_slack_webhook', secrets::conceal($url), 'local_ai_course_assistant');
+            $html = $field->output_html($field->get_setting());
+            $this->assertStringContainsString('A URL is saved.', $html, $url);
+            $this->assertStringNotContainsString('ends in', $html, $url);
+            foreach (['HOOK', 'BHOOK', 'EBHOOK', 'WEBHOOK', 'SENTINEL', 'B000', 'T000', 'ooks.example', 'sodium:'] as $part) {
+                $this->assertStringNotContainsString($part, $html, 'no part of the URL reaches the page: ' . $part);
+            }
+            $this->assertSame('desc', $field->description);
+        }
+        // A value saved before the upgrade is still plain text; the same rule applies to it.
+        set_config('anomaly_digest_slack_webhook', 'https://hooks.example/T000/B000/SENTINELWEBHOOK',
+            'local_ai_course_assistant');
+        $html = $field->output_html($field->get_setting());
+        $this->assertStringContainsString('A URL is saved.', $html);
+        $this->assertStringNotContainsString('HOOK', $html);
+        // So is one forced in config.php with stray leading whitespace.
+        set_config('anomaly_digest_slack_webhook', "  \nhttps://hooks.example/T000/B000/SENTINELWEBHOOK",
+            'local_ai_course_assistant');
+        $html = $field->output_html($field->get_setting());
+        $this->assertStringContainsString('A URL is saved.', $html);
+        $this->assertStringNotContainsString('HOOK', $html);
+    }
+
+    /**
+     * Only a value that starts with http:// or https:// is a URL. A key that merely begins with those letters
+     * is still a key and keeps its hint.
+     */
+    public function test_a_key_that_only_looks_a_little_like_a_url_keeps_the_key_hint(): void {
+        $this->resetAfterTest();
+        set_config('embed_apikey', secrets::conceal('https-key-0123456789-ABCD'), 'local_ai_course_assistant');
+        $field = $this->field();
+        $html = $field->output_html($field->get_setting());
+        $this->assertStringContainsString('Saved key ends in ABCD.', $html);
+        $this->assertStringNotContainsString('URL is saved', $html);
     }
 
     public function test_a_short_key_shows_no_hint(): void {
@@ -127,10 +179,10 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
     }
 
     /**
-     * The anomaly digest's webhook URLs carry a token in the path. On the settings page they show the same
-     * "ends in" hint as a key and never the URL, or its ciphertext.
+     * The anomaly digest's webhook URLs carry a token in the path. On the settings page they say only that a
+     * URL is saved: no last four, no part of the URL, no ciphertext.
      */
-    public function test_the_anomaly_webhook_fields_show_the_hint_and_never_the_url(): void {
+    public function test_the_anomaly_webhook_fields_say_a_url_is_saved_and_show_none_of_it(): void {
         global $CFG;
         require_once($CFG->libdir . '/adminlib.php');
         $this->resetAfterTest();
@@ -156,14 +208,14 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
             }
         }
         $this->assertSame(array_keys($urls), array_keys($found), 'both webhook fields are on the settings page');
-        $ends = ['anomaly_digest_slack_webhook' => 'HOOK', 'anomaly_digest_teams_webhook' => 'EAMS'];
         foreach ($found as $name => $setting) {
             $this->assertInstanceOf(admin_setting_secret_field::class, $setting);
             $html = $setting->output_html($setting->get_setting());
-            $this->assertStringContainsString('Saved key ends in ' . $ends[$name] . '.', $html);
-            $this->assertStringNotContainsString('SENTINEL', $html);
-            $this->assertStringNotContainsString('hooks.example', $html);
-            $this->assertStringNotContainsString('sodium:', $html);
+            $this->assertStringContainsString('A URL is saved.', $html);
+            $this->assertStringNotContainsString('ends in', $html);
+            foreach (['HOOK', 'EAMS', 'SENTINEL', 'hooks.example', 'T000', 'sodium:'] as $part) {
+                $this->assertStringNotContainsString($part, $html, $name . ' shows no part of the URL: ' . $part);
+            }
         }
     }
 

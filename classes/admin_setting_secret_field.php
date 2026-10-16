@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
  * provider_keys::last4(), which shows nothing for a key under 12 characters, and is never built from the
  * stored (encrypted) string. An unset field, or a key that won't decrypt on this site, gets no hint.
  *
+ * A saved value that is a URL (an incoming webhook, whose token sits in the path) gets no last four, because
+ * the tail of a URL is part of its token: the field says only that a URL is saved.
+ *
  * Saving is the parent's: a typed value is encrypted, a blank one clears the setting.
  *
  * @package    local_ai_course_assistant
@@ -43,14 +46,28 @@ class admin_setting_secret_field extends \admin_setting_encryptedpassword {
      */
     public function output_html($data, $query = '') {
         $original = $this->description;
-        $last4 = provider_keys::last4(secrets::get($this->name));
-        if ($last4 !== '') {
-            $this->description .= ' ' . get_string('providerkeys:last4_hint', 'local_ai_course_assistant', $last4);
+        $hint = $this->saved_hint(secrets::get($this->name));
+        if ($hint !== '') {
+            $this->description .= ' ' . $hint;
         }
         try {
             return parent::output_html($data, $query);
         } finally {
             $this->description = $original;
         }
+    }
+
+    /**
+     * The sentence that says what is saved, built from the revealed value and never containing it.
+     *
+     * @param string $plain the saved value, decrypted ('' when unset or undecryptable)
+     * @return string '' when there is nothing to say
+     */
+    private function saved_hint(string $plain): string {
+        if (preg_match('~^https?://~i', ltrim($plain))) {
+            return get_string('providerkeys:saved_url_hint', 'local_ai_course_assistant');
+        }
+        $last4 = provider_keys::last4($plain);
+        return $last4 === '' ? '' : get_string('providerkeys:last4_hint', 'local_ai_course_assistant', $last4);
     }
 }
