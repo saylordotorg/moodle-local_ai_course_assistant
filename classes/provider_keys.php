@@ -336,7 +336,8 @@ class provider_keys {
      *
      * Nothing it writes or reports contains a key: the notice and the summary carry last-four values only.
      *
-     * @return array{encrypted:int, settings:int, row_added:string, conflict:string}
+     * @return array{encrypted:int, settings:int, row_added:string, conflict:string} conflict is the provider whose
+     *         row took the default key ('' when none)
      */
     public static function upgrade(): array {
         global $CFG;
@@ -385,10 +386,14 @@ class provider_keys {
             set_config(self::SETTING, $concealed . $separator . $line, self::PLUGIN);
             $summary['row_added'] = $provider;
         } else if ($rowkey !== $legacy) {
-            $summary['conflict'] = $provider . ': the row ended in ' . self::last4($rowkey)
-                . ' and the default key ends in ' . self::last4($legacy);
-            // The notice first, so a crash between the two writes can't lose it (a re-run finds the same conflict).
-            set_config('provider_keys_notice', $summary['conflict'], self::PLUGIN);
+            $summary['conflict'] = $provider;
+            // The notice first, so a crash between the two writes can't lose it (a re-run finds the same
+            // conflict). Structured data, not a sentence: flush_notice() formats it with one lang string.
+            set_config('provider_keys_notice', json_encode([
+                'provider'     => $provider,
+                'rowlast4'     => self::last4($rowkey),
+                'defaultlast4' => self::last4($legacy),
+            ]), self::PLUGIN);
             set_config(self::SETTING, self::with_row_key($concealed, $found, secrets::conceal($legacy)), self::PLUGIN);
         }
         return $summary;
@@ -429,15 +434,32 @@ class provider_keys {
     /**
      * Show the one-time upgrade notice, if there is one, then forget it.
      *
+     * The stored value is JSON: {provider, rowlast4, defaultlast4}. Anything else (the English sentence an
+     * earlier build stored, a damaged value) shows nothing; it is still forgotten.
+     *
      * @return void
      */
     public static function flush_notice(): void {
-        $notice = (string) get_config(self::PLUGIN, 'provider_keys_notice');
-        if ($notice === '') {
+        $raw = (string) get_config(self::PLUGIN, 'provider_keys_notice');
+        if ($raw === '') {
             return;
         }
         unset_config('provider_keys_notice', self::PLUGIN);
-        \core\notification::warning(get_string('providerkeys:upgrade_conflict', self::PLUGIN, s($notice)));
+        $data = json_decode($raw, true);
+        if (!is_array($data)) {
+            return;
+        }
+        $a = new \stdClass();
+        foreach (['provider', 'rowlast4', 'defaultlast4'] as $field) {
+            if (!isset($data[$field]) || !is_string($data[$field])) {
+                return;
+            }
+            $a->$field = s($data[$field]);
+        }
+        if ($a->provider === '') {
+            return;
+        }
+        \core\notification::warning(branding::str('providerkeys:upgrade_conflict', $a));
     }
 
     /**

@@ -50,6 +50,16 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
     }
 
     /**
+     * The one-time notice as stored: structured data, never English text.
+     *
+     * @return array|null null when there is none
+     */
+    private function notice(): ?array {
+        $raw = get_config('local_ai_course_assistant', 'provider_keys_notice');
+        return $raw === false ? null : json_decode((string) $raw, true);
+    }
+
+    /**
      * The stored table, one entry per line.
      *
      * @return string[]
@@ -104,10 +114,12 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
         $summary = provider_keys::upgrade();
         $this->assertSame('sk-proj-PRIMARY-KEY-4444-DDDD', provider_keys::key_for('openai'));
         $this->assertSame('sk-proj-PRIMARY-KEY-4444-DDDD', secrets::get('apikey'));
-        $this->assertStringContainsString('EEEE', $summary['conflict']);
-        $this->assertStringContainsString('DDDD', $summary['conflict']);
-        $this->assertStringNotContainsString('STALE', $summary['conflict']);
-        $this->assertStringNotContainsString('PRIMARY', $summary['conflict']);
+        $this->assertSame('openai', $summary['conflict'], 'the summary names the provider only');
+        $this->assertSame(['provider' => 'openai', 'rowlast4' => 'EEEE', 'defaultlast4' => 'DDDD'], $this->notice(),
+            'the notice is structured data with the two last-four values');
+        $raw = (string) get_config('local_ai_course_assistant', 'provider_keys_notice');
+        $this->assertStringNotContainsString('STALE', $raw);
+        $this->assertStringNotContainsString('PRIMARY', $raw);
     }
 
     /** Review focus 4. */
@@ -269,10 +281,61 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
         provider_keys::flush_notice();
         $notices = \core\notification::fetch();
         $this->assertCount(1, $notices);
-        $this->assertStringContainsString('MMMM', $notices[0]->get_message());
-        $this->assertStringNotContainsString('OLDROW', $notices[0]->get_message());
+        $message = $notices[0]->get_message();
+        $this->assertStringContainsString('openai', $message);
+        $this->assertStringContainsString('MMMM', $message, 'the old row key\'s last four');
+        $this->assertStringContainsString('LLLL', $message, 'the default key\'s last four');
+        $this->assertStringNotContainsString('OLDROW', $message);
+        $this->assertStringNotContainsString('PRIMARY', $message);
+        $this->assertStringNotContainsString('[[', $message, 'brand tokens are resolved');
         provider_keys::flush_notice();
         $this->assertCount(0, \core\notification::fetch(), 'shown once');
+        $this->assertNull($this->notice(), 'and forgotten');
+    }
+
+    /** The notice is ONE translatable string: the product name comes from the branding tokens, not from code. */
+    public function test_the_notice_uses_the_configured_product_name(): void {
+        $this->resetAfterTest();
+        $this->cfg('short_name', 'ACMEBOT');
+        $this->cfg('provider', 'openai');
+        $this->cfg('apikey', secrets::conceal('sk-proj-PRIMARY-KEY-3030-LLLL'));
+        $this->cfg('comparison_providers', "openai|sk-proj-OLDROW-KEY-4040-MMMM|m");
+        provider_keys::upgrade();
+        provider_keys::flush_notice();
+        $notices = \core\notification::fetch();
+        $this->assertCount(1, $notices);
+        $this->assertStringContainsString('ACMEBOT', $notices[0]->get_message());
+        $this->assertStringNotContainsString('SOLA', $notices[0]->get_message());
+    }
+
+    /**
+     * A site that ran an earlier build holds the old value: a finished English sentence. It, and anything else
+     * that is not the structured shape, shows nothing, is forgotten and breaks nothing.
+     *
+     * @dataProvider unusable_notices_provider
+     * @param string $value
+     */
+    public function test_an_old_or_malformed_notice_shows_nothing_and_is_forgotten(string $value): void {
+        $this->resetAfterTest();
+        $this->cfg('provider_keys_notice', $value);
+        provider_keys::flush_notice();
+        $this->assertCount(0, \core\notification::fetch());
+        $this->assertFalse(get_config('local_ai_course_assistant', 'provider_keys_notice'));
+    }
+
+    /**
+     * @return array[]
+     */
+    public static function unusable_notices_provider(): array {
+        return [
+            'old english sentence' => ['openai: the row ended in MMMM and the default key ends in LLLL'],
+            'not json' => ['{"provider":'],
+            'json scalar' => ['5'],
+            'json list' => ['["openai","MMMM","LLLL"]'],
+            'missing a field' => ['{"provider":"openai","rowlast4":"MMMM"}'],
+            'a field of the wrong type' => ['{"provider":"openai","rowlast4":["x"],"defaultlast4":"LLLL"}'],
+            'empty provider' => ['{"provider":"","rowlast4":"MMMM","defaultlast4":"LLLL"}'],
+        ];
     }
 
     /** R15: a gateway key must never be copied into a row with no base URL, where a failover would send it to the vendor. */
@@ -330,9 +393,8 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
         $summary = provider_keys::upgrade();
 
         $this->assertSame('', $summary['row_added']);
-        $this->assertStringContainsString('3333', $summary['conflict']);
-        $this->assertStringContainsString('2222', $summary['conflict']);
-        $this->assertStringNotContainsString('9999-0000', $summary['conflict']);
+        $this->assertSame(['provider' => 'openai', 'rowlast4' => '3333', 'defaultlast4' => '2222'], $this->notice(),
+            'the gateway row\'s last four and the default\'s, not the vendor row\'s 0000');
         $rows = $this->rows_of('openai');
         $this->assertCount(2, $rows);
         $this->assertSame('sk-proj-REAL-VENDOR-KEY-9999-0000', $rows[0]['key'], 'the vendor row is left completely alone');
@@ -409,8 +471,8 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
         $summary = provider_keys::upgrade();
 
         $this->assertSame('', $summary['row_added']);
-        $this->assertStringContainsString('AAAA', $summary['conflict']);
-        $this->assertStringContainsString('BBBB', $summary['conflict']);
+        $this->assertSame('claude', $summary['conflict']);
+        $this->assertSame(['provider' => 'claude', 'rowlast4' => 'AAAA', 'defaultlast4' => 'BBBB'], $this->notice());
         $lines = $this->lines();
         $this->assertCount(3, $lines);
         $this->assertSame('openai', $lines[0]);
@@ -435,7 +497,8 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
             . "openai|sk-proj-OLDKEY-KEY-0000-2222|m");
         $summary = provider_keys::upgrade();
 
-        $this->assertStringContainsString('2222', $summary['conflict']);
+        $this->assertSame('openai', $summary['conflict']);
+        $this->assertSame('2222', $this->notice()['rowlast4']);
         $lines = $this->lines();
         $this->assertCount(4, $lines);
         $this->assertSame('# a comment', $lines[0]);
