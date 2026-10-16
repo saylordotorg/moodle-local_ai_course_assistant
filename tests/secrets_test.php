@@ -188,8 +188,12 @@ final class secrets_test extends \advanced_testcase {
     /**
      * The anomaly digest's Slack and Teams webhook URLs carry a token in the path, so anyone holding one can
      * post to the channel. They are secrets like any key: listed in names(), encrypted, read through get().
+     * (That the digest posts to the decrypted URL is pinned by anomaly_digest_webhook_test.)
+     *
+     * A URL saved before this release is plain text, and the 7.9.0 upgrade step encrypts it.
      */
-    public function test_the_anomaly_webhook_urls_are_secrets_and_the_digest_reads_them_decrypted(): void {
+    public function test_the_anomaly_webhook_urls_are_listed_secrets_the_upgrade_encrypts_and_get_reads(): void {
+        global $DB;
         $this->resetAfterTest();
         $this->assertTrue(secrets::is_secret('anomaly_digest_slack_webhook'));
         $this->assertTrue(secrets::is_secret('anomaly_digest_teams_webhook'));
@@ -198,6 +202,18 @@ final class secrets_test extends \advanced_testcase {
         $this->assertSame('https://hooks.example/T000/B000/SENTINELWEBHOOK', secrets::get('anomaly_digest_slack_webhook'));
         $this->assertStringNotContainsString('SENTINELWEBHOOK',
             (string) get_config('local_ai_course_assistant', 'anomaly_digest_slack_webhook'));
+
+        // A plain URL saved before the upgrade: provider_keys::upgrade() (the 7.9.0 step) encrypts it.
+        $raw = fn(string $name) => (string) $DB->get_field('config_plugins', 'value',
+            ['plugin' => 'local_ai_course_assistant', 'name' => $name]);
+        set_config('anomaly_digest_teams_webhook', 'https://hooks.example/teams/T000/SENTINELPLAIN', 'local_ai_course_assistant');
+        $this->assertSame('https://hooks.example/teams/T000/SENTINELPLAIN', $raw('anomaly_digest_teams_webhook'));
+        $summary = provider_keys::upgrade();
+        $this->assertSame(1, $summary['settings'], 'the plain Teams URL was encrypted (the Slack one already was)');
+        $this->assertTrue(secrets::is_encrypted($raw('anomaly_digest_teams_webhook')));
+        $this->assertStringNotContainsString('SENTINELPLAIN', $raw('anomaly_digest_teams_webhook'));
+        $this->assertSame('https://hooks.example/teams/T000/SENTINELPLAIN', secrets::get('anomaly_digest_teams_webhook'));
+        $this->assertSame(0, provider_keys::upgrade()['settings'], 'a second run changes nothing');
     }
 
     /**
