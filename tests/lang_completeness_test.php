@@ -289,6 +289,8 @@ final class lang_completeness_test extends \basic_testcase {
         'providerkeys:add_voice',
         'providerkeys:err_voice_provider',
         'settings:voice_providers_desc',
+        // Masked last-four hint on every single-key field (Task 8).
+        'providerkeys:last4_hint',
     ];
 
     /**

@@ -3706,3 +3706,4 @@ $string['providerkeys:col_rtvoice'] = 'Realtime voice';
 $string['providerkeys:col_ttsvoice'] = 'TTS voice';
 $string['providerkeys:add_voice'] = '+ Add voice provider';
 $string['providerkeys:err_voice_provider'] = '"{$a}" isn\'t a voice provider. Voice providers are openai or xai.';
+$string['providerkeys:last4_hint'] = 'Saved key ends in {$a}.';

@@ -50,6 +50,12 @@ final class settings_secret_masking_test extends \advanced_testcase {
     // policy_bundle_pubkey, which is already exempted below.
     private const SECRET_HINTS = ['apikey', 'api_key', 'key', 'secret', 'token', 'password'];
 
+    /** The setting classes that store a credential encrypted: Moodle's own, and the one with the "ends in" hint. */
+    private const PASSWORD_TYPES = ['admin_setting_encryptedpassword', 'admin_setting_secret_field'];
+
+    /** The fewest credential settings the scan must see in settings.php (the real count, less one). */
+    private const MIN_CHECKED = 12;
+
     /**
      * Names that match a hint but are NOT credentials, with the reason.
      *
@@ -74,8 +80,10 @@ final class settings_secret_masking_test extends \advanced_testcase {
         $this->assertFileExists($path);
         $src = file_get_contents($path);
 
-        // Each declaration: the class name, then the setting name a few lines on.
-        $pattern = '/new\s+(admin_setting_\w+)\s*\(\s*\'local_ai_course_assistant\/([a-z0-9_]+)\'/i';
+        // Each declaration: the class name, then the setting name a few lines on. The class may be written
+        // with its namespace (\local_ai_course_assistant\admin_setting_secret_field), which a bare
+        // "admin_setting_x" pattern would silently skip: a guard that passes by seeing nothing.
+        $pattern = '/new\s+\\\\?(?:local_ai_course_assistant\\\\)?(admin_setting_\w+)\s*\(\s*\'local_ai_course_assistant\/([a-z0-9_]+)\'/i';
         $this->assertMatchesRegularExpression(
             $pattern,
             $src,
@@ -103,7 +111,7 @@ final class settings_secret_masking_test extends \advanced_testcase {
             $checked++;
             // Encrypted, not merely masked (#302): a masked setting is still plain
             // text in config_plugins and in every database backup.
-            if (strtolower($class) !== 'admin_setting_encryptedpassword') {
+            if (!in_array(strtolower($class), self::PASSWORD_TYPES, true)) {
                 $offenders[] = "{$name} (declared {$class})";
             }
         }
@@ -112,6 +120,14 @@ final class settings_secret_masking_test extends \advanced_testcase {
             0,
             $checked,
             'no credential-looking settings matched -- the hint list may be stale'
+        );
+        // A floor, so the scan can't quietly shrink again. It counts only declarations written with a
+        // literal name; the avatar API keys and webhook secrets are declared in loops with a built name, so
+        // they aren't in the count. Raise the floor when a credential setting is added.
+        $this->assertGreaterThanOrEqual(
+            self::MIN_CHECKED,
+            $checked,
+            "the scan saw only {$checked} credential settings: the declaration pattern has drifted from settings.php"
         );
         $this->assertSame(
             [],
