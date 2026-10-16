@@ -509,6 +509,116 @@ final class admin_setting_provider_keys_test extends \advanced_testcase {
         $this->assertStringNotContainsString('[[', $err);
     }
 
+    /**
+     * Every plugin setting as the database holds it: name => value, byte for byte.
+     *
+     * @return array
+     */
+    private function config_snapshot(): array {
+        global $DB;
+        return $DB->get_records_menu('config_plugins', ['plugin' => 'local_ai_course_assistant'], 'name ASC', 'name, value');
+    }
+
+    /**
+     * The JavaScript the page has been asked to run (the arguments of every js_call_amd), as one string.
+     *
+     * @return string
+     */
+    private function page_js(): string {
+        global $PAGE;
+        $prop = new \ReflectionProperty($PAGE->requires, 'amdjscode');
+        $prop->setAccessible(true);
+        return implode("\n", $prop->getValue($PAGE->requires));
+    }
+
+    /**
+     * F2.1: a table forced in config.php reads as plain text, so a save would write its plain keys into
+     * config_plugins. A forced setting is never saved, whatever is posted, and the page shows it read-only.
+     */
+    public function test_a_table_forced_in_config_php_is_never_written_and_renders_read_only(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        $dbcipher = secrets::conceal('sk-proj-DB-ROW-NOT-SHOWN-1111-DBDB');
+        set_config('comparison_providers', 'openai|' . $dbcipher . '|m-db', 'local_ai_course_assistant');
+        $CFG->forced_plugin_settings['local_ai_course_assistant']['comparison_providers'] =
+            "claude|sk-ant-FORCED-PLAIN-ROW-2222-FRCD|m-forced\nollama||m-local|0.2|http://localhost:11434";
+        try {
+            $setting = $this->setting();
+            $this->assertTrue($setting->is_readonly());
+            $before = $this->config_snapshot();
+
+            // What the form would post (every row kept, plus a typed key) and the two other shapes write_setting() gets.
+            $posted = [];
+            foreach (provider_keys::stored_rows() as $r) {
+                $posted[] = $this->row($r['provider'], '', $r['id'], $r['models'], $r['temperature'], $r['baseurl']);
+            }
+            $posted[] = $this->row('openai', 'sk-proj-TYPED-WHILE-FORCED-3333-TYPD', '', 'gpt-4o-mini');
+            $this->assertSame('', $setting->write_setting(['rows' => $posted, 'present' => '1']));
+            $this->assertSame('', $setting->write_setting(['present' => '1']));
+            $this->assertSame('', $setting->write_setting(''));
+            $this->assertSame($before, $this->config_snapshot(), 'a save of a forced table writes nothing');
+            $this->assertStringNotContainsString('FORCED-PLAIN', implode("\n", $this->config_snapshot()));
+
+            $html = $setting->output_html('');
+            $this->assertStringNotContainsString('keyed_rows', $this->page_js(), 'no Add, Change or Remove to wire up');
+            $this->assertStringNotContainsString('FORCED-PLAIN', $html);
+            $this->assertStringNotContainsString('DB-ROW-NOT-SHOWN', $html);
+            $this->assertStringNotContainsString(substr($dbcipher, strpos($dbcipher, ':') + 1, 24), $html);
+            $this->assertStringNotContainsString('sodium:', $html);
+            $this->assertStringContainsString('m-forced', $html, 'the forced rows are shown');
+            $this->assertStringContainsString('m-local', $html);
+            $this->assertStringNotContainsString('m-db', $html, 'and the database copy is not');
+            $this->assertStringContainsString('FRCD', $html, 'the saved flag and last four still show');
+            $this->assertStringContainsString(s(get_string('providerkeys:forced_note', 'local_ai_course_assistant')), $html);
+            foreach (['sola-kr-add', 'sola-kr-remove', 'sola-kr-change', 'sola-kr-newkey', '[newkey]', '[keepid]',
+                    '[present]', '<button', 'type="password"', '__IDX__'] as $control) {
+                $this->assertStringNotContainsString($control, $html, "no $control on a read-only table");
+            }
+            $dom = new \DOMDocument();
+            $previous = libxml_use_internal_errors(true);
+            $dom->loadHTML('<?xml encoding="utf-8"?><body>' . $html . '</body>');
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+            $controls = 0;
+            foreach (['input', 'select'] as $tag) {
+                foreach ($dom->getElementsByTagName($tag) as $control) {
+                    $controls++;
+                    $this->assertTrue($control->hasAttribute('disabled'), "a $tag on a read-only table is disabled");
+                }
+            }
+            $this->assertGreaterThan(5, $controls, 'the rows were rendered, so the disabled check was not vacuous');
+        } finally {
+            unset($CFG->forced_plugin_settings['local_ai_course_assistant']['comparison_providers']);
+        }
+    }
+
+    /** F2.1: the same table with nothing forced keeps its editor and still saves. */
+    public function test_a_table_that_is_not_forced_stays_editable(): void {
+        $this->resetAfterTest();
+        $setting = $this->setting();
+        $this->assertFalse($setting->is_readonly());
+        $this->assertSame('', $setting->write_setting(['rows' => [$this->row('openai', 'sk-proj-OPEN-EDIT-4444-OPEN', '', 'm')]]));
+        $this->assertSame('sk-proj-OPEN-EDIT-4444-OPEN', provider_keys::key_for('openai'));
+        $html = $setting->output_html('');
+        $this->assertStringContainsString('keyed_rows', $this->page_js(), 'the editor script is loaded');
+        foreach (['sola-kr-add', 'sola-kr-remove', 'sola-kr-change', 'sola-kr-newkey', '[newkey]', '[keepid]', '[present]'] as $control) {
+            $this->assertStringContainsString($control, $html);
+        }
+        $this->assertStringNotContainsString(s(get_string('providerkeys:forced_note', 'local_ai_course_assistant')), $html);
+        $dom = new \DOMDocument();
+        $previous = libxml_use_internal_errors(true);
+        $dom->loadHTML('<?xml encoding="utf-8"?><body>' . $html . '</body>');
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+        foreach (['input', 'select'] as $tag) {
+            foreach ($dom->getElementsByTagName($tag) as $control) {
+                if (!str_contains($control->getAttribute('class'), 'sola-kr-newkey')) {
+                    $this->assertFalse($control->hasAttribute('disabled'), "a $tag on an editable table is not disabled");
+                }
+            }
+        }
+    }
+
     public function test_every_control_in_a_row_has_an_accessible_name(): void {
         $this->resetAfterTest();
         $setting = $this->setting();

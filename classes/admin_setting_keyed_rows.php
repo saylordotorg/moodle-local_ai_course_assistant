@@ -99,6 +99,11 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
      * @return string '' when saved, otherwise the problems
      */
     public function write_setting($data) {
+        if ($this->is_readonly()) {
+            // Forced in config.php: the value in force is the plain text from there, so keeping its keys through
+            // keepid and writing the table would put every one of them into config_plugins in the clear.
+            return '';
+        }
         if (!is_array($data)) {
             // Not from this form. Moodle passes the empty default when it installs a setting that was never
             // saved; anything else (an old string format) must not wipe a saved table.
@@ -172,9 +177,10 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
         global $OUTPUT, $PAGE;
         $id = $this->get_id();
         $columns = $this->columns();
+        $readonly = $this->is_readonly();
         $rows = [];
         foreach ($this->load_rows() as $i => $row) {
-            $rows[] = $this->row_context((string) $i, $row, $columns);
+            $rows[] = $this->row_context((string) $i, $row, $columns, $readonly);
         }
         $blank = ['id' => '', 'stored_key' => ''];
         foreach ($columns as $column) {
@@ -192,10 +198,15 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
             'presentname' => $this->get_full_name() . '[present]',
             'heads' => $heads,
             'rows' => $rows,
-            'blankrow' => $this->row_context('__IDX__', $blank, $columns),
+            'blankrow' => $this->row_context('__IDX__', $blank, $columns, $readonly),
             'addlabel' => get_string($this->add_label_key(), 'local_ai_course_assistant'),
+            'readonly' => $readonly,
+            'readonlynote' => get_string('providerkeys:forced_note', 'local_ai_course_assistant'),
         ]);
-        $PAGE->requires->js_call_amd('local_ai_course_assistant/keyed_rows', 'init', [$id]);
+        if (!$readonly) {
+            // A table forced in config.php has no Add, Change or Remove to wire up.
+            $PAGE->requires->js_call_amd('local_ai_course_assistant/keyed_rows', 'init', [$id]);
+        }
         return format_admin_setting($this, $this->visiblename, $html, $this->description, true, '', null, $query);
     }
 
@@ -229,9 +240,10 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
      * @param string $idx row index in the posted array
      * @param array $row
      * @param array[] $columns
+     * @param bool $readonly the setting is forced in config.php: every control is disabled, none can change a key
      * @return array
      */
-    private function row_context(string $idx, array $row, array $columns): array {
+    private function row_context(string $idx, array $row, array $columns, bool $readonly = false): array {
         $fullname = $this->get_full_name();
         $haskey = $row['stored_key'] !== '';
         $last4 = $haskey ? provider_keys::last4(secrets::reveal($row['stored_key'])) : '';
@@ -249,6 +261,7 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
                 'placeholder' => $column['placeholder'] ?? '',
                 'options' => [],
                 'iskeynext' => $i === 0,
+                'readonly' => $readonly,
             ];
             if ($cell['isselect']) {
                 $found = false;
@@ -269,6 +282,7 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
         return [
             'idx' => $idx,
             'rowid' => $row['id'],
+            'readonly' => $readonly,
             'haskey' => $haskey,
             'savedlabel' => $last4 !== ''
                 ? get_string('providerkeys:saved_ends_in', 'local_ai_course_assistant', $last4)

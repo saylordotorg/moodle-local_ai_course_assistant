@@ -377,4 +377,84 @@ final class admin_setting_voice_providers_test extends \advanced_testcase {
         $this->assertStringContainsString('value="nova"', $html);
         $this->assertStringContainsString(get_string('providerkeys:add_voice', 'local_ai_course_assistant'), $html);
     }
+
+    /**
+     * Every plugin setting as the database holds it: name => value, byte for byte.
+     *
+     * @return array
+     */
+    private function config_snapshot(): array {
+        global $DB;
+        return $DB->get_records_menu('config_plugins', ['plugin' => 'local_ai_course_assistant'], 'name ASC', 'name, value');
+    }
+
+    /** F2.1: a voice table forced in config.php is never written to the database, and the page shows it read-only. */
+    public function test_a_table_forced_in_config_php_is_never_written_and_renders_read_only(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        $dbcipher = secrets::conceal('sk-proj-VOICE-DB-ROW-1111-DBDB');
+        set_config('voice_providers', 'openai|' . $dbcipher . '|dbrow|shimmer|nova', 'local_ai_course_assistant');
+        $CFG->forced_plugin_settings['local_ai_course_assistant']['voice_providers'] =
+            "xai|xai-VOICE-FORCED-PLAIN-2222-FRCD|forcedrow|eve|eve";
+        try {
+            $setting = $this->setting();
+            $this->assertTrue($setting->is_readonly());
+            $before = $this->config_snapshot();
+
+            $posted = [];
+            foreach (voice_registry::parse_rows(false) as $r) {
+                $posted[] = $this->row($r['provider'], '', provider_keys::rowid($r['provider'] . '|' . $r['label'], $r['apikey']),
+                    $r['label'], $r['realtime_voice'], $r['tts_voice']);
+            }
+            $posted[] = $this->row('openai', 'sk-proj-VOICE-TYPED-FORCED-3333-TYPD', '', 'typedrow');
+            $this->assertSame('', $setting->write_setting(['rows' => $posted, 'present' => '1']));
+            $this->assertSame('', $setting->write_setting(['present' => '1']));
+            $this->assertSame('', $setting->write_setting(''));
+            $this->assertSame($before, $this->config_snapshot(), 'a save of a forced table writes nothing');
+            $this->assertStringNotContainsString('FORCED-PLAIN', implode("\n", $this->config_snapshot()));
+
+            $html = $setting->output_html('');
+            $this->assertStringNotContainsString('FORCED-PLAIN', $html);
+            $this->assertStringNotContainsString('VOICE-DB-ROW', $html);
+            $this->assertStringNotContainsString(substr($dbcipher, strpos($dbcipher, ':') + 1, 24), $html);
+            $this->assertStringNotContainsString('sodium:', $html);
+            $this->assertStringContainsString('forcedrow', $html, 'the forced row is shown');
+            $this->assertStringNotContainsString('dbrow', $html, 'and the database copy is not');
+            $this->assertStringContainsString('FRCD', $html, 'the saved flag and last four still show');
+            $this->assertStringContainsString(s(get_string('providerkeys:forced_note', 'local_ai_course_assistant')), $html);
+            foreach (['sola-kr-add', 'sola-kr-remove', 'sola-kr-change', 'sola-kr-newkey', '[newkey]', '[keepid]',
+                    '[present]', '<button', 'type="password"', '__IDX__'] as $control) {
+                $this->assertStringNotContainsString($control, $html, "no $control on a read-only table");
+            }
+            $dom = new \DOMDocument();
+            $previous = libxml_use_internal_errors(true);
+            $dom->loadHTML('<?xml encoding="utf-8"?><body>' . $html . '</body>');
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+            $controls = 0;
+            foreach (['input', 'select'] as $tag) {
+                foreach ($dom->getElementsByTagName($tag) as $control) {
+                    $controls++;
+                    $this->assertTrue($control->hasAttribute('disabled'), "a $tag on a read-only table is disabled");
+                }
+            }
+            $this->assertGreaterThan(3, $controls, 'the row was rendered, so the disabled check was not vacuous');
+        } finally {
+            unset($CFG->forced_plugin_settings['local_ai_course_assistant']['voice_providers']);
+        }
+    }
+
+    /** F2.1: the same table with nothing forced keeps its editor and still saves. */
+    public function test_a_table_that_is_not_forced_stays_editable(): void {
+        $this->resetAfterTest();
+        $setting = $this->setting();
+        $this->assertFalse($setting->is_readonly());
+        $this->assertSame('', $setting->write_setting(['rows' => [$this->row('openai', 'sk-proj-VOICE-OPEN-4444-OPEN', '', 'main')]]));
+        $this->assertSame('sk-proj-VOICE-OPEN-4444-OPEN', voice_registry::parse_rows(true)[0]['apikey']);
+        $html = $setting->output_html('');
+        foreach (['sola-kr-add', 'sola-kr-remove', 'sola-kr-change', 'sola-kr-newkey', '[newkey]', '[keepid]', '[present]'] as $control) {
+            $this->assertStringContainsString($control, $html);
+        }
+        $this->assertStringNotContainsString(s(get_string('providerkeys:forced_note', 'local_ai_course_assistant')), $html);
+    }
 }

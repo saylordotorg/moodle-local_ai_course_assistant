@@ -3709,3 +3709,4 @@ $string['providerkeys:err_voice_provider'] = '"{$a}" isn\'t a voice provider. Vo
 $string['providerkeys:last4_hint'] = 'Saved key ends in {$a}.';
 $string['providerkeys:saved_url_hint'] = 'A URL is saved.';
 $string['providerkeys:err_webhook_url'] = '{$a} must be a web address that starts with http:// or https:// and has no spaces. Nothing was saved.';
+$string['providerkeys:forced_note'] = 'This table is set in config.php, so it can\'t be changed here. Edit it in config.php instead.';

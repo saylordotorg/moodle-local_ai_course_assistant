@@ -19,6 +19,8 @@
 
     A table of rows with a secret key column. No key or ciphertext is ever in the context.
     The hidden present field makes the browser post the setting even when every row was removed.
+    A setting forced in config.php (readonly) shows its saved rows with every control disabled and no Add,
+    Change or Remove, and says so in a note.
     The example leaves the blank row empty because the lint renders without the row partial.
 
     @package    local_ai_course_assistant
@@ -27,16 +29,18 @@
 
     Example context (json):
     { "id": "id_s_x", "presentname": "s_x[present]", "heads": [ { "label": "Provider" }, { "label": "API key" } ],
-      "rows": [], "blankrow": [], "addlabel": "+ Add provider" }
+      "rows": [], "blankrow": [], "addlabel": "+ Add provider", "readonly": false,
+      "readonlynote": "This table is set in config.php, so it can't be changed here." }
 }}
 <div id="{{id}}-wrap" class="local-ai-course-assistant-keyed-rows">
-    <input type="hidden" name="{{presentname}}" value="1">
+    {{#readonly}}<p class="sola-kr-forced-note text-muted">{{readonlynote}}</p>{{/readonly}}
+    {{^readonly}}<input type="hidden" name="{{presentname}}" value="1">{{/readonly}}
     <table class="table table-sm table-bordered" style="max-width:960px">
-        <thead><tr>{{#heads}}<th>{{label}}</th>{{/heads}}<th style="width:50px"></th></tr></thead>
+        <thead><tr>{{#heads}}<th>{{label}}</th>{{/heads}}{{^readonly}}<th style="width:50px"></th>{{/readonly}}</tr></thead>
         <tbody>
             {{#rows}}{{> local_ai_course_assistant/admin_keyed_row}}{{/rows}}
-            <template class="sola-kr-blank">{{#blankrow}}{{> local_ai_course_assistant/admin_keyed_row}}{{/blankrow}}</template>
+            {{^readonly}}<template class="sola-kr-blank">{{#blankrow}}{{> local_ai_course_assistant/admin_keyed_row}}{{/blankrow}}</template>{{/readonly}}
         </tbody>
     </table>
-    <button type="button" class="btn btn-sm btn-outline-primary sola-kr-add">{{addlabel}}</button>
+    {{^readonly}}<button type="button" class="btn btn-sm btn-outline-primary sola-kr-add">{{addlabel}}</button>{{/readonly}}
 </div>

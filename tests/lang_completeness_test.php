@@ -293,6 +293,8 @@ final class lang_completeness_test extends \basic_testcase {
         'providerkeys:last4_hint',
         'providerkeys:saved_url_hint',
         'providerkeys:err_webhook_url',
+        // Security pass fix wave 2: the note on a table forced in config.php.
+        'providerkeys:forced_note',
     ];
 
     /**
