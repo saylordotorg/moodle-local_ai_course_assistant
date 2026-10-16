@@ -30,6 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 if ($hassiteconfig) {
     // v7.8.1: show what the previous save changed, by setting name.
     \local_ai_course_assistant\settings_save_report::flush();
+    // v7.9.0: the one-time notice the upgrade leaves when it found two different keys for one provider.
+    \local_ai_course_assistant\provider_keys::flush_notice();
 
     // Read plugin version for the banner text.
     $pluginfo   = core_plugin_manager::instance()->get_plugin_info('local_ai_course_assistant');
@@ -296,6 +298,29 @@ if ($hassiteconfig) {
         get_string('settings:provider_heading_desc', 'local_ai_course_assistant'),
     ));
 
+    // v7.9.0: every provider's key lives in this table. The default provider uses the key of its own row,
+    // and the legacy apikey setting is kept as an automatic mirror of that key (provider_keys::sync_default_key).
+    // The two headings are named without the word "key": settings_secret_masking_test treats any setting whose
+    // name contains it as a credential.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/providertable_heading',
+        get_string('providerkeys:heading', 'local_ai_course_assistant'),
+        get_string('providerkeys:heading_desc', 'local_ai_course_assistant')
+    ));
+    $providertable = new \local_ai_course_assistant\admin_setting_provider_keys(
+        'local_ai_course_assistant/comparison_providers',
+        get_string('providerkeys:table', 'local_ai_course_assistant'),
+        get_string('providerkeys:table_desc', 'local_ai_course_assistant')
+    );
+    $providertable->set_updatedcallback('local_ai_course_assistant\provider_keys::after_settings_saved');
+    $settings->add($providertable);
+
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/providerdefault_heading',
+        get_string('providerkeys:default_heading', 'local_ai_course_assistant'),
+        get_string('providerkeys:default_heading_desc', 'local_ai_course_assistant')
+    ));
+
     $providers = [
         'auto' => get_string('settings:provider_auto', 'local_ai_course_assistant'),
         'claude' => get_string('settings:provider_claude', 'local_ai_course_assistant'),
@@ -311,7 +336,7 @@ if ($hassiteconfig) {
         'coreai' => get_string('settings:provider_coreai', 'local_ai_course_assistant'),
         'custom' => get_string('settings:provider_custom', 'local_ai_course_assistant'),
     ];
-    $settings->add(new admin_setting_configselect(
+    $providersetting = new admin_setting_configselect(
         'local_ai_course_assistant/provider',
         get_string('settings:provider', 'local_ai_course_assistant'),
         // branding::str(), not get_string(): this description carries a
@@ -319,20 +344,21 @@ if ($hassiteconfig) {
         \local_ai_course_assistant\branding::str('settings:provider_desc'),
         'auto',
         $providers
-    ));
+    );
+    $providersetting->set_updatedcallback('local_ai_course_assistant\provider_keys::after_settings_saved');
+    $settings->add($providersetting);
 
-    $settings->add(new admin_setting_encryptedpassword(
-        'local_ai_course_assistant/apikey',
-        get_string('settings:apikey', 'local_ai_course_assistant'),
-        get_string('settings:apikey_desc', 'local_ai_course_assistant')
-    ));
+    // The "API Key" field that stood here is gone: apikey is now an automatic mirror of the default
+    // provider's row key, so there is one place to paste a key (secrets::NOT_ON_SETTINGS_PAGE).
 
-    $settings->add(new admin_setting_configtext(
+    $modelsetting = new admin_setting_configtext(
         'local_ai_course_assistant/model',
         get_string('settings:model', 'local_ai_course_assistant'),
         get_string('settings:model_desc_dynamic', 'local_ai_course_assistant'),
         ''
-    ));
+    );
+    $modelsetting->set_updatedcallback('local_ai_course_assistant\provider_keys::after_settings_saved');
+    $settings->add($modelsetting);
 
     // v6.9.5: which Anthropic models accept `temperature`. An ALLOW-list —
     // an unlisted model has temperature omitted, which is safe, rather than
@@ -350,12 +376,14 @@ if ($hassiteconfig) {
         PARAM_RAW
     ));
 
-    $settings->add(new admin_setting_configtext(
+    $baseurlsetting = new admin_setting_configtext(
         'local_ai_course_assistant/apibaseurl',
         get_string('settings:apibaseurl', 'local_ai_course_assistant'),
         get_string('settings:apibaseurl_desc', 'local_ai_course_assistant'),
         ''
-    ));
+    );
+    $baseurlsetting->set_updatedcallback('local_ai_course_assistant\provider_keys::after_settings_saved');
+    $settings->add($baseurlsetting);
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/temperature',
@@ -677,12 +705,6 @@ if ($hassiteconfig) {
         get_string('settings:profile_update_interval_desc', 'local_ai_course_assistant'),
         '10',
         PARAM_INT
-    ));
-
-    $settings->add(new \local_ai_course_assistant\admin_setting_comparison_providers(
-        'local_ai_course_assistant/comparison_providers',
-        get_string('settings:comparison_providers', 'local_ai_course_assistant'),
-        get_string('settings:comparison_providers_desc', 'local_ai_course_assistant')
     ));
 
     $settings->add(new admin_setting_configcheckbox(

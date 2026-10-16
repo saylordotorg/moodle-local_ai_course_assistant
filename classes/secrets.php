@@ -44,6 +44,9 @@ class secrets {
     /** Avatar providers whose key and webhook secret are secrets. */
     const AVATAR_PROVIDERS = ['did', 'heygen', 'tavus', 'synthesia'];
 
+    /** Declared in names() and encrypted, but not a field on the settings page: apikey is an automatic mirror of the default provider's row key (provider_keys::sync_default_key). */
+    public const NOT_ON_SETTINGS_PAGE = ['apikey'];
+
     /**
      * Every setting that holds a secret.
      *

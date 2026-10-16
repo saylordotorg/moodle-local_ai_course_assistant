@@ -53,10 +53,14 @@ final class secrets_test extends \advanced_testcase {
             }
         }
         sort($encrypted);
-        $names = secrets::names();
+        $names = array_values(array_diff(secrets::names(), secrets::NOT_ON_SETTINGS_PAGE));
         sort($names);
         $this->assertSame([], $masked, 'masked-but-plain-text key settings remain');
         $this->assertSame($names, $encrypted);
+        // The exemption can't rot into a way of silencing the test: every entry is still a declared secret,
+        // and none of them has come back onto the page.
+        $this->assertSame([], array_diff(secrets::NOT_ON_SETTINGS_PAGE, secrets::names()));
+        $this->assertSame([], array_intersect(secrets::NOT_ON_SETTINGS_PAGE, $encrypted));
     }
 
     /**
