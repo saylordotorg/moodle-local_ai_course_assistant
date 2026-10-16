@@ -38,6 +38,27 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
     }
 
     /**
+     * The value in the database, bypassing get_config() (which returns a value forced in config.php).
+     *
+     * @param string $name
+     * @return string '' when the row is absent
+     */
+    private function dbvalue(string $name): string {
+        global $DB;
+        return (string) ($DB->get_field('config_plugins', 'value',
+            ['plugin' => 'local_ai_course_assistant', 'name' => $name]) ?: '');
+    }
+
+    /**
+     * The stored table, one entry per line.
+     *
+     * @return string[]
+     */
+    private function lines(): array {
+        return explode("\n", $this->stored());
+    }
+
+    /**
      * Rows for a provider with their keys revealed, in stored order.
      *
      * @param string $provider
@@ -122,14 +143,57 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
     public function test_a_table_forced_in_config_php_is_untouched(): void {
         global $CFG;
         $this->resetAfterTest();
+        $plain = 'openai|sk-proj-DB-PLAIN-ROW-0000-1111|m';
+        $this->cfg('comparison_providers', $plain);
         $CFG->forced_plugin_settings['local_ai_course_assistant']['comparison_providers'] =
             'openai|sk-proj-FORCED-ROW-8888-HHHH|m';
-        $this->cfg('provider', 'openai');
-        $this->cfg('apikey', secrets::conceal('sk-proj-ANOTHER-KEY-9999-IIII'));
-        $summary = provider_keys::upgrade();
-        $this->assertSame(0, $summary['encrypted']);
-        $this->assertSame('', $summary['row_added']);
-        unset($CFG->forced_plugin_settings['local_ai_course_assistant']['comparison_providers']);
+        try {
+            $this->cfg('provider', 'openai');
+            $this->cfg('apikey', secrets::conceal('sk-proj-ANOTHER-KEY-9999-IIII'));
+            $summary = provider_keys::upgrade();
+            $this->assertSame(0, $summary['encrypted']);
+            $this->assertSame('', $summary['row_added']);
+            $this->assertSame($plain, $this->dbvalue('comparison_providers'), 'the database value is not rewritten');
+        } finally {
+            unset($CFG->forced_plugin_settings['local_ai_course_assistant']['comparison_providers']);
+        }
+    }
+
+    /** A key forced in config.php is kept out of the database on purpose; the upgrade must not copy it in. */
+    public function test_a_forced_apikey_is_never_copied_into_a_new_row(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        $CFG->forced_plugin_settings['local_ai_course_assistant']['apikey'] = 'sk-proj-FORCED-SITE-KEY-1212-3434';
+        try {
+            $this->cfg('provider', 'openai');
+            $this->cfg('comparison_providers', '');
+            $summary = provider_keys::upgrade();
+            $this->assertSame('', $summary['row_added']);
+            $this->assertSame('', $summary['conflict']);
+            $this->assertSame('', $this->stored(), 'no entry for the provider');
+            $this->assertSame('', $this->dbvalue('comparison_providers'));
+            $this->assertSame('', $this->dbvalue('apikey'), 'the forced key is not written either');
+        } finally {
+            unset($CFG->forced_plugin_settings['local_ai_course_assistant']['apikey']);
+        }
+    }
+
+    public function test_a_forced_apikey_never_overwrites_an_existing_row_and_sets_no_notice(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        $CFG->forced_plugin_settings['local_ai_course_assistant']['apikey'] = 'sk-proj-FORCED-SITE-KEY-1212-3434';
+        try {
+            $this->cfg('provider', 'openai');
+            $this->cfg('comparison_providers', 'openai|sk-proj-ROW-KEEP-KEY-5555-6666|m');
+            $summary = provider_keys::upgrade();
+            $this->assertSame('', $summary['conflict']);
+            $this->assertSame('', $summary['row_added']);
+            $this->assertSame('sk-proj-ROW-KEEP-KEY-5555-6666', provider_keys::key_for('openai'));
+            $this->assertFalse(get_config('local_ai_course_assistant', 'provider_keys_notice'));
+            $this->assertCount(1, $this->rows_of('openai'));
+        } finally {
+            unset($CFG->forced_plugin_settings['local_ai_course_assistant']['apikey']);
+        }
     }
 
     public function test_running_it_twice_changes_nothing(): void {
@@ -252,5 +316,113 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
         $this->assertSame($first, $this->stored());
         $this->assertSame('', $again['row_added']);
         $this->assertSame('', $again['conflict']);
+    }
+
+    /** The upgrade edits the stored text; it never rebuilds a line it was not asked to change. */
+    public function test_appending_a_row_leaves_every_existing_line_as_it_was(): void {
+        $this->resetAfterTest();
+        $comment = '# openai|sk-parked-comment-key|m';
+        $this->cfg('provider', 'gemini');
+        $this->cfg('apikey', secrets::conceal('AIzaDEFAULT-GEMINI-3333-CCCC'));
+        $this->cfg('comparison_providers', "openai\n" . $comment
+            . "\nClaude|sk-ant-MIXED-CASE-KEY-1111-AAAA|m|0.3|https://c.example|extra");
+        $summary = provider_keys::upgrade();
+
+        $this->assertSame('gemini', $summary['row_added']);
+        $lines = $this->lines();
+        $this->assertCount(4, $lines);
+        $this->assertSame('openai', $lines[0], 'a one-column line stays a one-column line');
+        $this->assertSame($comment, $lines[1], 'a comment line stays, byte for byte');
+        $claude = explode('|', $lines[2]);
+        $this->assertSame(['Claude', 'm', '0.3', 'https://c.example', 'extra'],
+            array_merge([$claude[0]], array_slice($claude, 2)), 'label case and every other column are kept');
+        $this->assertTrue(secrets::is_encrypted($claude[1]));
+        $this->assertSame('sk-ant-MIXED-CASE-KEY-1111-AAAA', secrets::reveal($claude[1]));
+        $added = explode('|', $lines[3]);
+        $this->assertSame('gemini', $added[0]);
+        $this->assertSame('AIzaDEFAULT-GEMINI-3333-CCCC', secrets::reveal($added[1]));
+        $this->assertSame('', $added[2]);
+        $this->assertNull(provider_keys::row_for('openai'), 'the one-column line did not become a row');
+        $first = $this->stored();
+        provider_keys::upgrade();
+        $this->assertSame($first, $this->stored(), 'a second run leaves the string byte-identical');
+    }
+
+    public function test_resolving_a_conflict_changes_only_the_key_field_of_that_line(): void {
+        $this->resetAfterTest();
+        $comment = '# openai|sk-parked-comment-key|m';
+        $this->cfg('provider', 'claude');
+        $this->cfg('apibaseurl', 'https://c.example');
+        $this->cfg('apikey', secrets::conceal('sk-ant-CURRENT-KEY-2222-BBBB'));
+        $this->cfg('comparison_providers', "openai\n" . $comment
+            . "\nClaude|sk-ant-MIXED-CASE-KEY-1111-AAAA|m|0.3|https://c.example|extra");
+        $summary = provider_keys::upgrade();
+
+        $this->assertSame('', $summary['row_added']);
+        $this->assertStringContainsString('AAAA', $summary['conflict']);
+        $this->assertStringContainsString('BBBB', $summary['conflict']);
+        $lines = $this->lines();
+        $this->assertCount(3, $lines);
+        $this->assertSame('openai', $lines[0]);
+        $this->assertSame($comment, $lines[1]);
+        $claude = explode('|', $lines[2]);
+        $this->assertSame(['Claude', 'm', '0.3', 'https://c.example', 'extra'],
+            array_merge([$claude[0]], array_slice($claude, 2)), 'only the key field was swapped');
+        $this->assertSame('sk-ant-CURRENT-KEY-2222-BBBB', secrets::reveal($claude[1]));
+        $this->assertNull(provider_keys::row_for('openai'));
+        $first = $this->stored();
+        $again = provider_keys::upgrade();
+        $this->assertSame($first, $this->stored(), 'a second run leaves the string byte-identical');
+        $this->assertSame('', $again['conflict']);
+    }
+
+    /** The line it swaps is the one stored_rows() calls that row, however many non-rows come before it. */
+    public function test_a_conflict_swap_finds_its_row_past_blank_comment_and_providerless_lines(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('apikey', secrets::conceal('sk-proj-CURRENT-KEY-0000-3333'));
+        $this->cfg('comparison_providers', "# a comment\n\n|sk-orphan-KEY-0000-1111|m\n"
+            . "openai|sk-proj-OLDKEY-KEY-0000-2222|m");
+        $summary = provider_keys::upgrade();
+
+        $this->assertStringContainsString('2222', $summary['conflict']);
+        $lines = $this->lines();
+        $this->assertCount(4, $lines);
+        $this->assertSame('# a comment', $lines[0]);
+        $this->assertSame('', $lines[1]);
+        $orphan = explode('|', $lines[2]);
+        $this->assertSame('', $orphan[0]);
+        $this->assertSame('sk-orphan-KEY-0000-1111', secrets::reveal($orphan[1]), 'the providerless line keeps its key');
+        $this->assertSame('m', $orphan[2]);
+        $this->assertSame('sk-proj-CURRENT-KEY-0000-3333', secrets::reveal(explode('|', $lines[3])[1]));
+        $this->assertSame('sk-proj-CURRENT-KEY-0000-3333', provider_keys::key_for('openai'));
+    }
+
+    public function test_a_table_that_ends_in_a_newline_gets_the_new_row_without_a_blank_line(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'gemini');
+        $this->cfg('apikey', secrets::conceal('AIzaDEFAULT-GEMINI-3333-CCCC'));
+        $this->cfg('comparison_providers', "claude|" . secrets::conceal('sk-ant-CLAUDE-ROW-2222-BBBB') . "|c\n");
+        provider_keys::upgrade();
+        $lines = $this->lines();
+        $this->assertCount(2, $lines, 'the existing trailing newline is the separator');
+        $this->assertStringStartsWith('claude|', $lines[0]);
+        $this->assertStringStartsWith('gemini|', $lines[1]);
+    }
+
+    /**
+     * R16. A crash between the two writes must not lose the notice, so the notice goes first. The two
+     * set_config() calls can't be observed from outside, so this reads the order from the method's source.
+     */
+    public function test_the_notice_is_saved_before_the_table_is_rewritten(): void {
+        $method = new \ReflectionMethod(provider_keys::class, 'upgrade');
+        $lines = file($method->getFileName());
+        $source = implode('', array_slice($lines, $method->getStartLine() - 1,
+            $method->getEndLine() - $method->getStartLine() + 1));
+        $notice = strpos($source, "set_config('provider_keys_notice'");
+        $table = strrpos($source, 'set_config(self::SETTING');
+        $this->assertNotFalse($notice);
+        $this->assertNotFalse($table);
+        $this->assertLessThan($table, $notice, 'the notice is written before the last table write');
     }
 }

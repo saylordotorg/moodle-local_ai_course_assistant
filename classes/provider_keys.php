@@ -322,7 +322,12 @@ class provider_keys {
      *    one from apikey, carrying the site's base URL so a failover never sends a gateway key to the real
      *    vendor. If it has one for the same destination with a DIFFERENT key, chat was using apikey, so the
      *    row takes apikey's value and a one-time notice names the two last-four values. A keyed row for the
-     *    same provider but another base URL is a different destination and is left alone.
+     *    same provider but another base URL is a different destination and is left alone. Skipped when
+     *    apikey is forced in config.php: that key is kept out of the database on purpose.
+     *
+     * Existing lines are edited as text, never rebuilt from the parsed rows. A one-column line, a comment
+     * line, a label's case and any column past the fifth stay exactly as the admin wrote them; only a key
+     * field is ever encrypted or swapped, and a new row is one line appended at the end.
      *
      * Nothing it writes or reports contains a key: the notice and the summary carry last-four values only.
      *
@@ -341,6 +346,11 @@ class provider_keys {
             set_config(self::SETTING, $concealed, self::PLUGIN);
             $summary['encrypted'] = 1;
         }
+        if (array_key_exists('apikey', $forced)) {
+            // get_config() returns a forced key, so going on would copy it into the table and leave a stale
+            // copy behind when config.php is rotated. The forced key stays where the admin put it.
+            return $summary;
+        }
         $legacy = secrets::get('apikey');
         $provider = self::site_provider();
         if ($legacy === '' || $provider === '' || in_array($provider, self::KEYLESS, true)) {
@@ -357,18 +367,51 @@ class provider_keys {
         }
         $rowkey = $found === null ? '' : secrets::reveal($rows[$found]['stored_key']);
         if ($found === null) {
-            $rows[] = ['provider' => $provider, 'stored_key' => secrets::conceal($legacy), 'models' => '',
-                'temperature' => '', 'baseurl' => $baseurl];
-            set_config(self::SETTING, self::serialize($rows), self::PLUGIN);
+            $line = self::serialize([['provider' => $provider, 'stored_key' => secrets::conceal($legacy), 'models' => '',
+                'temperature' => '', 'baseurl' => $baseurl]]);
+            $separator = ($concealed === '' || substr($concealed, -1) === "\n") ? '' : "\n";
+            set_config(self::SETTING, $concealed . $separator . $line, self::PLUGIN);
             $summary['row_added'] = $provider;
         } else if ($rowkey !== $legacy) {
             $summary['conflict'] = $provider . ': the row ended in ' . self::last4($rowkey)
                 . ' and the default key ends in ' . self::last4($legacy);
-            $rows[$found]['stored_key'] = secrets::conceal($legacy);
-            set_config(self::SETTING, self::serialize($rows), self::PLUGIN);
+            // The notice first, so a crash between the two writes can't lose it (a re-run finds the same conflict).
             set_config('provider_keys_notice', $summary['conflict'], self::PLUGIN);
+            set_config(self::SETTING, self::with_row_key($concealed, $found, secrets::conceal($legacy)), self::PLUGIN);
         }
         return $summary;
+    }
+
+    /**
+     * Replace the key field of one row in a stored table and leave every other character as it was.
+     *
+     * The index counts rows the way stored_rows() does (blank lines, comment lines and lines with no
+     * provider are not rows), so it is the index stored_rows() reports. Keep the two in step.
+     *
+     * @param string $text the stored table
+     * @param int $index row index as reported by stored_rows()
+     * @param string $stored the new value for the key column (already concealed)
+     * @return string the table with that one key field replaced
+     */
+    private static function with_row_key(string $text, int $index, string $stored): string {
+        $lines = preg_split("/\r?\n/", $text);
+        $seen = 0;
+        foreach ($lines as $n => $line) {
+            $line = trim($line);
+            if ($line === '' || $line[0] === '#') {
+                continue;
+            }
+            $parts = array_map('trim', explode('|', $line));
+            if ($parts[0] === '') {
+                continue;
+            }
+            if ($seen++ === $index) {
+                $parts[1] = $stored;
+                $lines[$n] = implode('|', $parts);
+                break;
+            }
+        }
+        return implode("\n", $lines);
     }
 
     /**
