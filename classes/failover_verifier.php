@@ -75,13 +75,19 @@ class failover_verifier {
     }
 
     /**
-     * The comparison_providers rows, keyed by lowercase label (first row wins).
+     * The comparison_providers rows that can serve chat, keyed by lowercase label (first row wins).
+     *
+     * A key-only provider's row (voyage: Embedding and Rerank) is left out, as the pickers leave it out, so a
+     * chat line naming one reads as having no row.
      *
      * @return array<string, array{label: string, haskey: bool, model: string, baseurl: string}>
      */
     public static function rows(): array {
         $rows = [];
         foreach (provider_keys::by_label() as $key => $row) {
+            if (in_array($key, provider_keys::KEY_ONLY_PROVIDERS, true)) {
+                continue;
+            }
             $rows[$key] = [
                 'label'   => $row['label'],
                 'haskey'  => $row['haskey'],

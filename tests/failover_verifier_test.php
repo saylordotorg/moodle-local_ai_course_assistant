@@ -75,6 +75,28 @@ final class failover_verifier_test extends \advanced_testcase {
         $this->assertStringContainsString('no row', $problems[0]);
     }
 
+    /** F3.3: voyage is a key for Embedding and Rerank only, so it is never a chat backup, whatever the chain says. */
+    public function test_a_chat_line_naming_a_key_only_provider_has_no_usable_row(): void {
+        $this->resetAfterTest();
+        $this->configure("voyage|pa-VOYAGE-KEY-1111-AAAA|rerank-2.5||", "chat:voyage");
+        set_config('failover_per_call_enabled', 1, 'local_ai_course_assistant');
+        $problems = failover_verifier::static_problems();
+        $this->assertCount(2, $problems);
+        $this->assertStringContainsString('chat:voyage', $problems[0]);
+        $this->assertStringContainsString('no row', $problems[0]);
+        $this->assertSame(get_string('verify:no_backup', 'local_ai_course_assistant'), $problems[1],
+            'and it does not count as a resolvable backup');
+        $this->assertArrayNotHasKey('voyage', failover_verifier::rows());
+    }
+
+    public function test_a_key_only_row_does_not_hide_the_real_backup_or_add_a_problem(): void {
+        $this->resetAfterTest();
+        $this->configure("voyage|pa-VOYAGE-KEY-1111-AAAA|rerank-2.5||\nopenai|sk-test-key-1|gpt-4o-mini||", "chat:openai");
+        set_config('failover_per_call_enabled', 1, 'local_ai_course_assistant');
+        $this->assertSame([], failover_verifier::static_problems());
+        $this->assertSame(['openai'], array_keys(failover_verifier::rows()));
+    }
+
     public function test_a_row_without_a_key_is_reported(): void {
         $this->resetAfterTest();
         $this->configure("openai||gpt-4o-mini||", "chat:openai");
