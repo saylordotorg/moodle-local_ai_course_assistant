@@ -29,6 +29,14 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
     /** @var string A gateway base URL used by the gateway tests. */
     private const GATEWAY = 'https://gateway.example.test/v1';
 
+    /**
+     * A test that pretends to be a web request must not leave that on for the next one, however it ends.
+     */
+    protected function tearDown(): void {
+        settings_save_report::assume_web(null);
+        parent::tearDown();
+    }
+
     private function cfg(string $name, string $value): void {
         set_config($name, $value, 'local_ai_course_assistant');
     }
@@ -295,6 +303,7 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
 
     public function test_a_conflict_leaves_a_one_time_notice_that_names_no_key(): void {
         $this->resetAfterTest();
+        settings_save_report::assume_web(true);
         $this->cfg('provider', 'openai');
         $this->cfg('apikey', secrets::conceal('sk-proj-PRIMARY-KEY-3030-LLLL'));
         $this->cfg('comparison_providers', "openai|sk-proj-OLDROW-KEY-4040-MMMM|m");
@@ -314,9 +323,53 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
         $this->assertNull($this->notice(), 'and forgotten');
     }
 
+    /**
+     * F2.3: admin/cli/upgrade.php runs admin_apply_default_settings(), which includes settings.php (and so
+     * flush_notice()) right after the upgrade step wrote the notice. A CLI request has no admin to show it
+     * to, and what it queued would die with its session, so the notice has to stay for the next web page.
+     */
+    public function test_a_cli_request_keeps_the_notice_for_the_next_admin_page(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('apikey', secrets::conceal('sk-proj-PRIMARY-KEY-3030-LLLL'));
+        $this->cfg('comparison_providers', "openai|sk-proj-OLDROW-KEY-4040-MMMM|m");
+        provider_keys::upgrade();
+        $raw = get_config('local_ai_course_assistant', 'provider_keys_notice');
+        $this->assertNotFalse($raw, 'the upgrade left a notice');
+        $this->assertTrue(CLI_SCRIPT, 'PHPUnit is a CLI request, as the upgrade script is');
+
+        provider_keys::flush_notice();
+        $this->assertCount(0, \core\notification::fetch(), 'nothing is queued into a CLI session');
+        $this->assertSame($raw, get_config('local_ai_course_assistant', 'provider_keys_notice'), 'and the notice is still there');
+
+        settings_save_report::assume_web(true);
+        provider_keys::flush_notice();
+        $this->assertCount(1, \core\notification::fetch(), 'the next web page shows it');
+        $this->assertFalse(get_config('local_ai_course_assistant', 'provider_keys_notice'), 'once');
+    }
+
+    /** F2.3: a web request that is part of the upgrade itself (the admin pages run while it is under way) waits too. */
+    public function test_a_web_request_during_an_upgrade_keeps_the_notice(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        settings_save_report::assume_web(true);
+        $notice = json_encode(['provider' => 'openai', 'rowlast4' => 'MMMM', 'defaultlast4' => 'LLLL']);
+        $this->cfg('provider_keys_notice', $notice);
+        $CFG->upgraderunning = time() + 300;
+        provider_keys::flush_notice();
+        $this->assertCount(0, \core\notification::fetch(), 'nothing is shown while the upgrade runs');
+        $this->assertSame($notice, get_config('local_ai_course_assistant', 'provider_keys_notice'), 'and it is kept');
+
+        unset($CFG->upgraderunning);
+        provider_keys::flush_notice();
+        $this->assertCount(1, \core\notification::fetch(), 'it shows once the upgrade is over');
+        $this->assertFalse(get_config('local_ai_course_assistant', 'provider_keys_notice'));
+    }
+
     /** The notice is ONE translatable string: the product name comes from the branding tokens, not from code. */
     public function test_the_notice_uses_the_configured_product_name(): void {
         $this->resetAfterTest();
+        settings_save_report::assume_web(true);
         $this->cfg('short_name', 'ACMEBOT');
         $this->cfg('provider', 'openai');
         $this->cfg('apikey', secrets::conceal('sk-proj-PRIMARY-KEY-3030-LLLL'));
@@ -338,6 +391,7 @@ final class provider_keys_upgrade_test extends \advanced_testcase {
      */
     public function test_an_old_or_malformed_notice_shows_nothing_and_is_forgotten(string $value): void {
         $this->resetAfterTest();
+        settings_save_report::assume_web(true);
         $this->cfg('provider_keys_notice', $value);
         provider_keys::flush_notice();
         $this->assertCount(0, \core\notification::fetch());

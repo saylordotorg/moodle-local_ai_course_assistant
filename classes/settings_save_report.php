@@ -66,11 +66,12 @@ class settings_save_report {
     }
 
     /**
-     * Only a person saving in the admin UI should see or leave a notice.
+     * Only a person saving in the admin UI should see or leave a notice. Also used by the one-time upgrade
+     * notice (provider_keys::flush_notice()), so it shares the test override above.
      *
      * @return bool
      */
-    private static function is_web_request(): bool {
+    public static function is_web_request(): bool {
         return self::$assumeweb ?? !(CLI_SCRIPT || (defined('AJAX_SCRIPT') && AJAX_SCRIPT));
     }
 

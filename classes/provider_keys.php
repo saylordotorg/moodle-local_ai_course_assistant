@@ -476,9 +476,18 @@ class provider_keys {
      * The stored value is JSON: {provider, rowlast4, defaultlast4}. Anything else (the English sentence an
      * earlier build stored, a damaged value) shows nothing; it is still forgotten.
      *
+     * Only a web request outside an upgrade shows it, and the value is left untouched otherwise.
+     * admin/cli/upgrade.php runs admin_apply_default_settings(), which includes settings.php (and so this)
+     * straight after the upgrade step wrote the notice: showing it there would queue it into the CLI's
+     * throwaway session and forget it before any administrator could see it.
+     *
      * @return void
      */
     public static function flush_notice(): void {
+        global $CFG;
+        if (!settings_save_report::is_web_request() || !empty($CFG->upgraderunning)) {
+            return;
+        }
         $raw = (string) get_config(self::PLUGIN, 'provider_keys_notice');
         if ($raw === '') {
             return;
