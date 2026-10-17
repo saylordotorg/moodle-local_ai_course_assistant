@@ -162,7 +162,7 @@ All admin pages live under one hub: **Site administration → Plugins → Local 
 ### Required Settings
 1. **Enable Plugin:** Turn on the AI Course Assistant
 2. **Providers and keys:** Add a row for your provider and paste its API key. Keys are encrypted at rest and never shown again, only their last four characters (see API Key Handling)
-3. **AI Provider:** Choose the default provider (Claude, OpenAI, etc.). Chat uses the key of that provider's row
+3. **AI Provider:** Choose the default provider (Claude, OpenAI, etc.). Chat uses the key of that provider's row only when the row's base URL is the same as **API Base URL** (both compared with spaces trimmed; both empty is the normal case). If you give the row a base URL of its own that differs, and no keyed row matches, the next admin page after a save warns that chat still uses the previous default key
 4. **Model:** Select the model (e.g., gemini-2.5-flash, gpt-4o-mini, claude-sonnet-5-5)
 
 ### Recommended Settings
