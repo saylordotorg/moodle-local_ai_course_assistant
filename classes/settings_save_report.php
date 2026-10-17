@@ -47,7 +47,11 @@ class settings_save_report {
     private const SHOWN = 48;
 
     /** @var string[] Settings whose change is worth a warning on its own. */
-    private const KEY_SETTINGS = ['provider', 'model', 'apikey', 'failover_per_call_enabled', 'support_enabled'];
+    private const KEY_SETTINGS = ['provider', 'model', 'apikey', 'comparison_providers', 'voice_providers',
+        'failover_per_call_enabled', 'support_enabled'];
+
+    /** @var string[] Tables whose rows carry a key. The log holds them with the key column masked. */
+    private const KEYED_TABLES = [provider_keys::SETTING, 'voice_providers'];
 
     /** @var ?bool Tests set this; the PHPUnit runner is a CLI request. */
     private static ?bool $assumeweb = null;
@@ -62,11 +66,12 @@ class settings_save_report {
     }
 
     /**
-     * Only a person saving in the admin UI should see or leave a notice.
+     * Only a person saving in the admin UI should see or leave a notice. Also used by the one-time upgrade
+     * notice (provider_keys::flush_notice()), so it shares the test override above.
      *
      * @return bool
      */
-    private static function is_web_request(): bool {
+    public static function is_web_request(): bool {
         return self::$assumeweb ?? !(CLI_SCRIPT || (defined('AJAX_SCRIPT') && AJAX_SCRIPT));
     }
 
@@ -114,6 +119,7 @@ class settings_save_report {
                 );
             }
         }
+        self::emit_default_provider_warnings($pending);
         $report = self::describe($pending);
         if ($report['changed'] === 0) {
             return;
@@ -122,6 +128,30 @@ class settings_save_report {
             $report['message'],
             $report['warn'] ? \core\notification::WARNING : \core\notification::INFO
         );
+    }
+
+    /**
+     * Warn when a save may have left the default provider without a key.
+     *
+     * Raised once per flush, and only when the save touched one of the four settings that decide which key
+     * chat uses (the default provider, its model, the gateway URL, or the provider table). The words come
+     * from provider_keys::default_provider_warnings(), which reads the settings as they are now. Moodle runs
+     * a setting's updated-callback while the save is still half done, so the warnings are read here instead,
+     * on the next page, when every value is final.
+     *
+     * @param array $pending Setting name => [old value, new value].
+     * @return int how many warnings were raised
+     */
+    public static function emit_default_provider_warnings(array $pending): int {
+        $names = ['provider', 'model', 'apibaseurl', 'comparison_providers'];
+        if (!array_intersect_key($pending, array_flip($names))) {
+            return 0;
+        }
+        $warnings = provider_keys::default_provider_warnings();
+        foreach ($warnings as $warning) {
+            \core\notification::warning($warning);
+        }
+        return count($warnings);
     }
 
     /**
@@ -168,11 +198,31 @@ class settings_save_report {
      * @return string HTML
      */
     private static function change_text(string $name, ?string $old, ?string $new): string {
-        if (config_log_audit::is_secret_name($name)) {
+        // A secret by its listing in secrets::names() or by the look of its name: a webhook URL or an access
+        // key id has no "key", "token" or "secret" in a name the second test would match.
+        if (secrets::is_secret($name) || config_log_audit::is_secret_name($name)) {
             return get_string('savereport:secret', 'local_ai_course_assistant');
+        }
+        $oldhadcr = false;
+        if (in_array($name, self::KEYED_TABLES, true)) {
+            // The two tables reach the log with every key blanked when an admin saves them, so this is normally
+            // a no-op. It is a second line of defence for any writer that logs a table whole (set_config() with
+            // logging on, say): the first 48 characters of a row are the provider and the start of its key.
+            // Blank the key column here as well, so no path to this notice can show one.
+            global $CFG;
+            require_once($CFG->libdir . '/adminlib.php');
+            $redact = $name === provider_keys::SETTING ? admin_setting_provider_keys::class : admin_setting_keyed_rows::class;
+            $oldhadcr = strpos((string) $old, "\r") !== false;
+            $old = $redact::redact_keys($old);
+            $new = $redact::redact_keys($new);
         }
         $norm = static fn(?string $v): string => trim(str_replace("\r\n", "\n", (string) $v));
         if ($norm($old) === $norm($new)) {
+            // The provider and voice tables reach the log with every key blanked, so equal text there means
+            // only a key changed, unless the old value had Windows line endings.
+            if (in_array($name, self::KEYED_TABLES, true) && !$oldhadcr) {
+                return get_string('savereport:keychanged', 'local_ai_course_assistant');
+            }
             return get_string('savereport:lineendings', 'local_ai_course_assistant');
         }
         return self::show($old) . ' &rarr; ' . self::show($new);

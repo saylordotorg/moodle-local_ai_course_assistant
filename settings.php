@@ -30,6 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 if ($hassiteconfig) {
     // v7.8.1: show what the previous save changed, by setting name.
     \local_ai_course_assistant\settings_save_report::flush();
+    // v7.9.0: the one-time notice the upgrade leaves when it found two different keys for one provider.
+    \local_ai_course_assistant\provider_keys::flush_notice();
 
     // Read plugin version for the banner text.
     $pluginfo   = core_plugin_manager::instance()->get_plugin_info('local_ai_course_assistant');
@@ -296,6 +298,29 @@ if ($hassiteconfig) {
         get_string('settings:provider_heading_desc', 'local_ai_course_assistant'),
     ));
 
+    // v7.9.0: every provider's key lives in this table. The default provider uses the key of its own row,
+    // and the legacy apikey setting is kept as an automatic mirror of that key (provider_keys::sync_default_key).
+    // The two headings are named without the word "key": settings_secret_masking_test treats any setting whose
+    // name contains it as a credential.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/providertable_heading',
+        get_string('providerkeys:heading', 'local_ai_course_assistant'),
+        get_string('providerkeys:heading_desc', 'local_ai_course_assistant')
+    ));
+    $providertable = new \local_ai_course_assistant\admin_setting_provider_keys(
+        'local_ai_course_assistant/comparison_providers',
+        get_string('providerkeys:table', 'local_ai_course_assistant'),
+        get_string('providerkeys:table_desc', 'local_ai_course_assistant')
+    );
+    $providertable->set_updatedcallback('local_ai_course_assistant\provider_keys::after_settings_saved');
+    $settings->add($providertable);
+
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/providerdefault_heading',
+        get_string('providerkeys:default_heading', 'local_ai_course_assistant'),
+        get_string('providerkeys:default_heading_desc', 'local_ai_course_assistant')
+    ));
+
     $providers = [
         'auto' => get_string('settings:provider_auto', 'local_ai_course_assistant'),
         'claude' => get_string('settings:provider_claude', 'local_ai_course_assistant'),
@@ -311,7 +336,7 @@ if ($hassiteconfig) {
         'coreai' => get_string('settings:provider_coreai', 'local_ai_course_assistant'),
         'custom' => get_string('settings:provider_custom', 'local_ai_course_assistant'),
     ];
-    $settings->add(new admin_setting_configselect(
+    $providersetting = new admin_setting_configselect(
         'local_ai_course_assistant/provider',
         get_string('settings:provider', 'local_ai_course_assistant'),
         // branding::str(), not get_string(): this description carries a
@@ -319,20 +344,21 @@ if ($hassiteconfig) {
         \local_ai_course_assistant\branding::str('settings:provider_desc'),
         'auto',
         $providers
-    ));
+    );
+    $providersetting->set_updatedcallback('local_ai_course_assistant\provider_keys::after_settings_saved');
+    $settings->add($providersetting);
 
-    $settings->add(new admin_setting_encryptedpassword(
-        'local_ai_course_assistant/apikey',
-        get_string('settings:apikey', 'local_ai_course_assistant'),
-        get_string('settings:apikey_desc', 'local_ai_course_assistant')
-    ));
+    // The "API Key" field that stood here is gone: apikey is now an automatic mirror of the default
+    // provider's row key, so there is one place to paste a key (secrets::NOT_ON_SETTINGS_PAGE).
 
-    $settings->add(new admin_setting_configtext(
+    $modelsetting = new admin_setting_configtext(
         'local_ai_course_assistant/model',
         get_string('settings:model', 'local_ai_course_assistant'),
         get_string('settings:model_desc_dynamic', 'local_ai_course_assistant'),
         ''
-    ));
+    );
+    $modelsetting->set_updatedcallback('local_ai_course_assistant\provider_keys::after_settings_saved');
+    $settings->add($modelsetting);
 
     // v6.9.5: which Anthropic models accept `temperature`. An ALLOW-list —
     // an unlisted model has temperature omitted, which is safe, rather than
@@ -350,12 +376,14 @@ if ($hassiteconfig) {
         PARAM_RAW
     ));
 
-    $settings->add(new admin_setting_configtext(
+    $baseurlsetting = new admin_setting_configtext(
         'local_ai_course_assistant/apibaseurl',
         get_string('settings:apibaseurl', 'local_ai_course_assistant'),
         get_string('settings:apibaseurl_desc', 'local_ai_course_assistant'),
         ''
-    ));
+    );
+    $baseurlsetting->set_updatedcallback('local_ai_course_assistant\provider_keys::after_settings_saved');
+    $settings->add($baseurlsetting);
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/temperature',
@@ -679,12 +707,6 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
-    $settings->add(new \local_ai_course_assistant\admin_setting_comparison_providers(
-        'local_ai_course_assistant/comparison_providers',
-        get_string('settings:comparison_providers', 'local_ai_course_assistant'),
-        get_string('settings:comparison_providers_desc', 'local_ai_course_assistant')
-    ));
-
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/enable_thinking',
         get_string('settings:enable_thinking', 'local_ai_course_assistant'),
@@ -751,7 +773,7 @@ if ($hassiteconfig) {
         '',
         PARAM_URL
     ));
-    $settings->add(new admin_setting_encryptedpassword(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/xai_proxy_jwt_secret',
         get_string('settings:xai_proxy_jwt_secret', 'local_ai_course_assistant'),
         get_string('settings:xai_proxy_jwt_secret_desc', 'local_ai_course_assistant')
@@ -846,7 +868,7 @@ if ($hassiteconfig) {
         $embeddingproviders
     ));
 
-    $settings->add(new admin_setting_encryptedpassword(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/embed_apikey',
         get_string('settings:embed_apikey', 'local_ai_course_assistant'),
         get_string('settings:embed_apikey_desc', 'local_ai_course_assistant')
@@ -1057,7 +1079,7 @@ if ($hassiteconfig) {
         0
     ));
 
-    $settings->add(new admin_setting_encryptedpassword(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/rerank_apikey',
         get_string('settings:rerank_apikey', 'local_ai_course_assistant'),
         get_string('settings:rerank_apikey_desc', 'local_ai_course_assistant')
@@ -1153,7 +1175,7 @@ if ($hassiteconfig) {
     ));
     // Password type, not configtext: a configtext credential has every
     // historical value recorded in the clear in mdl_config_log.
-    $settings->add(new admin_setting_encryptedpassword(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/embed_migration_target_apikey',
         get_string('settings:embed_migration_target_apikey', 'local_ai_course_assistant'),
         get_string('settings:embed_migration_target_apikey_desc', 'local_ai_course_assistant')
@@ -1788,7 +1810,7 @@ if ($hassiteconfig) {
         ''
     ));
 
-    $settings->add(new admin_setting_encryptedpassword(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/whatsapp_api_token',
         get_string('settings:whatsapp_api_token', 'local_ai_course_assistant'),
         get_string('settings:whatsapp_api_token_desc', 'local_ai_course_assistant')
@@ -1837,7 +1859,7 @@ if ($hassiteconfig) {
         0
     ));
 
-    $settings->add(new admin_setting_encryptedpassword(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/realtime_apikey',
         get_string('settings:realtime_apikey', 'local_ai_course_assistant'),
         get_string('settings:realtime_apikey_desc', 'local_ai_course_assistant')
@@ -1881,7 +1903,7 @@ if ($hassiteconfig) {
     ));
 
     $activechoices = ['' => get_string('settings:voice_active_default', 'local_ai_course_assistant')];
-    foreach (\local_ai_course_assistant\voice_registry::parse_rows() as $row) {
+    foreach (\local_ai_course_assistant\voice_registry::parse_rows(false) as $row) {
         $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
         $activechoices[$label] = $label . ' (' . $row['provider'] . ')';
     }
@@ -1906,7 +1928,7 @@ if ($hassiteconfig) {
     $sttchoices = ['' => get_string('settings:voice_active_stt_default', 'local_ai_course_assistant')];
     $sttchoices[\local_ai_course_assistant\voice_registry::SELFHOSTED_LABEL] =
         get_string('settings:voice_active_stt_selfhosted', 'local_ai_course_assistant');
-    foreach (\local_ai_course_assistant\voice_registry::parse_rows() as $row) {
+    foreach (\local_ai_course_assistant\voice_registry::parse_rows(false) as $row) {
         $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
         $sttchoices[$label] = $label . ' (' . $row['provider'] . ')';
     }
@@ -2014,7 +2036,7 @@ if ($hassiteconfig) {
         PARAM_TEXT
     ));
 
-    $settings->add(new admin_setting_encryptedpassword(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/stt_selfhosted_apikey',
         get_string('settings:stt_selfhosted_apikey', 'local_ai_course_assistant'),
         get_string('settings:stt_selfhosted_apikey_desc', 'local_ai_course_assistant')
@@ -2198,18 +2220,19 @@ if ($hassiteconfig) {
         'soapbox/',
         PARAM_TEXT
     ));
-    // Password type, not configtext: this is half of an IAM credential pair, and
-    // Moodle only writes '********' into config_log for password settings. As
+    // Password type, not configtext: this is half of an IAM credential pair. As
     // configtext, every access key ID ever saved stayed readable in mdl_config_log,
-    // which is never purged. Its sibling soapbox_storage_secret was already
-    // declared correctly; this one was missed, the same way redash_api_key was.
-    // (encryptedpassword takes no paramtype argument; it stores \core\encryption output.)
-    $settings->add(new admin_setting_encryptedpassword(
+    // which is never purged. admin_setting_secret_field stores \core\encryption
+    // output and logs only '********' (Moodle's own encrypted password field logs
+    // the full ciphertext, so the log masking is the subclass's). Its sibling
+    // soapbox_storage_secret was already declared correctly; this one was missed,
+    // the same way redash_api_key was. (It takes no paramtype argument.)
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/soapbox_storage_key',
         get_string('settings:soapbox_storage_key', 'local_ai_course_assistant'),
         get_string('settings:soapbox_storage_key_desc', 'local_ai_course_assistant')
     ));
-    $settings->add(new admin_setting_encryptedpassword(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/soapbox_storage_secret',
         get_string('settings:soapbox_storage_secret', 'local_ai_course_assistant'),
         get_string('settings:soapbox_storage_secret_desc', 'local_ai_course_assistant')
@@ -2467,7 +2490,7 @@ if ($hassiteconfig) {
                 PARAM_URL
             ));
             foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
-                $settings->add(new admin_setting_encryptedpassword(
+                $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
                     'local_ai_course_assistant/' . $tap . '_api_key',
                     \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_api_key', 'local_ai_course_assistant')),
                     \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_api_key_desc', 'local_ai_course_assistant'))
@@ -2508,7 +2531,7 @@ if ($hassiteconfig) {
             // payloads from that vendor; webhook rows take precedence over
             // heartbeat rows. Empty = webhook handler off for that provider.
             foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
-                $settings->add(new admin_setting_encryptedpassword(
+                $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
                     'local_ai_course_assistant/' . $tap . '_webhook_secret',
                     \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_webhook_secret', 'local_ai_course_assistant')),
                     \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_webhook_secret_desc', 'local_ai_course_assistant'))
@@ -3122,7 +3145,7 @@ if ($hassiteconfig) {
         ''
     ));
 
-    $settings->add(new admin_setting_encryptedpassword(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/zendesk_token',
         get_string('settings:zendesk_token', 'local_ai_course_assistant'),
         get_string('settings:zendesk_token_desc', 'local_ai_course_assistant')
@@ -3191,20 +3214,16 @@ if ($hassiteconfig) {
         PARAM_EMAIL
     ));
 
-    $settings->add(new admin_setting_configtext(
+    $settings->add(new \local_ai_course_assistant\admin_setting_webhook_url(
         'local_ai_course_assistant/anomaly_digest_slack_webhook',
         get_string('settings:anomaly_digest_slack_webhook', 'local_ai_course_assistant'),
-        get_string('settings:anomaly_digest_slack_webhook_desc', 'local_ai_course_assistant'),
-        '',
-        PARAM_URL
+        get_string('settings:anomaly_digest_slack_webhook_desc', 'local_ai_course_assistant')
     ));
 
-    $settings->add(new admin_setting_configtext(
+    $settings->add(new \local_ai_course_assistant\admin_setting_webhook_url(
         'local_ai_course_assistant/anomaly_digest_teams_webhook',
         get_string('settings:anomaly_digest_teams_webhook', 'local_ai_course_assistant'),
-        get_string('settings:anomaly_digest_teams_webhook_desc', 'local_ai_course_assistant'),
-        '',
-        PARAM_URL
+        get_string('settings:anomaly_digest_teams_webhook_desc', 'local_ai_course_assistant')
     ));
 
     // Analytics export (Redash).
@@ -3214,14 +3233,14 @@ if ($hassiteconfig) {
         get_string('redash_heading_desc', 'local_ai_course_assistant')
     ));
 
-    // Password type, not configtext: Moodle only writes '********' into
-    // config_log for password settings. A plain configtext credential has
-    // every historical value recorded in the clear in mdl_config_log, which is
-    // never purged and is readable by anything with DB or reporting access.
+    // Password type, not configtext: a plain configtext credential has every
+    // historical value recorded in the clear in mdl_config_log, which is never
+    // purged and is readable by anything with DB or reporting access. The
+    // secret field logs only '********' for a value that is set.
     // Confirmed on production 2026-08-03 -- a retired key was recoverable in
     // full from the log. Its siblings redash_user_api_key and github_token
     // were already declared correctly; this one was missed.
-    $settings->add(new admin_setting_encryptedpassword(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/redash_api_key',
         get_string('redash_api_key', 'local_ai_course_assistant'),
         get_string('redash_api_key_desc', 'local_ai_course_assistant')
@@ -3261,7 +3280,7 @@ if ($hassiteconfig) {
     // Authorization: Bearer header -- there is deliberately no query-string
     // path, and no "link with the key baked in" affordance, because that is the
     // leak redash_export.php had to paper over with HMAC download tokens.
-    $settings->add(new admin_setting_encryptedpassword(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/spend_export_key',
         get_string('settings:spend_export_key', 'local_ai_course_assistant'),
         get_string('settings:spend_export_key_desc', 'local_ai_course_assistant')
@@ -3279,7 +3298,7 @@ if ($hassiteconfig) {
         '',
         PARAM_URL
     ));
-    $settings->add(new admin_setting_encryptedpassword(
+    $settings->add(new \local_ai_course_assistant\admin_setting_secret_field(
         'local_ai_course_assistant/redash_user_api_key',
         get_string('settings:redash_user_api_key', 'local_ai_course_assistant'),
         \local_ai_course_assistant\branding::apply(get_string('settings:redash_user_api_key_desc', 'local_ai_course_assistant'))

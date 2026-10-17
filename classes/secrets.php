@@ -44,6 +44,9 @@ class secrets {
     /** Avatar providers whose key and webhook secret are secrets. */
     const AVATAR_PROVIDERS = ['did', 'heygen', 'tavus', 'synthesia'];
 
+    /** Declared in names() and encrypted, but not a field on the settings page: apikey is an automatic mirror of the default provider's row key (provider_keys::sync_default_key). */
+    public const NOT_ON_SETTINGS_PAGE = ['apikey'];
+
     /**
      * Every setting that holds a secret.
      *
@@ -65,6 +68,9 @@ class secrets {
             'redash_api_key',
             'redash_user_api_key',
             'spend_export_key',
+            // Incoming-webhook URLs carry their token in the path: whoever holds one can post to the channel.
+            'anomaly_digest_slack_webhook',
+            'anomaly_digest_teams_webhook',
         ];
         foreach (self::AVATAR_PROVIDERS as $p) {
             $names[] = $p . '_api_key';

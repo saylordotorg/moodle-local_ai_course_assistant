@@ -1,0 +1,64 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/admin_keyed_row
+
+    One row of a keyed-rows admin table. Never contains a key or ciphertext. When the table is forced in
+    config.php (readonly) every control is disabled and the key cell is only the saved flag.
+
+    The row is a bare table row. `lintwrap` exists only in the example context below so the template linter, which
+    validates this file on its own, sees a complete table; no real render sets it.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Saylor University
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    { "lintwrap": true, "idx": "0", "rowid": "a1b2c3d4e5f6", "readonly": false, "haskey": true, "savedlabel": "Saved, ends in ab12",
+      "keyinput": "x[rows][0][newkey]", "keylabel": "API key", "keepinput": "x[rows][0][keepid]", "changelabel": "Change",
+      "newkeyplaceholder": "Paste the API key", "removelabel": "Remove",
+      "cells": [ { "name": "provider", "label": "Provider", "inputname": "x[rows][0][provider]", "value": "openai", "isselect": true, "readonly": false,
+        "options": [ { "value": "openai", "label": "OpenAI", "selected": true } ], "iskeynext": true } ] }
+}}
+{{#lintwrap}}<table><tbody>{{/lintwrap}}<tr data-row="{{idx}}">
+    {{#cells}}
+    <td>
+        {{#isselect}}<select class="form-control form-control-sm" name="{{inputname}}" aria-label="{{label}}"{{#readonly}} disabled{{/readonly}}>{{#options}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/options}}</select>{{/isselect}}
+        {{#istext}}<input type="text" class="form-control form-control-sm" name="{{inputname}}" value="{{value}}" placeholder="{{placeholder}}" aria-label="{{label}}"{{#readonly}} disabled{{/readonly}}>{{/istext}}
+        {{#isnumber}}<input type="number" step="0.1" min="0" max="2" class="form-control form-control-sm" name="{{inputname}}" value="{{value}}" placeholder="{{placeholder}}" aria-label="{{label}}"{{#readonly}} disabled{{/readonly}}>{{/isnumber}}
+    </td>
+    {{#iskeynext}}
+    <td class="sola-kr-keycell">
+        {{#readonly}}
+        {{#haskey}}<span class="sola-kr-saved">{{savedlabel}}</span>{{/haskey}}
+        {{/readonly}}
+        {{^readonly}}
+        {{#haskey}}
+        <span class="sola-kr-saved">{{savedlabel}}</span>
+        <button type="button" class="btn btn-sm btn-link sola-kr-change">{{changelabel}}</button>
+        <input type="password" class="form-control form-control-sm sola-kr-newkey d-none" name="{{keyinput}}" value="" autocomplete="new-password" placeholder="{{newkeyplaceholder}}" aria-label="{{keylabel}}" disabled>
+        {{/haskey}}
+        {{^haskey}}
+        <input type="password" class="form-control form-control-sm sola-kr-newkey" name="{{keyinput}}" value="" autocomplete="new-password" placeholder="{{newkeyplaceholder}}" aria-label="{{keylabel}}">
+        {{/haskey}}
+        <input type="hidden" name="{{keepinput}}" value="{{rowid}}">
+        {{/readonly}}
+    </td>
+    {{/iskeynext}}
+    {{/cells}}
+    {{^readonly}}<td><button type="button" class="btn btn-sm btn-outline-danger sola-kr-remove" title="{{removelabel}}" aria-label="{{removelabel}}">&times;</button></td>{{/readonly}}
+</tr>{{#lintwrap}}</tbody></table>{{/lintwrap}}

@@ -195,4 +195,237 @@ final class config_log_audit_test extends \advanced_testcase {
         $remaining = array_column(config_log_audit::find_exposed(), 'id');
         $this->assertSame([$two], $remaining);
     }
+
+    /**
+     * Setting names the audit has no other way to know are secrets: they hold an incoming-webhook URL or an
+     * access key id, and no "key", "token" or "secret" word the name fragments look for.
+     *
+     * @return string[]
+     */
+    private function names_without_a_secret_word(): array {
+        return ['anomaly_digest_slack_webhook', 'anomaly_digest_teams_webhook', 'soapbox_storage_key', 'spend_export_key'];
+    }
+
+    /**
+     * A sentinel value for a secret setting: a URL for a webhook (whose token is in the path), else a key.
+     *
+     * @param string $name
+     * @return string
+     */
+    private function sentinel_for(string $name): string {
+        return (str_contains($name, 'webhook') && !str_contains($name, 'secret'))
+            ? 'https://hooks.example/T000/B000/SENTINEL-AUDIT-' . $name
+            : 'SENTINEL-AUDIT-' . $name . '-0123456789';
+    }
+
+    /**
+     * Every setting in secrets::names() is a secret name, including the ones no name fragment matches, and
+     * the public-key and token-count names stay exempt.
+     */
+    public function test_every_listed_secret_setting_is_a_secret_name(): void {
+        foreach (secrets::names() as $name) {
+            $this->assertTrue(config_log_audit::is_secret_name($name), "$name is a listed secret");
+        }
+        foreach ($this->names_without_a_secret_word() as $name) {
+            $this->assertTrue(secrets::is_secret($name), "$name is listed in secrets::names()");
+            $this->assertTrue(config_log_audit::is_secret_name($name), "$name has no secret word and is still a secret");
+        }
+        foreach (['policy_bundle_pubkey', 'token_analytics_link', 'backend_context_tokens', 'max_tokens', 'maxtokens',
+                'tokenexpiry'] as $name) {
+            $this->assertFalse(secrets::is_secret($name), "$name is not a listed secret");
+            $this->assertFalse(config_log_audit::is_secret_name($name), "$name is exempt");
+        }
+        // Names that are neither listed nor look like a secret stay out, so the list didn't turn into "everything".
+        foreach (['model', 'provider', 'comparison_providers', 'voice_providers', 'enabled'] as $name) {
+            $this->assertFalse(config_log_audit::is_secret_name($name), "$name is not a secret name");
+        }
+    }
+
+    /**
+     * Before 7.9.0 these settings logged their value (a URL, an access key id) or their ciphertext, and the
+     * audit could not see the rows because the name has no secret-looking word.
+     */
+    public function test_rows_for_every_listed_secret_setting_are_found_in_either_column(): void {
+        $this->resetAfterTest(true);
+        $expected = [];
+        foreach (secrets::names() as $name) {
+            $expected[$this->log_row('local_ai_course_assistant', $name, $this->sentinel_for($name))] = $name;
+        }
+        // A rotation row: a masked new value and the retired value in oldvalue.
+        $rotated = $this->log_row('local_ai_course_assistant', 'spend_export_key', '********', 'sodium:' . str_repeat('Q', 40));
+        // And rows that must stay out: masked or empty.
+        $masked = $this->log_row('local_ai_course_assistant', 'soapbox_storage_key', '********');
+        $empty = $this->log_row('local_ai_course_assistant', 'anomaly_digest_slack_webhook', '', '********');
+
+        $found = config_log_audit::find_exposed();
+        $ids = array_column($found, 'id');
+        foreach ($expected as $id => $name) {
+            $this->assertContains($id, $ids, "a row for $name is found");
+        }
+        $this->assertContains($rotated, $ids, 'a retired ciphertext in oldvalue is found');
+        $this->assertNotContains($masked, $ids);
+        $this->assertNotContains($empty, $ids);
+        foreach ($found as $record) {
+            $this->assertArrayNotHasKey('value', $record);
+            $this->assertArrayNotHasKey('oldvalue', $record);
+        }
+        $this->assertStringNotContainsString('SENTINEL-AUDIT', json_encode($found), 'no value is in what is reported');
+    }
+
+    /**
+     * The key column is the second column of both tables.
+     */
+    public function test_a_table_row_with_a_key_in_the_clear_or_encrypted_is_found(): void {
+        $this->resetAfterTest(true);
+        $plain = $this->log_row('local_ai_course_assistant', 'comparison_providers',
+            "openai|SENTINEL-TABLE-PLAIN-KEY-0001|gpt-4o-mini\nollama||llama3");
+        $cipher = $this->log_row('local_ai_course_assistant', 'voice_providers',
+            'openai|sodium:' . str_repeat('Z', 48) . '|main|shimmer|nova');
+        $retired = $this->log_row('local_ai_course_assistant', 'comparison_providers', "openai|********|gpt-4o-mini",
+            "openai|SENTINEL-TABLE-RETIRED-KEY-0002|gpt-4o-mini");
+        $found = config_log_audit::find_exposed();
+        $byid = [];
+        foreach ($found as $record) {
+            $byid[$record['id']][] = $record['column'];
+        }
+        $this->assertSame(['value'], $byid[$plain] ?? null);
+        $this->assertSame(['value'], $byid[$cipher] ?? null);
+        $this->assertSame(['oldvalue'], $byid[$retired] ?? null, 'a retired key in the old value is found');
+        $this->assertStringNotContainsString('SENTINEL', json_encode($found));
+        $this->assertStringNotContainsString('sodium', json_encode($found));
+        foreach ($found as $record) {
+            $this->assertSame('local_ai_course_assistant', $record['plugin']);
+            $this->assertArrayNotHasKey('value', $record);
+        }
+    }
+
+    public function test_a_table_row_the_editor_has_already_masked_is_not_found(): void {
+        global $CFG;
+        require_once($CFG->libdir . '/adminlib.php');
+        $this->resetAfterTest(true);
+        // What the 7.9.0 editor writes to the log for these two tables, made by the editor's own redaction, so
+        // a change to that format shows up here.
+        $provider = admin_setting_provider_keys::redact_keys("openai|sodium:" . str_repeat('A', 40) . "|m|0.5|https://gw.example\n"
+            . "claude|SENTINEL-NOT-FOUND-KEY-0003|m\nollama||llama3");
+        $voice = admin_setting_voice_providers::redact_keys('openai|sodium:' . str_repeat('B', 40) . '|main|shimmer|nova');
+        $this->assertStringContainsString('********', $provider);
+        $this->assertStringNotContainsString('SENTINEL', $provider);
+        $ids = [
+            $this->log_row('local_ai_course_assistant', 'comparison_providers', $provider, $provider),
+            $this->log_row('local_ai_course_assistant', 'voice_providers', $voice, $voice),
+            // A key column of asterisks of any length, a keyless row, blank lines, a comment, an empty value.
+            $this->log_row('local_ai_course_assistant', 'comparison_providers', "openai|****|m\n\n  \nollama||x\n# openai|SENTINEL-COMMENT-KEY-0004|m", ''),
+            $this->log_row('local_ai_course_assistant', 'voice_providers', '', ''),
+        ];
+        $found = array_column(config_log_audit::find_exposed(), 'id');
+        foreach ($ids as $id) {
+            $this->assertNotContains($id, $found);
+        }
+    }
+
+    public function test_one_unmasked_line_among_masked_ones_is_enough(): void {
+        $this->resetAfterTest(true);
+        $id = $this->log_row('local_ai_course_assistant', 'comparison_providers',
+            "openai|********|m\r\nollama||x\r\nclaude|SENTINEL-ONE-LINE-KEY-0005|m\r\n");
+        $this->assertContains($id, array_column(config_log_audit::find_exposed(), 'id'));
+    }
+
+    /**
+     * Only this plugin's two tables are read as tables: another plugin's setting of the same name is not ours
+     * to parse, or to overwrite.
+     */
+    public function test_a_table_setting_of_another_plugin_is_left_alone(): void {
+        $this->resetAfterTest(true);
+        $this->log_row('local_other', 'comparison_providers', 'openai|SENTINEL-OTHER-PLUGIN-KEY-0006|m');
+        $this->log_row('local_ai_course_assistant', 'some_other_table', 'openai|SENTINEL-OTHER-SETTING-KEY-0007|m');
+        $this->assertSame([], config_log_audit::find_exposed());
+    }
+
+    /**
+     * Redacting a table row blanks the key column of each line and nothing else, so the history still says
+     * which provider and model changed.
+     */
+    public function test_redacting_a_table_row_masks_only_the_key_column(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $value = "openai|SENTINEL-REDACT-KEY-0008|gpt-4o-mini|0.5|https://gw.example/v1\r\n"
+            . "claude|sodium:" . str_repeat('C', 40) . "|claude-haiku-4-5\r\n"
+            . "ollama||llama3|0.2|http://localhost:11434\r\n"
+            . "gemini|SENTINEL-REDACT-TWO-COLUMNS-0013\r\n"
+            . "# openai|SENTINEL-REDACT-COMMENT-0009|kept\r\n"
+            . "xai|********|grok";
+        $old = "openai|SENTINEL-REDACT-OLD-KEY-0010|gpt-4o-mini";
+        $id = $this->log_row('local_ai_course_assistant', 'comparison_providers', $value, $old);
+        $other = $this->log_row('local_saylorcode', 'jobeapikey', str_repeat('f', 64));
+
+        $this->assertSame(2, config_log_audit::redact([$id]), 'both columns of the table row, and not the other row');
+
+        $row = $DB->get_record('config_log', ['id' => $id]);
+        $this->assertSame("openai|********|gpt-4o-mini|0.5|https://gw.example/v1\r\n"
+            . "claude|********|claude-haiku-4-5\r\n"
+            . "ollama||llama3|0.2|http://localhost:11434\r\n"
+            . "gemini|********\r\n"
+            . "# openai|SENTINEL-REDACT-COMMENT-0009|kept\r\n"
+            . "xai|********|grok", $row->value);
+        $this->assertSame('openai|********|gpt-4o-mini', $row->oldvalue);
+        $this->assertSame(str_repeat('f', 64), $DB->get_field('config_log', 'value', ['id' => $other]), 'ids limit the redaction');
+        $this->assertSame('comparison_providers', $row->name);
+        $this->assertSame([$other], array_column(config_log_audit::find_exposed(), 'id'));
+    }
+
+    /**
+     * A table row redacts only the column that is exposed; a masked old value is left as it is, and a value that
+     * is not a table (every other setting) is still overwritten whole.
+     */
+    public function test_redacting_everything_handles_tables_and_other_settings_each_their_own_way(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $table = $this->log_row('local_ai_course_assistant', 'voice_providers', 'openai|SENTINEL-ALL-VOICE-KEY-0011|main|shimmer|nova',
+            'openai|********|main|shimmer|nova');
+        $hook = $this->log_row('local_ai_course_assistant', 'anomaly_digest_slack_webhook',
+            'https://hooks.example/T000/B000/SENTINEL-ALL-HOOK-0012');
+        $plain = $this->log_row('local_saylorcode', 'jobeapikey', str_repeat('g', 64));
+
+        $this->assertSame(3, config_log_audit::redact());
+        $this->assertSame([], config_log_audit::find_exposed());
+        $this->assertSame('openai|********|main|shimmer|nova', $DB->get_field('config_log', 'value', ['id' => $table]));
+        $this->assertSame('openai|********|main|shimmer|nova', $DB->get_field('config_log', 'oldvalue', ['id' => $table]));
+        $this->assertSame(config_log_audit::REDACTED, $DB->get_field('config_log', 'value', ['id' => $hook]));
+        $this->assertSame(config_log_audit::REDACTED, $DB->get_field('config_log', 'value', ['id' => $plain]));
+    }
+
+    /**
+     * The CLI help says what it now covers. The text lives in the class so a test can read it; the script
+     * must print it.
+     */
+    public function test_the_cli_help_mentions_the_two_tables_and_the_script_prints_it(): void {
+        $help = config_log_audit::help();
+        $this->assertStringContainsString('comparison_providers', $help);
+        $this->assertStringContainsString('voice_providers', $help);
+        $this->assertStringContainsString('key column', $help);
+        $this->assertStringContainsString('--redact', $help);
+        $this->assertStringContainsString('--ids', $help);
+        $this->assertStringContainsString('No key value is printed', $help);
+        // The two limits, said out loud: a retired key kept in a comment line is skipped and so survives
+        // --redact (no guessing at what a comment holds), and a base URL credential in a table row is out of scope.
+        $this->assertStringContainsString('starts with #', $help);
+        $this->assertStringContainsString('comment', $help);
+        $this->assertStringContainsString('survives --redact', $help);
+        $this->assertStringContainsString('base URL', $help);
+        $docblock = (string) (new \ReflectionClass(config_log_audit::class))->getDocComment();
+        $this->assertStringContainsString('comment line', $docblock, 'the class docblock states the comment-line limit too');
+        $this->assertStringContainsString('survives', $docblock);
+        $script = (string) file_get_contents(__DIR__ . '/../admin/cli/audit_config_log_secrets.php');
+        $this->assertStringContainsString('config_log_audit::help()', $script, 'the script prints the help from the class');
+    }
+
+    /**
+     * What the mask does to a key column that isn't a plain key: a mask of another length becomes the
+     * standard eight asterisks, and spaces around a key are dropped with it. An empty key column stays empty.
+     */
+    public function test_masking_normalises_a_mask_of_another_length_and_drops_spaces_around_a_key(): void {
+        $this->assertSame("openai|********|m\nclaude|********|m\nollama||x\n# openai|SENTINEL-KEPT-0014|c",
+            config_log_audit::mask_table_keys("openai| **** |m\nclaude|  SENTINEL-SPACED-0013  |m\nollama||x\n# openai|SENTINEL-KEPT-0014|c"));
+        $this->assertSame('openai|********', config_log_audit::mask_table_keys('openai|********'), 'idempotent');
+    }
 }

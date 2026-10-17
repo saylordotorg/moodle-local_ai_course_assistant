@@ -204,13 +204,14 @@ class provider_keys {
     }
 
     /**
-     * The last four characters of a key, for the "ends in" hint. A short key shows nothing.
+     * The last four characters of a key, for the "ends in" hint. A short key (under 12 characters) shows nothing.
+     * Counted and cut by character, so a multibyte tail is never split into invalid UTF-8.
      *
      * @param string $plain
      * @return string
      */
     public static function last4(string $plain): string {
-        return strlen($plain) >= 12 ? substr($plain, -4) : '';
+        return \core_text::strlen($plain) >= 12 ? \core_text::substr($plain, -4) : '';
     }
 
     /**
@@ -475,9 +476,18 @@ class provider_keys {
      * The stored value is JSON: {provider, rowlast4, defaultlast4}. Anything else (the English sentence an
      * earlier build stored, a damaged value) shows nothing; it is still forgotten.
      *
+     * Only a web request outside an upgrade shows it, and the value is left untouched otherwise.
+     * admin/cli/upgrade.php runs admin_apply_default_settings(), which includes settings.php (and so this)
+     * straight after the upgrade step wrote the notice: showing it there would queue it into the CLI's
+     * throwaway session and forget it before any administrator could see it.
+     *
      * @return void
      */
     public static function flush_notice(): void {
+        global $CFG;
+        if (!settings_save_report::is_web_request() || !empty($CFG->upgraderunning)) {
+            return;
+        }
         $raw = (string) get_config(self::PLUGIN, 'provider_keys_notice');
         if ($raw === '') {
             return;

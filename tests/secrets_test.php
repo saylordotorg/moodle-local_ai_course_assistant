@@ -53,10 +53,14 @@ final class secrets_test extends \advanced_testcase {
             }
         }
         sort($encrypted);
-        $names = secrets::names();
+        $names = array_values(array_diff(secrets::names(), secrets::NOT_ON_SETTINGS_PAGE));
         sort($names);
         $this->assertSame([], $masked, 'masked-but-plain-text key settings remain');
         $this->assertSame($names, $encrypted);
+        // The exemption can't rot into a way of silencing the test: every entry is still a declared secret,
+        // and none of them has come back onto the page.
+        $this->assertSame([], array_diff(secrets::NOT_ON_SETTINGS_PAGE, secrets::names()));
+        $this->assertSame([], array_intersect(secrets::NOT_ON_SETTINGS_PAGE, $encrypted));
     }
 
     /**
@@ -149,12 +153,16 @@ final class secrets_test extends \advanced_testcase {
         $this->resetAfterTest();
         $setting = new admin_setting_voice_providers('local_ai_course_assistant/voice_providers', 'v', 'd');
 
-        $setting->write_setting("# a comment stays as it is\nopenai|sk-voice-plain-789|openai-prod|shimmer|alloy");
+        // The form posts one array per row, and the key is typed once.
+        $setting->write_setting(['rows' => [[
+            'provider' => 'openai', 'newkey' => 'sk-voice-plain-789', 'keepid' => '', 'label' => 'openai-prod',
+            'realtime_voice' => 'shimmer', 'tts_voice' => 'alloy',
+        ]]]);
 
         $stored = $DB->get_field('config_plugins', 'value',
             ['plugin' => 'local_ai_course_assistant', 'name' => 'voice_providers']);
         $this->assertStringNotContainsString('sk-voice-plain-789', $stored);
-        $this->assertStringStartsWith("# a comment stays as it is\nopenai|sodium:", $stored);
+        $this->assertStringStartsWith('openai|sodium:', $stored);
         $this->assertStringEndsWith('|openai-prod|shimmer|alloy', $stored);
 
         $rows = voice_registry::parse_rows();
@@ -164,16 +172,48 @@ final class secrets_test extends \advanced_testcase {
         $html = $setting->output_html($setting->get_setting());
         $this->assertStringNotContainsString('sk-voice-plain-789', $html);
 
-        // Saving the form untouched posts the stored form back; it must not
-        // be encrypted a second time.
-        $setting->write_setting($stored);
-        $this->assertSame('sk-voice-plain-789', voice_registry::parse_rows()[0]['apikey']);
-
-        // The upgrade path encrypts a table written before this release.
-        set_config('voice_providers', 'xai|xai-plain-key|grok', 'local_ai_course_assistant');
+        // The upgrade path encrypts a table written before this release. Comment and blank lines stay as
+        // they are, and a key that is already ciphertext isn't encrypted a second time.
+        set_config('voice_providers', "# a comment stays as it is\n" . $stored . "\nxai|xai-plain-key|grok",
+            'local_ai_course_assistant');
         $this->assertSame(1, secrets::encrypt_stored_settings());
-        $this->assertStringNotContainsString('xai-plain-key', get_config('local_ai_course_assistant', 'voice_providers'));
-        $this->assertSame('xai-plain-key', voice_registry::parse_rows()[0]['apikey']);
+        $upgraded = get_config('local_ai_course_assistant', 'voice_providers');
+        $this->assertStringStartsWith("# a comment stays as it is\nopenai|sodium:", $upgraded);
+        $this->assertStringNotContainsString('xai-plain-key', $upgraded);
+        $this->assertSame('sk-voice-plain-789', voice_registry::parse_rows()[0]['apikey']);
+        $this->assertSame('xai-plain-key', voice_registry::parse_rows()[1]['apikey']);
+        $this->assertSame(0, secrets::encrypt_stored_settings(), 'a second run changes nothing');
+    }
+
+    /**
+     * The anomaly digest's Slack and Teams webhook URLs carry a token in the path, so anyone holding one can
+     * post to the channel. They are secrets like any key: listed in names(), encrypted, read through get().
+     * (That the digest posts to the decrypted URL is pinned by anomaly_digest_webhook_test.)
+     *
+     * A URL saved before this release is plain text, and the 7.9.0 upgrade step encrypts it.
+     */
+    public function test_the_anomaly_webhook_urls_are_listed_secrets_the_upgrade_encrypts_and_get_reads(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->assertTrue(secrets::is_secret('anomaly_digest_slack_webhook'));
+        $this->assertTrue(secrets::is_secret('anomaly_digest_teams_webhook'));
+        set_config('anomaly_digest_slack_webhook', secrets::conceal('https://hooks.example/T000/B000/SENTINELWEBHOOK'),
+            'local_ai_course_assistant');
+        $this->assertSame('https://hooks.example/T000/B000/SENTINELWEBHOOK', secrets::get('anomaly_digest_slack_webhook'));
+        $this->assertStringNotContainsString('SENTINELWEBHOOK',
+            (string) get_config('local_ai_course_assistant', 'anomaly_digest_slack_webhook'));
+
+        // A plain URL saved before the upgrade: provider_keys::upgrade() (the 7.9.0 step) encrypts it.
+        $raw = fn(string $name) => (string) $DB->get_field('config_plugins', 'value',
+            ['plugin' => 'local_ai_course_assistant', 'name' => $name]);
+        set_config('anomaly_digest_teams_webhook', 'https://hooks.example/teams/T000/SENTINELPLAIN', 'local_ai_course_assistant');
+        $this->assertSame('https://hooks.example/teams/T000/SENTINELPLAIN', $raw('anomaly_digest_teams_webhook'));
+        $summary = provider_keys::upgrade();
+        $this->assertSame(1, $summary['settings'], 'the plain Teams URL was encrypted (the Slack one already was)');
+        $this->assertTrue(secrets::is_encrypted($raw('anomaly_digest_teams_webhook')));
+        $this->assertStringNotContainsString('SENTINELPLAIN', $raw('anomaly_digest_teams_webhook'));
+        $this->assertSame('https://hooks.example/teams/T000/SENTINELPLAIN', secrets::get('anomaly_digest_teams_webhook'));
+        $this->assertSame(0, provider_keys::upgrade()['settings'], 'a second run changes nothing');
     }
 
     /**

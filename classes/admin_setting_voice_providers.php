@@ -19,160 +19,116 @@ namespace local_ai_course_assistant;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Admin setting widget for the voice_providers table.
+ * Admin setting for the voice_providers table: openai or xai rows with a key, a label and default voices.
  *
- * Renders a structured table so admins can define one or more voice API
- * providers (OpenAI, xAI, etc.) with an API key, a friendly label, and
- * default voices for Realtime and TTS. Stored in the same pipe-delimited
- * format voice_registry consumes:
- *   provider|apikey|label|realtime_voice|tts_voice
+ * Stored format (unchanged, read by voice_registry): provider|key|label|realtime_voice|tts_voice, with the
+ * key encrypted. It shares the row editor with the Providers and keys table, so the page never carries a
+ * key or ciphertext, a blank key keeps the stored one, and the config log shows the key column masked.
  *
  * @package    local_ai_course_assistant
- * @copyright  2026 AI Course Assistant
+ * @copyright  2026 Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class admin_setting_voice_providers extends \admin_setting {
-    private static array $provider_options = [
-        'openai' => 'OpenAI',
-        'xai'    => 'xAI (Grok)',
-    ];
+class admin_setting_voice_providers extends admin_setting_keyed_rows {
 
-    public function __construct(string $name, string $visiblename, string $description) {
-        parent::__construct($name, $visiblename, $description, '');
-    }
+    /** @var string[] The only providers with WebSocket Realtime, TTS and STT endpoints today. */
+    private const PROVIDERS = ['openai', 'xai'];
 
-    public function get_setting() {
-        return $this->config_read($this->name);
-    }
-
-    public function write_setting($data) {
-        if (!is_string($data)) {
-            return '';
+    /**
+     * The columns after the key.
+     *
+     * @return array[]
+     */
+    protected function columns(): array {
+        $options = [];
+        foreach (self::PROVIDERS as $id) {
+            $options[$id] = get_string('providerkeys:name_' . $id, 'local_ai_course_assistant');
         }
-        // Each row's key is encrypted before it is stored (#302).
-        $this->config_write($this->name, secrets::conceal_row_keys($data));
-        return '';
+        return [
+            ['name' => 'provider', 'label' => 'providerkeys:col_provider', 'type' => 'select', 'options' => $options],
+            ['name' => 'label', 'label' => 'providerkeys:col_label', 'type' => 'text',
+                'placeholder' => 'e.g. openai-prod'],
+            ['name' => 'realtime_voice', 'label' => 'providerkeys:col_rtvoice', 'type' => 'text',
+                'placeholder' => 'e.g. shimmer, eve'],
+            ['name' => 'tts_voice', 'label' => 'providerkeys:col_ttsvoice', 'type' => 'text',
+                'placeholder' => 'e.g. shimmer, eve'],
+        ];
     }
 
     /**
-     * Parse the stored config into structured rows for rendering.
+     * Rows as stored (server side only). The key stays in its stored, encrypted form.
      *
-     * @return array
+     * @return array[]
      */
-    private function parse_rows(): array {
-        // The stored form, never the plain key: this renders into the page.
-        return voice_registry::parse_rows(false);
-    }
-
-    public function output_html($data, $query = ''): string {
-        $rows = $this->parse_rows();
-        $id = $this->get_id();
-        $fullname = $this->get_full_name();
-
-        $provideroptions = '';
-        foreach (self::$provider_options as $val => $label) {
-            $provideroptions .= '<option value="' . s($val) . '">' . s($label) . '</option>';
+    protected function load_rows(): array {
+        $rows = [];
+        foreach (voice_registry::parse_rows(false) as $r) {
+            $rows[] = [
+                'id'             => provider_keys::rowid($r['provider'] . '|' . $r['label'], $r['apikey']),
+                'stored_key'     => $r['apikey'],
+                'provider'       => $r['provider'],
+                'label'          => $r['label'],
+                'realtime_voice' => $r['realtime_voice'],
+                'tts_voice'      => $r['tts_voice'],
+            ];
         }
+        return $rows;
+    }
 
-        $html = '<div id="' . $id . '-wrap">';
-        $html .= '<table class="table table-sm table-bordered" id="' . $id . '-table" style="max-width:960px">';
-        $html .= '<thead><tr>'
-            . '<th style="width:140px">Provider</th>'
-            . '<th style="width:220px">API Key</th>'
-            . '<th style="width:160px">Label</th>'
-            . '<th style="width:140px">Realtime voice</th>'
-            . '<th style="width:140px">TTS voice</th>'
-            . '<th style="width:50px"></th>'
-            . '</tr></thead>';
-        $html .= '<tbody>';
-
-        foreach ($rows as $i => $row) {
-            $html .= $this->render_row($i, $row, $provideroptions);
+    /**
+     * Rows to the stored string. Trailing empty columns are left off, as the old form did, so a line it wrote
+     * comes back unchanged from a save that touched nothing.
+     *
+     * @param array[] $rows
+     * @return string
+     */
+    protected function store(array $rows): string {
+        $lines = [];
+        foreach ($rows as $r) {
+            $lines[] = preg_replace('~\|+$~', '',
+                $r['provider'] . '|' . $r['stored_key'] . '|' . $r['label'] . '|' . $r['realtime_voice'] . '|' . $r['tts_voice']);
         }
-
-        $html .= '</tbody></table>';
-        $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="' . $id . '-add">+ Add Voice Provider</button>';
-        $html .= '<input type="hidden" name="' . s($fullname) . '" id="' . $id . '-value" value="' . s($data) . '">';
-        $html .= '</div>';
-        $html .= $this->render_js($id, $provideroptions);
-
-        return format_admin_setting($this, $this->visiblename, $html, $this->description, true, '', null, $query);
+        return implode("\n", $lines);
     }
 
-    private function render_row(int $index, array $row, string $provideroptions): string {
-        $selected = s($row['provider']);
-        $opts = str_replace(
-            'value="' . $selected . '"',
-            'value="' . $selected . '" selected',
-            $provideroptions
-        );
-        return '<tr data-row="' . $index . '">'
-            . '<td><select class="form-control form-control-sm sola-vp-provider">' . $opts . '</select></td>'
-            . '<td><input type="password" class="form-control form-control-sm sola-vp-key" '
-            . 'value="' . s($row['apikey']) . '" placeholder="Paste API key" autocomplete="off"></td>'
-            . '<td><input type="text" class="form-control form-control-sm sola-vp-label" '
-            . 'value="' . s($row['label']) . '" placeholder="e.g. openai-prod"></td>'
-            . '<td><input type="text" class="form-control form-control-sm sola-vp-rtvoice" '
-            . 'value="' . s($row['realtime_voice']) . '" placeholder="e.g. shimmer, eve"></td>'
-            . '<td><input type="text" class="form-control form-control-sm sola-vp-ttsvoice" '
-            . 'value="' . s($row['tts_voice']) . '" placeholder="e.g. shimmer, eve"></td>'
-            . '<td><button type="button" class="btn btn-sm btn-outline-danger sola-vp-remove" title="Remove">&times;</button></td>'
-            . '</tr>';
+    /**
+     * Lang key of the add button.
+     *
+     * @return string
+     */
+    protected function add_label_key(): string {
+        return 'providerkeys:add_voice';
     }
 
-    private function render_js(string $id, string $provideroptions): string {
-        $optsjs = json_encode($provideroptions);
-        return <<<JS
-<script>
-(function() {
-    var wrap = document.getElementById('{$id}-wrap');
-    var tbody = document.querySelector('#{$id}-table tbody');
-    var addBtn = document.getElementById('{$id}-add');
-    var hiddenInput = document.getElementById('{$id}-value');
-    var optsHtml = {$optsjs};
-
-    function serialize() {
-        var lines = [];
-        tbody.querySelectorAll('tr').forEach(function(tr) {
-            var p = tr.querySelector('.sola-vp-provider').value;
-            var k = tr.querySelector('.sola-vp-key').value;
-            var lbl = tr.querySelector('.sola-vp-label').value;
-            var rv = tr.querySelector('.sola-vp-rtvoice').value;
-            var tv = tr.querySelector('.sola-vp-ttsvoice').value;
-            if (p && k) {
-                lines.push([p, k, lbl, rv, tv].join('|').replace(/\\|+\$/,''));
+    /**
+     * Problems that stop a save. Messages repeat only a short provider id, never what was typed, because a
+     * key pasted into the wrong field must not come back in the page.
+     *
+     * @param array[] $rows
+     * @return string[]
+     */
+    protected function validate(array $rows): array {
+        $errors = [];
+        $plugin = 'local_ai_course_assistant';
+        foreach ($rows as $r) {
+            $p = $r['provider'];
+            if (!in_array($p, self::PROVIDERS, true)) {
+                $errors[] = get_string('providerkeys:err_voice_provider', $plugin, s(self::safe_name($p)));
+                continue;
             }
-        });
-        hiddenInput.value = lines.join('\\n');
-    }
-
-    function addRow() {
-        var tr = document.createElement('tr');
-        tr.innerHTML = '<td><select class="form-control form-control-sm sola-vp-provider">' + optsHtml + '</select></td>'
-            + '<td><input type="password" class="form-control form-control-sm sola-vp-key" placeholder="Paste API key" autocomplete="off"></td>'
-            + '<td><input type="text" class="form-control form-control-sm sola-vp-label" placeholder="e.g. openai-prod"></td>'
-            + '<td><input type="text" class="form-control form-control-sm sola-vp-rtvoice" placeholder="e.g. shimmer, eve"></td>'
-            + '<td><input type="text" class="form-control form-control-sm sola-vp-ttsvoice" placeholder="e.g. shimmer, eve"></td>'
-            + '<td><button type="button" class="btn btn-sm btn-outline-danger sola-vp-remove" title="Remove">&times;</button></td>';
-        tbody.appendChild(tr);
-        bindRow(tr);
-        serialize();
-    }
-
-    function bindRow(tr) {
-        tr.querySelector('.sola-vp-remove').addEventListener('click', function() { tr.remove(); serialize(); });
-        ['.sola-vp-provider', '.sola-vp-key', '.sola-vp-label', '.sola-vp-rtvoice', '.sola-vp-ttsvoice'].forEach(function(sel) {
-            var el = tr.querySelector(sel);
-            if (el) { el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', serialize); }
-        });
-    }
-
-    tbody.querySelectorAll('tr').forEach(bindRow);
-    addBtn.addEventListener('click', addRow);
-    var form = wrap.closest('form');
-    if (form) { form.addEventListener('submit', serialize); }
-})();
-</script>
-JS;
+            if ($r['stored_key'] === '') {
+                $errors[] = get_string('providerkeys:err_needs_key', $plugin, $p);
+            }
+            // These go between pipes on one line, so a pipe or a line break would shift a column, and the key
+            // column is one of them.
+            foreach (['label' => 'providerkeys:col_label', 'realtime_voice' => 'providerkeys:col_rtvoice',
+                    'tts_voice' => 'providerkeys:col_ttsvoice'] as $field => $label) {
+                if (preg_match('~[|\r\n]~', $r[$field])) {
+                    $errors[] = get_string('providerkeys:err_badchar', $plugin,
+                        (object) ['field' => get_string($label, $plugin), 'provider' => $p]);
+                }
+            }
+        }
+        return $errors;
     }
 }

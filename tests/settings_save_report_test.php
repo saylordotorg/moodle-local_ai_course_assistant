@@ -46,10 +46,143 @@ final class settings_save_report_test extends \advanced_testcase {
         $this->assertStringContainsString('apikey', $r['message']);
     }
 
+    /**
+     * Every secret setting is hidden in the notice, whatever its name: a webhook URL, an access key id or an
+     * export key has no "key", "token" or "secret" for config_log_audit's name list to match, so the notice
+     * showed the first 48 characters of its ciphertext.
+     */
+    public function test_no_secret_setting_ever_shows_a_value_or_ciphertext_in_the_notice(): void {
+        $names = secrets::names();
+        $this->assertGreaterThanOrEqual(17, count($names));
+        $this->assertContains('anomaly_digest_slack_webhook', $names);
+        $this->assertContains('soapbox_storage_key', $names);
+        $this->assertContains('spend_export_key', $names);
+        // And a setting that isn't listed yet but is named like a credential stays hidden by its name.
+        $names[] = 'github_token';
+        $names[] = 'some_future_password';
+        foreach ($names as $name) {
+            $r = settings_save_report::describe([$name => [
+                'sodium:OLDCIPHERTEXTSENTINEL' . base64_encode(random_bytes(30)),
+                'sodium:NEWCIPHERTEXTSENTINEL' . base64_encode(random_bytes(30)),
+            ]]);
+            $this->assertSame(1, $r['changed'], $name);
+            $this->assertStringContainsString('<code>' . $name . '</code>', $r['message'], $name);
+            $this->assertStringContainsString(get_string('savereport:secret', 'local_ai_course_assistant'),
+                $r['message'], $name . ' says only that it changed');
+            $this->assertStringNotContainsString('sodium', $r['message'], $name);
+            $this->assertStringNotContainsString('CIPHERTEXTSENTINEL', $r['message'], $name);
+            $this->assertStringNotContainsString('&rarr;', $r['message'], $name);
+        }
+    }
+
     public function test_line_ending_only_rewrite_is_labelled(): void {
         $r = settings_save_report::describe(['comparison_providers' => ["a|b\r\nc|d", "a|b\nc|d"]]);
         $this->assertStringContainsString(get_string('savereport:lineendings', 'local_ai_course_assistant'), $r['message']);
         $this->assertStringNotContainsString('&rarr;', $r['message']);
+    }
+
+    public function test_a_key_only_change_to_the_provider_table_says_so_and_is_a_warning(): void {
+        // The log holds the table with every key blanked, so a key-only change has equal old and new text.
+        $same = 'openai|********|gpt-4o-mini';
+        $r = settings_save_report::describe(['comparison_providers' => [$same, $same]]);
+        $this->assertStringContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $r['message']);
+        $this->assertStringNotContainsString(get_string('savereport:lineendings', 'local_ai_course_assistant'), $r['message']);
+        $this->assertTrue($r['warn'], 'a key change is worth a warning');
+    }
+
+    public function test_a_line_ending_rewrite_of_the_provider_table_is_still_labelled_as_that(): void {
+        $r = settings_save_report::describe(['comparison_providers' => ["a|********|b\r\nc||d", "a|********|b\nc||d"]]);
+        $this->assertStringContainsString(get_string('savereport:lineendings', 'local_ai_course_assistant'), $r['message']);
+        $this->assertStringNotContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $r['message']);
+    }
+
+    public function test_a_real_change_to_the_provider_table_shows_the_redacted_difference(): void {
+        $r = settings_save_report::describe(['comparison_providers' =>
+            ['openai|********|gpt-4o-mini', 'openai|********|gpt-4o']]);
+        $this->assertStringContainsString('&rarr;', $r['message']);
+        $this->assertStringContainsString('gpt-4o-mini', $r['message']);
+        $this->assertStringNotContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $r['message']);
+    }
+
+    public function test_a_real_key_replacement_reaches_the_notice_without_a_key_or_ciphertext(): void {
+        global $CFG, $SESSION;
+        require_once($CFG->libdir . '/adminlib.php');
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        settings_save_report::assume_web(true);
+        $setting = new admin_setting_provider_keys('local_ai_course_assistant/comparison_providers', 'Provider keys', 'd');
+        $row = ['provider' => 'openai', 'newkey' => 'sk-proj-OLD-NOTICE-3030-XXXX', 'keepid' => '', 'models' => 'm',
+            'temperature' => '', 'baseurl' => ''];
+        $setting->write_setting(['rows' => [$row]]);
+        unset($SESSION->local_ai_course_assistant_savedchanges);
+        // Only the key changes.
+        $row['newkey'] = 'sk-proj-NEW-NOTICE-4040-YYYY';
+        $setting->write_setting(['rows' => [$row]]);
+        $this->assertArrayHasKey('comparison_providers', $SESSION->local_ai_course_assistant_savedchanges);
+
+        settings_save_report::flush();
+        $text = '';
+        foreach (\core\notification::fetch() as $notice) {
+            $text .= $notice->get_message();
+        }
+        $this->assertStringContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $text);
+        $this->assertStringNotContainsString('NOTICE', $text);
+        $this->assertDoesNotMatchRegularExpression('~(sodium|openssl-aes-256-ctr):~', $text);
+        settings_save_report::assume_web(null);
+    }
+
+    public function test_a_key_only_change_to_the_voice_table_says_so_and_is_a_warning(): void {
+        // Same rule as the provider table: the log holds the table with every key blanked.
+        $same = 'openai|********|main|shimmer|nova';
+        $r = settings_save_report::describe(['voice_providers' => [$same, $same]]);
+        $this->assertStringContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $r['message']);
+        $this->assertStringNotContainsString(get_string('savereport:lineendings', 'local_ai_course_assistant'), $r['message']);
+        $this->assertTrue($r['warn'], 'a voice key change is worth a warning');
+    }
+
+    public function test_a_line_ending_rewrite_of_the_voice_table_is_still_labelled_as_that(): void {
+        $r = settings_save_report::describe(['voice_providers' =>
+            ["openai|********|main\r\nxai|********|grok", "openai|********|main\nxai|********|grok"]]);
+        $this->assertStringContainsString(get_string('savereport:lineendings', 'local_ai_course_assistant'), $r['message']);
+        $this->assertStringNotContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $r['message']);
+    }
+
+    public function test_a_real_change_to_the_voice_table_shows_the_redacted_difference(): void {
+        $r = settings_save_report::describe(['voice_providers' =>
+            ['openai|********|main|shimmer|nova', 'openai|********|main|alloy|nova']]);
+        $this->assertStringContainsString('&rarr;', $r['message']);
+        $this->assertStringContainsString('alloy', $r['message']);
+        $this->assertStringNotContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $r['message']);
+    }
+
+    public function test_a_real_voice_key_replacement_reaches_the_notice_without_a_key_or_ciphertext(): void {
+        global $CFG, $SESSION;
+        require_once($CFG->libdir . '/adminlib.php');
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        settings_save_report::assume_web(true);
+        $setting = new admin_setting_voice_providers('local_ai_course_assistant/voice_providers', 'Voice', 'd');
+        $row = ['provider' => 'openai', 'newkey' => 'sk-proj-OLD-VOICENOTICE-3030-XXXX', 'keepid' => '', 'label' => 'main',
+            'realtime_voice' => 'shimmer', 'tts_voice' => 'nova'];
+        $setting->write_setting(['rows' => [$row]]);
+        unset($SESSION->local_ai_course_assistant_savedchanges);
+        // Only the key changes.
+        $row['newkey'] = 'sk-proj-NEW-VOICENOTICE-4040-YYYY';
+        $setting->write_setting(['rows' => [$row]]);
+        $this->assertArrayHasKey('voice_providers', $SESSION->local_ai_course_assistant_savedchanges);
+
+        settings_save_report::flush();
+        $text = '';
+        $levels = [];
+        foreach (\core\notification::fetch() as $notice) {
+            $text .= $notice->get_message();
+            $levels[] = $notice->get_message_type();
+        }
+        $this->assertStringContainsString(get_string('savereport:keychanged', 'local_ai_course_assistant'), $text);
+        $this->assertStringNotContainsString('VOICENOTICE', $text);
+        $this->assertDoesNotMatchRegularExpression('~(sodium|openssl-aes-256-ctr):~', $text);
+        $this->assertContains(\core\output\notification::NOTIFY_WARNING, $levels);
+        settings_save_report::assume_web(null);
     }
 
     public function test_values_are_escaped_and_shortened(): void {
@@ -105,6 +238,65 @@ final class settings_save_report_test extends \advanced_testcase {
         settings_save_report::assume_web(null);
     }
 
+    /** The four settings whose change can leave the default provider without a key. */
+    public static function default_provider_setting_provider(): array {
+        return [['provider'], ['model'], ['apibaseurl'], ['comparison_providers']];
+    }
+
+    /**
+     * @dataProvider default_provider_setting_provider
+     * @param string $name
+     */
+    public function test_a_change_to_a_default_provider_setting_raises_the_key_warning(string $name): void {
+        $this->resetAfterTest();
+        set_config('provider', 'claude', 'local_ai_course_assistant');
+        $expected = provider_keys::default_provider_warnings();
+        $this->assertCount(1, $expected, 'claude is the default and no row has a key');
+
+        $this->assertSame(1, settings_save_report::emit_default_provider_warnings([$name => ['a', 'b']]));
+        $notices = \core\notification::fetch();
+        $this->assertCount(1, $notices);
+        $this->assertSame($expected[0], $notices[0]->get_message());
+        $this->assertSame(\core\output\notification::NOTIFY_WARNING, $notices[0]->get_message_type());
+    }
+
+    public function test_other_changes_raise_no_key_warning(): void {
+        $this->resetAfterTest();
+        set_config('provider', 'claude', 'local_ai_course_assistant');
+        $this->assertNotEmpty(provider_keys::default_provider_warnings());
+
+        $this->assertSame(0, settings_save_report::emit_default_provider_warnings([]));
+        $this->assertSame(0, settings_save_report::emit_default_provider_warnings(
+            ['greeting' => ['hi', 'hello'], 'apikey' => ['a', 'b'], 'failover_per_call_enabled' => ['0', '1']]));
+        $this->assertSame([], \core\notification::fetch());
+    }
+
+    public function test_no_key_warning_when_the_default_provider_has_its_key(): void {
+        $this->resetAfterTest();
+        set_config('provider', 'claude', 'local_ai_course_assistant');
+        set_config('comparison_providers', 'claude|' . secrets::conceal('sk-ant-HAS-ITS-KEY-0001-ABCD') . '|m',
+            'local_ai_course_assistant');
+        $this->assertSame(0, settings_save_report::emit_default_provider_warnings(['provider' => ['auto', 'claude']]));
+        $this->assertSame([], \core\notification::fetch());
+    }
+
+    public function test_flush_raises_each_key_warning_once_however_many_settings_changed(): void {
+        global $SESSION;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        settings_save_report::assume_web(true);
+        set_config('provider', 'claude', 'local_ai_course_assistant');
+        $expected = provider_keys::default_provider_warnings();
+        $SESSION->local_ai_course_assistant_savedchanges = [
+            'provider' => ['auto', 'claude'], 'model' => ['x', 'y'], 'apibaseurl' => ['', 'https://gw.example'],
+            'comparison_providers' => ['a', 'b'],
+        ];
+        settings_save_report::flush();
+        $messages = array_map(static fn($n) => $n->get_message(), \core\notification::fetch());
+        $this->assertSame(1, count(array_keys($messages, $expected[0], true)), 'once, not once per setting');
+        settings_save_report::assume_web(null);
+    }
+
     public function test_cli_changes_are_not_collected(): void {
         global $SESSION;
         $this->resetAfterTest();
@@ -115,5 +307,56 @@ final class settings_save_report_test extends \advanced_testcase {
             'other' => ['name' => 'provider', 'plugin' => 'local_ai_course_assistant', 'oldvalue' => 'a', 'value' => 'b'],
         ]));
         $this->assertEmpty($SESSION->local_ai_course_assistant_savedchanges ?? []);
+    }
+
+    /**
+     * Table values as a log row may hold them if a writer logs a table whole: a key in the clear (a row
+     * saved before 7.9.0), ciphertext, one line or many, with a trailing line break, with Windows line
+     * endings, with two-column lines, and with nothing on one side (the first write, a clear).
+     *
+     * @return array[] name => [setting, old value, new value]
+     */
+    public static function table_values_that_carry_a_key(): array {
+        $k1 = 'LEAKKEY-0001-AAAAAAAAAAAA';
+        $k2 = 'LEAKKEY-0002-BBBBBBBBBBBB';
+        $k3 = 'LEAKKEY-0003-CCCCCCCCCCCC';
+        $c1 = 'sodium:LEAKCIPHER' . str_repeat('A', 40);
+        $c2 = 'sodium:LEAKCIPHER' . str_repeat('B', 40);
+        return [
+            'a legacy plain key in the voice table' => ['voice_providers', "openai|$k1|main|shimmer|nova", "openai|$k2|main|shimmer|nova"],
+            'a legacy plain key in the provider table' => ['comparison_providers', "openai|$k1|gpt-4o", "claude|$k2|claude-haiku"],
+            'a key on every line of several' => ['comparison_providers', "openai|$k1|a\nclaude|$k2|b\ngemini|$k3|c",
+                "openai|$k2|a\nclaude|$k3|b\ngemini|$k1|c"],
+            'a key that starts inside the first 48 characters, on the second line' => ['comparison_providers',
+                "x||m\nclaude|$k1|b", "x||m\nclaude|$k2|b"],
+            'a trailing line break' => ['voice_providers', "openai|$k1|main\n", "openai|$k2|main\n"],
+            'Windows line endings with a key' => ['comparison_providers', "openai|$k1|a\r\nclaude|$k2|b\r\n",
+                "openai|$k2|a\r\nclaude|$k1|b\r\n"],
+            'Windows line endings, two-column lines' => ['voice_providers', "openai|$k1\r\nxai|$k2\r\n", "openai|$k2\r\nxai|$k1\r\n"],
+            'a first write (no old value)' => ['comparison_providers', null, "openai|$k1|m\nclaude|$k2|m"],
+            'a cleared table (no new value)' => ['voice_providers', "openai|$k1|main", null],
+            'ciphertext in the key column' => ['comparison_providers', "openai|$c1|m", "openai|$c2|m"],
+            'ciphertext in the voice table, several lines' => ['voice_providers', "openai|$c1|main|shimmer|nova\nxai|$c2|g",
+                "openai|$c2|main|shimmer|nova\nxai|$c1|g"],
+        ];
+    }
+
+    /**
+     * @dataProvider table_values_that_carry_a_key
+     * @param string $name the setting
+     * @param ?string $old
+     * @param ?string $new
+     */
+    public function test_a_table_change_never_prints_a_key_or_the_start_of_a_row_that_holds_one(string $name, ?string $old,
+            ?string $new): void {
+        $report = settings_save_report::describe([$name => [$old, $new]]);
+        $this->assertSame(1, $report['changed']);
+        $text = html_entity_decode(strip_tags($report['message']));
+        $this->assertStringContainsString($name, $text, 'the notice still names the setting');
+        // Every key here starts with LEAKKEY or is ciphertext starting sodium:LEAKCIPHER, so any piece of one
+        // longer than a few characters, and any part of a row's start that reaches into a key, is caught.
+        $this->assertStringNotContainsString('LEAKKEY', $text);
+        $this->assertStringNotContainsString('LEAKCIPHER', $text);
+        $this->assertStringNotContainsString('sodium', $text);
     }
 }

@@ -19,10 +19,12 @@ namespace local_ai_course_assistant;
 /**
  * Guards that credential settings are declared as password types.
  *
- * Moodle writes '********' into mdl_config_log for password settings only. A
- * credential declared as admin_setting_configtext has every historical value
- * recorded in the clear, in a table that is never purged and is readable by
- * anything with database or reporting access.
+ * Moodle's masked password type writes '********' into mdl_config_log, and
+ * admin_setting_secret_field does the same for the encrypted one (Moodle's own
+ * admin_setting_encryptedpassword logs the full ciphertext). A credential
+ * declared as admin_setting_configtext has every historical value recorded in
+ * the clear, in a table that is never purged and is readable by anything with
+ * database or reporting access.
  *
  * Found on production 2026-08-03: redash_api_key was a plain configtext, and a
  * retired key was recoverable in full from config_log. Its siblings
@@ -48,7 +50,23 @@ final class settings_secret_masking_test extends \advanced_testcase {
     // hints matched it, so the first version of this guard walked straight past a
     // credential it existed to catch. The bare hint flags exactly one non-secret,
     // policy_bundle_pubkey, which is already exempted below.
-    private const SECRET_HINTS = ['apikey', 'api_key', 'key', 'secret', 'token', 'password'];
+    // 'webhook' is there because an incoming-webhook URL carries its token in the path: anyone holding the
+    // anomaly digest's Slack or Teams URL can post to that channel, and as a configtext every old value
+    // stayed readable in mdl_config_log.
+    private const SECRET_HINTS = ['apikey', 'api_key', 'key', 'secret', 'token', 'password', 'webhook'];
+
+    /**
+     * The setting classes a credential may be declared with: the encrypted field that logs a mask and shows
+     * an "ends in" hint, and its webhook URL subclass. Moodle's own admin_setting_encryptedpassword is NOT
+     * accepted any more: it writes the full ciphertext of every save into mdl_config_log.
+     */
+    private const PASSWORD_TYPES = [
+        'admin_setting_secret_field',
+        'admin_setting_webhook_url',
+    ];
+
+    /** The fewest credential settings the scan must see in settings.php (the real count, less one). */
+    private const MIN_CHECKED = 14;
 
     /**
      * Names that match a hint but are NOT credentials, with the reason.
@@ -74,8 +92,10 @@ final class settings_secret_masking_test extends \advanced_testcase {
         $this->assertFileExists($path);
         $src = file_get_contents($path);
 
-        // Each declaration: the class name, then the setting name a few lines on.
-        $pattern = '/new\s+(admin_setting_\w+)\s*\(\s*\'local_ai_course_assistant\/([a-z0-9_]+)\'/i';
+        // Each declaration: the class name, then the setting name a few lines on. The class may be written
+        // with its namespace (\local_ai_course_assistant\admin_setting_secret_field), which a bare
+        // "admin_setting_x" pattern would silently skip: a guard that passes by seeing nothing.
+        $pattern = '/new\s+\\\\?(?:local_ai_course_assistant\\\\)?(admin_setting_\w+)\s*\(\s*\'local_ai_course_assistant\/([a-z0-9_]+)\'/i';
         $this->assertMatchesRegularExpression(
             $pattern,
             $src,
@@ -103,7 +123,7 @@ final class settings_secret_masking_test extends \advanced_testcase {
             $checked++;
             // Encrypted, not merely masked (#302): a masked setting is still plain
             // text in config_plugins and in every database backup.
-            if (strtolower($class) !== 'admin_setting_encryptedpassword') {
+            if (!in_array(strtolower($class), self::PASSWORD_TYPES, true)) {
                 $offenders[] = "{$name} (declared {$class})";
             }
         }
@@ -113,13 +133,22 @@ final class settings_secret_masking_test extends \advanced_testcase {
             $checked,
             'no credential-looking settings matched -- the hint list may be stale'
         );
+        // A floor, so the scan can't quietly shrink again. It counts only declarations written with a
+        // literal name; the avatar API keys and webhook secrets are declared in loops with a built name, so
+        // they aren't in the count. Raise the floor when a credential setting is added.
+        $this->assertGreaterThanOrEqual(
+            self::MIN_CHECKED,
+            $checked,
+            "the scan saw only {$checked} credential settings: the declaration pattern has drifted from settings.php"
+        );
         $this->assertSame(
             [],
             $offenders,
-            "Credential settings must be admin_setting_encryptedpassword and be listed in "
-            . "secrets::names(). Plain configtext records every historical value in "
-            . "mdl_config_log, and a masked password type is still plain text in the "
-            . "database. Offenders: " . implode(', ', $offenders)
+            "Credential settings must be admin_setting_secret_field (an encrypted password field that logs a "
+            . "mask and shows an \"ends in\" hint) or its webhook subclass, and be listed in secrets::names(). "
+            . "Moodle's own admin_setting_encryptedpassword logs the full ciphertext of every save, plain "
+            . "configtext records every historical value in mdl_config_log, and a masked password type is "
+            . "still plain text in the database. Offenders: " . implode(', ', $offenders)
         );
     }
 
