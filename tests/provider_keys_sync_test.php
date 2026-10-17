@@ -624,12 +624,23 @@ final class provider_keys_sync_test extends \advanced_testcase {
 
     // 7.9.1: a deleted default row leaves the old key in apikey, so the page must say so.
 
-    /** The finished sentence for a provider, as the page shows it. */
+    /**
+     * The finished sentence for a provider, as the page shows it.
+     *
+     * @param string $provider the default provider id the sentence names
+     * @return string
+     */
     private function stale_sentence(string $provider): string {
         return get_string('providerkeys:default_stale_key', 'local_ai_course_assistant', (object) ['provider' => $provider]);
     }
 
-    /** Every way the stale-key sentence must stay clean: no key text, no last four, no em dash, no markup. */
+    /**
+     * Every way the stale-key sentence must stay clean: no key text, no last four, no em dash, no markup.
+     *
+     * @param string $sentence the finished sentence
+     * @param string $provider the provider id it must name
+     * @param string $key the sentinel key that must not appear in it, nor its first or last characters
+     */
     private function assert_stale_sentence_is_clean(string $sentence, string $provider, string $key): void {
         $this->assertStringContainsString($provider, $sentence);
         $this->assertStringContainsString('Providers and keys', $sentence);
