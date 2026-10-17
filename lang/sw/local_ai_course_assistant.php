@@ -3465,3 +3465,5 @@ $string['settings:realtime_key_from'] = 'Chanzo cha ufunguo wa sauti na TTS';
 $string['settings:realtime_key_from_desc'] = 'Tumia ufunguo wa OpenAI kutoka "Watoa huduma na funguo" badala ya kuubandika tena. Kuchagua safu hapa ndiko kunakowasha, kwa ufunguo huo, kitufe cha kusoma kwa sauti, chip ya Mazoezi ya Mazungumzo (kwa kozi zinazoiwezesha) na huduma mbadala ya kubadilisha sauti kuwa maandishi. Hivi hubaki vimewashwa hata Hali ya Sauti ikizimwa baadaye. Kuongeza safu ya OpenAI kwa ajili ya failover pekee hakuviwashi kamwe, na safu yenye URL yake ya msingi hupuuzwa.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'Safu ya {$a->provider} ina URL yake ya msingi, ambayo ni tofauti na URL ya Msingi ya API, kwa hivyo gumzo bado linatumia ufunguo chaguo-msingi wa awali. Fanya hizo mbili zilingane, au futa URL ya msingi ya safu hiyo.';
+
+$string['providerkeys:default_stale_key'] = 'Hakuna ufunguo uliohifadhiwa wa {$a->provider} katika "Watoa huduma na funguo", lakini gumzo bado linatumia ufunguo chaguo-msingi wa zamani. Kuondoa safu hakuuzuii ufunguo huo. Ongeza ufunguo wa {$a->provider} ili uchukue nafasi yake.';

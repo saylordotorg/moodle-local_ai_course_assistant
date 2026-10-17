@@ -3464,3 +3464,5 @@ $string['settings:realtime_key_from'] = 'Sumber kunci Suara dan TTS';
 $string['settings:realtime_key_from_desc'] = 'Gunakan kunci OpenAI daripada "Pembekal dan kunci" dan bukannya menampalnya sekali lagi. Memilih baris di sini ialah tindakan yang menghidupkan butang sebut, cip Latihan Perbualan (untuk kursus yang mendayakannya) dan sandaran pertuturan-ke-teks dengan kunci itu. Ciri ini kekal hidup jika Mod Suara dimatikan kemudian. Menambah baris OpenAI untuk peralihan sandaran semata-mata tidak akan menghidupkannya, dan baris yang mempunyai URL asasnya sendiri diabaikan.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'Baris {$a->provider} mempunyai URL asas sendiri yang berbeza daripada URL Asas API, jadi sembang masih menggunakan kunci lalai sebelumnya. Samakan kedua-duanya, atau kosongkan URL asas baris itu.';
+
+$string['providerkeys:default_stale_key'] = 'Tiada kunci disimpan untuk {$a->provider} dalam "Pembekal dan kunci", tetapi sembang masih menggunakan kunci lalai yang lebih lama. Memadam baris tidak menghentikan kunci itu. Tambah kunci untuk {$a->provider} bagi menggantikannya.';

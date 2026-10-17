@@ -3442,3 +3442,5 @@ $string['settings:realtime_key_from'] = 'Orísun kọ́kọ́rọ́ Ohùn àti T
 $string['settings:realtime_key_from_desc'] = 'Lo kọ́kọ́rọ́ OpenAI láti inú "Àwọn olùpèsè àti kọ́kọ́rọ́" dípò kí o tún lẹ̀ ẹ́ mọ́. Yíyan ìlà náà níbí ni ohun tí ó ń tan bọ́tìnnì sísọ, bọ́tìnnì Ìdánilẹ́kọ̀ọ́ Ìfọ̀rọ̀wánilẹ́nuwò (fún àwọn kọ́ọ̀sì tí ó mú un ṣiṣẹ́) àti àbáwọlé ohùn-sí-ọ̀rọ̀ láti inú kọ́kọ́rọ́ yẹn. Wọ́n á máa ṣiṣẹ́ lọ bí a bá pa Ìpínlẹ̀ Ohùn lẹ́yìn náà. Fífi ìlà OpenAI kún fún ìdúró nìkan kì í tan wọ́n láé, a kò sì ní wo ìlà tí ó ní URL ìpìlẹ̀ tirẹ̀.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'Ìlà {$a->provider} ní URL ìpìlẹ̀ tirẹ̀, tí ó yàtọ̀ sí URL Ìpìlẹ̀ API, nítorí náà ìjíròrò ṣì ń lo kọ́kọ́rọ́ àìyípadà ti tẹ́lẹ̀. Mú kí méjèèjì bá ara wọn mu, tàbí pa URL ìpìlẹ̀ ìlà náà rẹ́.';
+
+$string['providerkeys:default_stale_key'] = 'Kò sí kọ́kọ́rọ́ tí a fi pamọ́ fún {$a->provider} nínú "Àwọn olùpèsè àti kọ́kọ́rọ́", ṣùgbọ́n ìjíròrò ṣì ń lo kọ́kọ́rọ́ àìyípadà àtijọ́ kan. Yíyọ ìlà kan kúrò kò dá kọ́kọ́rọ́ náà dúró. Fi kọ́kọ́rọ́ kan kún fún {$a->provider} láti rọ́pò rẹ̀.';

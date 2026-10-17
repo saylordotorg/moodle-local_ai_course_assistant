@@ -3466,3 +3466,5 @@ $string['settings:realtime_key_from'] = 'Umthombo wokhiye wezwi ne-TTS';
 $string['settings:realtime_key_from_desc'] = 'Sebenzisa ukhiye we-OpenAI ovela ku-"Abahlinzeki nokhiye" esikhundleni sokuwunamathisela futhi. Ukukhetha umugqa lapha yikho okuvula, ngalowo khiye, inkinobho yokukhuluma, i-chip ye-Ukuzilolongela Ingxoxo (ezifundweni eziyivulile) nokushintshela kokuguqula inkulumo ibe umbhalo. Kuhlala kuvuliwe noma Imodi Yezwi ivalwa kamuva. Ukwengeza umugqa we-OpenAI we-failover kuphela akukaze kukuvule, futhi umugqa one-URL eyisisekelo yawo awunakwa.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'Umugqa we-{$a->provider} une-URL yawo eyisisekelo, ehlukile ku-URL Yisisekelo se-API, ngakho ingxoxo isasebenzisa ukhiye ozenzakalelayo wangaphambilini. Yenza zombili zifane, noma usule i-URL eyisisekelo yomugqa.';
+
+$string['providerkeys:default_stale_key'] = 'Awukho ukhiye olondoloziwe we-{$a->provider} ku-"Abahlinzeki nokhiye", kodwa ingxoxo isasebenzisa ukhiye omdala ozenzakalelayo. Ukususa umugqa akuwumisi lowo khiye. Engeza ukhiye we-{$a->provider} ozothatha indawo yawo.';

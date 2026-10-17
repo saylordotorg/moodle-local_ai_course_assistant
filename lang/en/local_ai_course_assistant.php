@@ -3666,6 +3666,7 @@ $string['check:coursekeys_bad'] = '{$a->count} course(s) have a saved key that l
 $string['providerkeys:default_no_key'] = '{$a->provider} is the default provider, but no key is saved for it anywhere. Add a key for {$a->provider} in "Providers and keys" before students use chat.';
 $string['providerkeys:default_vendor_mismatch'] = 'The saved key looks like a {$a->owner} key, but the default provider is {$a->provider}. Add a key for {$a->provider} in "Providers and keys" before students use chat.';
 $string['providerkeys:default_baseurl_mismatch'] = 'The {$a->provider} row has its own base URL, which differs from API Base URL, so chat still uses the previous default key. Make the two match, or clear the row\'s base URL.';
+$string['providerkeys:default_stale_key'] = 'No key is saved for {$a->provider} in "Providers and keys", but chat is still using an older default key. Deleting a row doesn\'t stop that key. Add a key for {$a->provider} to replace it.';
 $string['providerkeys:use_own_key'] = 'Use the key pasted below';
 $string['providerkeys:use_row_key'] = 'Use the key from the {$a} row';
 $string['providerkeys:upgrade_conflict'] = 'On upgrade, [[tutorshort]] found two different keys for {$a->provider}: the row ended in {$a->rowlast4} and the default key ends in {$a->defaultlast4}. The row now uses the default key, the one chat was already using. Paste the other key again if it was the one you meant.';

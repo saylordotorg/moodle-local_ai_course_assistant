@@ -3422,3 +3422,5 @@ $string['settings:realtime_key_from'] = 'Source de la clé de voix et TTS';
 $string['settings:realtime_key_from_desc'] = 'Utilisez la clé OpenAI de "Fournisseurs et clés" au lieu de la coller de nouveau. C\'est le choix de la ligne ici qui active le bouton de lecture vocale, la puce Pratique de conversation (pour les cours qui l\'activent) et la transcription vocale de secours avec cette clé. Ils restent actifs si le mode vocal est désactivé par la suite. Ajouter une ligne OpenAI uniquement pour la bascule de secours ne les active jamais, et une ligne qui a sa propre URL de base est ignorée.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'La ligne {$a->provider} a sa propre URL de base, différente de l\'URL de base de l\'API, si bien que le chat utilise toujours l\'ancienne clé par défaut. Faites correspondre les deux ou videz l\'URL de base de la ligne.';
+
+$string['providerkeys:default_stale_key'] = 'Aucune clé n\'est enregistrée pour {$a->provider} dans "Fournisseurs et clés", mais le chat utilise toujours une ancienne clé par défaut. Supprimer une ligne n\'arrête pas cette clé. Ajoutez une clé pour {$a->provider} afin de la remplacer.';

@@ -3422,3 +3422,5 @@ $string['settings:realtime_key_from'] = 'Zdroj klíče pro hlas a TTS';
 $string['settings:realtime_key_from_desc'] = 'Použijte klíč OpenAI z části "Poskytovatelé a klíče", místo abyste jej vkládali znovu. Právě výběr řádku zde zapne s tímto klíčem tlačítko čtení nahlas, čip Konverzační cvičení (u kurzů, které jej povolí) a záložní převod řeči na text. Zůstanou zapnuté, i když hlasový režim později vypnete. Řádek OpenAI přidaný jen kvůli záložnímu přepnutí to nikdy neudělá a řádek s vlastní základní URL se ignoruje.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'Řádek pro {$a->provider} má vlastní základní URL, které se liší od nastavení Základní URL API, takže chat stále používá předchozí výchozí klíč. Sjednoťte obě hodnoty, nebo základní URL v řádku vymažte.';
+
+$string['providerkeys:default_stale_key'] = 'V "Poskytovatelé a klíče" není pro {$a->provider} uložen žádný klíč, chat však stále používá starší výchozí klíč. Smazání řádku tento klíč nezastaví. Nahraďte jej přidáním klíče pro {$a->provider}.';

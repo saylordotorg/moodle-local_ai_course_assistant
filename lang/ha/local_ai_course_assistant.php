@@ -3448,3 +3448,5 @@ $string['settings:realtime_key_from'] = 'Tushen maɓallin murya da TTS';
 $string['settings:realtime_key_from_desc'] = 'Ka yi amfani da maɓallin OpenAI daga "Masu bada sabis da maɓallai" maimakon sake manna shi. Zaɓar layin a nan shi ne ke kunna maɓallin karanta saƙo, alamar Aikin Tattaunawa (ga kwasa-kwasan da suka kunna ta) da madadin magana-zuwa-rubutu da wannan maɓallin. Suna ci gaba da kasancewa a kunne ko da an kashe Yanayin Murya daga baya. Ƙara layin OpenAI don madadi kawai ba ya yin haka ko kaɗan, kuma ba a la\'akari da layin da ke da nasa URL ɗin tushe.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'Layin {$a->provider} yana da URL ɗin tushe nasa, wanda ya bambanta da URL ɗin Tushen API, don haka hira har yanzu tana amfani da maɓallin asali na baya. Ka sa su biyun su yi daidai, ko ka goge URL ɗin tushe na layin.';
+
+$string['providerkeys:default_stale_key'] = 'Babu maɓallin da aka adana don {$a->provider} a cikin "Masu bada sabis da maɓallai", amma hira har yanzu tana amfani da wani tsohon maɓallin asali. Cire layi ba ya dakatar da wannan maɓallin. Ka ƙara maɓalli don {$a->provider} domin ya maye gurbinsa.';

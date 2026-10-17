@@ -3457,3 +3457,5 @@ $string['settings:realtime_key_from'] = '语音和 TTS 密钥来源';
 $string['settings:realtime_key_from_desc'] = '使用"供应商和密钥"中的 OpenAI 密钥，无需再次粘贴。正是在此处选择该行，才会基于该密钥开启朗读按钮、对话练习按钮（适用于启用该功能的课程）以及语音转文字后备功能。即使之后关闭语音模式，这些功能仍保持开启。仅为故障转移而添加 OpenAI 行永远不会开启这些功能，并且带有自己的基础 URL 的行会被忽略。';
 
 $string['providerkeys:default_baseurl_mismatch'] = '{$a->provider} 行有自己的基础 URL，与 API 基础 URL 不同，因此聊天仍在使用之前的默认密钥。请将两者设为一致，或清除该行的基础 URL。';
+
+$string['providerkeys:default_stale_key'] = '"供应商和密钥"中没有为 {$a->provider} 保存密钥，但聊天仍在使用一个较旧的默认密钥。删除某一行不会停用该密钥。请为 {$a->provider} 添加一个密钥来替换它。';

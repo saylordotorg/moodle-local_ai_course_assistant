@@ -3419,3 +3419,5 @@ $string['settings:realtime_key_from'] = '音声と TTS のキーの取得元';
 $string['settings:realtime_key_from_desc'] = '"プロバイダーとキー" の OpenAI キーを、もう一度貼り付けずに使用します。ここで行を選ぶと、そのキーで読み上げボタン、会話練習チップ（有効にしているコースのみ）、音声文字変換のフォールバックが有効になります。後で音声モードをオフにしても、これらは有効なままです。フェイルオーバー用に OpenAI の行を追加しただけでは有効にならず、独自のベースURLを持つ行は無視されます。';
 
 $string['providerkeys:default_baseurl_mismatch'] = '{$a->provider} の行には独自のベースURLがあり、APIベースURLと異なるため、チャットは引き続き以前のデフォルトのキーを使用しています。両者を一致させるか、この行のベースURLを空にしてください。';
+
+$string['providerkeys:default_stale_key'] = '"プロバイダーとキー" に {$a->provider} のキーが保存されていませんが、チャットは引き続き以前のデフォルトのキーを使用しています。行を削除しても、そのキーの使用は止まりません。置き換えるには、{$a->provider} のキーを追加してください。';

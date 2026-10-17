@@ -3459,3 +3459,5 @@ $string['settings:realtime_key_from'] = 'Origine della chiave per voce e TTS';
 $string['settings:realtime_key_from_desc'] = 'Usa la chiave OpenAI di "Provider e chiavi" invece di incollarla di nuovo. È la scelta della riga qui che attiva il pulsante TTS di lettura, il chip Pratica di conversazione (per i corsi che lo abilitano) e il riconoscimento vocale di riserva con quella chiave. Restano attivi anche se in seguito la Modalità vocale viene disattivata. Aggiungere una riga OpenAI solo per il failover non li attiva mai, e una riga con un proprio URL base viene ignorata.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'La riga {$a->provider} ha un proprio URL base, diverso da URL Base API, quindi la chat usa ancora la chiave predefinita precedente. Faccia corrispondere i due valori oppure svuoti l\'URL base della riga.';
+
+$string['providerkeys:default_stale_key'] = 'Non c\'è nessuna chiave salvata per {$a->provider} in "Provider e chiavi", ma la chat usa ancora una chiave predefinita precedente. L\'eliminazione di una riga non blocca quella chiave. Aggiunga una chiave per {$a->provider} per sostituirla.';

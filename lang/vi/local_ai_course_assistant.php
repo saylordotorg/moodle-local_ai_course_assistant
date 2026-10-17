@@ -3441,3 +3441,5 @@ $string['settings:realtime_key_from'] = 'Nguồn khóa giọng nói và TTS';
 $string['settings:realtime_key_from_desc'] = 'Dùng khóa OpenAI từ "Nhà cung cấp và khóa" thay vì dán lại. Chính việc chọn hàng ở đây sẽ bật nút đọc, nút Luyện Hội Thoại (cho các khóa học bật tính năng này) và tính năng dự phòng chuyển giọng nói thành văn bản từ khóa đó. Các tính năng này vẫn bật nếu sau đó Chế độ giọng nói bị tắt. Việc thêm một hàng OpenAI chỉ để dự phòng không bao giờ làm điều này, và hàng có URL cơ sở riêng sẽ bị bỏ qua.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'Hàng {$a->provider} có URL cơ sở riêng, khác với URL cơ sở API, nên tính năng trò chuyện vẫn dùng khóa mặc định trước đó. Hãy làm cho hai URL này khớp nhau, hoặc xóa URL cơ sở của hàng.';
+
+$string['providerkeys:default_stale_key'] = 'Không có khóa nào được lưu cho {$a->provider} trong "Nhà cung cấp và khóa", nhưng tính năng trò chuyện vẫn đang dùng một khóa mặc định cũ hơn. Xóa một hàng không làm khóa đó ngừng hoạt động. Hãy thêm khóa cho {$a->provider} để thay thế khóa đó.';
