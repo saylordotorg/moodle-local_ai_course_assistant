@@ -3422,3 +3422,5 @@ $string['settings:realtime_key_from'] = 'Ses ve TTS anahtarı kaynağı';
 $string['settings:realtime_key_from_desc'] = '"Sağlayıcılar ve anahtarlar" bölümündeki OpenAI anahtarını yeniden yapıştırmak yerine kullanın. Seslendirme düğmesini, Konuşma pratiği kısayolunu (bunu etkinleştiren derslerde) ve bu anahtarla konuşmadan metne yedek özelliğini açan şey, satırın burada seçilmesidir. Ses Modu daha sonra kapatılsa bile bunlar açık kalır. Yalnızca yedeğe geçiş için bir OpenAI satırı eklemek bunu asla yapmaz ve kendi temel URL\'si olan bir satır yok sayılır.';
 
 $string['providerkeys:default_baseurl_mismatch'] = '{$a->provider} satırının API temel URL\'sinden farklı, kendine ait bir temel URL\'si var; bu nedenle sohbet hâlâ önceki varsayılan anahtarı kullanıyor. İkisini eşleştirin veya satırın temel URL\'sini temizleyin.';
+
+$string['providerkeys:default_stale_key'] = '"Sağlayıcılar ve anahtarlar" içinde {$a->provider} için kayıtlı bir anahtar yok, ancak sohbet hâlâ daha eski bir varsayılan anahtarı kullanıyor. Bir satırı silmek bu anahtarı durdurmaz. Bu anahtarın yerine geçecek bir {$a->provider} anahtarı ekleyin.';

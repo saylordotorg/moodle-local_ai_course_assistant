@@ -3448,3 +3448,5 @@ $string['settings:realtime_key_from'] = 'Origen de la clave de voz y TTS';
 $string['settings:realtime_key_from_desc'] = 'Use la clave de OpenAI de "Proveedores y claves" en lugar de pegarla otra vez. Elegir aquí la fila es lo que activa el botón de lectura en voz alta, el chip de Práctica de conversación (en los cursos que lo habilitan) y la alternativa de voz a texto con esa clave. Siguen activos aunque más adelante se desactive el modo de voz. Añadir una fila de OpenAI solo para la conmutación por error nunca los activa, y una fila con su propia URL base se ignora.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'La fila de {$a->provider} tiene su propia URL base, distinta de la URL base de la API, por lo que el chat sigue usando la clave predeterminada anterior. Haga que ambas coincidan o borre la URL base de la fila.';
+
+$string['providerkeys:default_stale_key'] = 'No hay ninguna clave guardada para {$a->provider} en "Proveedores y claves", pero el chat sigue usando una clave predeterminada anterior. Eliminar una fila no detiene esa clave. Agregue una clave para {$a->provider} para reemplazarla.';

@@ -3453,3 +3453,5 @@ $string['settings:realtime_key_from'] = 'Madda furtuu Sagalee fi TTS';
 $string['settings:realtime_key_from_desc'] = 'Irra deebi\'anii maxxansuu mannaa, furtuu OpenAI "Dhiyeessitootaa fi furtuuwwan" keessaa fayyadami. Sarara asitti filachuun qabduu dubbisuu, filannoo Shaakala Haasawaa (koorsota dandeessisaniif) fi bakka bu\'aa sagalee gara barreeffamaatti jijjiiru furtuu sana irraa kan banu dha. Haalli Sagalee booda yoo cufamellee isaan banamanii turu. Sarara OpenAI bakka bu\'aa qofaaf dabaluun gonkumaa isaan hin banu, sararri URL bu\'uuraa mataa isaa qabu immoo hin ilaalamu.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'Sararri {$a->provider} URL bu\'uuraa mataa isaa qaba, kunis URL Bu\'uura API irraa adda, kanaaf haasawaan ammayyuu furtuu durtii duraanii fayyadama. Lamaan isaanii walsimsiisi, yookaan URL bu\'uuraa sararichaa haqi.';
+
+$string['providerkeys:default_stale_key'] = 'Furtuun {$a->provider} dhaaf "Dhiyeessitootaa fi furtuuwwan" keessatti olkaa\'ame hin jiru, garuu haasawaan ammayyuu furtuu durtii moofaa fayyadamaa jira. Sarara haquun furtuu sana hin dhaabu. Isa bakka buusuuf furtuu {$a->provider} dhaaf dabali.';

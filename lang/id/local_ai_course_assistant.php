@@ -3473,3 +3473,5 @@ $string['settings:realtime_key_from'] = 'Sumber kunci suara dan TTS';
 $string['settings:realtime_key_from_desc'] = 'Gunakan kunci OpenAI dari "Penyedia dan kunci" alih-alih menempelnya lagi. Memilih baris di sini yang mengaktifkan tombol bicara, chip Latihan Percakapan (untuk kursus yang mengaktifkannya), dan cadangan ucapan-ke-teks dari kunci tersebut. Semuanya tetap aktif meskipun Mode Suara kemudian dimatikan. Menambahkan baris OpenAI hanya untuk failover tidak pernah mengaktifkannya, dan baris yang memiliki URL dasarnya sendiri diabaikan.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'Baris {$a->provider} memiliki URL dasar sendiri yang berbeda dari URL Dasar API, sehingga chat masih menggunakan kunci default sebelumnya. Samakan keduanya, atau kosongkan URL dasar pada baris tersebut.';
+
+$string['providerkeys:default_stale_key'] = 'Tidak ada kunci yang disimpan untuk {$a->provider} di "Penyedia dan kunci", tetapi chat masih menggunakan kunci default yang lebih lama. Menghapus baris tidak menghentikan kunci tersebut. Tambahkan kunci untuk {$a->provider} guna menggantikannya.';

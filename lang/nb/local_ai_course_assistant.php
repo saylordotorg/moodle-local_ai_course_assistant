@@ -3419,3 +3419,5 @@ $string['settings:realtime_key_from'] = 'Kilde for tale- og TTS-nøkkel';
 $string['settings:realtime_key_from_desc'] = 'Bruk OpenAI-nøkkelen fra "Leverandører og nøkler" i stedet for å lime den inn på nytt. Det er valget av rad her som slår på opplesingsknappen, Samtaleøvelse-brikken (for kurs som har aktivert den) og reserveløsningen for tale-til-tekst med den nøkkelen. De forblir på selv om Talemodus senere slås av. Å legge til en OpenAI-rad bare for failover gjør aldri dette, og en rad med egen basis-URL ignoreres.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'Raden for {$a->provider} har sin egen basis-URL, som er forskjellig fra API-basis-URL, så chatten bruker fortsatt den forrige standardnøkkelen. Sørg for at de to er like, eller tøm basis-URL-en i raden.';
+
+$string['providerkeys:default_stale_key'] = 'Ingen nøkkel er lagret for {$a->provider} i "Leverandører og nøkler", men chatten bruker fortsatt en eldre standardnøkkel. Å slette en rad stopper ikke den nøkkelen. Legg til en nøkkel for {$a->provider} for å erstatte den.';

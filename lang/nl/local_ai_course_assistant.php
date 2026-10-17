@@ -3444,3 +3444,5 @@ $string['settings:realtime_key_from'] = 'Bron van de sleutel voor stem en TTS';
 $string['settings:realtime_key_from_desc'] = 'Gebruik de OpenAI-sleutel uit "Providers en sleutels" in plaats van deze opnieuw te plakken. Juist door hier de rij te kiezen, worden met die sleutel de voorleesknop, de chip Gespreksoefening (voor cursussen die deze inschakelen) en de terugval op spraak-naar-tekst ingeschakeld. Ze blijven aan als Stemmodus later wordt uitgeschakeld. Een OpenAI-rij die alleen voor failover is toegevoegd, doet dit nooit, en een rij met een eigen basis-URL wordt genegeerd.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'De rij voor {$a->provider} heeft een eigen basis-URL die verschilt van API-basis-URL, dus de chat gebruikt nog steeds de vorige standaardsleutel. Zorg dat beide overeenkomen of maak de basis-URL van de rij leeg.';
+
+$string['providerkeys:default_stale_key'] = 'Er is geen sleutel opgeslagen voor {$a->provider} in "Providers en sleutels", maar de chat gebruikt nog steeds een oudere standaardsleutel. Het verwijderen van een rij stopt die sleutel niet. Voeg een sleutel voor {$a->provider} toe om deze te vervangen.';

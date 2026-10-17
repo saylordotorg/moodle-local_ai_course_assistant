@@ -3419,3 +3419,5 @@ $string['settings:realtime_key_from'] = '음성 및 TTS 키 출처';
 $string['settings:realtime_key_from_desc'] = '키를 다시 붙여 넣는 대신 "제공자 및 키"의 OpenAI 키를 사용합니다. 여기에서 행을 선택해야 해당 키로 읽어주기 버튼, 대화 연습 칩(이 기능을 사용하는 강좌의 경우), 음성 텍스트 변환 대체 기능이 켜집니다. 나중에 음성 모드를 꺼도 이 기능들은 계속 켜져 있습니다. 대체 전환용으로만 OpenAI 행을 추가하면 이 기능들은 절대 켜지지 않으며, 자체 기본 URL이 있는 행은 무시됩니다.';
 
 $string['providerkeys:default_baseurl_mismatch'] = '{$a->provider} 행에 API 기본 URL과 다른 자체 기본 URL이 있어 채팅에서 여전히 이전 기본 키를 사용합니다. 두 값을 일치시키거나 행의 기본 URL을 비우세요.';
+
+$string['providerkeys:default_stale_key'] = '"제공자 및 키"에 {$a->provider}의 키가 저장되어 있지 않지만, 채팅은 여전히 이전 기본 키를 사용하고 있습니다. 행을 삭제해도 그 키의 사용은 중단되지 않습니다. 이 키를 교체하려면 {$a->provider}의 키를 추가하세요.';

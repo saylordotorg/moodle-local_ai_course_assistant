@@ -3420,3 +3420,5 @@ $string['settings:realtime_key_from'] = 'Nyckelkälla för röst och TTS';
 $string['settings:realtime_key_from_desc'] = 'Använd OpenAI-nyckeln från "Leverantörer och nycklar" i stället för att klistra in den igen. Det är valet av rad här som aktiverar uppläsningsknappen, knappen Konversationsövning (för kurser som aktiverar den) och reservlösningen för tal till text med den nyckeln. De förblir aktiverade om Röstläge senare stängs av. Att lägga till en OpenAI-rad enbart för reservväxling gör aldrig detta, och en rad med en egen bas-URL ignoreras.';
 
 $string['providerkeys:default_baseurl_mismatch'] = 'Raden för {$a->provider} har en egen bas-URL som skiljer sig från API-bas-URL, så chatten använder fortfarande den tidigare standardnyckeln. Se till att de stämmer överens, eller töm radens bas-URL.';
+
+$string['providerkeys:default_stale_key'] = 'Ingen nyckel är sparad för {$a->provider} i "Leverantörer och nycklar", men chatten använder fortfarande en äldre standardnyckel. Att ta bort en rad stoppar inte den nyckeln. Lägg till en nyckel för {$a->provider} som ersätter den.';
