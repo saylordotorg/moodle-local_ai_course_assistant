@@ -246,11 +246,7 @@ class provider_keys {
      * @return bool true when apikey was rewritten
      */
     public static function sync_default_key(): bool {
-        global $CFG;
-        $forced = $CFG->forced_plugin_settings[self::PLUGIN] ?? [];
-        // A forced apikey is not ours to write. A forced table keeps its keys out of the database on purpose,
-        // and the mirror would copy one in, where it goes stale when config.php is rotated.
-        if (array_key_exists('apikey', $forced) || array_key_exists(self::SETTING, $forced)) {
+        if (self::mirror_is_forced_off()) {
             return false;
         }
         $provider = self::site_provider();
@@ -263,6 +259,21 @@ class provider_keys {
         }
         set_config('apikey', secrets::conceal($row['key']), self::PLUGIN);
         return true;
+    }
+
+    /**
+     * Is the apikey mirror switched off by config.php?
+     *
+     * A forced apikey is not ours to write. A forced table keeps its keys out of the database on purpose, and the
+     * mirror would copy one in, where it goes stale when config.php is rotated. On such a site the mirror is off by
+     * design, so sync_default_key() does nothing and default_key_warnings() has no mirror to warn about.
+     *
+     * @return bool
+     */
+    private static function mirror_is_forced_off(): bool {
+        global $CFG;
+        $forced = $CFG->forced_plugin_settings[self::PLUGIN] ?? [];
+        return array_key_exists('apikey', $forced) || array_key_exists(self::SETTING, $forced);
     }
 
     /**
@@ -371,7 +382,8 @@ class provider_keys {
      * URL of its own: the mirror copies none of them, so chat still uses the previous default key, and an admin
      * who typed a new key into such a row (moving to an Azure or gateway endpoint) would otherwise see "Saved"
      * and nothing else. A plain row on a gateway site is not that case: it has no base URL of its own, and the
-     * sentence would be untrue.
+     * sentence would be untrue. Nor is a site whose apikey or table is forced in config.php: the mirror is off
+     * there by design, and clearing the row's base URL could break a same-vendor failover row.
      *
      * @param string $provider the concrete default provider
      * @return string[]
@@ -385,7 +397,7 @@ class provider_keys {
         if ($found['row'] !== null) {
             return [];
         }
-        if ($found['elsewhere']) {
+        if ($found['elsewhere'] && !self::mirror_is_forced_off()) {
             return [get_string('providerkeys:default_baseurl_mismatch', self::PLUGIN, (object) ['provider' => $provider])];
         }
         if ($found['keyed']) {

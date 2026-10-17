@@ -463,6 +463,61 @@ final class provider_keys_sync_test extends \advanced_testcase {
         $this->assertSame([], provider_keys::default_provider_warnings());
     }
 
+    /**
+     * A key or a table forced in config.php switches the mirror off by design (sync_default_key() returns early), so
+     * "make the two match, or clear the row's base URL" would be a false alarm there, and clearing the URL would break
+     * a legitimate same-vendor failover row.
+     */
+    public function test_the_base_url_warning_is_off_when_apikey_is_forced_in_config_php(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('comparison_providers', "openai|sk-proj-NEW-GATEWAY-KEY-BBBB-2222|m||https://gw.example.test/v1");
+        $this->assertCount(1, provider_keys::default_provider_warnings(), 'unforced: the sentence is raised');
+        $CFG->forced_plugin_settings['local_ai_course_assistant']['apikey'] = 'sk-proj-FORCED-KEY-4444-0000';
+        try {
+            $this->assertFalse(provider_keys::sync_default_key(), 'the mirror is off');
+            $this->assertSame([], provider_keys::default_provider_warnings());
+        } finally {
+            unset($CFG->forced_plugin_settings['local_ai_course_assistant']['apikey']);
+        }
+        $this->assertCount(1, provider_keys::default_provider_warnings(), 'unforced again: the sentence is back');
+    }
+
+    public function test_the_base_url_warning_is_off_when_the_table_is_forced_in_config_php(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('apikey', secrets::conceal('sk-proj-LEGACY-KEY-AAAA-1111'));
+        $row = 'openai|sk-proj-FORCED-TABLE-KEY-2222|m||https://gw.example.test/v1';
+        $this->cfg('comparison_providers', $row);
+        $this->assertCount(1, provider_keys::default_provider_warnings(), 'unforced: the sentence is raised');
+        $CFG->forced_plugin_settings['local_ai_course_assistant']['comparison_providers'] = $row;
+        try {
+            $this->assertFalse(provider_keys::sync_default_key(), 'the mirror is off');
+            $this->assertSame([], provider_keys::default_provider_warnings());
+        } finally {
+            unset($CFG->forced_plugin_settings['local_ai_course_assistant']['comparison_providers']);
+        }
+        $this->assertCount(1, provider_keys::default_provider_warnings(), 'unforced again: the sentence is back');
+    }
+
+    /** Forced config only silences the new sentence; the other two key warnings are as before. */
+    public function test_a_forced_apikey_does_not_silence_the_other_key_warnings(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        $this->cfg('provider', 'openai');
+        $this->cfg('comparison_providers', '');
+        $CFG->forced_plugin_settings['local_ai_course_assistant']['apikey'] = 'AIzaGEMINI-FORCED-0000-1234';
+        try {
+            $warnings = provider_keys::default_provider_warnings();
+            $this->assertCount(1, $warnings);
+            $this->assertStringContainsString('gemini', $warnings[0], 'the vendor-mismatch sentence still fires');
+        } finally {
+            unset($CFG->forced_plugin_settings['local_ai_course_assistant']['apikey']);
+        }
+    }
+
     public function test_no_base_url_warning_for_a_keyless_provider_or_auto_without_a_key(): void {
         $this->resetAfterTest();
         $this->cfg('provider', 'ollama');
