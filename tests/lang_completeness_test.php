@@ -234,6 +234,8 @@ final class lang_completeness_test extends \basic_testcase {
         // read the English.
         'settings:code_sandbox_pyodide_baseurl',
         'settings:code_sandbox_pyodide_baseurl_desc',
+        // 7.9.1 PENDING TRANSLATION: added after the 7.9.0 batch; the translation step removes this block.
+        'providerkeys:default_stale_key',
     ];
 
     /**

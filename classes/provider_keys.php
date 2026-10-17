@@ -359,8 +359,9 @@ class provider_keys {
      * Warnings about the default provider, as finished sentences. Pure: reads settings, raises nothing.
      *
      * First the key, if it is a problem: one sentence when the default provider needs a key and has no keyed
-     * row, and either the saved key belongs to another vendor or no key is saved anywhere (a custom gateway
-     * with a base URL is allowed to have none). Then the model, if the primary model is a display name
+     * row, and either the saved key belongs to another vendor, no key is saved anywhere (a custom gateway
+     * with a base URL is allowed to have none), or the saved key is the provider's own and chat is still using
+     * it (the row was deleted; see default_key_warnings()). Then the model, if the primary model is a display name
      * ("GPT-4o-mini") a hosted provider will refuse: the same check, failover_verifier::display_name_problem(),
      * that judges a failover row's model. The model sentence carries what the admin typed, so it is escaped.
      *
@@ -396,6 +397,14 @@ class provider_keys {
      * sentence would be untrue. Nor is a site whose apikey or table is forced in config.php: the mirror is off
      * there by design, and clearing the row's base URL could break a same-vendor failover row.
      *
+     * With no keyed row at all, one of three sentences, in this order: the saved key belongs to another vendor
+     * (vendor mismatch); there is no saved key either (no key; a custom gateway with a base URL may have none);
+     * or the saved key is the provider's own, which is the stale key. The mirror only ever copies a key IN, so an
+     * admin who deletes the default's row (a leaked or revoked key, say) leaves the old key in apikey, and chat
+     * keeps using it. Nothing clears apikey for them, because on some upgrade paths it is the only copy of a key,
+     * and no screen shows it, so the page says so. Quiet when apikey or the table is forced in config.php, where
+     * the mirror is off by design and the key isn't ours to talk about.
+     *
      * @param string $provider the concrete default provider
      * @return string[]
      */
@@ -422,6 +431,10 @@ class provider_keys {
         }
         if ($legacy === '' && !($provider === 'custom' && $baseurl !== '')) {
             return [get_string('providerkeys:default_no_key', self::PLUGIN, (object) ['provider' => $provider])];
+        }
+        if ($legacy !== '' && !self::mirror_is_forced_off()) {
+            // No keyed row, and a saved key that fits the provider: chat is using that key, whatever the table says.
+            return [get_string('providerkeys:default_stale_key', self::PLUGIN, (object) ['provider' => $provider])];
         }
         return [];
     }
