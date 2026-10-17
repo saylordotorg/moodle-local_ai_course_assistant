@@ -518,6 +518,45 @@ final class provider_keys_sync_test extends \advanced_testcase {
         }
     }
 
+    /**
+     * Make core encryption unusable: no key file, and none may be generated. secrets::conceal() then throws, which is
+     * the one way sync_default_key() can throw (a stored plain apikey and plain row keys are read without the key).
+     */
+    private function break_encryption(): void {
+        global $CFG;
+        $CFG->secretdataroot = $CFG->dataroot . '/no-such-secret-dir-for-the-sync-test';
+        $CFG->nokeygeneration = true;
+    }
+
+    /** F3 round 1: a failed sync must never throw into the policy bundle, the switcher or the rollback that called it. */
+    public function test_sync_after_writes_swallows_a_failing_sync_and_says_so_without_a_key(): void {
+        $this->resetAfterTest();
+        $this->cfg('provider', 'gemini');
+        $this->cfg('comparison_providers', 'gemini|AIzaROW-GEMINI-KEY-NEW-1111|g');
+        $this->cfg('apikey', 'AIzaSTALE-GEMINI-KEY-OLD-0000');
+        $this->break_encryption();
+        try {
+            provider_keys::sync_default_key();
+            $this->fail('the premise: with no usable encryption key the sync throws');
+        } catch (\moodle_exception $e) {
+            $this->assertSame('encryption_nokey', $e->errorcode);
+            $class = get_class($e);
+            $text = $e->getMessage();
+        }
+        $this->assertFalse(provider_keys::sync_after_writes(['model']), 'swallowed, and nothing was rewritten');
+        $messages = $this->getDebuggingMessages();
+        $this->assertCount(1, $messages);
+        $this->assertSame("provider_keys::sync_after_writes could not re-mirror the default key ({$class})", $messages[0]->message,
+            'one line that names the exception class and nothing else');
+        $this->assertStringNotContainsString($text, $messages[0]->message, 'not even the exception message');
+        $this->assertStringNotContainsString('AIza', $messages[0]->message, 'no key material');
+        $this->assertSame(DEBUG_DEVELOPER, $messages[0]->level);
+        $this->resetDebugging();
+        $this->assertSame('AIzaSTALE-GEMINI-KEY-OLD-0000', secrets::get('apikey'), 'apikey is as it was');
+        $this->assertFalse(provider_keys::sync_after_writes(['temperature']), 'nothing the mirror reads: no call, no notice');
+        $this->assertSame([], $this->getDebuggingMessages());
+    }
+
     public function test_no_base_url_warning_for_a_keyless_provider_or_auto_without_a_key(): void {
         $this->resetAfterTest();
         $this->cfg('provider', 'ollama');

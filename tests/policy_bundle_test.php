@@ -330,4 +330,31 @@ final class policy_bundle_test extends \advanced_testcase {
         policy_bundle::process_envelope($this->envelope(['version' => 1, 'settings' => ['provider' => 'gemini']]));
         $this->assertSame([], \core\notification::fetch());
     }
+
+    /** F3 round 1: a sync that throws (core encryption has no usable key) must not undo or abort an applied bundle. */
+    public function test_a_bundle_still_applies_and_is_audited_when_the_mirror_cannot_be_written(): void {
+        global $CFG, $DB;
+        set_config('provider', 'openai', 'local_ai_course_assistant');
+        set_config('comparison_providers', "openai|sk-proj-BUNDLE-OPENAI-1111-AAAA|gpt-4o-mini\n"
+            . "gemini|AIzaBUNDLE-GEMINI-2222-BBBB|gemini-2.5-flash", 'local_ai_course_assistant');
+        set_config('apikey', 'sk-proj-BUNDLE-OPENAI-1111-AAAA', 'local_ai_course_assistant');
+        $audits = $DB->count_records('local_ai_course_assistant_audit', ['action' => 'policy_bundle_applied']);
+        $CFG->secretdataroot = $CFG->dataroot . '/no-such-secret-dir-for-the-bundle-test';
+        $CFG->nokeygeneration = true;
+        $result = policy_bundle::process_envelope($this->envelope([
+            'version' => 7, 'settings' => ['provider' => 'gemini', 'rerank_candidates' => 25],
+        ]));
+        $this->assertSame('applied', $result['status'], $result['detail']);
+        $this->assertSame('gemini', get_config('local_ai_course_assistant', 'provider'));
+        $this->assertSame('25', get_config('local_ai_course_assistant', 'rerank_candidates'));
+        $this->assertSame('7', get_config('local_ai_course_assistant', 'policy_bundle_applied_version'));
+        $this->assertStringStartsWith('applied', (string) get_config('local_ai_course_assistant', 'policy_bundle_last_result'));
+        $this->assertSame($audits + 1, $DB->count_records('local_ai_course_assistant_audit', ['action' => 'policy_bundle_applied']));
+        $this->assertSame('sk-proj-BUNDLE-OPENAI-1111-AAAA', get_config('local_ai_course_assistant', 'apikey'), 'not re-mirrored');
+        $messages = $this->getDebuggingMessages();
+        $this->assertCount(1, $messages);
+        $this->assertStringNotContainsString('sk-proj', $messages[0]->message);
+        $this->assertStringNotContainsString('AIza', $messages[0]->message);
+        $this->resetDebugging();
+    }
 }

@@ -334,6 +334,11 @@ class provider_keys {
      * Syncs once when any written setting is one the mirror reads (the default provider, its model or the
      * gateway URL), and does nothing when none is: no write, no call. Idempotent, raises no notices.
      *
+     * Never throws into its caller. The callers have already written settings, an audit row or a switch record,
+     * and a failed mirror (the only throw path is secrets::conceal() when core encryption has no usable key) must
+     * not abort them half way. A failure leaves apikey as it was and says so in one developer debugging line that
+     * names only the exception class, never its message or any key.
+     *
      * @param string[] $names the settings the caller actually wrote
      * @return bool true when apikey was rewritten
      */
@@ -341,7 +346,13 @@ class provider_keys {
         if (!array_intersect(self::MIRROR_SETTINGS, $names)) {
             return false;
         }
-        return self::sync_default_key();
+        try {
+            return self::sync_default_key();
+        } catch (\Throwable $e) {
+            debugging('provider_keys::sync_after_writes could not re-mirror the default key (' . get_class($e) . ')',
+                DEBUG_DEVELOPER);
+            return false;
+        }
     }
 
     /**

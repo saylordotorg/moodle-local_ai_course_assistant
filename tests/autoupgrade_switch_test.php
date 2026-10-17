@@ -284,6 +284,58 @@ final class autoupgrade_switch_test extends \advanced_testcase {
         $this->assertNotEmpty($sink->get_messages());
     }
 
+    /**
+     * F3 round 1: a sync that throws (core encryption has no usable key) must not abort a switch or a rollback after
+     * their settings were written. The key is stored plain on purpose: it is read without the encryption key, and
+     * the sync then fails at the one place that needs it, writing the mirrored copy.
+     */
+    private function stale_plain_mirror_and_broken_encryption(): void {
+        global $CFG;
+        set_config('comparison_providers', 'gemini|AIzaROW-GEMINI-KEY-NEW-1111|gemini-2.5-flash', 'local_ai_course_assistant');
+        set_config('apikey', 'AIzaSTALE-GEMINI-KEY-OLD-0000', 'local_ai_course_assistant');
+        $CFG->secretdataroot = $CFG->dataroot . '/no-such-secret-dir-for-the-switch-test';
+        $CFG->nokeygeneration = true;
+    }
+
+    private function assert_one_quiet_debugging_line(): void {
+        $messages = $this->getDebuggingMessages();
+        $this->assertCount(1, $messages);
+        $this->assertStringNotContainsString('AIza', $messages[0]->message);
+        $this->resetDebugging();
+    }
+
+    public function test_a_switch_still_completes_and_is_recorded_when_the_mirror_cannot_be_written(): void {
+        global $DB;
+        $sink = $this->redirectEmails();
+        [$cand, $eval] = $this->passed();
+        $this->stale_plain_mirror_and_broken_encryption();
+        $out = switcher::switch_to($cand, $eval, 'auto', 0);
+        $this->assertTrue($out['ok'], $out['message']);
+        $this->assertSame('gemini-3.5-flash-lite', get_config('local_ai_course_assistant', 'model'));
+        $this->assertSame(switcher::WATCHING, $DB->get_field(switcher::TABLE, 'status', ['id' => $out['switchid']]));
+        $this->assertSame(candidates::SWITCHED, candidates::get((int) $cand->id)->status);
+        $this->assertSame(1, $DB->count_records('local_ai_course_assistant_audit', ['action' => 'model_switched']));
+        $this->assertNotEmpty($sink->get_messages(), 'the notification still went out');
+        $this->assertSame('AIzaSTALE-GEMINI-KEY-OLD-0000', get_config('local_ai_course_assistant', 'apikey'), 'not re-mirrored');
+        $this->assert_one_quiet_debugging_line();
+    }
+
+    public function test_a_rollback_still_completes_and_is_recorded_when_the_mirror_cannot_be_written(): void {
+        global $DB;
+        $sink = $this->redirectEmails();
+        [$cand, $eval] = $this->passed();
+        $id = switcher::switch_to($cand, $eval, 'auto', 0)['switchid'];
+        $this->stale_plain_mirror_and_broken_encryption();
+        $out = switcher::rollback($id, 'test', 2);
+        $this->assertTrue($out['ok'], $out['message']);
+        $this->assertSame('gemini-2.5-flash', get_config('local_ai_course_assistant', 'model'));
+        $this->assertSame(switcher::ROLLEDBACK, $DB->get_field(switcher::TABLE, 'status', ['id' => $id]));
+        $this->assertSame(candidates::ROLLEDBACK, candidates::get((int) $cand->id)->status);
+        $this->assertSame(1, $DB->count_records('local_ai_course_assistant_audit', ['action' => 'model_switch_rolled_back']));
+        $this->assertGreaterThanOrEqual(2, count($sink->get_messages()));
+        $this->assert_one_quiet_debugging_line();
+    }
+
     public function test_the_watcher_rolls_back_an_error_spike(): void {
         global $DB;
         $now = time();
