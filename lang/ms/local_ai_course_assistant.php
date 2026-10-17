@@ -3462,3 +3462,5 @@ $string['settings:rerank_key_from'] = 'Sumber kunci Pemeringkat semula';
 $string['settings:rerank_key_from_desc'] = 'Gunakan kunci daripada "Pembekal dan kunci" (contohnya baris voyage) dan bukannya menampalnya sekali lagi. Apabila kedua-duanya tidak ditetapkan, kunci Penyematan digunakan, seperti sebelum ini.';
 $string['settings:realtime_key_from'] = 'Sumber kunci Suara dan TTS';
 $string['settings:realtime_key_from_desc'] = 'Gunakan kunci OpenAI daripada "Pembekal dan kunci" dan bukannya menampalnya sekali lagi. Memilih baris di sini ialah tindakan yang menghidupkan butang sebut, cip Latihan Perbualan (untuk kursus yang mendayakannya) dan sandaran pertuturan-ke-teks dengan kunci itu. Ciri ini kekal hidup jika Mod Suara dimatikan kemudian. Menambah baris OpenAI untuk peralihan sandaran semata-mata tidak akan menghidupkannya, dan baris yang mempunyai URL asasnya sendiri diabaikan.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'Baris {$a->provider} mempunyai URL asas sendiri yang berbeza daripada URL Asas API, jadi sembang masih menggunakan kunci lalai sebelumnya. Samakan kedua-duanya, atau kosongkan URL asas baris itu.';

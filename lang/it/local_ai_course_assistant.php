@@ -3457,3 +3457,5 @@ $string['settings:rerank_key_from'] = 'Origine della chiave di rerank';
 $string['settings:rerank_key_from_desc'] = 'Usa una chiave di "Provider e chiavi" (per esempio una riga voyage) invece di incollarla di nuovo. Se nessuna delle due è impostata, si usa la chiave di embedding, come prima.';
 $string['settings:realtime_key_from'] = 'Origine della chiave per voce e TTS';
 $string['settings:realtime_key_from_desc'] = 'Usa la chiave OpenAI di "Provider e chiavi" invece di incollarla di nuovo. È la scelta della riga qui che attiva il pulsante TTS di lettura, il chip Pratica di conversazione (per i corsi che lo abilitano) e il riconoscimento vocale di riserva con quella chiave. Restano attivi anche se in seguito la Modalità vocale viene disattivata. Aggiungere una riga OpenAI solo per il failover non li attiva mai, e una riga con un proprio URL base viene ignorata.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'La riga {$a->provider} ha un proprio URL base, diverso da URL Base API, quindi la chat usa ancora la chiave predefinita precedente. Faccia corrispondere i due valori oppure svuoti l\'URL base della riga.';

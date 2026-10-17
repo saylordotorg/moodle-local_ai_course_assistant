@@ -3419,3 +3419,5 @@ $string['settings:rerank_key_from'] = 'Kilde til Rerank-nøgle';
 $string['settings:rerank_key_from_desc'] = 'Brug en nøgle fra "Udbydere og nøgler" (for eksempel en voyage-række) i stedet for at indsætte den igen. Når ingen af dem er angivet, bruges Embedding-nøglen som hidtil.';
 $string['settings:realtime_key_from'] = 'Kilde til stemme- og TTS-nøgle';
 $string['settings:realtime_key_from_desc'] = 'Brug OpenAI-nøglen fra "Udbydere og nøgler" i stedet for at indsætte den igen. Det er valget af rækken her, der slår oplæsningsknappen, Samtaleøvelse-chippen (for kurser, der aktiverer den) og tale-til-tekst-reserveløsningen til med den nøgle. De forbliver slået til, selv hvis Stemmetilstand senere slås fra. En OpenAI-række, der kun er tilføjet til failover, gør det aldrig, og en række med sin egen basis-URL ignoreres.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'Rækken for {$a->provider} har sin egen basis-URL, som afviger fra API-basis-URL, så chatten bruger stadig den tidligere standardnøgle. Sørg for, at de to stemmer overens, eller ryd rækkens basis-URL.';

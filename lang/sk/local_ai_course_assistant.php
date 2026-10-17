@@ -3419,3 +3419,5 @@ $string['settings:rerank_key_from'] = 'Zdroj kľúča pre re-ranker';
 $string['settings:rerank_key_from_desc'] = 'Použite kľúč z časti "Poskytovatelia a kľúče" (napríklad z riadka voyage) namiesto toho, aby ste ho vkladali znova. Ak nie je nastavené ani jedno, použije sa ako doteraz kľúč pre embedding.';
 $string['settings:realtime_key_from'] = 'Zdroj kľúča pre hlas a TTS';
 $string['settings:realtime_key_from_desc'] = 'Použite kľúč OpenAI z časti "Poskytovatelia a kľúče" namiesto toho, aby ste ho vkladali znova. Práve výber riadka tu zapne tlačidlo prehrávania, tlačidlo Konverzačné cvičenie (v kurzoch, ktoré ho povoľujú) a záložný prevod reči na text z tohto kľúča. Zostanú zapnuté, aj keď sa hlasový režim neskôr vypne. Pridanie riadka OpenAI len pre záložné prepnutie to nikdy neurobí a riadok s vlastnou základnou URL sa ignoruje.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'Riadok {$a->provider} má vlastnú základnú URL, ktorá sa líši od základnej URL API, preto chat stále používa predchádzajúci predvolený kľúč. Zosúlaďte ich alebo vymažte základnú URL v tomto riadku.';

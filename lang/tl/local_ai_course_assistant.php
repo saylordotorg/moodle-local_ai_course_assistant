@@ -3463,3 +3463,5 @@ $string['settings:rerank_key_from'] = 'Pinagmulan ng Rerank key';
 $string['settings:rerank_key_from_desc'] = 'Gumamit ng key mula sa "Mga provider at key" (halimbawa, isang voyage row) sa halip na i-paste ito muli. Kapag wala sa dalawa ang nakatakda, ang Embedding key ang ginagamit, gaya ng dati.';
 $string['settings:realtime_key_from'] = 'Pinagmulan ng key para sa Boses at TTS';
 $string['settings:realtime_key_from_desc'] = 'Gamitin ang OpenAI key mula sa "Mga provider at key" sa halip na i-paste ito muli. Ang pagpili ng row dito ang nagbubukas ng speak button, ng chip na Pagsasanay sa Pag-uusap (para sa mga kursong nag-enable nito) at ng speech-to-text fallback gamit ang key na iyon. Mananatili silang nakabukas kahit i-off pa ang Voice Mode sa ibang pagkakataon. Ang pagdaragdag ng OpenAI row para lang sa failover ay hindi kailanman magbubukas ng mga ito, at binabalewala ang row na may sariling base URL.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'May sariling base URL ang row ng {$a->provider} na iba sa Base URL ng API, kaya ginagamit pa rin ng chat ang dating default na key. Gawing magkapareho ang dalawa, o burahin ang base URL ng row.';

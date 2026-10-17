@@ -3434,3 +3434,5 @@ $string['settings:rerank_key_from'] = 'Ebe igodo Rerank si';
 $string['settings:rerank_key_from_desc'] = 'Jiri igodo sitere na "Ndị nnye na igodo" (dịka ọmụmaatụ ahịrị voyage) kama ịmado ya ọzọ. Mgbe edobeghị nke ọ bụla n\'ime ha, a na-eji igodo Embedding, dịka ọ dị na mbụ.';
 $string['settings:realtime_key_from'] = 'Ebe igodo olu na TTS si';
 $string['settings:realtime_key_from_desc'] = 'Jiri igodo OpenAI sitere na "Ndị nnye na igodo" kama ịmado ya ọzọ. Ịhọrọ ahịrị ahụ ebe a bụ ihe na-agbanye bọtịnụ ikwu okwu, akara Mmụta Mkparịta Ụka (maka kọọsị ndị gbanyere ya) na nkwado okwu-gaa-ederede site n\'igodo ahụ. Ha na-anọgide na-agbanye ọ bụrụgodị na emechiri Ọnọdụ Olu emesia. Ịtinye ahịrị OpenAI naanị maka nkwado anaghị eme nke a, a na-elegharakwa ahịrị nwere URL ntọala nke ya anya.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'Ahịrị {$a->provider} nwere URL ntọala nke ya, nke dị iche na URL Ntọala API, ya mere mkparịta ụka ka na-eji igodo ndabara gara aga. Mee ka ha abụọ dị otu, ma ọ bụ hichapụ URL ntọala nke ahịrị ahụ.';

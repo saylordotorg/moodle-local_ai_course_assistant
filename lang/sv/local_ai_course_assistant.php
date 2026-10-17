@@ -3418,3 +3418,5 @@ $string['settings:rerank_key_from'] = 'Nyckelkälla för re-ranker';
 $string['settings:rerank_key_from_desc'] = 'Använd en nyckel från "Leverantörer och nycklar" (till exempel en voyage-rad) i stället för att klistra in den igen. När ingen av dem är angiven används embedding-nyckeln, precis som tidigare.';
 $string['settings:realtime_key_from'] = 'Nyckelkälla för röst och TTS';
 $string['settings:realtime_key_from_desc'] = 'Använd OpenAI-nyckeln från "Leverantörer och nycklar" i stället för att klistra in den igen. Det är valet av rad här som aktiverar uppläsningsknappen, knappen Konversationsövning (för kurser som aktiverar den) och reservlösningen för tal till text med den nyckeln. De förblir aktiverade om Röstläge senare stängs av. Att lägga till en OpenAI-rad enbart för reservväxling gör aldrig detta, och en rad med en egen bas-URL ignoreras.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'Raden för {$a->provider} har en egen bas-URL som skiljer sig från API-bas-URL, så chatten använder fortfarande den tidigare standardnyckeln. Se till att de stämmer överens, eller töm radens bas-URL.';

@@ -3419,3 +3419,5 @@ $string['settings:rerank_key_from'] = 'Źródło klucza rerankingu';
 $string['settings:rerank_key_from_desc'] = 'Użyj klucza z sekcji "Dostawcy i klucze" (na przykład z wiersza voyage), zamiast wklejać go ponownie. Gdy żadne z nich nie jest ustawione, tak jak dotąd używany jest klucz embeddingów.';
 $string['settings:realtime_key_from'] = 'Źródło klucza głosu i TTS';
 $string['settings:realtime_key_from_desc'] = 'Użyj klucza OpenAI z sekcji "Dostawcy i klucze", zamiast wklejać go ponownie. To właśnie wybór wiersza tutaj włącza z użyciem tego klucza przycisk odczytu, chip Ćwiczenie konwersacji (w kursach, które go włączają) oraz zapasową zamianę mowy na tekst. Pozostają one włączone, nawet jeśli tryb głosowy zostanie później wyłączony. Dodanie wiersza OpenAI wyłącznie na potrzeby przełączania awaryjnego nigdy ich nie włącza, a wiersz z własnym bazowym URL jest ignorowany.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'Wiersz {$a->provider} ma własny bazowy URL, który różni się od ustawienia Bazowy URL API, więc czat nadal używa poprzedniego klucza domyślnego. Ustaw w obu miejscach tę samą wartość albo wyczyść bazowy URL w tym wierszu.';

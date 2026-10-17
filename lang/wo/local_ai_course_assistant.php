@@ -3439,3 +3439,5 @@ $string['settings:rerank_key_from'] = 'Fu caabiu Rerank bi jóge';
 $string['settings:rerank_key_from_desc'] = 'Jëfandikool ab caabi bu jóge ci "Joxekat yi ak caabi yi" (misaal ab rëdd voyage) te bañ koo taqaat. Su ñu defarul kenn ci ñoom ñaar, caabiu Embedding bi lañuy jëfandikoo, ni ko jëkkee.';
 $string['settings:realtime_key_from'] = 'Fu caabiu Baat ak TTS bi jóge';
 $string['settings:realtime_key_from_desc'] = 'Jëfandikool caabiu OpenAI bi ci "Joxekat yi ak caabi yi" te bañ koo taqaat. Tànn rëdd bi fii mooy ubbi bouton wax bi, bouton Jéef Waxtaan bi (ci njàng yi ko ubbi) ak wutal bu soppi baat ci mbind ak caabi boobu. Dañuy des ubbeeku su ñu tëjee Anamu Baat bi ginnaaw ba. Yokk ab rëdd OpenAI ngir wutal rekk du leen ubbi mukk, te rëdd bu am URL de baseam bopp dañu koy jéllaale.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'Rëddu {$a->provider} bi am na URL de base bu boppam, bu wuute ak URL de Base API, moo tax waxtaan bi ngi jëfandikoo ba tey caabi bu defo bu njëkk ba. Defal ñaar ñi ñu yem, walla far URL de base bu rëdd bi.';

@@ -3440,3 +3440,5 @@ $string['settings:rerank_key_from'] = 'Orísun kọ́kọ́rọ́ Rerank';
 $string['settings:rerank_key_from_desc'] = 'Lo kọ́kọ́rọ́ kan láti inú "Àwọn olùpèsè àti kọ́kọ́rọ́" (fún àpẹẹrẹ ìlà voyage kan) dípò kí o tún lẹ̀ ẹ́ mọ́. Nígbà tí a kò bá ṣètò ọ̀kankan nínú méjèèjì, a ó lo kọ́kọ́rọ́ Embedding, bí ti tẹ́lẹ̀.';
 $string['settings:realtime_key_from'] = 'Orísun kọ́kọ́rọ́ Ohùn àti TTS';
 $string['settings:realtime_key_from_desc'] = 'Lo kọ́kọ́rọ́ OpenAI láti inú "Àwọn olùpèsè àti kọ́kọ́rọ́" dípò kí o tún lẹ̀ ẹ́ mọ́. Yíyan ìlà náà níbí ni ohun tí ó ń tan bọ́tìnnì sísọ, bọ́tìnnì Ìdánilẹ́kọ̀ọ́ Ìfọ̀rọ̀wánilẹ́nuwò (fún àwọn kọ́ọ̀sì tí ó mú un ṣiṣẹ́) àti àbáwọlé ohùn-sí-ọ̀rọ̀ láti inú kọ́kọ́rọ́ yẹn. Wọ́n á máa ṣiṣẹ́ lọ bí a bá pa Ìpínlẹ̀ Ohùn lẹ́yìn náà. Fífi ìlà OpenAI kún fún ìdúró nìkan kì í tan wọ́n láé, a kò sì ní wo ìlà tí ó ní URL ìpìlẹ̀ tirẹ̀.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'Ìlà {$a->provider} ní URL ìpìlẹ̀ tirẹ̀, tí ó yàtọ̀ sí URL Ìpìlẹ̀ API, nítorí náà ìjíròrò ṣì ń lo kọ́kọ́rọ́ àìyípadà ti tẹ́lẹ̀. Mú kí méjèèjì bá ara wọn mu, tàbí pa URL ìpìlẹ̀ ìlà náà rẹ́.';

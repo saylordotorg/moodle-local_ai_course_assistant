@@ -3447,3 +3447,5 @@ $string['settings:rerank_key_from'] = 'Rerank kilé bɔyɔrɔ';
 $string['settings:rerank_key_from_desc'] = 'Kilé dɔ kɛ ka bɔ "Dibagaw ani kiléw" kɔnɔ (misali la voyage layini), sani k\'a bila tugun. Ni fila si ma sigi, Embedding kilé de bɛ kɛ, i n\'a fɔ fɔlɔ.';
 $string['settings:realtime_key_from'] = 'Kuma ani TTS kilé bɔyɔrɔ';
 $string['settings:realtime_key_from_desc'] = 'OpenAI kilé kɛ ka bɔ "Dibagaw ani kiléw" kɔnɔ, sani k\'a bila tugun. Layini sugandili yan de bɛ kumali butɔni, Kuma Lakodɔnni taamasiyɛn (kalansen minnu b\'a dabɔ olu kama) ani kuma-ka-kɛ-sɛbɛn nɔfɛ fɛɛrɛ dabɔ ni o kilé ye. U bɛ to dabɔlen hali ni Kuma cogoya datugura kɔfɛ. Ni OpenAI layini farala a kan nɔfɛ yɛlɛmali dɔrɔn kama, o tɛ o kɛ abada, ani layini min ye a yɛrɛ ka taaribolɔ URL sɔrɔ, o tɛ jate.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'Layini {$a->provider} ka taaribolɔ URL ye a yɛrɛ ta ye, a tɛ kelen ye ni API Taaribolɔ URL ye, o de kosɔn baro bɛ kilé lakikalen kɔrɔ kɛ hali sisan. Aw ye u fila kɛ kelen ye, walima aw ye layini ka taaribolɔ URL bɔ.';

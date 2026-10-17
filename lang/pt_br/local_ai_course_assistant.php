@@ -3439,3 +3439,5 @@ $string['settings:rerank_key_from'] = 'Origem da chave do re-ranker';
 $string['settings:rerank_key_from_desc'] = 'Use uma chave de "Provedores e chaves" (por exemplo, uma linha voyage) em vez de colá-la novamente. Quando nenhuma das duas opções está definida, a chave de incorporação é usada, como antes.';
 $string['settings:realtime_key_from'] = 'Origem da chave de voz e TTS';
 $string['settings:realtime_key_from_desc'] = 'Use a chave da OpenAI de "Provedores e chaves" em vez de colá-la novamente. É a escolha da linha aqui que ativa o botão de leitura em voz alta, o atalho Prática de Conversação (nos cursos que o habilitam) e o recurso alternativo de fala para texto a partir dessa chave. Eles continuam ativos se o Modo de Voz for desativado depois. Adicionar uma linha da OpenAI apenas para contingência nunca faz isso, e uma linha com a sua própria URL base é ignorada.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'A linha de {$a->provider} tem sua própria URL base, diferente da URL Base da API, então o chat ainda usa a chave padrão anterior. Faça as duas coincidirem ou limpe a URL base da linha.';

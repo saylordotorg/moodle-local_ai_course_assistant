@@ -234,8 +234,6 @@ final class lang_completeness_test extends \basic_testcase {
         // read the English.
         'settings:code_sandbox_pyodide_baseurl',
         'settings:code_sandbox_pyodide_baseurl_desc',
-        // 7.9.0 PENDING TRANSLATION (round 3): strings added after the 45-locale batch; the translation round deletes this whole block.
-        'providerkeys:default_baseurl_mismatch',
     ];
 
     /**

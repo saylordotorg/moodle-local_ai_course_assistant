@@ -3419,3 +3419,5 @@ $string['settings:rerank_key_from'] = 'Sursa cheii re-ranker';
 $string['settings:rerank_key_from_desc'] = 'Folosiți o cheie din "Furnizori și chei" (de exemplu un rând voyage) în loc să o lipiți din nou. Când niciuna nu este setată, se folosește cheia de încorporare, ca înainte.';
 $string['settings:realtime_key_from'] = 'Sursa cheii pentru voce și TTS';
 $string['settings:realtime_key_from_desc'] = 'Folosiți cheia OpenAI din "Furnizori și chei" în loc să o lipiți din nou. Alegerea rândului aici este cea care activează butonul de citire, butonul rapid Practică de conversație (pentru cursurile care îl activează) și varianta de rezervă de transcriere a vorbirii în text pe baza acelei chei. Acestea rămân active dacă Modul Voce este dezactivat ulterior. Adăugarea unui rând OpenAI doar pentru comutarea de rezervă nu face niciodată acest lucru, iar un rând cu propriul URL de bază este ignorat.';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'Rândul {$a->provider} are propriul URL de bază, diferit de URL de bază API, așa că chatul folosește în continuare cheia implicită anterioară. Faceți ca cele două să coincidă sau goliți URL-ul de bază al rândului.';

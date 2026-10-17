@@ -3446,3 +3446,5 @@ $string['settings:rerank_key_from'] = 'የRerank ቁልፍ ምንጭ';
 $string['settings:rerank_key_from_desc'] = 'ቁልፉን እንደገና ከመለጠፍ ይልቅ ከ"አቅራቢዎች እና ቁልፎች" ያለ ቁልፍ (ለምሳሌ የvoyage ረድፍ) ይጠቀሙ። ሁለቱም ካልተዘጋጁ እንደበፊቱ የEmbedding ቁልፉ ጥቅም ላይ ይውላል።';
 $string['settings:realtime_key_from'] = 'የድምፅ እና የTTS ቁልፍ ምንጭ';
 $string['settings:realtime_key_from_desc'] = 'ቁልፉን እንደገና ከመለጠፍ ይልቅ ከ"አቅራቢዎች እና ቁልፎች" ያለውን የOpenAI ቁልፍ ይጠቀሙ። በዚያ ቁልፍ የንግግር ቁልፉን፣ የውይይት ልምምድ ምልክቱን (ለሚያነቁት ኮርሶች) እና የንግግር-ወደ-ጽሑፍ መጠባበቂያውን የሚያበራው እዚህ ረድፉን መምረጥ ነው። የድምፅ ሁናቴ በኋላ ቢጠፋም እነዚህ እንደበሩ ይቆያሉ። ለመተኪያ ብቻ የOpenAI ረድፍ ማከል ይህን በጭራሽ አያደርግም፤ የራሱ መሰረታዊ URL ያለው ረድፍም ችላ ይባላል።';
+
+$string['providerkeys:default_baseurl_mismatch'] = 'የ{$a->provider} ረድፍ የራሱ መሰረታዊ URL አለው፤ ይህም ከAPI መሰረታዊ URL የተለየ ነው፣ ስለዚህ ውይይቱ አሁንም የቀድሞውን ነባሪ ቁልፍ ይጠቀማል። ሁለቱን አንድ ያድርጉ፣ ወይም የረድፉን መሰረታዊ URL ባዶ ያድርጉ።';
