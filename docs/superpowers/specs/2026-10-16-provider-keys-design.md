@@ -1,6 +1,6 @@
 # SOLA 7.9.0: one "Providers and keys" table, and no secret ever shown in settings
 
-Status: APPROVED by Tom on 2026-10-16 (the written spec, and all four decisions in section 11 as recommended). Nothing is built yet.
+Status: IMPLEMENTED in 7.9.0 (2026-10-16). Approved by Tom on 2026-10-16 (the written spec, and all four decisions in section 11 as recommended).
 Amended the same day, during planning, to correct two things found while reading the code (the Voice providers table in sections 2, 3 and 5.7, and how the legacy key is kept in step in section 5.3). Both keep the approved behavior. Written 2026-10-16. Requested by the AI Spend/MFA session on Tom's behalf, plus Tom's own addition (section 3).
 
 ## 1. What we are building, and how we will know it worked
