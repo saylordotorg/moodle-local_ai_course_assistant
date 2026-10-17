@@ -1,0 +1,528 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace local_ai_course_assistant;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * The one place that reads and writes the provider rows (the comparison_providers setting).
+ *
+ * Stored format, one row per line: provider|key|models|temperature|baseurl. The key column holds
+ * \core\encryption ciphertext (secrets::conceal); a plain value passes through secrets::reveal,
+ * so old and new rows can sit side by side.
+ *
+ * Nothing outside this class and the settings classes reads the raw setting (a guard test enforces
+ * it). rows() returns a key only when asked and only to server-side callers; a row id is a keyed
+ * hash that is safe to put in a page.
+ *
+ * @package    local_ai_course_assistant
+ * @copyright  2026 Saylor University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider_keys {
+    /** @var string Plugin component. */
+    public const PLUGIN = 'local_ai_course_assistant';
+    /** @var string Setting that stores the rows. */
+    public const SETTING = 'comparison_providers';
+    /** @var string[] Providers chat, failover and the LLM picker can use. */
+    public const CHAT_PROVIDERS = ['openai', 'claude', 'deepseek', 'gemini', 'ollama', 'minimax', 'mistral',
+        'openrouter', 'together', 'xai', 'coreai', 'custom'];
+    /** @var string[] Providers used only by Embedding and Rerank; chat code ignores their rows. */
+    public const KEY_ONLY_PROVIDERS = ['voyage'];
+    /** @var string[] Providers that work without a key, so a row for them may have none. */
+    public const KEYLESS = ['ollama', 'coreai'];
+
+    /**
+     * Rows as stored. SERVER-SIDE ONLY: stored_key is ciphertext (or a legacy plain key). Never pass
+     * this array to a template, a notice or a log.
+     *
+     * @return array[] provider, label, stored_key, models, temperature, baseurl, columns, id
+     */
+    public static function stored_rows(): array {
+        $raw = (string) (get_config(self::PLUGIN, self::SETTING) ?: '');
+        $rows = [];
+        foreach (preg_split("/\r?\n/", $raw) as $line) {
+            $line = trim($line);
+            if ($line === '' || $line[0] === '#') {
+                continue;
+            }
+            $parts = array_map('trim', explode('|', $line));
+            $provider = strtolower($parts[0] ?? '');
+            if ($provider === '') {
+                continue;
+            }
+            $stored = $parts[1] ?? '';
+            $rows[] = [
+                'provider'    => $provider,
+                'label'       => $parts[0],
+                'stored_key'  => $stored,
+                'models'      => $parts[2] ?? '',
+                'temperature' => $parts[3] ?? '',
+                'baseurl'     => $parts[4] ?? '',
+                'columns'     => count($parts),
+                'id'          => self::rowid($provider, $stored),
+            ];
+        }
+        return $rows;
+    }
+
+    /**
+     * Rows for callers that need to know about keys.
+     *
+     * @param bool $reveal Include each row's plain key. Only server-side code that is about to send the
+     *                     key to its provider may ask for it.
+     * @return array[] id, provider, label, haskey, last4, key, models, model, temperature, baseurl, columns
+     */
+    public static function rows(bool $reveal = false): array {
+        $out = [];
+        foreach (self::stored_rows() as $r) {
+            $plain = $r['stored_key'] === '' ? '' : secrets::reveal($r['stored_key']);
+            $models = array_values(array_filter(array_map('trim', explode(',', $r['models']))));
+            $out[] = [
+                'id'          => $r['id'],
+                'provider'    => $r['provider'],
+                'label'       => $r['label'],
+                'haskey'      => $r['stored_key'] !== '',
+                'last4'       => self::last4($plain),
+                'key'         => $reveal ? $plain : '',
+                'models'      => $r['models'],
+                'model'       => $models[0] ?? '',
+                'temperature' => $r['temperature'],
+                'baseurl'     => $r['baseurl'],
+                'columns'     => $r['columns'],
+            ];
+        }
+        return $out;
+    }
+
+    /**
+     * The row that serves each provider: the first row WITH a key, else the first row.
+     *
+     * @return array<string, array> lowercase provider => row (no key)
+     */
+    public static function by_label(): array {
+        $out = [];
+        foreach (self::rows() as $r) {
+            $key = $r['provider'];
+            if (isset($out[$key]) && ($out[$key]['haskey'] || !$r['haskey'])) {
+                continue;
+            }
+            $out[$key] = $r;
+        }
+        return $out;
+    }
+
+    /**
+     * The first row for a provider that has at least two columns (the old lookup_comparison_row rule).
+     *
+     * @param string $provider
+     * @param bool $reveal
+     * @return array|null
+     */
+    public static function row_for(string $provider, bool $reveal = false): ?array {
+        $provider = strtolower($provider);
+        foreach (self::rows($reveal) as $r) {
+            if ($r['provider'] === $provider && $r['columns'] >= 2) {
+                return $r;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * The first row for a provider that HAS a key (the old lookup_chat_label rule), key revealed.
+     *
+     * @param string $provider
+     * @return array|null
+     */
+    public static function for_provider(string $provider): ?array {
+        $provider = strtolower($provider);
+        foreach (self::rows(true) as $r) {
+            if ($r['provider'] === $provider && $r['haskey']) {
+                return $r;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * The plain key for a provider, or '' when no row has one.
+     *
+     * @param string $provider
+     * @return string
+     */
+    public static function key_for(string $provider): string {
+        $row = self::for_provider($provider);
+        return $row === null ? '' : $row['key'];
+    }
+
+    /**
+     * Turn rows back into the stored string, writing the fewest columns the parsers need.
+     *
+     * @param array[] $rows each with provider, stored_key, models, temperature, baseurl
+     * @return string
+     */
+    public static function serialize(array $rows): string {
+        $lines = [];
+        foreach ($rows as $r) {
+            $line = $r['provider'] . '|' . $r['stored_key'] . '|' . $r['models'];
+            if ($r['temperature'] !== '' || $r['baseurl'] !== '') {
+                $line .= '|' . $r['temperature'];
+            }
+            if ($r['baseurl'] !== '') {
+                $line .= '|' . $r['baseurl'];
+            }
+            $lines[] = $line;
+        }
+        return implode("\n", $lines);
+    }
+
+    /**
+     * An opaque, stable id for a row. A keyed hash (the site identifier is the secret), so a legacy plain
+     * key can never be guessed from it. Safe to put in a page.
+     *
+     * @param string $provider
+     * @param string $stored the stored key column
+     * @return string 12 hex characters
+     */
+    public static function rowid(string $provider, string $stored): string {
+        return substr(hash_hmac('sha256', $provider . '|' . $stored, get_site_identifier()), 0, 12);
+    }
+
+    /**
+     * The last four characters of a key, for the "ends in" hint. A short key shows nothing.
+     *
+     * @param string $plain
+     * @return string
+     */
+    public static function last4(string $plain): string {
+        return strlen($plain) >= 12 ? substr($plain, -4) : '';
+    }
+
+    /**
+     * The concrete provider the site chats with, or '' when there is none to mirror.
+     *
+     * 'auto' only counts when a legacy key is saved: with no key, auto means core_ai, and mirroring a row
+     * key into apikey would flip the site onto a direct provider.
+     *
+     * @return string
+     */
+    public static function site_provider(): string {
+        $provider = strtolower((string) (get_config(self::PLUGIN, 'provider') ?: 'auto'));
+        if ($provider !== 'auto') {
+            return $provider;
+        }
+        $legacy = secrets::get('apikey');
+        if ($legacy === '') {
+            return '';
+        }
+        return strtolower(provider\base_provider::resolve_auto_provider([
+            'apikey'     => $legacy,
+            'model'      => (string) get_config(self::PLUGIN, 'model'),
+            'apibaseurl' => (string) get_config(self::PLUGIN, 'apibaseurl'),
+        ]));
+    }
+
+    /**
+     * Make apikey equal the key of the default provider's row. Idempotent.
+     *
+     * @return bool true when apikey was rewritten
+     */
+    public static function sync_default_key(): bool {
+        global $CFG;
+        $forced = $CFG->forced_plugin_settings[self::PLUGIN] ?? [];
+        // A forced apikey is not ours to write. A forced table keeps its keys out of the database on purpose,
+        // and the mirror would copy one in, where it goes stale when config.php is rotated.
+        if (array_key_exists('apikey', $forced) || array_key_exists(self::SETTING, $forced)) {
+            return false;
+        }
+        $provider = self::site_provider();
+        if ($provider === '' || in_array($provider, self::KEYLESS, true)) {
+            return false;
+        }
+        // The site's apikey is sent to the site's apibaseurl, and a row's key to the row's base URL. Copy
+        // only from the first readable keyed row for the same destination (both empty is the normal case),
+        // or a gateway site would be handed the vendor's key and send it to the gateway host. A keyed row
+        // for another destination is skipped, not a stop: it can be listed before the right one.
+        $baseurl = trim((string) get_config(self::PLUGIN, 'apibaseurl'));
+        $row = null;
+        foreach (self::rows(true) as $candidate) {
+            if ($candidate['provider'] === $provider && $candidate['haskey'] && $candidate['key'] !== ''
+                    && trim($candidate['baseurl']) === $baseurl) {
+                $row = $candidate;
+                break;
+            }
+        }
+        if ($row === null || secrets::get('apikey') === $row['key']) {
+            return false;
+        }
+        set_config('apikey', secrets::conceal($row['key']), self::PLUGIN);
+        return true;
+    }
+
+    /**
+     * Admin updated-callback for provider, model, apibaseurl and the table: keep apikey in step.
+     *
+     * Sync only, and idempotent, because Moodle runs it once per changed setting, interleaved with the
+     * writes, so the table or the provider may still be the old value. It raises no notices; the warnings
+     * come from default_provider_warnings(), read once the whole save is done.
+     *
+     * @param string $fullname unused; Moodle passes the changed setting's name
+     * @return void
+     */
+    public static function after_settings_saved($fullname = ''): void {
+        self::sync_default_key();
+    }
+
+    /**
+     * Warnings about the default provider's key, as finished sentences. Pure: reads settings, raises nothing.
+     *
+     * Empty when the default provider needs no key or has a keyed row. Otherwise one sentence when the
+     * saved key belongs to another vendor, or when no key is saved anywhere (a custom gateway with a base
+     * URL is allowed to have none).
+     *
+     * @return string[]
+     */
+    public static function default_provider_warnings(): array {
+        $provider = self::site_provider();
+        if ($provider === '' || in_array($provider, self::KEYLESS, true) || self::key_for($provider) !== '') {
+            return [];
+        }
+        $baseurl = trim((string) get_config(self::PLUGIN, 'apibaseurl'));
+        $legacy = secrets::get('apikey');
+        $owner = $legacy === '' ? '' : course_key_guard::conflict($provider, $legacy, $baseurl);
+        if ($owner !== '') {
+            return [get_string('providerkeys:default_vendor_mismatch', self::PLUGIN,
+                (object) ['provider' => $provider, 'owner' => $owner])];
+        }
+        if ($legacy === '' && !($provider === 'custom' && $baseurl !== '')) {
+            return [get_string('providerkeys:default_no_key', self::PLUGIN, (object) ['provider' => $provider])];
+        }
+        return [];
+    }
+
+    /**
+     * The 7.9.0 upgrade. Idempotent. Moves where keys live and never which key a call uses.
+     *
+     * 1. Encrypt every stored secret still in plain text (secrets::encrypt_stored_settings, which also
+     *    covers the voice table).
+     * 2. Encrypt every key in the provider table.
+     * 3. Make sure the default provider has a keyed row for the destination chat uses. If it has none, add
+     *    one from apikey, carrying the site's base URL so a failover never sends a gateway key to the real
+     *    vendor. If it has one for the same destination with a DIFFERENT key, chat was using apikey, so the
+     *    row takes apikey's value and a one-time notice names the two last-four values. A keyed row for the
+     *    same provider but another base URL is a different destination and is left alone. Skipped when
+     *    apikey is forced in config.php: that key is kept out of the database on purpose. Skipped too when
+     *    the key's own prefix says it belongs to another vendor than the provider (course_key_guard), unless
+     *    the site has a gateway base URL, which takes any key.
+     *
+     * Existing lines are edited as text, never rebuilt from the parsed rows. A one-column line, a comment
+     * line, a label's case and any column past the fifth stay exactly as the admin wrote them; only a key
+     * field is ever encrypted or swapped, and a new row is one line appended at the end.
+     *
+     * A key it overwrites in a row is first kept, concealed, in config provider_keys_displaced (one release,
+     * no screen) and recorded in the audit log as a provider_key_displaced row.
+     *
+     * Nothing it writes or reports in the clear contains a key: the notice, the audit row and the summary carry
+     * a provider id and last-four values only.
+     *
+     * @return array{encrypted:int, settings:int, row_added:string, conflict:string} conflict is the provider whose
+     *         row took the default key ('' when none)
+     */
+    public static function upgrade(): array {
+        global $CFG;
+        $forced = $CFG->forced_plugin_settings[self::PLUGIN] ?? [];
+        $summary = ['encrypted' => 0, 'settings' => secrets::encrypt_stored_settings(), 'row_added' => '', 'conflict' => ''];
+        if (array_key_exists(self::SETTING, $forced)) {
+            return $summary;
+        }
+        $raw = (string) (get_config(self::PLUGIN, self::SETTING) ?: '');
+        $concealed = secrets::conceal_row_keys($raw);
+        if ($raw !== '' && $concealed !== $raw) {
+            set_config(self::SETTING, $concealed, self::PLUGIN);
+            $summary['encrypted'] = 1;
+        }
+        if (array_key_exists('apikey', $forced)) {
+            // get_config() returns a forced key, so going on would copy it into the table and leave a stale
+            // copy behind when config.php is rotated. The forced key stays where the admin put it.
+            return $summary;
+        }
+        $legacy = secrets::get('apikey');
+        $provider = self::site_provider();
+        if ($legacy === '' || $provider === '' || in_array($provider, self::KEYLESS, true)) {
+            return $summary;
+        }
+        $baseurl = trim((string) get_config(self::PLUGIN, 'apibaseurl'));
+        if (course_key_guard::conflict($provider, $legacy, $baseurl) !== '') {
+            // The saved key's own prefix says it belongs to another vendor (auto with an Anthropic key and no
+            // model name resolves openai, say). Filing it under this provider, as a new row or over an old
+            // one, would hand it to the wrong vendor on a failover. Leave everything as it is; the settings
+            // page warns about the mismatch (default_provider_warnings()).
+            return $summary;
+        }
+        $rows = self::stored_rows();
+        $found = null;
+        foreach ($rows as $i => $row) {
+            if ($row['provider'] === $provider && $row['stored_key'] !== '' && trim($row['baseurl']) === $baseurl) {
+                $found = $i;
+                break;
+            }
+        }
+        $rowkey = $found === null ? '' : secrets::reveal($rows[$found]['stored_key']);
+        if ($found === null) {
+            $line = self::serialize([['provider' => $provider, 'stored_key' => secrets::conceal($legacy), 'models' => '',
+                'temperature' => '', 'baseurl' => $baseurl]]);
+            $separator = ($concealed === '' || substr($concealed, -1) === "\n") ? '' : "\n";
+            set_config(self::SETTING, $concealed . $separator . $line, self::PLUGIN);
+            $summary['row_added'] = $provider;
+        } else if ($rowkey !== $legacy) {
+            $summary['conflict'] = $provider;
+            // The notice first, so a crash between the two writes can't lose it (a re-run finds the same
+            // conflict). Structured data, not a sentence: flush_notice() formats it with one lang string.
+            $rowlast4 = self::last4($rowkey);
+            $defaultlast4 = self::last4($legacy);
+            set_config('provider_keys_notice', json_encode([
+                'provider'     => $provider,
+                'rowlast4'     => $rowlast4,
+                'defaultlast4' => $defaultlast4,
+            ]), self::PLUGIN);
+            // The row is about to lose its key. Keep the old one, still encrypted, for one release, and say so in
+            // the audit log (provider and last-four values only), both before the row is rewritten.
+            self::keep_displaced($provider, $rows[$found]['stored_key']);
+            audit_logger::log('provider_key_displaced', 0, 0, [
+                'provider'      => $provider,
+                'row_last4'     => $rowlast4,
+                'default_last4' => $defaultlast4,
+            ]);
+            set_config(self::SETTING, self::with_row_key($concealed, $found, secrets::conceal($legacy)), self::PLUGIN);
+        }
+        return $summary;
+    }
+
+    /**
+     * Keep the key a conflict is about to overwrite, for one release (config provider_keys_displaced).
+     *
+     * The setting is a JSON map of provider => concealed key (\core\encryption ciphertext, never plain text).
+     * There is no screen for it; it exists so an admin who needed the older key can still be helped. An entry
+     * already there is the older, original credential, so a re-run never replaces it. A damaged value is
+     * treated as an empty map.
+     *
+     * @param string $provider lowercase provider id
+     * @param string $stored the row's stored key column
+     * @return void
+     */
+    private static function keep_displaced(string $provider, string $stored): void {
+        $map = json_decode((string) get_config(self::PLUGIN, 'provider_keys_displaced'), true);
+        if (!is_array($map)) {
+            $map = [];
+        }
+        if (isset($map[$provider])) {
+            return;
+        }
+        $map[$provider] = secrets::conceal($stored);
+        set_config('provider_keys_displaced', json_encode($map), self::PLUGIN);
+    }
+
+    /**
+     * Replace the key field of one row in a stored table and leave every other character as it was.
+     *
+     * The index counts rows the way stored_rows() does (blank lines, comment lines and lines with no
+     * provider are not rows), so it is the index stored_rows() reports. Keep the two in step.
+     *
+     * @param string $text the stored table
+     * @param int $index row index as reported by stored_rows()
+     * @param string $stored the new value for the key column (already concealed)
+     * @return string the table with that one key field replaced
+     */
+    private static function with_row_key(string $text, int $index, string $stored): string {
+        $lines = preg_split("/\r?\n/", $text);
+        $seen = 0;
+        foreach ($lines as $n => $line) {
+            $line = trim($line);
+            if ($line === '' || $line[0] === '#') {
+                continue;
+            }
+            $parts = array_map('trim', explode('|', $line));
+            if ($parts[0] === '') {
+                continue;
+            }
+            if ($seen++ === $index) {
+                $parts[1] = $stored;
+                $lines[$n] = implode('|', $parts);
+                break;
+            }
+        }
+        return implode("\n", $lines);
+    }
+
+    /**
+     * Show the one-time upgrade notice, if there is one, then forget it.
+     *
+     * The stored value is JSON: {provider, rowlast4, defaultlast4}. Anything else (the English sentence an
+     * earlier build stored, a damaged value) shows nothing; it is still forgotten.
+     *
+     * @return void
+     */
+    public static function flush_notice(): void {
+        $raw = (string) get_config(self::PLUGIN, 'provider_keys_notice');
+        if ($raw === '') {
+            return;
+        }
+        unset_config('provider_keys_notice', self::PLUGIN);
+        $data = json_decode($raw, true);
+        if (!is_array($data)) {
+            return;
+        }
+        $a = new \stdClass();
+        foreach (['provider', 'rowlast4', 'defaultlast4'] as $field) {
+            if (!isset($data[$field]) || !is_string($data[$field])) {
+                return;
+            }
+            $a->$field = s($data[$field]);
+        }
+        if ($a->provider === '') {
+            return;
+        }
+        \core\notification::warning(branding::str('providerkeys:upgrade_conflict', $a));
+    }
+
+    /**
+     * The key of the provider row an Embedding, Rerank or Voice field points at, or '' for "use my own".
+     *
+     * @param string $setting one of embed_key_from, rerank_key_from, realtime_key_from
+     * @return string
+     */
+    public static function key_from_setting(string $setting): string {
+        $from = strtolower(trim((string) get_config(self::PLUGIN, $setting)));
+        return ($from === '' || $from === 'own') ? '' : self::key_for($from);
+    }
+
+    /**
+     * Choices for an "use the key from a provider row" select: own key, then every provider that has a keyed row.
+     *
+     * @return array<string, string>
+     */
+    public static function from_choices(): array {
+        $choices = ['own' => get_string('providerkeys:use_own_key', self::PLUGIN)];
+        foreach (self::by_label() as $provider => $row) {
+            if ($row['haskey']) {
+                $choices[$provider] = get_string('providerkeys:use_row_key', self::PLUGIN, $provider);
+            }
+        }
+        return $choices;
+    }
+}

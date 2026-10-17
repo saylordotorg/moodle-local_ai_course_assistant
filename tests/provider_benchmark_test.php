@@ -67,6 +67,46 @@ final class provider_benchmark_test extends \advanced_testcase {
         $this->assertContains('openai', $ids);
     }
 
+    /**
+     * The provider list goes into the payload that is cached and exported as plain JSON (the admin page's
+     * ?export=json and the CLI --format=json), so no row key may be in it, concealed or not.
+     */
+    public function test_the_provider_list_and_its_json_export_carry_no_row_key(): void {
+        $this->resetAfterTest();
+        $this->setup_stub_primary();
+        set_config(
+            'comparison_providers',
+            "claude|sk-ant-SENTINEL-ROW-KEY-7777|claude-haiku-4-5|0.7\n"
+                . "openai|" . secrets::conceal('sk-proj-SENTINEL-CIPHER-KEY-8888') . "|gpt-4o-mini",
+            'local_ai_course_assistant'
+        );
+        $providers = provider_benchmark::list_chat_providers();
+        $this->assertContains('claude', array_column($providers, 'id'), 'the keyed rows are still listed');
+        $this->assertContains('openai', array_column($providers, 'id'));
+        foreach ($providers as $p) {
+            $this->assertArrayNotHasKey('apikey', $p, 'an entry has no key field at all');
+        }
+        $json = provider_benchmark::export_json(['chat' => ['providers' => $providers]]);
+        $this->assertStringNotContainsString('SENTINEL', $json);
+        $this->assertStringNotContainsString('sodium:', $json);
+        $this->assertStringNotContainsString('apikey', $json);
+    }
+
+    public function test_a_keyed_voice_row_still_reads_as_configured_without_its_key_in_the_payload(): void {
+        $this->resetAfterTest();
+        set_config(
+            'voice_providers',
+            "openai|" . secrets::conceal('sk-proj-SENTINEL-VOICE-KEY-9999') . "|OpenAI|alloy|alloy\n"
+                . "xai||NoKey|ara|ara",
+            'local_ai_course_assistant'
+        );
+        $voice = provider_benchmark::list_voice_providers();
+        $configured = array_column($voice['providers'], 'configured', 'id');
+        $this->assertTrue($configured['openai'], 'a keyed row is configured');
+        $this->assertFalse($configured['xai'], 'a row with no key is not');
+        $this->assertStringNotContainsString('SENTINEL', provider_benchmark::export_json(['voice' => $voice]));
+    }
+
     public function test_run_chat_runs_each_prompt_against_primary(): void {
         $this->resetAfterTest();
         $this->setup_stub_primary();

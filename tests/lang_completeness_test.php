@@ -234,6 +234,12 @@ final class lang_completeness_test extends \basic_testcase {
         // read the English.
         'settings:code_sandbox_pyodide_baseurl',
         'settings:code_sandbox_pyodide_baseurl_desc',
+        // 7.9.0 PENDING TRANSLATION: strings added by the provider keys work; Task 12 translates them and deletes this whole block.
+        'providerkeys:default_no_key',
+        'providerkeys:default_vendor_mismatch',
+        'providerkeys:use_own_key',
+        'providerkeys:use_row_key',
+        'providerkeys:upgrade_conflict',
     ];
 
     /**

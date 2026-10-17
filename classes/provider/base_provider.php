@@ -946,19 +946,10 @@ abstract class base_provider implements provider_interface {
      * @return string
      */
     private static function label_for_active_provider(string $providerid, array $overrides): string {
-        $raw = (string) (get_config('local_ai_course_assistant', 'comparison_providers') ?: '');
         $apikey = (string) ($overrides['apikey'] ?? '');
-        foreach (preg_split("/\r?\n/", $raw) as $line) {
-            $line = trim($line);
-            if ($line === '' || $line[0] === '#') {
-                continue;
-            }
-            $parts = array_map('trim', explode('|', $line));
-            if (
-                strtolower($parts[0] ?? '') === strtolower($providerid)
-                && ($apikey === '' || ($parts[1] ?? '') === $apikey)
-            ) {
-                return strtolower($parts[0]);
+        foreach (\local_ai_course_assistant\provider_keys::rows(true) as $row) {
+            if ($row['provider'] === strtolower($providerid) && ($apikey === '' || $row['key'] === $apikey)) {
+                return $row['provider'];
             }
         }
         return strtolower($providerid) . '-primary';
@@ -1167,7 +1158,18 @@ abstract class base_provider implements provider_interface {
 
         $row = self::lookup_comparison_row($providerid);
         if ($row !== null) {
-            if (!empty($row['apikey'])) {
+            // 7.9.0: the upgrade gives the default provider a row that MIRRORS the site key. Before that, a
+            // course with its own key for this provider kept it (and its own gateway) because no row existed,
+            // so a row whose key is just the site key must not take the course's credential over, or the site
+            // key would be billed and could be sent to the course's gateway. A row with a DISTINCT credential
+            // still wins, as it always did.
+            $sitekey = (string) (\local_ai_course_assistant\secrets::get('apikey') ?: '');
+            $coursekeepsown = strcasecmp($providerid, $keyowner) === 0
+                && (string) $effective['apikey'] !== ''
+                && (string) $effective['apikey'] !== $sitekey
+                && (string) $row['apikey'] !== ''
+                && (string) $row['apikey'] === $sitekey;
+            if (!$coursekeepsown && !empty($row['apikey'])) {
                 $overrides['apikey'] = $row['apikey'];
             }
             if ($row['temperature'] !== '') {
@@ -1175,7 +1177,7 @@ abstract class base_provider implements provider_interface {
             }
             // v5.5.2: per-row base URL override (5th column). Empty means
             // use the provider class's hardcoded default.
-            if (!empty($row['apibaseurl'])) {
+            if (!$coursekeepsown && !empty($row['apibaseurl'])) {
                 $overrides['apibaseurl'] = $row['apibaseurl'];
             }
         } else if (strcasecmp($providerid, $keyowner) !== 0) {
@@ -1226,26 +1228,25 @@ abstract class base_provider implements provider_interface {
      * row. Blank or absent means "use the provider class's default base URL."
      *
      * @param string $providerid
-     * @return array|null Row with apikey, models, temperature, apibaseurl keys, or null if not found.
+     * @return array|null Row with apikey, models, temperature, apibaseurl keys, or null if not found or if its key can't be read.
      */
     private static function lookup_comparison_row(string $providerid): ?array {
-        $raw = get_config('local_ai_course_assistant', 'comparison_providers') ?: '';
-        foreach (explode("\n", $raw) as $line) {
-            $line = trim($line);
-            if ($line === '' || $line[0] === '#') {
-                continue;
-            }
-            $parts = array_map('trim', explode('|', $line));
-            if (count($parts) >= 2 && strtolower($parts[0]) === $providerid) {
-                return [
-                    'apikey'      => $parts[1] ?? '',
-                    'models'      => $parts[2] ?? '',
-                    'temperature' => $parts[3] ?? '',
-                    'apibaseurl'  => $parts[4] ?? '',
-                ];
-            }
+        $row = \local_ai_course_assistant\provider_keys::row_for($providerid, true);
+        if ($row === null) {
+            return null;
         }
-        return null;
+        // A row that says it has a key but whose ciphertext can't be read (a database restored onto another
+        // site) is no row at all. Returning it would leave the apikey override empty, and the constructor
+        // would then fall back to the inherited site or course key, sending another vendor's key here.
+        if ($row['haskey'] && $row['key'] === '') {
+            return null;
+        }
+        return [
+            'apikey'      => $row['key'],
+            'models'      => $row['models'],
+            'temperature' => $row['temperature'],
+            'apibaseurl'  => $row['baseurl'],
+        ];
     }
 
     /**

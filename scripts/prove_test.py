@@ -72,7 +72,7 @@ import subprocess
 import sys
 import time
 
-REPO = os.path.expanduser('~/ai-projects/ai_course_assistant')
+REPO = os.path.expanduser(os.environ.get('SOLA_REPO', '~/ai-projects/ai_course_assistant'))
 DEPLOYED = os.path.expanduser('~/Sites/moodle/local/ai_course_assistant')
 MOODLE = os.path.expanduser('~/Sites/moodle')
 LOCKFILE = os.path.expanduser('~/Sites/moodle/.sola-prove.lock')

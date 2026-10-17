@@ -464,7 +464,6 @@ class spend_guard {
             return [];
         }
         $isvoice = in_array($capability, ['voice', 'realtime', 'tts', 'stt'], true);
-        $cmpraw  = !$isvoice ? (string) (get_config('local_ai_course_assistant', 'comparison_providers') ?: '') : '';
         $result = [];
         foreach (preg_split("/\r?\n/", $raw) as $line) {
             $line = trim($line);
@@ -478,7 +477,7 @@ class spend_guard {
             }
             $entry = $isvoice
                 ? self::lookup_voice_label($label)
-                : self::lookup_chat_label($label, $cmpraw);
+                : self::lookup_chat_label($label);
             if ($entry !== null) {
                 $result[] = $entry;
             }
@@ -487,40 +486,25 @@ class spend_guard {
     }
 
     /**
-     * Look up a chat/analytics failover label against the
-     * comparison_providers registry. Lines are pipe-delimited:
-     * label | apikey | models | temperature [ | apibaseurl ].
-     *
-     * v5.5.2: 5th column is an optional per-row base URL override that
-     * threads through to the failover_chain decorator.
+     * Look up a chat/analytics failover label in the provider rows: the first row WITH a key serves it.
      *
      * @param string $label
-     * @param string $raw Raw comparison_providers config (passed in so callers can read once).
-     * @return array|null ['provider' => string, 'apikey' => string, 'label' => string, 'apibaseurl' => string] or null
+     * @return array|null ['provider', 'apikey', 'label', 'model', 'apibaseurl'] or null
      */
-    private static function lookup_chat_label(string $label, string $raw): ?array {
-        foreach (preg_split("/\r?\n/", $raw) as $cprow) {
-            $cprow = trim($cprow);
-            if ($cprow === '' || $cprow[0] === '#') {
-                continue;
-            }
-            $parts = array_map('trim', explode('|', $cprow));
-            if (strtolower($parts[0] ?? '') === strtolower($label) && !empty($parts[1])) {
-                // v7.2.8: the 3rd column is the row's model list
-                // (provider_id|api_key|model1,model2|temperature|baseurl). It was
-                // parsed for the LLM picker but dropped here, so a failover entry
-                // had no model of its own and inherited the primary's.
-                $rowmodels = array_values(array_filter(array_map('trim', explode(',', (string) ($parts[2] ?? '')))));
-                return [
-                    'provider'   => strtolower($parts[0]),
-                    'apikey'     => $parts[1],
-                    'label'      => $label,
-                    'model'      => $rowmodels[0] ?? '',
-                    'apibaseurl' => $parts[4] ?? '',
-                ];
-            }
+    private static function lookup_chat_label(string $label): ?array {
+        $row = provider_keys::for_provider($label);
+        // A row whose stored key cannot be decrypted (a database restored onto another site) reads as
+        // having a key but reveals none: treat it as no key rather than build an entry that cannot call.
+        if ($row === null || $row['key'] === '') {
+            return null;
         }
-        return null;
+        return [
+            'provider'   => $row['provider'],
+            'apikey'     => $row['key'],
+            'label'      => $label,
+            'model'      => $row['model'],
+            'apibaseurl' => $row['baseurl'],
+        ];
     }
 
     /**

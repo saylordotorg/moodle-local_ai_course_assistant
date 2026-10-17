@@ -674,17 +674,8 @@ TXT;
      * @return bool
      */
     private function has_comparison_row(string $providerid): bool {
-        $raw = (string) (get_config('local_ai_course_assistant', 'comparison_providers') ?: '');
-        foreach (preg_split("/\r?\n/", $raw) as $line) {
-            $line = trim($line);
-            if ($line === '' || $line[0] === '#') {
-                continue;
-            }
-            $parts = array_map('trim', explode('|', $line));
-            if (count($parts) < 3 || $parts[1] === '') {
-                continue;
-            }
-            if (strtolower($parts[0]) === $providerid) {
+        foreach (\local_ai_course_assistant\provider_keys::rows() as $row) {
+            if ($row['columns'] >= 3 && $row['haskey'] && $row['provider'] === $providerid) {
                 return true;
             }
         }

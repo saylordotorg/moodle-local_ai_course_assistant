@@ -332,8 +332,11 @@ class provider_benchmark {
      * the primary provider plus every row in comparison_providers.
      * De-duplicated by (id, model).
      *
-     * @return array<int,array{id:string,label:string,model:string,apikey:string,
-     *     temperature:?float,is_primary:bool}>
+     * The entries go into the benchmark payload, which is cached and exported as plain JSON, so they carry
+     * no key. The run builds each provider through base_provider::create_for_comparison(), which looks its
+     * own key up server-side at the point of use.
+     *
+     * @return array<int,array{id:string,label:string,model:string,temperature:?float,is_primary:bool}>
      */
     public static function list_chat_providers(): array {
         $rows = [];
@@ -345,35 +348,21 @@ class provider_benchmark {
                 'id' => $primaryid,
                 'label' => $primaryid . ' (primary)',
                 'model' => (string) (get_config('local_ai_course_assistant', 'model') ?: ''),
-                'apikey' => '',
                 'temperature' => null,
                 'is_primary' => true,
             ];
         }
 
-        // 2. Comparison providers — multi-line config: provider|apikey|models|temperature
-        $raw = (string) (get_config('local_ai_course_assistant', 'comparison_providers') ?: '');
-        foreach (explode("\n", $raw) as $line) {
-            $line = trim($line);
-            if ($line === '' || $line[0] === '#') {
+        // 2. Comparison providers: one entry per row of the provider table (keys are never revealed here).
+        foreach (\local_ai_course_assistant\provider_keys::rows() as $row) {
+            if (in_array($row['provider'], \local_ai_course_assistant\provider_keys::KEY_ONLY_PROVIDERS, true)) {
                 continue;
             }
-            $parts = array_map('trim', explode('|', $line));
-            $id = strtolower($parts[0] ?? '');
-            if ($id === '') {
-                continue;
-            }
-            // For multiple-models rows, the first model is the one we test;
-            // the comparison setting allows comma-separated alternatives.
-            $models = array_filter(array_map('trim', explode(',', $parts[2] ?? '')));
-            $model = $models[0] ?? '';
             $rows[] = [
-                'id' => $id,
-                'label' => $id,
-                'model' => $model,
-                'apikey' => $parts[1] ?? '',
-                'temperature' => isset($parts[3]) && $parts[3] !== ''
-                    ? (float) $parts[3] : null,
+                'id' => $row['provider'],
+                'label' => $row['provider'],
+                'model' => $row['model'],
+                'temperature' => $row['temperature'] !== '' ? (float) $row['temperature'] : null,
                 'is_primary' => false,
             ];
         }
