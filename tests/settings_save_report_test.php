@@ -260,6 +260,25 @@ final class settings_save_report_test extends \advanced_testcase {
         $this->assertSame(\core\output\notification::NOTIFY_WARNING, $notices[0]->get_message_type());
     }
 
+    /** The primary model's display-name warning goes out through the same once-per-save path as the key warnings. */
+    public function test_changing_the_model_to_a_display_name_raises_the_model_warning_once(): void {
+        $this->resetAfterTest();
+        set_config('provider', 'openai', 'local_ai_course_assistant');
+        set_config('comparison_providers', 'openai|' . secrets::conceal('sk-proj-MODEL-EMIT-0000-ABCD') . '|m',
+            'local_ai_course_assistant');
+        set_config('model', 'GPT-4o-mini', 'local_ai_course_assistant');
+
+        $this->assertSame(1, settings_save_report::emit_default_provider_warnings(['model' => ['gpt-4o-mini', 'GPT-4o-mini']]));
+        $notices = \core\notification::fetch();
+        $this->assertCount(1, $notices);
+        $this->assertStringContainsString('gpt-4o-mini', $notices[0]->get_message());
+        $this->assertSame(\core\output\notification::NOTIFY_WARNING, $notices[0]->get_message_type());
+
+        // An unrelated change raises nothing, even though the model is still wrong.
+        $this->assertSame(0, settings_save_report::emit_default_provider_warnings(['greeting' => ['a', 'b']]));
+        $this->assertSame([], \core\notification::fetch());
+    }
+
     public function test_other_changes_raise_no_key_warning(): void {
         $this->resetAfterTest();
         set_config('provider', 'claude', 'local_ai_course_assistant');

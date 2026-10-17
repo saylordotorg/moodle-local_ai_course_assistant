@@ -73,6 +73,7 @@ zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*/tests/golden/*" \
   -x "*/.wiki/*" \
   -x "*/.drafts/*" \
+  -x "*/docs/superpowers/*" \
   -x "*/__pycache__/*" \
   -x "*.pyc" \
   -x "*/scripts/*"

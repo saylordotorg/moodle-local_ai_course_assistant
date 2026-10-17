@@ -83,6 +83,11 @@ final class settings_secret_masking_test extends \advanced_testcase {
         'prompt_budget_chars'     => 'budget',
         // A description row linking to the token-usage page; it stores nothing.
         'token_analytics_link'    => 'link to the token analytics page',
+        // Selects that hold a provider id ("own", "openai", "voyage") naming the row whose key is used. The key
+        // itself stays in the provider table (encrypted); these store which row, never a credential.
+        'embed_key_from'          => 'names a provider row, holds no secret',
+        'rerank_key_from'         => 'names a provider row, holds no secret',
+        'realtime_key_from'       => 'names a provider row, holds no secret',
     ];
 
     public function test_every_credential_setting_is_a_password_type(): void {

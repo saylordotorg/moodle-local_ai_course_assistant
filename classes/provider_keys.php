@@ -45,6 +45,8 @@ class provider_keys {
     public const KEY_ONLY_PROVIDERS = ['voyage'];
     /** @var string[] Providers that work without a key, so a row for them may have none. */
     public const KEYLESS = ['ollama', 'coreai'];
+    /** @var string[] Settings that decide which row's key apikey mirrors (the table is the fourth; its writers sync themselves). */
+    public const MIRROR_SETTINGS = ['provider', 'model', 'apibaseurl'];
 
     /**
      * Rows as stored. SERVER-SIDE ONLY: stored_key is ciphertext (or a legacy plain key). Never pass
@@ -244,35 +246,70 @@ class provider_keys {
      * @return bool true when apikey was rewritten
      */
     public static function sync_default_key(): bool {
-        global $CFG;
-        $forced = $CFG->forced_plugin_settings[self::PLUGIN] ?? [];
-        // A forced apikey is not ours to write. A forced table keeps its keys out of the database on purpose,
-        // and the mirror would copy one in, where it goes stale when config.php is rotated.
-        if (array_key_exists('apikey', $forced) || array_key_exists(self::SETTING, $forced)) {
+        if (self::mirror_is_forced_off()) {
             return false;
         }
         $provider = self::site_provider();
         if ($provider === '' || in_array($provider, self::KEYLESS, true)) {
             return false;
         }
-        // The site's apikey is sent to the site's apibaseurl, and a row's key to the row's base URL. Copy
-        // only from the first readable keyed row for the same destination (both empty is the normal case),
-        // or a gateway site would be handed the vendor's key and send it to the gateway host. A keyed row
-        // for another destination is skipped, not a stop: it can be listed before the right one.
-        $baseurl = trim((string) get_config(self::PLUGIN, 'apibaseurl'));
-        $row = null;
-        foreach (self::rows(true) as $candidate) {
-            if ($candidate['provider'] === $provider && $candidate['haskey'] && $candidate['key'] !== ''
-                    && trim($candidate['baseurl']) === $baseurl) {
-                $row = $candidate;
-                break;
-            }
-        }
+        $row = self::mirror_lookup($provider, (string) get_config(self::PLUGIN, 'apibaseurl'))['row'];
         if ($row === null || secrets::get('apikey') === $row['key']) {
             return false;
         }
         set_config('apikey', secrets::conceal($row['key']), self::PLUGIN);
         return true;
+    }
+
+    /**
+     * Is the apikey mirror switched off by config.php?
+     *
+     * A forced apikey is not ours to write. A forced table keeps its keys out of the database on purpose, and the
+     * mirror would copy one in, where it goes stale when config.php is rotated. On such a site the mirror is off by
+     * design, so sync_default_key() does nothing and default_key_warnings() has no mirror to warn about.
+     *
+     * @return bool
+     */
+    private static function mirror_is_forced_off(): bool {
+        global $CFG;
+        $forced = $CFG->forced_plugin_settings[self::PLUGIN] ?? [];
+        return array_key_exists('apikey', $forced) || array_key_exists(self::SETTING, $forced);
+    }
+
+    /**
+     * Which row does the apikey mirror copy for a provider and the site's API Base URL?
+     *
+     * The site's apikey is sent to the site's apibaseurl, and a row's key to the row's base URL. Only the first
+     * readable keyed row for the same destination (both empty is the normal case) can stand in for apikey, or a
+     * gateway site would be handed the vendor's key and send it to the gateway host. A keyed row for another
+     * destination is skipped, not a stop: it can be listed before the right one. A row whose key cannot be
+     * decrypted is no keyed row at all.
+     *
+     * One pass over the table, so sync_default_key() and default_key_warnings() always agree on the row.
+     *
+     * @param string $provider lowercase provider id
+     * @param string $baseurl the site's API Base URL (compared trimmed)
+     * @return array{row: ?array, keyed: bool, elsewhere: bool} row: the row the mirror copies, key revealed, or
+     *         null; keyed: whether the provider has any readable keyed row, under any base URL; elsewhere: whether
+     *         one of them has a base URL of its own that is not the site's, which is a row the admin pointed
+     *         somewhere else on purpose
+     */
+    private static function mirror_lookup(string $provider, string $baseurl): array {
+        $baseurl = trim($baseurl);
+        $found = ['row' => null, 'keyed' => false, 'elsewhere' => false];
+        foreach (self::rows(true) as $candidate) {
+            if ($candidate['provider'] !== $provider || !$candidate['haskey'] || $candidate['key'] === '') {
+                continue;
+            }
+            $found['keyed'] = true;
+            $rowurl = trim($candidate['baseurl']);
+            if ($rowurl === $baseurl) {
+                $found['row'] = $found['row'] ?? $candidate;
+            } else if ($rowurl !== '') {
+                $found['elsewhere'] = true;
+            }
+        }
+        return $found;
     }
 
     /**
@@ -290,20 +327,93 @@ class provider_keys {
     }
 
     /**
-     * Warnings about the default provider's key, as finished sentences. Pure: reads settings, raises nothing.
+     * Keep apikey in step after something OTHER than the admin settings page wrote settings (the signed policy
+     * bundle, the automatic model switcher and its rollback). The admin page has its updated-callback
+     * (after_settings_saved()); these writers go through set_config(), which fires no callback.
      *
-     * Empty when the default provider needs no key or has a keyed row. Otherwise one sentence when the
-     * saved key belongs to another vendor, or when no key is saved anywhere (a custom gateway with a base
-     * URL is allowed to have none).
+     * Syncs once when any written setting is one the mirror reads (the default provider, its model or the
+     * gateway URL), and does nothing when none is: no write, no call. Idempotent, raises no notices.
+     *
+     * Never throws into its caller. The callers have already written settings, an audit row or a switch record,
+     * and a failed mirror (the only throw path is secrets::conceal() when core encryption has no usable key) must
+     * not abort them half way. A failure leaves apikey as it was and says so in one developer debugging line that
+     * names only the exception class, never its message or any key.
+     *
+     * @param string[] $names the settings the caller actually wrote
+     * @return bool true when apikey was rewritten
+     */
+    public static function sync_after_writes(array $names): bool {
+        if (!array_intersect(self::MIRROR_SETTINGS, $names)) {
+            return false;
+        }
+        try {
+            return self::sync_default_key();
+        } catch (\Throwable $e) {
+            debugging('provider_keys::sync_after_writes could not re-mirror the default key (' . get_class($e) . ')',
+                DEBUG_DEVELOPER);
+            return false;
+        }
+    }
+
+    /**
+     * Warnings about the default provider, as finished sentences. Pure: reads settings, raises nothing.
+     *
+     * First the key, if it is a problem: one sentence when the default provider needs a key and has no keyed
+     * row, and either the saved key belongs to another vendor or no key is saved anywhere (a custom gateway
+     * with a base URL is allowed to have none). Then the model, if the primary model is a display name
+     * ("GPT-4o-mini") a hosted provider will refuse: the same check, failover_verifier::display_name_problem(),
+     * that judges a failover row's model. The model sentence carries what the admin typed, so it is escaped.
+     *
+     * Empty when there is no concrete default provider to judge ('auto' with no saved key is core_ai).
      *
      * @return string[]
      */
     public static function default_provider_warnings(): array {
         $provider = self::site_provider();
-        if ($provider === '' || in_array($provider, self::KEYLESS, true) || self::key_for($provider) !== '') {
+        if ($provider === '') {
+            return [];
+        }
+        $warnings = self::default_key_warnings($provider);
+        $problem = failover_verifier::display_name_problem(
+            $provider,
+            trim((string) get_config(self::PLUGIN, 'model')),
+            trim((string) get_config(self::PLUGIN, 'apibaseurl'))
+        );
+        if ($problem !== '') {
+            $warnings[] = s($problem);
+        }
+        return $warnings;
+    }
+
+    /**
+     * The key half of default_provider_warnings(): none when the provider needs no key or has a keyed row (the
+     * mirror's row, under the site's API Base URL, or a plain one that is kept for failover).
+     *
+     * One sentence when none of the provider's keyed rows is under the site's base URL and one of them has a base
+     * URL of its own: the mirror copies none of them, so chat still uses the previous default key, and an admin
+     * who typed a new key into such a row (moving to an Azure or gateway endpoint) would otherwise see "Saved"
+     * and nothing else. A plain row on a gateway site is not that case: it has no base URL of its own, and the
+     * sentence would be untrue. Nor is a site whose apikey or table is forced in config.php: the mirror is off
+     * there by design, and clearing the row's base URL could break a same-vendor failover row.
+     *
+     * @param string $provider the concrete default provider
+     * @return string[]
+     */
+    private static function default_key_warnings(string $provider): array {
+        if (in_array($provider, self::KEYLESS, true)) {
             return [];
         }
         $baseurl = trim((string) get_config(self::PLUGIN, 'apibaseurl'));
+        $found = self::mirror_lookup($provider, $baseurl);
+        if ($found['row'] !== null) {
+            return [];
+        }
+        if ($found['elsewhere'] && !self::mirror_is_forced_off()) {
+            return [get_string('providerkeys:default_baseurl_mismatch', self::PLUGIN, (object) ['provider' => $provider])];
+        }
+        if ($found['keyed']) {
+            return [];
+        }
         $legacy = secrets::get('apikey');
         $owner = $legacy === '' ? '' : course_key_guard::conflict($provider, $legacy, $baseurl);
         if ($owner !== '') {
@@ -332,8 +442,9 @@ class provider_keys {
      *    the site has a gateway base URL, which takes any key.
      *
      * Existing lines are edited as text, never rebuilt from the parsed rows. A one-column line, a comment
-     * line, a label's case and any column past the fifth stay exactly as the admin wrote them; only a key
-     * field is ever encrypted or swapped, and a new row is one line appended at the end.
+     * line, a label's case and any column past the fifth are kept. What does change: a key field is encrypted
+     * or swapped, the spaces around each field of a row line are trimmed (conceal_row_keys() rejoins the
+     * trimmed fields), and line endings become \n (a CR is dropped). A new row is one line appended at the end.
      *
      * A key it overwrites in a row is first kept, concealed, in config provider_keys_displaced (one release,
      * no screen) and recorded in the audit log as a provider_key_displaced row.
@@ -439,7 +550,11 @@ class provider_keys {
     }
 
     /**
-     * Replace the key field of one row in a stored table and leave every other character as it was.
+     * Replace the key field of one row in a stored table, touching no other row.
+     *
+     * Only that row's line is rebuilt: its fields are trimmed and rejoined with "|", every column kept, the
+     * key column replaced. Every other line comes back as it was, apart from line endings, which become \n (a
+     * CR is dropped, as conceal_row_keys() already did to the text passed in).
      *
      * The index counts rows the way stored_rows() does (blank lines, comment lines and lines with no
      * provider are not rows), so it is the index stored_rows() reports. Keep the two in step.
@@ -511,14 +626,80 @@ class provider_keys {
     }
 
     /**
-     * The key of the provider row an Embedding, Rerank or Voice field points at, or '' for "use my own".
+     * The provider row an Embedding or Rerank field points at, or null for "use my own" or a choice that can't be used.
      *
-     * @param string $setting one of embed_key_from, rerank_key_from, realtime_key_from
-     * @return string
+     * The row's key is sent to the target, so a row is passed over (null, and the caller falls back to the pasted
+     * key, silently) when:
+     * - it is gone, has no key, or its key cannot be decrypted;
+     * - it has a base URL of its own that is not the target's base URL: an Azure OpenAI or gateway key is for that
+     *   destination, not for the vendor's own endpoint (see row_reaches());
+     * - with a target vendor, the key's own prefix identifies it as ANOTHER vendor's (course_key_guard::conflict():
+     *   unambiguous prefixes only, a bare sk- identifies nobody). That covers a choice that went stale when the
+     *   admin switched the embedding provider after picking a row. A base URL for the target turns this check
+     *   off: a gateway takes any key.
+     *
+     * @param string $setting one of embed_key_from, rerank_key_from
+     * @param string $vendor the provider the key will be sent to ('' = do not check the vendor)
+     * @param string $baseurl the base URL the key will be sent to ('' = the vendor's own endpoint)
+     * @return array|null the row, key revealed
      */
-    public static function key_from_setting(string $setting): string {
+    public static function chosen_row(string $setting, string $vendor = '', string $baseurl = ''): ?array {
         $from = strtolower(trim((string) get_config(self::PLUGIN, $setting)));
-        return ($from === '' || $from === 'own') ? '' : self::key_for($from);
+        if ($from === '' || $from === 'own') {
+            return null;
+        }
+        $row = self::for_provider($from);
+        if ($row === null || $row['key'] === '' || !self::row_reaches($row['baseurl'], $baseurl)) {
+            return null;
+        }
+        if ($vendor !== '' && course_key_guard::conflict(strtolower($vendor), $row['key'], trim($baseurl)) !== '') {
+            return null;
+        }
+        return $row;
+    }
+
+    /**
+     * The key of the provider row an Embedding or Rerank field points at, or '' for "use my own".
+     *
+     * @param string $setting one of embed_key_from, rerank_key_from
+     * @param string $vendor the provider the key will be sent to ('' = do not check the vendor)
+     * @param string $baseurl the base URL the key will be sent to ('' = the vendor's own endpoint)
+     * @return string the plain key, or '' when the row is not to be used (see chosen_row())
+     */
+    public static function key_from_setting(string $setting, string $vendor = '', string $baseurl = ''): string {
+        $row = self::chosen_row($setting, $vendor, $baseurl);
+        return $row === null ? '' : $row['key'];
+    }
+
+    /**
+     * May a provider row's key be sent to this target? A row with no base URL is for the vendor's own endpoint and
+     * goes anywhere the caller already vetted (the vendor check); a row with a base URL of its own holds a
+     * credential for that destination, so it goes only to the same one. Compared trimmed.
+     *
+     * @param string $rowbaseurl the row's base URL column
+     * @param string $target the base URL the key would be sent to ('' = the vendor's own endpoint)
+     * @return bool
+     */
+    public static function row_reaches(string $rowbaseurl, string $target): bool {
+        $rowbaseurl = trim($rowbaseurl);
+        return $rowbaseurl === '' || $rowbaseurl === trim($target);
+    }
+
+    /**
+     * Which of the given key-source settings point at a provider row instead of "own".
+     *
+     * @param string[] $settings setting names (embed_key_from, rerank_key_from, realtime_key_from)
+     * @return string[] the names whose value is a provider id
+     */
+    public static function chosen_row_sources(array $settings): array {
+        $chosen = [];
+        foreach ($settings as $setting) {
+            $from = strtolower(trim((string) get_config(self::PLUGIN, $setting)));
+            if ($from !== '' && $from !== 'own') {
+                $chosen[] = $setting;
+            }
+        }
+        return $chosen;
     }
 
     /**

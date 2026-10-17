@@ -82,10 +82,66 @@ abstract class base_embedding_provider {
     }
 
     /**
+     * The key Embedding sends to its provider.
+     *
+     * A migration override of embed_apikey (embedding_migration builds the target provider with its own key)
+     * always wins. Otherwise an explicit "use the key from the X row" choice (embed_key_from) wins over the
+     * pasted key, and the pasted key is the fallback, so a choice naming a row that is gone, has no key, cannot
+     * be decrypted, belongs to another vendor than embed_provider (unless a base URL is set) or has a base URL of
+     * its own that is not Embedding's changes nothing.
+     *
+     * Also the answer for status pages (rag_admin.php): outside create_from_config() no override is active,
+     * so it reads the live settings.
+     *
+     * @return string the plain key, or '' when none is configured
+     */
+    public static function resolve_apikey(): string {
+        return self::resolve_apikey_source()['key'];
+    }
+
+    /**
+     * The key Embedding sends, and whether it is a chosen provider row's key rather than a pasted one.
+     *
+     * voyage_reranker needs the difference: it falls onward to this key, and a key that came from a chosen row
+     * is checked against Voyage (the vendor, and the row's own base URL against the reranker's) while a pasted
+     * one is passed on exactly as it always was.
+     *
+     * @return array{key: string, fromrow: bool, rowbaseurl: string} rowbaseurl: the chosen row's own base URL,
+     *         trimmed ('' when the key is not from a row, or the row has none)
+     */
+    public static function resolve_apikey_source(): array {
+        $own = (string) (self::cfg('embed_apikey') ?: '');
+        if (array_key_exists('embed_apikey', self::$configoverrides)) {
+            return ['key' => $own, 'fromrow' => false, 'rowbaseurl' => ''];
+        }
+        // The row's key goes to THIS provider's endpoint, so a row the key identifies as another vendor's is skipped
+        // (a choice made for the openai row, then Embedding switched to voyage, must not send the OpenAI key), and
+        // so is a row with a base URL of its own that is not the one Embedding sends to (an Azure key is for Azure).
+        $row = \local_ai_course_assistant\provider_keys::chosen_row(
+            'embed_key_from',
+            (string) (self::cfg('embed_provider') ?: 'openai'),
+            (string) self::cfg('embed_apibaseurl')
+        );
+        if ($row !== null) {
+            return ['key' => $row['key'], 'fromrow' => true, 'rowbaseurl' => trim($row['baseurl'])];
+        }
+        return ['key' => $own, 'fromrow' => false, 'rowbaseurl' => ''];
+    }
+
+    /**
+     * The key this instance will send. Read-only, so a test can check the choice without a network call.
+     *
+     * @return string
+     */
+    public function resolved_key(): string {
+        return $this->apikey;
+    }
+
+    /**
      * Constructor — reads plugin RAG config.
      */
     public function __construct() {
-        $this->apikey     = (string) (self::cfg('embed_apikey') ?: '');
+        $this->apikey     = self::resolve_apikey();
         $this->model      = (string) (self::cfg('embed_model') ?: $this->get_default_model());
         // Query-side model. Empty (the default) means "same as the document
         // model", which is the only universally safe choice: vectors from

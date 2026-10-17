@@ -75,6 +75,28 @@ final class failover_verifier_test extends \advanced_testcase {
         $this->assertStringContainsString('no row', $problems[0]);
     }
 
+    /** F3.3: voyage is a key for Embedding and Rerank only, so it is never a chat backup, whatever the chain says. */
+    public function test_a_chat_line_naming_a_key_only_provider_has_no_usable_row(): void {
+        $this->resetAfterTest();
+        $this->configure("voyage|pa-VOYAGE-KEY-1111-AAAA|rerank-2.5||", "chat:voyage");
+        set_config('failover_per_call_enabled', 1, 'local_ai_course_assistant');
+        $problems = failover_verifier::static_problems();
+        $this->assertCount(2, $problems);
+        $this->assertStringContainsString('chat:voyage', $problems[0]);
+        $this->assertStringContainsString('no row', $problems[0]);
+        $this->assertSame(get_string('verify:no_backup', 'local_ai_course_assistant'), $problems[1],
+            'and it does not count as a resolvable backup');
+        $this->assertArrayNotHasKey('voyage', failover_verifier::rows());
+    }
+
+    public function test_a_key_only_row_does_not_hide_the_real_backup_or_add_a_problem(): void {
+        $this->resetAfterTest();
+        $this->configure("voyage|pa-VOYAGE-KEY-1111-AAAA|rerank-2.5||\nopenai|sk-test-key-1|gpt-4o-mini||", "chat:openai");
+        set_config('failover_per_call_enabled', 1, 'local_ai_course_assistant');
+        $this->assertSame([], failover_verifier::static_problems());
+        $this->assertSame(['openai'], array_keys(failover_verifier::rows()));
+    }
+
     public function test_a_row_without_a_key_is_reported(): void {
         $this->resetAfterTest();
         $this->configure("openai||gpt-4o-mini||", "chat:openai");
@@ -98,6 +120,54 @@ final class failover_verifier_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->configure("openai|sk-test-key-1|My-Deployment||https://example.openai.azure.com", "chat:openai");
         $this->assertSame([], failover_verifier::static_problems());
+    }
+
+    public function test_display_name_problem_flags_a_capitalised_hosted_model_only(): void {
+        $this->assertStringContainsString('gpt-4o-mini', failover_verifier::display_name_problem('openai', 'GPT-4o-mini'));
+        $this->assertSame('', failover_verifier::display_name_problem('openai', 'gpt-4o-mini'));
+        $this->assertSame('', failover_verifier::display_name_problem('openrouter', 'Meta Llama'));
+        $this->assertSame('', failover_verifier::display_name_problem('openai', 'GPT-4o', 'https://gateway.example'));
+    }
+
+    public function test_display_name_problem_covers_every_hosted_provider_and_no_other(): void {
+        foreach (['openai', 'claude', 'gemini', 'mistral', 'deepseek', 'xai'] as $provider) {
+            $this->assertNotSame('', failover_verifier::display_name_problem($provider, 'Some Model'), $provider);
+        }
+        foreach (['ollama', 'openrouter', 'together', 'minimax', 'coreai', 'custom', ''] as $provider) {
+            $this->assertSame('', failover_verifier::display_name_problem($provider, 'Some Model'), "'{$provider}'");
+        }
+        $this->assertSame('', failover_verifier::display_name_problem('openai', ''), 'no model, nothing to check');
+    }
+
+    public function test_display_name_problem_names_the_provider_the_model_and_the_fix(): void {
+        $message = failover_verifier::display_name_problem('openai', 'GPT 4o mini');
+        $this->assertStringContainsString('openai', $message);
+        $this->assertStringContainsString('"GPT 4o mini"', $message);
+        $this->assertStringContainsString('gpt-4o-mini', $message);
+        $this->assertSame($message, failover_verifier::display_name_problem('OpenAI', 'GPT 4o mini'), 'case blind');
+    }
+
+    /** OpenAI fine-tune ids carry the organisation and suffix in their own case, so capitals there are legitimate. */
+    public function test_a_fine_tune_id_is_not_a_display_name(): void {
+        $this->resetAfterTest();
+        $finetune = 'ft:gpt-4o-mini-2024-07-18:Acme-University::AbC123xYz';
+        $this->assertSame('', failover_verifier::display_name_problem('openai', $finetune));
+        $this->assertSame('', failover_verifier::display_name_problem('mistral', 'ft:open-mistral-7b:Acme:Tutor:9f8e7d'));
+        $this->assertNotSame('', failover_verifier::display_name_problem('openai', 'GPT ft:gpt-4o-mini'), 'leading ft: only');
+        $this->assertNotSame('', failover_verifier::display_name_problem('openai', 'Ft:gpt-4o-mini'), 'an id is lowercase');
+        $this->configure("openai|sk-test-key-1|{$finetune}||", "chat:openai");
+        $this->assertSame([], failover_verifier::static_problems());
+    }
+
+    /** The sentence is shown for a failover row AND for the primary model, so it must not talk about failover only. */
+    public function test_the_display_name_sentence_fits_a_row_and_the_primary_model(): void {
+        $message = failover_verifier::display_name_problem('openai', 'GPT-4o-mini');
+        $this->assertStringNotContainsString('failover', $message);
+        $this->assertStringContainsString('openai', $message);
+        $this->assertStringContainsString('"GPT-4o-mini"', $message);
+        $this->assertStringContainsString('try gpt-4o-mini', $message);
+        $this->assertStringContainsString('admin LLM picker', $message, 'still says why the picker did not catch it');
+        $this->assertStringNotContainsString('{$a', $message, 'every placeholder is filled');
     }
 
     /**

@@ -269,6 +269,9 @@ class policy_bundle {
 
         set_config('policy_bundle_applied_version', (string) $version, 'local_ai_course_assistant');
         $tx->allow_commit();
+        // The bundle is the second writer (after the admin settings page) of the settings that decide which
+        // provider row's key apikey mirrors. Nothing written, nothing to sync.
+        provider_keys::sync_after_writes(array_keys($changes));
         audit_logger::log('policy_bundle_applied', 0, 0, [
             'version'   => $version,
             'issued_at' => $payload['issued_at'] ?? '',

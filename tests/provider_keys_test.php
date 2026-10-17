@@ -152,6 +152,17 @@ final class provider_keys_test extends \advanced_testcase {
         $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
     }
 
+    /** F3.3: a key-only provider (voyage) is not a chat provider, so a chat failover line naming it builds no entry. */
+    public function test_a_key_only_provider_is_never_a_chat_failover_entry(): void {
+        $this->resetAfterTest();
+        set_config('spend_failover_chain', "chat:voyage\nchat:openai", 'local_ai_course_assistant');
+        $this->seed("voyage|pa-VOYAGE-KEY-1111-AAAA|rerank-2.5\nopenai|sk-proj-OPENAI-KEY-0002-WXYZ|gpt-4o-mini");
+        $chain = \local_ai_course_assistant\spend_guard::resolve_failover_chain('chat');
+        $this->assertCount(1, $chain);
+        $this->assertSame('openai', $chain[0]['provider']);
+        $this->assertSame('pa-VOYAGE-KEY-1111-AAAA', provider_keys::key_for('voyage'), 'Embedding and Rerank still read it');
+    }
+
     /** Review focus 5: keyless providers resolve with no key. */
     public function test_a_keyless_row_is_listed_and_has_no_key(): void {
         $this->resetAfterTest();

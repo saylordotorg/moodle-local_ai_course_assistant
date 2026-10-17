@@ -75,13 +75,19 @@ class failover_verifier {
     }
 
     /**
-     * The comparison_providers rows, keyed by lowercase label (first row wins).
+     * The comparison_providers rows that can serve chat, keyed by lowercase label (first row wins).
+     *
+     * A key-only provider's row (voyage: Embedding and Rerank) is left out, as the pickers leave it out, so a
+     * chat line naming one reads as having no row.
      *
      * @return array<string, array{label: string, haskey: bool, model: string, baseurl: string}>
      */
     public static function rows(): array {
         $rows = [];
         foreach (provider_keys::by_label() as $key => $row) {
+            if (in_array($key, provider_keys::KEY_ONLY_PROVIDERS, true)) {
+                continue;
+            }
             $rows[$key] = [
                 'label'   => $row['label'],
                 'haskey'  => $row['haskey'],
@@ -120,18 +126,37 @@ class failover_verifier {
         }
 
         foreach ($rows as $key => $row) {
-            if ($row['model'] === '' || $row['baseurl'] !== '' || !in_array($key, self::HOSTED_LOWERCASE, true)) {
-                continue;
-            }
-            if (preg_match('/[A-Z\s]/', $row['model'])) {
-                $problems[] = get_string('verify:model_case', 'local_ai_course_assistant', (object) [
-                    'label' => $row['label'],
-                    'model' => $row['model'],
-                    'suggest' => strtolower((string) preg_replace('/\s+/', '-', $row['model'])),
-                ]);
+            $problem = self::display_name_problem($key, $row['model'], $row['baseurl']);
+            if ($problem !== '') {
+                $problems[] = $problem;
             }
         }
         return $problems;
+    }
+
+    /**
+     * A hosted provider's model written as a display name ("GPT-4o-mini") instead of its id.
+     *
+     * The one check behind both a backup row's model (static_problems()) and the site's primary model
+     * (provider_keys::default_provider_warnings()), so the two always say the same thing.
+     *
+     * @param string $provider provider id; compared in lowercase
+     * @param string $model the model as the admin typed it. A fine-tune id (a leading "ft:", as OpenAI and
+     *                      Mistral write them) is never a display name: its organisation and suffix keep their case.
+     * @param string $baseurl a gateway base URL turns the check off: a gateway names its models its own way
+     * @return string plain text (the verify:model_case message), or '' when there is no problem
+     */
+    public static function display_name_problem(string $provider, string $model, string $baseurl = ''): string {
+        $provider = strtolower($provider);
+        if ($model === '' || $baseurl !== '' || !in_array($provider, self::HOSTED_LOWERCASE, true)
+                || str_starts_with($model, 'ft:') || !preg_match('/[A-Z\s]/', $model)) {
+            return '';
+        }
+        return get_string('verify:model_case', 'local_ai_course_assistant', (object) [
+            'label' => $provider,
+            'model' => $model,
+            'suggest' => strtolower((string) preg_replace('/\s+/', '-', $model)),
+        ]);
     }
 
     /**

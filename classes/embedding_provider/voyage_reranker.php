@@ -45,23 +45,52 @@ class voyage_reranker {
     private string $baseurl;
 
     /**
-     * Constructor — reads rerank config (apikey shared with voyage embed
-     * config when same Voyage account; separate rerank_apikey override
-     * supported for split-account deployments).
+     * Constructor: reads rerank config. The key comes from, in order: the provider row chosen in
+     * rerank_key_from, the pasted rerank_apikey (split-account deployments), then the key Embedding
+     * resolves to (typical Voyage deployments share one key).
+     *
+     * A chosen row the key identifies as another vendor's is skipped, since the key goes to Voyage (unless a
+     * base URL is set: a gateway takes any key), and so is a row with a base URL of its own that is not the one
+     * the reranker sends to. The next source is used instead, silently. The same checks apply to the embedding
+     * key when Embedding itself took it from a chosen row.
      */
     public function __construct() {
-        $this->apikey = (string) (\local_ai_course_assistant\secrets::get('rerank_apikey') ?: '');
-        if ($this->apikey === '') {
-            // Fall back to the embed key — typical Voyage deployments share one key.
-            $this->apikey = (string) (\local_ai_course_assistant\secrets::get('embed_apikey') ?: '');
-        }
-        $this->model = (string) (get_config('local_ai_course_assistant', 'rerank_model') ?: 'rerank-2.5');
-
         $configurl = get_config('local_ai_course_assistant', 'rerank_apibaseurl');
         if ($configurl === false || $configurl === '') {
             $configurl = get_config('local_ai_course_assistant', 'embed_apibaseurl');
         }
+
+        $this->apikey = \local_ai_course_assistant\provider_keys::key_from_setting(
+            'rerank_key_from',
+            'voyage',
+            (string) $configurl
+        );
+        if ($this->apikey === '') {
+            $this->apikey = (string) (\local_ai_course_assistant\secrets::get('rerank_apikey') ?: '');
+        }
+        if ($this->apikey === '') {
+            // Fall back to the embed key. A pasted one is used exactly as it always was (typical Voyage deployments
+            // share one key). One Embedding took from a chosen provider row is vendor-checked against Voyage like
+            // Rerank's own choice: an OpenAI row chosen for Embedding must not reach Voyage by this road.
+            $embed = base_embedding_provider::resolve_apikey_source();
+            if (!$embed['fromrow']
+                    || (\local_ai_course_assistant\provider_keys::row_reaches($embed['rowbaseurl'], (string) $configurl)
+                        && \local_ai_course_assistant\course_key_guard::conflict('voyage', $embed['key'], (string) $configurl) === '')) {
+                $this->apikey = $embed['key'];
+            }
+        }
+        $this->model = (string) (get_config('local_ai_course_assistant', 'rerank_model') ?: 'rerank-2.5');
+
         $this->baseurl = !empty($configurl) ? rtrim($configurl, '/') : 'https://api.voyageai.com/v1';
+    }
+
+    /**
+     * The key this instance will send. Read-only, so a test can check the choice without a network call.
+     *
+     * @return string
+     */
+    public function resolved_key(): string {
+        return $this->apikey;
     }
 
     /**

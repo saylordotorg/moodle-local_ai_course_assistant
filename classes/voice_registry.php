@@ -168,8 +168,8 @@ class voice_registry {
         }
 
         if ($row === null) {
-            // Legacy fallback: pre-v3.9.5 single-key config (realtime_apikey or main OpenAI key).
-            $legacykey = \local_ai_course_assistant\secrets::get('realtime_apikey');
+            // Legacy fallback: pre-v3.9.5 single-key config (a chosen OpenAI row, realtime_apikey or main OpenAI key).
+            $legacykey = self::legacy_realtime_key();
             if (empty($legacykey)) {
                 $mainprovider = get_config('local_ai_course_assistant', 'provider');
                 if ($mainprovider === 'openai') {
@@ -317,13 +317,39 @@ class voice_registry {
     }
 
     /**
+     * The OpenAI key the single-key voice path uses: the provider row chosen in realtime_key_from, else the pasted
+     * realtime_apikey. '' when neither is set.
+     *
+     * A row is used only when the admin chose it, so an OpenAI failover row alone never turns voice on. And only
+     * a plain OpenAI row can be chosen: the single-key path always talks to api.openai.com, so another vendor's
+     * key would be sent to OpenAI, and a row with its own base URL (Azure OpenAI, a gateway) holds a key for that
+     * destination, not for api.openai.com. The first plain keyed OpenAI row serves, wherever it sits in the table:
+     * a gateway row listed before it is skipped, not a stop, and so is a row with no key or one that cannot be
+     * decrypted. A choice with no such row, or one that is gone, counts as no choice.
+     *
+     * @return string
+     */
+    public static function legacy_realtime_key(): string {
+        $from = strtolower(trim((string) get_config('local_ai_course_assistant', 'realtime_key_from')));
+        if ($from === 'openai') {
+            foreach (\local_ai_course_assistant\provider_keys::rows(true) as $row) {
+                if ($row['provider'] === 'openai' && $row['haskey'] && $row['key'] !== '' && trim($row['baseurl']) === '') {
+                    return $row['key'];
+                }
+            }
+        }
+        return (string) \local_ai_course_assistant\secrets::get('realtime_apikey');
+    }
+
+    /**
      * Lightweight config-only check: is any voice provider configured?
      *
      * Unlike {@see resolve()} this does NOT run the spend guard, so it is cheap
      * enough to call on every course-page render (e.g. to decide whether to
      * show the speaker button). A configured voice_providers row serves any
      * capability via resolve()'s first-row fallback, and the legacy single-key
-     * config (realtime_apikey, or the main OpenAI key) also counts. This fixes
+     * config (a chosen OpenAI row, realtime_apikey, or the main OpenAI key) also
+     * counts. A provider row nobody chose does not. This fixes
      * the speaker button being gated on the legacy key alone, which hid
      * registry-configured TTS on sites running a non-OpenAI chat provider.
      *
@@ -333,7 +359,7 @@ class voice_registry {
         if (!empty(self::parse_rows())) {
             return true;
         }
-        if (!empty(\local_ai_course_assistant\secrets::get('realtime_apikey'))) {
+        if (!empty(self::legacy_realtime_key())) {
             return true;
         }
         return get_config('local_ai_course_assistant', 'provider') === 'openai'

@@ -488,6 +488,9 @@ class spend_guard {
     /**
      * Look up a chat/analytics failover label in the provider rows: the first row WITH a key serves it.
      *
+     * A key-only provider (voyage: Embedding and Rerank) is not a chat provider, so a line naming one builds no
+     * entry, the same as the pickers that skip its row.
+     *
      * @param string $label
      * @return array|null ['provider', 'apikey', 'label', 'model', 'apibaseurl'] or null
      */
@@ -495,7 +498,7 @@ class spend_guard {
         $row = provider_keys::for_provider($label);
         // A row whose stored key cannot be decrypted (a database restored onto another site) reads as
         // having a key but reveals none: treat it as no key rather than build an entry that cannot call.
-        if ($row === null || $row['key'] === '') {
+        if ($row === null || $row['key'] === '' || in_array($row['provider'], provider_keys::KEY_ONLY_PROVIDERS, true)) {
             return null;
         }
         return [

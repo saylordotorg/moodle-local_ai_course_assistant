@@ -1,3 +1,5 @@
+providerkeys:name_claude
+providerkeys:name_coreai
 settings:embed_provider_openai
 settings:provider_claude
 settings:provider_together

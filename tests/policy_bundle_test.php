@@ -256,4 +256,105 @@ final class policy_bundle_test extends \advanced_testcase {
         $this->assertSame('applied', $result['status']);
         $this->assertStringContainsString('0 setting(s) changed', $result['detail']);
     }
+
+    // Fix wave 3, F3.5: the bundle is the second writer of the settings that decide which row's key apikey mirrors.
+
+    /**
+     * Two providers with a key each, apikey mirroring the first.
+     *
+     * @param string $provider the site provider
+     * @param string $apikey what apikey holds now (plain; stored concealed)
+     */
+    private function two_providers(string $provider, string $apikey): void {
+        set_config('provider', $provider, 'local_ai_course_assistant');
+        set_config('comparison_providers', "openai|sk-proj-BUNDLE-OPENAI-1111-AAAA|gpt-4o-mini\n"
+            . "gemini|AIzaBUNDLE-GEMINI-2222-BBBB|gemini-2.5-flash", 'local_ai_course_assistant');
+        set_config('apikey', secrets::conceal($apikey), 'local_ai_course_assistant');
+    }
+
+    public function test_a_bundle_that_changes_the_provider_re_mirrors_the_default_key(): void {
+        $this->two_providers('openai', 'sk-proj-BUNDLE-OPENAI-1111-AAAA');
+        $result = policy_bundle::process_envelope($this->envelope([
+            'version' => 1, 'settings' => ['provider' => 'gemini'],
+        ]));
+        $this->assertSame('applied', $result['status']);
+        $this->assertSame('gemini', get_config('local_ai_course_assistant', 'provider'));
+        $this->assertSame('AIzaBUNDLE-GEMINI-2222-BBBB', secrets::get('apikey'));
+        $this->assertTrue(secrets::is_encrypted(get_config('local_ai_course_assistant', 'apikey')));
+    }
+
+    public function test_a_bundle_that_changes_the_model_re_mirrors_when_the_provider_follows_the_model(): void {
+        $this->two_providers('auto', 'sk-proj-BUNDLE-OPENAI-1111-AAAA');
+        set_config('model', 'gpt-4o-mini', 'local_ai_course_assistant');
+        $this->assertSame('openai', provider_keys::site_provider());
+        $result = policy_bundle::process_envelope($this->envelope([
+            'version' => 1, 'settings' => ['model' => 'gemini-2.5-flash'],
+        ]));
+        $this->assertSame('applied', $result['status']);
+        $this->assertSame('gemini', provider_keys::site_provider());
+        $this->assertSame('AIzaBUNDLE-GEMINI-2222-BBBB', secrets::get('apikey'));
+    }
+
+    public function test_a_bundle_that_changes_nothing_the_mirror_reads_leaves_apikey_alone(): void {
+        $this->two_providers('gemini', 'AIzaSTALE-GEMINI-KEY-OLD-0000');
+        $result = policy_bundle::process_envelope($this->envelope([
+            'version' => 1, 'settings' => ['rerank_candidates' => 25, 'temperature' => '0.4'],
+        ]));
+        $this->assertSame('applied', $result['status']);
+        $this->assertSame('AIzaSTALE-GEMINI-KEY-OLD-0000', secrets::get('apikey'), 'no provider, model or URL written: no sync');
+    }
+
+    public function test_a_bundle_whose_provider_is_already_that_value_writes_nothing_and_syncs_nothing(): void {
+        $this->two_providers('gemini', 'AIzaSTALE-GEMINI-KEY-OLD-0000');
+        $result = policy_bundle::process_envelope($this->envelope([
+            'version' => 1, 'settings' => ['provider' => 'gemini'],
+        ]));
+        $this->assertSame('applied', $result['status']);
+        $this->assertStringContainsString('0 setting(s) changed', $result['detail']);
+        $this->assertSame('AIzaSTALE-GEMINI-KEY-OLD-0000', secrets::get('apikey'));
+    }
+
+    public function test_a_bundle_that_is_not_newer_is_not_applied_and_syncs_nothing(): void {
+        $this->two_providers('openai', 'sk-proj-BUNDLE-OPENAI-1111-AAAA');
+        policy_bundle::process_envelope($this->envelope(['version' => 5, 'settings' => ['rerank_candidates' => 25]]));
+        $result = policy_bundle::process_envelope($this->envelope([
+            'version' => 4, 'settings' => ['provider' => 'gemini'],
+        ]));
+        $this->assertSame('skipped', $result['status']);
+        $this->assertSame('openai', get_config('local_ai_course_assistant', 'provider'));
+        $this->assertSame('sk-proj-BUNDLE-OPENAI-1111-AAAA', secrets::get('apikey'));
+    }
+
+    public function test_a_bundle_raises_no_notice_when_it_re_mirrors(): void {
+        $this->two_providers('openai', 'sk-proj-BUNDLE-OPENAI-1111-AAAA');
+        policy_bundle::process_envelope($this->envelope(['version' => 1, 'settings' => ['provider' => 'gemini']]));
+        $this->assertSame([], \core\notification::fetch());
+    }
+
+    /** F3 round 1: a sync that throws (core encryption has no usable key) must not undo or abort an applied bundle. */
+    public function test_a_bundle_still_applies_and_is_audited_when_the_mirror_cannot_be_written(): void {
+        global $CFG, $DB;
+        set_config('provider', 'openai', 'local_ai_course_assistant');
+        set_config('comparison_providers', "openai|sk-proj-BUNDLE-OPENAI-1111-AAAA|gpt-4o-mini\n"
+            . "gemini|AIzaBUNDLE-GEMINI-2222-BBBB|gemini-2.5-flash", 'local_ai_course_assistant');
+        set_config('apikey', 'sk-proj-BUNDLE-OPENAI-1111-AAAA', 'local_ai_course_assistant');
+        $audits = $DB->count_records('local_ai_course_assistant_audit', ['action' => 'policy_bundle_applied']);
+        $CFG->secretdataroot = $CFG->dataroot . '/no-such-secret-dir-for-the-bundle-test';
+        $CFG->nokeygeneration = true;
+        $result = policy_bundle::process_envelope($this->envelope([
+            'version' => 7, 'settings' => ['provider' => 'gemini', 'rerank_candidates' => 25],
+        ]));
+        $this->assertSame('applied', $result['status'], $result['detail']);
+        $this->assertSame('gemini', get_config('local_ai_course_assistant', 'provider'));
+        $this->assertSame('25', get_config('local_ai_course_assistant', 'rerank_candidates'));
+        $this->assertSame('7', get_config('local_ai_course_assistant', 'policy_bundle_applied_version'));
+        $this->assertStringStartsWith('applied', (string) get_config('local_ai_course_assistant', 'policy_bundle_last_result'));
+        $this->assertSame($audits + 1, $DB->count_records('local_ai_course_assistant_audit', ['action' => 'policy_bundle_applied']));
+        $this->assertSame('sk-proj-BUNDLE-OPENAI-1111-AAAA', get_config('local_ai_course_assistant', 'apikey'), 'not re-mirrored');
+        $messages = $this->getDebuggingMessages();
+        $this->assertCount(1, $messages);
+        $this->assertStringNotContainsString('sk-proj', $messages[0]->message);
+        $this->assertStringNotContainsString('AIza', $messages[0]->message);
+        $this->resetDebugging();
+    }
 }

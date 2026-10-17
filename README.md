@@ -132,7 +132,8 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 - **Spend Reporting:** An optional token-authenticated endpoint reports per-provider monthly spend for external dashboards, and reports how many rows it could not price so a real zero is distinguishable from a silent one. Off by default
 - **Comprehensive Settings:** Fine-tune behavior, limits, and integrations
 - **Off-Topic Management:** Configure limits and lockout duration
-- **Provider Configuration:** Choose and configure AI provider
+- **Providers and Keys:** One table holds every AI provider's key, models, temperature and base URL. Add or change a key without touching the default provider, tell keys apart by their last four characters, and let Embedding, Rerank and Voice use a row's key instead of a pasted copy. The default provider's setting only chooses which row chat uses
+- **Provider Configuration:** Choose the default AI provider
 - **Zendesk Integration:** Auto-escalate unresolved issues to support tickets
 - **Audit Logging:** Full SOC2-compliant audit trail
 - **Rate Limiting:** Protect against abuse and API cost overruns
@@ -140,7 +141,7 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 ### Security & Compliance
 - **SOC2 Compliant:** Audit logging, encryption, access controls
 - **GDPR Ready:** Full Privacy API implementation
-- **API Key Handling:** Keys are never sent to the browser and, from v7.7.3, are encrypted at rest with Moodle's own encryption (`\core\encryption`), using a site key kept in moodledata. A database backup alone no longer reveals them. Two consequences: back up moodledata's key along with the database, and a database restored onto another site (a staging copy, say) can't decrypt them, so enter the keys again there. Keys typed into the free-text **comparison providers** and **spend guard fallback** lists are still stored as plain text
+- **API Key Handling:** Keys are never sent to the browser and, from v7.7.3, are encrypted at rest with Moodle's own encryption (`\core\encryption`), using a site key kept in moodledata. A database backup alone no longer reveals them. From v7.9.0 every provider key lives in one **Providers and keys** table and is encrypted there too (the old comparison providers table stored its keys as plain text), the two anomaly-digest webhook URLs are encrypted, and no settings page ever shows a key, token, webhook URL or the encrypted form of one: a saved key reads "Saved, ends in ab12" with a Change button, and a key you typed into a form that failed to save comes back as an empty box. The settings-changed notice and Moodle's configuration log hide secrets too, and `admin/cli/audit_config_log_secrets.php` finds and can redact older log rows that don't. Two consequences of the encryption: back up moodledata's key along with the database, and a database restored onto another site (a staging copy, say) can't decrypt the keys, so enter them again there. Rolling back to 7.8.x means restoring the database from before the upgrade, because 7.8.x doesn't understand encrypted rows and Moodle blocks a code-only downgrade
 - **Rate Limiting:** User and IP-based throttling
 - **Input Validation:** XSS and SQL injection protection
 - **Session Security:** Moodle-integrated authentication
@@ -160,8 +161,8 @@ All admin pages live under one hub: **Site administration → Plugins → Local 
 
 ### Required Settings
 1. **Enable Plugin:** Turn on the AI Course Assistant
-2. **AI Provider:** Choose your provider (Claude, OpenAI, etc.)
-3. **API Key:** Enter your provider's API key (encrypted at rest from v7.7.3; see API Key Handling)
+2. **Providers and keys:** Add a row for your provider and paste its API key. Keys are encrypted at rest and never shown again, only their last four characters (see API Key Handling)
+3. **AI Provider:** Choose the default provider (Claude, OpenAI, etc.). Chat uses the key of that provider's row only when the row's base URL is the same as **API Base URL** (both compared with spaces trimmed; both empty is the normal case). If you give the row a base URL of its own that differs, and no keyed row matches, the next admin page after a save warns that chat still uses the previous default key
 4. **Model:** Select the model (e.g., gemini-2.5-flash, gpt-4o-mini, claude-sonnet-5-5)
 
 ### Recommended Settings
