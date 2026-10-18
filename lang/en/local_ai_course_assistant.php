@@ -2333,6 +2333,7 @@ $string['coursesettings:force_on'] = 'Force on';
 $string['coursesettings:force_off'] = 'Force off';
 $string['coursesettings:state_enabled'] = 'enabled';
 $string['coursesettings:state_disabled'] = 'disabled';
+$string['coursesettings:more_options'] = 'More options';
 
 // ── v7.0.1 (I18N001): strings extracted from admin/learner pages that had
 // hardcoded English — rag_admin.php, admin_user_data.php, rubric_admin.php and

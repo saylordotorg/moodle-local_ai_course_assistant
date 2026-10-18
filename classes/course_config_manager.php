@@ -129,6 +129,34 @@ class course_config_manager {
     }
 
     /**
+     * Whether a course already holds a value in any of the four fields the course
+     * settings page keeps under "More options": API base URL, system prompt,
+     * temperature and monthly spend cap.
+     *
+     * The page opens that section when this is true, so a stored override is never
+     * hidden. It reads the row the way the form shows it: a text field counts when
+     * it is not an empty string (a prompt of spaces is still an override, and
+     * opening is the safe direction), a temperature counts when it is not null (0
+     * is a real temperature), and a spend cap counts only above zero (zero and
+     * blank both mean no per-course cap, as normalise_cap() stores them).
+     *
+     * @param \stdClass|null $record Row from get(), or null when the course has none.
+     * @return bool True when any of the four holds a value.
+     */
+    public static function has_more_options_values(?\stdClass $record): bool {
+        if (!$record) {
+            return false;
+        }
+        if ((string) ($record->apibaseurl ?? '') !== '' || (string) ($record->systemprompt ?? '') !== '') {
+            return true;
+        }
+        if (isset($record->temperature) && $record->temperature !== '') {
+            return true;
+        }
+        return isset($record->spend_cap_monthly) && (float) $record->spend_cap_monthly > 0;
+    }
+
+    /**
      * Get the effective config for a course, merging course overrides onto globals.
      *
      * Blank course fields fall through to the global plugin config value.

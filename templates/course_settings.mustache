@@ -26,6 +26,10 @@
     handler at the top of course_settings.php reads, so renaming one silently
     drops that setting on save.
 
+    The provider card keeps the monthly spend cap, API base URL, temperature and system prompt
+    inside one native details element ("More options"), open only when the page says one of them
+    already holds a value (moreoptionsopen).
+
     Strings are resolved in course_settings.php; there are no str helpers here.
     Every value is escaped except the three noted inline, which carry markup the
     page builds itself.
@@ -92,6 +96,8 @@
         "systemprompthint": "Leave blank to use the global default.",
         "resetprompttitle": "Load the global default prompt",
         "resetpromptlabel": "Reset to global",
+        "moreoptionslabel": "More options",
+        "moreoptionsopen": false,
         "showrag": true,
         "ragtitle": "Course knowledge (RAG)",
         "ragdesc": "Enable retrieval-augmented generation for this course.",
@@ -280,16 +286,6 @@
                     </div>
                 </div>
 
-                {{! Monthly spend cap. }}
-                <div class="form-group row">
-                    <label class="col-sm-3 col-form-label" for="spend_cap_monthly">{{spendcaplabel}}</label>
-                    <div class="col-sm-9">
-                        <input type="number" step="0.01" min="0" class="form-control" id="spend_cap_monthly"
-                               name="spend_cap_monthly" value="{{spendcapvalue}}">
-                        <small class="form-text text-muted">{{spendcapdesc}}</small>
-                    </div>
-                </div>
-
                 {{!
                     API key. The stored credential is never rendered: the field
                     always ships empty and a blank submission keeps whatever is
@@ -322,41 +318,65 @@
                     </div>
                 </div>
 
-                {{! API base URL. }}
-                <div class="form-group row">
-                    <label class="col-sm-3 col-form-label" for="apibaseurl">{{apibaseurllabel}}</label>
-                    <div class="col-sm-9">
-                        <input type="text" class="form-control" id="apibaseurl" name="apibaseurl"
-                               value="{{apibaseurlvalue}}" placeholder="{{apibaseurlplaceholder}}">
-                        <small class="form-text text-muted">{{apibaseurldesc}}</small>
-                    </div>
-                </div>
+                {{!
+                    More options. Monthly spend cap, API base URL, temperature and system prompt are
+                    rarely used, so they sit behind a native details element: no script, closed unless
+                    the course already holds a value in one of them (course_settings.php decides, as
+                    moreoptionsopen). A closed details element still posts its controls, so every field
+                    keeps its name and stays inside the one form. The spend cap moved here from between
+                    Provider and API key; the handler reads fields by name, so posting order is not
+                    significant. The system prompt's closing textarea tag starts at column 0 below on
+                    purpose: any space before it becomes part of the stored prompt.
+                }}
+                <details class="sola-more-options" {{#moreoptionsopen}}open{{/moreoptionsopen}}>
+                    <summary>{{moreoptionslabel}}</summary>
 
-                {{! Temperature. }}
-                <div class="form-group row">
-                    <label class="col-sm-3 col-form-label" for="temperature">{{temperaturelabel}}</label>
-                    <div class="col-sm-9">
-                        <input type="number" class="form-control" id="temperature" name="temperature"
-                               min="0" max="2" step="0.1"
-                               value="{{temperaturevalue}}" placeholder="{{temperatureplaceholder}}">
-                        <small class="form-text text-muted">{{temperaturedesc}}</small>
-                    </div>
-                </div>
-
-                {{! System prompt. }}
-                <div class="form-group row">
-                    <label class="col-sm-3 col-form-label" for="systemprompt">{{systempromptlabel}}</label>
-                    <div class="col-sm-9">
-                        <textarea class="form-control" id="systemprompt" name="systemprompt" rows="6"
-                                  placeholder="{{usingglobal}}">
-{{systempromptvalue}}</textarea>
-                        <div class="d-flex align-items-center mt-1 sola-cs-prompt-actions">
-                            <small class="form-text text-muted mb-0">{{systemprompthint}}</small>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-prompt"
-                                    title="{{resetprompttitle}}">{{resetpromptlabel}}</button>
+                    {{! Monthly spend cap. }}
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label" for="spend_cap_monthly">{{spendcaplabel}}</label>
+                        <div class="col-sm-9">
+                            <input type="number" step="0.01" min="0" class="form-control" id="spend_cap_monthly"
+                                   name="spend_cap_monthly" value="{{spendcapvalue}}">
+                            <small class="form-text text-muted">{{spendcapdesc}}</small>
                         </div>
                     </div>
-                </div>
+
+                    {{! API base URL. }}
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label" for="apibaseurl">{{apibaseurllabel}}</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="apibaseurl" name="apibaseurl"
+                                   value="{{apibaseurlvalue}}" placeholder="{{apibaseurlplaceholder}}">
+                            <small class="form-text text-muted">{{apibaseurldesc}}</small>
+                        </div>
+                    </div>
+
+                    {{! Temperature. }}
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label" for="temperature">{{temperaturelabel}}</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" id="temperature" name="temperature"
+                                   min="0" max="2" step="0.1"
+                                   value="{{temperaturevalue}}" placeholder="{{temperatureplaceholder}}">
+                            <small class="form-text text-muted">{{temperaturedesc}}</small>
+                        </div>
+                    </div>
+
+                    {{! System prompt. }}
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label" for="systemprompt">{{systempromptlabel}}</label>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" id="systemprompt" name="systemprompt" rows="6"
+                                      placeholder="{{usingglobal}}">
+{{systempromptvalue}}</textarea>
+                            <div class="d-flex align-items-center mt-1 sola-cs-prompt-actions">
+                                <small class="form-text text-muted mb-0">{{systemprompthint}}</small>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-prompt"
+                                        title="{{resetprompttitle}}">{{resetpromptlabel}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </details>
             </div>
         </div>
 

@@ -6333,6 +6333,12 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
 .sola-cs-select-extres { max-width: 240px; }
 .sola-cs-select-level { max-width: 320px; }
 
+/* Per-course page: the "More options" details element (spend cap, base URL,
+   temperature, system prompt). Native details, no script. */
+.sola-more-options { margin-top: 16px; padding-top: 8px; border-top: 1px solid #dee2e6; }
+.sola-more-options > summary { cursor: pointer; font-weight: 600; }
+.sola-more-options[open] > summary { margin-bottom: 12px; }
+
 /* Python sandbox page (moved from inline styles in sandbox.php and from the
    inline script it used to echo, CONTRIB-10574 #273). The ten style=""
    attributes became these classes, and the three colours the old script wrote

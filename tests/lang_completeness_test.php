@@ -276,6 +276,8 @@ final class lang_completeness_test extends \basic_testcase {
         'layout:remote',
         'layout:optimizer',
         'layout:legacy',
+        // The course page's "More options" summary (Release 1, task 3). Same ruling.
+        'coursesettings:more_options',
     ];
 
     /**
