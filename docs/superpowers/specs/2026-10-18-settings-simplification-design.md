@@ -41,6 +41,7 @@ Each says what was decided, why, and what it costs if wrong. Tom did not answer 
 10. **Release 2 keeps every stored setting name.** It changes how settings are shown and where keys come from, not what they are called. Renames and deletions wait for 8.0.0, the major version, where the upgrade chain from any older version runs the copy steps before the delete steps.
 11. **Course key profiles (report item B3) ship the capability and a report, not an automatic migration.** A course can choose a key row by label; a CLI tool with `--dry-run` proposes consolidating existing per-course keys; nothing is rewritten until an admin runs it. Existing course keys keep working untouched.
 12. **8.0.0 removes the Soapbox code and its settings, keeps the tables, and drops nothing.** This follows Tom's 2026-09-19 decision (code in 8.0, tables later and only after learners have an export path). The audit found zero Soapbox rows on Learn and Degrees, which fits the "no data lost" premise. The decision's other condition (PresenterAI migrator proven) is not met, so the release notes say plainly that Soapbox data stays in its tables, is still covered by the privacy provider, and has no UI after 8.0. If the code removal turns out to touch anything that holds data, stop and re-rule.
+14. **Pages are balanced by measured payload, not by rule count.** Task 1 found that 14 rules on Cost and 12 on Features came to 1,185 and 1,001 characters against the 950 ceiling (core's own limit is 1,024, and past it the all-settings hub page returns HTTP 500 at developer debug). The policy bundle, price drift and the Support and Zendesk sections therefore live on Advanced > Integrations and governance, which carries almost no rules. Cost if wrong: two settings groups a click further away.
 13. **No automatic deletion of "never changed" settings** (report item C3). It needs usage evidence from 7.9.x and Tom's call. Release 1 ships the usage report tool so that evidence can be collected.
 
 ## 4. Release 1 (7.10.0): regroup, no data change
@@ -86,7 +87,7 @@ Add to `lang/en`: `settingspage:essentials`, `:models`, `:features`, `:cost`, `:
 
 ### 4.8 Tests and guards
 
-- `settings_layout_test` (new): every name in the old admin tree is placed once or dropped; every `new` heading key has a lang string; every `PAGES` entry names a real staged object; page ids unique; no rule skipped; each page within the dependency budget; the redirect pages exist and point at real pages; **budget guard**: the five task pages together carry at most 150 settings (today's layout has 144) and no page carries a secret field that is not on a page that already had one (do not move secrets to Essentials).
+- `settings_layout_test` (new): every name in the old admin tree is placed once or dropped; every `new` heading key has a lang string; every `PAGES` entry names a real staged object; page ids unique; no rule skipped; each page within the dependency budget; the redirect pages exist and point at real pages; **budget guard**: the five task pages together carry at most 135 settings (the layout has 129) and no task page more than 50; no secret field sits on Essentials.
 - Update every test that reads `$category->children` to collect pages recursively (the Advanced group is a nested category): `settings_page_structure_test`, `settings_dependencies_test`, `settings_no_secret_in_page_test`, `settings_secret_masking_test`, `settings_branding_test`, `settings_save_report_test`. `settings_page_structure_test` expects at least 10 pages.
 - `settings_dependencies_test::test_no_setting_carries_more_than_one_dependency` and `test_removed_settings_are_no_longer_registered` read only the first page today; make them read all pages.
 - No change to any setting's default is allowed: a test snapshots `name => default` for every setting before and after the move (the snapshot is taken from a fixture generated now, committed under `tests/fixtures/`).
@@ -160,7 +161,6 @@ Generated from `classes/settings_layout_map.php`; the PHP file is authoritative.
 - heading `rubric_heading`: `practice_scoring_enabled`
 - heading `usertesting_heading`: `usertesting_enabled`, `usertesting_external_url`, `usertesting_editor_link`
 - new heading `layout:activelearners`: `active_learners_enabled`, `active_learners_scope`
-- heading `faq_heading`: `support_enabled`, `support_courseid`, `zendesk_enabled`, `escalation_intent_patterns`, `zendesk_require_consent`, `zendesk_subdomain`, `zendesk_email`, `zendesk_token`
 - heading `radar_batch_heading`: `radar_batch_enabled`
 - heading `empathy_heading`: `outreach_master_enabled`, `goals_feature_enabled`, `milestones_feature_enabled`, `memory_feature_enabled`, `struggle_classifier_enabled`, `outreach_dryrun`
 
@@ -178,8 +178,6 @@ Generated from `classes/settings_layout_map.php`; the PHP file is authoritative.
 - heading `cost_anomaly_heading`: `cost_anomaly_enabled`, `cost_anomaly_multiplier`, `unanswered_check_enabled`, `unanswered_window_hours`, `unanswered_min_questions`, `unanswered_min_answer_rate`, `unanswered_min_failed_turns`
 - heading `anomaly_digest_heading`: `anomaly_digest_enabled`, `anomaly_digest_threshold_pct`, `anomaly_digest_floor_usd`, `anomaly_digest_recipient_email`, `anomaly_digest_slack_webhook`, `anomaly_digest_teams_webhook`
 - heading `autoupgrade_heading`: `autoupgrade_mode`, `autoupgrade_budget_usd`, `autoupgrade_eval_courseid`
-- heading `price_drift_heading`: `price_drift_check_enabled`, `price_drift_tolerance_pct`, `price_drift_eol_horizon_days`, `model_eol_surfaces`
-- heading `policy_bundle_heading`: `policy_bundle_enabled`, `policy_bundle_url`, `policy_bundle_pubkey`
 
 **Advanced > Retrieval** (`adv_retrieval`)
 
@@ -208,10 +206,13 @@ Generated from `classes/settings_layout_map.php`; the PHP file is authoritative.
 
 **Advanced > Integrations and governance** (`adv_integrations`)
 
+- heading `faq_heading`: `support_enabled`, `support_courseid`, `zendesk_enabled`, `escalation_intent_patterns`, `zendesk_require_consent`, `zendesk_subdomain`, `zendesk_email`, `zendesk_token`
 - heading `redash_heading`: `redash_api_key`, `redash_allowed_origin`, `redash_export_window_days`, `redash_allow_deanonymized`, `spend_export_key`, `redash_base_url`, `redash_user_api_key`, `redash_data_source_id`
 - heading `cdn_heading`: `cdn_url`, `cdn_version`
 - new heading `layout:remote`: `remoteconfigurl`
 - heading `vendor_data_heading`: `vendor_dpa_admin_page_enabled`, `vendor_dpa_overrides`, `rate_card_overrides`, `rate_card_auto_refresh`, `rate_card_upstream_url`, `rate_card_refresh_button`, `model_registry_link`
+- heading `price_drift_heading`: `price_drift_check_enabled`, `price_drift_tolerance_pct`, `price_drift_eol_horizon_days`, `model_eol_surfaces`
+- heading `policy_bundle_heading`: `policy_bundle_enabled`, `policy_bundle_url`, `policy_bundle_pubkey`
 - heading `bench_heading`: `bench_default_samples`, `bench_min_quality_n`, `bench_judge_provider`, `bench_judge_model`
 - heading `rec_heading`: `rec_quality_epsilon`, `rec_savings_floor`, `rec_quality_margin`, `rec_min_quality_n`
 - new heading `layout:optimizer`: `opt_cost_weight`, `opt_quality_weight`
@@ -237,7 +238,7 @@ Page intros (one sentence each, shown under the navigation row):
 - adv_retrieval: "Search over course content: embeddings and how many passages are returned. Most sites never change these."
 - adv_documents: "Reranking, switching embedding models, and which document types are read into the index."
 - adv_prompt: "Prompt size and history, voice and speech providers, and the look of the chat widget."
-- adv_integrations: "Analytics export, CDN, remote configuration, vendor data, benchmarks and optimizer weights."
+- adv_integrations: "Support and Zendesk, analytics export, CDN, remote configuration, signed policy bundles, vendor data, price drift, benchmarks and optimizer weights."
 - adv_legacy: "Deprecated Soapbox, talking-avatar vendors and other settings that are parked here."
 
 New headings (`layout:<key>`): general "General"; contact "Contact and privacy"; faq "FAQ and conversation starters"; roles "Model roles"; failover "Failover and retries"; voice "Voice"; activelearners "Active learners"; embedding "Embeddings"; searchtuning "Search tuning"; modelcalls "Model call details"; promptbudget "Prompt budget and debugging"; history "History and learner profile"; appearance "Appearance"; remote "Remote configuration"; optimizer "Optimizer weights"; legacy "Deprecated settings".
