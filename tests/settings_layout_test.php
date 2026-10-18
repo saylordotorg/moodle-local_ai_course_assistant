@@ -86,6 +86,9 @@ final class settings_layout_test extends \advanced_testcase {
         $direct = [];
         $advanced = null;
         foreach ($category->children as $child) {
+            if ($child instanceof settings_redirect_page) {
+                continue; // The hidden pages old bookmarks land on; the redirect tests own them.
+            }
             if ($child instanceof \admin_settingpage) {
                 $direct[] = $child->name;
             } else if ($child instanceof \admin_category) {
@@ -212,6 +215,127 @@ final class settings_layout_test extends \advanced_testcase {
         // A real setting on the same page is still found.
         $topk = $pages[settings_layout::page_id('adv_retrieval')]->settings->{'local_ai_course_assistantrag_topk'};
         $this->assertTrue($topk->is_related('rag_topk'));
+    }
+
+    /**
+     * The plugin's redirect pages, by name, as registered in the tree.
+     *
+     * @param \admin_category $category The plugin category.
+     * @return settings_redirect_page[] Keyed by page name.
+     */
+    private function redirect_pages(\admin_category $category): array {
+        $found = [];
+        foreach ($category->children as $child) {
+            if ($child instanceof settings_redirect_page) {
+                $found[$child->name] = $child;
+            }
+        }
+        return $found;
+    }
+
+    public function test_every_old_page_name_redirects(): void {
+        $category = $this->category();
+        foreach (settings_layout_map::REDIRECTS as $old => $new) {
+            $oldid = settings_layout::page_id($old);
+            $newid = settings_layout::page_id($new);
+
+            $redirect = $category->locate($oldid);
+            $this->assertInstanceOf(settings_redirect_page::class, $redirect, "{$oldid} is registered as a redirect page");
+            $this->assertSame('/admin/settings.php?section=' . $newid, $redirect->url->out_as_local_url(false),
+                "{$oldid} sends the browser to {$newid}");
+
+            $target = $category->locate($newid);
+            $this->assertInstanceOf(\admin_settingpage::class, $target, "{$newid} is a settings page");
+            $this->assertNotInstanceOf(settings_redirect_page::class, $target, "{$newid} is a real page, not another redirect");
+        }
+
+        // Exactly the old names in the map, nothing extra. The old safety id is also a new page id,
+        // so it is a real page and has no redirect.
+        $expected = array_map([settings_layout::class, 'page_id'], array_keys(settings_layout_map::REDIRECTS));
+        $actual = array_keys($this->redirect_pages($category));
+        sort($expected);
+        sort($actual);
+        $this->assertSame($expected, $actual);
+        $this->assertNotInstanceOf(settings_redirect_page::class, $category->locate(settings_layout::page_id('safety')));
+    }
+
+    public function test_a_request_for_an_old_page_is_redirected_and_no_other_request_is(): void {
+        $category = $this->category();
+        $page = $category->locate(settings_layout::page_id('ai'));
+        $this->assertInstanceOf(settings_redirect_page::class, $page);
+
+        try {
+            // Core asks every page of a save request whether the user may write it: that must not redirect.
+            unset($_GET['section'], $_POST['section']);
+            $this->assertTrue($page->check_access(), 'no section requested');
+            $_GET['section'] = settings_layout::page_id('models');
+            $this->assertTrue($page->check_access(), 'a different section requested');
+
+            // admin/settings.php asks the located page first. Redirecting is the whole point.
+            $_GET['section'] = settings_layout::page_id('ai');
+            try {
+                $page->check_access();
+                $this->fail('a request for the old page did not redirect');
+            } catch (\moodle_exception $e) {
+                // In a CLI test core's redirect() throws instead of sending a header.
+                $this->assertSame('redirecterrordetected', $e->errorcode);
+            }
+
+            // Someone who may not open settings is never redirected into the page.
+            $this->setUser($this->getDataGenerator()->create_user());
+            $this->assertFalse($page->check_access());
+        } finally {
+            unset($_GET['section']);
+        }
+    }
+
+    public function test_redirect_pages_are_hidden(): void {
+        $category = $this->category();
+        $redirects = $this->redirect_pages($category);
+        $this->assertNotEmpty($redirects);
+
+        // What core's category page lists is every child that is not hidden.
+        $listed = [];
+        foreach ($category->children as $child) {
+            if (!$child->is_hidden()) {
+                $listed[] = $child->name;
+            }
+        }
+        $root = \admin_get_root();
+        foreach ($redirects as $name => $page) {
+            $this->assertTrue($page->hidden, "{$name} is hidden");
+            $this->assertTrue($page->is_hidden(), "{$name} reports hidden");
+            $this->assertNotContains($name, $listed, "{$name} is not listed on the plugin's page");
+            $this->assertSame([], $page->search(strtolower($name)), "{$name} is not an admin search hit");
+        }
+        $found = $root->search('moved');
+        foreach ($redirects as $name => $page) {
+            $this->assertArrayNotHasKey($name, $found, "searching for its title does not find {$name}");
+        }
+    }
+
+    public function test_internal_links_point_at_real_pages(): void {
+        $category = $this->category();
+        $files = ['audit_log.php', 'emergency_admin.php', 'rag_admin.php', 'classes/autoupgrade/page.php'];
+        foreach ($files as $file) {
+            $source = file_get_contents(__DIR__ . '/../' . $file);
+            $this->assertNotFalse($source, $file);
+
+            $total = preg_match_all('~\'section\'\s*=>~', $source);
+            $this->assertGreaterThan(0, $total, "{$file} links to no settings page (update this test if that is on purpose)");
+            $count = preg_match_all(
+                '~\'section\'\s*=>\s*(?:\'([a-z0-9_]+)\'|[\\\\\w]*settings_layout::page_id\(\'(\w+)\'\))~',
+                $source, $links, PREG_SET_ORDER);
+            $this->assertSame($total, $count, "{$file}: a 'section' value is neither a literal id nor settings_layout::page_id()");
+
+            foreach ($links as $link) {
+                $id = ($link[1] ?? '') !== '' ? $link[1] : settings_layout::page_id($link[2]);
+                $page = $category->locate($id);
+                $this->assertInstanceOf(\admin_settingpage::class, $page, "{$file} links to {$id}, which is not in the tree");
+                $this->assertNotInstanceOf(settings_redirect_page::class, $page,
+                    "{$file} links to {$id}, an old name that only redirects");
+            }
+        }
     }
 
     public function test_placement_logic_with_a_fake_staging_set(): void {

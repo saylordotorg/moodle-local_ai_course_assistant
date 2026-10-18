@@ -3733,6 +3733,7 @@ $string['settingspage:adv_prompt'] = 'Prompt, voice and display';
 $string['settingspage:adv_integrations'] = 'Integrations and governance';
 $string['settingspage:adv_legacy'] = 'Soapbox, avatars and legacy';
 $string['settingspage:nav_label'] = 'Settings pages';
+$string['settingspage:redirect'] = 'Moved';
 $string['settingspage:essentials_intro'] = 'The settings every site needs: switch [[tutorshort]] on, name it, and say who to contact.';
 $string['settingspage:models_intro'] = 'Which AI providers and keys [[tutorshort]] uses, the default model, and what takes over if it fails.';
 $string['settingspage:features_intro'] = 'Switch learner-facing features on or off. A feature\'s own options appear when you turn it on.';

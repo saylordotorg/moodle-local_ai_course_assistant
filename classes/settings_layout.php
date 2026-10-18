@@ -92,9 +92,10 @@ final class settings_layout {
     }
 
     /**
-     * Register the built pages: task pages first, then the Advanced category and its pages.
+     * Register the built pages: task pages first, then the Advanced category and its pages,
+     * then the hidden redirect pages for the old page names.
      *
-     * The tool pages and the redirect pages are registered by the caller.
+     * The tool pages are registered by the caller.
      *
      * @param \admin_root $admin The admin tree.
      * @param array $built The return value of build().
@@ -113,6 +114,25 @@ final class settings_layout {
             get_string('settingspage:advanced', self::COMPONENT)));
         foreach ($advanced as $page) {
             $admin->add(self::page_id('advanced'), $page);
+        }
+        self::register_redirects($admin);
+    }
+
+    /**
+     * Register a hidden page for each old settings page name, sending the browser to the page that replaced it.
+     *
+     * Old bookmarks and links name pages that no longer exist, and Moodle shows
+     * "Section error!" for an unknown section. The old safety id is also a new
+     * page id, so it is not in settings_layout_map::REDIRECTS and gets no redirect.
+     *
+     * @param \admin_root $admin The admin tree.
+     * @return void
+     */
+    public static function register_redirects(\admin_root $admin): void {
+        foreach (settings_layout_map::REDIRECTS as $old => $new) {
+            $admin->add(self::COMPONENT, new settings_redirect_page(self::page_id($old),
+                get_string('settingspage:redirect', self::COMPONENT),
+                new \moodle_url('/admin/settings.php', ['section' => self::page_id($new)])));
         }
     }
 

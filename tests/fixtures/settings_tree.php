@@ -16,6 +16,8 @@
 
 namespace local_ai_course_assistant\tests;
 
+use local_ai_course_assistant\settings_redirect_page;
+
 /**
  * The one way tests walk the plugin's settings pages.
  *
@@ -32,6 +34,9 @@ final class settings_tree {
     /**
      * Every settings page below a category, nested categories included, in tree order.
      *
+     * The hidden redirect pages for the old page names are not listed: they
+     * hold no settings and every walk here is about settings.
+     *
      * @param \admin_category $category The plugin category (or any category).
      * @return \admin_settingpage[] Keyed by page name.
      */
@@ -40,7 +45,7 @@ final class settings_tree {
         foreach ($category->children as $child) {
             if ($child instanceof \admin_category) {
                 $pages += self::pages($child);
-            } else if ($child instanceof \admin_settingpage) {
+            } else if ($child instanceof \admin_settingpage && !$child instanceof settings_redirect_page) {
                 $pages[$child->name] = $child;
             }
         }

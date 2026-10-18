@@ -3775,8 +3775,9 @@ if ($hassiteconfig) {
     // moves every setting onto the page classes/settings_layout_map.php names,
     // attaches each show/hide rule to the page holding both of its ends (a rule
     // split across pages is skipped and reported, see issue #292), and
-    // registers the five task pages and the Advanced category. The tool pages
-    // below still register after them.
+    // registers the five task pages, the Advanced category and the hidden
+    // pages that send the old page names to their replacements. The tool
+    // pages below still register after them.
     $aicabuilt = \local_ai_course_assistant\settings_layout::build($aicapages, $dependencies);
     \local_ai_course_assistant\settings_layout::register($ADMIN, $aicabuilt);
 

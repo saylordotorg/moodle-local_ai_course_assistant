@@ -20,6 +20,7 @@ use local_ai_course_assistant\branding;
 use local_ai_course_assistant\emergency_control;
 use local_ai_course_assistant\model_capabilities;
 use local_ai_course_assistant\model_registry_page;
+use local_ai_course_assistant\settings_layout;
 
 /**
  * Data and actions for the model upgrades admin page (v7.8.0).
@@ -59,7 +60,7 @@ class page {
             'emergency' => emergency_control::any_active(),
             'settingsurl' => (new \moodle_url(
                 '/admin/settings.php',
-                ['section' => 'local_ai_course_assistant_operations'],
+                ['section' => settings_layout::page_id('cost')],
                 'admin-autoupgrade_mode'
             ))->out(false),
         ];
