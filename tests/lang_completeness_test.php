@@ -187,7 +187,7 @@ final class lang_completeness_test extends \basic_testcase {
      * its twenty-five strings had been showing English to every non-English teacher
      * on every site while the docs claimed 46/46.
      *
-     * What is left is eleven keys with a reason each, below. Adding one should be
+     * What is left is a list of keys with a reason each, below. Adding one should be
      * a deliberate, reviewed act, because the parity test fails the moment an
      * unlisted key appears in English without translations, which is the drift
      * that went unnoticed.
@@ -234,6 +234,47 @@ final class lang_completeness_test extends \basic_testcase {
         // read the English.
         'settings:code_sandbox_pyodide_baseurl',
         'settings:code_sandbox_pyodide_baseurl_desc',
+        // 7.10.0 settings menu (page titles, page intros, the navigation label and
+        // the new section headings). Spec ruling 8: new admin strings ship English
+        // only, and a translation batch follows. Remove each key from here when
+        // that batch translates it.
+        'settingspage:essentials',
+        'settingspage:models',
+        'settingspage:features',
+        'settingspage:cost',
+        'settingspage:advanced',
+        'settingspage:adv_retrieval',
+        'settingspage:adv_documents',
+        'settingspage:adv_prompt',
+        'settingspage:adv_integrations',
+        'settingspage:adv_legacy',
+        'settingspage:nav_label',
+        'settingspage:essentials_intro',
+        'settingspage:models_intro',
+        'settingspage:features_intro',
+        'settingspage:safety_intro',
+        'settingspage:cost_intro',
+        'settingspage:adv_retrieval_intro',
+        'settingspage:adv_documents_intro',
+        'settingspage:adv_prompt_intro',
+        'settingspage:adv_integrations_intro',
+        'settingspage:adv_legacy_intro',
+        'layout:general',
+        'layout:contact',
+        'layout:faq',
+        'layout:roles',
+        'layout:failover',
+        'layout:voice',
+        'layout:activelearners',
+        'layout:embedding',
+        'layout:searchtuning',
+        'layout:modelcalls',
+        'layout:promptbudget',
+        'layout:history',
+        'layout:appearance',
+        'layout:remote',
+        'layout:optimizer',
+        'layout:legacy',
     ];
 
     /**

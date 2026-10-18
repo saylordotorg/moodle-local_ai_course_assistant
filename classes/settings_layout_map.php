@@ -154,11 +154,6 @@ final class settings_layout_map {
                 ['new', 'activelearners', [
                     'active_learners_enabled', 'active_learners_scope'
                 ]],
-                ['existing', 'faq_heading', [
-                    'support_enabled', 'support_courseid', 'zendesk_enabled',
-                    'escalation_intent_patterns', 'zendesk_require_consent', 'zendesk_subdomain',
-                    'zendesk_email', 'zendesk_token'
-                ]],
                 ['existing', 'radar_batch_heading', [
                     'radar_batch_enabled'
                 ]],
@@ -212,13 +207,6 @@ final class settings_layout_map {
                 ]],
                 ['existing', 'autoupgrade_heading', [
                     'autoupgrade_mode', 'autoupgrade_budget_usd', 'autoupgrade_eval_courseid'
-                ]],
-                ['existing', 'price_drift_heading', [
-                    'price_drift_check_enabled', 'price_drift_tolerance_pct',
-                    'price_drift_eol_horizon_days', 'model_eol_surfaces'
-                ]],
-                ['existing', 'policy_bundle_heading', [
-                    'policy_bundle_enabled', 'policy_bundle_url', 'policy_bundle_pubkey'
                 ]],
             ],
         ],
@@ -306,6 +294,11 @@ final class settings_layout_map {
         'adv_integrations' => [
             'parent' => 'advanced',
             'sections' => [
+                ['existing', 'faq_heading', [
+                    'support_enabled', 'support_courseid', 'zendesk_enabled',
+                    'escalation_intent_patterns', 'zendesk_require_consent', 'zendesk_subdomain',
+                    'zendesk_email', 'zendesk_token'
+                ]],
                 ['existing', 'redash_heading', [
                     'redash_api_key', 'redash_allowed_origin', 'redash_export_window_days',
                     'redash_allow_deanonymized', 'spend_export_key', 'redash_base_url',
@@ -321,6 +314,13 @@ final class settings_layout_map {
                     'vendor_dpa_admin_page_enabled', 'vendor_dpa_overrides', 'rate_card_overrides',
                     'rate_card_auto_refresh', 'rate_card_upstream_url', 'rate_card_refresh_button',
                     'model_registry_link'
+                ]],
+                ['existing', 'price_drift_heading', [
+                    'price_drift_check_enabled', 'price_drift_tolerance_pct',
+                    'price_drift_eol_horizon_days', 'model_eol_surfaces'
+                ]],
+                ['existing', 'policy_bundle_heading', [
+                    'policy_bundle_enabled', 'policy_bundle_url', 'policy_bundle_pubkey'
                 ]],
                 ['existing', 'bench_heading', [
                     'bench_default_samples', 'bench_min_quality_n', 'bench_judge_provider',

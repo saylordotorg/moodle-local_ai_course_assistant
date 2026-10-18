@@ -17,8 +17,12 @@
 /**
  * Admin settings for local_ai_course_assistant.
  *
- * Settings are organized into an admin category with 7 settings pages
- * and 7 external admin pages, visible under Site administration > Plugins > Local plugins.
+ * Settings are organized into an admin category, visible under Site administration >
+ * Plugins > Local plugins: five task pages (Essentials, Models and keys, Features,
+ * Safety and privacy, Cost and reliability), an Advanced category of five more, and
+ * the external tool pages. Since 7.10.0 the settings below are built onto staging
+ * pages that are never registered; \local_ai_course_assistant\settings_layout moves
+ * each one onto the page classes/settings_layout_map.php names.
  *
  * @package    local_ai_course_assistant
  * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
@@ -54,20 +58,15 @@ if ($hassiteconfig) {
         get_string('pluginname', 'local_ai_course_assistant')
     ));
 
-    // ── Single settings page with TOC ───────────────────────────────────────
-    // Every settings page, in order, so the dependency loop at the end of this
-    // file can attach each hide_if to the page that actually holds the setting.
+    // ── Staging pages ───────────────────────────────────────────────────────
+    // Every staging page, in order, handed to settings_layout::build() at the
+    // end of this file, which places each setting and attaches each hide_if.
     $aicapages = [];
     $settings = new admin_settingpage('local_ai_course_assistant_general',
         get_string('settingspage:pagetitle', 'local_ai_course_assistant'));
 
-    // The TOC and quicklink styling lives in styles.css (search .sola-toc).
-    // It used to be an inline <style> block injected through an
-    // admin_setting_description here, which is one of the things the plugin
-    // directory review asked us to stop doing; it came back when the TOC was
-    // added. Moodle loads the plugin's styles.css on admin pages, so nothing
-    // needs injecting.
-    $tocstyle = '';
+    // The quicklink styling lives in styles.css (search .sola-toc); nothing is
+    // injected inline (plugin directory review).
 
     $analyticsurl = new moodle_url('/local/ai_course_assistant/analytics.php');
     $tokenanalyticsurl = new moodle_url('/local/ai_course_assistant/token_analytics.php');
@@ -139,26 +138,10 @@ if ($hassiteconfig) {
         }
     }
 
-    // v5.5.6: TOC entries ordered by admin frequency-of-use (highest first)
-    // rather than by section-block order in this file. Branding & UI sits
-    // ahead of Content & RAG and Safety because first-install rebranding is
-    // a higher-frequency task than RAG tuning or off-topic-cap edits. The
-    // section blocks themselves stay where they are in the file; clicking a
-    // TOC link still jumps to the right anchor.
-    $toc = $tocstyle
-        . '<div class="sola-toc">'
-        . '<strong>' . get_string('settingspage:toc_heading', 'local_ai_course_assistant') . '</strong>'
-        . '<ul>'
-        . '<li><a href="#sec-general">' . get_string('settingspage:sec_general', 'local_ai_course_assistant') . '</a></li>'
-        . '<li><a href="#sec-ai">' . s(get_string('settingspage:sec_ai', 'local_ai_course_assistant')) . '</a></li>'
-        . '<li><a href="#sec-branding">' . s(get_string('settingspage:sec_branding', 'local_ai_course_assistant')) . '</a></li>'
-        . '<li><a href="#sec-content">' . s(get_string('settingspage:sec_content', 'local_ai_course_assistant')) . '</a></li>'
-        . '<li><a href="#sec-safety">' . s(get_string('settingspage:sec_safety', 'local_ai_course_assistant')) . '</a></li>'
-        . '<li><a href="#sec-engagement">' . get_string('settingspage:sec_engagement', 'local_ai_course_assistant') . '</a></li>'
-        . '<li><a href="#sec-integrations">' . s(get_string('settingspage:sec_integrations', 'local_ai_course_assistant')) . '</a></li>'
-        . '<li><a href="#sec-save" class="sola-toc-save">&#8595; '
-        . get_string('settingspage:toc_save', 'local_ai_course_assistant') . '</a></li>'
-        . '</ul>'
+    // 7.10.0: the in-page table of contents (jump links to #sec-* anchors) is
+    // gone; every page now opens with a navigation row (settings_layout::nav_html).
+    // The quick links stay, under the version banner on Essentials.
+    $toc = '<div class="sola-toc">'
         . '<div class="sola-quicklinks">' . $quicklinks . '</div>'
         . '</div>';
 
@@ -280,8 +263,10 @@ if ($hassiteconfig) {
     // Splitting by the sections this file already had means each page
     // carries only its own dependencies. The settings themselves, and their
     // config keys, are untouched: only which page renders them changes.
+    //
+    // 7.10.0: these are now staging pages. They are collected, never registered,
+    // and settings_layout (at the end of this file) places their settings.
     $aicapages[] = $settings;
-    $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_ai',
         get_string('settingspage:ai', 'local_ai_course_assistant'));
 
@@ -792,7 +777,6 @@ if ($hassiteconfig) {
     // carries only its own dependencies. The settings themselves, and their
     // config keys, are untouched: only which page renders them changes.
     $aicapages[] = $settings;
-    $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_content',
         get_string('settingspage:content', 'local_ai_course_assistant'));
 
@@ -1071,7 +1055,6 @@ if ($hassiteconfig) {
  
     // Issue #292: reranking split out. Its six dependents plus retrieval's eighteen exceeded the budget on one page.
     $aicapages[] = $settings;
-    $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_rerank',
         get_string('settingspage:rerank', 'local_ai_course_assistant'));
 
@@ -1207,7 +1190,6 @@ if ($hassiteconfig) {
 
     // Issue #292: document extraction split out; its toggles carry their own sub-settings.
     $aicapages[] = $settings;
-    $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_extraction',
         get_string('settingspage:extraction', 'local_ai_course_assistant'));
 
@@ -1391,7 +1373,6 @@ if ($hassiteconfig) {
     // of the content section, which put them on the extraction page and pushed
     // it over the dependency budget. They are their own concern anyway.
     $aicapages[] = $settings;
-    $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_operations',
         get_string('settingspage:operations', 'local_ai_course_assistant'));
 
@@ -1607,7 +1588,6 @@ if ($hassiteconfig) {
     // carries only its own dependencies. The settings themselves, and their
     // config keys, are untouched: only which page renders them changes.
     $aicapages[] = $settings;
-    $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_safety',
         get_string('settingspage:safety', 'local_ai_course_assistant'));
 
@@ -1784,7 +1764,6 @@ if ($hassiteconfig) {
     // carries only its own dependencies. The settings themselves, and their
     // config keys, are untouched: only which page renders them changes.
     $aicapages[] = $settings;
-    $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_engagement',
         get_string('settingspage:engagement', 'local_ai_course_assistant'));
 
@@ -2272,7 +2251,6 @@ if ($hassiteconfig) {
 
     // Issue #292: survey and feedback split out so the engagement page's dependency payload fits core's 1,024-character js_call_amd budget.
     $aicapages[] = $settings;
-    $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_feedback',
         get_string('settingspage:feedback', 'local_ai_course_assistant'));
 
@@ -2869,7 +2847,6 @@ if ($hassiteconfig) {
     // carries only its own dependencies. The settings themselves, and their
     // config keys, are untouched: only which page renders them changes.
     $aicapages[] = $settings;
-    $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_branding',
         get_string('settingspage:branding', 'local_ai_course_assistant'));
 
@@ -3073,7 +3050,6 @@ if ($hassiteconfig) {
     // carries only its own dependencies. The settings themselves, and their
     // config keys, are untouched: only which page renders them changes.
     $aicapages[] = $settings;
-    $ADMIN->add('local_ai_course_assistant', $settings);
     $settings = new admin_settingpage('local_ai_course_assistant_integrations',
         get_string('settingspage:integrations', 'local_ai_course_assistant'));
 
@@ -3794,51 +3770,14 @@ if ($hassiteconfig) {
 
     $aicapages[] = $settings;
 
-    // Attach each rule to the page that actually holds the dependent setting.
-    //
-    // Issue #292: this loop used to call $settings->hide_if() unconditionally,
-    // and by the time it ran $settings was whichever page happened to be last.
-    // So every rule in the map landed on one page, which is how a single page
-    // came to serialise 5,230 characters of dependency data into one
-    // js_call_amd argument against a 1,024 limit.
-    //
-    // A rule whose dependent and toggle are on DIFFERENT pages is skipped and
-    // reported, because core's show/hide only works within a page: emitting it
-    // would produce a rule that silently never fires, which is worse than
-    // showing the setting.
-    $aicaowner = function (string $name) use ($aicapages) {
-        foreach ($aicapages as $page) {
-            if (isset($page->settings->{'local_ai_course_assistant' . $name})) {
-                return $page;
-            }
-        }
-        return null;
-    };
-
-    foreach ($dependencies as $toggle => $dependents) {
-        $togglepage = $aicaowner($toggle);
-        foreach ($dependents as $dependent) {
-            $dependentpage = $aicaowner($dependent);
-            if ($dependentpage === null || $togglepage === null
-                    || $dependentpage !== $togglepage) {
-                debugging(
-                    "SOLA: hide_if skipped, '{$dependent}' and its toggle "
-                        . "'{$toggle}' are not on the same settings page, so the "
-                        . 'rule could never fire. Move them together or drop the '
-                        . 'rule. See issue #292.',
-                    DEBUG_DEVELOPER
-                );
-                continue;
-            }
-            $dependentpage->hide_if(
-                'local_ai_course_assistant/' . $dependent,
-                'local_ai_course_assistant/' . $toggle,
-                'notchecked'
-            );
-        }
-    }
-
-    $ADMIN->add('local_ai_course_assistant', $settings);
+    // 7.10.0: the staging pages above are never registered. settings_layout
+    // moves every setting onto the page classes/settings_layout_map.php names,
+    // attaches each show/hide rule to the page holding both of its ends (a rule
+    // split across pages is skipped and reported, see issue #292), and
+    // registers the five task pages and the Advanced category. The tool pages
+    // below still register after them.
+    $aicabuilt = \local_ai_course_assistant\settings_layout::build($aicapages, $dependencies);
+    \local_ai_course_assistant\settings_layout::register($ADMIN, $aicabuilt);
 
     // ── External admin pages (tools / editors) ──────────────────────────────
 

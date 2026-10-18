@@ -5961,6 +5961,17 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
 .sola-quicklinks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ced4da; }
 .sola-quicklinks a { display: inline-block; padding: 5px 12px; background: #3b5bdb; border: 1px solid #3b5bdb; border-radius: 4px; font-size: 13px; color: #fff; text-decoration: none; font-weight: 500; }
 .sola-quicklinks a:hover { background: #2d47b5; border-color: #2d47b5; color: #fff; }
+/* 7.10.0 settings navigation row (settings_layout::nav_html): one row of links
+   to the five task pages and Advanced, a second row of the Advanced pages when
+   on one of them, then the page intro. Same look as the .sola-toc links. */
+.sola-pagenav { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px 14px; margin: 0 0 8px; }
+.sola-pagenav-links { display: flex; flex-wrap: wrap; gap: 6px 10px; list-style: none; padding: 0; margin: 0; }
+.sola-pagenav-links li { margin: 0; }
+.sola-pagenav-links a { display: inline-block; padding: 4px 10px; background: #fff; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; color: #3b5bdb; text-decoration: none; }
+.sola-pagenav-links a:hover { background: #e7f0ff; border-color: #3b5bdb; text-decoration: none; }
+.sola-pagenav-links a.sola-pagenav-current { font-weight: 700; border-color: #3b5bdb; background: #e7f0ff; }
+.sola-pagenav-sub { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ced4da; }
+.sola-pagenav-intro { margin: 0 0 12px; color: #495057; }
 .sola-section-anchor { display: block; position: relative; top: -60px; visibility: hidden; }
 .sola-section-heading { margin-top: 24px; padding-top: 8px; border-top: 2px solid #e5e7eb; }
 

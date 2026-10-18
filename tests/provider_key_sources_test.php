@@ -19,6 +19,11 @@ namespace local_ai_course_assistant;
 use local_ai_course_assistant\embedding_provider\base_embedding_provider;
 use local_ai_course_assistant\embedding_provider\openai_embedding_provider;
 use local_ai_course_assistant\embedding_provider\voyage_reranker;
+use local_ai_course_assistant\tests\settings_tree;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/fixtures/settings_tree.php');
 
 /**
  * Embedding, Rerank and Voice can use a provider row's key, and nothing else turns voice on.
@@ -212,10 +217,7 @@ final class provider_key_sources_test extends \advanced_testcase {
         $this->cfg('comparison_providers', "openai|sk-proj-TREE-ROW-ONE-3030-KKKK|m\nclaude|sk-ant-TREE-ROW-TWO-4040-LLLL|m");
 
         $found = [];
-        foreach (\admin_get_root(true, true)->locate('local_ai_course_assistant')->children as $page) {
-            if (!$page instanceof \admin_settingpage) {
-                continue;
-            }
+        foreach (settings_tree::pages(\admin_get_root(true, true)->locate('local_ai_course_assistant')) as $page) {
             foreach ($page->settings as $setting) {
                 if (in_array($setting->name, ['embed_key_from', 'rerank_key_from', 'realtime_key_from'], true)) {
                     $found[$setting->name] = $setting;
