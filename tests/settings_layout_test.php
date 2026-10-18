@@ -201,6 +201,19 @@ final class settings_layout_test extends \advanced_testcase {
         }
     }
 
+    public function test_navigation_rows_are_not_search_results(): void {
+        $pages = settings_tree::pages($this->category());
+        foreach (array_keys(settings_layout_map::PAGES) as $short) {
+            $nav = $pages[settings_layout::page_id($short)]->settings->{'local_ai_course_assistant' . 'nav_' . $short};
+            $this->assertInstanceOf(admin_setting_page_nav::class, $nav, "nav_{$short}");
+            $this->assertStringContainsString('Features', $nav->description, 'the row does name the pages');
+            $this->assertFalse($nav->is_related('features'), "nav_{$short} is not a search hit");
+        }
+        // A real setting on the same page is still found.
+        $topk = $pages[settings_layout::page_id('adv_retrieval')]->settings->{'local_ai_course_assistantrag_topk'};
+        $this->assertTrue($topk->is_related('rag_topk'));
+    }
+
     public function test_placement_logic_with_a_fake_staging_set(): void {
         $this->resetAfterTest();
         global $CFG;

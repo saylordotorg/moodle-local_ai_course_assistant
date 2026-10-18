@@ -50,8 +50,9 @@ if ($hassiteconfig) {
         . '</div>';
 
     // ── Create the plugin admin category ────────────────────────────────────
-    // Admin tools live under this category as external pages; all settings
-    // live on a single "Settings" page with TOC navigation.
+    // Admin tools live under this category as external pages. The settings are
+    // built on staging pages below and placed by settings_layout onto five task
+    // pages and an Advanced category.
     // Reachable at: Site admin > Plugins > Local plugins > AI Course Assistant
     $ADMIN->add('localplugins', new admin_category(
         'local_ai_course_assistant',

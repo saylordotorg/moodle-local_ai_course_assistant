@@ -68,7 +68,7 @@ final class settings_layout {
         foreach (settings_layout_map::PAGES as $short => $layout) {
             $page = new \admin_settingpage(self::page_id($short),
                 get_string('settingspage:' . $short, self::COMPONENT), 'moodle/site:config');
-            $page->add(new \admin_setting_description(self::COMPONENT . '/nav_' . $short, '', self::nav_html($short)));
+            $page->add(new admin_setting_page_nav(self::COMPONENT . '/nav_' . $short, '', self::nav_html($short)));
             foreach ($layout['sections'] as $section) {
                 self::place_section($page, $section, $index, $missing);
             }
