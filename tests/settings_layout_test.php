@@ -490,6 +490,15 @@ final class settings_layout_test extends \advanced_testcase {
         $this->assertSame([], $homeless, 'settings.php builds these but settings_layout_map gives them no page');
     }
 
+    public function test_dropped_lists_only_a_heading_that_still_exists(): void {
+        // The nine table-of-contents anchors were deleted in 7.12.0 together with the
+        // helper that built them. provider_heading is still built by settings.php
+        // and is dropped on purpose (the Models page opens on its own headings).
+        $this->assertSame(['provider_heading'], settings_layout_map::DROPPED);
+        $src = file_get_contents(__DIR__ . '/../settings.php');
+        $this->assertStringContainsString("'local_ai_course_assistant/provider_heading'", $src);
+    }
+
     public function test_optional_names_are_listed_in_pages(): void {
         $listed = [];
         foreach (settings_layout_map::PAGES as $page) {
@@ -543,7 +552,7 @@ final class settings_layout_test extends \advanced_testcase {
         $one = new \admin_settingpage('stage_one', 'Stage one');
         $one->add(new \admin_setting_configtext('local_ai_course_assistant/rag_topk', 'Top k', '', '5'));
         $one->add(new \admin_setting_configtext('local_ai_course_assistant/fake_unmapped', 'Unmapped', '', 'x'));
-        $one->add(new \admin_setting_description('local_ai_course_assistant/sec_ai_anchor', '', 'anchor'));
+        $one->add(new \admin_setting_description('local_ai_course_assistant/provider_heading', '', 'dropped'));
         $two = new \admin_settingpage('stage_two', 'Stage two');
         $two->add(new \admin_setting_configcheckbox('local_ai_course_assistant/rag_enabled', 'RAG', '', 1));
         $two->add(new \admin_setting_configtext('local_ai_course_assistant/rerank_model', 'Model', '', 'm'));
@@ -569,7 +578,7 @@ final class settings_layout_test extends \advanced_testcase {
         $this->assertSame(['adv_retrieval'], $where['rag_enabled']);
         $this->assertSame(['adv_documents'], $where['rerank_model']);
         $this->assertSame(['adv_legacy'], $where['fake_unmapped'], 'an unplaced setting is never lost');
-        $this->assertArrayNotHasKey('sec_ai_anchor', $where, 'a dropped entry is placed nowhere');
+        $this->assertArrayNotHasKey('provider_heading', $where, 'a dropped entry is placed nowhere');
 
         // The rule whose ends share a page is attached there, and only there.
         $this->assertTrue($built['pages']['adv_retrieval']->has_dependencies());

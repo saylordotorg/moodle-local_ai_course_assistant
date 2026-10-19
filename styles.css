@@ -5972,8 +5972,6 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
 .sola-pagenav-links a.sola-pagenav-current { font-weight: 700; border-color: #3b5bdb; background: #e7f0ff; }
 .sola-pagenav-sub { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ced4da; }
 .sola-pagenav-intro { margin: 0 0 12px; color: #495057; }
-.sola-section-anchor { display: block; position: relative; top: -60px; visibility: hidden; }
-.sola-section-heading { margin-top: 24px; padding-top: 8px; border-top: 2px solid #e5e7eb; }
 
 /* ── Learning Radar printable report (v7.0.1) ─────────────────────────────
    Was an inline <style> block in radar_export.php emitting a detached HTML

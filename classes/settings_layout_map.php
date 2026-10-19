@@ -50,11 +50,13 @@ final class settings_layout_map {
         'prompt_budget_nowindow_warning', 'prompt_truncation_warning',
     ];
 
-    /** @var string[] Entries that no longer render: the old in-page table of contents anchors. */
+    /**
+     * @var string[] Entries settings.php still builds but that render nowhere. The only one left is the old
+     *               "AI Provider & Conversation" heading: the Models page opens on its own headings. (The
+     *               in-page table of contents anchors that used to be listed here were deleted in 7.12.0.)
+     */
     public const DROPPED = [
-        'sec_general_anchor', 'sec_ai_anchor', 'provider_heading', 'sec_content_anchor',
-        'sec_safety_anchor', 'sec_engagement_anchor', 'sec_branding_anchor',
-        'sec_integrations_anchor', 'sec_save_anchor'
+        'provider_heading'
     ];
 
     /** @var string[] Old settings page name (without the plugin prefix) => the page that replaced it. */

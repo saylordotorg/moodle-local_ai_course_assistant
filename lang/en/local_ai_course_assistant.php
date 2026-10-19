@@ -1519,10 +1519,6 @@ $string['prompt_metrics:recommended']            = 'Recommended budget';
 $string['prompt_metrics:apply']                  = 'Apply recommendation';
 $string['prompt_metrics:applied']                = 'Applied: budget changed from {$a->old} to {$a->new}. {$a->reason}';
 $string['prompt_metrics:noop']                   = 'No change applied: {$a}';
-$string['prompt_metrics:auto_tune_heading']      = 'Daily auto-tune';
-$string['prompt_metrics:auto_tune_on']           = 'Daily auto-tune is ON. The recommendation will be applied automatically every night at 03:20 server time.';
-$string['prompt_metrics:auto_tune_off']          = 'Daily auto-tune is OFF. The recommendation is shown here for review; nothing is applied automatically. Toggle on in plugin settings if you want unattended daily tuning.';
-$string['prompt_metrics:settings_link']          = 'Open plugin settings to toggle auto-tune.';
 // v5.0.0 patch 10: prompt debug log viewer.
 $string['prompt_debug_view:title']            = 'Prompt debug log viewer';
 $string['prompt_debug_view:subtitle']         = 'Per-turn assembled system prompt + per-section breakdown + conversation history + current user message + attachment metadata, exactly as the model received them. Use this to verify whether a section like Current Page Content actually landed in the prompt and to debug answer-quality issues without SSHing into the server.';
@@ -2234,15 +2230,6 @@ $string['settings:anomaly_digest_threshold_pct'] = 'Alert threshold (%)';
 $string['settings:anomaly_digest_threshold_pct_desc'] = 'Percent change between the recent and prior window that triggers an alert. Default: 50.';
 // v7.2.0 (CONTRIB-10574 #205): settings-page interface text, previously written
 // as hardcoded English literals inside settings.php and therefore untranslatable.
-$string['settingspage:toc_heading'] = 'Jump to section';
-$string['settingspage:sec_general'] = 'General';
-$string['settingspage:sec_ai'] = 'AI Provider & Models';
-$string['settingspage:sec_branding'] = 'Branding & UI';
-$string['settingspage:sec_content'] = 'Content & RAG';
-$string['settingspage:sec_safety'] = 'Safety & Moderation';
-$string['settingspage:sec_engagement'] = 'Engagement';
-$string['settingspage:sec_integrations'] = 'Integrations & Delivery';
-$string['settingspage:toc_save'] = 'Save';
 $string['settingspage:token_analytics_title'] = 'Token Cost & Analytics';
 $string['settingspage:token_analytics_link'] = 'View Token Analytics';
 $string['settingspage:token_analytics_blurb'] = 'Monitor token usage and costs across courses and providers.';
@@ -3000,17 +2987,7 @@ $string['mobile:error_generic'] = 'Sorry, something went wrong. Please try again
 
 // --- from newstrings_e.php ---
 // settings.php — page/nav chrome and select options (i18n extraction batch E).
-$string['settingspage:operations'] = 'Resilience and operations';
-$string['settingspage:rerank'] = 'Reranking';
-$string['settingspage:extraction'] = 'Document extraction';
-$string['settingspage:feedback'] = 'Surveys and feedback';
-$string['settingspage:ai'] = 'AI provider and models';
-$string['settingspage:content'] = 'Content and retrieval';
 $string['settingspage:safety'] = 'Safety and privacy';
-$string['settingspage:engagement'] = 'Engagement';
-$string['settingspage:branding'] = 'Branding and interface';
-$string['settingspage:integrations'] = 'Integrations and delivery';
-$string['settingspage:pagetitle'] = 'Settings';
 $string['toc:providerbenchmark'] = 'Provider benchmark';
 $string['toc:playground'] = 'Prompt Playground';
 $string['toc:course_ai_settings'] = '{$a} AI settings';
