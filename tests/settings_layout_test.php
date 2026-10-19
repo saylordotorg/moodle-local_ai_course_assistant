@@ -491,7 +491,7 @@ final class settings_layout_test extends \advanced_testcase {
     }
 
     public function test_dropped_lists_only_a_heading_that_still_exists(): void {
-        // The nine table-of-contents anchors were deleted in 7.12.0 together with the
+        // The eight table-of-contents anchors were deleted in 7.12.0 together with the
         // helper that built them. provider_heading is still built by settings.php
         // and is dropped on purpose (the Models page opens on its own headings).
         $this->assertSame(['provider_heading'], settings_layout_map::DROPPED);
