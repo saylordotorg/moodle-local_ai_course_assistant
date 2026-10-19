@@ -89,15 +89,17 @@ class voice_registry {
      * @param string $oldfingerprint fingerprint of the key to replace
      * @param string $newstored the new key column, already concealed with secrets::conceal()
      * @return int number of lines changed
-     * @throws \coding_exception when $newstored is empty or not ciphertext; the message names neither key
+     * @throws \coding_exception when $newstored is empty, not ciphertext, holds a "|", CR or LF, or doesn't
+     *         decrypt on this site (key_inventory::check_new_stored()); the message names neither key
      */
     public static function replace_row_key(string $oldfingerprint, string $newstored): int {
         global $CFG;
-        $raw = (string) (get_config('local_ai_course_assistant', 'voice_providers') ?: '');
-        $edit = key_inventory::replace_in_table($raw, $oldfingerprint, $newstored);
+        key_inventory::check_new_stored($newstored);
         if (array_key_exists('voice_providers', $CFG->forced_plugin_settings['local_ai_course_assistant'] ?? [])) {
             return 0;
         }
+        $raw = (string) (get_config('local_ai_course_assistant', 'voice_providers') ?: '');
+        $edit = key_inventory::replace_in_table($raw, $oldfingerprint, $newstored);
         if ($edit['changed'] > 0) {
             set_config('voice_providers', $edit['text'], 'local_ai_course_assistant');
         }

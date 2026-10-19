@@ -163,7 +163,7 @@ final class key_inventory_test extends \advanced_testcase {
         $this->assertSame('https://whisper.example.test', $byref['pasted:stt_selfhosted_apikey']['baseurl']);
         $this->assertSame('xai', $byref['voice:xai']['provider']);
         $this->assertSame('openai', $byref['mirror:apikey']['provider']);
-        $this->assertSame('https://***@gw.example.test/v1', $byref['row:claude']['baseurl'],
+        $this->assertTrue('https://***@gw.example.test/v1' === $byref['row:claude']['baseurl'],
             'a credential in a base URL is masked');
         $this->assertSame('openai', $byref['course:INV3']['provider'], 'a course with no provider uses the site one');
         $this->assertSame('claude', $byref['course:INV4']['provider']);
@@ -241,12 +241,17 @@ final class key_inventory_test extends \advanced_testcase {
         }
         $this->assertFalse(str_contains($blob, 'sodium:'), 'no ciphertext prefix in the output');
         $this->assertFalse(str_contains($blob, 'openssl-aes'), 'no ciphertext prefix in the output');
+        // Every ciphertext planted: standalone values and the ones inside the key and voice table lines.
+        $bodies = 0;
         foreach ($this->stored as $i => $value) {
-            if (secrets::is_encrypted($value)) {
-                $body = substr($value, strpos($value, ':') + 1, 24);
-                $this->assertFalse(str_contains($blob, $body), "stored ciphertext $i appears in the output");
+            preg_match_all('~(?:sodium|openssl-aes-256-ctr):([A-Za-z0-9+/=]{24,})~', $value, $m);
+            foreach ($m[1] as $j => $body) {
+                $bodies++;
+                $this->assertFalse(str_contains($blob, substr($body, 0, 24)),
+                    "stored ciphertext $i.$j appears in the output");
             }
         }
+        $this->assertTrue($bodies >= 14, 'the ciphertext search saw the table lines as well as the settings');
     }
 
     public function test_an_empty_site_has_no_places_and_no_groups(): void {

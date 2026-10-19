@@ -232,6 +232,25 @@ class key_inventory {
     }
 
     /**
+     * Refuse a new key column that could break a table or leave a row keyless.
+     *
+     * It must be non-empty ciphertext (secrets::is_encrypted()), hold no "|", CR or LF, and decrypt on this site
+     * to a non-empty key (checked with debugging held off). The message is fixed text and names no value.
+     *
+     * @param string $newstored the new key column, already concealed (secrets::conceal())
+     * @return void
+     * @throws \coding_exception when $newstored is empty, not ciphertext, holds a "|", CR or LF, or doesn't decrypt
+     */
+    public static function check_new_stored(string $newstored): void {
+        $ok = $newstored !== '' && secrets::is_encrypted($newstored) && strpbrk($newstored, "|\r\n") === false
+            && self::quietly(fn(): bool => secrets::reveal($newstored) !== '');
+        if (!$ok) {
+            throw new \coding_exception('The new key must be passed concealed (secrets::conceal()), as one '
+                . 'non-empty field that decrypts on this site.');
+        }
+    }
+
+    /**
      * In a "provider|key|..." table, put a new stored value in the key column of every row whose key has the
      * given fingerprint. Pure: reads and writes no setting.
      *
@@ -245,14 +264,11 @@ class key_inventory {
      * @param string $oldfingerprint fingerprint() of the key to replace
      * @param string $newstored the new key column, already concealed (secrets::conceal())
      * @return array ['text' => the edited table, 'changed' => number of lines changed]
-     * @throws \coding_exception when $newstored is empty, not ciphertext, or holds a separator; the message names
-     *         neither key
+     * @throws \coding_exception when $newstored is refused by check_new_stored() (empty, not ciphertext, holding
+     *         a "|", CR or LF, or not decryptable on this site); the message names neither key
      */
     public static function replace_in_table(string $text, string $oldfingerprint, string $newstored): array {
-        if ($newstored === '' || !secrets::is_encrypted($newstored) || strpbrk($newstored, "|\r\n") !== false) {
-            throw new \coding_exception('The new key must be passed concealed (secrets::conceal()), as one '
-                . 'non-empty field.');
-        }
+        self::check_new_stored($newstored);
         $lines = explode("\n", $text);
         $changed = 0;
         self::quietly(function () use (&$lines, &$changed, $oldfingerprint, $newstored): void {

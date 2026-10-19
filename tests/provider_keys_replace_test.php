@@ -96,9 +96,9 @@ final class provider_keys_replace_test extends \advanced_testcase {
         $this->assert_only_lines_changed($before, $after, [0]);
         $this->assertTrue(explode("\n", $after)[0] === 'openai|' . $newstored . '|gpt-4o-mini',
             'line 0 is the old line with only the key column replaced');
-        $this->assertSame(self::NEWKEY, provider_keys::rows(true)[0]['key']);
-        $this->assertSame(self::OPENAI_TWO, provider_keys::rows(true)[1]['key']);
-        $this->assertSame(self::CLAUDE, provider_keys::key_for('claude'));
+        $this->assertTrue(self::NEWKEY === provider_keys::rows(true)[0]['key'], 'row 0 reveals the new key');
+        $this->assertTrue(self::OPENAI_TWO === provider_keys::rows(true)[1]['key'], 'row 1 keeps its key');
+        $this->assertTrue(self::CLAUDE === provider_keys::key_for('claude'), 'the claude row keeps its key');
     }
 
     public function test_every_line_holding_the_key_changes(): void {
@@ -113,7 +113,7 @@ final class provider_keys_replace_test extends \advanced_testcase {
 
         $this->assertSame(2, $changed);
         $this->assert_only_lines_changed($before, $this->stored(), [0, 2]);
-        $this->assertSame(self::NEWKEY, provider_keys::rows(true)[2]['key']);
+        $this->assertTrue(self::NEWKEY === provider_keys::rows(true)[2]['key'], 'row 2 reveals the new key');
         $this->assertSame('https://gw.example.test/v1', provider_keys::rows()[2]['baseurl']);
     }
 
@@ -130,7 +130,7 @@ final class provider_keys_replace_test extends \advanced_testcase {
         $this->assertTrue($after[1] === str_replace(self::OPENAI_ONE, $newstored, $legacy),
             'the legacy line keeps its label case, its spacing, its models, temperature, base URL and extra column');
         $this->assert_only_lines_changed($before, $this->stored(), [1]);
-        $this->assertSame(self::NEWKEY, provider_keys::key_for('openai'));
+        $this->assertTrue(self::NEWKEY === provider_keys::key_for('openai'), 'the legacy row reveals the new key');
     }
 
     public function test_comment_blank_and_crlf_lines_survive_and_a_commented_key_is_left_alone(): void {
@@ -173,11 +173,12 @@ final class provider_keys_replace_test extends \advanced_testcase {
         $this->assert_only_lines_changed($before, $this->stored(), [1]);
     }
 
-    public function test_an_empty_or_plain_new_value_is_refused_without_naming_either_key(): void {
+    public function test_an_empty_plain_or_undecryptable_new_value_is_refused_without_naming_either_key(): void {
         $this->resetAfterTest();
         $before = 'openai|' . secrets::conceal(self::OPENAI_ONE) . '|gpt-4o-mini';
         set_config('comparison_providers', $before, 'local_ai_course_assistant');
-        foreach (['', self::NEWKEY, secrets::conceal(self::NEWKEY) . "|x"] as $i => $bad) {
+        $undecryptable = ['sodium:xyz', 'sodium:' . base64_encode(random_bytes(80))];
+        foreach (array_merge(['', self::NEWKEY, secrets::conceal(self::NEWKEY) . "|x"], $undecryptable) as $i => $bad) {
             try {
                 provider_keys::replace_key(key_inventory::fingerprint(self::OPENAI_ONE), $bad);
                 $this->fail("bad new value $i was accepted");
@@ -188,6 +189,7 @@ final class provider_keys_replace_test extends \advanced_testcase {
                 $this->assertFalse(str_contains($text, 'sodium:'), "message $i carries ciphertext");
             }
         }
+        $this->assertDebuggingNotCalled();
         $this->assertTrue($before === $this->stored(), 'nothing was written');
     }
 
@@ -199,7 +201,7 @@ final class provider_keys_replace_test extends \advanced_testcase {
         $this->assertSame(0, provider_keys::replace_key(key_inventory::fingerprint(self::OPENAI_ONE),
             secrets::conceal(self::NEWKEY)));
         unset($CFG->forced_plugin_settings['local_ai_course_assistant']['comparison_providers']);
-        $this->assertSame('', $this->stored(), 'nothing reached the database');
+        $this->assertTrue('' === $this->stored(), 'nothing reached the database');
     }
 
     public function test_a_voice_row_key_is_replaced_as_text_and_every_other_line_is_byte_identical(): void {
@@ -218,9 +220,9 @@ final class provider_keys_replace_test extends \advanced_testcase {
         $this->assertTrue(explode("\n", $after)[3] === 'openai | ' . $newstored . ' |legacy-plain',
             'the plain line keeps its spacing and label');
         $rows = voice_registry::parse_rows();
-        $this->assertSame(self::NEWKEY, $rows[0]['apikey']);
+        $this->assertTrue(self::NEWKEY === $rows[0]['apikey'], 'voice row 0 reveals the new key');
         $this->assertSame('openai-prod', $rows[0]['label']);
-        $this->assertSame(self::NEWKEY, $rows[2]['apikey']);
+        $this->assertTrue(self::NEWKEY === $rows[2]['apikey'], 'voice row 2 reveals the new key');
 
         $again = $this->voice();
         $this->assertSame(0, voice_registry::replace_row_key(key_inventory::fingerprint(self::OPENAI_ONE), $newstored));
