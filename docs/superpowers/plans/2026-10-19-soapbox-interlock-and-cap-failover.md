@@ -23,14 +23,14 @@
 
 ## Review Focus
 
-1. A held recording is neither deleted from storage nor changed in the database, in BOTH the retention loop and the stored-attempts pruning loop. (Task A.)
-2. With no `presenterai_migration_map` table, or a map row for another site's `sourcesiteid`, cleanup behaves exactly as before. (Task A.)
-3. A cap-tripped chat call to a failover with its own model and base URL sends exactly those, and a failover row with no model sends the provider's default model, never the primary's name. (Task B.)
-4. The cap path still refuses with the same message when no failover is configured, and the emergency-stop path is untouched. (Task B.)
+1. A held recording is neither deleted from storage nor changed in the database, in BOTH the retention loop and the stored-attempts pruning loop. (Task 1.)
+2. With no `presenterai_migration_map` table, or a map row for another site's `sourcesiteid`, cleanup behaves exactly as before. (Task 1.)
+3. A cap-tripped chat call to a failover with its own model and base URL sends exactly those, and a failover row with no model sends the provider's default model, never the primary's name. (Task 2.)
+4. The cap path still refuses with the same message when no failover is configured, and the emergency-stop path is untouched. (Task 2.)
 
 ---
 
-### Task A: The Soapbox cleanup interlock
+### Task 1: The Soapbox cleanup interlock
 
 **Files:**
 - Create: `classes/presenterai_interlock.php`, `tests/presenterai_interlock_test.php`
@@ -47,7 +47,7 @@
 
 ---
 
-### Task B: The spend-cap failover uses the failover's own model and base URL
+### Task 2: The spend-cap failover uses the failover's own model and base URL
 
 **Files:**
 - Modify: `classes/provider/base_provider.php` (the CAP_BLOCKED branch of `create_from_config()`, about lines 788 to 811)
@@ -64,6 +64,6 @@
 
 ---
 
-### Task C: Release (controller)
+### Task 3: Release (controller)
 
 Version `7.13.0` (`2026101901`... check `version.php`; build number must be greater than `2026101803`), `README` and `CLAUDE.md` header lines, `.wiki/Changelog.md`, `.wiki/Migration-to-PresenterAI.md` and the in-product Soapbox notices updated to say the importer exists, `.drafts/v7.13.0-release-notes-and-walkthrough.md`, full suite, PR, CI, merge, tag, GitHub release, wiki push, deploy to dev then alpha, verify. No Marketplace upload, no prod.
