@@ -21,8 +21,8 @@
  * captured by {@see prompt_metrics_logger}, plus a recommendation for
  * `prompt_budget_chars` based on observed truncation / headroom. An
  * "Apply recommendation" button is shown when the recommendation
- * differs from the current setting. The daily auto-tune task is
- * deprecated (v7.2.6) and is no longer offered from this page.
+ * differs from the current setting. The button is the only way to apply
+ * it: the daily auto-tune task and its setting were retired in v7.12.0.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell & David Ta / Saylor University

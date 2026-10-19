@@ -569,43 +569,6 @@ if ($hassiteconfig) {
         get_string('settings:prompt_metrics_enabled_desc', 'local_ai_course_assistant'),
         '1'
     ));
-    // v7.2.6: DEPRECATED. The tuner infers a ceiling by watching for truncation
-    // and chasing the largest prompt it has seen; the v7.2.4 derived budget
-    // reads the model's context window directly. The second is strictly better
-    // -- it cannot oscillate, cannot chase noise, and needs no warm-up samples.
-    //
-    // Worse than redundant, the two collide. The tuner writes
-    // prompt_budget_chars, and resolve_budget_chars() treats any value other
-    // than the default as a deliberate administrator decision and stops
-    // deriving. So on a site with both enabled the tuner's first write silently
-    // switches the derived budget off. Found on Saylor production, where both
-    // were on and neither site's budget was the default.
-    //
-    // The task now stands down in auto mode, so the collision cannot happen
-    // even if this stays ticked. Kept for one release so nobody's configuration
-    // changes under them; scheduled for removal after that.
-    $settings->add(new admin_setting_configcheckbox(
-        'local_ai_course_assistant/prompt_budget_auto_tune',
-        get_string('settings:prompt_budget_auto_tune', 'local_ai_course_assistant'),
-        \local_ai_course_assistant\branding::str('settings:prompt_budget_auto_tune_desc'),
-        '0'
-    ));
-
-    // Warn only when both are actually on: a deprecation notice that fires for
-    // everyone is noise, and this page already has a lot of it.
-    if (
-        (bool) get_config('local_ai_course_assistant', 'prompt_budget_auto_tune')
-        && (string) get_config('local_ai_course_assistant', 'prompt_budget_mode') !== 'fixed'
-    ) {
-        $settings->add(new admin_setting_description(
-            'local_ai_course_assistant/prompt_budget_tuner_conflict',
-            '',
-            $OUTPUT->notification(
-                \local_ai_course_assistant\branding::str('settings:prompt_budget_tuner_conflict'),
-                \core\output\notification::NOTIFY_WARNING
-            )
-        ));
-    }
 
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/prompt_verbosity',
@@ -2074,7 +2037,7 @@ if ($hassiteconfig) {
     ));
 
     // v7.5.2: Soapbox is deprecated, and the notice is graded by whether this
-    // site actually runs it. Same house rule as the tuner banner above: a
+    // site actually runs it. Same house rule as the prompt budget notices: a
     // deprecation notice that fires for everyone is noise, and this page has a
     // lot of it already. get_config() with no second argument returns the whole
     // cached plugin config, so scanning the per-course soapbox_enabled_course_N

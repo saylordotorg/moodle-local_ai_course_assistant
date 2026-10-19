@@ -129,6 +129,9 @@ if ($options['sign']) {
         cli_error('payload "settings" must be a non-empty object');
     }
     foreach ($settings as $key => $value) {
+        if (in_array($key, policy_bundle::RETIRED_KEYS, true)) {
+            cli_error("setting '{$key}' is retired and does nothing; remove it from the payload before signing");
+        }
         if (!in_array($key, policy_bundle::ALLOWED_KEYS, true)) {
             cli_error("setting '{$key}' is not on the allowlist; refusing to sign");
         }

@@ -1168,9 +1168,6 @@ $string['settings:prompt_verbosity_standard'] = '标准';
 $string['settings:prompt_verbosity_verbose'] = '详尽（用于较弱的自托管模型）';
 $string['settings:prompt_metrics_enabled'] = '采集分区提示词指标';
 $string['settings:prompt_metrics_enabled_desc'] = '开启时（默认），每轮聊天都会为组装出的提示词向 <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> 写入一行 JSON，记录各类别的字符数。保留最近 7 天。指标管理页面会汇总这些数据，用于给出预算建议。不记录任何个人身份信息 — 只记录各分区的大小。如果贵机构完全不希望产生指标文件，请关闭此项。';
-$string['settings:prompt_budget_auto_tune'] = '每日自动调整系统提示词预算（已弃用）';
-$string['settings:prompt_budget_auto_tune_desc'] = '已弃用。除非上方的预算模式设为<strong>固定</strong>，否则本项不起作用。过去有一个每日任务，通过观察截断情况并追逐它见过的最大提示词来推断字符预算。由模型的上下文窗口推导预算做得更好：它不会来回摆动，也不需要预热数据。两者还会互相冲突，因为该任务会写入字符预算，而任何非默认值都会关闭推导出的预算。请保持关闭；将在未来版本中移除。建议值仍会显示在<a href="/local/ai_course_assistant/prompt_metrics.php">提示词指标</a>页面上。';
-$string['task:auto_tune_prompt_budget'] = '根据观测到的指标自动调整 [[tutorshort]] 的提示预算';
 $string['prompt_metrics:title'] = '提示词指标与预算建议';
 $string['prompt_metrics:subtitle'] = '最近 7 天采集到的各提示段长度。用于为「系统提示字符预算」设置推荐取值。';
 $string['prompt_metrics:no_data'] = '尚未记录任何提示词指标。请用学习者账号发送几轮聊天，然后刷新本页。（如果插件设置中的指标采集开关处于关闭状态，则不会积累任何数据。）';
@@ -1934,7 +1931,6 @@ $string['quizlock:scope_course'] = '仅本课程（推荐）';
 $string['quizlock:scope_site'] = '所有课程';
 $string['quizlock:scope_desc'] = '进行中的答题是仅在包含该测验的课程中阻止 [[tutorshort]]，还是在所有地方都阻止。<strong>仅本课程</strong>为默认值，几乎总是你想要的。全站范围是 v7.2.4 之前的行为，它有一个值得了解的缺陷：被放弃的答题会永远停留在“进行中”，因此学习者历史记录中某个被遗忘的测验，就会让助手在他所修的每一门课程中失效，而屏幕上没有任何说明。对于铁了心要作弊、手边就有第二个浏览器的学习者，全站范围几乎没有帮助，而助手的课程材料与检索本来就以课程为界。';
 
-$string['settings:prompt_budget_tuner_conflict'] = '已弃用的提示词预算自动调整任务处于开启状态，而预算模式却设为由模型推导。两者相互冲突：该任务会写入字符预算，而任何非默认值都会被视为有意的选择，从而关闭推导出的预算。在此模式下该任务现在会自行停止，因此并没有东西被覆盖——但仍请将其关闭，以消除歧义。';
 
 $string['settings:prompt_budget_no_window'] = '上方的预算模式设置为从模型推导，但没有可供推导的依据：聊天模型未设置，后端上下文窗口也未配置，因此推导会退回到下方的固定字符预算。请设置聊天模型，或手动设置后端上下文窗口，然后重新运行后端自检并确认上下文窗口检查通过。在此之前，无论模式声称什么，预算都是下方的这个数字。';
 

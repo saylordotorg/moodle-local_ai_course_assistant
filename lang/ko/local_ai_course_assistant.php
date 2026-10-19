@@ -1139,9 +1139,6 @@ $string['settings:prompt_verbosity_standard'] = '표준';
 $string['settings:prompt_verbosity_verbose'] = '상세(성능이 낮은 자체 호스팅 모델용)';
 $string['settings:prompt_metrics_enabled'] = '섹션별 프롬프트 지표 수집';
 $string['settings:prompt_metrics_enabled_desc'] = '켜면(기본값) 채팅 차례마다 조립된 프롬프트당 JSON 한 줄이 카테고리별 문자 수와 함께 <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code>에 기록됩니다. 최근 7일치가 보관됩니다. 지표 관리 페이지는 이 기록을 집계해 예산 권장값을 산출합니다. 개인식별정보는 기록되지 않으며 섹션 크기만 기록됩니다. 기관에서 지표 파일 자체를 두고 싶지 않다면 끄세요.';
-$string['settings:prompt_budget_auto_tune'] = '시스템 프롬프트 예산 매일 자동 조정(사용 중단)';
-$string['settings:prompt_budget_auto_tune_desc'] = '사용이 중단되었습니다. 위의 예산 모드가 <strong>고정</strong>으로 설정된 경우가 아니면 아무 일도 하지 않습니다. 예전에는 매일 실행되는 작업이 잘림을 관찰하고 지금까지 본 가장 큰 프롬프트를 뒤쫓아 문자 예산을 추정했습니다. 모델의 컨텍스트 윈도에서 예산을 산출하는 편이 더 낫습니다. 진동하지 않고 준비 데이터도 필요 없습니다. 게다가 둘은 충돌했습니다. 이 작업이 문자 예산을 기록하는데, 기본값이 아닌 값은 산출된 예산을 꺼버리기 때문입니다. 꺼둔 채로 두십시오. 향후 릴리스에서 제거됩니다. 권장값은 <a href="/local/ai_course_assistant/prompt_metrics.php">프롬프트 지표</a> 페이지에 계속 표시됩니다.';
-$string['task:auto_tune_prompt_budget'] = '관측된 지표로 [[tutorshort]] 프롬프트 예산 자동 조정';
 $string['prompt_metrics:title'] = '프롬프트 지표 + 예산 권장값';
 $string['prompt_metrics:subtitle'] = '최근 7일간 수집된 섹션별 프롬프트 크기입니다. 시스템 프롬프트 문자 예산 설정의 권장값을 산출하는 데 사용됩니다.';
 $string['prompt_metrics:no_data'] = '아직 기록된 프롬프트 지표가 없습니다. 학습자 계정으로 채팅을 몇 차례 주고받은 후 이 페이지를 새로 고치세요. (플러그인 설정에서 지표 수집 플래그가 꺼져 있으면 데이터가 쌓이지 않습니다.)';
@@ -1912,7 +1909,6 @@ $string['quizlock:scope_course'] = '이 강좌만(권장)';
 $string['quizlock:scope_site'] = '모든 강좌';
 $string['quizlock:scope_desc'] = '진행 중인 응시가 [[tutorshort]]을(를) 퀴즈가 있는 강좌에서만 막을지, 모든 곳에서 막을지 정합니다. <strong>이 강좌만</strong>이 기본값이며 거의 언제나 적절한 선택입니다. 사이트 전체는 v7.2.4까지의 동작으로, 알아둘 만한 결함이 있었습니다. 중단된 응시는 영원히 ‘진행 중’으로 남기 때문에, 학습자 이력 어딘가에 잊힌 퀴즈 하나가 그 사람이 수강하는 모든 강좌에서 어시스턴트를 꺼버렸고, 화면에는 이유가 전혀 표시되지 않았습니다. 사이트 전체로 막아도 두 번째 브라우저를 가진 작정한 학습자에게는 거의 효과가 없으며, 어시스턴트의 강좌 자료와 검색은 원래 강좌 단위입니다.';
 
-$string['settings:prompt_budget_tuner_conflict'] = '사용이 중단된 프롬프트 예산 자동 조정 작업이 켜져 있는데, 예산 모드는 모델에서 산출하도록 설정되어 있습니다. 두 가지는 충돌합니다. 작업이 문자 예산을 기록하고, 기본값이 아닌 값은 의도적인 선택으로 읽혀 산출된 예산을 꺼버립니다. 이 모드에서 작업은 이제 스스로 물러나므로 덮어써지는 것은 없지만, 모호함을 없애려면 꺼두십시오.';
 
 $string['settings:prompt_budget_no_window'] = '위의 예산 모드는 모델에서 도출하도록 설정되어 있지만 도출할 근거가 없습니다. 채팅 모델이 설정되지 않았고 백엔드 컨텍스트 창도 구성되지 않아, 도출은 아래의 고정 문자 예산으로 되돌아갑니다. 채팅 모델을 설정하거나 백엔드 컨텍스트 창을 직접 설정한 다음, 백엔드 자체 점검을 다시 실행해 컨텍스트 창 점검이 통과하는지 확인하세요. 그때까지는 모드가 무엇이라 표시하든 예산은 아래의 숫자입니다.';
 

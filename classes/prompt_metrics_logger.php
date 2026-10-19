@@ -282,7 +282,7 @@ class prompt_metrics_logger {
     }
 
     /**
-     * Apply the recommended budget. Used by the auto-tune cron task.
+     * Apply the recommended budget. Used by the Apply recommendation button on prompt_metrics.php.
      *
      * @return array{applied: bool, old: int, new: int|null, reason: string}
      */

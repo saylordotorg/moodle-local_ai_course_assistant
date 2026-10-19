@@ -1433,7 +1433,6 @@ $string['settings:prompt_debug_enabled_desc'] = 'When on, every chat-turn writes
 $string['settings:socratic_verbose']      = 'Verbose Socratic mode prompt';
 $string['settings:socratic_verbose_desc'] = 'When on, Socratic-mode courses receive the full ~600-token do/don\'t directive originally added in v3.9.30. When off (default), they receive a single-line directive that modern hosted models follow reliably and saves ~600 tokens per turn. Turn this on if a course is running on a weaker self-hosted model that needs the explicit scaffolding.';
 // v4.12.0: structured prompt budget + verbosity.
-$string['settings:prompt_budget_tuner_conflict'] = 'The deprecated prompt-budget auto-tune task is switched on while the budget mode is set to derive from the model. These two conflict: the task writes the character budget, and any value other than the default is read as a deliberate choice, which switches the derived budget off. The task now stands down by itself in this mode, so nothing is being overwritten — but switch it off to remove the ambiguity.';
 $string['settings:prompt_budget_no_window'] = 'The budget mode above is set to derive from the model, but there is nothing to derive from: the chat model is not set and no backend context window has been configured, so the derivation falls back to the fixed character budget below. Set the chat model, or set the backend context window by hand, then re-run the backend self-test and confirm the context-window check passes. Until then the budget is whatever the number below says, whatever the mode claims.';
 $string['settings:prompt_budget_mode'] = 'System prompt budget mode';
 $string['settings:prompt_budget_mode_desc'] = 'How the system prompt character budget is decided. <strong>Derive from the model</strong> works out how much room the configured model actually offers — its context window, less the reserved reply and the conversation history — and uses that, capped so a very large window does not license a very large prompt. It applies only while the character budget below is left at its default of 36,000: change that number and it wins instead, in both directions, because a figure an administrator typed is a decision rather than a guess. <strong>Fixed</strong> always uses the number below. A self-hosted backend should set the backend context window, which takes precedence over everything here.';
@@ -1495,12 +1494,9 @@ $string['settings:prompt_verbosity_desc'] = 'Default verbosity for instruction b
 $string['settings:prompt_verbosity_concise']  = 'Concise (recommended for hosted models)';
 $string['settings:prompt_verbosity_standard'] = 'Standard';
 $string['settings:prompt_verbosity_verbose']  = 'Verbose (for weaker self-hosted models)';
-// v5.0.0 patch 3: prompt metrics + budget auto-tune.
+// v5.0.0 patch 3: prompt metrics + budget recommendation.
 $string['settings:prompt_metrics_enabled']      = 'Capture per-section prompt metrics';
 $string['settings:prompt_metrics_enabled_desc'] = 'When on (default), every chat turn writes one JSON line per assembled prompt to <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> with per-category char counts. Last 7 days kept. The metrics admin page aggregates these for the budget recommendation. No PII is recorded — only section sizes. Turn off if your institution prefers no metrics file at all.';
-$string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily (deprecated)';
-$string['settings:prompt_budget_auto_tune_desc'] = 'Deprecated. Does nothing unless the budget mode above is set to <strong>Fixed</strong>. A daily task used to infer the character budget by watching for truncation and chasing the largest prompt it had seen. Deriving the budget from the model\'s context window does that better: it cannot oscillate and needs no warm-up data. The two also conflicted, because the task writes the character budget and any value other than the default switches the derived budget off. Leave this off; it will be removed in a future release. The recommendation still appears on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> page.';
-$string['task:auto_tune_prompt_budget']          = 'Auto-tune [[tutorshort]] prompt budget from observed metrics';
 $string['prompt_metrics:title']                  = 'Prompt metrics + budget recommendation';
 $string['prompt_metrics:subtitle']               = 'Per-section prompt sizes captured over the last 7 days. Used to recommend a value for the System prompt character budget setting.';
 $string['prompt_metrics:no_data']                = 'No prompt metrics recorded yet. Send a few chat turns from a learner account, then refresh this page. (If the metrics capture flag is off in plugin settings, no data will accumulate.)';
@@ -3761,7 +3757,6 @@ $string['layout:history'] = 'History and learner profile';
 $string['layout:appearance'] = 'Appearance';
 $string['layout:remote'] = 'Remote configuration';
 $string['layout:optimizer'] = 'Optimizer weights';
-$string['layout:legacy'] = 'Deprecated settings';
 
 // Key places status check (7.11.0).
 $string['check:key_places'] = 'AI Course Assistant key places';
