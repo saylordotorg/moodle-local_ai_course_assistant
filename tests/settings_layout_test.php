@@ -289,7 +289,6 @@ final class settings_layout_test extends \advanced_testcase {
 
             $redirect = $category->locate($oldid);
             $this->assertInstanceOf(settings_redirect_page::class, $redirect, "{$oldid} is registered as a redirect page");
-            // The redirect() argument itself cannot be asserted: core's CLI redirect() throws before a target can be captured.
             $this->assertSame('/admin/settings.php?section=' . $newid, $redirect->url->out_as_local_url(false),
                 "{$oldid} sends the browser to {$newid}");
 
@@ -308,46 +307,178 @@ final class settings_layout_test extends \advanced_testcase {
         $this->assertNotInstanceOf(settings_redirect_page::class, $category->locate(settings_layout::page_id('safety')));
     }
 
-    public function test_a_request_for_an_old_page_is_redirected_and_no_other_request_is(): void {
+    /**
+     * Checking access to an old page only reports access, whatever the request says.
+     *
+     * Core calls check_access() on every page of the admin tree each time it builds the settings
+     * navigation, on any admin page and at any point of the page, including after the header has
+     * started printing, where redirect() throws a coding error (#342). So the answer must not
+     * depend on the request, and must never redirect.
+     */
+    public function test_checking_access_to_an_old_page_never_redirects(): void {
         $category = $this->category();
-        $page = $category->locate(settings_layout::page_id('ai'));
+        $page = $category->locate(settings_layout::page_id('general'));
         $this->assertInstanceOf(settings_redirect_page::class, $page);
 
         try {
-            // Core asks every page of a save request whether the user may write it: that must not redirect.
             unset($_GET['section'], $_POST['section']);
             $this->assertTrue($page->check_access(), 'no section requested');
+
             $_GET['section'] = settings_layout::page_id('models');
             $this->assertTrue($page->check_access(), 'a different section requested');
 
-            // admin/settings.php asks the located page first. Redirecting is the whole point.
-            $_GET['section'] = settings_layout::page_id('ai');
-            try {
-                $page->check_access();
-                $this->fail('a request for the old page did not redirect');
-            } catch (\moodle_exception $e) {
-                // In a CLI test core's redirect() throws instead of sending a header.
-                $this->assertSame('redirecterrordetected', $e->errorcode);
-            }
+            // The request names this very page: the case that used to redirect.
+            $_GET['section'] = $page->name;
+            $this->assertTrue($page->check_access(), 'the old page requested in the query string');
+            unset($_GET['section']);
+            $_POST['section'] = $page->name;
+            $this->assertTrue($page->check_access(), 'the old page requested in a form post');
+            unset($_POST['section']);
 
-            // Someone who may not open settings is never redirected into the page.
+            // Someone who may not open settings is still refused.
+            $_GET['section'] = $page->name;
             $this->setUser($this->getDataGenerator()->create_user());
             $this->assertFalse($page->check_access());
+        } finally {
+            unset($_GET['section'], $_POST['section']);
+        }
+    }
+
+    /**
+     * Opening an old link builds the settings navigation while the header is printing, and that must not throw.
+     *
+     * Reviewer's Moodle 5.2.3 reached check_access() of the old page from the settings navigation
+     * (through a block that asks for $PAGE->settingsnav) with the page in the printing-header state,
+     * where the old redirect() raised "You cannot redirect while printing the page header" (#342).
+     *
+     * @dataProvider old_page_provider
+     * @param string $old Short id of the old page.
+     */
+    public function test_the_settings_navigation_builds_for_an_old_link_while_the_header_is_printing(string $old): void {
+        global $PAGE;
+        $this->category();
+        $oldid = settings_layout::page_id($old);
+
+        try {
+            $_GET['section'] = $oldid;
+            $PAGE->set_url('/admin/settings.php', ['section' => $oldid]);
+            $PAGE->set_context(\context_system::instance());
+            $PAGE->set_pagelayout('admin');
+            $PAGE->set_pagetype('admin-setting-' . $oldid);
+            \navigation_node::require_admin_tree();
+            // What admin/settings.php has done by the time a block asks for the settings navigation.
+            $PAGE->set_state(\moodle_page::STATE_PRINTING_HEADER);
+
+            $settingsnav = $PAGE->settingsnav;
+            $this->assertInstanceOf(\settings_navigation::class, $settingsnav);
+            // The walk reached the plugin's real pages (and asked the old page for access without redirecting).
+            $walked = $settingsnav->find(settings_layout::page_id('essentials'), null);
+            $this->assertNotFalse($walked, 'the admin tree was walked');
         } finally {
             unset($_GET['section']);
         }
     }
 
     /**
-     * A section parameter that is an array is simply not a request for the page.
+     * The short ids of every old settings page, one data set each.
+     *
+     * @return array[] Short id keyed by itself.
+     */
+    public static function old_page_provider(): array {
+        $sets = [];
+        foreach (array_keys(settings_layout_map::REDIRECTS) as $old) {
+            $sets[$old] = [$old];
+        }
+        return $sets;
+    }
+
+    /**
+     * Old page and the page that replaced it, one data set each.
+     *
+     * @return array[] [old short id, new short id] keyed by the old id.
+     */
+    public static function redirect_provider(): array {
+        $sets = [];
+        foreach (settings_layout_map::REDIRECTS as $old => $new) {
+            $sets[$old] = [$old, $new];
+        }
+        return $sets;
+    }
+
+    /**
+     * What core prints for an old link: a notice naming the new page, a link to it, and an automatic jump there.
+     *
+     * admin/settings.php prints the header and then calls output_html() on the located page,
+     * so this is the one place the old page can send the browser on.
+     *
+     * @dataProvider redirect_provider
+     * @param string $old Short id of the old page.
+     * @param string $new Short id of the page that replaced it.
+     */
+    public function test_an_old_page_says_where_it_moved_and_sends_the_browser_there(string $old, string $new): void {
+        global $PAGE;
+        $category = $this->category();
+        set_config('apikey', 'sk-sentinel-never-on-a-redirect-page', 'local_ai_course_assistant');
+        $page = $category->locate(settings_layout::page_id($old));
+        $this->assertInstanceOf(settings_redirect_page::class, $page);
+        $PAGE->set_url('/admin/settings.php', ['section' => $page->name]);
+
+        $html = $page->output_html();
+
+        $target = new \moodle_url('/admin/settings.php', ['section' => settings_layout::page_id($new)]);
+        $title = get_string('settingspage:' . $new, 'local_ai_course_assistant');
+        $this->assertStringContainsString('href="' . s($target->out(false)) . '"', $html, 'a link to the new page');
+        $this->assertStringContainsString(s($title), strip_tags($html), 'the new page is named');
+        $this->assertStringNotContainsString('<script', $html, 'the link works without script');
+
+        // The automatic jump is client-side script that Moodle prints in the footer.
+        $footer = $PAGE->requires->get_end_code();
+        $this->assertStringContainsString('window.location.replace(' . $this->js_string($target->out(false)) . ')', $footer);
+
+        $this->assertStringNotContainsString('sentinel', $html . $footer, 'no secret on the page');
+    }
+
+    /**
+     * Whatever the redirect page is given is escaped in the markup and in the script.
+     */
+    public function test_the_moved_notice_escapes_the_title_and_the_address(): void {
+        global $PAGE;
+        $this->resetAfterTest();
+        $PAGE->set_url('/admin/settings.php');
+        $url = new \moodle_url('/admin/x</script><script>alert(1)</script>.php', ['section' => '"><b>']);
+        $page = new settings_redirect_page('local_ai_course_assistant_test', 'Moved', $url, '<b>Pwned</b> "title"');
+
+        $html = $page->output_html();
+        $footer = $PAGE->requires->get_end_code();
+
+        $this->assertStringNotContainsString('<b>Pwned', $html, 'the title is escaped');
+        $this->assertStringContainsString('&lt;b&gt;Pwned&lt;/b&gt;', $html);
+        $this->assertStringNotContainsString('alert(1)</script>', $html . $footer, 'the address cannot close a script element');
+        $this->assertStringNotContainsString('"><b>', $html, 'the address cannot close the attribute');
+        $this->assertStringContainsString('window.location.replace(' . $this->js_string($url->out(false)) . ')', $footer);
+    }
+
+    /**
+     * The JavaScript string literal the page is expected to print for a value.
+     *
+     * @param string $value Plain text.
+     * @return string Quoted, with the characters that could end a script element or an attribute hex escaped.
+     */
+    private function js_string(string $value): string {
+        return json_encode($value, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    }
+
+    /**
+     * A section parameter that is an array does not break checking access.
      *
      * Core builds the admin navigation on every admin page and calls
      * check_access() on each page it finds, so ?section[]=x reaches this class
-     * on pages that never asked for it. optional_param() throws a
-     * coding_exception on an array, which would turn a malformed query string
-     * into an error page for the whole admin area.
+     * on pages that never asked for it. Reading the request with optional_param()
+     * throws a coding_exception on an array, which would turn a malformed query
+     * string into an error page for the whole admin area. check_access() reads no
+     * request data at all.
      */
-    public function test_an_array_section_parameter_is_not_a_request_and_does_not_throw(): void {
+    public function test_an_array_section_parameter_does_not_break_checking_access(): void {
         $category = $this->category();
         $page = $category->locate(settings_layout::page_id('ai'));
         $this->assertInstanceOf(settings_redirect_page::class, $page);
@@ -366,19 +497,10 @@ final class settings_layout_test extends \advanced_testcase {
                 } else {
                     $_POST['section'] = $value;
                 }
-                $this->assertFalse($page->is_requested(), "{$label} is not a request");
                 $this->assertTrue($page->check_access(), "{$label} neither redirects nor throws");
             } finally {
                 unset($_GET['section'], $_POST['section']);
             }
-        }
-
-        // The string form still works, so the guard did not turn the check off.
-        try {
-            $_GET['section'] = settings_layout::page_id('ai');
-            $this->assertTrue($page->is_requested());
-        } finally {
-            unset($_GET['section']);
         }
     }
 

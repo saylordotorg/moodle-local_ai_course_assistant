@@ -250,6 +250,7 @@ final class lang_completeness_test extends \basic_testcase {
         'settingspage:adv_legacy',
         'settingspage:nav_label',
         'settingspage:redirect',
+        'settingspage:redirect_notice',
         'settingspage:essentials_intro',
         'settingspage:models_intro',
         'settingspage:features_intro',

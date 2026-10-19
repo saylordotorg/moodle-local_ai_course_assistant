@@ -3740,6 +3740,7 @@ $string['check:key_places'] = 'AI Course Assistant key places';
 $string['check:key_places_none'] = 'No API keys are stored.';
 $string['check:key_places_single'] = 'Each stored API key is kept in one place.';
 $string['check:key_places_some'] = '{$a} API key(s) are stored in more than one place. Replacing one means changing it in every place it is stored.';
+$string['settingspage:redirect_notice'] = 'This settings page has moved to {$a}. You are being taken there now. If nothing happens, select the link.';
 $string['check:key_places_keyhint'] = 'The key ending in {$a}';
 $string['check:key_places_keyshort'] = 'A key too short to show a hint';
 $string['check:key_places_vendor'] = ' ({$a} key)';

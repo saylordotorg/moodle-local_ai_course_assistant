@@ -132,7 +132,8 @@ final class settings_layout {
         foreach (settings_layout_map::REDIRECTS as $old => $new) {
             $admin->add(self::COMPONENT, new settings_redirect_page(self::page_id($old),
                 get_string('settingspage:redirect', self::COMPONENT),
-                new \moodle_url('/admin/settings.php', ['section' => self::page_id($new)])));
+                new \moodle_url('/admin/settings.php', ['section' => self::page_id($new)]),
+                get_string('settingspage:' . $new, self::COMPONENT)));
         }
     }
 
