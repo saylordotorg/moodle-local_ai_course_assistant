@@ -539,6 +539,36 @@ class provider_keys {
     }
 
     /**
+     * Replace one key in the table, wherever it appears, editing the stored text and nothing else.
+     *
+     * Every row whose revealed key has the fingerprint $oldfingerprint (key_inventory::fingerprint()) gets
+     * $newstored in its key column. Every other byte of every line stays as it was: other rows, comment and blank
+     * lines, the matched row's other columns, its spacing and line ending (key_inventory::replace_in_table()). The
+     * table is written with set_config() only when a line changed. A table forced in config.php is not ours to
+     * write and is left alone (0).
+     *
+     * The caller conceals the new key and re-syncs the apikey mirror (sync_after_writes() or sync_default_key());
+     * this method never sees a plain new key.
+     *
+     * @param string $oldfingerprint fingerprint of the key to replace
+     * @param string $newstored the new key column, already concealed with secrets::conceal()
+     * @return int number of lines changed
+     * @throws \coding_exception when $newstored is empty or not ciphertext; the message names neither key
+     */
+    public static function replace_key(string $oldfingerprint, string $newstored): int {
+        global $CFG;
+        $raw = (string) (get_config(self::PLUGIN, self::SETTING) ?: '');
+        $edit = key_inventory::replace_in_table($raw, $oldfingerprint, $newstored);
+        if (array_key_exists(self::SETTING, $CFG->forced_plugin_settings[self::PLUGIN] ?? [])) {
+            return 0;
+        }
+        if ($edit['changed'] > 0) {
+            set_config(self::SETTING, $edit['text'], self::PLUGIN);
+        }
+        return $edit['changed'];
+    }
+
+    /**
      * Keep the key a conflict is about to overwrite, for one release (config provider_keys_displaced).
      *
      * The setting is a JSON map of provider => concealed key (\core\encryption ciphertext, never plain text).
