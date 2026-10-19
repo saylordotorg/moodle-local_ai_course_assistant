@@ -131,6 +131,15 @@ TXT;
         // a retrieved chunk still says which part of the course it came from.
         $modinfo = get_fast_modinfo($courseid);
         foreach ($modinfo->get_section_info_all() as $section) {
+            // Issue #341: a hidden section, or one behind an access restriction, is left out (summary and
+            // title). This document has no cmid, so retrieval can't tell which section a passage came from
+            // and filter it per learner; the scheduled indexer runs as an administrator, so without this a
+            // hidden section's text reached every learner in the course. The safe trade: a learner who meets
+            // a restriction also loses that section's summary here. Its activities are still indexed and
+            // filtered per learner by rag_visibility.
+            if (!$section->visible || self::has_access_restriction($section->availability ?? null)) {
+                continue;
+            }
             $summary = trim(html_to_text((string) ($section->summary ?? ''), 0, false));
             if ($summary === '') {
                 continue;
@@ -155,6 +164,28 @@ TXT;
             'section' => '',
             'text'    => $text,
         ];
+    }
+
+    /**
+     * Whether a section's stored availability JSON restricts access at all.
+     *
+     * Empty, or a tree with no conditions (what the editor can leave behind once every
+     * restriction is removed), is no restriction. Anything else, unreadable JSON included,
+     * counts as restricted: this decides whether text is shown to everyone, so it fails closed.
+     *
+     * @param string|null $availability The section's availability column.
+     * @return bool
+     */
+    private static function has_access_restriction(?string $availability): bool {
+        $raw = trim((string) $availability);
+        if ($raw === '') {
+            return false;
+        }
+        $tree = json_decode($raw, true);
+        if (!is_array($tree)) {
+            return true;
+        }
+        return !empty($tree['c']);
     }
 
     /**
