@@ -40,6 +40,12 @@ class soapbox_assignment_manager {
     /** @var string Recordings table. */
     const T_REC = 'local_ai_course_assistant_sbx_rec';
 
+    /** @var string Error code (and lang key): the assignment holds recordings PresenterAI's importer owns. */
+    const ERR_HELD = 'soapbox:assignment_held';
+
+    /** @var string Error code (and lang key): the PresenterAI check could not be made, so nothing was deleted. */
+    const ERR_HELD_UNCHECKED = 'soapbox:assignment_held_unchecked';
+
     /**
      * Fetch one assignment.
      *
@@ -180,7 +186,17 @@ class soapbox_assignment_manager {
      * only the bucket lifecycle rule as a backstop. The "later Phase 1 PR" it
      * deferred to never landed.
      *
+     * It refuses, deleting nothing, while any of the assignment's recordings is
+     * held by PresenterAI's importer (presenterai_interlock): the importer
+     * re-points its own attempts at the same stored objects, so deleting them here
+     * would leave every migrated attempt pointing at nothing. It refuses just the
+     * same when the check cannot be made, because not knowing is not permission.
+     * Course deletion and privacy erasure do NOT go through this method and are
+     * not held back: removing a course or a person's data still removes the media.
+     *
      * @param int $id
+     * @throws \moodle_exception soapbox:assignment_held when a recording is held,
+     *         soapbox:assignment_held_unchecked when the lookup failed.
      */
     public static function delete_assignment(int $id): void {
         global $DB;
@@ -189,10 +205,56 @@ class soapbox_assignment_manager {
             return;
         }
         self::require_manage((int) $existing->courseid);
+        self::refuse_while_held($id, (int) $existing->courseid);
         self::drop_recording_objects([$id]);
         $DB->delete_records(self::T_REC, ['assignid' => $id]);
         $DB->delete_records(self::T_TOPIC, ['assignid' => $id]);
         $DB->delete_records(self::T_ASSIGN, ['id' => $id]);
+    }
+
+    /**
+     * Refuse to go on when PresenterAI's importer holds any recording of this assignment.
+     *
+     * Fails closed: if the lookup throws, the deletion is refused with a different
+     * message and one audit row names the exception class (never its message,
+     * which can carry SQL).
+     *
+     * @param int $id The assignment.
+     * @param int $courseid Its course, for the audit row.
+     * @return void
+     * @throws \moodle_exception
+     */
+    private static function refuse_while_held(int $id, int $courseid): void {
+        global $DB, $USER;
+
+        $recids = $DB->get_fieldset_select(self::T_REC, 'id', 'assignid = :aid', ['aid' => $id]);
+        if (empty($recids)) {
+            return;
+        }
+        try {
+            $held = static::held_recordings(array_map('intval', $recids));
+        } catch (\Throwable $e) {
+            audit_logger::log('soapbox_delete_interlock_failed', (int) $USER->id, $courseid, [
+                'assignid' => $id,
+                'error_class' => get_class($e),
+            ]);
+            throw new \moodle_exception(self::ERR_HELD_UNCHECKED, 'local_ai_course_assistant');
+        }
+        if (!empty($held)) {
+            throw new \moodle_exception(self::ERR_HELD, 'local_ai_course_assistant');
+        }
+    }
+
+    /**
+     * Which of these recordings PresenterAI's importer holds.
+     *
+     * Protected so a test can make the lookup fail; production asks the interlock.
+     *
+     * @param array $recids Soapbox recording ids.
+     * @return array The held ids.
+     */
+    protected static function held_recordings(array $recids): array {
+        return presenterai_interlock::held_ids($recids);
     }
 
     /**

@@ -784,6 +784,10 @@ abstract class base_provider implements provider_interface {
 
         self::enforce_learner_guards($diagnostic, $courseid);
 
+        // Set only by the spend-cap failover below: a failover on another provider with no model of its own
+        // asks that provider for its default model, never the primary's name.
+        $usedefaultmodel = false;
+
         try {
             $level = $enforcespend
                 ? spend_guard::check($courseid, self::infer_capability_for_primary($courseid))
@@ -802,8 +806,37 @@ abstract class base_provider implements provider_interface {
                 }
                 $failover = spend_guard::resolve_failover('chat');
                 if ($failover !== null) {
+                    $primaryprovider = $provider;
                     $overrides['provider'] = $failover['provider'];
                     $overrides['apikey']   = $failover['apikey'];
+                    // v7.12.1: the failover is asked for ITS model at ITS base URL, as build_fallbacks()
+                    // has done for the per-call chain since v7.2.8. Only the provider and the key were
+                    // swapped here, so a capped Gemini primary sent "gemini-2.5-flash" to OpenAI (HTTP
+                    // 404, model not found) along with the primary's base URL. $overrides already holds
+                    // the course's model and base URL, or the site's where the course has none.
+                    // Base URL: the row's own replaces it and a row with none drops it. A limit shared
+                    // with build_fallbacks(): a dropped base URL falls back to the site `apibaseurl`,
+                    // which the constructor reads for any provider built without one, so a COURSE base
+                    // URL no longer reaches another vendor but a SITE one still does.
+                    // Model: the row's own replaces it. A row with none on ANOTHER provider drops it and
+                    // takes that provider's default after instantiate(). A row with none on the SAME
+                    // provider leaves it exactly as it was. build_fallbacks() drops it there, and the
+                    // constructor then reads the SITE model, which breaks a course that overrides the
+                    // provider (site gemini, course openai / gpt-4o, an openai row with no model: OpenAI
+                    // is asked for the site's Gemini model). This path kept the course's model before
+                    // 7.12.1 and still does, so the same-provider case is deliberately not mirrored.
+                    if (!empty($failover['apibaseurl'])) {
+                        $overrides['apibaseurl'] = $failover['apibaseurl'];
+                    } else {
+                        unset($overrides['apibaseurl']);
+                    }
+                    $usedefaultmodel = empty($failover['model'])
+                        && strtolower((string) $failover['provider']) !== strtolower((string) $primaryprovider);
+                    if (!empty($failover['model'])) {
+                        $overrides['model'] = $failover['model'];
+                    } else if ($usedefaultmodel) {
+                        unset($overrides['model']);
+                    }
                     $provider = $failover['provider'];
                 } else {
                     throw new chat_refused_exception(
@@ -824,6 +857,11 @@ abstract class base_provider implements provider_interface {
         }
 
         $primary = self::instantiate($provider, $overrides);
+        if ($usedefaultmodel) {
+            // As build_fallbacks() does: with the model override removed the constructor reads the site
+            // `model` setting, which names the primary's model, so reset it to this provider's own default.
+            $primary->use_default_model();
+        }
 
         // v5.5.0: optional per-call failover. Off by default until admins
         // build confidence. When the failover_per_call_enabled flag is set
