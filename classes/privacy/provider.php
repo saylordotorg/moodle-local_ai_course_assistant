@@ -324,20 +324,39 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         // forwards learner-authored content to the admin-configured AI provider
         // to generate tutoring responses; voice content to the configured speech
         // provider; and, when escalation is enabled, contact details to Zendesk.
+        //
+        // CONTRIB-10574 #340 (7.12.2): an audit of every outbound call found data
+        // these three sent that their fields didn't name. The AI provider also
+        // gets the learner's first name, the earlier turns, the saved goals,
+        // memory, profile and mastery (context_builder), essays and Soapbox
+        // transcripts and slides (score_essay, score_speech, slide vision) and
+        // the still frames of a Soapbox video (soapbox_gesture_vision). The voice
+        // provider also gets a whole Soapbox recording for transcription
+        // (soapbox_scorer) and, for live voice, the tutoring instructions built
+        // for the learner (get_realtime_token). Zendesk also gets the course name
+        // and the page the learner was on (zendesk_client::format_ticket_body).
         $collection->add_external_location_link('ai_provider', [
             'message' => 'privacy:metadata:ai_provider:message',
             'coursecontext' => 'privacy:metadata:ai_provider:coursecontext',
+            'firstname' => 'privacy:metadata:ai_provider:firstname',
+            'history' => 'privacy:metadata:ai_provider:history',
+            'learnerprofile' => 'privacy:metadata:ai_provider:learnerprofile',
+            'submission' => 'privacy:metadata:ai_provider:submission',
+            'videoframes' => 'privacy:metadata:ai_provider:videoframes',
         ], 'privacy:metadata:ai_provider');
 
         $collection->add_external_location_link('voice_provider', [
             'audio' => 'privacy:metadata:voice_provider:audio',
             'text' => 'privacy:metadata:voice_provider:text',
+            'recording' => 'privacy:metadata:voice_provider:recording',
+            'instructions' => 'privacy:metadata:voice_provider:instructions',
         ], 'privacy:metadata:voice_provider');
 
         $collection->add_external_location_link('zendesk', [
             'name' => 'privacy:metadata:zendesk:name',
             'email' => 'privacy:metadata:zendesk:email',
             'message' => 'privacy:metadata:zendesk:message',
+            'coursecontext' => 'privacy:metadata:zendesk:coursecontext',
         ], 'privacy:metadata:zendesk');
 
         $collection->add_external_location_link('radar_webhook', [
@@ -355,6 +374,62 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             'ipaddress' => 'privacy:metadata:code_sandbox_runtime:ipaddress',
             'useragent' => 'privacy:metadata:code_sandbox_runtime:useragent',
         ], 'privacy:metadata:code_sandbox_runtime');
+
+        // CONTRIB-10574 #340 (7.12.2). Every destination below was found by
+        // auditing each outbound call; tests/privacy/external_locations_test.php
+        // pins the list field by field and fails when a file starts calling out
+        // without being accounted for.
+        //
+        // Soapbox object storage (soapbox_storage): the browser PUTs the
+        // recording, the slide deck and the still-frame sheet to presigned URLs
+        // on the administrator's S3 bucket, and plays them back from it. Object
+        // keys are prefix/courseid/userid/random (make_object_key() and friends).
+        $collection->add_external_location_link('soapbox_storage', [
+            'recording' => 'privacy:metadata:soapbox_storage:recording',
+            'slidedeck' => 'privacy:metadata:soapbox_storage:slidedeck',
+            'frames' => 'privacy:metadata:soapbox_storage:frames',
+            'objectkey' => 'privacy:metadata:soapbox_storage:objectkey',
+            'ipaddress' => 'privacy:metadata:soapbox_storage:ipaddress',
+        ], 'privacy:metadata:soapbox_storage');
+
+        // WhatsApp reminders (reminder_manager::send_whatsapp_reminder()): the
+        // learner's number and the reminder text, to Twilio or to the generic
+        // provider at whatsapp_api_url.
+        $collection->add_external_location_link('whatsapp_delivery', [
+            'phonenumber' => 'privacy:metadata:whatsapp_delivery:phonenumber',
+            'message' => 'privacy:metadata:whatsapp_delivery:message',
+        ], 'privacy:metadata:whatsapp_delivery');
+
+        // Embedding and rerank service (rag_retriever, history_selector,
+        // voyage_reranker): may be a different vendor from the chat provider.
+        $collection->add_external_location_link('embedding_provider', [
+            'query' => 'privacy:metadata:embedding_provider:query',
+        ], 'privacy:metadata:embedding_provider');
+
+        // The Redash analytics export: redash_export.php is pulled by the
+        // configured analytics platform with a key, and redash_client pushes the
+        // Learning Radar question and answer to it.
+        $collection->add_external_location_link('analytics_export', [
+            'learner' => 'privacy:metadata:analytics_export:learner',
+            'usage' => 'privacy:metadata:analytics_export:usage',
+            'feedback' => 'privacy:metadata:analytics_export:feedback',
+            'survey' => 'privacy:metadata:analytics_export:survey',
+            'transcript' => 'privacy:metadata:analytics_export:transcript',
+            'radarreport' => 'privacy:metadata:analytics_export:radarreport',
+        ], 'privacy:metadata:analytics_export');
+
+        // Talking avatar vendors (D-ID, HeyGen, Tavus, Synthesia): the session
+        // runs in an iframe allowed the microphone and camera, so the learner's
+        // browser talks to the vendor directly.
+        $collection->add_external_location_link('talking_avatar', [
+            'audio' => 'privacy:metadata:talking_avatar:audio',
+            'video' => 'privacy:metadata:talking_avatar:video',
+            'ipaddress' => 'privacy:metadata:talking_avatar:ipaddress',
+        ], 'privacy:metadata:talking_avatar');
+
+        // The 'coreai' chat provider routes requests through Moodle's AI
+        // subsystem, which sends them on and keeps its own record.
+        $collection->add_subsystem_link('core_ai', [], 'privacy:metadata:core_ai');
 
         return $collection;
     }

@@ -796,10 +796,18 @@ $string['privacy:metadata:sbx_assign:usermodified'] = 'The staff member who last
 $string['privacy:metadata:ai_provider'] = 'To generate tutoring responses, learner-authored content is sent to the AI provider configured by the site or course administrator.';
 $string['privacy:metadata:ai_provider:message'] = 'The message text and attachments the learner sends to the AI tutor.';
 $string['privacy:metadata:ai_provider:coursecontext'] = 'Course and activity context (such as the course name and current page) included to ground the response.';
+$string['privacy:metadata:ai_provider:firstname'] = 'The learner\'s first name, so the tutor can address them by name.';
+$string['privacy:metadata:ai_provider:history'] = 'Earlier messages of the same conversation. For background features that summarize learners (the learner profile and objective mastery) and for staff analysis (Learning Radar, course insights), excerpts of learners\' conversations and their feedback, survey and usability-testing answers.';
+$string['privacy:metadata:ai_provider:learnerprofile'] = 'What the plugin has stored about the learner in the course, when those features are on: their saved goals, memory notes from earlier sessions, the learner profile and their progress on the course objectives.';
+$string['privacy:metadata:ai_provider:submission'] = 'Work the learner submits for feedback: essays, the transcript of a Soapbox speech with its stated topic and target length, and the text and page images of a Soapbox slide deck.';
+$string['privacy:metadata:ai_provider:videoframes'] = 'Still frames of the learner taken from a Soapbox video recording, sent for body-language feedback when that feature is on.';
 $string['privacy:metadata:voice_provider'] = 'When voice input or output is used, audio and text are sent to the configured speech-to-text / text-to-speech provider.';
 $string['privacy:metadata:voice_provider:audio'] = 'Recorded audio of the learner speaking, sent for transcription.';
+$string['privacy:metadata:voice_provider:instructions'] = 'For live voice conversations, the tutoring instructions built for the learner, which include their first name and, when those features are on, their saved goals and memory notes.';
+$string['privacy:metadata:voice_provider:recording'] = 'A Soapbox presentation recording (video with sound, or audio only), sent whole for transcription.';
 $string['privacy:metadata:voice_provider:text'] = 'Text sent to the provider to be synthesised into speech.';
 $string['privacy:metadata:zendesk'] = 'When human-support escalation is enabled and the learner consents, their contact details and message are sent to Zendesk to open a support ticket.';
+$string['privacy:metadata:zendesk:coursecontext'] = 'The name of the course and the address of the page the learner was on.';
 $string['privacy:metadata:zendesk:name'] = 'The learner full name, used to identify the support requester.';
 $string['privacy:metadata:zendesk:email'] = 'The learner email address, used to reply to the support request.';
 $string['privacy:metadata:zendesk:message'] = 'The message or conversation content the learner chose to escalate.';
@@ -3446,10 +3454,35 @@ $string['settings:code_sandbox_pyodide_baseurl'] = 'Python runtime location';
 $string['settings:code_sandbox_pyodide_baseurl_desc'] = 'The https base URL the Python sandbox loads the Pyodide runtime from, for example <code>https://cdn.jsdelivr.net/pyodide/v0.27.0/full/</code>. The runtime is about 10 MB and is fetched by each learner\'s browser, so whoever serves this URL learns the IP address and browser of every learner who opens the sandbox. If that\'s a third-party CDN, say so in your site\'s privacy notice, or host a copy of the Pyodide release on your own site and point this at it. Leave this blank (the default) and the sandbox stays off, whatever the course and site toggles say. Nothing is requested until you fill it in.';
 $string['sandbox:noruntimeurl'] = 'The Python sandbox is on for this course, but the site has no Python runtime location set, so there\'s nothing to load. An administrator can set one in the plugin settings.';
 
+$string['privacy:metadata:analytics_export'] = 'When the analytics export is configured, the analytics platform the site administrator set up (such as Redash) collects usage data from this site with an export key, and Learning Radar can save its questions and answers there. Learners are shown under a pseudonym unless an administrator has allowed exports with real identities.';
+$string['privacy:metadata:analytics_export:feedback'] = 'The learner\'s rating and comment on the tutor, and, only in exports with real identities, the browser, operating system, device, screen size and page they sent it from.';
+$string['privacy:metadata:analytics_export:learner'] = 'A pseudonym for the learner, or, only when an administrator has allowed exports with real identities, their user id, first name and last name.';
+$string['privacy:metadata:analytics_export:radarreport'] = 'Learning Radar questions asked by staff and the answers generated, which may describe learner activity in the course.';
+$string['privacy:metadata:analytics_export:survey'] = 'The learner\'s survey answers.';
+$string['privacy:metadata:analytics_export:transcript'] = 'Text from learners\' chat messages: the opening words of common questions and, when that section is requested, an excerpt of course conversations.';
+$string['privacy:metadata:analytics_export:usage'] = 'How many messages the learner sent in a course and when they were last active.';
+
 // Privacy: the sandbox runtime request (v7.6.1, CONTRIB-10574 #271).
 $string['privacy:metadata:code_sandbox_runtime'] = 'When the Python sandbox is enabled, the learner\'s browser downloads the Python runtime from the location the site administrator configured, which may belong to a third party. Code written in the sandbox and its output stay on the device and are never sent anywhere.';
 $string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'The learner IP address, disclosed to whoever serves the runtime by the act of requesting it.';
 $string['privacy:metadata:code_sandbox_runtime:useragent'] = 'The learner browser and operating system, sent as the user agent of that request.';
+
+$string['privacy:metadata:core_ai'] = 'When the site sends tutoring requests through Moodle\'s AI subsystem, the same content listed for the AI provider goes through it, and the AI subsystem keeps its own record of each request.';
+$string['privacy:metadata:embedding_provider'] = 'When course search (retrieval) is enabled, the learner\'s question is sent to the embedding and reranking service the site administrator configured, which may be a different company from the AI provider, to find the parts of the course that answer it.';
+$string['privacy:metadata:embedding_provider:query'] = 'The text of the learner\'s question and, when history is chosen by relevance (the default), the text of their earlier messages in the conversation.';
+$string['privacy:metadata:soapbox_storage'] = 'When Soapbox presentations are enabled and object storage is configured, the learner\'s recording and the files that go with it are uploaded to the Amazon S3 bucket the site administrator configured. The learner\'s browser uploads them and plays them back directly. They\'re deleted at the end of the retention window, when the assignment or course is deleted, and when the learner\'s data is erased.';
+$string['privacy:metadata:soapbox_storage:frames'] = 'A sheet of still frames of the learner, taken in the browser from the video recording, used for body-language feedback.';
+$string['privacy:metadata:soapbox_storage:ipaddress'] = 'The learner\'s IP address and browser user agent, disclosed to the storage service when their browser uploads or plays back a file.';
+$string['privacy:metadata:soapbox_storage:objectkey'] = 'The name each file is stored under, which contains the course id and the learner\'s user id.';
+$string['privacy:metadata:soapbox_storage:recording'] = 'The learner\'s presentation recording: video with sound, or audio only.';
+$string['privacy:metadata:soapbox_storage:slidedeck'] = 'The PDF slide deck the learner uploads with the recording, if the assignment allows slides.';
+$string['privacy:metadata:talking_avatar'] = 'When the talking avatar is enabled, the learner talks to an avatar from the vendor the site administrator configured (D-ID, HeyGen, Tavus or Synthesia). The conversation runs in the learner\'s browser, which connects to the vendor directly.';
+$string['privacy:metadata:talking_avatar:audio'] = 'The learner\'s voice during the avatar conversation, from the microphone.';
+$string['privacy:metadata:talking_avatar:ipaddress'] = 'The learner\'s IP address and browser user agent, disclosed to the vendor and to the location the avatar software is loaded from.';
+$string['privacy:metadata:talking_avatar:video'] = 'The learner\'s camera image, if the vendor\'s session asks for the camera and the learner allows it.';
+$string['privacy:metadata:whatsapp_delivery'] = 'When WhatsApp study reminders are enabled and a learner subscribes to them, each reminder is sent to the WhatsApp messaging provider the site administrator configured (such as Twilio), which delivers it to the learner\'s phone.';
+$string['privacy:metadata:whatsapp_delivery:message'] = 'The reminder text: the course name, a study tip and a link that is unique to the learner for turning the reminders off.';
+$string['privacy:metadata:whatsapp_delivery:phonenumber'] = 'The phone number the learner gave for reminders.';
 
 // v7.8.0: automatic model upgrades.
 $string['autoupgrade:title'] = 'Model upgrades';
