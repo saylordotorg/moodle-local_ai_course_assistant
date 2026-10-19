@@ -54,6 +54,18 @@ class key_rotation {
     /** @var int The shortest new key accepted. */
     public const MIN_LENGTH = 8;
 
+    /** @var int The longest new key accepted. */
+    public const MAX_LENGTH = 512;
+
+    /** @var string[] Command-line options that would carry a key, recognised by the command only to refuse them. */
+    public const KEY_OPTIONS = ['new-key', 'newkey', 'key', 'apikey', 'old-key'];
+
+    /** @var string[] The command's on/off options. */
+    private const FLAGS = ['help', 'list', 'stdin', 'apply'];
+
+    /** @var string[] Key prefixes an environment variable name must not start with. */
+    private const KEY_PREFIXES = ['sk-', 'sk-ant-', 'AIza', 'xai-'];
+
     /** @var string The audit action of a rotation. */
     public const AUDIT_ACTION = 'key_rotated';
 
@@ -124,7 +136,8 @@ class key_rotation {
      * @param array $selector exactly one of ['last4' => 'ab12'] or ['fingerprint' => key_inventory::fingerprint()]
      * @param string $newkey the new plain key (trimmed)
      * @return array ['ok' => bool, 'errors' => string[], 'reason' => as plan(), or 'failed' when a write failed
-     *         and everything was rolled back, 'counts' => kind => places changed (every kind in KINDS),
+     *         and everything was rolled back, or 'unconfirmed' when the commit worked but reading the stores back
+     *         did not find the new key, 'counts' => kind => places changed (every kind in KINDS),
      *         'notrotated' => int, 'newlast4' => provider_keys::last4() of the new key ('' unless it worked)]
      */
     public static function apply(array $selector, string $newkey): array {
@@ -153,27 +166,32 @@ class key_rotation {
         }
 
         $userid = (int) ($USER->id ?? 0);
+        // The mirror follows the default provider's row, so it needs a re-sync only when a row or the mirror held
+        // the key.
+        $resync = $plan['counts']['row'] > 0 || $plan['counts']['mirror'] > 0;
         $changed = false;
         try {
             $done = static::in_one_transaction(function () use ($fingerprint, $newstored, $refs, $plan, $newlast4,
-                    $userid, &$changed): array {
+                    $userid, $resync, &$changed): array {
                 $done = array_fill_keys(self::KINDS, 0);
                 $done['row'] = static::write_rows($fingerprint, $newstored);
                 $done['voice'] = static::write_voice($fingerprint, $newstored);
                 $done['pasted'] = static::write_settings($refs['pasted'], $fingerprint, $newstored);
                 $done['mirror'] = static::write_settings($refs['mirror'], $fingerprint, $newstored);
-                $done['course'] = static::write_courses($refs['course'], $newstored);
+                $done['course'] = static::write_courses($refs['course'], $fingerprint, $newstored);
                 if ($done !== $plan['counts']) {
                     // A store changed between the plan and the write: roll back rather than half rotate.
                     $changed = true;
                     throw new \RuntimeException('A store changed since the plan.');
                 }
-                audit_logger::log(self::AUDIT_ACTION, $userid, 0, [
-                    'provider'    => $plan['group']['vendor'],
-                    'fingerprint' => $fingerprint,
-                    'old_last4'   => $plan['group']['last4'],
-                    'new_last4'   => $newlast4,
-                    'counts'      => $done,
+                // Written here, inside the transaction, and allowed to throw: a rotation with no audit row rolls back.
+                static::write_audit($userid, [
+                    'provider'      => $plan['group']['vendor'],
+                    'fingerprint'   => $fingerprint,
+                    'old_last4'     => $plan['group']['last4'],
+                    'new_last4'     => $newlast4,
+                    'counts'        => $done,
+                    'mirror_synced' => $resync,
                 ]);
                 return $done;
             });
@@ -188,19 +206,75 @@ class key_rotation {
             return $result;
         }
 
-        // The default provider's row may have just changed, and chat reads its key from the apikey mirror.
-        // sync_after_writes() skips a table write on purpose (MIRROR_SETTINGS), so sync directly, and never let a
-        // failed mirror undo a committed rotation: the class name only, like sync_after_writes().
-        try {
-            provider_keys::sync_default_key();
-        } catch (\Throwable $e) {
-            debugging('key_rotation could not re-mirror the default key (' . get_class($e) . ')', DEBUG_DEVELOPER);
+        // Moodle's config cache is not transaction-aware: a request that read the settings between the last write
+        // and the commit may have cached the old rows. Drop the cache before anything reads it again.
+        \cache_helper::invalidate_by_definition('core', 'config', [], self::PLUGIN);
+
+        if ($resync) {
+            // Chat reads the default provider's key from the apikey mirror. sync_after_writes() skips a table write
+            // on purpose (MIRROR_SETTINGS), so sync directly, and never let a failed mirror undo a committed
+            // rotation: the class name only, like sync_after_writes().
+            try {
+                provider_keys::sync_default_key();
+            } catch (\Throwable $e) {
+                debugging('key_rotation could not re-mirror the default key (' . get_class($e) . ')', DEBUG_DEVELOPER);
+            }
         }
 
-        $result['ok'] = true;
         $result['counts'] = $done;
+        if (!static::confirm(key_inventory::fingerprint(trim($newkey)), $done)) {
+            $result['reason'] = 'unconfirmed';
+            $result['errors'][] = 'The change was saved, but reading it back did not find the new key. Run --list '
+                . 'to see where each key is now before you revoke the old one.';
+            return $result;
+        }
+        $result['ok'] = true;
         $result['newlast4'] = $newlast4;
         return $result;
+    }
+
+    /**
+     * After the commit, read the stores back: is the new key in at least one place of every kind that was written?
+     *
+     * @param string $newfingerprint the new key's fingerprint
+     * @param array $counts kind => places written
+     * @return bool
+     */
+    protected static function confirm(string $newfingerprint, array $counts): bool {
+        $found = [];
+        foreach (key_inventory::places() as $place) {
+            if ($place['fingerprint'] === $newfingerprint) {
+                $found[$place['kind']] = true;
+            }
+        }
+        foreach ($counts as $kind => $n) {
+            if ($n > 0 && empty($found[$kind])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Write the key_rotated audit row, the same table and columns as audit_logger::log(), but letting a failed
+     * insert throw so that the transaction rolls back (audit_logger::log() swallows it).
+     *
+     * @param int $userid the user who ran the rotation
+     * @param array $details provider, fingerprint, last-four values and counts; never a key
+     * @return void
+     * @throws \dml_exception when the row can't be written
+     */
+    protected static function write_audit(int $userid, array $details): void {
+        global $DB;
+        $DB->insert_record('local_ai_course_assistant_audit', (object) [
+            'action'      => self::AUDIT_ACTION,
+            'userid'      => $userid,
+            'courseid'    => 0,
+            'ipaddress'   => getremoteaddr(),
+            'useragent'   => substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255),
+            'details'     => json_encode($details),
+            'timecreated' => time(),
+        ]);
     }
 
     /**
@@ -267,25 +341,84 @@ class key_rotation {
     }
 
     /**
-     * Replace the key of courses, setting only the key column and the time modified (never a full-row rewrite).
+     * Replace the key of courses, setting only the key column and the time modified (never a full-row rewrite),
+     * each only if its row still holds the old key (a row changed since the plan is skipped, and the count check in
+     * apply() then rolls everything back).
      *
-     * @param array $courseids course ids whose course_cfg row holds the old key
+     * @param array $courseids course ids whose course_cfg row held the old key when the plan was made
+     * @param string $fingerprint the old key's fingerprint
      * @param string $newstored the new key, concealed
      * @return int course rows changed
      */
-    protected static function write_courses(array $courseids, string $newstored): int {
+    protected static function write_courses(array $courseids, string $fingerprint, string $newstored): int {
         global $DB;
         $changed = 0;
         $now = time();
         foreach ($courseids as $courseid) {
-            $id = $DB->get_field(self::COURSE_TABLE, 'id', ['courseid' => (int) $courseid]);
-            if ($id === false) {
+            $row = $DB->get_record(self::COURSE_TABLE, ['courseid' => (int) $courseid], 'id, apikey');
+            if (!$row || !hash_equals($fingerprint, key_inventory::stored_fingerprint((string) $row->apikey))) {
                 continue;
             }
-            $DB->update_record(self::COURSE_TABLE, (object) ['id' => $id, 'apikey' => $newstored, 'timemodified' => $now]);
+            $DB->update_record(self::COURSE_TABLE, (object) ['id' => $row->id, 'apikey' => $newstored,
+                'timemodified' => $now]);
             $changed++;
         }
         return $changed;
+    }
+
+    /**
+     * Check the command's options before anything is read: a key must never arrive on the command line.
+     *
+     * Refused: any of KEY_OPTIONS; any unknown option or argument; an on/off option given a value other than
+     * true or '1'; an --old-last4 that is not exactly four non-space characters; an --old-fingerprint that is not
+     * exactly 12 hex characters; a --new-key-env that is not an environment variable NAME (an upper-case letter,
+     * then upper-case letters, digits or underscores, 64 at most) or that starts with a key prefix. The message is
+     * fixed text and never repeats a value.
+     *
+     * @param array $options from cli_get_params()
+     * @param array $unrecognised from cli_get_params()
+     * @return string why the command line is refused, or '' when it is fine
+     */
+    public static function command_line_problem(array $options, array $unrecognised): string {
+        foreach (self::KEY_OPTIONS as $name) {
+            if (($options[$name] ?? null) !== null) {
+                return 'A key is never taken on the command line: it would be saved in your shell history and shown '
+                    . 'in the process list. Nothing was read or changed. If that was a real key, treat it as '
+                    . 'exposed. Put the new key in an environment variable (--new-key-env=NAME, default '
+                    . 'SOLA_NEW_KEY) or pipe it in with --stdin.';
+            }
+        }
+        if ($unrecognised) {
+            return 'Unknown option or argument (not shown here, in case it was a key). Nothing was read or changed. '
+                . 'Try --help.';
+        }
+        foreach (self::FLAGS as $name) {
+            $value = $options[$name] ?? false;
+            if ($value !== false && $value !== true && $value !== '1') {
+                return '--' . $name . ' takes no value (not shown here, in case it was a key). Nothing was read or '
+                    . 'changed.';
+            }
+        }
+        $last4 = (string) ($options['old-last4'] ?? '');
+        if ($last4 !== '' && !preg_match('~^\S{4}$~', $last4)) {
+            return '--old-last4 takes exactly the last four characters of the old key (the value is not shown here, '
+                . 'in case it was a key). Nothing was read or changed.';
+        }
+        $fingerprint = (string) ($options['old-fingerprint'] ?? '');
+        if ($fingerprint !== '' && !preg_match('~^[0-9a-fA-F]{12}$~', $fingerprint)) {
+            return '--old-fingerprint takes the 12 hex characters --list shows (the value is not shown here, in case '
+                . 'it was a key). Nothing was read or changed.';
+        }
+        $envname = (string) ($options['new-key-env'] ?? '');
+        $prefixed = false;
+        foreach (self::KEY_PREFIXES as $prefix) {
+            $prefixed = $prefixed || str_starts_with($envname, $prefix);
+        }
+        if ($prefixed || !preg_match('~^[A-Z][A-Z0-9_]{0,63}$~', $envname)) {
+            return '--new-key-env takes the NAME of an environment variable (upper-case letters, digits and '
+                . 'underscores), not a key. The value is not shown here. Nothing was read or changed.';
+        }
+        return '';
     }
 
     /**
@@ -318,8 +451,9 @@ class key_rotation {
         }
         if (!$matches) {
             $result['reason'] = 'nomatch';
-            $result['errors'][] = 'No stored key ends in those four characters. Keys under 12 characters show no '
-                . 'last four; use --list and select one by its fingerprint.';
+            $result['errors'][] = 'No stored key ends in those four characters. Matching is case-sensitive and '
+                . 'compares the last four characters only. Keys under 12 characters show no last four; use --list '
+                . 'and select one by its fingerprint.';
             return null;
         }
         $result['reason'] = 'ambiguous';
@@ -344,8 +478,12 @@ class key_rotation {
         if (strlen($new) < self::MIN_LENGTH) {
             return 'The new key is shorter than ' . self::MIN_LENGTH . ' characters.';
         }
-        if (strpbrk($new, "|\r\n\0") !== false) {
-            return 'The new key holds a "|", a line break or a NUL character, which a key never does.';
+        if (strlen($new) > self::MAX_LENGTH) {
+            return 'The new key is longer than ' . self::MAX_LENGTH . ' characters.';
+        }
+        if (strpos($new, '|') !== false || preg_match('~[\x00-\x1F\x7F\s]~', $new)) {
+            return 'The new key holds a "|", a space, a tab, a line break or another control character, which a key '
+                . 'never does.';
         }
         return '';
     }

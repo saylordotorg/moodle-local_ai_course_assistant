@@ -63,18 +63,11 @@ use local_ai_course_assistant\key_rotation;
     ['h' => 'help']
 );
 
-const LOCAL_AI_COURSE_ASSISTANT_KEY_ON_THE_COMMAND_LINE = 'A key is never taken on the command line: it would be saved '
-    . 'in your shell history and shown in the process list. Nothing was read or changed. If that was a real key, '
-    . 'treat it as exposed. Put the new key in an environment variable (--new-key-env=NAME, default SOLA_NEW_KEY) or pipe it in with --stdin.';
-foreach (['new-key', 'newkey', 'key', 'apikey', 'old-key'] as $option) {
-    if ($options[$option] !== null) {
-        cli_error(LOCAL_AI_COURSE_ASSISTANT_KEY_ON_THE_COMMAND_LINE);
-    }
-}
-if ($unrecognised) {
-    // Not repeated back: an unknown argument may be a key pasted in the wrong place.
-    cli_error('Unknown option or argument (not shown here, in case it was a key). Nothing was read or changed. '
-        . 'Try --help.');
+// Before anything is read: a key on the command line, or an option's value that could be one, is refused and
+// never repeated back.
+$problem = key_rotation::command_line_problem($options, $unrecognised);
+if ($problem !== '') {
+    cli_error($problem);
 }
 if ($options['help']) {
     cli_writeln(
@@ -149,11 +142,8 @@ if ($options['stdin']) {
     $line = fgets(STDIN);
     $newkey = $line === false ? '' : $line;
 } else {
-    $envname = (string) $options['new-key-env'];
-    if (!preg_match('~^[A-Za-z_][A-Za-z0-9_]*$~', $envname)) {
-        cli_error('--new-key-env takes the NAME of an environment variable, not a key. Nothing was changed.');
-    }
-    $newkey = (string) getenv($envname);
+    // command_line_problem() has checked that this is an environment variable name.
+    $newkey = (string) getenv((string) $options['new-key-env']);
 }
 if (trim($newkey) === '') {
     cli_error('No new key: the environment variable (--new-key-env, default SOLA_NEW_KEY) is empty or unset, '

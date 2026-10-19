@@ -341,6 +341,10 @@ final class key_rotation_test extends \advanced_testcase {
                 $this->assertFalse($result['ok']);
                 $this->assertSame('nomatch', $result['reason']);
                 $this->assertNotEmpty($result['errors']);
+                if (isset($selector['last4'])) {
+                    $this->assertStringContainsString('case-sensitive', implode(' ', $result['errors']));
+                    $this->assertStringContainsString('last four characters only', implode(' ', $result['errors']));
+                }
             }
         }
         foreach ([[], ['last4' => 'AB12', 'fingerprint' => key_inventory::fingerprint(self::OLD)], ['last4' => ''],
@@ -378,7 +382,8 @@ final class key_rotation_test extends \advanced_testcase {
         $this->plant_everywhere();
         $before = $this->snapshot();
         $bad = ['', '   ', 'short7c', ' abcdefg ', "abcd|efghijkl", "abcdefgh\nijkl", "abcdefgh\rijkl",
-            "abcdefgh\0ijkl"];
+            "abcdefgh\0ijkl",
+            "abcd\tefghijkl", "abcd efghijkl", "abcdefgh\x7Fijkl", "abcdefgh\x0Bijkl", str_repeat('k', 513)];
         foreach ($bad as $i => $newkey) {
             foreach (['plan', 'apply'] as $method) {
                 $result = key_rotation::$method(['last4' => 'AB12'], $newkey);
@@ -393,6 +398,7 @@ final class key_rotation_test extends \advanced_testcase {
 
         $padded = key_rotation::plan(['last4' => 'AB12'], "  " . self::NEW . "\n");
         $this->assertTrue($padded['ok'], 'spaces and a newline around a key are trimmed, not refused');
+        $this->assertTrue(key_rotation::plan(['last4' => 'AB12'], str_repeat('k', 512))['ok'], '512 characters is allowed');
     }
 
     // (g) A write that fails half way leaves every store as it was.
@@ -409,10 +415,11 @@ final class key_rotation_test extends \advanced_testcase {
              * The course write fails after every other store was written.
              *
              * @param array $courseids
+             * @param string $fingerprint
              * @param string $newstored
              * @return int
              */
-            protected static function write_courses(array $courseids, string $newstored): int {
+            protected static function write_courses(array $courseids, string $fingerprint, string $newstored): int {
                 // A read inside the transaction fills the config cache with values the rollback will undo.
                 get_config('local_ai_course_assistant');
                 throw new \RuntimeException('planted failure ' . secrets::reveal($newstored) . ' ' . $newstored);
@@ -481,7 +488,9 @@ final class key_rotation_test extends \advanced_testcase {
         $rows = array_values($DB->get_records('local_ai_course_assistant_audit', ['action' => 'key_rotated']));
         $this->assertCount(1, $rows);
         $details = json_decode($rows[0]->details, true);
-        $this->assertSame(['provider', 'fingerprint', 'old_last4', 'new_last4', 'counts'], array_keys($details));
+        $this->assertSame(['provider', 'fingerprint', 'old_last4', 'new_last4', 'counts', 'mirror_synced'],
+            array_keys($details));
+        $this->assertTrue($details['mirror_synced'], 'the default row changed, so the mirror was re-synced');
         $this->assertSame('openai', $details['provider']);
         $this->assertSame(key_inventory::fingerprint(self::OLD), $details['fingerprint']);
         $this->assertSame('AB12', $details['old_last4']);
@@ -579,14 +588,172 @@ final class key_rotation_test extends \advanced_testcase {
         foreach (['new-key', 'newkey', 'key', 'apikey', 'old-key'] as $option) {
             $this->assertStringContainsString("'$option' => null", $source, "--$option is recognised so it can be refused");
         }
-        $refuse = strpos($source, 'ON_THE_COMMAND_LINE');
-        $this->assertNotFalse($refuse);
-        foreach (['getenv(', 'STDIN', 'key_rotation::', 'key_inventory::'] as $later) {
+        $refuse = strpos($source, 'key_rotation::command_line_problem(');
+        $this->assertNotFalse($refuse, 'the script checks its options with key_rotation::command_line_problem()');
+        $this->assertLessThan(strpos($source, 'cli_writeln('), $refuse, 'the options are checked before any output');
+        foreach (['getenv(', 'STDIN', 'key_rotation::plan(', 'key_rotation::apply(', 'key_inventory::'] as $later) {
             $at = strpos($source, $later);
             $this->assertNotFalse($at, "$later is used");
             $this->assertGreaterThan($refuse, $at, "the command-line key is refused before $later");
         }
         // An unknown option is never echoed back: it could be a key.
         $this->assertStringNotContainsString('implode(\', \', $unrecognised)', $source);
+    }
+
+    // Review 1: the audit row is written in the transaction, so a failed insert rolls the rotation back.
+    public function test_a_failing_audit_insert_rolls_back_every_store(): void {
+        global $DB;
+        $this->plant_everywhere();
+        $before = $this->snapshot();
+        $rotation = new class extends key_rotation {
+            /**
+             * The audit insert fails.
+             *
+             * @param int $userid
+             * @param array $details
+             * @return void
+             */
+            protected static function write_audit(int $userid, array $details): void {
+                throw new \dml_write_exception('planted audit failure');
+            }
+        };
+        $result = $rotation::apply(['last4' => 'AB12'], self::NEW);
+        $this->assertDebuggingNotCalled();
+        $this->assertFalse($result['ok'], 'a rotation whose audit row could not be written is not reported as done');
+        $this->assertSame('failed', $result['reason']);
+        $this->assertTrue($before === $this->snapshot(), 'every store as before');
+        $this->assertSame(0, $DB->count_records('local_ai_course_assistant_audit', ['action' => 'key_rotated']));
+        $this->assert_no_key(self::forms($result), 'the failed result');
+    }
+
+    // Review 1: after the commit one written store is read back; if the new key is not there, it is not ok.
+    public function test_a_rotation_that_cannot_be_read_back_is_not_reported_as_done(): void {
+        $this->plant_default(self::OLD);
+        $rotation = new class extends key_rotation {
+            /**
+             * Reading back finds nothing.
+             *
+             * @param string $newfingerprint
+             * @param array $counts
+             * @return bool
+             */
+            protected static function confirm(string $newfingerprint, array $counts): bool {
+                return false;
+            }
+        };
+        $result = $rotation::apply(['last4' => 'AB12'], self::NEW);
+        $this->assertFalse($result['ok']);
+        $this->assertSame('unconfirmed', $result['reason']);
+        $this->assertStringContainsString('--list', implode(' ', $result['errors']));
+        $this->assert_no_key(self::forms($result), 'the unconfirmed result');
+        $this->assertTrue(key_rotation::apply(['last4' => 'CD34'], self::OLD)['ok'], 'the real read-back confirms');
+    }
+
+    // Review 2: a config cache filled with the old rows before the commit is dropped after it.
+    public function test_a_config_cache_filled_before_the_commit_does_not_serve_the_old_key(): void {
+        global $DB;
+        $this->plant_everywhere();
+        $rotation = new class extends key_rotation {
+            /** @var array the committed rows another request would have cached */
+            public static array $stale = [];
+
+            /**
+             * After the last settings write, another request caches the old committed rows.
+             *
+             * @param array $names
+             * @param string $fingerprint
+             * @param string $newstored
+             * @return int
+             */
+            protected static function write_settings(array $names, string $fingerprint, string $newstored): int {
+                $n = parent::write_settings($names, $fingerprint, $newstored);
+                if ($names === ['apikey']) {
+                    \cache::make('core', 'config')->set('local_ai_course_assistant', static::$stale);
+                }
+                return $n;
+            }
+        };
+        $rotation::$stale = $DB->get_records_menu('config_plugins', ['plugin' => self::PLUGIN], '', 'name, value');
+        $result = $rotation::apply(['last4' => 'AB12'], self::NEW);
+        $this->assertTrue($result['ok'], 'apply worked');
+        $this->assertTrue(secrets::get('embed_apikey') === self::NEW, 'a pasted setting reads the new key after apply');
+        $this->assertTrue(secrets::get('apikey') === self::NEW, 'the mirror reads the new key after apply');
+        $this->assertTrue(provider_keys::key_for('openai') === self::NEW, 'the row reads the new key after apply');
+    }
+
+    // Review minor 3: a course whose key changed since the plan is not overwritten; the rotation rolls back.
+    public function test_a_course_key_changed_since_the_plan_rolls_the_rotation_back(): void {
+        global $DB;
+        $this->plant_everywhere();
+        $before = $this->snapshot();
+        $rotation = new class extends key_rotation {
+            /** @var string the value another admin saved for ROT1 meanwhile */
+            public static string $meanwhile = '';
+
+            /**
+             * Before the first write, ROT1's key is changed (inside the transaction, so it rolls back too).
+             *
+             * @param string $fingerprint
+             * @param string $newstored
+             * @return int
+             */
+            protected static function write_rows(string $fingerprint, string $newstored): int {
+                global $DB;
+                $courseid = $DB->get_field('course', 'id', ['shortname' => 'ROT1']);
+                $DB->set_field('local_ai_course_assistant_course_cfg', 'apikey', static::$meanwhile, ['courseid' => $courseid]);
+                return parent::write_rows($fingerprint, $newstored);
+            }
+        };
+        $rotation::$meanwhile = $this->c(self::OTHER);
+        $result = $rotation::apply(['last4' => 'AB12'], self::NEW);
+        $this->assertFalse($result['ok']);
+        $this->assertSame('failed', $result['reason']);
+        $this->assertStringContainsString('changed', implode(' ', $result['errors']));
+        $this->assertTrue($before === $this->snapshot(), 'every store as before');
+    }
+
+    // Review minor 4: the mirror is re-synced only when the default row or the mirror held the key.
+    public function test_the_mirror_is_resynced_only_when_a_row_or_the_mirror_held_the_key(): void {
+        global $DB;
+        $this->plant_default(self::STALE);
+        $this->course_key('AMB', 'openai', $this->c(self::AMBIG));
+        $result = key_rotation::apply(['fingerprint' => key_inventory::fingerprint(self::AMBIG)], self::NEW);
+        $this->assertTrue($result['ok']);
+        $this->assertTrue(secrets::get('apikey') === self::STALE, 'a course-only rotation leaves the mirror alone');
+        $row = $DB->get_record('local_ai_course_assistant_audit', ['action' => 'key_rotated']);
+        $this->assertFalse(json_decode($row->details, true)['mirror_synced']);
+    }
+
+    // Review minor 1: every way of putting a key on the command line is refused, and none is echoed.
+    public function test_the_command_line_checks_refuse_a_key_anywhere_on_the_command_line(): void {
+        $ok = ['help' => false, 'list' => false, 'old-last4' => '', 'old-fingerprint' => '',
+            'new-key-env' => 'SOLA_NEW_KEY', 'stdin' => false, 'apply' => false, 'new-key' => null, 'newkey' => null,
+            'key' => null, 'apikey' => null, 'old-key' => null];
+        $this->assertSame('', key_rotation::command_line_problem($ok, []));
+        $this->assertSame('', key_rotation::command_line_problem(['old-last4' => 'AB12', 'apply' => true, 'stdin' => '1']
+            + $ok, []));
+        $this->assertSame('', key_rotation::command_line_problem(['old-fingerprint' => '0123456789ab'] + $ok, []));
+        $bad = [
+            ['new-key' => self::NEW], ['newkey' => true], ['key' => self::NEW], ['apikey' => self::NEW],
+            ['old-key' => self::OLD],
+            ['stdin' => self::NEW], ['apply' => self::NEW], ['list' => 'yes'], ['help' => self::NEW],
+            ['old-last4' => self::NEW], ['old-last4' => 'AB1'], ['old-last4' => 'AB 2'],
+            ['old-fingerprint' => self::NEW], ['old-fingerprint' => '0123456789az'], ['old-fingerprint' => '0123456789a'],
+            ['new-key-env' => self::NEW], ['new-key-env' => 'sk-ant-xyz'], ['new-key-env' => 'AIzaSyKEY'],
+            ['new-key-env' => 'xai-KEY'], ['new-key-env' => 'lower_case'], ['new-key-env' => '1ABC'],
+            ['new-key-env' => str_repeat('A', 65)], ['new-key-env' => ''],
+        ];
+        foreach ($bad as $i => $override) {
+            $problem = key_rotation::command_line_problem($override + $ok, []);
+            $this->assertNotSame('', $problem, "bad command line $i is refused");
+            $this->assert_no_key($problem, "the refusal of bad command line $i");
+            $value = reset($override);
+            if (is_string($value) && strlen($value) >= 4) {
+                $this->assertStringNotContainsString($value, $problem, "bad command line $i is not echoed");
+            }
+        }
+        $unknown = key_rotation::command_line_problem($ok, [self::NEW]);
+        $this->assertNotSame('', $unknown, 'an unknown argument is refused');
+        $this->assert_no_key($unknown, 'the unknown-argument refusal');
     }
 }
