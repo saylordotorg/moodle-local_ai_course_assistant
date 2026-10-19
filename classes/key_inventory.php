@@ -232,6 +232,28 @@ class key_inventory {
     }
 
     /**
+     * The fingerprint of a stored value (ciphertext or a legacy plain key), with debugging held off.
+     *
+     * @param string $stored the value as stored
+     * @return string fingerprint(), or '' when the value is empty or can't be decrypted on this site
+     */
+    public static function stored_fingerprint(string $stored): string {
+        $plain = self::quietly(fn(): string => secrets::reveal(trim($stored)));
+        return $plain === '' ? '' : self::fingerprint($plain);
+    }
+
+    /**
+     * The fingerprint of the key a plugin setting holds (read with secrets::get()), with debugging held off.
+     *
+     * @param string $name a setting of this plugin
+     * @return string fingerprint(), or '' when the setting is unset, empty or can't be decrypted on this site
+     */
+    public static function setting_fingerprint(string $name): string {
+        $plain = self::quietly(fn(): string => secrets::get($name));
+        return $plain === '' ? '' : self::fingerprint($plain);
+    }
+
+    /**
      * Refuse a new key column that could break a table or leave a row keyless.
      *
      * It must be non-empty ciphertext (secrets::is_encrypted()), hold no "|", CR or LF, and decrypt on this site
