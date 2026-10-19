@@ -40,6 +40,17 @@ use local_ai_course_assistant\embedding_provider\base_embedding_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rag_retriever {
+    /** retrieve() $foruserid: filter for the logged-in user. */
+    public const FOR_CURRENT_USER = 0;
+
+    /**
+     * retrieve() $foruserid: return every chunk, hidden activities included.
+     *
+     * Only for administrator tools that show what the index holds (the prompt
+     * playground, the benchmark CLIs). Never for anything a learner reads.
+     */
+    public const UNFILTERED = -1;
+
     /**
      * @var array Decoded chunk vectors, keyed "course_<id>".
      *
@@ -587,17 +598,30 @@ class rag_retriever {
      *                            on (0 if none). Drives the current-page ordering
      *                            boost and, when `rag_scope` constrains to the
      *                            document, filters retrieval to that document.
+     * @param int    $foruserid The user the passages are for: their visibility
+     *                          decides which chunks survive (rag_visibility,
+     *                          #341). FOR_CURRENT_USER (the default) is the
+     *                          logged-in user; no user keeps only the site FAQ.
+     *                          UNFILTERED is for administrator tools only.
      * @return array Array of [
      *                  'content'    => string,
      *                  'score'      => float,
      *                  'cmid'       => int|null,
      *                  'modtype'    => string,
      *                  'chunkindex' => int,
+     *                  'courseid'   => int,
      *               ] sorted by score desc, filtered to those at/above the
-     *               configured relevance floor. Empty array if no chunks clear
-     *               the floor, no chunks exist, or embedding fails.
+     *               configured relevance floor and to what the user may see.
+     *               Empty array if no chunks clear the floor, no chunks exist,
+     *               or embedding fails. May hold fewer than $topk.
      */
-    public static function retrieve(int $courseid, string $query, int $topk = 5, int $currentcmid = 0): array {
+    public static function retrieve(
+        int $courseid,
+        string $query,
+        int $topk = 5,
+        int $currentcmid = 0,
+        int $foruserid = self::FOR_CURRENT_USER
+    ): array {
         global $DB;
 
         $final = null;
@@ -800,6 +824,15 @@ class rag_retriever {
 
         $final = $final ?? array_slice($scored, 0, $topk);
 
+        // Issue #341: drop what this user may not see, on the final top-k only (no
+        // refill), and after every cache read: the caches above hold vectors per
+        // course, never per user, so visibility is decided fresh on each call.
+        // Before expansion, so a hidden activity's siblings are never fetched.
+        $final = self::visible_to($final, $courseid, $foruserid);
+        if (empty($final)) {
+            return [];
+        }
+
         // Parent-document expansion (opt-in). Selection above is unchanged;
         // here we optionally widen each hit to a neighbour window or full page.
         $rawreturn = get_config('local_ai_course_assistant', 'rag_return_scope');
@@ -900,24 +933,45 @@ class rag_retriever {
         }
 
         [$insql, $params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
-        $texts = $DB->get_records_select_menu(
+        // The courseid rides along for rag_visibility: the packed index doesn't carry
+        // it, and a supplemental or FAQ chunk is judged by the course it came from.
+        $texts = $DB->get_records_select(
             'local_ai_course_assistant_chunks',
             "id {$insql}",
             $params,
             '',
-            'id, content'
+            'id, courseid, content'
         );
 
         $out = [];
         foreach ($rows as $row) {
             $id = (int) ($row['id'] ?? 0);
-            if (!isset($texts[$id]) || trim((string) $texts[$id]) === '') {
+            if (!isset($texts[$id]) || trim((string) $texts[$id]->content) === '') {
                 continue;
             }
-            $row['content'] = (string) $texts[$id];
+            $row['content'] = (string) $texts[$id]->content;
+            $row['courseid'] = (int) $texts[$id]->courseid;
             $out[] = $row;
         }
         return $out;
+    }
+
+    /**
+     * Keep only the chunks one user may see; see rag_visibility for the rules.
+     *
+     * @param array $rows Final hydrated rows.
+     * @param int $courseid The course being chatted in.
+     * @param int $foruserid A user id, FOR_CURRENT_USER or UNFILTERED.
+     * @return array The kept rows, in order.
+     */
+    private static function visible_to(array $rows, int $courseid, int $foruserid): array {
+        global $USER;
+        if ($foruserid === self::UNFILTERED) {
+            return $rows;
+        }
+        // Any other value below 1 is the logged-in user, or nobody (FAQ only).
+        $userid = $foruserid > 0 ? $foruserid : (int) ($USER->id ?? 0);
+        return rag_visibility::filter($rows, $courseid, $userid);
     }
 
     /**

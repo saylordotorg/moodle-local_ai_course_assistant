@@ -515,7 +515,9 @@ try {
             // Pass the current page's cmid so retrieval prefers the page the
             // learner is on among near-ties (and so a large page is grounded by
             // its own relevant chunks rather than a head-truncated dump).
-            $retrievedchunks = rag_retriever::retrieve($courseid, $message, $topk, (int) $pageid);
+            // Issue #341: for this learner, so a hidden or restricted activity's text
+            // never reaches the prompt, the citations or the debug log.
+            $retrievedchunks = rag_retriever::retrieve($courseid, $message, $topk, (int) $pageid, (int) $USER->id);
             $raglatencyms = (int) round((microtime(true) - $ragstart) * 1000);
             // v7.1.1: record what retrieval actually returned. This was
             // previously inferred from prompt_tokens, which is not a valid proxy

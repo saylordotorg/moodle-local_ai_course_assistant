@@ -221,11 +221,13 @@ class send_message extends external_api {
                 $rawtopk = get_config('local_ai_course_assistant', 'rag_topk');
                 $topk = ($rawtopk === false || $rawtopk === '') ? 5 : (int) $rawtopk;
                 $ragstart = microtime(true);
+                // Issue #341: filtered to what this learner can see, as in sse.php.
                 $retrievedchunks = rag_retriever::retrieve(
                     $params['courseid'],
                     $params['message'],
                     $topk,
-                    (int) $params['pageid']
+                    (int) $params['pageid'],
+                    (int) $userid
                 );
                 $raglatencyms = (int) round((microtime(true) - $ragstart) * 1000);
             } catch (\Throwable $e) {
