@@ -301,4 +301,37 @@ final class presenterai_interlock_test extends \advanced_testcase {
         $this->assertSame([10005, 12100], $held);
         $this->assertSame(3, $reads, '2,500 distinct ids are read in three chunks of at most 1,000');
     }
+
+    /**
+     * A temporary table whose CREATE fails leaves no registered name behind.
+     *
+     * Moodle registers a temporary table's name before it runs the CREATE. An uppercase table name makes the
+     * definition invalid only after that registration, so the create throws with the name registered and no table
+     * behind it. The fixture must undo that and rethrow the original exception, or every later test would see a table
+     * that is not there and the whole run would cascade. The table here has its own name: the map table is untouched.
+     *
+     * @return void
+     */
+    public function test_a_failed_temporary_table_create_leaves_nothing_registered(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $bad = self::build_map_table('Presenterai_BadMap');
+        $threw = null;
+        try {
+            $this->create_temp_table_or_clean_up($bad);
+        } catch (\moodle_exception $e) {
+            $threw = $e;
+        } finally {
+            $stuck = $DB->get_manager()->table_exists($bad);
+            if ($stuck) {
+                // Do not let a regression in the fixture poison the tests that follow this one.
+                self::discard_temp_table($bad);
+            }
+        }
+
+        $this->assertInstanceOf(\moodle_exception::class, $threw, 'the original exception is rethrown');
+        $this->assertFalse($stuck, 'a failed create must not leave its name registered');
+        $this->assertFalse($DB->get_manager()->table_exists($bad));
+    }
 }

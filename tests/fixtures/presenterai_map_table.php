@@ -85,8 +85,60 @@ trait presenterai_map_table {
         if ($dbman->table_exists(presenterai_interlock::MAP_TABLE)) {
             return;
         }
-        $dbman->create_temp_table(self::build_map_table());
+        $this->create_temp_table_or_clean_up(self::build_map_table());
         $this->maptabletemp = true;
+    }
+
+    /**
+     * Create a temporary table; if that fails, leave nothing registered and rethrow the original exception.
+     *
+     * Moodle registers a temporary table's name BEFORE it generates and runs the CREATE. If the CREATE then fails (on
+     * some database, or because the definition is refused), the name stays registered with no table behind it: every
+     * later table_exists() says true, and resetting the test database throws, so one failing test would take the whole
+     * run down with it. This undoes the registration so the failing test is the only casualty.
+     *
+     * @param \xmldb_table $table
+     * @return void
+     * @throws \Throwable The exception create_temp_table() threw, unchanged.
+     */
+    protected function create_temp_table_or_clean_up(\xmldb_table $table): void {
+        global $DB;
+        try {
+            $DB->get_manager()->create_temp_table($table);
+        } catch (\Throwable $e) {
+            self::discard_temp_table($table);
+            throw $e;
+        }
+    }
+
+    /**
+     * Best effort: remove a temporary table and, whatever happens, its registration. Never throws.
+     *
+     * drop_table() un-registers the name only after a successful DROP, and the DROP fails when the CREATE never created
+     * the table, so the registration is also removed directly.
+     *
+     * @param \xmldb_table $table
+     * @return void
+     */
+    protected static function discard_temp_table(\xmldb_table $table): void {
+        global $DB;
+        try {
+            $dbman = $DB->get_manager();
+            if ($dbman->table_exists($table)) {
+                $dbman->drop_table($table);
+            }
+        } catch (\Throwable $ignored) {
+            // The table may never have been created. The registration is removed below.
+            unset($ignored);
+        }
+        try {
+            $registry = new \ReflectionProperty(\moodle_database::class, 'temptables');
+            $registry->setAccessible(true);
+            $registry->getValue($DB)->delete_temptable($table->getName());
+        } catch (\Throwable $ignored) {
+            // Best effort: the original failure is what the caller must see.
+            unset($ignored);
+        }
     }
 
     /**
