@@ -18,6 +18,8 @@ namespace local_ai_course_assistant;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once(__DIR__ . '/fixtures/presenterai_map_table.php');
+
 /**
  * The SOLA half of the contract with PresenterAI's Soapbox importer.
  *
@@ -28,63 +30,24 @@ defined('MOODLE_INTERNAL') || die();
  *
  * Three literals and one formula are the whole contract, and they are pinned
  * here and in PresenterAI's own tests: the source table name, the map table
- * name, and the site id (sha1 of wwwroot, a pipe and the site identifier). A
- * change on either side that the other does not follow makes the importer and
- * the cleanup disagree about which recordings are held, silently.
+ * name, and the site id (sha1 of the Moodle site identifier, with no address in
+ * it). A change on either side that the other does not follow makes the importer
+ * and the cleanup disagree about which recordings are held, silently.
  *
  * SOLA only reads the map and only behind table_exists(), so a site without
  * PresenterAI behaves exactly as it did before. PresenterAI's tables are not
- * part of this plugin and may be absent from the PHPUnit database, so the
- * tests that need real map rows skip themselves there; the absent-table
- * behavior is asserted both through a stub of the existence check (which runs
- * everywhere) and, where the table is genuinely absent, for real.
+ * part of this plugin and may be absent from the PHPUnit database (CI). The
+ * presenterai_map_table fixture then creates a temporary table of the same name,
+ * so every held-path test, and the query that decides what the cleanup may
+ * delete, runs on every database. The absent-table behavior is asserted through
+ * a stub of the existence check (which runs everywhere, with a matching row in
+ * place) and, where the table is genuinely absent, for real.
  *
  * @package    local_ai_course_assistant
  * @covers     \local_ai_course_assistant\presenterai_interlock
  */
 final class presenterai_interlock_test extends \advanced_testcase {
-    /**
-     * Whether PresenterAI's map table exists in this test database.
-     *
-     * @return bool
-     */
-    private function map_table_present(): bool {
-        global $DB;
-        return $DB->get_manager()->table_exists('presenterai_migration_map');
-    }
-
-    /**
-     * Skip a test that needs real map rows when PresenterAI is not installed.
-     *
-     * @return void
-     */
-    private function require_map_table(): void {
-        if (!$this->map_table_present()) {
-            $this->markTestSkipped('PresenterAI is not installed here, so presenterai_migration_map '
-                . 'does not exist; the stubbed absent-table test covers the guard.');
-        }
-    }
-
-    /**
-     * Insert one map row, with only the columns PresenterAI requires.
-     *
-     * @param string $sourcetable
-     * @param int $sourceid
-     * @param string $sourcesiteid
-     * @return void
-     */
-    private function map_row(string $sourcetable, int $sourceid, string $sourcesiteid): void {
-        global $DB;
-        $DB->insert_record('presenterai_migration_map', (object) [
-            'runid' => 'testrun',
-            'sourcetable' => $sourcetable,
-            'sourceid' => $sourceid,
-            'sourcesiteid' => $sourcesiteid,
-            'state' => 'planned',
-            'timecreated' => time(),
-            'timemodified' => time(),
-        ]);
-    }
+    use presenterai_map_table;
 
     /**
      * A subclass whose existence check says the map table is absent.
@@ -110,12 +73,34 @@ final class presenterai_interlock_test extends \advanced_testcase {
      * @return void
      */
     public function test_the_contract_literals_and_the_site_id_formula_are_pinned(): void {
-        global $CFG;
-
         $this->assertSame('local_ai_course_assistant_sbx_rec', presenterai_interlock::SOURCE_TABLE);
         $this->assertSame('presenterai_migration_map', presenterai_interlock::MAP_TABLE);
-        $this->assertSame(sha1($CFG->wwwroot . '|' . get_site_identifier()), presenterai_interlock::site_id());
+        $this->assertSame(sha1(get_site_identifier()), presenterai_interlock::site_id());
         $this->assertSame(40, strlen(presenterai_interlock::site_id()), 'a sha1 hex digest');
+    }
+
+    /**
+     * A change of address changes neither the site id nor what is held.
+     *
+     * A host rename or an http to https change must not make the cleanup forget
+     * the recordings PresenterAI already points at. The id is the site
+     * identifier's hash alone, so the address is not part of it.
+     *
+     * @return void
+     */
+    public function test_a_change_of_address_changes_neither_the_site_id_nor_the_held_result(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        $this->require_map_table();
+
+        $before = presenterai_interlock::site_id();
+        $this->map_row(presenterai_interlock::SOURCE_TABLE, 601, $before);
+        $this->assertSame([601], presenterai_interlock::held_ids([601, 602]));
+
+        $CFG->wwwroot = 'https://renamed.example.org/learn';
+
+        $this->assertSame($before, presenterai_interlock::site_id());
+        $this->assertSame([601], presenterai_interlock::held_ids([601, 602]));
     }
 
     /**
@@ -158,18 +143,18 @@ final class presenterai_interlock_test extends \advanced_testcase {
     /**
      * A site without PresenterAI holds nothing, even if a row would match.
      *
-     * The existence check is stubbed to false. When the real table is present
-     * a matching row is inserted first, so only the guard stands between this
-     * call and a non-empty answer: without it the query would run and find it.
+     * The existence check is stubbed to false. A matching row is inserted first
+     * (in the real table, or the fixture's temporary one), so only the guard
+     * stands between this call and a non-empty answer: without it the query
+     * would run and find it.
      *
      * @return void
      */
     public function test_a_missing_map_table_holds_nothing_even_when_a_row_would_match(): void {
         $this->resetAfterTest();
+        $this->require_map_table();
 
-        if ($this->map_table_present()) {
-            $this->map_row(presenterai_interlock::SOURCE_TABLE, 41, presenterai_interlock::site_id());
-        }
+        $this->map_row(presenterai_interlock::SOURCE_TABLE, 41, presenterai_interlock::site_id());
         $variant = $this->absent_variant();
 
         $this->assertSame([], $variant::held_ids([41, 42]));
@@ -181,8 +166,10 @@ final class presenterai_interlock_test extends \advanced_testcase {
      * @return void
      */
     public function test_a_genuinely_absent_map_table_holds_nothing(): void {
+        global $DB;
         $this->resetAfterTest();
-        if ($this->map_table_present()) {
+        // Deliberately does not call require_map_table(): the table must be absent.
+        if ($DB->get_manager()->table_exists(presenterai_interlock::MAP_TABLE)) {
             $this->markTestSkipped('PresenterAI is installed here; the stubbed test covers the absent path.');
         }
 
@@ -222,7 +209,7 @@ final class presenterai_interlock_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->require_map_table();
 
-        $this->map_row(presenterai_interlock::SOURCE_TABLE, 201, sha1('https://other.example|other-site-id'));
+        $this->map_row(presenterai_interlock::SOURCE_TABLE, 201, sha1('another-site-identifier'));
 
         $this->assertSame([], presenterai_interlock::held_ids([201]));
     }

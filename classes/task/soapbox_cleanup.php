@@ -29,7 +29,7 @@ use local_ai_course_assistant\soapbox_storage;
  *     objects. A bucket lifecycle rule on the prefix is the backstop.
  *
  * Neither step deletes the object of, or retires the row of, a recording that
- * PresenterAI's importer holds (v7.13.0): the importer re-points its own row at
+ * PresenterAI's importer holds (v7.12.1): the importer re-points its own row at
  * the same S3 key, so doing either here would break the migrated attempt. See
  * presenterai_interlock for how a recording comes to be held. The one thing a
  * held recording still gets is the body-language prose forgotten, on the same

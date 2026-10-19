@@ -56,14 +56,18 @@ class presenterai_interlock {
     /**
      * The id PresenterAI's map uses for this site's rows.
      *
-     * Two sites restored from one database must not read each other's mapping,
-     * so the id mixes the address with the site identifier.
+     * It is the sha1 of Moodle's site identifier and nothing else. The address is
+     * deliberately NOT part of it: a host rename or an http to https change would
+     * otherwise change the id, every migrated recording would stop being held, and
+     * the next nightly cleanup would delete media PresenterAI still points at. The
+     * identifier is created at install and survives a change of address. A database
+     * cloned onto a second site keeps it too, so the clone holds the same
+     * recordings, which errs on the side of not deleting.
      *
      * @return string sha1 hex digest
      */
     public static function site_id(): string {
-        global $CFG;
-        return sha1($CFG->wwwroot . '|' . get_site_identifier());
+        return sha1(get_site_identifier());
     }
 
     /**

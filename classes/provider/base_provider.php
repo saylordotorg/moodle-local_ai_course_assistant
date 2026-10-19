@@ -809,7 +809,7 @@ abstract class base_provider implements provider_interface {
                     $primaryprovider = $provider;
                     $overrides['provider'] = $failover['provider'];
                     $overrides['apikey']   = $failover['apikey'];
-                    // v7.13.0: the failover is asked for ITS model at ITS base URL, as build_fallbacks()
+                    // v7.12.1: the failover is asked for ITS model at ITS base URL, as build_fallbacks()
                     // has done for the per-call chain since v7.2.8. Only the provider and the key were
                     // swapped here, so a capped Gemini primary sent "gemini-2.5-flash" to OpenAI (HTTP
                     // 404, model not found) along with the primary's base URL. $overrides already holds
@@ -824,7 +824,7 @@ abstract class base_provider implements provider_interface {
                     // constructor then reads the SITE model, which breaks a course that overrides the
                     // provider (site gemini, course openai / gpt-4o, an openai row with no model: OpenAI
                     // is asked for the site's Gemini model). This path kept the course's model before
-                    // 7.13.0 and still does, so the same-provider case is deliberately not mirrored.
+                    // 7.12.1 and still does, so the same-provider case is deliberately not mirrored.
                     if (!empty($failover['apibaseurl'])) {
                         $overrides['apibaseurl'] = $failover['apibaseurl'];
                     } else {

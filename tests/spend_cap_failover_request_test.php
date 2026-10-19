@@ -20,10 +20,10 @@ use local_ai_course_assistant\provider\base_provider;
 use local_ai_course_assistant\provider\chat_refused_exception;
 
 /**
- * A spend-cap failover asks the failover for ITS model, at ITS base URL (v7.13.0).
+ * A spend-cap failover asks the failover for ITS model, at ITS base URL (v7.12.1).
  *
  * When a spend cap trips, base_provider::create_from_config() swaps the provider and the key for the first
- * line of the failover chain. Until 7.13.0 it left the model and the base URL of the primary in place, so a
+ * line of the failover chain. Until 7.12.1 it left the model and the base URL of the primary in place, so a
  * Gemini primary with a capped month sent "gemini-2.5-flash" to OpenAI (HTTP 404, model not found), and sent
  * the primary's own gateway URL along with another vendor's key. build_fallbacks() fixed the same thing for
  * the per-call chain in v7.2.8; the cap path never got the fix (spend analysis 2026-10-19, "What a learner
@@ -81,7 +81,7 @@ final class spend_cap_failover_request_test extends \advanced_testcase {
      * OpenAI's default, so using the provider default instead would fail too), and does not send the course's
      * gateway URL (the primary's) to OpenAI: with no URL of its own the row means the vendor's own endpoint,
      * but only while the site `apibaseurl` is empty, as setUp() makes it. A site-level URL is still read by the
-     * constructor for any provider built without one (build_fallbacks() has the same limit). Before 7.13.0 the
+     * constructor for any provider built without one (build_fallbacks() has the same limit). Before 7.12.1 the
      * model was "gemini-2.5-flash" and the URL the course's.
      *
      * @return void
@@ -218,7 +218,7 @@ final class spend_cap_failover_request_test extends \advanced_testcase {
      * no model. The primary is OpenAI, so the failover is the same provider and must keep the COURSE's model. If
      * the model override were dropped the constructor would read the SITE model and OpenAI would be asked for
      * "gemini-2.5-flash" (HTTP 404). build_fallbacks() drops it in this case; the cap path deliberately does not,
-     * because it kept the course's model before 7.13.0 and this is the case a blanket "unset" would break.
+     * because it kept the course's model before 7.12.1 and this is the case a blanket "unset" would break.
      *
      * @return void
      */

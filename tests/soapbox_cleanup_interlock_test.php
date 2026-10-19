@@ -18,6 +18,8 @@ namespace local_ai_course_assistant;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once(__DIR__ . '/fixtures/presenterai_map_table.php');
+
 /**
  * The nightly Soapbox cleanup leaves alone what PresenterAI's importer holds.
  *
@@ -29,13 +31,16 @@ defined('MOODLE_INTERNAL') || die();
  * The task is driven through two small seams. open_storage() replaces the
  * configured-credentials gate and the S3 client with a spy that records every
  * delete; held_ids() replaces the lookup in PresenterAI's table so these tests
- * run on a Moodle that has none. One test group goes through the real lookup and
- * skips itself where the map table does not exist.
+ * run on a Moodle that has none. One test goes through the real lookup and the
+ * real map query; where PresenterAI is not installed the presenterai_map_table
+ * fixture supplies a temporary map table, so it runs everywhere.
  *
  * @package    local_ai_course_assistant
  * @covers     \local_ai_course_assistant\task\soapbox_cleanup
  */
 final class soapbox_cleanup_interlock_test extends \advanced_testcase {
+    use presenterai_map_table;
+
     /**
      * A storage spy: records every key it is asked to delete and says yes.
      *
@@ -669,23 +674,12 @@ final class soapbox_cleanup_interlock_test extends \advanced_testcase {
     public function test_the_real_lookup_holds_a_recording_the_map_names(): void {
         global $DB;
         $this->resetAfterTest();
-        if (!$DB->get_manager()->table_exists('presenterai_migration_map')) {
-            $this->markTestSkipped('PresenterAI is not installed here, so there is no map table to read.');
-        }
+        $this->require_map_table();
         [$assignid, $userid] = $this->assignment();
         $held = $this->recording($assignid, $userid, 'held', 8 * DAYSECS, true);
         $foreign = $this->recording($assignid, $userid, 'foreign', 7 * DAYSECS, true);
-        foreach ([[$held, presenterai_interlock::site_id()], [$foreign, sha1('https://other.example|elsewhere')]] as $m) {
-            $DB->insert_record('presenterai_migration_map', (object) [
-                'runid' => 'testrun',
-                'sourcetable' => presenterai_interlock::SOURCE_TABLE,
-                'sourceid' => $m[0],
-                'sourcesiteid' => $m[1],
-                'state' => 'planned',
-                'timecreated' => time(),
-                'timemodified' => time(),
-            ]);
-        }
+        $this->map_row(presenterai_interlock::SOURCE_TABLE, $held, presenterai_interlock::site_id());
+        $this->map_row(presenterai_interlock::SOURCE_TABLE, $foreign, sha1('another-site-identifier'));
 
         $storage = $this->spy_storage();
         $this->task($storage, null)->execute();
