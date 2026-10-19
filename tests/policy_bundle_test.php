@@ -276,6 +276,17 @@ final class policy_bundle_test extends \advanced_testcase {
         $this->assertNotSame('25', get_config('local_ai_course_assistant', 'rerank_candidates'));
     }
 
+    public function test_verify_output_labels_a_retired_key_and_nothing_else(): void {
+        $this->assertSame(
+            "prompt_budget_auto_tune = 1  (retired, ignored)",
+            policy_bundle::describe_setting('prompt_budget_auto_tune', 1)
+        );
+        $this->assertSame('rerank_candidates = 25', policy_bundle::describe_setting('rerank_candidates', 25));
+        $this->assertSame("temperature = '0.4'", policy_bundle::describe_setting('temperature', '0.4'));
+        $tool = file_get_contents(__DIR__ . '/../admin/cli/policy_bundle_tool.php');
+        $this->assertStringContainsString('policy_bundle::describe_setting(', $tool, '--verify prints through the helper');
+    }
+
     public function test_the_model_switcher_still_may_not_write_a_retired_key(): void {
         $blocked = autoupgrade\switcher::blocker('chat', ['prompt_budget_auto_tune' => '1']);
         $this->assertSame(

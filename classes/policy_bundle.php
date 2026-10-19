@@ -75,7 +75,8 @@ class policy_bundle {
      * Settings a bundle may set. Behavior data only — deliberately excludes
      * every *_apikey, *_apibaseurl, URL, webhook, email-recipient, consent,
      * privacy, SSRF, emergency, and voice/STT setting. Fail closed: a bundle
-     * containing ANY key not on this list (or on RETIRED_KEYS) is rejected in full.
+     * containing ANY key that is neither on this list nor on RETIRED_KEYS is
+     * rejected in full.
      *
      * @var string[]
      */
@@ -437,6 +438,18 @@ class policy_bundle {
             }
         }
         return $payload;
+    }
+
+    /**
+     * One line of the settings list that `policy_bundle_tool.php --verify` prints for a payload.
+     *
+     * @param string $key Setting name as it stands in the payload.
+     * @param mixed $value Its value.
+     * @return string "name = value", with "(retired, ignored)" after a retired key.
+     */
+    public static function describe_setting(string $key, $value): string {
+        $line = $key . ' = ' . var_export($value, true);
+        return in_array($key, self::RETIRED_KEYS, true) ? $line . '  (retired, ignored)' : $line;
     }
 
     /**

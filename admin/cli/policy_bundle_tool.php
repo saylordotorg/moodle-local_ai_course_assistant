@@ -190,7 +190,7 @@ if ($options['verify']) {
     cli_writeln('comment:   ' . ($payload['comment'] ?? '(none)'));
     cli_writeln('settings:');
     foreach ($payload['settings'] as $key => $value) {
-        cli_writeln('  ' . $key . ' = ' . var_export($value, true));
+        cli_writeln('  ' . policy_bundle::describe_setting((string) $key, $value));
     }
     exit(0);
 }

@@ -130,12 +130,26 @@ final class prompt_budget_auto_tune_retirement_test extends \advanced_testcase {
     public function test_the_daily_task_is_no_longer_scheduled(): void {
         global $DB;
         $this->resetAfterTest();
+        // Core stores a task's class name with a leading backslash (manager::get_canonical_class_name()).
         $classname = '\\local_ai_course_assistant\\task\\auto_tune_prompt_budget';
+
+        // The phpunit database was built from the new db/tasks.php, so it never held this row. A site upgrading
+        // from 7.11.0 does: put it back, as that site has it.
+        $DB->insert_record('task_scheduled', (object) [
+            'component' => self::PLUGIN, 'classname' => $classname, 'customised' => 0, 'disabled' => 0,
+            'lastruntime' => 0, 'nextruntime' => 0, 'faildelay' => 0,
+            'minute' => '20', 'hour' => '3', 'day' => '*', 'month' => '*', 'dayofweek' => '*',
+        ]);
+        $this->assertTrue($DB->record_exists('task_scheduled', ['classname' => $classname]), 'the stale row is in place');
 
         // Core runs this after a plugin's upgrade steps, and it deletes every task db/tasks.php no longer lists.
         \core\task\manager::reset_scheduled_tasks_for_component(self::PLUGIN);
 
         $this->assertFalse($DB->record_exists('task_scheduled', ['classname' => $classname]), 'the task row is gone');
+        $this->assertTrue(
+            $DB->record_exists('task_scheduled', ['classname' => '\\local_ai_course_assistant\\task\\milestone_check']),
+            'the plugin\'s other tasks are still scheduled'
+        );
         $this->assertFalse(class_exists('local_ai_course_assistant\\task\\auto_tune_prompt_budget'), 'the class is gone');
         $this->assertFileDoesNotExist(__DIR__ . '/../classes/task/auto_tune_prompt_budget.php');
         $this->assertStringNotContainsString(
@@ -143,6 +157,40 @@ final class prompt_budget_auto_tune_retirement_test extends \advanced_testcase {
             file_get_contents(__DIR__ . '/../db/tasks.php'),
             'db/tasks.php no longer lists the task'
         );
+    }
+
+    /**
+     * Seed prompt metrics that truncate on every turn, so a recommendation exists to apply.
+     *
+     * Ported from the deleted budget_tuner_standdown_test. Without enough samples (30) recommend() returns null
+     * and apply_recommendation() declines, so a test of the write would pass or fail for the wrong reason.
+     * These 40 records sit far above the 1% truncation trigger, so the recommendation is a raise.
+     *
+     * @return string The log file written, for the caller to remove.
+     */
+    private function seed_truncating_metrics(): string {
+        global $CFG;
+        $dir = $CFG->dataroot . '/sola_prompt_metrics';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        $lines = '';
+        for ($i = 0; $i < 40; $i++) {
+            $lines .= json_encode([
+                't' => time(),
+                'course' => 2,
+                'user' => 3,
+                'total' => 25800 + $i,
+                'budget' => 26000,
+                'cats' => ['identity' => 4000, 'context' => 18000, 'learner' => 1200,
+                           'behavior' => 1600, 'markers' => 600, 'safety' => 400],
+                'dropped' => 0,
+                'truncated' => 1,
+            ]) . "\n";
+        }
+        $path = $dir . '/' . date('Y-m-d') . '.log';
+        file_put_contents($path, $lines);
+        return $path;
     }
 
     public function test_the_manual_recommendation_still_applies_by_hand(): void {
@@ -153,8 +201,37 @@ final class prompt_budget_auto_tune_retirement_test extends \advanced_testcase {
         $this->assertStringContainsString("'apply_url'", $page, 'the prompt metrics page keeps its Apply recommendation button');
         // With no samples there is nothing to recommend, and calling it by hand must not throw or write.
         set_config('prompt_budget_chars', '16000', self::PLUGIN);
+        $this->assertSame(0, prompt_metrics_logger::aggregate()['samples'], 'no metrics are seeded in this test');
         $result = prompt_metrics_logger::apply_recommendation();
         $this->assertFalse($result['applied']);
         $this->assertSame('16000', get_config(self::PLUGIN, 'prompt_budget_chars'));
+    }
+
+    public function test_the_apply_button_writes_the_recommended_budget_in_fixed_mode(): void {
+        $this->resetAfterTest();
+        set_config('prompt_budget_mode', 'fixed', self::PLUGIN);
+        set_config('prompt_budget_chars', '26000', self::PLUGIN);
+        set_config('backend_context_tokens', 0, self::PLUGIN); // No window, so no ceiling caps the recommendation.
+        $seeded = $this->seed_truncating_metrics();
+        try {
+            $agg = prompt_metrics_logger::aggregate();
+            $this->assertSame(40, $agg['samples'], 'the seeded metrics were read back');
+            $recommended = prompt_metrics_logger::recommend($agg);
+            $this->assertNotNull($recommended, 'enough samples to recommend');
+            $this->assertNotSame(26000, $recommended['budget'], 'the seed recommends a change, so a write can be seen');
+
+            $result = prompt_metrics_logger::apply_recommendation();
+
+            $this->assertTrue($result['applied'], $result['reason']);
+            $this->assertSame(26000, $result['old']);
+            $this->assertSame($recommended['budget'], $result['new']);
+            $this->assertSame(
+                (string) $recommended['budget'],
+                get_config(self::PLUGIN, 'prompt_budget_chars'),
+                'the recommended budget is what the setting holds now'
+            );
+        } finally {
+            @unlink($seeded);
+        }
     }
 }
