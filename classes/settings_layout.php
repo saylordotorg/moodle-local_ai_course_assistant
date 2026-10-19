@@ -203,6 +203,10 @@ final class settings_layout {
     /**
      * Index every staged setting object by its bare name, in staging order.
      *
+     * Two staged settings with one name would collide on a page anyway (core keys
+     * a page's settings by plugin and name), so the later one wins and a
+     * developer notice names it.
+     *
      * @param \admin_settingpage[] $staged
      * @return array<string, \admin_setting>
      */
@@ -210,6 +214,10 @@ final class settings_layout {
         $index = [];
         foreach ($staged as $page) {
             foreach ((array) $page->settings as $setting) {
+                if (isset($index[$setting->name])) {
+                    debugging("SOLA: two staged settings are both named '{$setting->name}'; only the later "
+                        . 'one is placed. Rename one of them in settings.php.', DEBUG_DEVELOPER);
+                }
                 $index[$setting->name] = $setting;
             }
         }
@@ -221,6 +229,7 @@ final class settings_layout {
      *
      * A placed object is removed from the index, so whatever is left at the
      * end is unplaced, and a name listed twice is reported missing the second time.
+     * A settings_layout_map::OPTIONAL name that was not built is skipped quietly.
      *
      * @param \admin_settingpage $page Page being built.
      * @param array $section [kind, heading name or key, setting names].
@@ -241,7 +250,9 @@ final class settings_layout {
         }
         foreach ($names as $name) {
             if (!isset($index[$name])) {
-                $missing[] = $name;
+                if (!in_array($name, settings_layout_map::OPTIONAL, true)) {
+                    $missing[] = $name;
+                }
                 continue;
             }
             $page->add($index[$name]);

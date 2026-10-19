@@ -420,6 +420,20 @@ final class settings_usage_test extends \advanced_testcase {
         $this->assertStringNotContainsString('text-section-sentinel', $full);
     }
 
+    public function test_a_site_showing_the_conditional_prompt_warnings_raises_no_layout_notice(): void {
+        // The report builds the admin tree, so a developer notice from settings_layout::build() (a setting with
+        // no page) would land in --json. These two warnings are built only under a condition, which used to
+        // send them to adv_legacy with a notice on every tree build.
+        set_config('prompt_truncation_seen', time() - HOURSECS, self::PLUGIN);
+        set_config('prompt_budget_auto_tune', 1, self::PLUGIN);
+        set_config('prompt_budget_mode', 'auto', self::PLUGIN);
+
+        $report = settings_usage::report();
+        $this->assertDebuggingNotCalled('building the tree for the report raised a developer notice');
+        $this->assertSame([], settings_layout::last_report()['unplaced']);
+        $this->assertArrayNotHasKey('prompt_truncation_warning', $report['settings'], 'a notice stores no value');
+    }
+
     public function test_an_undecryptable_secret_raises_no_notice_and_the_json_stays_valid(): void {
         global $CFG;
         // A database restored onto another site: ciphertext this site's key can't open. secrets::reveal() treats

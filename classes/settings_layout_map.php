@@ -40,6 +40,17 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class settings_layout_map {
+    /**
+     * @var string[] Warnings settings.php builds only under a condition (a prompt
+     *               budget with no model window, a truncation in the last 7 days,
+     *               the deprecated tuner on while the budget mode is not fixed).
+     *               Each is placed in PAGES like any other entry; when it was not
+     *               built, settings_layout::build() does not report it missing.
+     */
+    public const OPTIONAL = [
+        'prompt_budget_nowindow_warning', 'prompt_truncation_warning', 'prompt_budget_tuner_conflict',
+    ];
+
     /** @var string[] Entries that no longer render: the old in-page table of contents anchors. */
     public const DROPPED = [
         'sec_general_anchor', 'sec_ai_anchor', 'provider_heading', 'sec_content_anchor',
@@ -263,7 +274,7 @@ final class settings_layout_map {
                 ]],
                 ['new', 'promptbudget', [
                     'prompt_budget_mode', 'prompt_budget_chars', 'prompt_budget_nowindow_warning',
-                    'current_page_content_maxchars', 'prompt_verbosity', 'prompt_debug_enabled',
+                    'prompt_truncation_warning', 'current_page_content_maxchars', 'prompt_verbosity', 'prompt_debug_enabled',
                     'socratic_verbose', 'prompt_metrics_enabled'
                 ]],
                 ['existing', 'prompt_proportions_heading', [
@@ -354,7 +365,7 @@ final class settings_layout_map {
                     'heygen_webhook_secret', 'tavus_webhook_secret', 'synthesia_webhook_secret'
                 ]],
                 ['new', 'legacy', [
-                    'prompt_budget_auto_tune'
+                    'prompt_budget_auto_tune', 'prompt_budget_tuner_conflict'
                 ]],
             ],
         ],

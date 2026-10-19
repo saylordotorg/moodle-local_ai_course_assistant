@@ -77,6 +77,9 @@ final class settings_layout_test extends \advanced_testcase {
 
     public function test_every_staged_setting_has_a_home(): void {
         $this->category();
+        // A normal tree build raises no developer notice (settings_usage_report --json
+        // builds the same tree, so a notice here would land in its output).
+        $this->assertDebuggingNotCalled();
         $report = settings_layout::last_report();
         $this->assertNotNull($report, 'settings.php did not run the layout engine');
         $this->assertSame([], $report['unplaced'], 'settings with no home in settings_layout_map (appended to adv_legacy)');
@@ -138,8 +141,11 @@ final class settings_layout_test extends \advanced_testcase {
                     $expected[] = 'layout_' . $heading . '_heading';
                 }
                 foreach ($names as $name) {
-                    $this->assertTrue(isset($pages[$id]->settings->{'local_ai_course_assistant' . $name}),
-                        "{$name} is on {$short}");
+                    $onpage = isset($pages[$id]->settings->{'local_ai_course_assistant' . $name});
+                    if (!$onpage && in_array($name, settings_layout_map::OPTIONAL, true)) {
+                        continue; // A conditional notice this site does not meet the condition for.
+                    }
+                    $this->assertTrue($onpage, "{$name} is on {$short}");
                     $expected[] = $name;
                 }
             }
@@ -405,6 +411,92 @@ final class settings_layout_test extends \advanced_testcase {
                     "{$file} links to {$id}, an old name that only redirects");
             }
         }
+    }
+
+    public function test_conditional_notices_are_placed_when_their_condition_is_met(): void {
+        $this->resetAfterTest();
+        // Both conditions met: a truncation in the last 7 days, and the deprecated
+        // tuner on while the budget mode is not fixed.
+        set_config('prompt_truncation_seen', time() - HOURSECS, 'local_ai_course_assistant');
+        set_config('prompt_budget_auto_tune', 1, 'local_ai_course_assistant');
+        set_config('prompt_budget_mode', 'auto', 'local_ai_course_assistant');
+        $pages = settings_tree::pages($this->category());
+        $this->assertDebuggingNotCalled();
+
+        $report = settings_layout::last_report();
+        $this->assertSame([], $report['unplaced'], 'a conditional notice was appended to adv_legacy instead of placed');
+        $this->assertTrue(isset($pages[settings_layout::page_id('adv_prompt')]
+            ->settings->{'local_ai_course_assistantprompt_truncation_warning'}));
+        $this->assertTrue(isset($pages[settings_layout::page_id('adv_legacy')]
+            ->settings->{'local_ai_course_assistantprompt_budget_tuner_conflict'}));
+    }
+
+    public function test_every_literal_setting_name_in_settings_php_has_a_home(): void {
+        // Reads settings.php as text, so it also sees settings built only under a
+        // condition the test site does not meet. Names built in loops from a
+        // variable ('local_ai_course_assistant/' . $key) are not literals and are
+        // covered by the runtime tree checks above instead.
+        $src = file_get_contents(__DIR__ . '/../settings.php');
+        preg_match_all("~new\s+\\\\?(?:local_ai_course_assistant\\\\)?admin_setting_[a-z_]+\(\s*"
+            . "'local_ai_course_assistant/([a-z0-9_]+)'~", $src, $m);
+        $this->assertGreaterThan(300, count($m[1]), 'the scan pattern has drifted from settings.php');
+
+        $homes = settings_layout_map::DROPPED;
+        foreach (settings_layout_map::PAGES as $page) {
+            foreach ($page['sections'] as [$kind, $heading, $names]) {
+                if ($kind === 'existing') {
+                    $homes[] = $heading;
+                }
+                $homes = array_merge($homes, $names);
+            }
+        }
+        $homeless = array_values(array_diff($m[1], $homes));
+        $this->assertSame([], $homeless, 'settings.php builds these but settings_layout_map gives them no page');
+    }
+
+    public function test_optional_names_are_listed_in_pages(): void {
+        $listed = [];
+        foreach (settings_layout_map::PAGES as $page) {
+            foreach ($page['sections'] as [, , $names]) {
+                $listed = array_merge($listed, $names);
+            }
+        }
+        $this->assertNotEmpty(settings_layout_map::OPTIONAL);
+        foreach (settings_layout_map::OPTIONAL as $name) {
+            $this->assertContains($name, $listed, "{$name} is optional, so it still needs a page");
+        }
+    }
+
+    public function test_an_optional_entry_is_placed_when_built_and_not_missing_when_absent(): void {
+        $this->resetAfterTest();
+        global $CFG;
+        require_once($CFG->libdir . '/adminlib.php');
+        $optional = 'prompt_truncation_warning';
+        $this->assertContains($optional, settings_layout_map::OPTIONAL);
+
+        $built = settings_layout::build([new \admin_settingpage('stage', 'Stage')], []);
+        $this->assertNotContains($optional, $built['missing'], 'an absent optional entry is not missing');
+        $this->assertContains('enabled', $built['missing'], 'an absent required entry still is');
+
+        $stage = new \admin_settingpage('stage', 'Stage');
+        $stage->add(new \admin_setting_description('local_ai_course_assistant/' . $optional, '', 'warning'));
+        $built = settings_layout::build([$stage], []);
+        $this->assertTrue(isset($built['pages']['adv_prompt']->settings->{'local_ai_course_assistant' . $optional}),
+            'a built optional entry is placed on its page');
+        $this->assertNotContains($optional, $built['unplaced']);
+    }
+
+    public function test_a_duplicate_staged_name_raises_a_developer_notice(): void {
+        $this->resetAfterTest();
+        global $CFG;
+        require_once($CFG->libdir . '/adminlib.php');
+        $one = new \admin_settingpage('stage_one', 'Stage one');
+        $one->add(new \admin_setting_configtext('local_ai_course_assistant/rag_topk', 'Top k', '', '5'));
+        $two = new \admin_settingpage('stage_two', 'Stage two');
+        $two->add(new \admin_setting_configtext('local_ai_course_assistant/rag_topk', 'Top k again', '', '6'));
+
+        settings_layout::build([$one, $two], []);
+        $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
     }
 
     public function test_placement_logic_with_a_fake_staging_set(): void {
