@@ -281,6 +281,22 @@ final class lang_completeness_test extends \basic_testcase {
         // The essay-scoring role's label, missing since the role arrived in 7.8.2
         // (Release 1, task 7). Same ruling.
         'autoupgrade:role_essay',
+        // The key places status check (7.11.0, Release 2, task 3). Same ruling.
+        'check:key_places',
+        'check:key_places_none',
+        'check:key_places_single',
+        'check:key_places_some',
+        'check:key_places_keyhint',
+        'check:key_places_keyshort',
+        'check:key_places_vendor',
+        'check:key_places_group',
+        'check:key_places_more',
+        'check:key_places_row',
+        'check:key_places_pasted',
+        'check:key_places_voice',
+        'check:key_places_mirror',
+        'check:key_places_course',
+        'check:key_places_advice',
     ];
 
     /**

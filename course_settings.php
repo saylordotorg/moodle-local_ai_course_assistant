@@ -504,7 +504,7 @@ foreach ($providers as $val => $label) {
 // API key field. The stored credential is never rendered; the placeholder is
 // the only hint that one exists, and the clear checkbox is the only way to
 // remove it.
-$haskey = $current && $current->apikey !== '';
+$haskey = course_config_manager::has_stored_key($current);
 $keyph = $haskey
     ? get_string('coursesettings:apikey_stored', 'local_ai_course_assistant')
     : get_string('coursesettings:using_global', 'local_ai_course_assistant');

@@ -978,7 +978,7 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
             "~\\\$keyph = \\\$haskey\\s*\\?\\s*get_string\\('coursesettings:apikey_stored', 'local_ai_course_assistant'\\)"
             . "\\s*:\\s*get_string\\('coursesettings:using_global', 'local_ai_course_assistant'\\);~",
             $script, 'the placeholder is one of two fixed strings');
-        $this->assertStringContainsString("\$haskey = \$current && \$current->apikey !== '';", $script,
+        $this->assertStringContainsString('$haskey = course_config_manager::has_stored_key($current);', $script,
             'the stored key is reduced to a yes/no');
 
         // The stored record and the revealed keys are never passed on: $current is only ever tested or read
@@ -1025,7 +1025,7 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
             "if (optional_param('apikey_clear', 0, PARAM_INT)) {",
             "\$data['apikey'] = '';",
             // The page: a stored key becomes a yes/no and one of two fixed sentences, and the labels.
-            "\$haskey = \$current && \$current->apikey !== '';",
+            "\$haskey = course_config_manager::has_stored_key(\$current);",
             "\$keyph = \$haskey",
             "? get_string('coursesettings:apikey_stored', 'local_ai_course_assistant')",
             "'apikeylabel' => get_string('settings:apikey', 'local_ai_course_assistant'),",
