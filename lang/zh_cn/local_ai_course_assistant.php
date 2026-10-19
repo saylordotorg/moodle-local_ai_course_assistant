@@ -1168,9 +1168,6 @@ $string['settings:prompt_verbosity_standard'] = '标准';
 $string['settings:prompt_verbosity_verbose'] = '详尽（用于较弱的自托管模型）';
 $string['settings:prompt_metrics_enabled'] = '采集分区提示词指标';
 $string['settings:prompt_metrics_enabled_desc'] = '开启时（默认），每轮聊天都会为组装出的提示词向 <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> 写入一行 JSON，记录各类别的字符数。保留最近 7 天。指标管理页面会汇总这些数据，用于给出预算建议。不记录任何个人身份信息 — 只记录各分区的大小。如果贵机构完全不希望产生指标文件，请关闭此项。';
-$string['settings:prompt_budget_auto_tune'] = '每日自动调整系统提示词预算（已弃用）';
-$string['settings:prompt_budget_auto_tune_desc'] = '已弃用。除非上方的预算模式设为<strong>固定</strong>，否则本项不起作用。过去有一个每日任务，通过观察截断情况并追逐它见过的最大提示词来推断字符预算。由模型的上下文窗口推导预算做得更好：它不会来回摆动，也不需要预热数据。两者还会互相冲突，因为该任务会写入字符预算，而任何非默认值都会关闭推导出的预算。请保持关闭；将在未来版本中移除。建议值仍会显示在<a href="/local/ai_course_assistant/prompt_metrics.php">提示词指标</a>页面上。';
-$string['task:auto_tune_prompt_budget'] = '根据观测到的指标自动调整 [[tutorshort]] 的提示预算';
 $string['prompt_metrics:title'] = '提示词指标与预算建议';
 $string['prompt_metrics:subtitle'] = '最近 7 天采集到的各提示段长度。用于为「系统提示字符预算」设置推荐取值。';
 $string['prompt_metrics:no_data'] = '尚未记录任何提示词指标。请用学习者账号发送几轮聊天，然后刷新本页。（如果插件设置中的指标采集开关处于关闭状态，则不会积累任何数据。）';
@@ -1193,10 +1190,6 @@ $string['prompt_metrics:recommended'] = '建议预算';
 $string['prompt_metrics:apply'] = '应用建议';
 $string['prompt_metrics:applied'] = '已应用：预算从 {$a->old} 改为 {$a->new}。{$a->reason}';
 $string['prompt_metrics:noop'] = '未做任何更改：{$a}';
-$string['prompt_metrics:auto_tune_heading'] = '每日自动调优';
-$string['prompt_metrics:auto_tune_on'] = '每日自动调优已开启。建议将于每晚服务器时间 03:20 自动应用。';
-$string['prompt_metrics:auto_tune_off'] = '每日自动调优已关闭。此处的建议仅供查看，不会自动应用。如需无人值守的每日调优，请在插件设置中开启。';
-$string['prompt_metrics:settings_link'] = '打开插件设置以开关自动调优。';
 // v5.3.0: Empathetic communications + carryover memory (English fallback).
 $string['task:milestone_check'] = '发送每日里程碑回顾邮件（v5.3.0）';
 $string['task:struggle_signal_review'] = '将学习困难信号归入学生的私密记忆（v5.3.0）';
@@ -1934,7 +1927,6 @@ $string['quizlock:scope_course'] = '仅本课程（推荐）';
 $string['quizlock:scope_site'] = '所有课程';
 $string['quizlock:scope_desc'] = '进行中的答题是仅在包含该测验的课程中阻止 [[tutorshort]]，还是在所有地方都阻止。<strong>仅本课程</strong>为默认值，几乎总是你想要的。全站范围是 v7.2.4 之前的行为，它有一个值得了解的缺陷：被放弃的答题会永远停留在“进行中”，因此学习者历史记录中某个被遗忘的测验，就会让助手在他所修的每一门课程中失效，而屏幕上没有任何说明。对于铁了心要作弊、手边就有第二个浏览器的学习者，全站范围几乎没有帮助，而助手的课程材料与检索本来就以课程为界。';
 
-$string['settings:prompt_budget_tuner_conflict'] = '已弃用的提示词预算自动调整任务处于开启状态，而预算模式却设为由模型推导。两者相互冲突：该任务会写入字符预算，而任何非默认值都会被视为有意的选择，从而关闭推导出的预算。在此模式下该任务现在会自行停止，因此并没有东西被覆盖——但仍请将其关闭，以消除歧义。';
 
 $string['settings:prompt_budget_no_window'] = '上方的预算模式设置为从模型推导，但没有可供推导的依据：聊天模型未设置，后端上下文窗口也未配置，因此推导会退回到下方的固定字符预算。请设置聊天模型，或手动设置后端上下文窗口，然后重新运行后端自检并确认上下文窗口检查通过。在此之前，无论模式声称什么，预算都是下方的这个数字。';
 
@@ -2282,7 +2274,6 @@ $string['mobile:input_placeholder'] = '提出问题…';
 $string['mobile:clear_history'] = '清除历史';
 $string['mobile:error_generic'] = '抱歉，出了点问题。请重试。';
 // settings.php — page/nav chrome and select options.
-$string['settingspage:pagetitle'] = '设置';
 $string['toc:providerbenchmark'] = '提供商基准测试';
 $string['toc:playground'] = '提示词演练场';
 $string['toc:course_ai_settings'] = '{$a} AI 设置';
@@ -2948,15 +2939,6 @@ $string['settingspage:analytics_title'] = '分析仪表板';
 $string['settingspage:rag_explainer'] = 'RAG（检索增强生成）会为你的课程内容建立索引，并在学生提问时检索相关段落，让 AI 能够基于你的教材给出答案。需要嵌入 API 密钥（推荐 OpenAI）。启用后，请在 RAG 管理页面为课程建立索引。';
 $string['settingspage:realtime_explainer'] = '实时语音模式使用 OpenAI 的 Realtime API，让学生与 AI 进行实时的双向语音对话。这与标准的文字转语音（TTS）不同，后者只是把 AI 的回复朗读出来。实时语音需要单独的 API 密钥，并按音频分钟数计费。全局启用后，你可以在每门课程的设置页面上逐课程开关。';
 $string['settingspage:reset_prompt_template'] = '恢复默认模板';
-$string['settingspage:sec_ai'] = 'AI 供应商与模型';
-$string['settingspage:sec_branding'] = '品牌与界面';
-$string['settingspage:sec_content'] = '内容与 RAG';
-$string['settingspage:sec_engagement'] = '参与度';
-$string['settingspage:sec_general'] = '常规';
-$string['settingspage:sec_integrations'] = '集成与推送';
-$string['settingspage:sec_safety'] = '安全与内容审核';
-$string['settingspage:toc_heading'] = '跳转到章节';
-$string['settingspage:toc_save'] = '保存';
 $string['settingspage:token_analytics_blurb'] = '监控各课程和各供应商的 token 用量与成本。';
 $string['settingspage:token_analytics_link'] = '查看 Token 分析';
 $string['settingspage:token_analytics_title'] = 'Token 成本与分析';
@@ -3181,16 +3163,7 @@ $string['support:starter_howto_prompt'] = '我不知道在这个网站上该怎�
 $string['support:starter_enrolment'] = '报名与证书';
 $string['support:starter_enrolment_desc'] = '加入课程、访问问题、考试与证书。';
 $string['support:starter_enrolment_prompt'] = '我有关于报名、账号或获取证书的问题。请先问我是哪一类，然后根据你掌握的帮助资料回答。';
-$string['settingspage:ai'] = 'AI 提供方与模型';
-$string['settingspage:content'] = '内容与检索';
 $string['settingspage:safety'] = '安全与审核';
-$string['settingspage:engagement'] = '参与度';
-$string['settingspage:branding'] = '品牌与界面';
-$string['settingspage:integrations'] = '集成与投递';
-$string['settingspage:rerank'] = '重排序';
-$string['settingspage:extraction'] = '文档提取';
-$string['settingspage:feedback'] = '问卷与反馈';
-$string['settingspage:operations'] = '韧性与运维';
 
 $string['survey_admin:err_invalid_bounds'] = '评分题的量表范围必须在 {$a->min} 到 {$a->max} 之间，且较小的值在前。';
 $string['survey_admin:err_no_title'] = '请输入问卷标题。';

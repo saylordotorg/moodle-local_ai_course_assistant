@@ -62,9 +62,10 @@ if ($hassiteconfig) {
     // ── Staging pages ───────────────────────────────────────────────────────
     // Every staging page, in order, handed to settings_layout::build() at the
     // end of this file, which places each setting and attaches each hide_if.
+    // A staging page is never registered or shown, so its title is its own id
+    // and not a lang string.
     $aicapages = [];
-    $settings = new admin_settingpage('local_ai_course_assistant_general',
-        get_string('settingspage:pagetitle', 'local_ai_course_assistant'));
+    $settings = new admin_settingpage('local_ai_course_assistant_general', 'general');
 
     // The quicklink styling lives in styles.css (search .sola-toc); nothing is
     // injected inline (plugin directory review).
@@ -152,19 +153,7 @@ if ($hassiteconfig) {
         $versionbanner . $toc
     ));
 
-    // Helper to render a section anchor + heading.
-    $sectionanchor = function (string $id, string $title): string {
-        return '<span id="' . $id . '" class="sola-section-anchor"></span>'
-            . '<h2 class="sola-section-heading">' . $title . '</h2>';
-    };
-
     // ── Section: General ────────────────────────────────────────────────────
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/sec_general_anchor',
-        '',
-        $sectionanchor('sec-general', get_string('settingspage:sec_general', 'local_ai_course_assistant'))
-    ));
-
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/enabled',
         get_string('settings:enabled', 'local_ai_course_assistant'),
@@ -268,16 +257,9 @@ if ($hassiteconfig) {
     // 7.10.0: these are now staging pages. They are collected, never registered,
     // and settings_layout (at the end of this file) places their settings.
     $aicapages[] = $settings;
-    $settings = new admin_settingpage('local_ai_course_assistant_ai',
-        get_string('settingspage:ai', 'local_ai_course_assistant'));
+    $settings = new admin_settingpage('local_ai_course_assistant_ai', 'ai');
 
     // ── Section: AI Provider & Models ───────────────────────────────────────
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/sec_ai_anchor',
-        '',
-        $sectionanchor('sec-ai', s(get_string('settingspage:sec_ai', 'local_ai_course_assistant')))
-    ));
-
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/provider_heading',
         get_string('settings:provider_heading', 'local_ai_course_assistant'),
@@ -569,43 +551,6 @@ if ($hassiteconfig) {
         get_string('settings:prompt_metrics_enabled_desc', 'local_ai_course_assistant'),
         '1'
     ));
-    // v7.2.6: DEPRECATED. The tuner infers a ceiling by watching for truncation
-    // and chasing the largest prompt it has seen; the v7.2.4 derived budget
-    // reads the model's context window directly. The second is strictly better
-    // -- it cannot oscillate, cannot chase noise, and needs no warm-up samples.
-    //
-    // Worse than redundant, the two collide. The tuner writes
-    // prompt_budget_chars, and resolve_budget_chars() treats any value other
-    // than the default as a deliberate administrator decision and stops
-    // deriving. So on a site with both enabled the tuner's first write silently
-    // switches the derived budget off. Found on Saylor production, where both
-    // were on and neither site's budget was the default.
-    //
-    // The task now stands down in auto mode, so the collision cannot happen
-    // even if this stays ticked. Kept for one release so nobody's configuration
-    // changes under them; scheduled for removal after that.
-    $settings->add(new admin_setting_configcheckbox(
-        'local_ai_course_assistant/prompt_budget_auto_tune',
-        get_string('settings:prompt_budget_auto_tune', 'local_ai_course_assistant'),
-        \local_ai_course_assistant\branding::str('settings:prompt_budget_auto_tune_desc'),
-        '0'
-    ));
-
-    // Warn only when both are actually on: a deprecation notice that fires for
-    // everyone is noise, and this page already has a lot of it.
-    if (
-        (bool) get_config('local_ai_course_assistant', 'prompt_budget_auto_tune')
-        && (string) get_config('local_ai_course_assistant', 'prompt_budget_mode') !== 'fixed'
-    ) {
-        $settings->add(new admin_setting_description(
-            'local_ai_course_assistant/prompt_budget_tuner_conflict',
-            '',
-            $OUTPUT->notification(
-                \local_ai_course_assistant\branding::str('settings:prompt_budget_tuner_conflict'),
-                \core\output\notification::NOTIFY_WARNING
-            )
-        ));
-    }
 
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/prompt_verbosity',
@@ -778,16 +723,9 @@ if ($hassiteconfig) {
     // carries only its own dependencies. The settings themselves, and their
     // config keys, are untouched: only which page renders them changes.
     $aicapages[] = $settings;
-    $settings = new admin_settingpage('local_ai_course_assistant_content',
-        get_string('settingspage:content', 'local_ai_course_assistant'));
+    $settings = new admin_settingpage('local_ai_course_assistant_content', 'content');
 
     // ── Section: Content & RAG ──────────────────────────────────────────────
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/sec_content_anchor',
-        '',
-        $sectionanchor('sec-content', s(get_string('settingspage:sec_content', 'local_ai_course_assistant')))
-    ));
-
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/rag_heading',
         get_string('settings:rag_heading', 'local_ai_course_assistant'),
@@ -1056,8 +994,7 @@ if ($hassiteconfig) {
  
     // Issue #292: reranking split out. Its six dependents plus retrieval's eighteen exceeded the budget on one page.
     $aicapages[] = $settings;
-    $settings = new admin_settingpage('local_ai_course_assistant_rerank',
-        get_string('settingspage:rerank', 'local_ai_course_assistant'));
+    $settings = new admin_settingpage('local_ai_course_assistant_rerank', 'rerank');
 
     // The page break used to sit BELOW this heading, so it was the last thing
     // on the previous page with nothing under it, and this page opened on its
@@ -1191,8 +1128,7 @@ if ($hassiteconfig) {
 
     // Issue #292: document extraction split out; its toggles carry their own sub-settings.
     $aicapages[] = $settings;
-    $settings = new admin_settingpage('local_ai_course_assistant_extraction',
-        get_string('settingspage:extraction', 'local_ai_course_assistant'));
+    $settings = new admin_settingpage('local_ai_course_assistant_extraction', 'extraction');
 
     // The page break used to sit BELOW this heading, so it was the last thing
     // on the previous page with nothing under it, and this page opened on its
@@ -1374,8 +1310,7 @@ if ($hassiteconfig) {
     // of the content section, which put them on the extraction page and pushed
     // it over the dependency budget. They are their own concern anyway.
     $aicapages[] = $settings;
-    $settings = new admin_settingpage('local_ai_course_assistant_operations',
-        get_string('settingspage:operations', 'local_ai_course_assistant'));
+    $settings = new admin_settingpage('local_ai_course_assistant_operations', 'operations');
 
     // The page break used to sit BELOW this heading, so it was the last thing
     // on the previous page with nothing under it, and this page opened on its
@@ -1589,16 +1524,9 @@ if ($hassiteconfig) {
     // carries only its own dependencies. The settings themselves, and their
     // config keys, are untouched: only which page renders them changes.
     $aicapages[] = $settings;
-    $settings = new admin_settingpage('local_ai_course_assistant_safety',
-        get_string('settingspage:safety', 'local_ai_course_assistant'));
+    $settings = new admin_settingpage('local_ai_course_assistant_safety', 'safety');
 
     // ── Section: Safety & Moderation ────────────────────────────────────────
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/sec_safety_anchor',
-        '',
-        $sectionanchor('sec-safety', s(get_string('settingspage:sec_safety', 'local_ai_course_assistant')))
-    ));
-
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/quiz_hide_heading',
         get_string('settings:quiz_hide_heading', 'local_ai_course_assistant'),
@@ -1765,16 +1693,9 @@ if ($hassiteconfig) {
     // carries only its own dependencies. The settings themselves, and their
     // config keys, are untouched: only which page renders them changes.
     $aicapages[] = $settings;
-    $settings = new admin_settingpage('local_ai_course_assistant_engagement',
-        get_string('settingspage:engagement', 'local_ai_course_assistant'));
+    $settings = new admin_settingpage('local_ai_course_assistant_engagement', 'engagement');
 
     // ── Section: Engagement ─────────────────────────────────────────────────
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/sec_engagement_anchor',
-        '',
-        $sectionanchor('sec-engagement', get_string('settingspage:sec_engagement', 'local_ai_course_assistant'))
-    ));
-
     // Study plans and reminders.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/studyplan_heading',
@@ -2074,7 +1995,7 @@ if ($hassiteconfig) {
     ));
 
     // v7.5.2: Soapbox is deprecated, and the notice is graded by whether this
-    // site actually runs it. Same house rule as the tuner banner above: a
+    // site actually runs it. Same house rule as the prompt budget notices: a
     // deprecation notice that fires for everyone is noise, and this page has a
     // lot of it already. get_config() with no second argument returns the whole
     // cached plugin config, so scanning the per-course soapbox_enabled_course_N
@@ -2252,8 +2173,7 @@ if ($hassiteconfig) {
 
     // Issue #292: survey and feedback split out so the engagement page's dependency payload fits core's 1,024-character js_call_amd budget.
     $aicapages[] = $settings;
-    $settings = new admin_settingpage('local_ai_course_assistant_feedback',
-        get_string('settingspage:feedback', 'local_ai_course_assistant'));
+    $settings = new admin_settingpage('local_ai_course_assistant_feedback', 'feedback');
 
     // The page break used to sit BELOW this heading, so it was the last thing
     // on the previous page with nothing under it, and this page opened on its
@@ -2848,16 +2768,9 @@ if ($hassiteconfig) {
     // carries only its own dependencies. The settings themselves, and their
     // config keys, are untouched: only which page renders them changes.
     $aicapages[] = $settings;
-    $settings = new admin_settingpage('local_ai_course_assistant_branding',
-        get_string('settingspage:branding', 'local_ai_course_assistant'));
+    $settings = new admin_settingpage('local_ai_course_assistant_branding', 'branding');
 
     // ── Section: Branding & UI ──────────────────────────────────────────────
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/sec_branding_anchor',
-        '',
-        $sectionanchor('sec-branding', s(get_string('settingspage:sec_branding', 'local_ai_course_assistant')))
-    ));
-
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/branding_heading',
         get_string('settings:branding_heading', 'local_ai_course_assistant'),
@@ -3051,16 +2964,9 @@ if ($hassiteconfig) {
     // carries only its own dependencies. The settings themselves, and their
     // config keys, are untouched: only which page renders them changes.
     $aicapages[] = $settings;
-    $settings = new admin_settingpage('local_ai_course_assistant_integrations',
-        get_string('settingspage:integrations', 'local_ai_course_assistant'));
+    $settings = new admin_settingpage('local_ai_course_assistant_integrations', 'integrations');
 
     // ── Section: Integrations & Delivery ────────────────────────────────────
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/sec_integrations_anchor',
-        '',
-        $sectionanchor('sec-integrations', s(get_string('settingspage:sec_integrations', 'local_ai_course_assistant')))
-    ));
-
     // FAQ & Zendesk.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/faq_heading',
@@ -3649,17 +3555,6 @@ if ($hassiteconfig) {
         get_string('empathy:outreach_dryrun', 'local_ai_course_assistant'),
         get_string('empathy:outreach_dryrun_desc', 'local_ai_course_assistant'),
         '0'
-    ));
-
-    // v5.5.6: invisible anchor at the bottom of the registered settings so
-    // the TOC can offer a "jump to Save" shortcut without forcing admins to
-    // scroll through 2,000 lines of settings to commit a single change.
-    // Moodle's framework renders the actual Save button just below this
-    // anchor as part of the form template.
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/sec_save_anchor',
-        '',
-        '<span id="sec-save" class="sola-section-anchor"></span>'
     ));
 
     // ── Dependencies: collapse a feature's detail until the feature is on ───

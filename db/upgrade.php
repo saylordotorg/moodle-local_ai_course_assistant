@@ -2330,5 +2330,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026101601, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026101803) {
+        // v7.12.0: the deprecated prompt_budget_auto_tune flag is gone with its daily task. The stored value
+        // would otherwise sit in config_plugins for good, read by nothing. Core drops the task's schedule
+        // itself once db/tasks.php stops listing it. The budget itself (prompt_budget_chars and the mode) is
+        // the administrator's and stays exactly as the last tune left it. unset_config() is called without
+        // its log argument: this is an upgrade, not an admin edit, so config_log gets no row.
+        unset_config('prompt_budget_auto_tune', 'local_ai_course_assistant');
+
+        upgrade_plugin_savepoint(true, 2026101803, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

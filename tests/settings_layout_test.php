@@ -46,13 +46,13 @@ final class settings_layout_test extends \advanced_testcase {
     /**
      * Settings that were in tests/fixtures/settings_defaults_snapshot.json and were deleted on purpose.
      *
-     * Empty today: the regroup renamed, removed and re-defaulted nothing. A
-     * later release that drops a setting lists its name here in the same
-     * commit, so the removal is visible in review.
+     * The regroup (7.10.0) renamed, removed and re-defaulted nothing. A release
+     * that drops a setting lists its name here in the same commit, so the
+     * removal is visible in review: prompt_budget_auto_tune went in 7.12.0.
      *
      * @var string[]
      */
-    private const REMOVED_ON_PURPOSE = [];
+    private const REMOVED_ON_PURPOSE = ['prompt_budget_auto_tune'];
 
     /**
      * Rebuild the real admin tree as an administrator and return the plugin category.
@@ -231,6 +231,24 @@ final class settings_layout_test extends \advanced_testcase {
             $this->assertArrayHasKey($name, $live, "{$name} was in the snapshot and is no longer registered "
                 . '(list it in REMOVED_ON_PURPOSE if that is intended)');
             $this->assertSame($default, $live[$name], "default of {$name}");
+        }
+    }
+
+    /**
+     * A name in REMOVED_ON_PURPOSE must really be gone, or the list hides a changed default.
+     *
+     * test_defaults_are_unchanged skips every listed name, so a setting that was listed and then kept (or came
+     * back) would escape the pin. The snapshot still holds the names, on purpose: the fixture is one-way.
+     */
+    public function test_a_setting_listed_as_removed_is_not_registered(): void {
+        $snapshot = json_decode(file_get_contents(__DIR__ . '/fixtures/settings_defaults_snapshot.json'), true);
+        $live = [];
+        foreach (settings_tree::settings($this->category()) as $setting) {
+            $live[$setting->name] = true;
+        }
+        foreach (self::REMOVED_ON_PURPOSE as $name) {
+            $this->assertArrayHasKey($name, $snapshot, "{$name} is not in the snapshot, so it needs no entry here");
+            $this->assertArrayNotHasKey($name, $live, "{$name} is listed as removed but is still registered");
         }
     }
 
@@ -415,11 +433,12 @@ final class settings_layout_test extends \advanced_testcase {
 
     public function test_conditional_notices_are_placed_when_their_condition_is_met(): void {
         $this->resetAfterTest();
-        // Both conditions met: a truncation in the last 7 days, and the deprecated
-        // tuner on while the budget mode is not fixed.
+        // Both conditions met: a truncation in the last 7 days, and an automatic budget with no model window to
+        // derive it from (no model name, no backend_context_tokens).
         set_config('prompt_truncation_seen', time() - HOURSECS, 'local_ai_course_assistant');
-        set_config('prompt_budget_auto_tune', 1, 'local_ai_course_assistant');
         set_config('prompt_budget_mode', 'auto', 'local_ai_course_assistant');
+        set_config('model', '', 'local_ai_course_assistant');
+        set_config('backend_context_tokens', 0, 'local_ai_course_assistant');
         $pages = settings_tree::pages($this->category());
         $this->assertDebuggingNotCalled();
 
@@ -427,8 +446,25 @@ final class settings_layout_test extends \advanced_testcase {
         $this->assertSame([], $report['unplaced'], 'a conditional notice was appended to adv_legacy instead of placed');
         $this->assertTrue(isset($pages[settings_layout::page_id('adv_prompt')]
             ->settings->{'local_ai_course_assistantprompt_truncation_warning'}));
-        $this->assertTrue(isset($pages[settings_layout::page_id('adv_legacy')]
-            ->settings->{'local_ai_course_assistantprompt_budget_tuner_conflict'}));
+        $this->assertTrue(isset($pages[settings_layout::page_id('adv_prompt')]
+            ->settings->{'local_ai_course_assistantprompt_budget_nowindow_warning'}));
+    }
+
+    public function test_conditional_notices_are_left_out_quietly_when_their_condition_is_not_met(): void {
+        $this->resetAfterTest();
+        set_config('prompt_truncation_seen', 0, 'local_ai_course_assistant');
+        set_config('prompt_budget_mode', 'fixed', 'local_ai_course_assistant');
+        $pages = settings_tree::pages($this->category());
+        $this->assertDebuggingNotCalled();
+
+        $report = settings_layout::last_report();
+        $this->assertSame([], $report['missing'], 'an OPTIONAL name that was not built is not reported missing');
+        $this->assertSame([], $report['unplaced']);
+        foreach (settings_layout_map::OPTIONAL as $name) {
+            foreach ($pages as $page) {
+                $this->assertFalse(isset($page->settings->{'local_ai_course_assistant' . $name}), "{$name} was not built");
+            }
+        }
     }
 
     public function test_every_literal_setting_name_in_settings_php_has_a_home(): void {
@@ -452,6 +488,15 @@ final class settings_layout_test extends \advanced_testcase {
         }
         $homeless = array_values(array_diff($m[1], $homes));
         $this->assertSame([], $homeless, 'settings.php builds these but settings_layout_map gives them no page');
+    }
+
+    public function test_dropped_lists_only_a_heading_that_still_exists(): void {
+        // The eight table-of-contents anchors were deleted in 7.12.0 together with the
+        // helper that built them. provider_heading is still built by settings.php
+        // and is dropped on purpose (the Models page opens on its own headings).
+        $this->assertSame(['provider_heading'], settings_layout_map::DROPPED);
+        $src = file_get_contents(__DIR__ . '/../settings.php');
+        $this->assertStringContainsString("'local_ai_course_assistant/provider_heading'", $src);
     }
 
     public function test_optional_names_are_listed_in_pages(): void {
@@ -507,7 +552,7 @@ final class settings_layout_test extends \advanced_testcase {
         $one = new \admin_settingpage('stage_one', 'Stage one');
         $one->add(new \admin_setting_configtext('local_ai_course_assistant/rag_topk', 'Top k', '', '5'));
         $one->add(new \admin_setting_configtext('local_ai_course_assistant/fake_unmapped', 'Unmapped', '', 'x'));
-        $one->add(new \admin_setting_description('local_ai_course_assistant/sec_ai_anchor', '', 'anchor'));
+        $one->add(new \admin_setting_description('local_ai_course_assistant/provider_heading', '', 'dropped'));
         $two = new \admin_settingpage('stage_two', 'Stage two');
         $two->add(new \admin_setting_configcheckbox('local_ai_course_assistant/rag_enabled', 'RAG', '', 1));
         $two->add(new \admin_setting_configtext('local_ai_course_assistant/rerank_model', 'Model', '', 'm'));
@@ -533,7 +578,7 @@ final class settings_layout_test extends \advanced_testcase {
         $this->assertSame(['adv_retrieval'], $where['rag_enabled']);
         $this->assertSame(['adv_documents'], $where['rerank_model']);
         $this->assertSame(['adv_legacy'], $where['fake_unmapped'], 'an unplaced setting is never lost');
-        $this->assertArrayNotHasKey('sec_ai_anchor', $where, 'a dropped entry is placed nowhere');
+        $this->assertArrayNotHasKey('provider_heading', $where, 'a dropped entry is placed nowhere');
 
         // The rule whose ends share a page is attached there, and only there.
         $this->assertTrue($built['pages']['adv_retrieval']->has_dependencies());

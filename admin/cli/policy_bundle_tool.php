@@ -129,6 +129,9 @@ if ($options['sign']) {
         cli_error('payload "settings" must be a non-empty object');
     }
     foreach ($settings as $key => $value) {
+        if (in_array($key, policy_bundle::RETIRED_KEYS, true)) {
+            cli_error("setting '{$key}' is retired and does nothing; remove it from the payload before signing");
+        }
         if (!in_array($key, policy_bundle::ALLOWED_KEYS, true)) {
             cli_error("setting '{$key}' is not on the allowlist; refusing to sign");
         }
@@ -187,7 +190,7 @@ if ($options['verify']) {
     cli_writeln('comment:   ' . ($payload['comment'] ?? '(none)'));
     cli_writeln('settings:');
     foreach ($payload['settings'] as $key => $value) {
-        cli_writeln('  ' . $key . ' = ' . var_export($value, true));
+        cli_writeln('  ' . policy_bundle::describe_setting((string) $key, $value));
     }
     exit(0);
 }

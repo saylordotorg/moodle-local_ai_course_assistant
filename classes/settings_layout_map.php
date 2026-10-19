@@ -42,20 +42,21 @@ namespace local_ai_course_assistant;
 final class settings_layout_map {
     /**
      * @var string[] Warnings settings.php builds only under a condition (a prompt
-     *               budget with no model window, a truncation in the last 7 days,
-     *               the deprecated tuner on while the budget mode is not fixed).
+     *               budget with no model window, a truncation in the last 7 days).
      *               Each is placed in PAGES like any other entry; when it was not
      *               built, settings_layout::build() does not report it missing.
      */
     public const OPTIONAL = [
-        'prompt_budget_nowindow_warning', 'prompt_truncation_warning', 'prompt_budget_tuner_conflict',
+        'prompt_budget_nowindow_warning', 'prompt_truncation_warning',
     ];
 
-    /** @var string[] Entries that no longer render: the old in-page table of contents anchors. */
+    /**
+     * @var string[] Entries settings.php still builds but that render nowhere. The only one left is the old
+     *               "AI Provider & Conversation" heading: the Models page opens on its own headings. (The
+     *               in-page table of contents anchors that used to be listed here were deleted in 7.12.0.)
+     */
     public const DROPPED = [
-        'sec_general_anchor', 'sec_ai_anchor', 'provider_heading', 'sec_content_anchor',
-        'sec_safety_anchor', 'sec_engagement_anchor', 'sec_branding_anchor',
-        'sec_integrations_anchor', 'sec_save_anchor'
+        'provider_heading'
     ];
 
     /** @var string[] Old settings page name (without the plugin prefix) => the page that replaced it. */
@@ -363,9 +364,6 @@ final class settings_layout_map {
                     'tavus_api_key', 'tavus_persona_id', 'synthesia_api_key',
                     'synthesia_persona_id', 'avatar_rate_card_overrides', 'did_webhook_secret',
                     'heygen_webhook_secret', 'tavus_webhook_secret', 'synthesia_webhook_secret'
-                ]],
-                ['new', 'legacy', [
-                    'prompt_budget_auto_tune', 'prompt_budget_tuner_conflict'
                 ]],
             ],
         ],

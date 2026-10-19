@@ -47,7 +47,8 @@ defined('MOODLE_INTERNAL') || die();
  *      compromised hosting bucket cannot alter site behavior.
  *   2. Every settings key is on the hard-coded ALLOWED_KEYS list below —
  *      behavior data only. API keys, URLs, webhooks, email addresses, and
- *      security settings can never be set by a bundle, signed or not.
+ *      security settings can never be set by a bundle, signed or not. A key
+ *      on RETIRED_KEYS is also accepted, and then ignored.
  *   3. The payload version is strictly greater than the last applied
  *      version (replay/rollback protection).
  *
@@ -74,7 +75,8 @@ class policy_bundle {
      * Settings a bundle may set. Behavior data only — deliberately excludes
      * every *_apikey, *_apibaseurl, URL, webhook, email-recipient, consent,
      * privacy, SSRF, emergency, and voice/STT setting. Fail closed: a bundle
-     * containing ANY key not on this list is rejected in full.
+     * containing ANY key that is neither on this list nor on RETIRED_KEYS is
+     * rejected in full.
      *
      * @var string[]
      */
@@ -96,7 +98,7 @@ class policy_bundle {
         'spend_failover_chain',
         // Prompt budgeting (v5.10) and proportions (v6.2).
         'prompt_budget_chars',
-        'prompt_budget_auto_tune',
+        // prompt_budget_auto_tune moved to RETIRED_KEYS in v7.12.0.
         'prompt_section_weights',
         'prompt_section_weights_coach',
         'prompt_context_boost_mode',
@@ -173,6 +175,25 @@ class policy_bundle {
     ];
 
     /**
+     * Settings that no longer exist but that an already-signed bundle may still carry.
+     *
+     * A retired key is accepted so that a bundle signed before the setting was
+     * removed keeps verifying and applying its other keys, instead of being
+     * rejected in full as an unknown key. It is never written, never reported
+     * as changed in the audit row and never counted among the keys the bundle
+     * manages (see live_settings()).
+     *
+     * Removing a name from this list is a major-version decision: from then on
+     * a bundle that still carries it is rejected in full.
+     *
+     * @var string[]
+     */
+    public const RETIRED_KEYS = [
+        // The daily prompt budget auto-tune flag, removed in v7.12.0 with its task.
+        'prompt_budget_auto_tune',
+    ];
+
+    /**
      * Fetch the configured bundle URL and apply it if valid and newer.
      *
      * Called by the daily scheduled task and by the CLI --sync mode. All
@@ -243,21 +264,23 @@ class policy_bundle {
         // every VERIFIED bundle, applied or not newer. The automatic model
         // switcher reads this so it never changes a setting the next bundle
         // would change back.
-        $managed = implode(',', array_keys($payload['settings']));
+        $settings = self::live_settings($payload['settings']);
+        $managed = implode(',', array_keys($settings));
         set_config('policy_bundle_managed_keys', $managed, 'local_ai_course_assistant');
         $applied = (int) (get_config('local_ai_course_assistant', 'policy_bundle_applied_version') ?: 0);
         if ($version <= $applied) {
             return self::record('skipped', "bundle version {$version} is not newer than applied {$applied}");
         }
 
-        // Apply. Keys and value types were validated in verify_envelope().
+        // Apply. Keys and value types were validated in verify_envelope(); retired keys were accepted there and
+        // are left out of $settings, so none of them is written.
         // Wrap the whole apply (settings + version stamp) in one transaction so
         // a crash mid-loop cannot leave a partially-applied bundle whose version
         // was never advanced (which would re-apply the remainder next sync).
         global $DB;
         $changes = [];
         $tx = $DB->start_delegated_transaction();
-        foreach ($payload['settings'] as $key => $value) {
+        foreach ($settings as $key => $value) {
             $old = get_config('local_ai_course_assistant', $key);
             $new = self::scalar_to_config($value);
             if ((string) $old === $new) {
@@ -302,8 +325,9 @@ class policy_bundle {
      *
      * Checks: envelope shape, format id, strict base64, Ed25519 signature,
      * payload shape (positive int version, non-empty settings object),
-     * allowlist membership, and scalar value types. Throws on any failure;
-     * applies nothing.
+     * allowlist membership (a retired key counts as a member), and scalar
+     * value types. Throws on any failure; applies nothing. The returned
+     * payload still lists a retired key; live_settings() drops it.
      *
      * @param string $json Raw envelope JSON.
      * @param string $pubkeyb64 Base64-encoded 32-byte Ed25519 public key.
@@ -396,7 +420,7 @@ class policy_bundle {
             );
         }
         foreach ($settings as $key => $value) {
-            if (!in_array($key, self::ALLOWED_KEYS, true)) {
+            if (!in_array($key, self::ALLOWED_KEYS, true) && !in_array($key, self::RETIRED_KEYS, true)) {
                 throw new \moodle_exception(
                     "policy_bundle:invalid",
                     "local_ai_course_assistant",
@@ -414,6 +438,28 @@ class policy_bundle {
             }
         }
         return $payload;
+    }
+
+    /**
+     * One line of the settings list that `policy_bundle_tool.php --verify` prints for a payload.
+     *
+     * @param string $key Setting name as it stands in the payload.
+     * @param mixed $value Its value.
+     * @return string "name = value", with "(retired, ignored)" after a retired key.
+     */
+    public static function describe_setting(string $key, $value): string {
+        $line = $key . ' = ' . var_export($value, true);
+        return in_array($key, self::RETIRED_KEYS, true) ? $line . '  (retired, ignored)' : $line;
+    }
+
+    /**
+     * The settings of a verified payload that a site acts on: all of them except the retired keys.
+     *
+     * @param array $settings The payload's settings object, after verify_envelope().
+     * @return array The same map without any key on RETIRED_KEYS.
+     */
+    private static function live_settings(array $settings): array {
+        return array_diff_key($settings, array_flip(self::RETIRED_KEYS));
     }
 
     /**

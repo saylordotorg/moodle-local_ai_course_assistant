@@ -31,7 +31,6 @@ use local_ai_course_assistant\task\learner_weekly_digest;
 use local_ai_course_assistant\task\instructor_weekly_digest;
 use local_ai_course_assistant\task\index_course_content;
 use local_ai_course_assistant\task\auto_reindex_rag_drifted;
-use local_ai_course_assistant\task\auto_tune_prompt_budget;
 use local_ai_course_assistant\task\refresh_rate_card;
 use local_ai_course_assistant\provider\stub_provider;
 
@@ -906,27 +905,6 @@ final class cron_tasks_test extends \advanced_testcase {
         set_config('rag_enabled', 0, 'local_ai_course_assistant');
         $this->run_task_silently(new auto_reindex_rag_drifted());
         $this->assertTrue(true, 'RAG disabled site-wide overrides the per-task flag.');
-    }
-
-    public function test_auto_tune_prompt_budget_skips_when_disabled(): void {
-        $this->resetAfterTest();
-        set_config('prompt_budget_auto_tune', 0, 'local_ai_course_assistant');
-        set_config('prompt_budget_chars', 12000, 'local_ai_course_assistant');
-        $this->run_task_silently(new auto_tune_prompt_budget());
-        // Budget must not change when auto-tune is off.
-        $this->assertEquals(
-            12000,
-            (int) get_config('local_ai_course_assistant', 'prompt_budget_chars'),
-            'Auto-tune disabled => budget setting untouched.'
-        );
-    }
-
-    public function test_auto_tune_prompt_budget_runs_when_enabled(): void {
-        $this->resetAfterTest();
-        set_config('prompt_budget_auto_tune', 1, 'local_ai_course_assistant');
-        // Empty metrics => apply_recommendation returns "no change". Must not throw.
-        $this->run_task_silently(new auto_tune_prompt_budget());
-        $this->assertTrue(true, 'Enabled auto-tune on empty metrics is a no-op, not an error.');
     }
 
     public function test_refresh_rate_card_skips_when_disabled(): void {

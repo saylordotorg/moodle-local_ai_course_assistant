@@ -190,18 +190,6 @@ $tasks = [
         'dayofweek' => '*',
     ],
     [
-        // v5.0.0 patch 3 — Daily prompt-budget auto-tune. Default off
-        // (admin opts in via `prompt_budget_auto_tune`); when on, applies
-        // the recommendation surfaced on the metrics admin page.
-        'classname' => \local_ai_course_assistant\task\auto_tune_prompt_budget::class,
-        'blocking' => 0,
-        'minute' => '20',
-        'hour' => '3',
-        'day' => '*',
-        'month' => '*',
-        'dayofweek' => '*',
-    ],
-    [
         // v5.3.0 — Daily milestone reflections (7-day, 30-day, completion).
         // Sends only when per-feature kill switch + per-learner consent +
         // 7-day cooldown all clear. Default off at the outreach_master

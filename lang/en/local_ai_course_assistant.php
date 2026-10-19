@@ -1433,7 +1433,6 @@ $string['settings:prompt_debug_enabled_desc'] = 'When on, every chat-turn writes
 $string['settings:socratic_verbose']      = 'Verbose Socratic mode prompt';
 $string['settings:socratic_verbose_desc'] = 'When on, Socratic-mode courses receive the full ~600-token do/don\'t directive originally added in v3.9.30. When off (default), they receive a single-line directive that modern hosted models follow reliably and saves ~600 tokens per turn. Turn this on if a course is running on a weaker self-hosted model that needs the explicit scaffolding.';
 // v4.12.0: structured prompt budget + verbosity.
-$string['settings:prompt_budget_tuner_conflict'] = 'The deprecated prompt-budget auto-tune task is switched on while the budget mode is set to derive from the model. These two conflict: the task writes the character budget, and any value other than the default is read as a deliberate choice, which switches the derived budget off. The task now stands down by itself in this mode, so nothing is being overwritten — but switch it off to remove the ambiguity.';
 $string['settings:prompt_budget_no_window'] = 'The budget mode above is set to derive from the model, but there is nothing to derive from: the chat model is not set and no backend context window has been configured, so the derivation falls back to the fixed character budget below. Set the chat model, or set the backend context window by hand, then re-run the backend self-test and confirm the context-window check passes. Until then the budget is whatever the number below says, whatever the mode claims.';
 $string['settings:prompt_budget_mode'] = 'System prompt budget mode';
 $string['settings:prompt_budget_mode_desc'] = 'How the system prompt character budget is decided. <strong>Derive from the model</strong> works out how much room the configured model actually offers — its context window, less the reserved reply and the conversation history — and uses that, capped so a very large window does not license a very large prompt. It applies only while the character budget below is left at its default of 36,000: change that number and it wins instead, in both directions, because a figure an administrator typed is a decision rather than a guess. <strong>Fixed</strong> always uses the number below. A self-hosted backend should set the backend context window, which takes precedence over everything here.';
@@ -1495,12 +1494,9 @@ $string['settings:prompt_verbosity_desc'] = 'Default verbosity for instruction b
 $string['settings:prompt_verbosity_concise']  = 'Concise (recommended for hosted models)';
 $string['settings:prompt_verbosity_standard'] = 'Standard';
 $string['settings:prompt_verbosity_verbose']  = 'Verbose (for weaker self-hosted models)';
-// v5.0.0 patch 3: prompt metrics + budget auto-tune.
+// v5.0.0 patch 3: prompt metrics + budget recommendation.
 $string['settings:prompt_metrics_enabled']      = 'Capture per-section prompt metrics';
 $string['settings:prompt_metrics_enabled_desc'] = 'When on (default), every chat turn writes one JSON line per assembled prompt to <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> with per-category char counts. Last 7 days kept. The metrics admin page aggregates these for the budget recommendation. No PII is recorded — only section sizes. Turn off if your institution prefers no metrics file at all.';
-$string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily (deprecated)';
-$string['settings:prompt_budget_auto_tune_desc'] = 'Deprecated. Does nothing unless the budget mode above is set to <strong>Fixed</strong>. A daily task used to infer the character budget by watching for truncation and chasing the largest prompt it had seen. Deriving the budget from the model\'s context window does that better: it cannot oscillate and needs no warm-up data. The two also conflicted, because the task writes the character budget and any value other than the default switches the derived budget off. Leave this off; it will be removed in a future release. The recommendation still appears on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> page.';
-$string['task:auto_tune_prompt_budget']          = 'Auto-tune [[tutorshort]] prompt budget from observed metrics';
 $string['prompt_metrics:title']                  = 'Prompt metrics + budget recommendation';
 $string['prompt_metrics:subtitle']               = 'Per-section prompt sizes captured over the last 7 days. Used to recommend a value for the System prompt character budget setting.';
 $string['prompt_metrics:no_data']                = 'No prompt metrics recorded yet. Send a few chat turns from a learner account, then refresh this page. (If the metrics capture flag is off in plugin settings, no data will accumulate.)';
@@ -1523,10 +1519,6 @@ $string['prompt_metrics:recommended']            = 'Recommended budget';
 $string['prompt_metrics:apply']                  = 'Apply recommendation';
 $string['prompt_metrics:applied']                = 'Applied: budget changed from {$a->old} to {$a->new}. {$a->reason}';
 $string['prompt_metrics:noop']                   = 'No change applied: {$a}';
-$string['prompt_metrics:auto_tune_heading']      = 'Daily auto-tune';
-$string['prompt_metrics:auto_tune_on']           = 'Daily auto-tune is ON. The recommendation will be applied automatically every night at 03:20 server time.';
-$string['prompt_metrics:auto_tune_off']          = 'Daily auto-tune is OFF. The recommendation is shown here for review; nothing is applied automatically. Toggle on in plugin settings if you want unattended daily tuning.';
-$string['prompt_metrics:settings_link']          = 'Open plugin settings to toggle auto-tune.';
 // v5.0.0 patch 10: prompt debug log viewer.
 $string['prompt_debug_view:title']            = 'Prompt debug log viewer';
 $string['prompt_debug_view:subtitle']         = 'Per-turn assembled system prompt + per-section breakdown + conversation history + current user message + attachment metadata, exactly as the model received them. Use this to verify whether a section like Current Page Content actually landed in the prompt and to debug answer-quality issues without SSHing into the server.';
@@ -2238,15 +2230,6 @@ $string['settings:anomaly_digest_threshold_pct'] = 'Alert threshold (%)';
 $string['settings:anomaly_digest_threshold_pct_desc'] = 'Percent change between the recent and prior window that triggers an alert. Default: 50.';
 // v7.2.0 (CONTRIB-10574 #205): settings-page interface text, previously written
 // as hardcoded English literals inside settings.php and therefore untranslatable.
-$string['settingspage:toc_heading'] = 'Jump to section';
-$string['settingspage:sec_general'] = 'General';
-$string['settingspage:sec_ai'] = 'AI Provider & Models';
-$string['settingspage:sec_branding'] = 'Branding & UI';
-$string['settingspage:sec_content'] = 'Content & RAG';
-$string['settingspage:sec_safety'] = 'Safety & Moderation';
-$string['settingspage:sec_engagement'] = 'Engagement';
-$string['settingspage:sec_integrations'] = 'Integrations & Delivery';
-$string['settingspage:toc_save'] = 'Save';
 $string['settingspage:token_analytics_title'] = 'Token Cost & Analytics';
 $string['settingspage:token_analytics_link'] = 'View Token Analytics';
 $string['settingspage:token_analytics_blurb'] = 'Monitor token usage and costs across courses and providers.';
@@ -3004,17 +2987,7 @@ $string['mobile:error_generic'] = 'Sorry, something went wrong. Please try again
 
 // --- from newstrings_e.php ---
 // settings.php — page/nav chrome and select options (i18n extraction batch E).
-$string['settingspage:operations'] = 'Resilience and operations';
-$string['settingspage:rerank'] = 'Reranking';
-$string['settingspage:extraction'] = 'Document extraction';
-$string['settingspage:feedback'] = 'Surveys and feedback';
-$string['settingspage:ai'] = 'AI provider and models';
-$string['settingspage:content'] = 'Content and retrieval';
 $string['settingspage:safety'] = 'Safety and privacy';
-$string['settingspage:engagement'] = 'Engagement';
-$string['settingspage:branding'] = 'Branding and interface';
-$string['settingspage:integrations'] = 'Integrations and delivery';
-$string['settingspage:pagetitle'] = 'Settings';
 $string['toc:providerbenchmark'] = 'Provider benchmark';
 $string['toc:playground'] = 'Prompt Playground';
 $string['toc:course_ai_settings'] = '{$a} AI settings';
@@ -3745,7 +3718,7 @@ $string['settingspage:adv_retrieval_intro'] = 'Search over course content: embed
 $string['settingspage:adv_documents_intro'] = 'Reranking, switching embedding models, and which document types are read into the index.';
 $string['settingspage:adv_prompt_intro'] = 'Prompt size and history, voice and speech providers, and the look of the chat widget.';
 $string['settingspage:adv_integrations_intro'] = 'Support and Zendesk, analytics export, CDN, remote configuration, signed policy bundles, vendor data, price drift, benchmarks and optimizer weights.';
-$string['settingspage:adv_legacy_intro'] = 'Deprecated Soapbox, talking-avatar vendors and other settings that are parked here.';
+$string['settingspage:adv_legacy_intro'] = 'The deprecated Soapbox settings and the talking-avatar vendor settings.';
 $string['layout:general'] = 'General';
 $string['layout:contact'] = 'Contact and privacy';
 $string['layout:faq'] = 'FAQ and conversation starters';
@@ -3761,7 +3734,6 @@ $string['layout:history'] = 'History and learner profile';
 $string['layout:appearance'] = 'Appearance';
 $string['layout:remote'] = 'Remote configuration';
 $string['layout:optimizer'] = 'Optimizer weights';
-$string['layout:legacy'] = 'Deprecated settings';
 
 // Key places status check (7.11.0).
 $string['check:key_places'] = 'AI Course Assistant key places';

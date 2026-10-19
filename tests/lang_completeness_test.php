@@ -275,7 +275,6 @@ final class lang_completeness_test extends \basic_testcase {
         'layout:appearance',
         'layout:remote',
         'layout:optimizer',
-        'layout:legacy',
         // The course page's "More options" summary (Release 1, task 3). Same ruling.
         'coursesettings:more_options',
         // The essay-scoring role's label, missing since the role arrived in 7.8.2
@@ -301,6 +300,108 @@ final class lang_completeness_test extends \basic_testcase {
         'check:key_places_morekeys',
         'check:key_places_unreadable',
     ];
+
+    /**
+     * Keys that were deleted in 7.12.0 because nothing renders or reads them any more.
+     *
+     * The ten old page titles and the section and table-of-contents strings were
+     * used only by the staging pages in settings.php (7.10.0 never registers those
+     * pages, so no title or heading from them reaches an administrator). The four
+     * prompt_metrics strings described a nightly auto-apply that 7.12.0 retired.
+     * settingspage:safety is NOT here: it is the title of the Safety and privacy page.
+     */
+    private const REMOVED_KEYS = [
+        'settingspage:pagetitle',
+        'settingspage:ai',
+        'settingspage:content',
+        'settingspage:rerank',
+        'settingspage:extraction',
+        'settingspage:operations',
+        'settingspage:feedback',
+        'settingspage:engagement',
+        'settingspage:branding',
+        'settingspage:integrations',
+        'settingspage:sec_general',
+        'settingspage:sec_ai',
+        'settingspage:sec_branding',
+        'settingspage:sec_content',
+        'settingspage:sec_safety',
+        'settingspage:sec_engagement',
+        'settingspage:sec_integrations',
+        'settingspage:toc_heading',
+        'settingspage:toc_save',
+        'prompt_metrics:auto_tune_heading',
+        'prompt_metrics:auto_tune_on',
+        'prompt_metrics:auto_tune_off',
+        'prompt_metrics:settings_link',
+    ];
+
+    /**
+     * A removed key must not come back in lang/en or in any of the 45 other locale files.
+     *
+     * The raw text is scanned, not the loaded array, so a second definition of the
+     * same key (a few locale files carry duplicates) cannot hide behind the first.
+     *
+     * @return void
+     */
+    public function test_removed_keys_are_gone_from_every_locale_file(): void {
+        $langs = array_values(array_filter(
+            scandir($this->plugin_root() . '/lang'),
+            fn($d) => $d !== '.' && $d !== '..'
+        ));
+        $this->assertContains('en', $langs);
+        $this->assertGreaterThan(40, count($langs), 'expected the full locale set');
+
+        $found = [];
+        foreach ($langs as $lang) {
+            $path = $this->plugin_root() . '/lang/' . $lang . '/local_ai_course_assistant.php';
+            $this->assertFileExists($path);
+            $body = file_get_contents($path);
+            foreach (self::REMOVED_KEYS as $key) {
+                $pattern = '/\$string\[\s*[\'"]' . preg_quote($key, '/') . '[\'"]\s*\]/';
+                $count = preg_match_all($pattern, $body);
+                if ($count > 0) {
+                    $found[] = "{$lang}: {$key} x{$count}";
+                }
+            }
+        }
+        $this->assertSame([], $found, "Removed lang keys are defined again:\n  " . implode("\n  ", $found));
+    }
+
+    /**
+     * No PHP, JavaScript or Mustache file may reference a removed key or the string families they came from.
+     *
+     * Dynamic uses are covered too: the layout code builds 'settingspage:' . $short
+     * from the keys of settings_layout_map::PAGES, which never include an old page.
+     *
+     * @return void
+     */
+    public function test_no_code_references_a_removed_key(): void {
+        $pattern = '/settingspage:(?:sec_|toc_)|settingspage:(?:pagetitle|ai|content|rerank|extraction|operations'
+            . '|feedback|engagement|branding|integrations)\b|prompt_metrics:(?:auto_tune_|settings_link)/';
+        // The scan must be able to see what it is looking for.
+        $this->assertSame(1, preg_match($pattern, "get_string('settingspage:sec_ai', 'x')"));
+        $this->assertSame(1, preg_match($pattern, "get_string('settingspage:ai', 'x')"));
+        $this->assertSame(1, preg_match($pattern, "get_string('prompt_metrics:settings_link', 'x')"));
+        $this->assertSame(0, preg_match($pattern, "get_string('settingspage:safety', 'x')"));
+        $this->assertSame(0, preg_match($pattern, "get_string('settingspage:analytics_title', 'x')"));
+        $this->assertSame(0, preg_match($pattern, "get_string('settingspage:adv_integrations', 'x')"));
+
+        $root = $this->plugin_root();
+        $files = array_filter(
+            $this->walk($root, ['.php', '.js', '.mustache']),
+            fn($f) => !str_starts_with(substr($f, strlen($root) + 1), 'lang/')
+        );
+        $this->assertGreaterThan(200, count($files), 'the scan found too few files to mean anything');
+
+        $hits = [];
+        foreach ($files as $f) {
+            if (preg_match_all($pattern, file_get_contents($f), $m)) {
+                $hits[] = substr($f, strlen($root) + 1) . ': ' . implode(', ', array_unique($m[0]));
+            }
+        }
+        $this->assertSame([], $hits, "Code still references a removed lang key:\n  " . implode("\n  ", $hits));
+    }
 
     /**
      * Keys defined in a locale file.

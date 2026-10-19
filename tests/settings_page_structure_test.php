@@ -67,12 +67,12 @@ final class settings_page_structure_test extends \advanced_testcase {
 
             // Essentials leads with the version banner by design. Every other page
             // must reach a heading before its first real setting; the navigation
-            // notice (nav_*) and any old TOC anchor (*_anchor) are not settings.
+            // notice (nav_*) is not a setting.
             if ($page->name === settings_layout::page_id('essentials')) {
                 continue;
             }
             foreach ($list as $setting) {
-                if (str_starts_with($setting->name, 'nav_') || str_ends_with($setting->name, '_anchor')) {
+                if (str_starts_with($setting->name, 'nav_')) {
                     continue;
                 }
                 if (!$setting instanceof \admin_setting_heading) {
@@ -84,5 +84,29 @@ final class settings_page_structure_test extends \advanced_testcase {
 
         $this->assertGreaterThanOrEqual(10, $pages, 'expected every settings page');
         $this->assertSame([], $problems, "Settings pages strand a heading:\n  " . implode("\n  ", $problems));
+    }
+
+    /**
+     * settings.php builds no table-of-contents anchor and titles its staging pages with their own ids.
+     *
+     * 7.10.0 stopped rendering the in-page table of contents and the section
+     * anchors; 7.12.0 deleted them and the strings behind them. A staging page is
+     * never registered, so its title is never shown and must not cost a lang string.
+     */
+    public function test_settings_php_has_no_section_anchors_and_no_lang_titled_staging_pages(): void {
+        $src = file_get_contents(__DIR__ . '/../settings.php');
+        $this->assertStringNotContainsString('$sectionanchor', $src);
+        $this->assertStringNotContainsString('$tocstyle', $src);
+        $this->assertStringNotContainsString('sola-section-anchor', $src);
+        $this->assertSame(0, preg_match("~'local_ai_course_assistant/sec_[a-z_]*anchor'~", $src),
+            'a sec_*_anchor setting is still built');
+
+        $this->assertSame(11, preg_match_all("~new\\s+admin_settingpage\\(\\s*'local_ai_course_assistant_([a-z]+)',\\s*"
+            . "'([a-z]+)'\\s*\\)~", $src, $m), 'the eleven staging pages');
+        foreach ($m[1] as $i => $id) {
+            $this->assertSame($id, $m[2][$i], 'a staging page is titled with its own id');
+        }
+        $this->assertSame(['general', 'ai', 'content', 'rerank', 'extraction', 'operations', 'safety',
+            'engagement', 'feedback', 'branding', 'integrations'], $m[1]);
     }
 }
