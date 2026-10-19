@@ -107,6 +107,8 @@ final class course_stored_key_display_test extends \advanced_testcase {
         $this->assertFalse(course_config_manager::has_stored_key($this->row_with('')), 'an empty key column');
         $this->assertFalse(course_config_manager::has_stored_key((object) ['provider' => 'openai']),
             'a record with no key field at all');
+        $this->assertFalse(course_config_manager::has_stored_key($this->row_with(" \t\n ")),
+            'whitespace only is not a key, as the key inventory reads it');
     }
 
     public function test_a_course_with_a_stored_value_holds_a_key(): void {

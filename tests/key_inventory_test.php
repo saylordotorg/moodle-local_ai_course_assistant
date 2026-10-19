@@ -259,4 +259,28 @@ final class key_inventory_test extends \advanced_testcase {
         $this->assertSame([], key_inventory::places());
         $this->assertSame([], key_inventory::groups());
     }
+
+    /**
+     * course_cfg.apikey is a TEXT column: Oracle can't compare a CLOB with '' (and reads '' as NULL), so every query
+     * on it goes through $DB->sql_isnotempty(), as secrets, course_key_guard and settings_usage do. This suite runs
+     * on MySQL and PostgreSQL only, so the idiom is pinned at the source.
+     */
+    public function test_the_course_key_query_filters_the_text_column_with_the_portable_idiom(): void {
+        $source = (string) file_get_contents(__DIR__ . '/../classes/key_inventory.php');
+        $this->assertNotSame('', $source);
+        $this->assertStringContainsString(
+            "sql_isnotempty(self::COURSE_TABLE, 'apikey', true, true)", $source,
+            'the course key query uses sql_isnotempty() for the nullable TEXT column');
+        $this->assertSame(0, preg_match("~apikey\\s*(<>|!=)\\s*''~", $source),
+            'no raw comparison of the TEXT column with an empty string');
+        $this->assertSame(0, preg_match("~['\"]\\s*apikey\\s+IS\\s+NOT\\s+NULL~i", $source),
+            'no hand-written NULL test of the TEXT column either');
+    }
+
+    public function test_a_course_row_holding_only_whitespace_is_not_a_place(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $this->course_key((int) $course->id, 'openai', " \t ");
+        $this->assertSame([], key_inventory::places(), 'whitespace is not a stored key');
+    }
 }

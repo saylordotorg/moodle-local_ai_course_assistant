@@ -70,9 +70,6 @@ class key_rotation {
     /** @var string[] The command's on/off options. */
     private const FLAGS = ['help', 'list', 'stdin', 'apply'];
 
-    /** @var string[] Key prefixes an environment variable name must not start with. */
-    private const KEY_PREFIXES = ['sk-', 'sk-ant-', 'AIza', 'xai-'];
-
     /** @var string The audit action of a rotation. */
     public const AUDIT_ACTION = 'key_rotated';
 
@@ -251,7 +248,13 @@ class key_rotation {
         }
 
         try {
-            $confirmed = static::confirm(key_inventory::fingerprint(trim($newkey)), $done) && $confirmed;
+            // When the re-sync ran, the mirror is not read back: the sync is the authority for that place, and it
+            // puts the default row's own key there, which can differ from the rotated one.
+            $expected = $done;
+            if ($resync) {
+                $expected['mirror'] = 0;
+            }
+            $confirmed = static::confirm(key_inventory::fingerprint(trim($newkey)), $expected) && $confirmed;
         } catch (\Throwable) {
             $confirmed = false;
         }
@@ -278,8 +281,12 @@ class key_rotation {
     /**
      * After the commit, read the stores back: is the new key in at least one place of every kind that was written?
      *
+     * A kind with a count of 0 is not checked. apply() passes 0 for the apikey mirror whenever it re-synced it:
+     * the re-sync copies the default provider's row key into the mirror, which is not the rotated key when the
+     * mirror held the old key but the default row holds another one, and that end state is the safe one.
+     *
      * @param string $newfingerprint the new key's fingerprint
-     * @param array $counts kind => places written
+     * @param array $counts kind => places written (0 = do not check that kind)
      * @return bool
      */
     protected static function confirm(string $newfingerprint, array $counts): bool {
@@ -338,6 +345,7 @@ class key_rotation {
             return $done;
         } catch (\Throwable $e) {
             $transaction->rollback($e);
+            // rollback() rethrows $e itself; this line is a guard, so a change in Moodle can't make it return.
             throw $e;
         }
     }
@@ -417,14 +425,18 @@ class key_rotation {
      * Refused: any of KEY_OPTIONS; any unknown option or argument; an on/off option given a value other than
      * true or '1'; an --old-last4 that is not exactly four non-space characters; an --old-fingerprint that is not
      * exactly 12 hex characters; a --new-key-env that is not an environment variable NAME (an upper-case letter,
-     * then upper-case letters, digits or underscores, 64 at most) or that starts with a key prefix. The message is
+     * then upper-case letters, digits or underscores, 64 at most, which no key prefix can be); and --stdin when
+     * standard input is a terminal, where the key would be shown as it is typed. The message is
      * fixed text and never repeats a value.
      *
      * @param array $options from cli_get_params()
      * @param array $unrecognised from cli_get_params()
+     * @param bool $stdinisterminal whether standard input is a terminal (the command passes posix_isatty(STDIN);
+     *         a test passes true or false, so it needs no real terminal); false when not known
      * @return string why the command line is refused, or '' when it is fine
      */
-    public static function command_line_problem(array $options, array $unrecognised): string {
+    public static function command_line_problem(array $options, array $unrecognised,
+            bool $stdinisterminal = false): string {
         foreach (self::KEY_OPTIONS as $name) {
             if (($options[$name] ?? null) !== null) {
                 return 'A key is never taken on the command line: it would be saved in your shell history and shown '
@@ -444,6 +456,12 @@ class key_rotation {
                     . 'changed.';
             }
         }
+        if ($stdinisterminal && ($options['stdin'] ?? false) !== false) {
+            return '--stdin reads the key from a terminal here, so it would be shown as you type it and stay in the '
+                . 'scrollback. Nothing was read or changed. Read it without echo and pipe it in: '
+                . 'read -rs SOLA_NEW_KEY; printf \'%s\n\' "$SOLA_NEW_KEY" | php '
+                . 'local/ai_course_assistant/admin/cli/rotate_key.php --old-last4=XXXX --stdin';
+        }
         $last4 = (string) ($options['old-last4'] ?? '');
         if ($last4 !== '' && !preg_match('~^\S{4}$~', $last4)) {
             return '--old-last4 takes exactly the last four characters of the old key (the value is not shown here, '
@@ -455,11 +473,8 @@ class key_rotation {
                 . 'it was a key). Nothing was read or changed.';
         }
         $envname = (string) ($options['new-key-env'] ?? '');
-        $prefixed = false;
-        foreach (self::KEY_PREFIXES as $prefix) {
-            $prefixed = $prefixed || str_starts_with($envname, $prefix);
-        }
-        if ($prefixed || !preg_match('~^[A-Z][A-Z0-9_]{0,63}$~', $envname)) {
+        // A key can't pass this: every vendor prefix holds a lower-case letter or a hyphen.
+        if (!preg_match('~^[A-Z][A-Z0-9_]{0,63}$~', $envname)) {
             return '--new-key-env takes the NAME of an environment variable (upper-case letters, digits and '
                 . 'underscores), not a key. The value is not shown here. Nothing was read or changed.';
         }

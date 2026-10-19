@@ -28,7 +28,10 @@
  *   read -rs SOLA_NEW_KEY && export SOLA_NEW_KEY    (typed at a hidden prompt, so it stays out of shell history)
  *   php local/ai_course_assistant/admin/cli/rotate_key.php --old-last4=ab12
  *   unset SOLA_NEW_KEY
- *   php local/ai_course_assistant/admin/cli/rotate_key.php --old-fingerprint=0123456789ab --stdin --apply
+ *   read -rs SOLA_NEW_KEY                           (the same hidden prompt; --stdin is refused on a terminal)
+ *   printf '%s\n' "$SOLA_NEW_KEY" | \
+ *       php local/ai_course_assistant/admin/cli/rotate_key.php --old-fingerprint=0123456789ab --stdin --apply
+ *   unset SOLA_NEW_KEY
  *
  * Exit codes: 0 ok, 1 error or refused (also the rare case where the rotation was saved but could not be
  * confirmed: the message says which), 2 no stored key matches or more than one does.
@@ -68,7 +71,8 @@ use local_ai_course_assistant\key_rotation;
 
 // Before anything is read: a key on the command line, or an option's value that could be one, is refused and
 // never repeated back.
-$problem = key_rotation::command_line_problem($options, $unrecognised);
+$problem = key_rotation::command_line_problem($options, $unrecognised,
+    function_exists('posix_isatty') && posix_isatty(STDIN));
 if ($problem !== '') {
     cli_error($problem);
 }
@@ -80,7 +84,7 @@ if ($options['help']) {
         . "  --old-last4=XXXX         the key to replace, by its last four characters\n"
         . "  --old-fingerprint=HEX    the key to replace, by its fingerprint (from --list)\n"
         . "  --new-key-env=NAME       read the new key from this environment variable (default SOLA_NEW_KEY)\n"
-        . "  --stdin                  read the new key from the first line of standard input instead\n"
+        . "  --stdin                  read the new key from the first line of piped standard input (not a terminal)\n"
         . "  --apply                  make the change (without it, a dry run that changes nothing)\n"
         . "  -h, --help               this help\n\n"
         . "The new key is never accepted on the command line.\n"

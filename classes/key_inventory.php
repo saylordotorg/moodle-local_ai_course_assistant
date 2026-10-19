@@ -206,7 +206,10 @@ class key_inventory {
      */
     private static function course_rows(): array {
         global $DB;
-        $records = $DB->get_records_select(self::COURSE_TABLE, "apikey IS NOT NULL AND apikey <> ''", null, '',
+        // apikey is a nullable TEXT column: sql_isnotempty() is the portable test (Oracle can't compare a CLOB
+        // with '' and reads '' as NULL). A value of only spaces passes it and is dropped below, after trim().
+        $records = $DB->get_records_select(self::COURSE_TABLE,
+            $DB->sql_isnotempty(self::COURSE_TABLE, 'apikey', true, true), null, '',
             'id, courseid, provider, model, apikey, apibaseurl');
         if (!$records) {
             return [];

@@ -983,4 +983,102 @@ final class key_rotation_test extends \advanced_testcase {
         $this->assertTrue(key_rotation::plan(['last4' => 'AB12'], '~~~~~~~~')['ok'], 'the highest printable character');
         $this->assertFalse(key_rotation::plan(['last4' => 'AB12'], 'abcd|efghijkl')['ok'], 'the pipe is the separator');
     }
+
+    /**
+     * Command-line options as cli_get_params() returns them for a plain run, with overrides.
+     *
+     * @param array $override option => value
+     * @return array
+     */
+    private function clean_options(array $override = []): array {
+        return $override + ['help' => false, 'list' => false, 'old-last4' => 'AB12', 'old-fingerprint' => '',
+            'new-key-env' => 'SOLA_NEW_KEY', 'stdin' => false, 'apply' => false, 'new-key' => null, 'newkey' => null,
+            'key' => null, 'apikey' => null, 'old-key' => null];
+    }
+
+    // PR review: --stdin on a terminal would echo the key as it is typed, so it is refused before anything is read.
+    public function test_stdin_is_refused_when_standard_input_is_a_terminal(): void {
+        foreach ([true, '1'] as $flag) {
+            $problem = key_rotation::command_line_problem($this->clean_options(['stdin' => $flag]), [], true);
+            $this->assertNotSame('', $problem, 'stdin on a terminal is refused');
+            $this->assertTrue(str_contains($problem, 'terminal'), 'the refusal says why');
+            $this->assertTrue(str_contains($problem, "printf '%s\\n' \"\$SOLA_NEW_KEY\" | php"), 'it shows the pipe form');
+            $this->assertTrue(str_contains($problem, 'read -rs'), 'it shows the hidden prompt');
+            $this->assertTrue(str_contains($problem, '--stdin'), 'it names the option');
+            $this->assert_no_key($problem, 'the terminal refusal');
+        }
+        $this->assertSame('', key_rotation::command_line_problem($this->clean_options(['stdin' => true]), [], false),
+            'a pipe is fine');
+        $this->assertSame('', key_rotation::command_line_problem($this->clean_options(['stdin' => true]), []),
+            'with no answer given, standard input is taken to be a pipe');
+        $this->assertSame('', key_rotation::command_line_problem($this->clean_options(), [], true),
+            'a terminal is fine when the key comes from the environment');
+        $bad = key_rotation::command_line_problem($this->clean_options(['stdin' => self::NEW]), [], true);
+        $this->assertTrue(str_contains($bad, 'takes no value'), 'a value given to --stdin is still refused first');
+        $this->assert_no_key($bad, 'the refusal of a value given to stdin');
+    }
+
+    // PR review: the command tells the check whether standard input is a terminal, in the pre-read call.
+    public function test_the_cli_script_asks_posix_isatty_in_the_check_that_runs_before_it_reads_anything(): void {
+        $source = (string) file_get_contents(__DIR__ . '/../admin/cli/rotate_key.php');
+        $this->assertSame(1, preg_match('~key_rotation::command_line_problem\(([^;]*)\);~', $source, $m),
+            'the script calls the pre-read check');
+        $this->assertTrue(str_contains($m[1], "function_exists('posix_isatty') && posix_isatty(STDIN)"),
+            'the pre-read check is told whether standard input is a terminal');
+    }
+
+    // PR review: the apikey mirror follows the default row, so a mirror that held the old key may end on another key.
+    public function test_a_mirror_the_resync_sets_to_the_default_rows_own_key_is_not_an_unconfirmed_rotation(): void {
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+        $this->cfg('provider', 'openai');
+        $this->cfg('model', 'gpt-4o-mini');
+        // The default provider's row holds another key; the mirror (and one pasted setting) hold the old one.
+        $this->cfg('comparison_providers', 'openai|' . $this->c(self::STALE) . '|gpt-4o-mini');
+        $this->cfg('apikey', $this->c(self::OLD));
+        $this->cfg('embed_apikey', $this->c(self::OLD));
+
+        $result = key_rotation::apply(['last4' => 'AB12'], self::NEW);
+
+        $this->assertDebuggingNotCalled();
+        $this->assertTrue($result['ok'], 'rotated and safe: ' . implode(' / ', $result['errors']));
+        $this->assertSame('', $result['reason']);
+        $this->assertSame(['row' => 0, 'pasted' => 1, 'voice' => 0, 'mirror' => 1, 'course' => 0], $result['counts']);
+        $this->assertSame('CD34', $result['newlast4']);
+        $this->assertTrue(secrets::get('embed_apikey') === self::NEW, 'the pasted setting holds the new key');
+        $this->assertTrue(secrets::get('apikey') === self::STALE, 'the mirror follows the default row, which wins');
+        $this->assertSame([], $this->holders(key_inventory::fingerprint(self::OLD)), 'the old key is stored nowhere');
+        $this->assert_no_key(self::forms($result), 'the result');
+    }
+
+    // PR review: the other kinds are still read back when the mirror is skipped.
+    public function test_a_missing_new_key_in_a_pasted_setting_is_still_unconfirmed_when_the_mirror_is_skipped(): void {
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+        $this->cfg('provider', 'openai');
+        $this->cfg('model', 'gpt-4o-mini');
+        $this->cfg('comparison_providers', 'openai|' . $this->c(self::STALE) . '|gpt-4o-mini');
+        $this->cfg('apikey', $this->c(self::OLD));
+        $this->cfg('embed_apikey', $this->c(self::OLD));
+        $rotation = new class extends key_rotation {
+            /**
+             * After the writes, the pasted key is put back to something else, as a failed write would leave it.
+             *
+             * @param array $names
+             * @param string $fingerprint
+             * @param string $newstored
+             * @return int
+             */
+            protected static function write_settings(array $names, string $fingerprint, string $newstored): int {
+                $n = parent::write_settings($names, $fingerprint, $newstored);
+                if ($names === ['apikey']) {
+                    set_config('embed_apikey', secrets::conceal('sk-ROTSTALE-SENTINEL-0006-STAL'), 'local_ai_course_assistant');
+                }
+                return $n;
+            }
+        };
+        $result = $rotation::apply(['last4' => 'AB12'], self::NEW);
+        $this->assertFalse($result['ok'], 'a pasted setting that does not hold the new key is not confirmed');
+        $this->assertSame('unconfirmed', $result['reason']);
+    }
 }
