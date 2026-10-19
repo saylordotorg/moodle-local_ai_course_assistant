@@ -8,10 +8,10 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 
 A 3-minute tour, recorded on Saylor University's live Degrees site in a hidden test course with fake demo students. The learner half is shown in student view: answers drawn only from the course's own content, Socratic guidance, Quiz Me, Study Plan, and 46 languages with automatic detection. The admin half covers mastery tracking, provider settings and guardrails, analytics, Learning Radar, and cost tracking.
 
-## Version 7.10.0
+## Version 7.11.0
 
 **Release Date:** October 2026
-**Plugin build:** 2026101801
+**Plugin build:** 2026101802
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1. `version.php` declares support through 5.2.
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+
@@ -132,6 +132,7 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 - **Spend Reporting:** An optional token-authenticated endpoint reports per-provider monthly spend for external dashboards, and reports how many rows it could not price so a real zero is distinguishable from a silent one. Off by default
 - **Settings Organized by Task (v7.10.0):** The settings menu has five task pages (Essentials, Models and keys, Features, Safety and privacy, Cost and reliability) and an **Advanced** group of five pages (Retrieval; Reranking and documents; Prompt, voice and display; Integrations and governance; Soapbox, avatars and legacy), instead of the 11 flat pages of earlier releases. Nothing was renamed, deleted or given a new default, so a site that changes nothing behaves the same. Old settings URLs redirect to the page that replaced them
 - **Settings Usage Report:** `admin/cli/settings_usage_report.php` lists every setting as default, changed, secret set, secret unset or not stored, so you can see which settings your site has never touched. It never prints a stored value or a secret. `--json` for machines, `--per-course` for per-course overrides, `--tables` for row counts
+- **Find and Replace a Key Everywhere (v7.11.0):** `admin/cli/rotate_key.php --list` shows every place an AI key is stored (Providers and keys rows, the pasted-key settings, voice provider rows, the legacy `apikey` copy and per-course keys) by its last four characters and a fingerprint, never the key. Name the old key by its last four, give the new key in an environment variable or on standard input (never on the command line), and the command is a dry run until you add `--apply`, which replaces the key in every place in one transaction. It refuses an ambiguous old key, a new key whose prefix belongs to another vendor, and a key forced in `config.php`. A Reports > Status check lists keys stored in two or more places, and a course settings row with no key (as after a restore) no longer shows a saved key
 - **Off-Topic Management:** Configure limits and lockout duration
 - **Providers and Keys:** One table, on the **Models and keys** page, holds every AI provider's key, models, temperature and base URL. Add or change a key without touching the default provider, tell keys apart by their last four characters, and let Embedding, Rerank and Voice use a row's key instead of a pasted copy. The default provider's setting only chooses which row chat uses
 - **Provider Configuration:** Choose the default AI provider

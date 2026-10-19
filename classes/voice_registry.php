@@ -79,6 +79,34 @@ class voice_registry {
     }
 
     /**
+     * Replace one key in the voice providers table, wherever it appears, editing the stored text and nothing else.
+     *
+     * The voice-table twin of provider_keys::replace_key(): every row whose revealed key has the fingerprint
+     * $oldfingerprint (key_inventory::fingerprint()) gets $newstored in its key column, and every other byte of
+     * every line stays as it was (key_inventory::replace_in_table()). Written only when a line changed; a table
+     * forced in config.php is left alone (0). The caller conceals the new key.
+     *
+     * @param string $oldfingerprint fingerprint of the key to replace
+     * @param string $newstored the new key column, already concealed with secrets::conceal()
+     * @return int number of lines changed
+     * @throws \coding_exception when $newstored is empty, not ciphertext, holds a "|", CR or LF, or doesn't
+     *         decrypt on this site (key_inventory::check_new_stored()); the message names neither key
+     */
+    public static function replace_row_key(string $oldfingerprint, string $newstored): int {
+        global $CFG;
+        key_inventory::check_new_stored($newstored);
+        if (array_key_exists('voice_providers', $CFG->forced_plugin_settings['local_ai_course_assistant'] ?? [])) {
+            return 0;
+        }
+        $raw = (string) (get_config('local_ai_course_assistant', 'voice_providers') ?: '');
+        $edit = key_inventory::replace_in_table($raw, $oldfingerprint, $newstored);
+        if ($edit['changed'] > 0) {
+            set_config('voice_providers', $edit['text'], 'local_ai_course_assistant');
+        }
+        return $edit['changed'];
+    }
+
+    /**
      * Resolve the active voice provider config for a given capability.
      *
      * Looks up the voice_active_{capability} admin setting, matches against

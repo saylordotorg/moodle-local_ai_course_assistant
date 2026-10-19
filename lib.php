@@ -288,5 +288,6 @@ function local_ai_course_assistant_status_checks(): array {
         new \local_ai_course_assistant\check\primary_provider(),
         new \local_ai_course_assistant\check\failover_providers(),
         new \local_ai_course_assistant\check\course_keys(),
+        new \local_ai_course_assistant\check\key_places(),
     ];
 }

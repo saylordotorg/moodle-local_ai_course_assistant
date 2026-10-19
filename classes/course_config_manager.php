@@ -129,6 +129,23 @@ class course_config_manager {
     }
 
     /**
+     * Whether a course row holds a key of its own.
+     *
+     * The course settings page uses this to decide whether to say "a key is stored" and offer to clear it. The
+     * key column is nullable: a row made by a restore has NULL there, and a row saved with a blank key has an
+     * empty string. Neither holds a key, so both answer false. Any other value counts, whether it is ciphertext,
+     * a legacy plain key or a value this site can't decrypt, because there is something stored to clear. A value
+     * of only whitespace is not a key (the key inventory trims the column the same way). The value is only
+     * compared with the empty string and never returned.
+     *
+     * @param \stdClass|null $record Row from get(), or null when the course has none.
+     * @return bool True when the key column holds a value.
+     */
+    public static function has_stored_key(?\stdClass $record): bool {
+        return $record !== null && trim((string) ($record->apikey ?? '')) !== '';
+    }
+
+    /**
      * Whether a course already holds a value in any of the four fields the course
      * settings page keeps under "More options": API base URL, system prompt,
      * temperature and monthly spend cap.

@@ -3762,3 +3762,22 @@ $string['layout:appearance'] = 'Appearance';
 $string['layout:remote'] = 'Remote configuration';
 $string['layout:optimizer'] = 'Optimizer weights';
 $string['layout:legacy'] = 'Deprecated settings';
+
+// Key places status check (7.11.0).
+$string['check:key_places'] = 'AI Course Assistant key places';
+$string['check:key_places_none'] = 'No API keys are stored.';
+$string['check:key_places_single'] = 'Each stored API key is kept in one place.';
+$string['check:key_places_some'] = '{$a} API key(s) are stored in more than one place. Replacing one means changing it in every place it is stored.';
+$string['check:key_places_keyhint'] = 'The key ending in {$a}';
+$string['check:key_places_keyshort'] = 'A key too short to show a hint';
+$string['check:key_places_vendor'] = ' ({$a} key)';
+$string['check:key_places_group'] = '{$a->key}{$a->vendor} is stored in {$a->count} places: {$a->places}.';
+$string['check:key_places_more'] = 'and {$a} more';
+$string['check:key_places_row'] = 'the Providers and keys row {$a}';
+$string['check:key_places_pasted'] = 'the {$a} setting';
+$string['check:key_places_voice'] = 'the Voice providers row {$a}';
+$string['check:key_places_mirror'] = 'the legacy apikey setting, an automatic copy of the default provider\'s key';
+$string['check:key_places_course'] = 'course {$a}';
+$string['check:key_places_advice'] = 'To replace a key in all of these places in one step, run php local/ai_course_assistant/admin/cli/rotate_key.php --list from the Moodle root, then the same command with --old-last4. It shows what would change first and changes nothing until you add --apply.';
+$string['check:key_places_morekeys'] = 'and {$a} more keys.';
+$string['check:key_places_unreadable'] = 'The places where API keys are stored could not be read.';
