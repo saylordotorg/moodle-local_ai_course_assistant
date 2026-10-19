@@ -98,7 +98,7 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 - **Spoken Responses:** Text-to-speech playback of answers
 - **Live Voice Mode:** Optional two-way spoken conversation using OpenAI's Realtime API, with a live transcript and ELL coaching
 - **Self-hosted Speech-to-Text:** Point at any OpenAI-compatible Whisper server for transcription at no per-minute cost
-- **Recording Size Limit:** Configurable (default 25 MB). Note that PHP's own `post_max_size` (default 8 MB) and `upload_max_filesize` (default 2 MB) are both below that, and the smaller limit always wins. The settings page prints your server's real values next to the setting, so you can see which number is actually in force before a learner finds out for you. Raise both to at least one megabyte above whatever you set here, in `php.ini`, for learners to get the full amount
+- **Recording Size Limit:** Configurable (default 25 MB). Note that PHP's own `post_max_size` (default 8 MB) and `upload_max_filesize` (default 2 MB) are both below that, and the smaller limit always wins. The setting is under **Advanced > Prompt, voice and display**, and it prints your server's real values next to it, so you can see which number is actually in force before a learner finds out for you. Raise both to at least one megabyte above whatever you set here, in `php.ini`, for learners to get the full amount
 
 ### Retrieval (RAG)
 - **Semantic Retrieval:** Answers are grounded in the actual course content rather than general web knowledge. Indexes pages, books, files, PDF, DOCX, PPTX, H5P and SCORM content, plus transcripts for embedded video
@@ -130,9 +130,10 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 - **Failure Alerts:** The unanswered-question alert counts failed replies as failures (they used to look like answers) and also fires when a set number of replies fail anywhere on the site, naming the most common provider message. Off by default.
 - **Read-Only Audit Access:** `local/ai_course_assistant:viewaudit` opens the audit log without `moodle/site:config`. No role has it by default.
 - **Spend Reporting:** An optional token-authenticated endpoint reports per-provider monthly spend for external dashboards, and reports how many rows it could not price so a real zero is distinguishable from a silent one. Off by default
-- **Comprehensive Settings:** Fine-tune behavior, limits, and integrations
+- **Settings Organized by Task (v7.10.0):** The settings menu has five task pages (Essentials, Models and keys, Features, Safety and privacy, Cost and reliability) and an **Advanced** group of five pages (Retrieval; Reranking and documents; Prompt, voice and display; Integrations and governance; Soapbox, avatars and legacy), instead of the 11 flat pages of earlier releases. Nothing was renamed, deleted or given a new default, so a site that changes nothing behaves the same. Old settings URLs redirect to the page that replaced them
+- **Settings Usage Report:** `admin/cli/settings_usage_report.php` lists every setting as default, changed, secret set, secret unset or not stored, so you can see which settings your site has never touched. It never prints a stored value or a secret. `--json` for machines, `--per-course` for per-course overrides, `--tables` for row counts
 - **Off-Topic Management:** Configure limits and lockout duration
-- **Providers and Keys:** One table holds every AI provider's key, models, temperature and base URL. Add or change a key without touching the default provider, tell keys apart by their last four characters, and let Embedding, Rerank and Voice use a row's key instead of a pasted copy. The default provider's setting only chooses which row chat uses
+- **Providers and Keys:** One table, on the **Models and keys** page, holds every AI provider's key, models, temperature and base URL. Add or change a key without touching the default provider, tell keys apart by their last four characters, and let Embedding, Rerank and Voice use a row's key instead of a pasted copy. The default provider's setting only chooses which row chat uses
 - **Provider Configuration:** Choose the default AI provider
 - **Zendesk Integration:** Auto-escalate unresolved issues to support tickets
 - **Audit Logging:** Full SOC2-compliant audit trail
@@ -155,27 +156,46 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 
 ### Finding the admin pages
 
-All admin pages live under one hub: **Site administration → Plugins → Local plugins → AI Course Assistant**. Bookmark the hub directly: `{moodle_root_url}/admin/category.php?category=local_ai_course_assistant` — it lists every settings page and tool (Analytics, RAG Index, Prompt Debug Log, Emergency Controls, the editors). The Site administration search box also finds every page by name (try "AI Course"). Course staff additionally get **Course AI Settings** and **AI Tutor Analytics** links in each course's "More" menu (v6.6.1+). **Change settings from the individual pages, not the hub's combined form.** Opening the hub's category URL shows every setting from every page in one very large form (about 350 fields), and Save rewrites all of them at once, so a stray click on one field changes it without any sign. Use the page links under **AI Course Assistant** (AI provider and models, Integrations and delivery, and so on); each saves only its own fields. Since v7.8.1 every save, from either place, ends with a notice listing the settings it changed. Note: Moodle does not show a "Settings" link for local plugins on the Plugins overview page (admin/plugins.php) — that column only exists for other plugin types, so use the hub bookmark instead.
+All admin pages live under one hub: **Site administration → Plugins → Local plugins → AI Course Assistant**. Bookmark the hub directly: `{moodle_root_url}/admin/category.php?category=local_ai_course_assistant`. It lists the five task pages and the tools (Analytics, RAG Index, Prompt Debug Log, Emergency Controls, the editors), and an **Advanced** link that opens the second group. The Site administration search box finds every setting and page by name (try "AI Course"), including the ones on Advanced pages. Course staff additionally get **Course AI Settings** and **AI Tutor Analytics** links in each course's "More" menu (v6.6.1+).
+
+**The menu (v7.10.0).**
+
+| Page | What is on it |
+|------|---------------|
+| **Essentials** | Switch SOLA on, default course mode, auto-open, branding and avatar, contact and privacy details, FAQ, footer links. Opens with the version banner and the quick links to the tool pages |
+| **Models and keys** | The Providers and keys table, the default provider, model and system prompt, model roles (quiz, essay, mastery classifier), the premium tier, and failover and retries |
+| **Features** | Learner-facing features: mastery and learning paths, study plans and reminders, practice scoring, surveys, usability testing, active learners, outreach |
+| **Safety and privacy** | Quiz lock, hiding on quizzes, off-topic limits, wellbeing, integrity checks and data retention |
+| **Cost and reliability** | Spend caps, cost and answer-rate alerts, the anomaly digest, and automatic model upgrades |
+| **Advanced > Retrieval** | Switch retrieval on, external resources, embeddings and search tuning |
+| **Advanced > Reranking and documents** | Reranking, switching embedding models, which document types are indexed |
+| **Advanced > Prompt, voice and display** | Model call details, prompt budget and debugging, history, voice and speech providers, widget appearance |
+| **Advanced > Integrations and governance** | Support and Zendesk, analytics export, CDN, remote configuration, signed policy bundles, vendor data and price drift, benchmarks, optimizer weights |
+| **Advanced > Soapbox, avatars and legacy** | Deprecated Soapbox, talking-avatar vendors and other parked settings |
+
+Every page opens with a row of links to the other pages. A bookmark to an older page name (for example `admin/settings.php?section=local_ai_course_assistant_ai`) redirects to the page that replaced it, and the old Safety and moderation page is now Safety and privacy. Course-level settings (base URL, system prompt, temperature and monthly spend cap) are on each course's AI settings page, under a **More options** section that stays closed until one of them has a value.
+
+**Change settings from the individual pages, not the hub's combined form.** Opening the hub's category URL shows the settings of all five task pages (about 130) in one very large form, and the **Advanced** link does the same for the Advanced pages (about 160). Save rewrites all of a form's settings at once, so a stray click on one field changes it without any sign. Use the page links under **AI Course Assistant**; each saves only its own fields. Since v7.8.1 every save, from either place, ends with a notice listing the settings it changed. Note: Moodle does not show a "Settings" link for local plugins on the Plugins overview page (admin/plugins.php), because that column only exists for other plugin types, so use the hub bookmark instead.
 
 ## Configuration
 
 ### Required Settings
-1. **Enable Plugin:** Turn on the AI Course Assistant
-2. **Providers and keys:** Add a row for your provider and paste its API key. Keys are encrypted at rest and never shown again, only their last four characters (see API Key Handling)
-3. **AI Provider:** Choose the default provider (Claude, OpenAI, etc.). Chat uses the key of that provider's row only when the row's base URL is the same as **API Base URL** (both compared with spaces trimmed; both empty is the normal case). If you give the row a base URL of its own that differs, and no keyed row matches, the next admin page after a save warns that chat still uses the previous default key
-4. **Model:** Select the model (e.g., gemini-2.5-flash, gpt-4o-mini, claude-sonnet-5-5)
+1. **Enable Plugin:** Turn on the AI Course Assistant (**Essentials**)
+2. **Providers and keys** (**Models and keys**): Add a row for your provider and paste its API key. Keys are encrypted at rest and never shown again, only their last four characters (see API Key Handling)
+3. **AI Provider** (**Models and keys**): Choose the default provider (Claude, OpenAI, etc.). Chat uses the key of that provider's row only when the row's base URL is the same as **API Base URL** (both compared with spaces trimmed; both empty is the normal case). If you give the row a base URL of its own that differs, and no keyed row matches, the next admin page after a save warns that chat still uses the previous default key
+4. **Model** (**Models and keys**): Select the model (e.g., gemini-2.5-flash, gpt-4o-mini, claude-sonnet-5-5)
 
 ### Recommended Settings
-- **System Prompt:** Customize the AI's personality and behavior
-- **Max History:** Limit conversation context (default: 20 message pairs)
-- **Avatar:** Choose from 10 included avatars
-- **Position:** Bottom-right or bottom-left
+- **System Prompt:** Customize the AI's personality and behavior (**Models and keys**)
+- **Max History:** Limit conversation context, default 20 message pairs (**Advanced > Prompt, voice and display**)
+- **Avatar:** Choose from 10 included avatars (**Essentials**)
+- **Position:** Bottom-right or bottom-left (**Advanced > Prompt, voice and display**)
 
 ### Optional Integrations
-- **FAQ:** Add common questions and answers
-- **Zendesk:** Configure for automatic ticket creation
-- **Study Reminders:** Enable email/WhatsApp notifications
-- **Off-Topic Detection:** Set limits and actions
+- **FAQ:** Add common questions and answers (**Essentials**)
+- **Zendesk:** Configure for automatic ticket creation (**Advanced > Integrations and governance**)
+- **Study Reminders:** Enable email/WhatsApp notifications (**Features**)
+- **Off-Topic Detection:** Set limits and actions (**Safety and privacy**)
 
 ## Usage
 
@@ -233,7 +253,7 @@ All admin pages live under one hub: **Site administration → Plugins → Local 
 ```
 ai_course_assistant/
 ├── version.php                    # Plugin metadata
-├── settings.php                   # Admin settings (11 pages)
+├── settings.php                   # Admin settings: builds every setting once, then places it
 ├── settings_user.php              # Student data management page
 ├── analytics.php                  # Analytics dashboard
 ├── unsubscribe.php                # Reminder opt-out page
@@ -263,6 +283,8 @@ ai_course_assistant/
 │   ├── analytics.php              # Usage analytics
 │   ├── rate_limiter.php           # Rate limiting
 │   ├── audit_logger.php           # Audit logging
+│   ├── settings_layout_map.php    # Which settings page each setting lives on (data)
+│   ├── settings_layout.php        # Places settings on the five task pages and Advanced group
 │   ├── provider/
 │   │   ├── provider_interface.php
 │   │   ├── base_provider.php
