@@ -299,6 +299,10 @@ final class lang_completeness_test extends \basic_testcase {
         // The status check's cap on listed keys and its unreadable fallback (Release 2, task 5). Same ruling.
         'check:key_places_morekeys',
         'check:key_places_unreadable',
+        // The refusals when an editing teacher deletes a Soapbox assignment whose recordings PresenterAI's importer
+        // holds, or whose hold cannot be checked (7.12.1). Same ruling: English only until the next batch.
+        'soapbox:assignment_held',
+        'soapbox:assignment_held_unchecked',
     ];
 
     /**

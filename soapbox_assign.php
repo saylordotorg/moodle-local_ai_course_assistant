@@ -70,7 +70,21 @@ if ($action === 'delete' && $id) {
         throw new \moodle_exception('soapbox:assignment_notfound', 'local_ai_course_assistant');
     }
     if (optional_param('confirm', 0, PARAM_BOOL) && confirm_sesskey()) {
-        soapbox_assignment_manager::delete_assignment($id);
+        try {
+            soapbox_assignment_manager::delete_assignment($id);
+        } catch (\moodle_exception $e) {
+            // PresenterAI's importer holds this assignment's recordings, or the check could not
+            // be made: nothing was deleted. Say so and go back to the list, as the addlink
+            // failure above does. Any other failure is not ours to dress up.
+            $refusals = [
+                soapbox_assignment_manager::ERR_HELD,
+                soapbox_assignment_manager::ERR_HELD_UNCHECKED,
+            ];
+            if (!in_array($e->errorcode, $refusals, true)) {
+                throw $e;
+            }
+            redirect($pageurl, $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
+        }
         redirect($pageurl, get_string('soapbox:assign_deleted', 'local_ai_course_assistant'), null,
             \core\output\notification::NOTIFY_SUCCESS);
     }
