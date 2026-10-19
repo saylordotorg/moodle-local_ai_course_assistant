@@ -3779,3 +3779,5 @@ $string['check:key_places_voice'] = 'the Voice providers row {$a}';
 $string['check:key_places_mirror'] = 'the legacy apikey setting, an automatic copy of the default provider\'s key';
 $string['check:key_places_course'] = 'course {$a}';
 $string['check:key_places_advice'] = 'To replace a key in all of these places in one step, run php local/ai_course_assistant/admin/cli/rotate_key.php --list from the Moodle root, then the same command with --old-last4. It shows what would change first and changes nothing until you add --apply.';
+$string['check:key_places_morekeys'] = 'and {$a} more keys.';
+$string['check:key_places_unreadable'] = 'The places where API keys are stored could not be read.';

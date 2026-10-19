@@ -149,7 +149,8 @@ final class course_stored_key_display_test extends \advanced_testcase {
         $this->assertSame($stored, $input->item(0)->getAttribute('placeholder'), 'a saved key is announced');
         $this->assertSame('', $input->item(0)->getAttribute('value'), 'and still never printed');
         $this->assertSame(1, $xpath($doc)->query('//input[@name="apikey_clear"]')->length, 'and can be cleared');
-        $this->assertStringNotContainsString(self::KEY, $doc->saveHTML());
+        // Not assertStringNotContainsString: a failure would print the key.
+        $this->assertFalse(str_contains($doc->saveHTML(), self::KEY), 'the page holds the planted course key');
     }
 
     /**

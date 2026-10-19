@@ -297,6 +297,9 @@ final class lang_completeness_test extends \basic_testcase {
         'check:key_places_mirror',
         'check:key_places_course',
         'check:key_places_advice',
+        // The status check's cap on listed keys and its unreadable fallback (Release 2, task 5). Same ruling.
+        'check:key_places_morekeys',
+        'check:key_places_unreadable',
     ];
 
     /**

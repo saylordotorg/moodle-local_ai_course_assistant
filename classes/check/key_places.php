@@ -28,8 +28,14 @@ use local_ai_course_assistant\key_inventory;
  * is stored, so this lists each key that is stored in two or more places, by its last four characters and the
  * places that hold it, and points at admin/cli/rotate_key.php, which replaces a key everywhere in one step.
  *
- * It is advice, not a fault: the result is always INFO. It reads key_inventory::groups() and nothing else, so
- * it never holds a key: the page shows last-four hints, provider names, setting names and course short names.
+ * The legacy apikey setting is an automatic copy of the default provider's row, which the site keeps in step
+ * itself, so it does not count toward "two or more places": a key qualifies only with at least two places of
+ * the other kinds. A qualifying key that is also held by the copy lists the copy too (a rotation changes it)
+ * and says it is an automatic copy.
+ *
+ * It is advice, not a fault: the result is always INFO, and at most KEY_LIMIT keys are listed. It reads
+ * key_inventory::groups() and nothing else, so it never holds a key: the page shows last-four hints, provider
+ * names, setting names and course short names. If the inventory can't be read the result says so in fixed text.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor University
@@ -38,6 +44,9 @@ use local_ai_course_assistant\key_inventory;
 class key_places extends check {
     /** @var int Most places listed for one key; the rest are counted ("and 6 more"). */
     public const PLACE_LIMIT = 12;
+
+    /** @var int Most keys listed; the rest are counted ("and 3 more keys"). */
+    public const KEY_LIMIT = 10;
 
     /**
      * Name shown in the status list.
@@ -54,26 +63,48 @@ class key_places extends check {
      * @return result always INFO
      */
     public function get_result(): result {
-        $groups = key_inventory::groups();
+        try {
+            $groups = $this->groups();
+        } catch (\Throwable) {
+            // Fixed text only: an exception's message could quote a value, and a status page must never fail.
+            return new result(result::INFO, get_string('check:key_places_unreadable', 'local_ai_course_assistant'));
+        }
         if (!$groups) {
             return new result(result::INFO, get_string('check:key_places_none', 'local_ai_course_assistant'));
         }
-        // groups() is ordered by place count, so the keys kept in the most places come first.
-        $repeated = array_filter($groups, fn(array $group): bool => count($group['places']) >= 2);
+        // groups() is ordered by place count, so the keys kept in the most places come first. The automatic apikey
+        // copy is not a place of the admin's own, so a key needs two places of the other kinds to be listed.
+        $repeated = array_filter($groups, function (array $group): bool {
+            $own = array_filter($group['places'], fn(array $place): bool => $place['kind'] !== 'mirror');
+            return count($own) >= 2;
+        });
         if (!$repeated) {
             return new result(result::INFO, get_string('check:key_places_single', 'local_ai_course_assistant'));
         }
         $items = '';
-        foreach ($repeated as $group) {
+        foreach (array_slice($repeated, 0, self::KEY_LIMIT) as $group) {
             $items .= '<li>' . $this->describe($group) . '</li>';
         }
-        $details = '<ul>' . $items . '</ul><p>' . get_string('check:key_places_advice', 'local_ai_course_assistant')
-            . '</p>';
+        $left = count($repeated) - self::KEY_LIMIT;
+        $more = $left > 0
+            ? '<p>' . get_string('check:key_places_morekeys', 'local_ai_course_assistant', $left) . '</p>'
+            : '';
+        $details = '<ul>' . $items . '</ul>' . $more . '<p>'
+            . get_string('check:key_places_advice', 'local_ai_course_assistant') . '</p>';
         return new result(
             result::INFO,
             get_string('check:key_places_some', 'local_ai_course_assistant', count($repeated)),
             $details
         );
+    }
+
+    /**
+     * Every stored key with the places that hold it. A seam: a test makes it throw.
+     *
+     * @return array key_inventory::groups()
+     */
+    protected function groups(): array {
+        return key_inventory::groups();
     }
 
     /**
@@ -90,12 +121,15 @@ class key_places extends check {
         $vendor = $group['vendor'] !== ''
             ? get_string('check:key_places_vendor', $component, s($group['vendor']))
             : '';
+        // The automatic copy is always named, after the places of the admin's own, so cutting the list can't hide it.
+        $own = array_values(array_filter($group['places'], fn(array $place): bool => $place['kind'] !== 'mirror'));
+        $copies = array_values(array_filter($group['places'], fn(array $place): bool => $place['kind'] === 'mirror'));
         $places = [];
-        foreach (array_slice($group['places'], 0, self::PLACE_LIMIT) as $place) {
+        foreach (array_merge(array_slice($own, 0, self::PLACE_LIMIT), $copies) as $place) {
             $places[] = '<span class="sola-keyplace">' . $this->place_label($place) . '</span>';
         }
         $list = implode(', ', $places);
-        $left = count($group['places']) - self::PLACE_LIMIT;
+        $left = count($own) - self::PLACE_LIMIT;
         if ($left > 0) {
             $list .= ' ' . get_string('check:key_places_more', $component, $left);
         }

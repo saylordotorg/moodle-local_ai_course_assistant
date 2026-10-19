@@ -749,11 +749,238 @@ final class key_rotation_test extends \advanced_testcase {
             $this->assert_no_key($problem, "the refusal of bad command line $i");
             $value = reset($override);
             if (is_string($value) && strlen($value) >= 4) {
-                $this->assertStringNotContainsString($value, $problem, "bad command line $i is not echoed");
+                // Not assertStringNotContainsString: a failure would print the value, which can be a key.
+                $this->assertFalse(str_contains($problem, $value), "bad command line $i is echoed");
             }
         }
         $unknown = key_rotation::command_line_problem($ok, [self::NEW]);
         $this->assertNotSame('', $unknown, 'an unknown argument is refused');
         $this->assert_no_key($unknown, 'the unknown-argument refusal');
+    }
+
+    /**
+     * A rotation class whose audit writer can be called from a test.
+     *
+     * @return key_rotation
+     */
+    private function audit_writer(): key_rotation {
+        return new class extends key_rotation {
+            /**
+             * Call the protected audit writer.
+             *
+             * @param int $userid
+             * @param array $details
+             * @return void
+             */
+            public static function audit(int $userid, array $details): void {
+                static::write_audit($userid, $details);
+            }
+        };
+    }
+
+    // Task 5 (A): a byte that is not UTF-8 is replaced in the audit row, not turned into details='0'.
+    public function test_the_audit_row_is_valid_json_when_a_value_holds_a_byte_that_is_not_utf8(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $writer = $this->audit_writer();
+        $writer::audit(0, ['provider' => 'openai', 'old_last4' => "AB\xE9\xFF", 'new_last4' => 'CD34',
+            'counts' => ['row' => 1]]);
+
+        $rows = array_values($DB->get_records('local_ai_course_assistant_audit', ['action' => 'key_rotated']));
+        $this->assertCount(1, $rows);
+        $this->assertTrue($rows[0]->details !== '0' && $rows[0]->details !== '', 'the details were stored');
+        $details = json_decode($rows[0]->details, true);
+        $this->assertTrue(is_array($details), 'the stored details are a JSON object');
+        $this->assertTrue(str_starts_with($details['old_last4'], 'AB') && str_contains($details['old_last4'], "\u{FFFD}"),
+            'the bad bytes were substituted, the good ones kept');
+        $this->assertTrue($details['new_last4'] === 'CD34' && $details['provider'] === 'openai', 'the rest is intact');
+    }
+
+    // Task 5 (A): details that can't be encoded at all throw, so a rotation can't commit without its audit row.
+    public function test_audit_details_that_cannot_be_encoded_throw_and_write_no_row(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $writer = $this->audit_writer();
+        $threw = false;
+        try {
+            $writer::audit(0, ['provider' => 'openai', 'counts' => NAN]);
+        } catch (\JsonException $e) {
+            $threw = true;
+        }
+        $this->assertTrue($threw, 'an audit detail that can not be encoded throws a JsonException');
+        $this->assertSame(0, $DB->count_records('local_ai_course_assistant_audit', ['action' => 'key_rotated']));
+    }
+
+    // Task 5 (A): and the throw happens inside the transaction, so the whole rotation rolls back.
+    public function test_a_rotation_whose_audit_details_cannot_be_encoded_rolls_back_every_store(): void {
+        global $DB;
+        $this->plant_everywhere();
+        $before = $this->snapshot();
+        $rotation = new class extends key_rotation {
+            /**
+             * The audit details can't be encoded.
+             *
+             * @param int $userid
+             * @param array $details
+             * @return void
+             */
+            protected static function write_audit(int $userid, array $details): void {
+                parent::write_audit($userid, $details + ['unencodable' => NAN]);
+            }
+        };
+        $result = $rotation::apply(['last4' => 'AB12'], self::NEW);
+        $this->assertDebuggingNotCalled();
+        $this->assertFalse($result['ok'], 'a rotation whose audit row could not be encoded is not reported as done');
+        $this->assertSame('failed', $result['reason']);
+        $this->assertTrue($before === $this->snapshot(), 'every store as before');
+        $this->assertSame(0, $DB->count_records('local_ai_course_assistant_audit', ['action' => 'key_rotated']));
+        $this->assert_no_key(self::forms($result), 'the failed result');
+    }
+
+    // Task 5 (B): an exception while reading back, after the commit, is "unconfirmed", not an escaped exception.
+    public function test_an_exception_while_reading_back_is_unconfirmed_and_says_nothing_about_it(): void {
+        global $DB;
+        $this->plant_default(self::OLD);
+        $rotation = new class extends key_rotation {
+            /**
+             * Reading back throws, with a message that a real exception could carry a value in.
+             *
+             * @param string $newfingerprint
+             * @param array $counts
+             * @return bool
+             */
+            protected static function confirm(string $newfingerprint, array $counts): bool {
+                throw new \RuntimeException('planted read-back failure MARKER-8c1d');
+            }
+        };
+        $result = $rotation::apply(['last4' => 'AB12'], self::NEW);
+
+        $this->assertDebuggingNotCalled();
+        $this->assertFalse($result['ok'], 'a rotation that can not be confirmed is not reported as done');
+        $this->assertSame('unconfirmed', $result['reason']);
+        $text = implode(' ', $result['errors']);
+        $this->assertTrue(str_contains($text, '--list'), 'the admin is told to look before revoking the old key');
+        $this->assertFalse(str_contains($text, 'MARKER-8c1d') || str_contains($text, 'Exception'),
+            'the exception is not described');
+        $this->assertSame('', $result['newlast4'], 'no new last four is promised for an unconfirmed rotation');
+        $this->assertSame(['row' => 1, 'pasted' => 0, 'voice' => 0, 'mirror' => 1, 'course' => 0], $result['counts'],
+            'what was written is still reported');
+        $this->assertTrue(provider_keys::key_for('openai') === self::NEW, 'the rotation is committed');
+        $this->assertSame(1, $DB->count_records('local_ai_course_assistant_audit', ['action' => 'key_rotated']));
+        $this->assert_no_key(self::forms($result), 'the unconfirmed result');
+    }
+
+    // Task 5 (B): the same when the cache invalidation after the commit throws.
+    public function test_an_exception_from_the_cache_invalidation_after_the_commit_is_unconfirmed(): void {
+        global $DB;
+        $this->plant_everywhere();
+        $rotation = new class extends key_rotation {
+            /**
+             * Dropping the config cache throws, with a message that a real exception could carry a value in.
+             *
+             * @return void
+             */
+            protected static function drop_config_cache(): void {
+                throw new \RuntimeException('planted cache failure MARKER-8c1d');
+            }
+        };
+        $result = $rotation::apply(['last4' => 'AB12'], self::NEW);
+
+        $this->assertDebuggingNotCalled();
+        $this->assertFalse($result['ok']);
+        $this->assertSame('unconfirmed', $result['reason']);
+        $text = implode(' ', $result['errors']);
+        $this->assertTrue(str_contains($text, '--list'), 'the admin is told to look before revoking the old key');
+        $this->assertFalse(str_contains($text, 'MARKER-8c1d') || str_contains($text, 'Exception'),
+            'the exception is not described');
+        $courseid = (int) $DB->get_field('course', 'id', ['shortname' => 'ROT1']);
+        $stored = (string) $DB->get_field(self::COURSE_TABLE, 'apikey', ['courseid' => $courseid]);
+        $this->assertTrue(key_inventory::stored_fingerprint($stored) === key_inventory::fingerprint(self::NEW),
+            'the rotation is committed');
+        $this->assert_no_key(self::forms($result), 'the unconfirmed result');
+    }
+
+    // Task 5 (B): a cache invalidation that throws while rolling back does not hide the failed result.
+    public function test_an_exception_from_the_cache_invalidation_while_rolling_back_still_reports_failed(): void {
+        global $DB;
+        $this->plant_everywhere();
+        $before = $this->snapshot();
+        $rotation = new class extends key_rotation {
+            /**
+             * The course write fails after every other store was written.
+             *
+             * @param array $courseids
+             * @param string $fingerprint
+             * @param string $newstored
+             * @return int
+             */
+            protected static function write_courses(array $courseids, string $fingerprint, string $newstored): int {
+                throw new \RuntimeException('planted write failure MARKER-8c1d');
+            }
+
+            /**
+             * Dropping the config cache throws too.
+             *
+             * @return void
+             */
+            protected static function drop_config_cache(): void {
+                throw new \RuntimeException('planted cache failure MARKER-8c1d');
+            }
+        };
+        $result = $rotation::apply(['last4' => 'AB12'], self::NEW);
+
+        $this->assertDebuggingNotCalled();
+        $this->assertFalse($result['ok']);
+        $this->assertSame('failed', $result['reason']);
+        $this->assertFalse(str_contains(implode(' ', $result['errors']), 'MARKER-8c1d'),
+            'the exceptions are not described');
+        $this->assertFalse($DB->is_transaction_started(), 'no transaction is left open');
+        $this->assertTrue($before === $this->snapshot(), 'every store as before');
+        $this->assert_no_key(self::forms($result), 'the failed result');
+    }
+
+    // Task 5 (C): only printable ASCII is a key: a paste can bring a non-breaking space or a zero-width space.
+    public function test_a_new_key_with_a_non_ascii_space_or_an_invisible_character_is_refused(): void {
+        $this->plant_everywhere();
+        $before = $this->snapshot();
+        $nbsp = "\u{00A0}";
+        $zwsp = "\u{200B}";
+        $bad = [
+            'U+00A0 inside' => "sk-NEWKEY{$nbsp}SENTINEL-0099",
+            'U+00A0 at the end' => "sk-NEWKEY-SENTINEL-0099{$nbsp}",
+            'U+00A0 at the start' => "{$nbsp}sk-NEWKEY-SENTINEL-0099",
+            'U+200B inside' => "sk-NEWKEY{$zwsp}SENTINEL-0099",
+            'U+200B at the end' => "sk-NEWKEY-SENTINEL-0099{$zwsp}",
+            'U+200B at the start' => "{$zwsp}sk-NEWKEY-SENTINEL-0099",
+            'U+FEFF' => "\u{FEFF}sk-NEWKEY-SENTINEL-0099",
+            'U+2028' => "sk-NEWKEY\u{2028}SENTINEL-0099",
+            'an accented letter' => 'sk-NEWKEY-SENTINEL-0099-caf' . "\u{00E9}",
+            'only non-ASCII, long enough in bytes' => str_repeat("\u{00E9}", 6),
+        ];
+        foreach ($bad as $what => $newkey) {
+            foreach (['plan', 'apply'] as $method) {
+                $result = key_rotation::$method(['last4' => 'AB12'], $newkey);
+                $this->assertFalse($result['ok'], "$method refuses a key with $what");
+                $this->assertSame('refused', $result['reason'], "$method gives the reason for $what");
+                $this->assertNotEmpty($result['errors']);
+                $this->assertFalse(str_contains(implode(' ', $result['errors']), 'NEWKEY'), "the error for $what quotes the key");
+            }
+        }
+        $this->assertTrue($before === $this->snapshot(), 'nothing changed');
+    }
+
+    // Task 5 (C): every printable ASCII character but the column separator is allowed in a key, at both ends of the range.
+    public function test_every_printable_ascii_character_except_the_separator_is_allowed_in_a_new_key(): void {
+        $this->plant_everywhere();
+        $all = '';
+        for ($c = 0x21; $c <= 0x7E; $c++) {
+            if ($c !== ord('|')) {
+                $all .= chr($c);
+            }
+        }
+        $this->assertTrue(key_rotation::plan(['last4' => 'AB12'], $all)['ok'], 'every printable ASCII character but the pipe');
+        $this->assertTrue(key_rotation::plan(['last4' => 'AB12'], '!!!!!!!!')['ok'], 'the lowest printable character');
+        $this->assertTrue(key_rotation::plan(['last4' => 'AB12'], '~~~~~~~~')['ok'], 'the highest printable character');
+        $this->assertFalse(key_rotation::plan(['last4' => 'AB12'], 'abcd|efghijkl')['ok'], 'the pipe is the separator');
     }
 }

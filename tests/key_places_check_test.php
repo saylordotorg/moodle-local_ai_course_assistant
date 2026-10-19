@@ -124,7 +124,8 @@ final class key_places_check_test extends \advanced_testcase {
             foreach ($this->stored as $i => $value) {
                 $this->assertFalse($value !== '' && str_contains($text, $value), "$form holds stored value #$i");
             }
-            $this->assertFalse(str_contains($text, 'sodium:'), "$form holds ciphertext");
+            // Both ciphertext prefixes secrets::conceal() can write (libsodium, or OpenSSL where it is not available).
+            $this->assertSame(0, preg_match('~(sodium|openssl-aes-256-ctr):~', $text), "$form holds ciphertext");
         }
     }
 
@@ -202,11 +203,186 @@ final class key_places_check_test extends \advanced_testcase {
         set_config('provider', 'openai', 'local_ai_course_assistant');
         $this->cfg('comparison_providers', 'openai|' . secrets::conceal(self::SHARED) . '|gpt-4o-mini');
         $this->cfg('apikey', secrets::conceal(self::SHARED));
+        // The copy does not count, so the key needs two places of its own to be listed at all.
+        $this->cfg('embed_apikey', secrets::conceal(self::SHARED));
         $details = (new key_places())->get_result()->get_details();
         $this->assertStringContainsString('openai', $details);
+        $this->assertStringContainsString('embed_apikey', $details);
         $this->assertStringContainsString(
             get_string('check:key_places_mirror', 'local_ai_course_assistant'), $details,
             'the legacy apikey setting is described, not shown as a bare setting name');
+    }
+
+    /**
+     * Plant SHARED in the places a test names, plus the automatic apikey copy of the default key.
+     *
+     * @param string[] $others any of 'row', 'embed', 'rerank', 'voice', 'course1', 'course2'
+     * @return void
+     */
+    private function plant_with_mirror(array $others): void {
+        set_config('provider', 'openai', 'local_ai_course_assistant');
+        $this->cfg('apikey', secrets::conceal(self::SHARED));
+        foreach ($others as $other) {
+            switch ($other) {
+                case 'row':
+                    $this->cfg('comparison_providers', 'openai|' . secrets::conceal(self::SHARED) . '|gpt-4o-mini');
+                    break;
+                case 'embed':
+                    $this->cfg('embed_apikey', secrets::conceal(self::SHARED));
+                    break;
+                case 'rerank':
+                    $this->cfg('rerank_apikey', secrets::conceal(self::SHARED));
+                    break;
+                case 'voice':
+                    $this->cfg('voice_providers', 'openai|' . secrets::conceal(self::SHARED) . '|tts-1');
+                    break;
+                default:
+                    $this->course_key('KPMIRROR' . $other, self::SHARED);
+            }
+        }
+    }
+
+    /**
+     * Each kind of place that can hold a key beside the automatic copy.
+     *
+     * @return array
+     */
+    public static function one_other_place_provider(): array {
+        return ['a table row' => ['row'], 'a pasted setting' => ['embed'], 'another pasted setting' => ['rerank'],
+            'a voice row' => ['voice'], 'a course' => ['course1']];
+    }
+
+    /**
+     * The ruling: the automatic copy of the default key is not a place of the admin's own, so it is not counted.
+     *
+     * @dataProvider one_other_place_provider
+     * @param string $other the one place that holds the key beside the copy
+     * @return void
+     */
+    public function test_a_key_held_by_one_other_place_and_the_automatic_copy_is_not_listed(string $other): void {
+        $this->resetAfterTest();
+        $this->plant_with_mirror([$other]);
+        $result = (new key_places())->get_result();
+        $this->assertDebuggingNotCalled();
+        $this->assertSame(result::INFO, $result->get_status());
+        $this->assertTrue(
+            $result->get_summary() === get_string('check:key_places_single', 'local_ai_course_assistant'),
+            "a key held by $other and its automatic copy is one place, so it is not listed");
+        $this->assertSame('', $result->get_details(), "nothing to list for $other and the copy");
+        $this->assert_no_key_anywhere($result, [self::SHARED]);
+    }
+
+    public function test_a_key_held_only_by_the_default_row_and_its_automatic_copy_is_not_listed(): void {
+        $this->resetAfterTest();
+        $this->plant_with_mirror(['row']);
+        $result = (new key_places())->get_result();
+        $this->assertTrue(
+            $result->get_summary() === get_string('check:key_places_single', 'local_ai_course_assistant'),
+            'the default row and its copy: nothing to replace twice, nothing to list');
+        $this->assertSame('', $result->get_details());
+    }
+
+    public function test_a_key_held_by_two_courses_and_the_automatic_copy_is_listed_with_the_copy_noted(): void {
+        $this->resetAfterTest();
+        $this->plant_with_mirror(['course1', 'course2']);
+        $result = (new key_places())->get_result();
+        $this->assertDebuggingNotCalled();
+        $this->assertSame(result::INFO, $result->get_status());
+        $this->assertTrue(
+            $result->get_summary() === get_string('check:key_places_some', 'local_ai_course_assistant', 1),
+            'one key is held by two places of its own');
+        $details = $result->get_details();
+        $this->assertStringContainsString('AB12', $details);
+        $this->assertStringContainsString('KPMIRRORcourse1', $details);
+        $this->assertStringContainsString('KPMIRRORcourse2', $details);
+        $this->assertStringContainsString(get_string('check:key_places_mirror', 'local_ai_course_assistant'), $details,
+            'rotation changes the copy too, and it is described as an automatic copy');
+        $this->assertStringContainsString('rotate_key.php', $details);
+        $this->assert_no_key_anywhere($result, [self::SHARED]);
+    }
+
+    public function test_the_automatic_copy_is_still_named_when_the_list_of_places_is_cut(): void {
+        $this->resetAfterTest();
+        set_config('provider', 'openai', 'local_ai_course_assistant');
+        $this->cfg('apikey', secrets::conceal(self::SHARED));
+        $lines = [];
+        for ($i = 0; $i < key_places::PLACE_LIMIT + 1; $i++) {
+            $lines[] = 'openai|' . secrets::conceal(self::SHARED) . '|gpt-4o-mini';
+        }
+        $this->cfg('comparison_providers', implode("\n", $lines));
+        $details = (new key_places())->get_result()->get_details();
+        $this->assertStringContainsString(get_string('check:key_places_mirror', 'local_ai_course_assistant'), $details,
+            'the copy comes after every table row in the inventory, but it is still named');
+        $this->assertStringContainsString(get_string('check:key_places_more', 'local_ai_course_assistant', 1), $details);
+        $this->assertSame(key_places::PLACE_LIMIT + 1, substr_count($details, '<span class="sola-keyplace">'),
+            'PLACE_LIMIT places of its own and the copy');
+    }
+
+    // Minor 1: a failure reading the inventory is an INFO line that says so, never an exception on the status page.
+    public function test_a_failure_reading_the_inventory_gives_a_fixed_info_result_and_leaks_nothing(): void {
+        $this->resetAfterTest();
+        $this->plant();
+        $check = new class extends key_places {
+            /**
+             * The inventory can't be read; the message is what a real exception could carry a value in.
+             *
+             * @return array
+             */
+            protected function groups(): array {
+                throw new \RuntimeException('planted inventory failure MARKER-5e2a');
+            }
+        };
+        $result = $check->get_result();
+        $this->assertDebuggingNotCalled();
+        $this->assertSame(result::INFO, $result->get_status(), 'advice, never a fault');
+        $this->assertTrue($result->get_summary() === get_string('check:key_places_unreadable', 'local_ai_course_assistant'),
+            'the summary is the fixed unreadable string');
+        $this->assertSame('', $result->get_details());
+        foreach ($this->outputs($result) as $form => $text) {
+            $this->assertFalse(str_contains($text, 'MARKER-5e2a') || str_contains($text, 'Exception'),
+                "$form describes the failure");
+        }
+        $this->assert_no_key_anywhere($result, [self::SHARED, self::SINGLE, self::PAIR]);
+    }
+
+    // Minor 2: the list of keys is capped, and says how many more there are.
+    public function test_a_long_list_of_keys_is_cut_and_says_how_many_more(): void {
+        $this->resetAfterTest();
+        $keys = [];
+        $lines = [];
+        $total = key_places::KEY_LIMIT + 2;
+        for ($i = 1; $i <= $total; $i++) {
+            $key = sprintf('sk-proj-KPCAP-SENTINEL-%04d-C%03d', $i, $i);
+            $keys[] = $key;
+            $stored = secrets::conceal($key);
+            $lines[] = 'openai|' . $stored . '|gpt-4o-mini';
+            $lines[] = 'claude|' . $stored . '|claude-haiku-4-5';
+        }
+        $this->cfg('comparison_providers', implode("\n", $lines));
+        $result = (new key_places())->get_result();
+        $this->assertDebuggingNotCalled();
+        $this->assertTrue(
+            $result->get_summary() === get_string('check:key_places_some', 'local_ai_course_assistant', $total),
+            'the summary counts every key stored in more than one place, not only the ones listed');
+        $details = $result->get_details();
+        $this->assertSame(key_places::KEY_LIMIT, substr_count($details, '<li>'), 'KEY_LIMIT keys are listed');
+        $this->assertStringContainsString(get_string('check:key_places_morekeys', 'local_ai_course_assistant', 2), $details);
+        $this->assertStringContainsString('rotate_key.php', $details, 'the advice is still there');
+        $this->assert_no_key_anywhere($result, $keys);
+    }
+
+    public function test_a_list_of_keys_at_the_limit_has_no_more_line(): void {
+        $this->resetAfterTest();
+        $lines = [];
+        for ($i = 1; $i <= key_places::KEY_LIMIT; $i++) {
+            $stored = secrets::conceal(sprintf('sk-proj-KPCAP-SENTINEL-%04d-C%03d', $i, $i));
+            $lines[] = 'openai|' . $stored . '|gpt-4o-mini';
+            $lines[] = 'claude|' . $stored . '|claude-haiku-4-5';
+        }
+        $this->cfg('comparison_providers', implode("\n", $lines));
+        $details = (new key_places())->get_result()->get_details();
+        $this->assertSame(key_places::KEY_LIMIT, substr_count($details, '<li>'));
+        $this->assertSame(0, preg_match('~\bmore keys\b~', $details), 'no "more keys" line when every key is listed');
     }
 
     public function test_voice_rows_and_course_places_are_named(): void {

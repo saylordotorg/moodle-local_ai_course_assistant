@@ -29,10 +29,17 @@ defined('MOODLE_INTERNAL') || die();
  * apikey mirror is re-synced to the default provider's row.
  *
  * Refused, and nothing written, when: the selector matches no key or more than one; the new key is empty, shorter
- * than 8 characters, holds a "|", CR, LF or NUL, or is the old key again; the new key's prefix names another vendor
- * than a place's provider (course_key_guard::conflict()); or a place holding the key is forced in config.php, which
- * this code can't write (the place is counted in notrotated and named in an error, so the admin changes config.php
- * first and runs again, rather than being told the key was replaced when a copy is left behind).
+ * than 8 characters or longer than 512, holds anything outside printable ASCII (the characters "!" to "~": no
+ * space, tab, line break or other control character, and no non-ASCII character, so a non-breaking space or a
+ * zero-width space that came along with a paste is refused) or a "|" (printable, but the key table's column
+ * separator), or is the old key again; the new key's prefix names another vendor than a place's provider
+ * (course_key_guard::conflict()); or a place holding the key is forced in config.php, which this code can't write
+ * (the place is counted in notrotated and named in an error, so the admin changes config.php first and runs
+ * again, rather than being told the key was replaced when a copy is left behind).
+ *
+ * The apikey mirror's re-sync after the commit is conditional: it runs only when a Providers and keys row or the
+ * mirror itself held the key. A rotation that touched only pasted-key settings, voice rows or courses leaves the
+ * mirror, and so the key chat uses, as it was.
  *
  * Nothing either method returns, prints, logs or audits carries a key, its ciphertext or any part of it beyond
  * provider_keys::last4(). Errors name a place by kind and ref (provider id, setting name or course short name).
@@ -133,12 +140,20 @@ class key_rotation {
      * Refused (nothing written) when plan() refuses, or when a database transaction is already open: a rollback
      * inside someone else's transaction can't be promised, so a rotation always runs in a transaction of its own.
      *
+     * The key_rotated audit row's mirror_synced records that a re-sync of the apikey mirror was DUE (a row or the
+     * mirror held the key), which is decided before the commit because the row is written inside the transaction.
+     * It does not say that the sync ran after the commit, or that the mirror's value changed.
+     *
+     * Nothing after the commit can undo it or escape as an exception: a failure while dropping the config cache or
+     * reading the stores back gives reason 'unconfirmed' and a fixed message that does not describe the failure.
+     *
      * @param array $selector exactly one of ['last4' => 'ab12'] or ['fingerprint' => key_inventory::fingerprint()]
      * @param string $newkey the new plain key (trimmed)
      * @return array ['ok' => bool, 'errors' => string[], 'reason' => as plan(), or 'failed' when a write failed
-     *         and everything was rolled back, or 'unconfirmed' when the commit worked but reading the stores back
-     *         did not find the new key, 'counts' => kind => places changed (every kind in KINDS),
-     *         'notrotated' => int, 'newlast4' => provider_keys::last4() of the new key ('' unless it worked)]
+     *         and everything was rolled back, or 'unconfirmed' when the commit worked but the cache could not be
+     *         dropped, or reading the stores back failed or did not find the new key, 'counts' => kind => places
+     *         changed (every kind in KINDS), 'notrotated' => int, 'newlast4' => provider_keys::last4() of the new
+     *         key ('' unless it worked)]
      */
     public static function apply(array $selector, string $newkey): array {
         global $DB, $USER;
@@ -197,8 +212,13 @@ class key_rotation {
             });
         } catch (\Throwable $e) {
             // The writes were rolled back in the database; the config cache may still hold a value written inside
-            // the transaction, so drop it. The exception's message is never passed on: it could quote a value.
-            \cache_helper::invalidate_by_definition('core', 'config', [], self::PLUGIN);
+            // the transaction, so drop it. The exception's message is never passed on: it could quote a value, and
+            // a failure to drop the cache must not hide that the rotation failed.
+            try {
+                static::drop_config_cache();
+            } catch (\Throwable) {
+                $result['errors'][] = 'The configuration cache could not be cleared, so purge caches.';
+            }
             $result['reason'] = 'failed';
             $result['errors'][] = $changed
                 ? 'A store changed while the key was being replaced. Nothing was changed; run the command again.'
@@ -206,9 +226,18 @@ class key_rotation {
             return $result;
         }
 
-        // Moodle's config cache is not transaction-aware: a request that read the settings between the last write
-        // and the commit may have cached the old rows. Drop the cache before anything reads it again.
-        \cache_helper::invalidate_by_definition('core', 'config', [], self::PLUGIN);
+        $result['counts'] = $done;
+
+        // Nothing from here on may undo the commit or escape as an exception: whatever goes wrong, the admin is told
+        // to look before revoking the old key, in words that don't describe the failure (it could quote a value).
+        $confirmed = true;
+        try {
+            // Moodle's config cache is not transaction-aware: a request that read the settings between the last
+            // write and the commit may have cached the old rows. Drop the cache before anything reads it again.
+            static::drop_config_cache();
+        } catch (\Throwable) {
+            $confirmed = false;
+        }
 
         if ($resync) {
             // Chat reads the default provider's key from the apikey mirror. sync_after_writes() skips a table write
@@ -221,16 +250,29 @@ class key_rotation {
             }
         }
 
-        $result['counts'] = $done;
-        if (!static::confirm(key_inventory::fingerprint(trim($newkey)), $done)) {
+        try {
+            $confirmed = static::confirm(key_inventory::fingerprint(trim($newkey)), $done) && $confirmed;
+        } catch (\Throwable) {
+            $confirmed = false;
+        }
+        if (!$confirmed) {
             $result['reason'] = 'unconfirmed';
-            $result['errors'][] = 'The change was saved, but reading it back did not find the new key. Run --list '
-                . 'to see where each key is now before you revoke the old one.';
+            $result['errors'][] = 'The change was saved, but it could not be confirmed. Run --list to see where each '
+                . 'key is now before you revoke the old one.';
             return $result;
         }
         $result['ok'] = true;
         $result['newlast4'] = $newlast4;
         return $result;
+    }
+
+    /**
+     * Drop the plugin's cached settings, so the next read comes from the database.
+     *
+     * @return void
+     */
+    protected static function drop_config_cache(): void {
+        \cache_helper::invalidate_by_definition('core', 'config', [], self::PLUGIN);
     }
 
     /**
@@ -263,6 +305,7 @@ class key_rotation {
      * @param array $details provider, fingerprint, last-four values and counts; never a key
      * @return void
      * @throws \dml_exception when the row can't be written
+     * @throws \JsonException when the details can't be encoded
      */
     protected static function write_audit(int $userid, array $details): void {
         global $DB;
@@ -272,7 +315,9 @@ class key_rotation {
             'courseid'    => 0,
             'ipaddress'   => getremoteaddr(),
             'useragent'   => substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255),
-            'details'     => json_encode($details),
+            // A byte that is not UTF-8 is replaced rather than turning the whole row into '0'; anything that still
+            // can't be encoded throws here, inside the transaction, and rolls the rotation back.
+            'details'     => json_encode($details, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR),
             'timecreated' => time(),
         ]);
     }
@@ -481,9 +526,14 @@ class key_rotation {
         if (strlen($new) > self::MAX_LENGTH) {
             return 'The new key is longer than ' . self::MAX_LENGTH . ' characters.';
         }
-        if (strpos($new, '|') !== false || preg_match('~[\x00-\x1F\x7F\s]~', $new)) {
-            return 'The new key holds a "|", a space, a tab, a line break or another control character, which a key '
-                . 'never does.';
+        if (strpos($new, '|') !== false) {
+            return 'The new key holds a "|", which a key never does and the key table uses to separate its columns.';
+        }
+        // Printable ASCII only: no space, no control character, and no non-ASCII character, which includes the
+        // non-breaking space and the zero-width space that a paste can bring along and trim() leaves in place.
+        if (!preg_match('~\A[\x21-\x7E]+\z~', $new)) {
+            return 'The new key holds a character that is not printable ASCII (a space, a tab, a line break, a '
+                . 'non-breaking space or another invisible or non-English character), which a key never does.';
         }
         return '';
     }
