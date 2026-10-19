@@ -2333,6 +2333,7 @@ $string['coursesettings:force_on'] = 'Force on';
 $string['coursesettings:force_off'] = 'Force off';
 $string['coursesettings:state_enabled'] = 'enabled';
 $string['coursesettings:state_disabled'] = 'disabled';
+$string['coursesettings:more_options'] = 'More options';
 
 // ── v7.0.1 (I18N001): strings extracted from admin/learner pages that had
 // hardcoded English — rag_admin.php, admin_user_data.php, rubric_admin.php and
@@ -3009,7 +3010,7 @@ $string['settingspage:extraction'] = 'Document extraction';
 $string['settingspage:feedback'] = 'Surveys and feedback';
 $string['settingspage:ai'] = 'AI provider and models';
 $string['settingspage:content'] = 'Content and retrieval';
-$string['settingspage:safety'] = 'Safety and moderation';
+$string['settingspage:safety'] = 'Safety and privacy';
 $string['settingspage:engagement'] = 'Engagement';
 $string['settingspage:branding'] = 'Branding and interface';
 $string['settingspage:integrations'] = 'Integrations and delivery';
@@ -3526,6 +3527,7 @@ $string['autoupgrade:role_chat'] = 'Chat (primary model)';
 $string['autoupgrade:role_premium'] = 'Premium tier';
 $string['autoupgrade:role_failover'] = 'Failover';
 $string['autoupgrade:role_quiz'] = 'Quiz generation';
+$string['autoupgrade:role_essay'] = 'Essay scoring';
 $string['autoupgrade:role_classifier'] = 'Mastery classifier';
 $string['autoupgrade:role_safety'] = 'Safety reference';
 $string['autoupgrade:role_soapbox'] = 'Soapbox scoring';
@@ -3718,3 +3720,45 @@ $string['providerkeys:last4_hint'] = 'Saved key ends in {$a}.';
 $string['providerkeys:saved_url_hint'] = 'A URL is saved.';
 $string['providerkeys:err_webhook_url'] = '{$a} must be a web address that starts with http:// or https:// and has no spaces. Nothing was saved.';
 $string['providerkeys:forced_note'] = 'This table is set in config.php, so it can\'t be changed here. Edit it in config.php instead.';
+
+// 7.10.0: the settings menu regrouped into five task pages and an Advanced group
+// (classes/settings_layout.php, classes/settings_layout_map.php). English only for
+// now, listed in KNOWN_UNTRANSLATED in tests/lang_completeness_test.php.
+$string['settingspage:essentials'] = 'Essentials';
+$string['settingspage:models'] = 'Models and keys';
+$string['settingspage:features'] = 'Features';
+$string['settingspage:cost'] = 'Cost and reliability';
+$string['settingspage:advanced'] = 'Advanced';
+$string['settingspage:adv_retrieval'] = 'Retrieval';
+$string['settingspage:adv_documents'] = 'Reranking and documents';
+$string['settingspage:adv_prompt'] = 'Prompt, voice and display';
+$string['settingspage:adv_integrations'] = 'Integrations and governance';
+$string['settingspage:adv_legacy'] = 'Soapbox, avatars and legacy';
+$string['settingspage:nav_label'] = 'Settings pages';
+$string['settingspage:redirect'] = 'Moved';
+$string['settingspage:essentials_intro'] = 'The settings every site needs: switch [[tutorshort]] on, name it, and say who to contact.';
+$string['settingspage:models_intro'] = 'Which AI providers and keys [[tutorshort]] uses, the default model, and what takes over if it fails.';
+$string['settingspage:features_intro'] = 'Switch learner-facing features on or off. A feature\'s own options appear when you turn it on.';
+$string['settingspage:safety_intro'] = 'Quiz mode, off-topic limits, wellbeing, integrity checks and data retention.';
+$string['settingspage:cost_intro'] = 'Spend caps, cost and answer-rate alerts, and automatic model upgrades.';
+$string['settingspage:adv_retrieval_intro'] = 'Search over course content: embeddings and how many passages are returned. Most sites never change these.';
+$string['settingspage:adv_documents_intro'] = 'Reranking, switching embedding models, and which document types are read into the index.';
+$string['settingspage:adv_prompt_intro'] = 'Prompt size and history, voice and speech providers, and the look of the chat widget.';
+$string['settingspage:adv_integrations_intro'] = 'Support and Zendesk, analytics export, CDN, remote configuration, signed policy bundles, vendor data, price drift, benchmarks and optimizer weights.';
+$string['settingspage:adv_legacy_intro'] = 'Deprecated Soapbox, talking-avatar vendors and other settings that are parked here.';
+$string['layout:general'] = 'General';
+$string['layout:contact'] = 'Contact and privacy';
+$string['layout:faq'] = 'FAQ and conversation starters';
+$string['layout:roles'] = 'Model roles';
+$string['layout:failover'] = 'Failover and retries';
+$string['layout:voice'] = 'Voice';
+$string['layout:activelearners'] = 'Active learners';
+$string['layout:embedding'] = 'Embeddings';
+$string['layout:searchtuning'] = 'Search tuning';
+$string['layout:modelcalls'] = 'Model call details';
+$string['layout:promptbudget'] = 'Prompt budget and debugging';
+$string['layout:history'] = 'History and learner profile';
+$string['layout:appearance'] = 'Appearance';
+$string['layout:remote'] = 'Remote configuration';
+$string['layout:optimizer'] = 'Optimizer weights';
+$string['layout:legacy'] = 'Deprecated settings';

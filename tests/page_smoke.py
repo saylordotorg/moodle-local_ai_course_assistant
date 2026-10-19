@@ -57,7 +57,7 @@ PAGES = [
     ('prompt_debug_view',          P + 'prompt_debug_view.php'),
     ('prompt_metrics',             P + 'prompt_metrics.php'),
     ('integrity_admin',            P + 'integrity_admin.php'),
-    ('settings page',              '/admin/settings.php?section=local_ai_course_assistant_general'),
+    ('settings page',              '/admin/settings.php?section=local_ai_course_assistant_essentials'),
     ('rubric_admin',               P + 'rubric_admin.php'),
     ('survey_admin',               P + 'survey_admin.php'),
     ('usertesting_admin',          P + 'usertesting_admin.php'),

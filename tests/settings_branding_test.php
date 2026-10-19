@@ -16,6 +16,12 @@
 
 namespace local_ai_course_assistant;
 
+use local_ai_course_assistant\tests\settings_tree;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/fixtures/settings_tree.php');
+
 /**
  * The admin settings page must rebrand completely (v7.0.0).
  *
@@ -58,14 +64,8 @@ final class settings_branding_test extends \advanced_testcase {
         $category = admin_get_root(true, true)->locate('local_ai_course_assistant');
         $this->assertNotEmpty($category, 'Settings category must be reachable.');
 
-        $allsettings = [];
-        foreach ($category->children as $child) {
-            if ($child instanceof \admin_settingpage) {
-                foreach ((array) $child->settings as $setting) {
-                    $allsettings[] = $setting;
-                }
-            }
-        }
+        // 7.10.0 nested five pages in an Advanced category; settings_tree descends into it.
+        $allsettings = settings_tree::settings($category);
 
         $leaks = [];
         $rawtokens = [];
@@ -83,11 +83,15 @@ final class settings_branding_test extends \advanced_testcase {
             }
         }
 
+        // About 289 value settings plus headings: a floor of 250 fails if the walk
+        // stops descending into the Advanced category, which holds about half.
         $this->assertGreaterThan(
-            100,
+            250,
             $scanned,
-            'Scanned too few settings — the page did not build, so this guard proves nothing.'
+            'Scanned too few settings — the pages did not build, so this guard proves nothing.'
         );
+        $names = array_map(fn($s) => $s->name, $allsettings);
+        $this->assertContains('rag_topk', $names, 'the walk reached the Advanced pages');
         $this->assertSame([], $leaks, 'Default brand still visible after rebranding: ' . implode(', ', $leaks));
         $this->assertSame([], $rawtokens, 'Unresolved brand tokens rendered to admins: ' . implode(', ', $rawtokens));
     }

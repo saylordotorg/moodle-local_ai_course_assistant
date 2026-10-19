@@ -44,6 +44,7 @@ require_login();
 require_capability('moodle/site:config', \context_system::instance());
 
 use local_ai_course_assistant\emergency_control;
+use local_ai_course_assistant\settings_layout;
 
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/emergency_admin.php'));
@@ -137,7 +138,7 @@ echo $OUTPUT->render_from_template('local_ai_course_assistant/emergency_admin', 
     'page_warning' => \local_ai_course_assistant\branding::str('emergency:page_warning'),
     'sesskey' => sesskey(),
     'actionurl' => $PAGE->url->out(false),
-    'settings_url' => (new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant_general']))->out(false),
+    'settings_url' => (new moodle_url('/admin/settings.php', ['section' => settings_layout::page_id('essentials')]))->out(false),
     'cli_path' => 'php local/ai_course_assistant/admin/cli/emergency_disable.php',
 ]);
 echo $OUTPUT->footer();

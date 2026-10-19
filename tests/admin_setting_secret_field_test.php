@@ -16,6 +16,12 @@
 
 namespace local_ai_course_assistant;
 
+use local_ai_course_assistant\tests\settings_tree;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/fixtures/settings_tree.php');
+
 /**
  * A single-key field shows only a masked "ends in" hint.
  *
@@ -364,10 +370,7 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
         $seen = 0;
         $plain = [];
         $hinted = null;
-        foreach ($category->children as $page) {
-            if (!$page instanceof \admin_settingpage) {
-                continue;
-            }
+        foreach (settings_tree::pages($category) as $page) {
             foreach ($page->settings as $setting) {
                 if (!$setting instanceof \admin_setting_encryptedpassword) {
                     continue;
@@ -411,10 +414,7 @@ final class admin_setting_secret_field_test extends \advanced_testcase {
         }
         $category = \admin_get_root(true, true)->locate('local_ai_course_assistant');
         $found = [];
-        foreach ($category->children as $page) {
-            if (!$page instanceof \admin_settingpage) {
-                continue;
-            }
+        foreach (settings_tree::pages($category) as $page) {
             foreach ($page->settings as $setting) {
                 if (isset($urls[$setting->name])) {
                     $found[$setting->name] = $setting;

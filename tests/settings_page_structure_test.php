@@ -16,6 +16,12 @@
 
 namespace local_ai_course_assistant;
 
+use local_ai_course_assistant\tests\settings_tree;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/fixtures/settings_tree.php');
+
 /**
  * Every settings page opens with its own heading and none ends on an empty one.
  *
@@ -44,15 +50,12 @@ final class settings_page_structure_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        $category = \admin_get_root(true, true)->locate('local_ai_course_assistant');
-        $this->assertNotEmpty($category);
+        // 7.10.0: five of the pages sit in the nested Advanced category.
+        $category = settings_tree::category();
 
         $pages = 0;
         $problems = [];
-        foreach ($category->children as $page) {
-            if (!$page instanceof \admin_settingpage) {
-                continue;
-            }
+        foreach (settings_tree::pages($category) as $page) {
             $pages++;
             $list = array_values((array) $page->settings);
             $this->assertNotEmpty($list, "{$page->name} has no settings");
@@ -62,14 +65,14 @@ final class settings_page_structure_test extends \advanced_testcase {
                     . strip_tags(end($list)->visiblename);
             }
 
-            // The general page leads with the enable switch and version banner by
-            // design. Every other page must reach a heading before its first real
-            // setting; the TOC anchors are not settings.
-            if ($page->name === 'local_ai_course_assistant_general') {
+            // Essentials leads with the version banner by design. Every other page
+            // must reach a heading before its first real setting; the navigation
+            // notice (nav_*) and any old TOC anchor (*_anchor) are not settings.
+            if ($page->name === settings_layout::page_id('essentials')) {
                 continue;
             }
             foreach ($list as $setting) {
-                if (str_ends_with($setting->name, '_anchor')) {
+                if (str_starts_with($setting->name, 'nav_') || str_ends_with($setting->name, '_anchor')) {
                     continue;
                 }
                 if (!$setting instanceof \admin_setting_heading) {
@@ -79,7 +82,7 @@ final class settings_page_structure_test extends \advanced_testcase {
             }
         }
 
-        $this->assertGreaterThanOrEqual(11, $pages, 'expected every settings page');
+        $this->assertGreaterThanOrEqual(10, $pages, 'expected every settings page');
         $this->assertSame([], $problems, "Settings pages strand a heading:\n  " . implode("\n  ", $problems));
     }
 }

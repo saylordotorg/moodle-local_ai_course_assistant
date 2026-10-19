@@ -26,6 +26,7 @@ require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\content_indexer;
 use local_ai_course_assistant\embedding_migration;
+use local_ai_course_assistant\settings_layout;
 
 $syscontext = context_system::instance();
 require_login();
@@ -606,8 +607,8 @@ $templatedata = [
         'local_ai_course_assistant',
         (new moodle_url(
             '/admin/settings.php',
-            ['section' => 'local_ai_course_assistant_general'],
-            'sec-content'
+            ['section' => settings_layout::page_id('adv_documents')],
+            'admin-rag_extract_pdf'
         ))->out()
     ),
     'statusrows' => array_values($statusrows),

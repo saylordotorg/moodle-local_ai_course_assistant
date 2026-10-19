@@ -16,6 +16,12 @@
 
 namespace local_ai_course_assistant;
 
+use local_ai_course_assistant\tests\settings_tree;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/fixtures/settings_tree.php');
+
 /**
  * Guards for the settings page's hide_if dependency map (v7.0.0).
  *
@@ -31,16 +37,6 @@ namespace local_ai_course_assistant;
  */
 final class settings_dependencies_test extends \advanced_testcase {
     /**
-     * Build the plugin's settings page from the real admin tree.
-     *
-     * @return \admin_settingpage
-     */
-    private function settings_page(): \admin_settingpage {
-        $pages = $this->settings_pages();
-        return reset($pages);
-    }
-
-    /**
      * Every settings page the plugin registers.
      *
      * Issue #292 split one page into eleven, because core serialises a page's
@@ -49,25 +45,14 @@ final class settings_dependencies_test extends \advanced_testcase {
      * reasons about dependencies has to look at all of them now: before the
      * split this helper returned the only page, and a test that kept doing that
      * would quietly assert nothing, since the general page now carries no
-     * dependencies at all.
+     * dependencies at all. 7.10.0 nested five pages in an Advanced category,
+     * so the walk goes through settings_tree, which descends into it.
      *
      * @return \admin_settingpage[] keyed by page name.
      */
     private function settings_pages(): array {
-        global $CFG;
-        require_once($CFG->libdir . '/adminlib.php');
         $this->setAdminUser();
-        $admin = admin_get_root(true, true);
-        $category = $admin->locate('local_ai_course_assistant');
-        $this->assertNotEmpty($category,
-            'The plugin settings category must be reachable, or every assertion below is vacuous.');
-
-        $pages = [];
-        foreach ($category->children as $child) {
-            if ($child instanceof \admin_settingpage) {
-                $pages[$child->name] = $child;
-            }
-        }
+        $pages = settings_tree::pages(settings_tree::category());
         $this->assertNotEmpty($pages, 'no settings pages found');
         return $pages;
     }
@@ -93,8 +78,13 @@ final class settings_dependencies_test extends \advanced_testcase {
 
         $ceiling = 950;
         $over = [];
+        $pages = $this->settings_pages();
+        // 7.10.0: the walk must reach the pages inside the nested Advanced category,
+        // where the heaviest payload (retrieval) lives.
+        $this->assertArrayHasKey(settings_layout::page_id('adv_retrieval'), $pages,
+            'the budget check reads the Advanced pages too');
 
-        foreach ($this->settings_pages() as $name => $page) {
+        foreach ($pages as $name => $page) {
             if (!$page->has_dependencies()) {
                 continue;
             }
@@ -177,7 +167,13 @@ final class settings_dependencies_test extends \advanced_testcase {
 
     public function test_no_setting_carries_more_than_one_dependency(): void {
         $this->resetAfterTest();
-        $pairs = $this->dependency_pairs($this->settings_page());
+        // Every page, not the first one: the first page (Essentials) carries no
+        // dependencies, so reading only it would pass whatever the map did.
+        $pairs = [];
+        foreach ($this->settings_pages() as $page) {
+            $pairs = array_merge($pairs, $this->dependency_pairs($page));
+        }
+        $this->assertNotEmpty($pairs, 'Read no dependencies, so this guard would pass vacuously.');
 
         // The map is deliberately a tree: each setting hangs off its nearest
         // owning toggle only. Two dependencies on one setting would make its
@@ -195,8 +191,10 @@ final class settings_dependencies_test extends \advanced_testcase {
     public function test_removed_settings_are_no_longer_registered(): void {
         $this->resetAfterTest();
         $onpage = [];
-        foreach ((array) $this->settings_page()->settings as $setting) {
-            $onpage[] = $setting->get_full_name();
+        foreach ($this->settings_pages() as $page) {
+            foreach ((array) $page->settings as $setting) {
+                $onpage[] = $setting->get_full_name();
+            }
         }
         $this->assertNotEmpty($onpage, 'Parsed no settings — this guard would pass vacuously.');
 

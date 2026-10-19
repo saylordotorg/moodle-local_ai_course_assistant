@@ -16,6 +16,12 @@
 
 namespace local_ai_course_assistant;
 
+use local_ai_course_assistant\tests\settings_tree;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/fixtures/settings_tree.php');
+
 /**
  * No SOLA settings page ever contains a secret or the ciphertext of one, however it was rendered.
  *
@@ -318,10 +324,9 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $category = $root->locate('local_ai_course_assistant');
         $this->assertNotNull($category, 'the SOLA settings category is in the admin tree');
         $pages = [];
-        foreach ($category->children as $page) {
-            if ($page instanceof \admin_settingpage) {
-                $pages[$page->name] = $page->output_html();
-            }
+        // Every page, including the five inside the nested Advanced category (7.10.0).
+        foreach (settings_tree::pages($category) as $page) {
+            $pages[$page->name] = $page->output_html();
         }
         return ['pages' => $pages, 'html' => implode("\n", $pages), 'js' => $this->page_js()];
     }
@@ -456,7 +461,8 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
     private function assert_rendered(array $rendered, string $when, array $rows, bool $legacyurls, bool $forced = false): void {
         $html = $rendered['html'];
         $has = fn(string $needle): bool => str_contains($html, $needle);
-        $this->assertGreaterThanOrEqual(11, count($rendered['pages']), "the tree walk saw every SOLA settings page ($when)");
+        // 7.10.0: five task pages and five Advanced pages.
+        $this->assertGreaterThanOrEqual(10, count($rendered['pages']), "the tree walk saw every SOLA settings page ($when)");
         foreach ($rendered['pages'] as $name => $pagehtml) {
             $this->assertTrue(str_contains($pagehtml, 'id_s_local_ai_course_assistant_'),
                 "the page $name rendered at least one setting ($when)");
@@ -592,10 +598,7 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $category = \admin_get_root(true, true)->locate('local_ai_course_assistant');
         $seen = [];
         $wrong = [];
-        foreach ($category->children as $page) {
-            if (!$page instanceof \admin_settingpage) {
-                continue;
-            }
+        foreach (settings_tree::pages($category) as $page) {
             foreach ($page->settings as $setting) {
                 if ($setting->plugin !== 'local_ai_course_assistant' || !secrets::is_secret($setting->name)) {
                     continue;

@@ -509,6 +509,11 @@ $keyph = $haskey
     ? get_string('coursesettings:apikey_stored', 'local_ai_course_assistant')
     : get_string('coursesettings:using_global', 'local_ai_course_assistant');
 
+// "More options" (base URL, system prompt, temperature, spend cap) starts open only when
+// the course already holds a value in one of the four, so a stored override is never hidden.
+// Decided here, as a yes/no, so the stored row itself never goes near the template context.
+$moreoptionsopen = course_config_manager::has_more_options_values($current);
+
 // Soapbox course type, shown only once Soapbox resolves to on for this course.
 $soapboxleveloptions = [];
 foreach (\local_ai_course_assistant\rubric_manager::speech_presets() as $lvkey => $lvdef) {
@@ -681,6 +686,10 @@ $templatedata = [
     'systemprompthint' => get_string('coursesettings:systemprompt_hint', 'local_ai_course_assistant'),
     'resetprompttitle' => get_string('coursesettings:reset_prompt_title', 'local_ai_course_assistant'),
     'resetpromptlabel' => get_string('coursesettings:reset_prompt', 'local_ai_course_assistant'),
+
+    // Base URL, system prompt, temperature and spend cap sit under "More options".
+    'moreoptionslabel' => get_string('coursesettings:more_options', 'local_ai_course_assistant'),
+    'moreoptionsopen' => $moreoptionsopen,
 
     // RAG card. The pedagogy toggles below live inside it, so they are shown
     // only when RAG is on site-wide -- carried over from the old markup.
