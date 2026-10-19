@@ -57,18 +57,32 @@ final class settings_redirect_page extends \admin_settingpage {
     /**
      * Whether the current request is asking for this page, as admin/settings.php?section= does.
      *
+     * Core's navigation build reaches this on every admin page, whatever its
+     * query string says, so a malformed section (?section[]=x) must read as "not
+     * this page" and never throw: optional_param() raises a coding_exception for
+     * an array, which would turn a bad link into an error page for the whole
+     * admin area.
+     *
      * @return bool
      */
     public function is_requested(): bool {
-        return optional_param('section', '', PARAM_SAFEDIR) === $this->name;
+        try {
+            $section = optional_param('section', '', PARAM_SAFEDIR);
+        } catch (\coding_exception $e) {
+            return false;
+        }
+        return $section === $this->name;
     }
 
     /**
      * Redirect when this page was asked for; otherwise just report access.
      *
-     * Core calls this on every settings page of the tree when a settings form
-     * is saved, so it redirects only for the one page named in the request,
-     * and only for a user who could open it.
+     * Core calls this when a settings form is saved, and also on every admin
+     * navigation build (it asks each page whether the user can see it). So it
+     * runs on pages that never asked for this one, and the is_requested() guard
+     * is load-bearing: without it, any admin page would redirect. It redirects
+     * only for the one page named in the request, and only for a user who could
+     * open it.
      *
      * @return bool True if the user has access.
      */

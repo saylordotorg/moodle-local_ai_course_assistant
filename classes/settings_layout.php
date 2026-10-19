@@ -256,7 +256,7 @@ final class settings_layout {
      * different pages (or missing) is skipped and reported rather than emitted
      * as a rule that would never fire.
      *
-     * @param array<string, \admin_settingpage> $pages Built pages.
+     * @param array $pages Built pages: short page id => \admin_settingpage.
      * @param array $dependencies Toggle name => list of dependent setting names.
      * @return array<int, array{0: string, 1: string}> Skipped [dependent, toggle] pairs.
      */

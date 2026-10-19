@@ -241,6 +241,7 @@ final class settings_layout_test extends \advanced_testcase {
 
             $redirect = $category->locate($oldid);
             $this->assertInstanceOf(settings_redirect_page::class, $redirect, "{$oldid} is registered as a redirect page");
+            // The redirect() argument itself cannot be asserted: core's CLI redirect() throws before a target can be captured.
             $this->assertSame('/admin/settings.php?section=' . $newid, $redirect->url->out_as_local_url(false),
                 "{$oldid} sends the browser to {$newid}");
 
@@ -284,6 +285,50 @@ final class settings_layout_test extends \advanced_testcase {
             // Someone who may not open settings is never redirected into the page.
             $this->setUser($this->getDataGenerator()->create_user());
             $this->assertFalse($page->check_access());
+        } finally {
+            unset($_GET['section']);
+        }
+    }
+
+    /**
+     * A section parameter that is an array is simply not a request for the page.
+     *
+     * Core builds the admin navigation on every admin page and calls
+     * check_access() on each page it finds, so ?section[]=x reaches this class
+     * on pages that never asked for it. optional_param() throws a
+     * coding_exception on an array, which would turn a malformed query string
+     * into an error page for the whole admin area.
+     */
+    public function test_an_array_section_parameter_is_not_a_request_and_does_not_throw(): void {
+        $category = $this->category();
+        $page = $category->locate(settings_layout::page_id('ai'));
+        $this->assertInstanceOf(settings_redirect_page::class, $page);
+
+        $cases = [
+            'an array in GET' => ['get', [settings_layout::page_id('ai')]],
+            'an array in POST' => ['post', [settings_layout::page_id('ai')]],
+            'a nested array in GET' => ['get', ['nested' => ['x']]],
+            'a nested array in POST' => ['post', ['nested' => ['x']]],
+        ];
+        foreach ($cases as $label => [$source, $value]) {
+            try {
+                unset($_GET['section'], $_POST['section']);
+                if ($source === 'get') {
+                    $_GET['section'] = $value;
+                } else {
+                    $_POST['section'] = $value;
+                }
+                $this->assertFalse($page->is_requested(), "{$label} is not a request");
+                $this->assertTrue($page->check_access(), "{$label} neither redirects nor throws");
+            } finally {
+                unset($_GET['section'], $_POST['section']);
+            }
+        }
+
+        // The string form still works, so the guard did not turn the check off.
+        try {
+            $_GET['section'] = settings_layout::page_id('ai');
+            $this->assertTrue($page->is_requested());
         } finally {
             unset($_GET['section']);
         }

@@ -16,6 +16,12 @@
 
 namespace local_ai_course_assistant;
 
+use local_ai_course_assistant\tests\settings_tree;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/fixtures/settings_tree.php');
+
 /**
  * CONTRIB-10574 #273: the pages it names stay on Templates, Output API and AMD.
  *
@@ -121,19 +127,13 @@ final class templates_migration_test extends \advanced_testcase {
         $PAGE->set_url('/admin/settings.php');
         $PAGE->set_context(\context_system::instance());
 
-        // locate() finds pages, not settings, and the settings are split across
-        // several pages (#292), so search every page this plugin registers
-        // rather than hard-coding which one holds the prompt today.
-        $root = \admin_get_root(true, true);
-        preg_match_all("/new admin_settingpage\\(\\s*'(local_ai_course_assistant_[a-z_]+)'/",
-            file_get_contents(__DIR__ . '/../settings.php'), $pages);
-        $this->assertNotEmpty($pages[1], 'sanity: settings.php should register pages');
+        // The settings are split across several pages (#292) and, since 7.10.0,
+        // some sit in a nested category, so walk the whole tree through the
+        // shared helper rather than hard-coding which page holds the prompt.
         $setting = null;
-        foreach ($pages[1] as $name) {
-            $page = $root->locate($name);
-            // A page keys its settings by plugin and name run together.
-            if ($page && isset($page->settings->local_ai_course_assistantsystemprompt)) {
-                $setting = $page->settings->local_ai_course_assistantsystemprompt;
+        foreach (settings_tree::settings(settings_tree::category()) as $candidate) {
+            if ($candidate->plugin === 'local_ai_course_assistant' && $candidate->name === 'systemprompt') {
+                $setting = $candidate;
                 break;
             }
         }
