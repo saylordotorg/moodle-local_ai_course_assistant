@@ -349,6 +349,13 @@ final class settings_usage_test extends \advanced_testcase {
             'a list default in another order' => ['b,a', ['a', 'b'], 'default'],
             'a list default with a different member' => ['a,c', ['a', 'b'], 'changed'],
             'an empty list default and an empty stored value' => ['', [], 'default'],
+            // Moodle's multicheckbox default is keyed: the key names a choice, the value says on (1) or off (0).
+            'a keyed default compares the enabled keys, in another order' => ['c,a', ['a' => 1, 'b' => 0, 'c' => 1], 'default'],
+            'a keyed default with one more choice switched on' => ['a,b,c', ['a' => 1, 'b' => 0, 'c' => 1], 'changed'],
+            'a keyed default with one choice switched off' => ['a', ['a' => 1, 'b' => 0, 'c' => 1], 'changed'],
+            'a keyed default whose 0 and 1 values are not the choice names' => ['0,1', ['a' => 1, 'b' => 0], 'changed'],
+            'a keyed default with every choice off and nothing stored' => ['', ['a' => 0, 'b' => 0], 'default'],
+            'a keyed default with every choice off against a stored choice' => ['a', ['a' => 0, 'b' => 0], 'changed'],
         ];
     }
 
@@ -411,5 +418,111 @@ final class settings_usage_test extends \advanced_testcase {
         $this->assertStringContainsString('Table row counts', $full);
         $this->assertMatchesRegularExpression('~^\s*' . self::COURSE_TABLE . '\s+1$~m', $full);
         $this->assertStringNotContainsString('text-section-sentinel', $full);
+    }
+
+    public function test_an_undecryptable_secret_raises_no_notice_and_the_json_stays_valid(): void {
+        global $CFG;
+        // A database restored onto another site: ciphertext this site's key can't open. secrets::reveal() treats
+        // it as unset and raises a developer debugging() notice, which a CLI run would echo into --json output.
+        $CFG->debug = DEBUG_DEVELOPER;
+        $CFG->debugdisplay = 1;
+        $planted = 'sodium:' . base64_encode(str_repeat('undecryptable-sentinel-', 4));
+        set_config(self::SECRET_SETTING, $planted, self::PLUGIN);
+        $this->assertTrue(secrets::is_encrypted($planted));
+
+        ob_start();
+        try {
+            $report = settings_usage::report(true, true);
+            $json = json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        } finally {
+            $printed = ob_get_clean();
+        }
+
+        // Under phpunit a debugging() call is recorded instead of printed, so the call itself is the thing to refuse.
+        $this->assertDebuggingNotCalled('report() let a decryption notice through');
+        $this->assertSame('', $printed, 'report() wrote to the output');
+        $decoded = json_decode($json, true);
+        $this->assertIsArray($decoded, 'the JSON does not decode');
+        $this->assertSame(['settings', 'summary', 'percourse', 'tables'], array_keys($decoded));
+        $this->assertSame('secret unset', $decoded['settings'][self::SECRET_SETTING],
+            'an undecryptable secret reads as unset, as it does everywhere else in SOLA');
+        $this->assertStringNotContainsString('could not be decrypted', $json);
+        $this->assertStringNotContainsString('++', $json);
+        $this->assert_nowhere($report, [$planted]);
+    }
+
+    public function test_debugging_is_back_as_it_was_after_the_report(): void {
+        global $CFG;
+        $CFG->debug = DEBUG_DEVELOPER;
+        $CFG->debugusers = '2';
+        settings_usage::report();
+        $this->assertSame(DEBUG_DEVELOPER, (int) $CFG->debug);
+        $this->assertSame('2', $CFG->debugusers);
+        // And a notice raised afterwards is still raised.
+        debugging('after the report', DEBUG_DEVELOPER);
+        $this->assertDebuggingCalled('after the report');
+    }
+
+    /**
+     * Whether a token is a function or method call with one of the given names.
+     *
+     * @param array $tokens token_get_all() output without whitespace and comments.
+     * @param int $i Index of the token to test.
+     * @param string[] $names Lower-case function names.
+     * @return bool
+     */
+    private static function is_call_to(array $tokens, int $i, array $names): bool {
+        return is_array($tokens[$i]) && $tokens[$i][0] === T_STRING
+            && in_array(strtolower($tokens[$i][1]), $names, true)
+            && ($tokens[$i + 1] ?? null) === '(';
+    }
+
+    public function test_the_cli_script_writes_output_only_through_the_report_helpers(): void {
+        $source = file_get_contents(__DIR__ . '/../admin/cli/settings_usage_report.php');
+        $this->assertNotFalse($source);
+        $tokens = [];
+        foreach (token_get_all($source) as $token) {
+            if (is_array($token) && in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
+                continue;
+            }
+            $tokens[] = $token;
+        }
+        $this->assertGreaterThan(50, count($tokens), 'the script was not read');
+
+        $banned = ['var_dump', 'print_r', 'var_export', 'printf', 'vprintf', 'fprintf', 'vfprintf', 'debug_zval_dump',
+            'fwrite', 'fputs', 'file_put_contents', 'error_log', 'mtrace', 'debugging', 'print_object', 'var_dump'];
+        $clihelpers = ['cli_get_params', 'cli_error', 'cli_writeln', 'cli_heading', 'cli_separator'];
+        $echoes = 0;
+        foreach ($tokens as $i => $token) {
+            $kind = is_array($token) ? $token[0] : null;
+            $this->assertNotSame(T_INLINE_HTML, $kind, 'text outside the php tags would be printed');
+            $this->assertNotSame(T_OPEN_TAG_WITH_ECHO, $kind, 'a short echo tag prints');
+            $this->assertNotSame(T_PRINT, $kind, 'print writes output');
+            $this->assertFalse(self::is_call_to($tokens, $i, $banned), 'the script calls ' . ($token[1] ?? '?'));
+            if (is_array($token) && $token[0] === T_STRING && strncmp($token[1], 'cli_', 4) === 0
+                    && ($tokens[$i + 1] ?? null) === '(') {
+                $this->assertContains($token[1], $clihelpers, "{$token[1]}() is not a known Moodle CLI helper");
+            }
+            if ($kind === T_EXIT) {
+                // exit('text') and die('text') print the text; exit(0) and a bare exit do not.
+                $arg = $tokens[$i + 1] ?? null;
+                if ($arg === '(') {
+                    $this->assertSame(T_LNUMBER, $tokens[$i + 2][0] ?? null, 'exit() with something other than a status code');
+                }
+            }
+            if ($kind === T_ECHO) {
+                $echoes++;
+                $statement = '';
+                for ($j = $i + 1; $tokens[$j] !== ';'; $j++) {
+                    $statement .= is_array($tokens[$j]) ? $tokens[$j][1] : $tokens[$j];
+                }
+                $this->assertMatchesRegularExpression(
+                    '~^(json_encode\(\$report,[A-Z_|]+\),"\\\\n"|settings_usage::render_text\(\$report\))$~',
+                    str_replace(' ', '', $statement),
+                    "echo $statement prints something other than the report"
+                );
+            }
+        }
+        $this->assertSame(2, $echoes, 'the script prints the report as JSON or as text, and nothing else');
     }
 }

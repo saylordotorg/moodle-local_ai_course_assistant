@@ -3527,6 +3527,7 @@ $string['autoupgrade:role_chat'] = 'Chat (primary model)';
 $string['autoupgrade:role_premium'] = 'Premium tier';
 $string['autoupgrade:role_failover'] = 'Failover';
 $string['autoupgrade:role_quiz'] = 'Quiz generation';
+$string['autoupgrade:role_essay'] = 'Essay scoring';
 $string['autoupgrade:role_classifier'] = 'Mastery classifier';
 $string['autoupgrade:role_safety'] = 'Safety reference';
 $string['autoupgrade:role_soapbox'] = 'Soapbox scoring';

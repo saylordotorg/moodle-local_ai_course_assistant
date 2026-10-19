@@ -44,6 +44,17 @@ final class settings_layout_test extends \advanced_testcase {
     private const ADVANCED_PAGES = ['adv_retrieval', 'adv_documents', 'adv_prompt', 'adv_integrations', 'adv_legacy'];
 
     /**
+     * Settings that were in tests/fixtures/settings_defaults_snapshot.json and were deleted on purpose.
+     *
+     * Empty today: the regroup renamed, removed and re-defaulted nothing. A
+     * later release that drops a setting lists its name here in the same
+     * commit, so the removal is visible in review.
+     *
+     * @var string[]
+     */
+    private const REMOVED_ON_PURPOSE = [];
+
+    /**
      * Rebuild the real admin tree as an administrator and return the plugin category.
      *
      * @return \admin_category
@@ -180,9 +191,19 @@ final class settings_layout_test extends \advanced_testcase {
         }
     }
 
+    /**
+     * Pin that no existing setting's default changed since the regroup.
+     *
+     * One way on purpose: every setting in the snapshot must still be registered
+     * with the same default, but a setting the snapshot has never heard of is
+     * allowed, so adding a setting later needs no fixture change. A setting
+     * removed on purpose is named in REMOVED_ON_PURPOSE, with the release that
+     * dropped it, so a deletion is a reviewed edit and never a silent one.
+     */
     public function test_defaults_are_unchanged(): void {
         $snapshot = json_decode(file_get_contents(__DIR__ . '/fixtures/settings_defaults_snapshot.json'), true);
         $this->assertIsArray($snapshot);
+        // The fixture itself must not be trimmed to make a missing setting go unnoticed.
         $this->assertCount(289, $snapshot);
 
         $live = [];
@@ -196,10 +217,13 @@ final class settings_layout_test extends \advanced_testcase {
         }
         // Through JSON, so an int default compares to the snapshot as it was written.
         $live = json_decode(json_encode($live), true);
-        ksort($live);
 
-        $this->assertSame(array_keys($snapshot), array_keys($live), 'the same settings exist as before the regroup');
         foreach ($snapshot as $name => $default) {
+            if (in_array($name, self::REMOVED_ON_PURPOSE, true)) {
+                continue;
+            }
+            $this->assertArrayHasKey($name, $live, "{$name} was in the snapshot and is no longer registered "
+                . '(list it in REMOVED_ON_PURPOSE if that is intended)');
             $this->assertSame($default, $live[$name], "default of {$name}");
         }
     }

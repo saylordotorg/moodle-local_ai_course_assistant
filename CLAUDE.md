@@ -111,7 +111,7 @@ See `.drafts/sola-vendor-recommendations-2026-06-09.md` (concise canonical) and 
 - SOLA_NEXT: system prompt emits `[SOLA_NEXT]chip1||chip2||chip3||chip4[/SOLA_NEXT]`; `chat.js` strips tag and calls `UI.showSuggestions()`; tags are never shown to students
 - Starter translations live in `STARTER_LABELS` in `amd/src/speech.js` (46 languages)
 - SVG avatar: `buildFaceSVG()` + `renderAvatar()` in `ui.js`; prefs in localStorage `aica_avatar`; legacy img hidden when SVG active
-- Settings placement (v7.10.0): a new setting must be added to `classes/settings_layout_map.php` (no home fails `settings_layout_test`, which also caps the five task pages at 135 settings) and to `tests/fixtures/settings_defaults_snapshot.json` with the count in `test_defaults_are_unchanged`; a new feature ships with at most three visible settings, the rest behind its on/off toggle or on an Advanced page.
+- Settings placement (v7.10.0): a new setting must be added to `classes/settings_layout_map.php` (no home fails `settings_layout_test`, which also caps the five task pages at 135 settings); `tests/fixtures/settings_defaults_snapshot.json` is a one-way pin of the 289 settings that existed at the regroup (each must still exist with the same default), so a new setting needs no fixture change, and deleting one means naming it in `REMOVED_ON_PURPOSE` in `test_defaults_are_unchanged`; a new feature ships with at most three visible settings, the rest behind its on/off toggle or on an Advanced page.
 
 ---
 

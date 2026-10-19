@@ -278,6 +278,9 @@ final class lang_completeness_test extends \basic_testcase {
         'layout:legacy',
         // The course page's "More options" summary (Release 1, task 3). Same ruling.
         'coursesettings:more_options',
+        // The essay-scoring role's label, missing since the role arrived in 7.8.2
+        // (Release 1, task 7). Same ruling.
+        'autoupgrade:role_essay',
     ];
 
     /**

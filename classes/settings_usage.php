@@ -32,6 +32,12 @@ defined('MOODLE_INTERNAL') || die();
  *    encrypted-password field), reported as present or absent and nothing else;
  *  - not stored: no config_plugins row (the default applies).
  *
+ * `default` means the site's own default: a value local/defaults.php gives
+ * the site counts, because the registered default honours it. A value forced
+ * in config.php with no stored row reads `not stored` (the report reads the
+ * database, not the forced value), while a forced secret reads `secret set`
+ * (secrets::get() sees the forced value).
+ *
  * A value is never returned, printed or logged. A stored value is compared to
  * the default by the md5 of each, in this process, and only the verdict leaves
  * the comparison. A secret's stored text is not read at all except through
@@ -75,7 +81,9 @@ final class settings_usage {
      * Returns ['settings' => name => state, 'summary' => counts per state,
      * 'percourse' => per-course counts or null, 'tables' => table => rows or
      * null]. The current user must be able to see the plugin's settings pages
-     * (an administrator); the CLI signs in as one.
+     * (an administrator); the CLI signs in as one. Nothing is printed and no
+     * developer notice escapes, so a CLI run's --json output stays valid even
+     * when a stored secret can't be decrypted (it reads as secret unset).
      *
      * @param bool $percourse Also count per-course override settings and per-course config rows.
      * @param bool $tables Also count the rows of every table the plugin owns.
@@ -92,10 +100,11 @@ final class settings_usage {
         $stored = $DB->get_records_select_menu('config_plugins', "plugin = :plugin AND name $notsecret",
             $params, '', 'name, value');
 
+        $secretset = self::secrets_set(array_keys(array_filter($registered, fn($info) => $info['secret'])));
         $settings = [];
         foreach ($registered as $name => $info) {
             if ($info['secret']) {
-                $settings[$name] = secrets::get($name) !== '' ? self::STATE_SECRET_SET : self::STATE_SECRET_UNSET;
+                $settings[$name] = $secretset[$name] ? self::STATE_SECRET_SET : self::STATE_SECRET_UNSET;
             } else {
                 $settings[$name] = self::status_of(isset($stored[$name]) ? (string) $stored[$name] : null, $info['default']);
             }
@@ -118,6 +127,43 @@ final class settings_usage {
     }
 
     /**
+     * Whether each named secret holds a value, read with debugging held off.
+     *
+     * secrets::get() raises a developer debugging() notice for ciphertext this
+     * site's key can't open (a database restored onto another site) and treats
+     * it as unset. A CLI run echoes that notice, which would land in the middle
+     * of --json output, so debugging is switched off for the loop and put back
+     * exactly as it was, an exception included.
+     *
+     * @param string[] $names Secret setting names.
+     * @return array Name => true when the secret holds a value, false when it is absent, empty or unreadable.
+     */
+    private static function secrets_set(array $names): array {
+        global $CFG;
+        $before = [];
+        foreach (['debug', 'debugusers'] as $key) {
+            $before[$key] = property_exists($CFG, $key) ? [$CFG->$key] : null;
+        }
+        $CFG->debug = 0;
+        $CFG->debugusers = '';
+        try {
+            $set = [];
+            foreach ($names as $name) {
+                $set[$name] = secrets::get($name) !== '';
+            }
+        } finally {
+            foreach ($before as $key => $was) {
+                if ($was === null) {
+                    unset($CFG->$key);
+                } else {
+                    $CFG->$key = $was[0];
+                }
+            }
+        }
+        return $set;
+    }
+
+    /**
      * Decide a non-secret setting's state from its stored value and its registered default.
      *
      * The two are compared by md5, and only the verdict is returned. Line
@@ -125,7 +171,9 @@ final class settings_usage {
      * setting saved untouched would otherwise read as changed against the
      * LF default in settings.php. A list default (a multi-select or checkbox
      * group, stored comma-separated) compares as a set, because the stored
-     * order follows the choices and the default's follows settings.php.
+     * order follows the choices and the default's follows settings.php. A
+     * keyed list default (Moodle's multicheckbox shape, ['a' => 1, 'b' => 0])
+     * compares by the keys that are switched on.
      *
      * @param string|null $stored The stored value, or null when there is no config_plugins row.
      * @param mixed $default The default the setting registers: a scalar, null or a list.
@@ -307,7 +355,15 @@ final class settings_usage {
      */
     private static function canonical($value, bool $aslist): string {
         if ($aslist) {
-            $members = is_array($value) ? $value : explode(',', (string) $value);
+            if (!is_array($value)) {
+                $members = explode(',', (string) $value);
+            } else if (array_is_list($value)) {
+                $members = $value;
+            } else {
+                // Moodle's multicheckbox default is keyed, ['a' => 1, 'b' => 0]: the choices switched on are the
+                // keys with a truthy value, and those are what the stored comma-separated list names.
+                $members = array_keys(array_filter($value));
+            }
             $members = array_values(array_filter(array_map('strval', $members), fn($m) => $m !== ''));
             sort($members);
             return implode(',', $members);
