@@ -28,10 +28,13 @@ use local_ai_course_assistant\soapbox_storage;
  *     newest N recordings (the assignment's stored_attempts), deleting older
  *     objects. A bucket lifecycle rule on the prefix is the backstop.
  *
- * Neither step touches a recording that PresenterAI's importer holds (v7.13.0):
- * the importer re-points its own row at the same S3 key, so deleting the object
- * or retiring the row here would break the migrated attempt. See
- * presenterai_interlock for how a recording comes to be held.
+ * Neither step deletes the object of, or retires the row of, a recording that
+ * PresenterAI's importer holds (v7.13.0): the importer re-points its own row at
+ * the same S3 key, so doing either here would break the migrated attempt. See
+ * presenterai_interlock for how a recording comes to be held. The one thing a
+ * held recording still gets is the body-language prose forgotten, on the same
+ * clock as ever (see drop_unheld()), because that lives in the score row, not
+ * in the object the importer now uses.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor
@@ -175,7 +178,12 @@ class soapbox_cleanup extends \core\task\scheduled_task {
      * Retire the given recordings except the ones PresenterAI's importer holds.
      *
      * The held lookup is one call for the whole list, not one per recording. A
-     * held recording keeps its row and every object key exactly as they were.
+     * held recording keeps its row and every object key exactly as they were and
+     * its object is never deleted. It still has its body-language observation
+     * forgotten, because v7.5.1 promises that prose goes on the same clock as the
+     * video, and the recordings in $recs are exactly the ones that clock has
+     * reached (expired, or beyond the assignment's keep-newest-N window).
+     * forget_visual_observation() edits only the score row's session_meta.
      *
      * @param soapbox_storage $storage
      * @param array $recs Recording rows keyed by id.
@@ -185,16 +193,39 @@ class soapbox_cleanup extends \core\task\scheduled_task {
         if (!$recs) {
             return [];
         }
-        $held = array_flip($this->held_ids(array_keys($recs)));
+        $held = array_flip($this->lookup_held(array_keys($recs)));
         $skipped = [];
         foreach ($recs as $rec) {
             if (isset($held[(int) $rec->id])) {
                 $skipped[(int) $rec->id] = (int) $rec->id;
+                $this->forget_visual_observation($rec);
                 continue;
             }
             $this->drop_object($storage, $rec);
         }
         return $skipped;
+    }
+
+    /**
+     * Ask which of these recordings are held, failing closed but visibly.
+     *
+     * If the lookup throws, the task must not guess and delete: the exception
+     * goes on up, so the task fails and nothing in this loop is retired. Before
+     * it does, one audit row names the exception class (never its message, which
+     * can carry SQL) so the failure shows up in the audit log and not only in the
+     * scheduled-task log.
+     *
+     * @param array $ids Soapbox recording ids.
+     * @return array The held ids, as ints.
+     * @throws \Throwable Whatever the lookup threw, after the audit row.
+     */
+    private function lookup_held(array $ids): array {
+        try {
+            return $this->held_ids($ids);
+        } catch (\Throwable $e) {
+            audit_logger::log('soapbox_cleanup_interlock_failed', 0, 0, ['error_class' => get_class($e)]);
+            throw $e;
+        }
     }
 
     /**

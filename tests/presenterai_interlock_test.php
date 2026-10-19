@@ -281,4 +281,37 @@ final class presenterai_interlock_test extends \advanced_testcase {
         $this->assertSame([501], $held);
         $this->assertSame(1, $reads, 'one SELECT for the whole list');
     }
+
+    /**
+     * A long list is read in chunks, and an id repeated across chunks is one hold.
+     *
+     * 2,500 distinct ids go to the database as three reads (1,000 + 1,000 + 500),
+     * not one oversized IN list. One held id sits in the first chunk and another
+     * in the third, and the first is repeated at the end of the input, where it
+     * would land in the third chunk too if the input were not made distinct
+     * first. Each held id is reported once.
+     *
+     * @return void
+     */
+    public function test_a_long_list_is_read_in_three_chunks_and_a_repeated_id_counts_once(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->require_map_table();
+
+        $this->map_row(presenterai_interlock::SOURCE_TABLE, 10005, presenterai_interlock::site_id());
+        $this->map_row(presenterai_interlock::SOURCE_TABLE, 12100, presenterai_interlock::site_id());
+        // Warm the table-list cache so the measured call is only the lookups.
+        presenterai_interlock::held_ids([10005]);
+
+        $ids = range(10000, 12499);
+        $ids[] = 10005;
+
+        $before = $DB->perf_get_reads();
+        $held = presenterai_interlock::held_ids($ids);
+        $reads = $DB->perf_get_reads() - $before;
+
+        sort($held);
+        $this->assertSame([10005, 12100], $held);
+        $this->assertSame(3, $reads, '2,500 distinct ids are read in three chunks of at most 1,000');
+    }
 }

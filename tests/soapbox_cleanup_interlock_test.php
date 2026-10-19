@@ -64,14 +64,17 @@ final class soapbox_cleanup_interlock_test extends \advanced_testcase {
      *
      * @param soapbox_storage|null $storage Null makes the task see storage as unconfigured.
      * @param int[]|null $held Ids the lookup reports as held; null uses the real lookup.
+     * @param \Throwable|null $failure When given, the lookup throws it instead of answering.
      * @return task\soapbox_cleanup
      */
-    private function task(?soapbox_storage $storage, ?array $held = []): task\soapbox_cleanup {
-        return new class ($storage, $held) extends task\soapbox_cleanup {
+    private function task(?soapbox_storage $storage, ?array $held = [], ?\Throwable $failure = null): task\soapbox_cleanup {
+        return new class ($storage, $held, $failure) extends task\soapbox_cleanup {
             /** @var soapbox_storage|null */
             private ?soapbox_storage $spy;
             /** @var int[]|null */
             private ?array $fixedheld;
+            /** @var \Throwable|null */
+            private ?\Throwable $failure;
             /** @var array[] Every list the task asked held_ids() about. */
             public array $asked = [];
 
@@ -80,10 +83,12 @@ final class soapbox_cleanup_interlock_test extends \advanced_testcase {
              *
              * @param soapbox_storage|null $spy
              * @param int[]|null $fixedheld
+             * @param \Throwable|null $failure
              */
-            public function __construct(?soapbox_storage $spy, ?array $fixedheld) {
+            public function __construct(?soapbox_storage $spy, ?array $fixedheld, ?\Throwable $failure) {
                 $this->spy = $spy;
                 $this->fixedheld = $fixedheld;
+                $this->failure = $failure;
             }
 
             /**
@@ -103,6 +108,9 @@ final class soapbox_cleanup_interlock_test extends \advanced_testcase {
              */
             protected function held_ids(array $ids): array {
                 $this->asked[] = array_values($ids);
+                if ($this->failure !== null) {
+                    throw $this->failure;
+                }
                 if ($this->fixedheld === null) {
                     return parent::held_ids($ids);
                 }
@@ -139,9 +147,17 @@ final class soapbox_cleanup_interlock_test extends \advanced_testcase {
      * @param string $name Short unique label used in the three keys.
      * @param int $age Seconds old; also orders the recordings for pruning.
      * @param bool $expired Whether retention has already passed.
+     * @param int $scoreid The score row this recording was scored into, 0 for none.
      * @return int The new recording id.
      */
-    private function recording(int $assignid, int $userid, string $name, int $age, bool $expired): int {
+    private function recording(
+        int $assignid,
+        int $userid,
+        string $name,
+        int $age,
+        bool $expired,
+        int $scoreid = 0
+    ): int {
         global $DB;
         return (int) $DB->insert_record('local_ai_course_assistant_sbx_rec', (object) [
             'assignid' => $assignid,
@@ -151,6 +167,7 @@ final class soapbox_cleanup_interlock_test extends \advanced_testcase {
             'deck_key' => "sbx/deck/$name.pdf",
             'frames_key' => "sbx/frames/$name.jpg",
             'status' => 'scored',
+            'scoreid' => $scoreid > 0 ? $scoreid : null,
             'expires_at' => $expired ? time() - DAYSECS : time() + (30 * DAYSECS),
             'timecreated' => time() - $age,
         ]);
@@ -159,14 +176,57 @@ final class soapbox_cleanup_interlock_test extends \advanced_testcase {
     /**
      * The audit rows the interlock wrote.
      *
+     * @param string $action Audit action code.
      * @return \stdClass[]
      */
-    private function interlock_audit_rows(): array {
+    private function interlock_audit_rows(string $action = 'soapbox_cleanup_interlock'): array {
         global $DB;
-        return array_values($DB->get_records(
-            'local_ai_course_assistant_audit',
-            ['action' => 'soapbox_cleanup_interlock']
-        ));
+        return array_values($DB->get_records('local_ai_course_assistant_audit', ['action' => $action]));
+    }
+
+    /**
+     * A score row whose session_meta carries a body-language observation.
+     *
+     * The meta also holds feedback the learner is told is kept (tips, pct and a
+     * topic), so a test can tell "only the observation went" from "all of it".
+     *
+     * @param int $assignid The assignment the recording belongs to (for its course).
+     * @param int $userid
+     * @return int The score id.
+     */
+    private function score_with_observation(int $assignid, int $userid): int {
+        global $DB;
+        $courseid = (int) $DB->get_field('local_ai_course_assistant_sbx_assign', 'courseid', ['id' => $assignid]);
+        return (int) $DB->insert_record('local_ai_course_assistant_practice_scores', (object) [
+            'userid' => $userid,
+            'courseid' => $courseid,
+            'rubricid' => 0,
+            'session_type' => rubric_manager::TYPE_SPEECH,
+            'overall_score' => 4,
+            'scores' => json_encode([['name' => 'Delivery', 'score' => 4, 'feedback' => 'Clear.']]),
+            'ai_feedback' => 'Good pace.',
+            'session_meta' => json_encode([
+                'tips' => ['Slow down', 'Look up', 'Pause more'],
+                'pct' => 80,
+                'topic' => 'Climate',
+                'visual_observation' => 'The speaker keeps both hands below the desk edge.',
+            ]),
+            'timecreated' => time(),
+        ]);
+    }
+
+    /**
+     * A score row's session_meta, decoded.
+     *
+     * @param int $scoreid
+     * @return array
+     */
+    private function meta_of(int $scoreid): array {
+        global $DB;
+        return json_decode(
+            (string) $DB->get_field('local_ai_course_assistant_practice_scores', 'session_meta', ['id' => $scoreid]),
+            true
+        );
     }
 
     /**
@@ -362,6 +422,204 @@ final class soapbox_cleanup_interlock_test extends \advanced_testcase {
     }
 
     /**
+     * A held recording keeps its slot in the keep-newest-N window.
+     *
+     * Quota 1, the HELD recording is the newest, one older recording is not held.
+     * The held one occupies the single slot, so the older one is over quota and
+     * goes. A defect that filtered held rows out before slicing would see the
+     * older one as the newest and wrongly keep it.
+     *
+     * @return void
+     */
+    public function test_a_held_recording_keeps_its_slot_in_the_keep_newest_window(): void {
+        global $DB;
+        $this->resetAfterTest();
+        [$assignid, $userid] = $this->assignment(1);
+        $heldnewest = $this->recording($assignid, $userid, 'heldnewest', 1 * DAYSECS, false);
+        $older = $this->recording($assignid, $userid, 'older', 2 * DAYSECS, false);
+
+        $storage = $this->spy_storage();
+        $this->task($storage, [$heldnewest])->execute();
+
+        $this->assertSame('scored', $DB->get_field('local_ai_course_assistant_sbx_rec', 'status', ['id' => $heldnewest]));
+        $this->assertSame(
+            'deleted',
+            $DB->get_field('local_ai_course_assistant_sbx_rec', 'status', ['id' => $older]),
+            'the held recording still counts as the newest, so the older one is beyond the window'
+        );
+        $this->assertEqualsCanonicalizing(
+            ['sbx/rec/older.webm', 'sbx/deck/older.pdf', 'sbx/frames/older.jpg'],
+            $storage->deleted
+        );
+        $this->assertSame([], $this->interlock_audit_rows(), 'the held recording was never a candidate, so nothing was held');
+    }
+
+    /**
+     * A held expired recording still loses its body-language prose, and only that.
+     *
+     * The object and the row are the importer's now and stay exactly as they
+     * were; the observation lives in the score row, and v7.5.1 promises it goes
+     * on the video's clock.
+     *
+     * @return void
+     */
+    public function test_a_held_expired_recording_still_forgets_the_visual_observation_and_only_that(): void {
+        global $DB;
+        $this->resetAfterTest();
+        [$assignid, $userid] = $this->assignment();
+        $scoreid = $this->score_with_observation($assignid, $userid);
+        $recid = $this->recording($assignid, $userid, 'held', 8 * DAYSECS, true, $scoreid);
+        $before = $DB->get_record('local_ai_course_assistant_sbx_rec', ['id' => $recid]);
+        $scorebefore = $DB->get_record('local_ai_course_assistant_practice_scores', ['id' => $scoreid]);
+
+        $storage = $this->spy_storage();
+        $this->task($storage, [$recid])->execute();
+
+        $meta = $this->meta_of($scoreid);
+        $this->assertArrayNotHasKey('visual_observation', $meta);
+        $this->assertSame(['Slow down', 'Look up', 'Pause more'], $meta['tips']);
+        $this->assertSame(80, $meta['pct']);
+        $this->assertSame('Climate', $meta['topic']);
+        $scoreafter = $DB->get_record('local_ai_course_assistant_practice_scores', ['id' => $scoreid]);
+        $this->assertSame($scorebefore->overall_score, $scoreafter->overall_score);
+        $this->assertSame($scorebefore->ai_feedback, $scoreafter->ai_feedback);
+        $this->assertSame($scorebefore->scores, $scoreafter->scores);
+        $this->assertEquals($before, $DB->get_record('local_ai_course_assistant_sbx_rec', ['id' => $recid]));
+        $this->assertSame([], $storage->deleted, 'the held recording\'s objects are never deleted');
+    }
+
+    /**
+     * The same for a held recording beyond the keep-newest-N window.
+     *
+     * @return void
+     */
+    public function test_a_held_over_quota_recording_still_forgets_the_visual_observation(): void {
+        global $DB;
+        $this->resetAfterTest();
+        [$assignid, $userid] = $this->assignment(1);
+        $this->recording($assignid, $userid, 'newest', 1 * DAYSECS, false);
+        $scoreid = $this->score_with_observation($assignid, $userid);
+        $heldold = $this->recording($assignid, $userid, 'heldold', 3 * DAYSECS, false, $scoreid);
+        $before = $DB->get_record('local_ai_course_assistant_sbx_rec', ['id' => $heldold]);
+
+        $storage = $this->spy_storage();
+        $this->task($storage, [$heldold])->execute();
+
+        $meta = $this->meta_of($scoreid);
+        $this->assertArrayNotHasKey('visual_observation', $meta);
+        $this->assertSame(['Slow down', 'Look up', 'Pause more'], $meta['tips']);
+        $this->assertSame(80, $meta['pct']);
+        $this->assertEquals($before, $DB->get_record('local_ai_course_assistant_sbx_rec', ['id' => $heldold]));
+        $this->assertSame([], $storage->deleted);
+    }
+
+    /**
+     * A held recording the clock has not reached keeps its observation.
+     *
+     * Not expired and inside the window: it is not a candidate in either loop,
+     * so nothing about it changes, held or not.
+     *
+     * @return void
+     */
+    public function test_a_held_recording_not_yet_due_keeps_its_visual_observation(): void {
+        global $DB;
+        $this->resetAfterTest();
+        [$assignid, $userid] = $this->assignment(2);
+        $scoreid = $this->score_with_observation($assignid, $userid);
+        $recid = $this->recording($assignid, $userid, 'held', 1 * DAYSECS, false, $scoreid);
+        $before = $DB->get_record('local_ai_course_assistant_sbx_rec', ['id' => $recid]);
+        $metabefore = $this->meta_of($scoreid);
+
+        $storage = $this->spy_storage();
+        $this->task($storage, [$recid])->execute();
+
+        $this->assertSame($metabefore, $this->meta_of($scoreid));
+        $this->assertArrayHasKey('visual_observation', $this->meta_of($scoreid));
+        $this->assertEquals($before, $DB->get_record('local_ai_course_assistant_sbx_rec', ['id' => $recid]));
+        $this->assertSame([], $storage->deleted);
+    }
+
+    /**
+     * A recording nobody holds still loses its observation with its object.
+     *
+     * @return void
+     */
+    public function test_an_unheld_expired_recording_still_forgets_the_visual_observation(): void {
+        global $DB;
+        $this->resetAfterTest();
+        [$assignid, $userid] = $this->assignment();
+        $scoreid = $this->score_with_observation($assignid, $userid);
+        $recid = $this->recording($assignid, $userid, 'free', 8 * DAYSECS, true, $scoreid);
+
+        $this->task($this->spy_storage(), [])->execute();
+
+        $this->assertSame('deleted', $DB->get_field('local_ai_course_assistant_sbx_rec', 'status', ['id' => $recid]));
+        $this->assertArrayNotHasKey('visual_observation', $this->meta_of($scoreid));
+        $this->assertSame(80, $this->meta_of($scoreid)['pct']);
+    }
+
+    /**
+     * A failing lookup fails the task, visibly, and nothing is deleted.
+     *
+     * The exception must still propagate, so the scheduled task fails. One audit
+     * row names only the exception class: the message here carries a fake SQL
+     * fragment and must not reach the audit log.
+     *
+     * @return void
+     */
+    public function test_a_failing_lookup_fails_the_task_with_one_audit_row_and_deletes_nothing(): void {
+        global $DB;
+        $this->resetAfterTest();
+        [$assignid, $userid] = $this->assignment();
+        $recid = $this->recording($assignid, $userid, 'free', 8 * DAYSECS, true);
+        $before = $DB->get_record('local_ai_course_assistant_sbx_rec', ['id' => $recid]);
+
+        $storage = $this->spy_storage();
+        $task = $this->task($storage, [], new \RuntimeException('SELECT secret FROM {map} WHERE token = abc123'));
+        try {
+            $task->execute();
+            $this->fail('the lookup failure must propagate so the scheduled task fails');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('abc123', $e->getMessage(), 'the original exception is rethrown intact');
+        }
+
+        $rows = $this->interlock_audit_rows('soapbox_cleanup_interlock_failed');
+        $this->assertCount(1, $rows);
+        $this->assertSame(['error_class' => 'RuntimeException'], json_decode($rows[0]->details, true));
+        $this->assertStringNotContainsString('abc123', $rows[0]->details);
+        $this->assertStringNotContainsString('SELECT', $rows[0]->details);
+        $this->assertEquals($before, $DB->get_record('local_ai_course_assistant_sbx_rec', ['id' => $recid]));
+        $this->assertSame([], $storage->deleted, 'when the importer\'s ownership cannot be read, nothing is deleted');
+        $this->assertSame([], $this->interlock_audit_rows(), 'no held-count row on a failed run');
+    }
+
+    /**
+     * The same when the failure is in the pruning loop's lookup.
+     *
+     * @return void
+     */
+    public function test_a_failing_lookup_in_the_pruning_loop_also_fails_the_task_visibly(): void {
+        global $DB;
+        $this->resetAfterTest();
+        [$assignid, $userid] = $this->assignment(1);
+        $this->recording($assignid, $userid, 'newest', 1 * DAYSECS, false);
+        $old = $this->recording($assignid, $userid, 'old', 2 * DAYSECS, false);
+
+        $storage = $this->spy_storage();
+        $task = $this->task($storage, [], new \RuntimeException('boom'));
+        try {
+            $task->execute();
+            $this->fail('the lookup failure must propagate');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('boom', $e->getMessage());
+        }
+
+        $this->assertCount(1, $this->interlock_audit_rows('soapbox_cleanup_interlock_failed'));
+        $this->assertSame('scored', $DB->get_field('local_ai_course_assistant_sbx_rec', 'status', ['id' => $old]));
+        $this->assertSame([], $storage->deleted);
+    }
+
+    /**
      * Unconfigured storage still means the task does nothing at all.
      *
      * @return void
@@ -400,6 +658,7 @@ final class soapbox_cleanup_interlock_test extends \advanced_testcase {
         $this->assertSame('deleted', $DB->get_field('local_ai_course_assistant_sbx_rec', 'status', ['id' => $recid]));
         $this->assertCount(3, $storage->deleted);
         $this->assertSame([], $this->interlock_audit_rows());
+        $this->assertSame([], $this->interlock_audit_rows('soapbox_cleanup_interlock_failed'), 'no failure row either');
     }
 
     /**

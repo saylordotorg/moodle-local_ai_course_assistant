@@ -97,11 +97,11 @@ class presenterai_interlock {
                 "sourcetable = :srctable AND sourcesiteid = :siteid AND sourceid $insql",
                 $params
             );
-            foreach ($found as $id) {
-                $held[(int) $id] = (int) $id;
-            }
+            // The map's unique index means one row per id, and the ids were made
+            // distinct above, so no id can come back from two chunks.
+            $held = array_merge($held, array_map('intval', $found));
         }
-        return array_values($held);
+        return $held;
     }
 
     /**
