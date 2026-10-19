@@ -45,6 +45,9 @@ final class spend_cap_failover_request_test extends \advanced_testcase {
     /** @var string The primary's own gateway, which must never reach another vendor. */
     private const PRIMARY_URL = 'https://primary-gateway.example/v1beta/openai';
 
+    /** @var string A failover row's own model: not OpenAI's default (gpt-4o-mini), so ignoring it cannot pass. */
+    private const ROW_MODEL = 'gpt-4.1-mini';
+
     /** @var string A base URL a failover row sets for itself. */
     private const ROW_URL = 'https://failover-gateway.example/v1';
 
@@ -74,9 +77,12 @@ final class spend_cap_failover_request_test extends \advanced_testcase {
     /**
      * Gemini primary, capped; the failover row is OpenAI with its own model and no base URL.
      *
-     * The built provider is OpenAI, holds the failover's key, asks for the row's model, and does not send the
-     * course's gateway URL (the primary's) to OpenAI: with no URL of its own the row means the vendor's own
-     * endpoint. Before 7.13.0 the model was "gemini-2.5-flash" and the URL the course's.
+     * The built provider is OpenAI, holds the failover's key, asks for the row's model (a model that is NOT
+     * OpenAI's default, so using the provider default instead would fail too), and does not send the course's
+     * gateway URL (the primary's) to OpenAI: with no URL of its own the row means the vendor's own endpoint,
+     * but only while the site `apibaseurl` is empty, as setUp() makes it. A site-level URL is still read by the
+     * constructor for any provider built without one (build_fallbacks() has the same limit). Before 7.13.0 the
+     * model was "gemini-2.5-flash" and the URL the course's.
      *
      * @return void
      */
@@ -85,14 +91,14 @@ final class spend_cap_failover_request_test extends \advanced_testcase {
             'enabled' => 1,
             'apibaseurl' => self::PRIMARY_URL,
         ]);
-        $this->failover_rows('openai|sk-failover-key-0000000000|gpt-4o-mini');
+        $this->failover_rows('openai|sk-failover-key-0000000000|' . self::ROW_MODEL);
         $this->trip_the_chat_cap();
 
         $built = $this->build();
 
         $this->assertSame('openai', $built->provider_id(), 'the cap did not move chat onto the failover provider');
         $this->assertSame(
-            'gpt-4o-mini',
+            self::ROW_MODEL,
             $built->model_id(),
             'the failover was asked for a model other than its own row model'
         );
@@ -165,24 +171,25 @@ final class spend_cap_failover_request_test extends \advanced_testcase {
             'enabled' => 1,
             'apibaseurl' => self::PRIMARY_URL,
         ]);
-        $this->failover_rows('openai|sk-failover-key-0000000000|gpt-4o-mini||' . self::ROW_URL);
+        $this->failover_rows('openai|sk-failover-key-0000000000|' . self::ROW_MODEL . '||' . self::ROW_URL);
         $this->trip_the_chat_cap();
 
         $built = $this->build();
 
         $this->assertSame('openai', $built->provider_id());
         $this->assertSame(self::ROW_URL, $this->read($built, 'baseurl'), 'the failover row\'s own base URL was not used');
-        $this->assertSame('gpt-4o-mini', $built->model_id());
+        $this->assertSame(self::ROW_MODEL, $built->model_id());
     }
 
     // Case (d): the same provider keeps the primary's model.
 
     /**
-     * The failover is the SAME provider as the primary (a second key, say) and names no model.
+     * The failover is the SAME provider as the primary (a second key, say), names no model, and the primary's
+     * model comes from the site setting.
      *
      * Nothing says the primary's model is wrong for it, so it keeps asking for that model instead of falling
-     * back to the provider default (gpt-4o-mini here, which is not what the site chose). build_fallbacks()
-     * does the same; this pins that the cap path does not "fix" the same-provider case into a downgrade.
+     * back to the provider default (gpt-4o-mini here, which is not what the site chose). The cap path leaves
+     * the model override exactly as it was in this case.
      *
      * @return void
      */
@@ -202,6 +209,38 @@ final class spend_cap_failover_request_test extends \advanced_testcase {
             $this->read($built, 'apikey'),
             'the cap must still swap in the failover\'s key'
         );
+    }
+
+    /**
+     * The same, when the COURSE overrides the site's provider and model.
+     *
+     * Site: gemini / gemini-2.5-flash. Course: openai / gpt-4o. The failover row is OpenAI with a different key and
+     * no model. The primary is OpenAI, so the failover is the same provider and must keep the COURSE's model. If
+     * the model override were dropped the constructor would read the SITE model and OpenAI would be asked for
+     * "gemini-2.5-flash" (HTTP 404). build_fallbacks() drops it in this case; the cap path deliberately does not,
+     * because it kept the course's model before 7.13.0 and this is the case a blanket "unset" would break.
+     *
+     * @return void
+     */
+    public function test_a_same_provider_failover_keeps_the_course_model_when_the_course_overrides_the_provider(): void {
+        \local_ai_course_assistant\course_config_manager::save((int) $this->course->id, [
+            'enabled' => 1,
+            'provider' => 'openai',
+            'model' => 'gpt-4o',
+        ]);
+        $this->failover_rows('openai|sk-second-account-key-0000');
+        $this->trip_the_chat_cap();
+
+        $built = $this->build();
+
+        $this->assertSame('openai', $built->provider_id());
+        $this->assertNotSame(
+            'gemini-2.5-flash',
+            $built->model_id(),
+            'the site model replaced the course\'s: OpenAI is asked for a Gemini model name'
+        );
+        $this->assertSame('gpt-4o', $built->model_id(), 'a same-provider failover lost the course\'s model');
+        $this->assertSame('sk-second-account-key-0000', $this->read($built, 'apikey'));
     }
 
     // Case (e): no failover.
@@ -247,12 +286,15 @@ final class spend_cap_failover_request_test extends \advanced_testcase {
      * The emergency stop is engaged while a failover is configured and the cap is also tripped.
      *
      * The call is refused with the emergency message and never fails over: a kill switch must not be read as
-     * "this provider is capped".
+     * "this provider is capped". This does NOT reach the emergency check inside the cap branch: for a
+     * non-diagnostic call enforce_learner_guards() throws the same refusal earlier, before the spend guard is
+     * consulted at all. What it pins is the outcome a learner gets (the emergency message, no failover provider,
+     * not the spend-cap message), whichever of the two checks produces it.
      *
      * @return void
      */
-    public function test_the_emergency_stop_refuses_with_its_own_message_and_never_fails_over(): void {
-        $this->failover_rows('openai|sk-failover-key-0000000000|gpt-4o-mini');
+    public function test_an_engaged_emergency_stop_refuses_with_its_own_message_before_any_failover(): void {
+        $this->failover_rows('openai|sk-failover-key-0000000000|' . self::ROW_MODEL);
         $this->trip_the_chat_cap();
         $this->cfg('emergency_chat_disabled', '1');
 
@@ -281,7 +323,7 @@ final class spend_cap_failover_request_test extends \advanced_testcase {
             'enabled' => 1,
             'apibaseurl' => self::PRIMARY_URL,
         ]);
-        $this->failover_rows('openai|sk-failover-key-0000000000|gpt-4o-mini');
+        $this->failover_rows('openai|sk-failover-key-0000000000|' . self::ROW_MODEL);
         $this->cfg('spend_cap_chat', '1000');
 
         $built = $this->build();
