@@ -25,10 +25,13 @@
  *
  * Usage:
  *   php local/ai_course_assistant/admin/cli/rotate_key.php --list
- *   SOLA_NEW_KEY=... php local/ai_course_assistant/admin/cli/rotate_key.php --old-last4=ab12
+ *   read -rs SOLA_NEW_KEY && export SOLA_NEW_KEY    (typed at a hidden prompt, so it stays out of shell history)
+ *   php local/ai_course_assistant/admin/cli/rotate_key.php --old-last4=ab12
+ *   unset SOLA_NEW_KEY
  *   php local/ai_course_assistant/admin/cli/rotate_key.php --old-fingerprint=0123456789ab --stdin --apply
  *
- * Exit codes: 0 ok, 1 error or refused, 2 no stored key matches or more than one does.
+ * Exit codes: 0 ok, 1 error or refused (also the rare case where the rotation was saved but could not be
+ * confirmed: the message says which), 2 no stored key matches or more than one does.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor University
