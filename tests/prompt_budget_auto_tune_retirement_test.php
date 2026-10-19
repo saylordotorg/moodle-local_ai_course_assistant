@@ -61,7 +61,12 @@ final class prompt_budget_auto_tune_retirement_test extends \advanced_testcase {
         $this->upgrade_from(self::BEFORE);
 
         $this->assertFalse(get_config(self::PLUGIN, 'prompt_budget_auto_tune'), 'the stored flag is gone');
-        $this->assertSame((string) self::RETIRING, get_config(self::PLUGIN, 'version'), 'the savepoint was reached');
+        // The upgrade runs every later step too (7.12.2 added one), so the stored build is this step's or a later one.
+        $this->assertGreaterThanOrEqual(
+            self::RETIRING,
+            (int) get_config(self::PLUGIN, 'version'),
+            'the savepoint was reached'
+        );
     }
 
     public function test_a_site_with_the_flag_on_and_a_fixed_budget_upgrades_cleanly_and_keeps_its_budget(): void {
