@@ -3471,8 +3471,8 @@ $string['privacy:metadata:browser_speech:text'] = 'Text the browser reads aloud,
 
 // Privacy: the sandbox runtime request (v7.6.1, CONTRIB-10574 #271).
 $string['privacy:metadata:code_sandbox_runtime'] = 'When the Python sandbox is enabled, the learner\'s browser downloads the Python runtime from the location the site administrator configured, which may belong to a third party. Code written in the sandbox and its output stay on the device and are never sent anywhere.';
-$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'The learner's IP address, disclosed to whoever serves the runtime by the act of requesting it.';
-$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'The learner's browser and operating system, sent as the user agent of that request.';
+$string['privacy:metadata:code_sandbox_runtime:ipaddress'] = 'The learner\'s IP address, disclosed to whoever serves the runtime by the act of requesting it.';
+$string['privacy:metadata:code_sandbox_runtime:useragent'] = 'The learner\'s browser and operating system, sent as the user agent of that request.';
 
 $string['privacy:metadata:core_ai'] = 'When the site sends tutoring requests through Moodle\'s AI subsystem, the same content listed for the AI provider goes through it, and the AI subsystem keeps its own record of each request.';
 $string['privacy:metadata:embedding_provider'] = 'When course search (retrieval) is enabled, the learner\'s question is sent to the embedding and reranking service the site administrator configured, which may be a different company from the AI provider, to find the parts of the course that answer it. The course passages sent with it may include glossary entries that learners wrote.';
@@ -3501,8 +3501,8 @@ $string['privacy:metadata:whatsapp_delivery'] = 'When WhatsApp study reminders a
 $string['privacy:metadata:whatsapp_delivery:message'] = 'The reminder text: the course name, a study tip and a link that is unique to the learner for turning the reminders off.';
 $string['privacy:metadata:whatsapp_delivery:phonenumber'] = 'The phone number the learner gave for reminders.';
 $string['privacy:metadata:widget_cdn'] = 'Only when the site administrator sets a CDN location for the tutor (off by default), the learner\'s browser downloads the tutor\'s script and stylesheet from that location on every course page, which may belong to a third party. Nothing the learner writes is sent there.';
-$string['privacy:metadata:widget_cdn:ipaddress'] = 'The learner's IP address, disclosed to whoever serves the files by the act of requesting them.';
-$string['privacy:metadata:widget_cdn:useragent'] = 'The learner's browser and operating system, sent as the user agent of that request.';
+$string['privacy:metadata:widget_cdn:ipaddress'] = 'The learner\'s IP address, disclosed to whoever serves the files by the act of requesting them.';
+$string['privacy:metadata:widget_cdn:useragent'] = 'The learner\'s browser and operating system, sent as the user agent of that request.';
 
 // v7.8.0: automatic model upgrades.
 $string['autoupgrade:title'] = 'Model upgrades';
@@ -3762,7 +3762,7 @@ $string['settingspage:adv_integrations'] = 'Integrations and governance';
 $string['settingspage:adv_legacy'] = 'Soapbox, avatars and legacy';
 $string['settingspage:nav_label'] = 'Settings pages';
 $string['settingspage:redirect'] = 'Moved';
-$string['settingspage:redirect_notice'] = 'This settings page has moved to {$a}. You're being taken there now. If nothing happens, select the link.';
+$string['settingspage:redirect_notice'] = 'This settings page has moved to {$a}. You\'re being taken there now. If nothing happens, select the link.';
 $string['settingspage:essentials_intro'] = 'The settings every site needs: switch [[tutorshort]] on, name it, and say who to contact.';
 $string['settingspage:models_intro'] = 'Which AI providers and keys [[tutorshort]] uses, the default model, and what takes over if it fails.';
 $string['settingspage:features_intro'] = 'Switch learner-facing features on or off. A feature\'s own options appear when you turn it on.';
