@@ -305,7 +305,8 @@ class context_builder {
         // still lands, and activity detail is what gives way.
         $coursetopics = self::build_course_topics(
             $courseid,
-            $skipwidedump ? self::TOPICS_ANCHORED_MAX_CHARS : self::TOPICS_MAX_CHARS
+            $skipwidedump ? self::TOPICS_ANCHORED_MAX_CHARS : self::TOPICS_MAX_CHARS,
+            $userid
         );
 
         // Determine course content: RAG chunks or full content stuffing.
@@ -365,7 +366,7 @@ class context_builder {
             // assembled from the same authored pages and books — and it was
             // reaching the prompt with no sanitisation on any path.
             $coursecontent = \local_ai_course_assistant\security::fence_untrusted(
-                self::build_course_content($courseid, $pageid),
+                self::build_course_content($courseid, $pageid, $userid),
                 'course material'
             );
         }
@@ -1711,16 +1712,21 @@ class context_builder {
      *   4. activities, round-robin across sections so unit 8 gets a first
      *      activity before unit 1 gets a second.
      *
+     * Issue #341: sections and activities are listed only when they are uservisible for the learner the prompt
+     * is for, so a hidden or restricted section's name and summary, and a restricted activity's name, stay out.
+     *
      * @param int $courseid
      * @param int $maxchars Total character budget for the block.
+     * @param int $userid The learner the block is for; 0 is the logged-in user.
      * @return string
      */
     private static function build_course_topics(
         int $courseid,
-        int $maxchars = self::TOPICS_MAX_CHARS
+        int $maxchars = self::TOPICS_MAX_CHARS,
+        int $userid = 0
     ): string {
         $maxchars = max(200, $maxchars);
-        $modinfo = get_fast_modinfo($courseid);
+        $modinfo = get_fast_modinfo($courseid, $userid);
         $sections = $modinfo->get_section_info_all();
 
         // Gather the raw material for every visible section before pricing any
@@ -1728,7 +1734,7 @@ class context_builder {
         // consumed front-to-back.
         $entries = [];
         foreach ($sections as $section) {
-            if (!$section->visible) {
+            if (!$section->uservisible) {
                 continue;
             }
 
@@ -1750,7 +1756,7 @@ class context_builder {
             if (!empty($modinfo->sections[$section->section])) {
                 foreach ($modinfo->sections[$section->section] as $cmid) {
                     $cm = $modinfo->get_cm($cmid);
-                    if ($cm->visible && $cm->has_view()) {
+                    if ($cm->uservisible && $cm->has_view()) {
                         $activities[] = "{$cm->name} (id:{$cmid})";
                     }
                 }
@@ -1973,9 +1979,10 @@ class context_builder {
      *                         (e.g. unsupported module type, filter collapse),
      *                         this guarantees the page still appears at the top
      *                         of the wide dump rather than being squeezed out.
+     * @param int $userid The learner the content is for; 0 is the logged-in user.
      * @return string Formatted content, empty string if none found.
      */
-    private static function build_course_content(int $courseid, int $preemptcmid = 0): string {
+    private static function build_course_content(int $courseid, int $preemptcmid = 0, int $userid = 0): string {
         global $DB;
 
         // Per-resource character cap and total cap. Use explicit-default
@@ -1988,7 +1995,7 @@ class context_builder {
         $total          = 0;
         $sections       = [];
 
-        $modinfo = get_fast_modinfo($courseid);
+        $modinfo = get_fast_modinfo($courseid, $userid);
 
         // v5.3.6: build an iteration order that puts the preempt cmid first.
         $cms = $modinfo->get_cms();

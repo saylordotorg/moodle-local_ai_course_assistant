@@ -364,15 +364,16 @@ final class rag_visibility_test extends \advanced_testcase {
      * @param int $cmid
      * @param string $content
      * @param array $vector
+     * @param int $chunkindex Position of the chunk in its document.
      * @return int The chunk id.
      */
-    private function store_chunk(int $courseid, int $cmid, string $content, array $vector): int {
+    private function store_chunk(int $courseid, int $cmid, string $content, array $vector, int $chunkindex = 0): int {
         global $DB;
         return (int) $DB->insert_record('local_ai_course_assistant_chunks', (object) [
             'courseid' => $courseid,
             'cmid' => $cmid,
             'modtype' => $cmid > 0 ? 'page' : 'course',
-            'chunkindex' => 0,
+            'chunkindex' => $chunkindex,
             'content' => $content,
             'contenthash' => sha1($content),
             'embedding' => null,
@@ -404,9 +405,8 @@ final class rag_visibility_test extends \advanced_testcase {
         $this->store_chunk((int) $course->id, $visible, 'Visible page on titration', [0.9, 0.1, 0.0]);
         $this->store_chunk((int) $course->id, 0, 'Course overview for Chemistry 101', [0.6, 0.4, 0.0]);
 
-        $this->setUser($student);
         $this->mock_query_embedding([1.0, 0.0, 0.0]);
-        $chunks = rag_retriever::retrieve((int) $course->id, 'question three answer', 5);
+        $chunks = rag_retriever::retrieve((int) $course->id, 'question three answer', 5, 0, (int) $student->id);
         $this->assertSame(['Visible page on titration', 'Course overview for Chemistry 101'], $this->contents($chunks));
         $this->assertSame([0, 1], array_keys($chunks));
 
@@ -446,6 +446,163 @@ final class rag_visibility_test extends \advanced_testcase {
         $this->setUser(null);
         $this->mock_query_embedding([1.0, 0.0, 0.0]);
         $this->assertSame([], rag_retriever::retrieve((int) $course->id, 'anything at all', 5));
+    }
+
+    /**
+     * The default is no user even when an administrator is logged in, as in a scheduled or adhoc task.
+     *
+     * A caller that forgets to name the learner must not get administrator visibility silently.
+     */
+    public function test_retrieve_default_is_no_user_even_for_a_logged_in_administrator(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $this->configure_rag();
+        $hidden = $this->page($course, ['visible' => 0]);
+        $this->store_chunk((int) $course->id, $hidden, 'HIDDEN draft page', [1.0, 0.0, 0.0]);
+
+        $this->setAdminUser();
+        $this->mock_query_embedding([1.0, 0.0, 0.0]);
+        $this->assertSame([], rag_retriever::retrieve((int) $course->id, 'anything at all', 5));
+        $this->assertSame(rag_retriever::NO_USER, 0);
+    }
+
+    /**
+     * A current page the learner can't see neither scopes nor boosts retrieval.
+     *
+     * Under document_only a hidden cmid in the request narrowed retrieval to that page's chunks, which the
+     * filter then removed, so the learner got nothing. It is now treated as no page: course-wide retrieval.
+     */
+    public function test_a_hidden_current_page_is_ignored_for_scoping(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $this->configure_rag();
+        set_config('rag_scope', 'document_only', 'local_ai_course_assistant');
+        $visible = $this->page($course);
+        $hidden = $this->page($course, ['visible' => 0]);
+        $this->store_chunk((int) $course->id, $hidden, 'HIDDEN page body', [1.0, 0.0, 0.0]);
+        $this->store_chunk((int) $course->id, $visible, 'Visible page body', [0.9, 0.1, 0.0]);
+
+        $this->mock_query_embedding([1.0, 0.0, 0.0]);
+        $out = rag_retriever::retrieve((int) $course->id, 'anything at all', 5, $hidden, (int) $student->id);
+        $this->assertSame(['Visible page body'], $this->contents($out));
+
+        // A visible current page still scopes as before.
+        $this->mock_query_embedding([1.0, 0.0, 0.0]);
+        $out = rag_retriever::retrieve((int) $course->id, 'anything at all', 5, $visible, (int) $student->id);
+        $this->assertSame(['Visible page body'], $this->contents($out));
+    }
+
+    /**
+     * With reranking on, the filter runs on the reranked top-k and keeps the reranker's order and scores.
+     */
+    public function test_retrieve_with_rerank_filters_the_reranked_set(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $this->configure_rag();
+        set_config('rerank_enabled', 1, 'local_ai_course_assistant');
+        set_config('rerank_apikey', 'pa-test-visibility-0000', 'local_ai_course_assistant');
+        set_config('rerank_apibaseurl', 'https://embed.sola.test/v1', 'local_ai_course_assistant');
+        set_config('rerank_min_query_chars', '0', 'local_ai_course_assistant');
+        set_config('rerank_margin_threshold', '0', 'local_ai_course_assistant');
+        $visible = $this->page($course);
+        $hidden = $this->page($course, ['visible' => 0]);
+        $this->store_chunk((int) $course->id, $hidden, 'HIDDEN answer key', [1.0, 0.0, 0.0]);
+        $this->store_chunk((int) $course->id, $visible, 'Visible page', [0.9, 0.1, 0.0]);
+        $this->store_chunk((int) $course->id, 0, 'Course overview', [0.6, 0.4, 0.0]);
+
+        // Mocked responses are served last in, first out: the rerank answer is queued before the embedding.
+        // Cosine order is hidden, visible, overview; the reranker puts the overview first.
+        \curl::mock_response(json_encode([
+            'data' => [
+                ['index' => 2, 'relevance_score' => 0.9],
+                ['index' => 0, 'relevance_score' => 0.8],
+                ['index' => 1, 'relevance_score' => 0.7],
+            ],
+            'usage' => ['total_tokens' => 5],
+        ]));
+        $this->mock_query_embedding([1.0, 0.0, 0.0]);
+        $out = rag_retriever::retrieve((int) $course->id, 'which answer is right', 3, 0, (int) $student->id);
+
+        $this->assertSame(['Course overview', 'Visible page'], $this->contents($out));
+        $this->assertSame([0.9, 0.7], array_column($out, 'score'));
+    }
+
+    /**
+     * With window expansion on, a hidden activity is dropped before its siblings are fetched.
+     */
+    public function test_retrieve_with_window_expansion_never_expands_a_hidden_activity(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $this->configure_rag();
+        set_config('rag_return_scope', 'window', 'local_ai_course_assistant');
+        set_config('rag_window_size', 1, 'local_ai_course_assistant');
+        $visible = $this->page($course);
+        $hidden = $this->page($course, ['visible' => 0]);
+        $this->store_chunk((int) $course->id, $hidden, 'HIDDEN first part', [1.0, 0.0, 0.0], 0);
+        $this->store_chunk((int) $course->id, $hidden, 'HIDDEN second part', [0.0, 0.0, 1.0], 1);
+        $this->store_chunk((int) $course->id, $visible, 'Visible first part of the page', [0.9, 0.1, 0.0], 0);
+        $this->store_chunk((int) $course->id, $visible, 'Visible second part of the page', [0.0, 0.0, 1.0], 1);
+
+        $this->mock_query_embedding([1.0, 0.0, 0.0]);
+        $out = rag_retriever::retrieve((int) $course->id, 'anything at all', 2, 0, (int) $student->id);
+
+        $text = implode("\n", $this->contents($out));
+        $this->assertStringNotContainsString('HIDDEN', $text);
+        $this->assertStringContainsString('Visible first part of the page', $text);
+        $this->assertStringContainsString('Visible second part of the page', $text, 'the visible hit was expanded');
+    }
+
+    /**
+     * The support course admits holders of the support capability who aren't enrolled, and only them.
+     */
+    public function test_support_course_admits_holders_of_the_support_capability(): void {
+        global $DB;
+        $course = $this->getDataGenerator()->create_course();
+        $visitor = $this->getDataGenerator()->create_user();
+        $chunks = [$this->chunk((int) $course->id, 0, 'support overview', 0.7, 'course')];
+
+        // Not the support course: not enrolled, so nothing.
+        $this->assertSame([], rag_visibility::filter($chunks, (int) $course->id, (int) $visitor->id));
+
+        set_config('support_enabled', 1, 'local_ai_course_assistant');
+        set_config('support_courseid', (int) $course->id, 'local_ai_course_assistant');
+        support_mode::reset_cache();
+        $this->assertSame(
+            ['support overview'],
+            $this->contents(rag_visibility::filter($chunks, (int) $course->id, (int) $visitor->id))
+        );
+
+        // Without the capability the support course is closed to a non-enrolled user again.
+        $userrole = $DB->get_field('role', 'id', ['shortname' => 'user']);
+        assign_capability(
+            'local/ai_course_assistant:usesupport',
+            CAP_PROHIBIT,
+            $userrole,
+            \context_system::instance()->id,
+            true
+        );
+        accesslib_clear_all_caches_for_unit_testing();
+        $this->assertSame([], rag_visibility::filter($chunks, (int) $course->id, (int) $visitor->id));
+    }
+
+    /**
+     * A user who can't read the chatted course gets nothing from its supplemental courses either.
+     */
+    public function test_no_access_to_the_chatted_course_means_no_supplemental_content(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $shared = $this->getDataGenerator()->create_course();
+        $stranger = $this->getDataGenerator()->create_user();
+        set_config('supplemental_courses', (string) $shared->id, 'local_ai_course_assistant');
+        supplemental_sources::reset_cache();
+        $visible = $this->page($shared);
+        $faq = $this->chunk(SITEID, 0, 'faq answer', 0.5, faq_manager::MODTYPE);
+
+        $out = rag_visibility::filter([
+            $this->chunk((int) $shared->id, 0, 'shared overview', 0.9, 'course'),
+            $this->chunk((int) $shared->id, $visible, 'shared visible'),
+            $faq,
+        ], (int) $course->id, (int) $stranger->id);
+
+        $this->assertSame(['faq answer'], $this->contents($out));
     }
 
     /**

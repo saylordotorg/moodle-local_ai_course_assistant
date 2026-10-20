@@ -40,8 +40,14 @@ use local_ai_course_assistant\embedding_provider\base_embedding_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rag_retriever {
-    /** retrieve() $foruserid: filter for the logged-in user. */
-    public const FOR_CURRENT_USER = 0;
+    /**
+     * retrieve() $foruserid default: no user, so only the site FAQ survives.
+     *
+     * Deliberately not "the logged-in user": a scheduled or adhoc task runs as an
+     * administrator, and a caller that forgot to name the learner would silently
+     * get administrator visibility. Callers pass the learner's id, or UNFILTERED.
+     */
+    public const NO_USER = 0;
 
     /**
      * retrieve() $foruserid: return every chunk, hidden activities included.
@@ -600,9 +606,9 @@ class rag_retriever {
      *                            document, filters retrieval to that document.
      * @param int    $foruserid The user the passages are for: their visibility
      *                          decides which chunks survive (rag_visibility,
-     *                          #341). FOR_CURRENT_USER (the default) is the
-     *                          logged-in user; no user keeps only the site FAQ.
-     *                          UNFILTERED is for administrator tools only.
+     *                          #341). Pass the learner's id. NO_USER (the
+     *                          default) keeps only the site FAQ. UNFILTERED is
+     *                          for administrator tools only.
      * @return array Array of [
      *                  'content'    => string,
      *                  'score'      => float,
@@ -620,7 +626,7 @@ class rag_retriever {
         string $query,
         int $topk = 5,
         int $currentcmid = 0,
-        int $foruserid = self::FOR_CURRENT_USER
+        int $foruserid = self::NO_USER
     ): array {
         global $DB;
 
@@ -772,6 +778,16 @@ class rag_retriever {
 
         if (empty($scored)) {
             return [];
+        }
+
+        // Issue #341: a current page the learner can't see (a hidden cmid typed into
+        // the request) must neither scope nor boost retrieval: under document_only it
+        // would narrow everything to chunks the filter then removes. Treated as no page.
+        if (
+            $currentcmid > 0 && $foruserid !== self::UNFILTERED
+            && !rag_visibility::cm_visible($courseid, $currentcmid, $foruserid)
+        ) {
+            $currentcmid = 0;
         }
 
         // Relevance gate + current-page bias. Applied before reranking, so
@@ -961,17 +977,15 @@ class rag_retriever {
      *
      * @param array $rows Final hydrated rows.
      * @param int $courseid The course being chatted in.
-     * @param int $foruserid A user id, FOR_CURRENT_USER or UNFILTERED.
+     * @param int $foruserid A user id, NO_USER or UNFILTERED.
      * @return array The kept rows, in order.
      */
     private static function visible_to(array $rows, int $courseid, int $foruserid): array {
-        global $USER;
         if ($foruserid === self::UNFILTERED) {
             return $rows;
         }
-        // Any other value below 1 is the logged-in user, or nobody (FAQ only).
-        $userid = $foruserid > 0 ? $foruserid : (int) ($USER->id ?? 0);
-        return rag_visibility::filter($rows, $courseid, $userid);
+        // Any other value below 1 is nobody: rag_visibility keeps only the FAQ.
+        return rag_visibility::filter($rows, $courseid, max(0, $foruserid));
     }
 
     /**

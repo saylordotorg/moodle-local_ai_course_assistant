@@ -385,7 +385,8 @@ final class email_optout_owner_backfill_test extends \advanced_testcase {
         $this->assertSame($owner, $this->owner($left), 'the row the old step left null is claimed');
         $this->assertNull($this->owner($ambiguous));
         $this->assertNull($this->owner($nobody));
-        $this->assertSame((string) self::REPAIRING, get_config(self::PLUGIN, 'version'), 'the savepoint was reached');
+        // Later steps run too (7.12.2 added 2026101903), so the stored build is this step's or a later one.
+        $this->assertGreaterThanOrEqual(self::REPAIRING, (int) get_config(self::PLUGIN, 'version'), 'the savepoint was reached');
     }
 
     public function test_the_step_does_not_claim_a_row_twice_or_touch_one_that_has_an_owner(): void {

@@ -228,4 +228,116 @@ final class course_level_section_visibility_test extends \advanced_testcase {
         $this->assertStringNotContainsString('RESTRICTEDSECTION', $after);
         $this->assertStringContainsString('VISIBLESECTION-SUMMARY', $after);
     }
+
+    /**
+     * Add a subsection (a delegated section) to a section and give it a distinctive summary.
+     *
+     * @param \stdClass $course
+     * @param int $parentsection Section number the subsection module sits in.
+     * @param string $word Distinctive word for the summary and title.
+     * @return \stdClass The subsection module record (with cmid).
+     */
+    private function subsection(\stdClass $course, int $parentsection, string $word): \stdClass {
+        global $DB;
+        $mod = $this->getDataGenerator()->create_module(
+            'subsection',
+            ['course' => $course->id, 'section' => $parentsection, 'name' => "{$word}-TITLE"]
+        );
+        $DB->set_field(
+            'course_sections',
+            'summary',
+            "{$word}-SUMMARY text." . self::PAD,
+            ['course' => $course->id, 'component' => 'mod_subsection', 'itemid' => $mod->id]
+        );
+        rebuild_course_cache($course->id, true);
+        return $mod;
+    }
+
+    /**
+     * A subsection inherits hiding and restrictions from its module and the section that holds it.
+     */
+    public function test_delegated_section_inherits_hiding_and_restrictions(): void {
+        global $CFG, $DB;
+        $this->resetAfterTest();
+        if (!file_exists($CFG->dirroot . '/mod/subsection/version.php')) {
+            $this->markTestSkipped('mod_subsection is not installed on this Moodle, so there are no delegated sections.');
+        }
+        set_config('enableavailability', 1);
+        // Moodle 4.5 installs mod_subsection disabled; a site that uses subsections has enabled it.
+        \core\plugininfo\mod::enable_plugin('subsection', 1);
+        $this->setAdminUser();
+        $course = $this->course();
+        $this->subsection($course, 1, 'OPENSUB');
+        $this->subsection($course, 3, 'SUBINRESTRICTED');
+        $this->subsection($course, 2, 'SUBINHIDDEN');
+        $restrictedcm = $this->subsection($course, 1, 'SUBCMRESTRICTED');
+
+        // Section 3 restricted; section 2 hidden directly in the table, so the subsection's own row stays
+        // visible and only inheritance can hide it; one subsection module restricted on the module itself.
+        $date = json_encode(['op' => '&', 'c' => [['type' => 'date', 'd' => '>=', 't' => time() + WEEKSECS]],
+            'showc' => [true]]);
+        $DB->set_field('course_sections', 'availability', $date, ['course' => $course->id, 'section' => 3]);
+        $DB->set_field('course_sections', 'visible', 0, ['course' => $course->id, 'section' => 2]);
+        $DB->set_field('course_modules', 'availability', $date, ['id' => $restrictedcm->cmid]);
+        rebuild_course_cache($course->id, true);
+        $this->assertSame(
+            1,
+            (int) $DB->get_field(
+                'course_sections',
+                'visible',
+                ['course' => $course->id, 'component' => 'mod_subsection', 'itemid' => $this->subsection_id($course, 'SUBINHIDDEN')]
+            ),
+            'precondition: the delegated section itself is still visible'
+        );
+
+        $text = content_extractor::extract_course_level((int) $course->id)['text'];
+
+        $this->assertStringContainsString('OPENSUB-SUMMARY', $text);
+        $this->assertStringNotContainsString('SUBINRESTRICTED', $text);
+        $this->assertStringNotContainsString('SUBINHIDDEN', $text);
+        $this->assertStringNotContainsString('SUBCMRESTRICTED', $text);
+
+        // With the subsection module disabled the delegate can't be inspected, so every subsection is left out.
+        \core\plugininfo\mod::enable_plugin('subsection', 0);
+        rebuild_course_cache($course->id, true);
+        $text = content_extractor::extract_course_level((int) $course->id)['text'];
+        $this->assertStringNotContainsString('OPENSUB', $text);
+        $this->assertStringContainsString('VISIBLESECTION-SUMMARY', $text);
+    }
+
+    /**
+     * The subsection instance id whose module name starts with a word.
+     *
+     * @param \stdClass $course
+     * @param string $word
+     * @return int
+     */
+    private function subsection_id(\stdClass $course, string $word): int {
+        global $DB;
+        return (int) $DB->get_field('subsection', 'id', ['course' => $course->id, 'name' => "{$word}-TITLE"]);
+    }
+
+    /**
+     * An assignment whose description is shown only from its submission date isn't indexed before it.
+     */
+    public function test_assignment_description_hidden_until_the_submission_date_is_not_indexed(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course();
+        $intro = ' brief: write an essay comparing two economic systems, citing at least three sources each.';
+        $make = function (string $word, int $always, int $from) use ($course, $intro) {
+            $this->getDataGenerator()->create_module('assign', ['course' => $course->id, 'name' => $word,
+                'intro' => "{$word}{$intro}", 'introformat' => FORMAT_HTML,
+                'alwaysshowdescription' => $always, 'allowsubmissionsfromdate' => $from]);
+        };
+        $make('LATERONLY', 0, time() + WEEKSECS);
+        $make('ALWAYSSHOWN', 1, time() + WEEKSECS);
+        $make('DATEPASSED', 0, time() - DAYSECS);
+
+        $texts = implode("\n", array_column(content_extractor::extract_course_modules((int) $course->id), 'text'));
+
+        $this->assertStringNotContainsString('LATERONLY', $texts);
+        $this->assertStringContainsString('ALWAYSSHOWN', $texts);
+        $this->assertStringContainsString('DATEPASSED', $texts);
+    }
 }

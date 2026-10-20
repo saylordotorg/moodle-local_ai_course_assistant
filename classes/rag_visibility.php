@@ -29,13 +29,14 @@ namespace local_ai_course_assistant;
  * Rules, in order:
  *  1. A site FAQ chunk (site course, modtype faq, no cmid) is kept: it is one
  *     admin setting shown to everyone, not activity content.
- *  2. A chunk is dropped unless it comes from the course being chatted in or
- *     from one of that course's supplemental courses (the administrator shared
- *     those on purpose; supplemental_sources already drops hidden courses).
- *  3. Every chunk of the chatted course is dropped when the user can't access
- *     that course (can_access_course(), or the support course for a holder of
- *     the support capability). A supplemental course counts as accessible: that
- *     is the sharing the setting exists for.
+ *  2. Every other chunk is dropped when there is no user, or the user can't
+ *     access the chatted course (can_access_course(), or the support course for
+ *     a holder of the support capability). Checked first, so a supplemental
+ *     course can't be reached through a course the user can't read.
+ *  3. A chunk is dropped unless it comes from the chatted course or one of its
+ *     supplemental courses. A supplemental course needs no enrolment: the
+ *     administrator shared it on purpose (supplemental_sources already drops
+ *     hidden courses).
  *  4. A chunk with no cmid (course summary and section text) is then kept.
  *  5. A chunk with a cmid is kept only when that cm is in the chunk's course and
  *     cm_info::uservisible is true for this user, which covers hidden activities,
@@ -64,7 +65,7 @@ class rag_visibility {
             return [];
         }
         $supplemental = null;
-        $access = [];
+        $chattedaccess = null;
         $modinfos = [];
         $out = [];
         foreach ($chunks as $chunk) {
@@ -80,17 +81,17 @@ class rag_visibility {
             if ($userid <= 0 || $chunkcourse <= 0) {
                 continue;
             }
+            // The chatted course first: a user who can't read it gets nothing but the FAQ, so its
+            // supplemental courses can't be reached through it either.
+            $chattedaccess = $chattedaccess ?? self::can_read_course($courseid, $userid);
+            if (!$chattedaccess) {
+                continue;
+            }
             if ($chunkcourse !== $courseid) {
                 $supplemental = $supplemental ?? supplemental_sources::usable_course_ids($courseid);
                 if (!in_array($chunkcourse, $supplemental, true)) {
                     continue;
                 }
-            }
-            if (!array_key_exists($chunkcourse, $access)) {
-                $access[$chunkcourse] = ($chunkcourse !== $courseid) || self::can_read_course($courseid, $userid);
-            }
-            if (!$access[$chunkcourse]) {
-                continue;
             }
             if ($cmid <= 0) {
                 $out[] = $chunk;
@@ -105,6 +106,23 @@ class rag_visibility {
             }
         }
         return $out;
+    }
+
+    /**
+     * Whether one course module of a course is uservisible for a user.
+     *
+     * @param int $courseid The course the cm must belong to.
+     * @param int $cmid
+     * @param int $userid 0 or less is never visible.
+     * @return bool
+     */
+    public static function cm_visible(int $courseid, int $cmid, int $userid): bool {
+        if ($userid <= 0 || $cmid <= 0) {
+            return false;
+        }
+        $modinfo = self::modinfo($courseid, $userid);
+        $cms = $modinfo !== null ? $modinfo->get_cms() : [];
+        return isset($cms[$cmid]) && $cms[$cmid]->uservisible;
     }
 
     /**
