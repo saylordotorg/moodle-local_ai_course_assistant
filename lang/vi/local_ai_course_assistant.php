@@ -1761,21 +1761,15 @@ $string['settings:max_content_per_resource_desc'] = 'Số ký tự nội dung t�
 $string['settings:max_total_content'] = 'Tổng nội dung tối đa (ký tự)';
 $string['settings:max_total_content_desc'] = 'Tổng số ký tự nội dung khóa học tối đa được đưa vào lời nhắc hệ thống. Giá trị nhỏ hơn giúp giảm kích thước lời nhắc và tăng tốc phản hồi.';
 $string['settings:spend_guard_heading'] = 'Bảo vệ chi tiêu và bộ tối ưu';
-$string['settings:spend_guard_heading_desc'] = 'Đặt hạn mức chi tiêu cho LLM theo kỳ. Khi chạm hạn mức, [[tutorshort]] tạm dừng yêu cầu hoặc chuyển sang nhà cung cấp rẻ hơn trong chuỗi dự phòng của bạn. Xem <a href="{$a}">trang Chi phí token</a> để biết tình trạng chi tiêu hiện tại và khuyến nghị của bộ tối ưu.';
 $string['settings:spend_cap_period'] = 'Kỳ hạn mức chi tiêu';
 $string['settings:spend_cap_period_desc'] = 'Tần suất đặt lại hạn mức chi tiêu. Bám theo lịch: hằng tháng bắt đầu vào ngày 1, hằng tuần vào thứ Hai và hằng ngày vào nửa đêm.';
 $string['settings:spend_cap_site'] = 'Hạn mức chi tiêu toàn trang (USD)';
-$string['settings:spend_cap_site_desc'] = 'Hạn mức tổng bằng USD cho tất cả khóa học và tính năng trong kỳ hiện tại. <code>0</code> = không giới hạn. Các hạn mức theo tính năng bên dưới sẽ được ưu tiên khi được đặt.';
 $string['settings:spend_cap_chat'] = 'Hạn mức trò chuyện (USD)';
-$string['settings:spend_cap_chat_desc'] = 'Hạn mức chỉ dành cho trò chuyện và bài kiểm tra của người học. <code>0</code> = dùng hạn mức toàn trang.';
 $string['settings:spend_cap_voice'] = 'Hạn mức giọng nói (USD)';
 $string['settings:spend_cap_voice_desc'] = 'Hạn mức cho giọng nói (Realtime + TTS + STT). Giọng nói thường là khoản chi lớn nhất — hãy giới hạn nó trước.';
 $string['settings:spend_cap_rag'] = 'Hạn mức RAG (USD)';
-$string['settings:spend_cap_rag_desc'] = 'Hạn mức cho các lệnh gọi nhúng trong quá trình lập chỉ mục khóa học.';
 $string['settings:spend_cap_analytics'] = 'Hạn mức phân tích (USD)';
-$string['settings:spend_cap_analytics_desc'] = 'Hạn mức cho các truy vấn Learning Radar của quản trị viên.';
 $string['settings:spend_failover_chain'] = 'Chuỗi dự phòng';
-$string['settings:spend_failover_chain_desc'] = 'Khi chạm hạn mức, [[tutorshort]] lần lượt thử các nhà cung cấp này. Mỗi dòng một mục, theo dạng <code>capability:label</code>. Nhãn tham chiếu tới các mục trong Nhà cung cấp và khóa (cho <code>chat</code> / <code>analytics</code>) hoặc Nhà cung cấp giọng nói (cho <code>voice</code>). Các dòng bắt đầu bằng <code>#</code> là chú thích. Ví dụ:<br><code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>';
 $string['settings:failover_per_call_enabled'] = 'Dự phòng theo từng lệnh gọi (v5.5.0)';
 $string['settings:failover_per_call_enabled_desc'] = 'Khi bật, mỗi lệnh gọi trò chuyện sẽ bọc nhà cung cấp chính trong một lớp chuỗi dự phòng. Nếu một lệnh gọi bị quá thời gian hoặc gặp lỗi 5xx, [[tutorshort]] chuyển sang mục kế tiếp trong <strong>chuỗi dự phòng</strong> ở trên và mở mạch 15 phút cho nhà cung cấp bị lỗi. Mỗi lần chuyển đều ghi một dòng kiểm toán (<code>failover_fallthrough</code>); sau khi bật, hãy kiểm tra Quản trị -> [[tutorshort]] -> Nhật ký kiểm toán để xác nhận chuỗi hoạt động. Mặc định tắt; chỉ bật sau khi chuỗi đã được kiểm chứng và tổ chức của bạn xác nhận đã có các thỏa thuận xử lý dữ liệu cần thiết cho từng nhà cung cấp trong chuỗi.';
 $string['settings:failover_timeout_chat'] = 'Dự phòng: thời gian chờ trò chuyện (giây)';
@@ -2782,7 +2776,6 @@ $string['settings:radar_batch_enabled'] = 'Gửi các báo cáo theo lịch tớ
 $string['settings:radar_batch_enabled_desc'] = 'Mặc định tắt. Khi bật, mỗi báo cáo theo lịch được gửi đi theo mức giá lô và được giao khi nhà cung cấp hoàn tất, có thể vào bất kỳ lúc nào trong vòng 24 giờ; cho tới lúc đó lịch sẽ hiển thị trạng thái "đã gửi". Các lịch có nhà cung cấp không hỗ trợ bậc xử lý theo lô vẫn chạy đồng bộ, nên không báo cáo nào bị mất vì thiết lập này. Tắt nó đi sẽ đưa mọi lịch trở lại đường chạy đồng bộ ở lần chạy kế tiếp, và mọi lô còn đang xử lý vẫn được thu về và giao đầy đủ.';
 $string['settings:radar_batch_heading'] = 'Learning Radar: bậc xử lý theo lô ngoại tuyến';
 $string['settings:radar_batch_heading_desc'] = 'Các báo cáo Learning Radar theo lịch có thể được gửi tới bậc xử lý theo lô ngoại tuyến của nhà cung cấp AI, rẻ hơn 50% cho cả token đầu vào lẫn đầu ra, đổi lại thời gian chờ có thể lên tới 24 giờ. Chỉ các báo cáo THEO LỊCH mới đủ điều kiện: bản Learning Radar bạn chạy tức thời từ trang này truyền câu trả lời trực tiếp về trình duyệt của bạn và luôn giữ chế độ đồng bộ, mọi tính năng hướng tới người học cũng vậy. Chi tiêu theo lô được ghi vào một tên mô hình có tiền tố <code>batch/</code>, nhờ đó bảng điều khiển AI Spend hiển thị mức giá đã giảm thay vì giá niêm yết.';
-$string['settings:soapbox_deprecated_inuse'] = 'Soapbox đã ngừng phát triển. Nó đang được thay thế bằng PresenterAI, một plugin hoạt động Moodle riêng biệt làm được mọi việc Soapbox làm, xuất hiện trong bộ chọn hoạt động, cho phép bạn chọn giữa một bucket S3 và kho tệp riêng của Moodle, cũng như giữa AI lõi của Moodle và Claude, OpenAI hoặc Gemini được cấu hình trực tiếp. Bản phát hành này không thay đổi gì: các bài tập, bản ghi, bản ghi lời thoại, điểm và phản hồi của bạn vẫn nguyên vẹn, thiết lập thời hạn lưu giữ vẫn áp dụng y như trước, và tác vụ dọn dẹp hằng ngày vẫn chạy. Mã nguồn dự kiến bị gỡ bỏ ở v8.0.0, và sẽ không bản phát hành nào gỡ nó đi cho tới khi PresenterAI có thể nhập được các bản ghi và điểm hiện có. Các bảng cơ sở dữ liệu sẽ bị xóa riêng và muộn hơn, vì Soapbox không ghi mục nào vào sổ điểm, nên các bảng này là bản sao duy nhất của hồ sơ thuyết trình của người học. Việc cần làm: ngừng xây dựng khóa học mới trên Soapbox ngay từ bây giờ, cài PresenterAI song song khi nó được phát hành và dùng nó cho công việc mới, còn các khóa học Soapbox hiện có thì cứ để chạy cho tới khi có chức năng nhập. Người học của bạn chưa cần được thông báo gì.';
 $string['settings:soapbox_deprecated_off'] = 'Soapbox đã ngừng phát triển và hiện không được bật ở bất kỳ đâu trên trang này. Hãy cứ để tắt. Nó đang được thay thế bằng PresenterAI, một plugin hoạt động Moodle riêng biệt làm cùng công việc đó với lựa chọn về kho lưu trữ và nhà cung cấp AI. Mã nguồn dự kiến bị gỡ bỏ ở v8.0.0.';
 $string['survey_admin:add_option'] = '+ Thêm lựa chọn';
 $string['survey_admin:add_question'] = '+ Thêm câu hỏi';
@@ -2926,7 +2919,6 @@ $string['settingspage:reset_prompt_template'] = 'Đặt lại về mẫu mặc �
 $string['settingspage:token_analytics_blurb'] = 'Theo dõi mức dùng token và chi phí theo khóa học và nhà cung cấp.';
 $string['settingspage:token_analytics_link'] = 'Xem phân tích token';
 $string['settingspage:token_analytics_title'] = 'Chi phí & Phân tích token';
-$string['soapbox:assign_deprecated'] = 'Soapbox đang được thay thế bằng PresenterAI, một hoạt động riêng sẽ xuất hiện trong trình chọn hoạt động. Các bài tập của bạn, cùng bản ghi, điểm và phản hồi của người học, không bị ảnh hưởng và vẫn hoạt động bình thường. Hôm nay bạn không cần làm gì cả. Khi PresenterAI được phát hành, hãy tạo các bài thuyết trình mới ở đó thay vì ở đây. Người học của bạn chưa cần được thông báo điều gì.';
 $string['task:collect_meta_ai_batches'] = 'Thu thập các báo cáo lô Learning Radar đã hoàn tất';
 $string['modelregistry:col_eol'] = 'Hết vòng đời';
 $string['modelregistry:drift_eol_horizon'] = 'Báo cáo các đợt ngừng hỗ trợ đã công bố trong vòng {$a} ngày.';

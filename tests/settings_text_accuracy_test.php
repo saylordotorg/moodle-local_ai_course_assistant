@@ -17,17 +17,20 @@
 namespace local_ai_course_assistant;
 
 /**
- * Four admin descriptions say what the code does (7.12.2).
+ * Eight admin descriptions say what the code does (7.12.2).
  *
- * Found in the 7.12.1 review: the English text of four settings and notices said
+ * Found in the 7.12.1 review: the English text of eight settings and notices said
  * something the code does not do. Nothing else reads these strings by name, so a
  * description can drift from the code without any test noticing. This file pins the
  * new meaning in both directions: the false claim is gone from the English value, and
  * the behavior the new sentence describes is what spend_guard really does, so the
  * text and the code cannot part again unnoticed.
  *
- * The 45 other locales still hold translations of the old English; no test compares
- * a translation with the English it came from, only placeholders and brand tokens.
+ * No test compares a translation with the English it came from, so the 45 other
+ * locales would have kept the old, wrong text silently. The locale lines for every
+ * corrected key were therefore removed, and Moodle falls back to the accurate English
+ * (the keys are listed in KNOWN_UNTRANSLATED, lang_completeness_test); a test below
+ * keeps a stale translation from coming back.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor
@@ -35,9 +38,13 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\spend_guard
  */
 final class settings_text_accuracy_test extends \advanced_testcase {
-    /** @var string[] The four keys this release corrected. */
+    /** @var string[] The keys this release corrected. */
     private const KEYS = [
         'settings:spend_cap_site_desc',
+        'settings:spend_cap_chat_desc',
+        'settings:spend_cap_rag_desc',
+        'settings:spend_cap_analytics_desc',
+        'settings:spend_guard_heading_desc',
         'settings:spend_failover_chain_desc',
         'settings:soapbox_deprecated_inuse',
         'soapbox:assign_deprecated',
@@ -96,6 +103,7 @@ final class settings_text_accuracy_test extends \advanced_testcase {
         $this->assertStringContainsString("that one course's spend", $text);
         $this->assertStringContainsString('site-wide chat spend', $text);
         $this->assertStringContainsString('<code>0</code> = unlimited', $text);
+        $this->assertStringContainsString('for information only', $text);
     }
 
     /**
@@ -204,6 +212,171 @@ final class settings_text_accuracy_test extends \advanced_testcase {
         $this->assertSame(['claude', 'gemini'], array_column($chain, 'provider'));
         $first = spend_guard::resolve_failover('chat');
         $this->assertSame('claude', $first['provider']);
+    }
+
+    // The other spend cap descriptions.
+
+    /**
+     * The Chat cap text says what it is compared with and what replaces it when it is 0.
+     *
+     * @return void
+     */
+    public function test_the_chat_cap_text_says_per_course_and_what_zero_means(): void {
+        $text = $this->en('settings:spend_cap_chat_desc');
+        $this->assertStringNotContainsString('use site-wide cap', $text);
+        $this->assertStringContainsString('each course on its own', $text);
+        $this->assertStringContainsString('site-wide chat spend', $text);
+        $this->assertStringContainsString('default per-course cap applies, then the site-wide cap', $text);
+    }
+
+    /**
+     * The behavior the Chat cap text states: a course's own cap wins, a 0 falls to the default, then the site cap.
+     *
+     * @return void
+     */
+    public function test_a_zero_chat_cap_falls_to_the_default_per_course_cap_then_the_site_cap(): void {
+        $this->resetAfterTest(true);
+        $course = $this->getDataGenerator()->create_course();
+        $cid = (int) $course->id;
+        set_config('spend_cap_site', '500', 'local_ai_course_assistant');
+        set_config('spend_cap_per_course_default', '30', 'local_ai_course_assistant');
+        set_config('spend_cap_chat', '0', 'local_ai_course_assistant');
+        $this->assertEquals(30.0, spend_guard::get_cap($cid, 'chat'));
+
+        set_config('spend_cap_per_course_default', '0', 'local_ai_course_assistant');
+        $this->assertEquals(500.0, spend_guard::get_cap($cid, 'chat'));
+        $this->assertEquals(500.0, spend_guard::get_cap(0, 'chat'));
+
+        set_config('spend_cap_chat', '200', 'local_ai_course_assistant');
+        $this->assertEquals(200.0, spend_guard::get_cap($cid, 'chat'));
+        $this->assertEquals(200.0, spend_guard::get_cap(0, 'chat'));
+
+        course_config_manager::save($cid, ['enabled' => 1, 'spend_cap_monthly' => '2']);
+        $this->assertEquals(2.0, spend_guard::get_cap($cid, 'chat'));
+    }
+
+    /**
+     * The RAG cap text says embedding and rerank, site-wide, and what happens when it is reached.
+     *
+     * @return void
+     */
+    public function test_the_rag_cap_text_covers_searches_and_says_what_stops(): void {
+        $text = $this->en('settings:spend_cap_rag_desc');
+        $this->assertStringNotContainsString('made during course indexing', $text);
+        $this->assertStringContainsString('site-wide RAG spend', $text);
+        $this->assertStringContainsString('when a question is searched', $text);
+        $this->assertStringContainsString('reranking', $text);
+        $this->assertStringContainsString('indexing stops and searches return no passages', $text);
+        $this->assertStringContainsString('<code>0</code> = use the site-wide cap', $text);
+    }
+
+    /**
+     * The analytics cap text says plainly that nothing enforces it.
+     *
+     * @return void
+     */
+    public function test_the_analytics_cap_text_says_it_is_not_enforced(): void {
+        $text = $this->en('settings:spend_cap_analytics_desc');
+        $this->assertStringStartsWith('Not enforced.', $text);
+        $this->assertStringContainsString('Learning Radar queries are checked against the Chat cap', $text);
+        $this->assertStringNotContainsString('Cap for Learning Radar admin queries', $text);
+    }
+
+    /**
+     * The behavior the analytics text states: no enforcement path ever asks for the analytics capability.
+     *
+     * Two halves. A request-time check never reads the analytics cap, so exceeding it blocks nothing; and no
+     * production file passes 'analytics' to spend_guard::check(), get_cap() or get_spend() (status_rows() builds
+     * its list from a variable, for the Token Cost page only). If someone starts enforcing it, this fails and the
+     * description has to change with the code.
+     *
+     * @return void
+     */
+    public function test_nothing_enforces_the_analytics_cap(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->redirectEmails();
+        set_config('spend_cap_analytics', '0.01', 'local_ai_course_assistant');
+        $DB->insert_record('local_ai_course_assistant_msgs', (object) [
+            'conversationid' => 0,
+            'userid' => 0,
+            'courseid' => SITEID,
+            'role' => 'assistant',
+            'message' => '[meta]',
+            'tokens_used' => 4000000,
+            'prompt_tokens' => 4000000,
+            'completion_tokens' => 0,
+            'model_name' => 'gpt-4o-mini',
+            'provider' => 'openai',
+            'interaction_type' => 'meta',
+            'timecreated' => time(),
+        ]);
+        $this->assertGreaterThan(0.01, spend_guard::get_spend(0, 'analytics'), 'the analytics spend is not over its cap');
+        $this->assertSame(spend_guard::CAP_OK, spend_guard::check(0, 'chat', false));
+        $this->assertSame(spend_guard::CAP_OK, spend_guard::check(0, 'rag', false));
+        $this->assertSame(spend_guard::CAP_OK, spend_guard::check(0, 'voice', false));
+
+        $root = dirname(__DIR__);
+        $skip = ['tests/', 'lang/', 'vendor/', 'node_modules/', '.superpowers/', 'scripts/'];
+        $offenders = [];
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS));
+        foreach ($files as $file) {
+            $path = $file->getPathname();
+            $rel = substr($path, strlen($root) + 1);
+            if (substr($path, -4) !== '.php') {
+                continue;
+            }
+            foreach ($skip as $prefix) {
+                if (strpos($rel, $prefix) === 0) {
+                    continue 2;
+                }
+            }
+            $call = "/spend_guard::(?:check|get_cap|get_spend)\\(\\s*[^;]*?'analytics'/s";
+            if (preg_match($call, (string) file_get_contents($path))) {
+                $offenders[] = $rel;
+            }
+        }
+        $this->assertSame([], $offenders, 'a file now asks spend_guard about the analytics cap; update its description');
+    }
+
+    /**
+     * The section heading text says what a hit cap does and when the emails go out.
+     *
+     * @return void
+     */
+    public function test_the_spend_guard_heading_text_describes_the_failover_and_the_emails(): void {
+        $text = $this->en('settings:spend_guard_heading_desc');
+        $this->assertStringNotContainsString('pauses requests when a cap is hit', $text);
+        $this->assertStringNotContainsString('cheaper provider', $text);
+        $this->assertStringContainsString('moves chat and voice to the first backup in your failover chain', $text);
+        $this->assertStringContainsString('80%, 95% and 100%', $text);
+        $this->assertStringContainsString('{$a}', $text);
+        $this->assertStringContainsString('[[tutorshort]]', $text);
+    }
+
+    // No stale translation.
+
+    /**
+     * No locale carries a translation of a corrected key: the old text said something wrong.
+     *
+     * The lines were removed in 7.12.2 so Moodle shows the accurate English. A translation batch that restores
+     * them removes the key from KNOWN_UNTRANSLATED in the same change, and from this list.
+     *
+     * @return void
+     */
+    public function test_no_locale_holds_a_stale_translation_of_a_corrected_key(): void {
+        $locales = array_filter(glob(__DIR__ . '/../lang/*', GLOB_ONLYDIR), fn($d) => basename($d) !== 'en');
+        $this->assertGreaterThan(40, count($locales), 'expected the full locale set');
+        $stale = [];
+        foreach ($locales as $dir) {
+            $body = (string) file_get_contents($dir . '/local_ai_course_assistant.php');
+            foreach (self::KEYS as $key) {
+                if (strpos($body, '$string[\'' . $key . '\']') !== false) {
+                    $stale[] = basename($dir) . ' ' . $key;
+                }
+            }
+        }
+        $this->assertSame([], $stale, "A locale holds a translation of the old English:\n  " . implode("\n  ", $stale));
     }
 
     // The two Soapbox notices.

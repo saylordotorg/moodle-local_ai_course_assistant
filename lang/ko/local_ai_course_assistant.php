@@ -1739,21 +1739,15 @@ $string['settings:max_content_per_resource_desc'] = '각 페이지나 책 챕터
 $string['settings:max_total_content'] = '전체 최대 콘텐츠(문자)';
 $string['settings:max_total_content_desc'] = '시스템 프롬프트에 포함되는 강좌 콘텐츠의 전체 최대 문자 수입니다. 값이 작을수록 프롬프트 크기가 줄고 응답이 빨라집니다.';
 $string['settings:spend_guard_heading'] = '지출 보호 및 최적화 도구';
-$string['settings:spend_guard_heading_desc'] = '기간별 LLM 지출 상한을 설정하십시오. 상한에 도달하면 [[tutorshort]]가 요청을 중단하거나 대체 체인의 더 저렴한 공급자로 전환합니다. 현재 지출 현황과 최적화 도구의 권장 사항은 <a href="{$a}">토큰 비용 페이지</a>를 참고하십시오.';
 $string['settings:spend_cap_period'] = '지출 상한 기간';
 $string['settings:spend_cap_period_desc'] = '지출 상한이 초기화되는 주기입니다. 달력 기준으로 맞춰져 월간은 매월 1일, 주간은 월요일, 일간은 자정에 시작합니다.';
 $string['settings:spend_cap_site'] = '사이트 전체 지출 상한(USD)';
-$string['settings:spend_cap_site_desc'] = '현재 기간의 모든 강좌와 기능을 합한 USD 상한입니다. <code>0</code> = 무제한. 아래의 기능별 상한이 설정되어 있으면 그것이 우선합니다.';
 $string['settings:spend_cap_chat'] = '채팅 상한(USD)';
-$string['settings:spend_cap_chat_desc'] = '학습자 채팅과 퀴즈에만 적용되는 상한입니다. <code>0</code> = 사이트 전체 상한을 사용합니다.';
 $string['settings:spend_cap_voice'] = '음성 상한(USD)';
 $string['settings:spend_cap_voice_desc'] = '음성(Realtime + TTS + STT) 상한입니다. 음성은 보통 지출이 가장 큰 항목이므로 먼저 제한하십시오.';
 $string['settings:spend_cap_rag'] = 'RAG 상한(USD)';
-$string['settings:spend_cap_rag_desc'] = '강좌 인덱싱 중 발생하는 임베딩 호출에 대한 상한입니다.';
 $string['settings:spend_cap_analytics'] = '분석 상한(USD)';
-$string['settings:spend_cap_analytics_desc'] = '관리자용 Learning Radar 쿼리에 대한 상한입니다.';
 $string['settings:spend_failover_chain'] = '대체 체인';
-$string['settings:spend_failover_chain_desc'] = '상한에 도달하면 [[tutorshort]]가 이 공급자들을 순서대로 시도합니다. 한 줄에 항목 하나씩 <code>capability:label</code> 형식으로 입력합니다. 레이블은 제공자 및 키(<code>chat</code> / <code>analytics</code>의 경우) 또는 음성 공급자(<code>voice</code>의 경우)의 항목을 가리킵니다. <code>#</code>로 시작하는 줄은 주석입니다. 예:<br><code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>';
 $string['settings:failover_per_call_enabled'] = '호출별 대체 전환(v5.5.0)';
 $string['settings:failover_per_call_enabled_desc'] = '켜면 모든 채팅 호출이 기본 공급자를 대체 체인 데코레이터로 감쌉니다. 호출에서 시간 초과나 5xx 오류가 발생하면 [[tutorshort]]가 위 <strong>대체 체인</strong>의 다음 항목으로 전환하고 실패한 공급자에 대해 15분 동안 회로를 엽니다. 전환할 때마다 감사 기록(<code>failover_fallthrough</code>)이 남으므로, 켠 뒤에는 관리 -> [[tutorshort]] -> 감사 로그에서 체인이 동작하는지 확인하십시오. 기본값은 꺼짐이며, 체인을 검증하고 소속 기관이 체인의 모든 공급자에 대해 필요한 데이터 처리 계약이 있음을 확인한 뒤에만 켜십시오.';
 $string['settings:failover_timeout_chat'] = '대체 전환: 채팅 시간 제한(초)';
@@ -2760,7 +2754,6 @@ $string['settings:radar_batch_enabled'] = '예약 보고서를 배치 등급으�
 $string['settings:radar_batch_enabled_desc'] = '기본값은 꺼짐입니다. 켜면 각 예약 보고서가 배치 요금으로 제출되고 제공자가 처리를 마치는 시점(24시간 이내의 임의 시점)에 전달됩니다. 그때까지 일정에는 "제출됨" 상태가 표시됩니다. 제공자에게 배치 등급이 없는 일정은 계속 동기 방식으로 실행되므로 이 설정 때문에 보고서가 사라지는 일은 없습니다. 이 설정을 끄면 다음 실행부터 모든 일정이 동기 경로로 돌아가며, 이미 진행 중인 배치는 그대로 수집되어 전달됩니다.';
 $string['settings:radar_batch_heading'] = 'Learning Radar: 오프라인 배치 등급';
 $string['settings:radar_batch_heading_desc'] = '예약된 Learning Radar 보고서는 AI 제공자의 오프라인 배치 등급으로 보낼 수 있습니다. 최대 24시간의 처리 시간을 감수하는 대신 입력 및 출력 토큰 비용이 모두 50% 저렴합니다. 예약된 보고서만 대상이 됩니다. 이 페이지에서 즉석으로 실행하는 Learning Radar는 답변을 브라우저로 스트리밍하므로 항상 동기 방식으로 유지되며, 학습자 대상 기능도 모두 마찬가지입니다. 배치 지출은 <code>batch/</code> 접두사가 붙은 모델 이름으로 기록되므로 AI 지출 대시보드에는 정가가 아닌 할인된 요금이 표시됩니다.';
-$string['settings:soapbox_deprecated_inuse'] = 'Soapbox는 더 이상 사용되지 않습니다. Soapbox를 대체하는 것은 PresenterAI이며, Soapbox가 하는 모든 일을 수행하는 별도의 Moodle 활동 플러그인입니다. 활동 선택기에 표시되고, S3 버킷과 Moodle 자체 파일 저장소 중에서, 그리고 Moodle 코어 AI와 직접 구성한 Claude, OpenAI 또는 Gemini 중에서 선택할 수 있습니다. 이번 릴리스에서 바뀌는 것은 없습니다. 과제, 녹음, 전사본, 점수, 피드백은 그대로 유지되고, 보존 설정도 이전과 똑같이 적용되며, 일일 정리 작업도 계속 실행됩니다. 코드는 v8.0.0에서 제거될 예정이지만, PresenterAI가 기존 녹음과 점수를 가져올 수 있게 되기 전에는 어떤 릴리스도 이를 제거하지 않습니다. 데이터베이스 테이블은 그보다 나중에 별도로 삭제됩니다. Soapbox는 성적부 항목을 기록하지 않으므로 이 테이블이 학습자 발표 기록의 유일한 사본이기 때문입니다. 해야 할 일: 지금부터 Soapbox를 기반으로 새 강좌를 만들지 말고, PresenterAI가 출시되면 함께 설치하여 새 작업에 사용하고, 기존 Soapbox 강좌는 가져오기 기능이 제공될 때까지 그대로 운영하세요. 학습자에게는 아직 알릴 필요가 없습니다.';
 $string['settings:soapbox_deprecated_off'] = 'Soapbox는 더 이상 사용되지 않으며, 이 사이트 어디에서도 켜져 있지 않습니다. 그대로 꺼 두세요. Soapbox는 PresenterAI로 대체됩니다. PresenterAI는 저장소와 AI 제공자를 선택할 수 있는 별도의 Moodle 활동 플러그인으로 같은 역할을 수행합니다. 코드는 v8.0.0에서 제거될 예정입니다.';
 $string['survey_admin:add_option'] = '+ 선택지 추가';
 $string['survey_admin:add_question'] = '+ 질문 추가';
@@ -2904,7 +2897,6 @@ $string['settingspage:reset_prompt_template'] = '기본 템플릿으로 재설�
 $string['settingspage:token_analytics_blurb'] = '강좌와 공급자 전반의 토큰 사용량과 비용을 모니터링합니다.';
 $string['settingspage:token_analytics_link'] = '토큰 분석 보기';
 $string['settingspage:token_analytics_title'] = '토큰 비용 및 분석';
-$string['soapbox:assign_deprecated'] = 'Soapbox는 활동 선택기에 표시될 별도 활동인 PresenterAI로 대체됩니다. 기존 과제와 학습자의 녹음, 점수, 피드백은 영향을 받지 않고 계속 작동합니다. 지금 하실 일은 없습니다. PresenterAI가 출시되면 새 발표 과제는 여기가 아니라 그곳에서 만드세요. 학습자에게는 아직 아무것도 알리지 않아도 됩니다.';
 $string['task:collect_meta_ai_batches'] = '완료된 Learning Radar 배치 보고서 수집';
 $string['modelregistry:col_eol'] = '지원 종료';
 $string['modelregistry:drift_eol_horizon'] = '{$a}일 이내에 예고된 지원 종료를 보고합니다.';

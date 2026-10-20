@@ -304,6 +304,20 @@ final class lang_completeness_test extends \basic_testcase {
         // holds, or whose hold cannot be checked (7.12.1). Same ruling: English only until the next batch.
         'soapbox:assignment_held',
         'soapbox:assignment_held_unchecked',
+        // Eight existing admin and teacher descriptions whose English was corrected in 7.12.2 because it no
+        // longer matched the code (spend caps, the failover chain, the Soapbox deprecation notices). Their 45
+        // old translations said the wrong thing, so the locale lines were REMOVED and Moodle falls back to the
+        // accurate English: an honest fallback beats a stale translation (the 7.8.9 ruling for Bambara and
+        // Wolof). Not deferred debt in the usual sense: when a translation batch covers them, add the key back
+        // to the locale files and delete it from here.
+        'settings:spend_cap_site_desc',
+        'settings:spend_cap_chat_desc',
+        'settings:spend_cap_rag_desc',
+        'settings:spend_cap_analytics_desc',
+        'settings:spend_guard_heading_desc',
+        'settings:spend_failover_chain_desc',
+        'settings:soapbox_deprecated_inuse',
+        'soapbox:assign_deprecated',
         // The privacy declarations for every place learner data goes (7.12.2, CONTRIB-10574 #340). Same ruling.
         'privacy:metadata:ai_provider:firstname',
         'privacy:metadata:ai_provider:history',

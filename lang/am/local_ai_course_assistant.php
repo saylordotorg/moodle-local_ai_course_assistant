@@ -1775,21 +1775,15 @@ $string['settings:max_content_per_resource_desc'] = 'ከየገጹ ወይም ከ�
 $string['settings:max_total_content'] = 'ከፍተኛ አጠቃላይ ይዘት (ቁምፊዎች)';
 $string['settings:max_total_content_desc'] = 'በሥርዓቱ መመሪያ ውስጥ የሚካተት ከፍተኛ አጠቃላይ የኮርስ ይዘት ቁምፊ ቁጥር። ዝቅተኛ እሴቶች የመመሪያውን መጠን ይቀንሱና መልሶችን ያፋጥናሉ።';
 $string['settings:spend_guard_heading'] = 'የወጪ ጥበቃና አመቻቺ';
-$string['settings:spend_guard_heading_desc'] = 'በየጊዜው የLLM የወጪ ወሰኖችን ያዘጋጁ። ወሰኑ ሲደረስ [[tutorshort]] ጥያቄዎችን ያቆማል ወይም ከመተኪያ ሰንሰለትዎ ወደ ርካሽ አቅራቢ ይቀይራል። የአሁኑን የወጪ ሁኔታና የአመቻቺውን ምክሮች ለማየት <a href="{$a}">የቶከን ወጪ ገጽን</a> ይመልከቱ።';
 $string['settings:spend_cap_period'] = 'የወጪ ወሰን ጊዜ';
 $string['settings:spend_cap_period_desc'] = 'የወጪ ወሰኑ በየምን ያህል ጊዜ እንደሚዳስስ። ከቀን መቁጠሪያ ጋር ይጣጣማል፦ ወርኃዊው በ1ኛው ቀን፣ ሳምንታዊው ሰኞ፣ ዕለታዊው በእኩለ ሌሊት ይጀምራል።';
 $string['settings:spend_cap_site'] = 'የመላው ጣቢያ የወጪ ወሰን (USD)';
-$string['settings:spend_cap_site_desc'] = 'በአሁኑ ጊዜ ለሁሉም ኮርሶችና ችሎታዎች የተጣመረ የUSD ወሰን። <code>0</code> = ወሰን የለም። ከታች ያሉት በችሎታ የተከፋፈሉ ወሰኖች ሲዘጋጁ ቅድሚያ ያገኛሉ።';
 $string['settings:spend_cap_chat'] = 'የውይይት ወሰን (USD)';
-$string['settings:spend_cap_chat_desc'] = 'ለተማሪ ውይይትና ፈተናዎች ብቻ ወሰን። <code>0</code> = የመላው ጣቢያ ወሰን ይሠራል።';
 $string['settings:spend_cap_voice'] = 'የድምጽ ወሰን (USD)';
 $string['settings:spend_cap_voice_desc'] = 'ለድምጽ ወሰን (Realtime + TTS + STT)። ድምጽ በአብዛኛው ትልቁ ወጪ ነው — መጀመሪያ ይገድቡት።';
 $string['settings:spend_cap_rag'] = 'የRAG ወሰን (USD)';
-$string['settings:spend_cap_rag_desc'] = 'ኮርሶች መረጃ በሚጠቆሙበት ጊዜ ለሚደረጉ የembedding ጥሪዎች ወሰን።';
 $string['settings:spend_cap_analytics'] = 'የትንታኔ ወሰን (USD)';
-$string['settings:spend_cap_analytics_desc'] = 'ለአስተዳዳሪ የLearning Radar ጥያቄዎች ወሰን።';
 $string['settings:spend_failover_chain'] = 'የመተኪያ ሰንሰለት';
-$string['settings:spend_failover_chain_desc'] = 'ወሰኑ ሲደረስ [[tutorshort]] እነዚህን አቅራቢዎች በቅደም ተከተል ይሞክራል። በየመስመሩ አንድ ግቤት፣ በ<code>capability:label</code> ቅርጸት። ስያሜዎቹ በአቅራቢዎች እና ቁልፎች (ለ<code>chat</code> / <code>analytics</code>) ወይም በድምጽ አቅራቢዎች (ለ<code>voice</code>) ውስጥ ያሉ ግቤቶችን ያመለክታሉ። በ<code>#</code> የሚጀምሩ መስመሮች አስተያየቶች ናቸው። ምሳሌ፦<br><code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>';
 $string['settings:failover_per_call_enabled'] = 'በየጥሪው ወደ መተኪያ መቀየር (v5.5.0)';
 $string['settings:failover_per_call_enabled_desc'] = 'ሲበራ እያንዳንዱ የውይይት ጥሪ ዋናውን አቅራቢ በመተኪያ ሰንሰለት መሸፈኛ ውስጥ ያጠቅልላል። በጥሪ ላይ ጊዜ ካለፈ ወይም የ5xx ስህተት ከተከሰተ [[tutorshort]] ከላይ ወደ ያለው <strong>የመተኪያ ሰንሰለት</strong> ቀጣይ ግቤት ይቀይርና ላልተሳካው አቅራቢ የ15 ደቂቃ ዑደት ይከፍታል። እያንዳንዱ ቅያሬ የምርመራ መስመር ይጽፋል (<code>failover_fallthrough</code>)፤ ካበሩ በኋላ ሰንሰለቱ እየሠራ መሆኑን ለማረጋገጥ አስተዳደር -> [[tutorshort]] -> የምርመራ መዝገብን ይመልከቱ። በነባሪ ጠፍቷል፤ ሰንሰለቱ ከተረጋገጠና ተቋምዎ ለሰንሰለቱ ውስጥ ላለ እያንዳንዱ አቅራቢ የሚያስፈልጉት የመረጃ ማቀናበሪያ ስምምነቶች መኖራቸውን ካረጋገጠ በኋላ ብቻ ያብሩት።';
 $string['settings:failover_timeout_chat'] = 'መተኪያ፦ የውይይት ጊዜ ማብቂያ (ሰከንዶች)';
@@ -2789,7 +2783,6 @@ $string['settings:radar_batch_enabled'] = 'የታቀዱ ሪፖርቶችን ወ�
 $string['settings:radar_batch_enabled_desc'] = 'በነባሪ ጠፍቷል። ሲበራ እያንዳንዱ የታቀደ ሪፖርት በጅምላ ተመን ይቀርባል፣ አቅራቢውም ሲጨርሰው ይደርሳል፤ ይህ በ24 ሰዓታት ውስጥ በማንኛውም ጊዜ ሊሆን ይችላል፤ እስከዚያ ድረስ መርሐ ግብሩ "ቀርቧል" የሚል ሁኔታ ያሳያል። አቅራቢያቸው የጅምላ እርከን የሌላቸው መርሐ ግብሮች በተመሳሳይ ጊዜ መሥራታቸውን ይቀጥላሉ፤ ስለዚህ በዚህ ቅንብር ምክንያት ሪፖርት አይጠፋም። ማጥፋት እያንዳንዱን መርሐ ግብር በሚቀጥለው ሩጫ ወደ ተመሳሳይ-ጊዜ መንገድ ይመልሳል፤ በሂደት ላይ ያለ ማንኛውም ጅምላም ተሰብስቦ ይደርሳል።';
 $string['settings:radar_batch_heading'] = 'የመማር ራዳር፦ ከመስመር ውጪ የጅምላ እርከን';
 $string['settings:radar_batch_heading_desc'] = 'የታቀዱ የመማር ራዳር ሪፖርቶች ወደ AI አቅራቢው ከመስመር ውጪ የጅምላ እርከን ሊላኩ ይችላሉ፤ ይህም እስከ 24 ሰዓት በሚደርስ የመመለሻ ጊዜ ምትክ በግቤትም በውጤትም ቶከኖች ላይ 50% ያነሰ ያስከፍላል። ብቁ የሚሆኑት የታቀዱ ሪፖርቶች ብቻ ናቸው፦ ከዚህ ገጽ የሚያስኬዱት ጊዜያዊ የመማር ራዳር መልሱን ወደ አሳሽዎ ስለሚያፈስ ሁልጊዜ በተመሳሳይ ጊዜ ይቆያል፤ ለተማሪ የሚታዩ ሁሉም ባህሪያትም እንደዚያው። የጅምላ ወጪ <code>batch/</code> በሚል ቅድመ ቅጥያ በተሰየመ የሞዴል ስም ይመዘገባል፤ ስለዚህ የAI ወጪ ዳሽቦርድ ከዝርዝር ዋጋ ይልቅ የቅናሽ ተመኑን ያሳያል።';
-$string['settings:soapbox_deprecated_inuse'] = 'Soapbox ከአገልግሎት ተቋርጧል። በPresenterAI እየተተካ ነው፤ ይህም Soapbox የሚሠራውን ሁሉ የሚሠራ፣ በእንቅስቃሴ መምረጫው ውስጥ የሚታይ፣ በS3 ባልዲና በMoodle የራሱ ፋይል ማከማቻ መካከል እንዲሁም በMoodle ዋና AI እና በቀጥታ በተዋቀሩ Claude፣ OpenAI ወይም Gemini መካከል እንዲመርጡ የሚያስችል የተለየ የMoodle እንቅስቃሴ ፕላግኢን ነው። በዚህ ልቀት ውስጥ ምንም አይለወጥም፦ ምደባዎችዎ፣ ቀረጻዎችዎ፣ ግልባጮችዎ፣ ነጥቦችዎና ግብረ መልሶችዎ አልተነኩም፤ የማቆያ ቅንብሩ አሁንም እንደበፊቱ በትክክል ይሠራል፤ ዕለታዊው የጽዳት ተግባርም አሁንም ይሠራል። ኮዱ በv8.0.0 ለመወገድ ታቅዷል፤ ነገር ግን PresenterAI ነባር ቀረጻዎችንና ነጥቦችን ማስመጣት እስኪችል ድረስ ምንም ልቀት አያስወግደውም። የዳታቤዝ ሠንጠረዦቹ ለብቻቸውና በኋላ ይወገዳሉ፤ ምክንያቱም Soapbox ምንም የውጤት መዝገብ ግቤት ስለማይጽፍ እነዚህ ሠንጠረዦች የተማሪውን የአቀራረብ መዝገብ ብቸኛ ቅጂ ናቸው። ማድረግ ያለብዎት፦ አሁኑኑ በSoapbox ላይ አዳዲስ ኮርሶችን መገንባት ያቁሙ፤ PresenterAI ሲለቀቅ ከጎኑ ይጫኑትና ለአዲስ ሥራ ይጠቀሙበት፤ ነባር የSoapbox ኮርሶችዎን ማስመጣቱ እስኪገኝ ድረስ እየሠሩ ይተዉ። ለተማሪዎችዎ ገና ምንም መነገር አያስፈልግም።';
 $string['settings:soapbox_deprecated_off'] = 'Soapbox ከአገልግሎት ተቋርጧል፤ በዚህ ጣቢያ ላይ በየትኛውም ቦታ አልበራም። እንደጠፋ ይተዉት። በPresenterAI እየተተካ ነው፤ ይህም ተመሳሳይ ሥራ የሚሠራ፣ የማከማቻና የAI አቅራቢ ምርጫ የሚሰጥ የተለየ የMoodle እንቅስቃሴ ፕላግኢን ነው። ኮዱ በv8.0.0 ለመወገድ ታቅዷል።';
 $string['survey_admin:add_option'] = '+ አማራጭ ጨምር';
 $string['survey_admin:add_question'] = '+ ጥያቄ ጨምር';
@@ -2933,7 +2926,6 @@ $string['settingspage:reset_prompt_template'] = 'ወደ ነባሪ ቅጥ መል�
 $string['settingspage:token_analytics_blurb'] = 'በኮርሶችና በአቅራቢዎች ላይ የቶከን አጠቃቀምንና ወጪዎችን ይከታተሉ።';
 $string['settingspage:token_analytics_link'] = 'የቶከን ትንተና ይመልከቱ';
 $string['settingspage:token_analytics_title'] = 'የቶከን ወጪና ትንተና';
-$string['soapbox:assign_deprecated'] = 'Soapbox በPresenterAI እየተተካ ነው፤ ይህም በእንቅስቃሴ መራጩ ውስጥ የሚታይ የተለየ እንቅስቃሴ ነው። የእርስዎ ምደባዎች፣ እንዲሁም የተማሪዎችዎ ቀረጻዎች፣ ውጤቶችና ግብረመልሶች አይነኩም፤ መሥራታቸውንም ይቀጥላሉ። ዛሬ ማድረግ የሚያስፈልግ ምንም ነገር የለም። PresenterAI ሲለቀቅ አዲስ የአቀራረብ ሥራ እዚህ ሳይሆን እዚያ ይገንቡ። ተማሪዎችዎ ገና ምንም መነገር አያስፈልጋቸውም።';
 $string['task:collect_meta_ai_batches'] = 'የተጠናቀቁ የመማሪያ ራዳር ጥቅል ሪፖርቶችን ሰብስብ';
 $string['modelregistry:col_eol'] = 'የአገልግሎት ማብቂያ';
 $string['modelregistry:drift_eol_horizon'] = 'በ{$a} ቀናት ውስጥ የታወጁ መቋረጦችን ይነግራል።';

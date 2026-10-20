@@ -1740,21 +1740,15 @@ $string['settings:max_content_per_resource_desc'] = 'Maximalt antal tecken inneh
 $string['settings:max_total_content'] = 'Största totala innehåll (tecken)';
 $string['settings:max_total_content_desc'] = 'Maximalt totalt antal tecken kursinnehåll som tas med i systemprompten. Lägre värden minskar promptens storlek och snabbar upp svaren.';
 $string['settings:spend_guard_heading'] = 'Kostnadsspärr och optimerare';
-$string['settings:spend_guard_heading_desc'] = 'Ange kostnadstak för LLM per period. [[tutorshort]] pausar förfrågningar när ett tak nås, eller växlar till en billigare leverantör i din reservkedja. Se <a href="{$a}">sidan Tokenkostnad</a> för aktuell kostnadsstatus och optimerarens rekommendationer.';
 $string['settings:spend_cap_period'] = 'Period för kostnadstak';
 $string['settings:spend_cap_period_desc'] = 'Hur ofta kostnadstaket nollställs. Följer kalendern: månadsvis börjar den 1:a i månaden, veckovis på måndag och dagligen vid midnatt.';
 $string['settings:spend_cap_site'] = 'Kostnadstak för hela webbplatsen (USD)';
-$string['settings:spend_cap_site_desc'] = 'Totalt tak i USD för alla kurser och funktioner under den aktuella perioden. <code>0</code> = obegränsat. Taken per funktion nedan gäller före detta värde när de är angivna.';
 $string['settings:spend_cap_chat'] = 'Tak för chatt (USD)';
-$string['settings:spend_cap_chat_desc'] = 'Tak enbart för studenternas chatt och quiz. <code>0</code> = använd taket för hela webbplatsen.';
 $string['settings:spend_cap_voice'] = 'Tak för röst (USD)';
 $string['settings:spend_cap_voice_desc'] = 'Tak för röst (Realtime + TTS + STT). Röst är oftast den största kostnadsposten — sätt tak för den först.';
 $string['settings:spend_cap_rag'] = 'Tak för RAG (USD)';
-$string['settings:spend_cap_rag_desc'] = 'Tak för de embedding-anrop som görs vid indexering av kurser.';
 $string['settings:spend_cap_analytics'] = 'Tak för analys (USD)';
-$string['settings:spend_cap_analytics_desc'] = 'Tak för administratörsfrågor i Learning Radar.';
 $string['settings:spend_failover_chain'] = 'Reservkedja';
-$string['settings:spend_failover_chain_desc'] = 'När ett tak nås provar [[tutorshort]] dessa leverantörer i tur och ordning. En post per rad med formatet <code>capability:label</code>. Etiketterna hänvisar till poster under Leverantörer och nycklar (för <code>chat</code> / <code>analytics</code>) eller Röstleverantörer (för <code>voice</code>). Rader som börjar med <code>#</code> är kommentarer. Exempel:<br><code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>';
 $string['settings:failover_per_call_enabled'] = 'Reservväxling per anrop (v5.5.0)';
 $string['settings:failover_per_call_enabled_desc'] = 'När detta är aktiverat omsluts den primära leverantören av en reservkedjedekorator vid varje chattanrop. Vid tidsgräns eller 5xx-fel på ett anrop går [[tutorshort]] vidare till nästa post i <strong>reservkedjan</strong> ovan och öppnar en 15 minuter lång brytare för den felande leverantören. En granskningsrad (<code>failover_fallthrough</code>) skapas vid varje växling; kontrollera Administration -> [[tutorshort]] -> Granskningslogg efter aktivering för att se att kedjan fungerar. Avstängt som standard; slå på det först när kedjan har validerats och er organisation har bekräftat att nödvändiga personuppgiftsbiträdesavtal finns för varje leverantör i kedjan.';
 $string['settings:failover_timeout_chat'] = 'Reservväxling per anrop: tidsgräns för chatt (sekunder)';
@@ -2761,7 +2755,6 @@ $string['settings:radar_batch_enabled'] = 'Skicka schemalagda rapporter till bat
 $string['settings:radar_batch_enabled_desc'] = 'Avstängt som standard. När det är på skickas varje schemalagd rapport till batchtaxan och levereras när leverantören blir klar med den, vilket kan ske när som helst inom 24 timmar; fram till dess visar schemat statusen "skickad". Scheman vars leverantör saknar batchnivå fortsätter att köras synkront, så ingen rapport går förlorad på grund av den här inställningen. Att stänga av den återför varje schema till den synkrona vägen vid nästa körning, och en batch som fortfarande är på väg hämtas och levereras ändå.';
 $string['settings:radar_batch_heading'] = 'Learning Radar: offline batchnivå';
 $string['settings:radar_batch_heading_desc'] = 'Schemalagda Learning Radar-rapporter kan skickas till AI-leverantörens offline batchnivå, som kostar 50 % mindre för både in- och utdatatokens i utbyte mot en leveranstid på upp till 24 timmar. Bara de SCHEMALAGDA rapporterna är aktuella: den tillfälliga Learning Radar som du kör från den här sidan strömmar sitt svar till din webbläsare och förblir alltid synkron, liksom varje funktion som studenterna möter. Batchkostnaden bokförs mot ett modellnamn med prefixet <code>batch/</code>, så att panelen för AI-kostnader visar det rabatterade priset i stället för listpriset.';
-$string['settings:soapbox_deprecated_inuse'] = 'Soapbox är utfasat. Det ersätts av PresenterAI, ett separat Moodle-aktivitetsplugin som gör allt som Soapbox gör, syns i aktivitetsväljaren och låter dig välja mellan en S3-bucket och Moodles egen fillagring, och mellan Moodles inbyggda AI och Claude, OpenAI eller Gemini konfigurerade direkt. Ingenting ändras i den här versionen: dina uppgifter, inspelningar, transkriptioner, poäng och återkoppling är orörda, lagringsinställningen gäller precis som förut, och den dagliga rensningsuppgiften körs fortfarande. Koden är planerad att tas bort i v8.0.0, och ingen version tar bort den förrän PresenterAI kan importera befintliga inspelningar och poäng. Databastabellerna tas bort separat och senare, eftersom Soapbox inte skriver någon post i betygsboken, så dessa tabeller är den enda kopian av en students presentationsresultat. Så här gör du: sluta bygga nya kurser på Soapbox nu, installera PresenterAI vid sidan av när det släpps och använd det för nytt arbete, och låt dina befintliga Soapbox-kurser fortsätta som de är tills importen finns. Dina studenter behöver inte få veta något ännu.';
 $string['settings:soapbox_deprecated_off'] = 'Soapbox är utfasat och är inte påslaget någonstans på den här webbplatsen. Låt det vara avstängt. Det ersätts av PresenterAI, ett separat Moodle-aktivitetsplugin som gör samma sak med valfri lagring och AI-leverantör. Koden är planerad att tas bort i v8.0.0.';
 $string['survey_admin:add_option'] = '+ Lägg till alternativ';
 $string['survey_admin:add_question'] = '+ Lägg till fråga';
@@ -2905,7 +2898,6 @@ $string['settingspage:reset_prompt_template'] = 'Återställ till standardmallen
 $string['settingspage:token_analytics_blurb'] = 'Följ tokenanvändning och kostnader över kurser och leverantörer.';
 $string['settingspage:token_analytics_link'] = 'Visa tokenanalys';
 $string['settingspage:token_analytics_title'] = 'Tokenkostnad och analys';
-$string['soapbox:assign_deprecated'] = 'Soapbox ersätts av PresenterAI, en separat aktivitet som kommer att finnas i aktivitetsväljaren. Dina uppgifter, och dina elevers inspelningar, poäng och återkoppling, påverkas inte och fungerar som vanligt. Det finns inget att göra i dag. När PresenterAI släpps bygger du nytt presentationsarbete där i stället för här. Dina elever behöver inte få veta något ännu.';
 $string['task:collect_meta_ai_batches'] = 'Hämta färdiga Learning Radar-batchrapporter';
 $string['modelregistry:col_eol'] = 'Livscykelslut';
 $string['modelregistry:drift_eol_horizon'] = 'Rapporterar aviserade avvecklingar inom {$a} dagar.';
