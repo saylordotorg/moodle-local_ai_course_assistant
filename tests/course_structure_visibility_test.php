@@ -31,7 +31,8 @@ namespace local_ai_course_assistant;
  */
 final class course_structure_visibility_test extends \advanced_testcase {
     /**
-     * A course with one open section and one group-restricted section, plus a group-restricted activity.
+     * A course with one open section, one group-restricted section and one hidden section, plus a
+     * group-restricted activity and a hidden activity.
      *
      * @return array [course, member, outsider, teacher]
      */
@@ -40,7 +41,7 @@ final class course_structure_visibility_test extends \advanced_testcase {
         set_config('enableavailability', 1);
         set_config('rag_enabled', 0, 'local_ai_course_assistant');
         $gen = $this->getDataGenerator();
-        $course = $gen->create_course(['numsections' => 2, 'fullname' => 'Structure 101']);
+        $course = $gen->create_course(['numsections' => 3, 'fullname' => 'Structure 101']);
         $member = $gen->create_and_enrol($course, 'student');
         $outsider = $gen->create_and_enrol($course, 'student');
         $teacher = $gen->create_and_enrol($course, 'editingteacher');
@@ -57,9 +58,12 @@ final class course_structure_visibility_test extends \advanced_testcase {
             ['course' => $course->id, 'section' => 2]
         );
         $DB->set_field('course_sections', 'availability', $groupjson, ['course' => $course->id, 'section' => 2]);
+        $DB->set_field('course_sections', 'name', 'HIDDENSECTION', ['course' => $course->id, 'section' => 3]);
+        $DB->set_field('course_sections', 'visible', 0, ['course' => $course->id, 'section' => 3]);
         $gen->create_module('page', ['course' => $course->id, 'section' => 1, 'name' => 'OPENPAGE']);
         $gen->create_module('page', ['course' => $course->id, 'section' => 1, 'name' => 'GROUPPAGE',
             'availability' => $groupjson]);
+        $gen->create_module('page', ['course' => $course->id, 'section' => 1, 'name' => 'HIDDENPAGE', 'visible' => 0]);
         rebuild_course_cache($course->id, true);
         return [$course, $member, $outsider, $teacher];
     }
@@ -113,25 +117,28 @@ final class course_structure_visibility_test extends \advanced_testcase {
     }
 
     /**
-     * A teacher running the objectives import still lists the course as a plain user sees it.
+     * A teacher running the objectives import still gets the course as published: nothing hidden.
      *
-     * The import asks the model for learning objectives, which describe what learners get, so the block is built for a
-     * plain user even though the logged-in teacher could see the restricted section.
+     * The import asks the model for learning objectives, which describe what learners get, so the block is built
+     * as published even though the logged-in teacher can see the hidden section and activity. Access restrictions
+     * don't remove content from it: a course that unlocks its units in sequence still gets objectives for all of
+     * them, as it did before 7.12.2.
      */
-    public function test_topics_text_for_a_named_plain_user_hides_the_restricted_section_from_a_teacher(): void {
+    public function test_published_topics_text_leaves_out_hidden_material_for_a_teacher(): void {
         $this->resetAfterTest();
         [$course, , , $teacher] = $this->setup_course();
         $this->setUser($teacher);
 
         $asteacher = context_builder::get_course_topics_text((int) $course->id);
-        $asplain = context_builder::get_course_topics_text(
-            (int) $course->id,
-            userid: (int) \core_user::get_noreply_user()->id
-        );
+        $published = context_builder::get_course_topics_text((int) $course->id, published: true);
 
-        $this->assertStringContainsString('RESTRICTEDSECTION', $asteacher, 'the teacher\'s own view lists it');
-        $this->assertStringNotContainsString('RESTRICTEDSECTION', $asplain);
-        $this->assertStringNotContainsString('GROUPPAGE', $asplain);
-        $this->assertStringContainsString('OPENPAGE', $asplain);
+        $this->assertStringContainsString('HIDDENSECTION', $asteacher, 'the teacher\'s own view lists it');
+        $this->assertStringContainsString('HIDDENPAGE', $asteacher, 'the teacher\'s own view lists it');
+        $this->assertStringNotContainsString('HIDDENSECTION', $published);
+        $this->assertStringNotContainsString('HIDDENPAGE', $published);
+        $this->assertStringContainsString('OPENSECTION', $published);
+        $this->assertStringContainsString('OPENPAGE', $published);
+        $this->assertStringContainsString('RESTRICTEDSECTION', $published);
+        $this->assertStringContainsString('GROUPPAGE', $published);
     }
 }

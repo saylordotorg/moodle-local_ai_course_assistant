@@ -995,16 +995,20 @@ class context_builder {
      *
      * @param int $courseid
      * @param int $maxchars Total character budget for the block.
-     * @param int $userid Whose view of the course to list (0 = the current user). A caller that works as staff
-     *                    but needs the learners' outline, such as the objectives import, passes a plain user.
+     * @param int $userid Whose view of the course to list (0 = the current user).
+     * @param bool $published List the course as it is published, whoever asks: a section or activity counts when it
+     *                        isn't hidden, whatever the viewer's capabilities and whatever access restrictions
+     *                        apply to some learners. For a caller that works as staff, such as the objectives import,
+     *                        and so would otherwise see the hidden material too. $userid is then ignored.
      * @return string
      */
     public static function get_course_topics_text(
         int $courseid,
         int $maxchars = self::TOPICS_MAX_CHARS,
-        int $userid = 0
+        int $userid = 0,
+        bool $published = false
     ): string {
-        return self::build_course_topics($courseid, $maxchars, $userid);
+        return self::build_course_topics($courseid, $maxchars, $userid, $published);
     }
 
     /**
@@ -1721,15 +1725,17 @@ class context_builder {
      * @param int $courseid
      * @param int $maxchars Total character budget for the block.
      * @param int $userid The learner the block is for; 0 is the logged-in user.
+     * @param bool $published List the course as published (not hidden), ignoring the viewer and access restrictions.
      * @return string
      */
     private static function build_course_topics(
         int $courseid,
         int $maxchars = self::TOPICS_MAX_CHARS,
-        int $userid = 0
+        int $userid = 0,
+        bool $published = false
     ): string {
         $maxchars = max(200, $maxchars);
-        $modinfo = get_fast_modinfo($courseid, $userid);
+        $modinfo = get_fast_modinfo($courseid, $published ? 0 : $userid);
         $sections = $modinfo->get_section_info_all();
 
         // Gather the raw material for every visible section before pricing any
@@ -1737,7 +1743,7 @@ class context_builder {
         // consumed front-to-back.
         $entries = [];
         foreach ($sections as $section) {
-            if (!$section->uservisible) {
+            if (!($published ? $section->visible : $section->uservisible)) {
                 continue;
             }
 
@@ -1759,7 +1765,7 @@ class context_builder {
             if (!empty($modinfo->sections[$section->section])) {
                 foreach ($modinfo->sections[$section->section] as $cmid) {
                     $cm = $modinfo->get_cm($cmid);
-                    if ($cm->uservisible && $cm->has_view()) {
+                    if (($published ? $cm->visible : $cm->uservisible) && $cm->has_view()) {
                         $activities[] = "{$cm->name} (id:{$cmid})";
                     }
                 }

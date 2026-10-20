@@ -533,12 +533,26 @@ final class external_locations_test extends \advanced_testcase {
     }
 
     /**
+     * Drop the export writer a test filled, so that it doesn't leak into the next test in the same run.
+     *
+     * The writer is a static singleton; without this the system-context preferences exported below made another
+     * privacy test's "nothing exported yet" check fail, but only in a full-suite run.
+     *
+     * @return void
+     */
+    protected function tearDown(): void {
+        \core_privacy\local\request\writer::reset();
+        parent::tearDown();
+    }
+
+    /**
      * A user's preferences are exported with a readable description; another user's are not.
      *
      * @return void
      */
     public function test_user_preferences_are_exported(): void {
         $this->resetAfterTest();
+        \core_privacy\local\request\writer::reset();
         $user = $this->getDataGenerator()->create_user();
         $other = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course();
