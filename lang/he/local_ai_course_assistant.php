@@ -1780,21 +1780,15 @@ $string['settings:max_content_per_resource_desc'] = 'מספר התווים המ�
 $string['settings:max_total_content'] = 'תוכן כולל מרבי (תווים)';
 $string['settings:max_total_content_desc'] = 'מספר התווים הכולל המרבי של תוכן הקורס הנכלל בהנחיית המערכת. ערכים נמוכים יותר מקטינים את גודל ההנחיה ומאיצים את התשובות.';
 $string['settings:spend_guard_heading'] = 'הגנת הוצאות ומייעל';
-$string['settings:spend_guard_heading_desc'] = 'הגדירו תקרות הוצאה ל-LLM לכל תקופה. כאשר תקרה מגיעה למיצוי, [[tutorshort]] משהה בקשות או עובר לספק זול יותר משרשרת הגיבוי שלכם. ראו את <a href="{$a}">דף עלות הטוקנים</a> למצב ההוצאות הנוכחי ולהמלצות המייעל.';
 $string['settings:spend_cap_period'] = 'תקופת תקרת ההוצאה';
 $string['settings:spend_cap_period_desc'] = 'באיזו תדירות מתאפסת תקרת ההוצאה. מיושר ללוח השנה: החודשי מתחיל ב-1 בחודש, השבועי ביום שני והיומי בחצות.';
 $string['settings:spend_cap_site'] = 'תקרת הוצאה לכלל האתר (USD)';
-$string['settings:spend_cap_site_desc'] = 'תקרה כוללת ב-USD לכל הקורסים והיכולות בתקופה הנוכחית. <code>0</code> = ללא הגבלה. התקרות לפי יכולת שלהלן גוברות כאשר הן מוגדרות.';
 $string['settings:spend_cap_chat'] = 'תקרת צ\'אט (USD)';
-$string['settings:spend_cap_chat_desc'] = 'תקרה לצ\'אט ולבחנים של הלומדים בלבד. <code>0</code> = נעשה שימוש בתקרת האתר.';
 $string['settings:spend_cap_voice'] = 'תקרת קול (USD)';
 $string['settings:spend_cap_voice_desc'] = 'תקרה ליכולות הקול (Realtime + TTS + STT). הקול הוא בדרך כלל ההוצאה הגדולה ביותר — הגבילו אותו ראשון.';
 $string['settings:spend_cap_rag'] = 'תקרת RAG (USD)';
-$string['settings:spend_cap_rag_desc'] = 'תקרה לקריאות ההטמעה המתבצעות בעת אינדוקס הקורסים.';
 $string['settings:spend_cap_analytics'] = 'תקרת ניתוח נתונים (USD)';
-$string['settings:spend_cap_analytics_desc'] = 'תקרה לשאילתות Learning Radar של מנהלי המערכת.';
 $string['settings:spend_failover_chain'] = 'שרשרת גיבוי';
-$string['settings:spend_failover_chain_desc'] = 'כאשר תקרה מגיעה למיצוי, [[tutorshort]] מנסה את הספקים האלה לפי הסדר. רשומה אחת בכל שורה, בתבנית <code>capability:label</code>. התוויות מפנות לרשומות בטבלה ספקים ומפתחות (עבור <code>chat</code> / <code>analytics</code>) או בספקי הקול (עבור <code>voice</code>). שורות המתחילות ב-<code>#</code> הן הערות. לדוגמה:<br><code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>';
 $string['settings:failover_per_call_enabled'] = 'מעבר לגיבוי בכל קריאה (v5.5.0)';
 $string['settings:failover_per_call_enabled_desc'] = 'כאשר מופעל, כל קריאת צ\'אט עוטפת את הספק הראשי במעטפת של שרשרת גיבוי. אם בקריאה מסוימת חלה חריגת זמן או שגיאת 5xx, [[tutorshort]] עובר לרשומה הבאה ב<strong>שרשרת הגיבוי</strong> שלמעלה ופותח מפסק ל-15 דקות עבור הספק שנכשל. כל מעבר כותב שורת ביקורת (<code>failover_fallthrough</code>); לאחר ההפעלה בדקו ניהול -> [[tutorshort]] -> יומן ביקורת כדי לוודא שהשרשרת פועלת. מושבת כברירת מחדל; הפעילו רק לאחר שהשרשרת אומתה והמוסד שלכם אישר שקיימים הסכמי עיבוד הנתונים הנדרשים לכל ספק בשרשרת.';
 $string['settings:failover_timeout_chat'] = 'גיבוי: חריגת זמן לצ\'אט (שניות)';
@@ -2801,7 +2795,6 @@ $string['settings:radar_batch_enabled'] = 'שלח דוחות מתוזמנים ל
 $string['settings:radar_batch_enabled_desc'] = 'כבוי כברירת מחדל. כאשר ההגדרה פעילה, כל דוח מתוזמן נשלח בתעריף ה-batch ונמסר כאשר הספק מסיים אותו, מה שעשוי לקרות בכל רגע בתוך 24 שעות; עד אז לוח הזמנים מציג סטטוס "נשלח". לוחות זמנים שלספק שלהם אין שכבת batch ממשיכים לרוץ באופן סינכרוני, כך ששום דוח אינו אובד בגלל הגדרה זו. כיבוי ההגדרה מחזיר כל לוח זמנים למסלול הסינכרוני בהרצה הבאה, וכל batch שעדיין בדרך עדיין נאסף ונמסר.';
 $string['settings:radar_batch_heading'] = 'Learning Radar: שכבת batch לא מקוונת';
 $string['settings:radar_batch_heading_desc'] = 'דוחות Learning Radar מתוזמנים יכולים להישלח לשכבת ה-batch הלא מקוונת של ספק ה-AI, שעולה 50% פחות גם על טוקני קלט וגם על טוקני פלט בתמורה לזמן אספקה של עד 24 שעות. רק הדוחות המתוזמנים כשירים לכך: Learning Radar האד-הוק שאתה מריץ מדף זה מזרים את תשובתו לדפדפן שלך ונשאר תמיד סינכרוני, וכך גם כל תכונה שפונה ללומדים. הוצאה בשכבת batch נרשמת תחת שם מודל הנושא את התחילית <code>batch/</code>, כך שלוח ההוצאות על AI מציג את התעריף המוזל ולא את מחיר המחירון.';
-$string['settings:soapbox_deprecated_inuse'] = 'Soapbox הוצא משימוש. הוא מוחלף ב-PresenterAI, תוסף פעילות נפרד ל-Moodle שעושה כל מה ש-Soapbox עושה, מופיע בבורר הפעילויות, ומאפשר לך לבחור בין דלי S3 לבין אחסון הקבצים של Moodle עצמו, ובין ה-AI המובנה של Moodle לבין Claude, OpenAI או Gemini המוגדרים ישירות. שום דבר אינו משתנה בגרסה זו: המטלות, ההקלטות, התמלילים, הציונים והמשוב שלך נותרים כמות שהם, הגדרת השמירה עדיין חלה בדיוק כמו קודם, ומשימת הניקוי היומית עדיין רצה. הקוד מיועד להסרה בגרסה 8.0.0, ושום גרסה לא תסיר אותו עד ש-PresenterAI יוכל לייבא הקלטות וציונים קיימים. טבלאות מסד הנתונים נמחקות בנפרד ובשלב מאוחר יותר, משום ש-Soapbox אינו כותב רשומה לגיליון הציונים, ולכן טבלאות אלה הן העותק היחיד של רשומת המצגת של הלומד. מה לעשות: הפסק כבר עכשיו לבנות קורסים חדשים על Soapbox, התקן את PresenterAI לצדו עם שחרורו והשתמש בו לעבודה חדשה, והשאר את קורסי ה-Soapbox הקיימים שלך פעילים עד שהייבוא יהיה זמין. אין צורך ליידע את הלומדים שלך בשלב זה.';
 $string['settings:soapbox_deprecated_off'] = 'Soapbox הוצא משימוש ואינו מופעל בשום מקום באתר זה. השאר אותו כבוי. הוא מוחלף ב-PresenterAI, תוסף פעילות נפרד ל-Moodle שעושה את אותה עבודה עם אפשרות בחירה של אחסון ושל ספק AI. הקוד מיועד להסרה בגרסה 8.0.0.';
 $string['survey_admin:add_option'] = '+ הוסף אפשרות';
 $string['survey_admin:add_question'] = '+ הוסף שאלה';
@@ -2945,7 +2938,6 @@ $string['settingspage:reset_prompt_template'] = 'איפוס לתבנית ברי�
 $string['settingspage:token_analytics_blurb'] = 'מעקב אחר שימוש בטוקנים ואחר עלויות לאורך קורסים וספקים.';
 $string['settingspage:token_analytics_link'] = 'צפייה בניתוח הטוקנים';
 $string['settingspage:token_analytics_title'] = 'עלות טוקנים וניתוח נתונים';
-$string['soapbox:assign_deprecated'] = 'Soapbox מוחלף ב-PresenterAI, פעילות נפרדת שתופיע בבורר הפעילויות. המטלות שלכם, וההקלטות, הציונים והמשוב של הלומדים שלכם, אינם מושפעים וממשיכים לעבוד. אין מה לעשות היום. כאשר PresenterAI ישוחרר, בנו שם עבודות מצגת חדשות במקום כאן. אין צורך לומר ללומדים שלכם דבר בשלב זה.';
 $string['task:collect_meta_ai_batches'] = 'איסוף דוחות אצווה שהסתיימו של Learning Radar';
 $string['modelregistry:col_eol'] = 'סוף חיים';
 $string['modelregistry:drift_eol_horizon'] = 'מדווח על הוצאות משימוש שהוכרזו בתוך {$a} ימים.';

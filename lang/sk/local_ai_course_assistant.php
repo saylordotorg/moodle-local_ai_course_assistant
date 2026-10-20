@@ -1740,21 +1740,15 @@ $string['settings:max_content_per_resource_desc'] = 'Maximálny počet znakov ob
 $string['settings:max_total_content'] = 'Maximálny celkový obsah (znaky)';
 $string['settings:max_total_content_desc'] = 'Maximálny celkový počet znakov obsahu kurzu zahrnutých do systémového promptu. Nižšie hodnoty zmenšujú prompt a zrýchľujú odpovede.';
 $string['settings:spend_guard_heading'] = 'Ochrana výdavkov a optimalizátor';
-$string['settings:spend_guard_heading_desc'] = 'Nastavte limity výdavkov na LLM za obdobie. Po dosiahnutí limitu [[tutorshort]] pozastaví požiadavky alebo prejde na lacnejšieho poskytovateľa z vášho záložného reťazca. Aktuálny stav výdavkov a odporúčania optimalizátora nájdete na <a href="{$a}">stránke nákladov na tokeny</a>.';
 $string['settings:spend_cap_period'] = 'Obdobie limitu výdavkov';
 $string['settings:spend_cap_period_desc'] = 'Ako často sa limit výdavkov obnovuje. Podľa kalendára: mesačný sa začína 1. dňa mesiaca, týždenný v pondelok a denný o polnoci.';
 $string['settings:spend_cap_site'] = 'Limit výdavkov pre celý web (USD)';
-$string['settings:spend_cap_site_desc'] = 'Celkový limit v USD pre všetky kurzy a funkcie v aktuálnom období. <code>0</code> = bez obmedzenia. Nižšie uvedené limity jednotlivých funkcií majú prednosť, ak sú nastavené.';
 $string['settings:spend_cap_chat'] = 'Limit pre chat (USD)';
-$string['settings:spend_cap_chat_desc'] = 'Limit iba pre chat a testy študentov. <code>0</code> = použiť limit celého webu.';
 $string['settings:spend_cap_voice'] = 'Limit pre hlas (USD)';
 $string['settings:spend_cap_voice_desc'] = 'Limit pre hlas (Realtime + TTS + STT). Hlas býva najväčšou nákladovou položkou — obmedzte ho ako prvý.';
 $string['settings:spend_cap_rag'] = 'Limit pre RAG (USD)';
-$string['settings:spend_cap_rag_desc'] = 'Limit pre volania vkladania vykonávané pri indexovaní kurzov.';
 $string['settings:spend_cap_analytics'] = 'Limit pre analytiku (USD)';
-$string['settings:spend_cap_analytics_desc'] = 'Limit pre administrátorské dopyty Learning Radar.';
 $string['settings:spend_failover_chain'] = 'Záložný reťazec';
-$string['settings:spend_failover_chain_desc'] = 'Po dosiahnutí limitu skúša [[tutorshort]] týchto poskytovateľov v poradí. Jedna položka na riadok v tvare <code>capability:label</code>. Označenia odkazujú na položky v sekcii Poskytovatelia a kľúče (pre <code>chat</code> / <code>analytics</code>) alebo Hlasoví poskytovatelia (pre <code>voice</code>). Riadky začínajúce znakom <code>#</code> sú komentáre. Príklad:<br><code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>';
 $string['settings:failover_per_call_enabled'] = 'Záložné prepnutie pre každé volanie (v5.5.0)';
 $string['settings:failover_per_call_enabled_desc'] = 'Ak je zapnuté, každé volanie chatu obalí primárneho poskytovateľa dekorátorom záložného reťazca. Pri vypršaní časového limitu volania alebo chybe 5xx prejde [[tutorshort]] na ďalšiu položku <strong>záložného reťazca</strong> vyššie a otvorí na 15 minút istič pre poskytovateľa, ktorý zlyhal. Pri každom prepnutí sa zapíše auditný riadok (<code>failover_fallthrough</code>); po zapnutí skontrolujte Správa -> [[tutorshort]] -> Auditný denník, aby ste overili, že reťazec funguje. Predvolene vypnuté; zapnite ho až potom, čo je reťazec overený a vaša inštitúcia potvrdila, že pre každého poskytovateľa v reťazci sú uzavreté potrebné zmluvy o spracúvaní údajov.';
 $string['settings:failover_timeout_chat'] = 'Záložné prepnutie: časový limit chatu (sekundy)';
@@ -2761,7 +2755,6 @@ $string['settings:radar_batch_enabled'] = 'Odosielať naplánované reporty do d
 $string['settings:radar_batch_enabled_desc'] = 'Predvolene vypnuté. Keď je zapnuté, každý naplánovaný report sa odošle za dávkovú sadzbu a doručí sa, keď ho poskytovateľ dokončí, čo môže byť kedykoľvek do 24 hodín; plán dovtedy zobrazuje stav „odoslané“. Plány, ktorých poskytovateľ nemá dávkovú vrstvu, bežia naďalej synchrónne, takže sa kvôli tomuto nastaveniu žiadny report nestratí. Vypnutie vráti pri ďalšom spustení každý plán na synchrónnu cestu a každá dávka, ktorá je ešte rozpracovaná, sa aj tak vyzdvihne a doručí.';
 $string['settings:radar_batch_heading'] = 'Learning Radar: offline dávková vrstva';
 $string['settings:radar_batch_heading_desc'] = 'Naplánované reporty Learning Radar možno posielať do offline dávkovej vrstvy poskytovateľa AI, ktorá stojí o 50 % menej na vstupných aj výstupných tokenoch výmenou za dobu spracovania až 24 hodín. Oprávnené sú iba NAPLÁNOVANÉ reporty: ad hoc Learning Radar, ktorý spustíte z tejto stránky, streamuje svoju odpoveď do vášho prehliadača a zostáva vždy synchrónny, rovnako ako každá funkcia určená študentom. Dávkové výdavky sa zaznamenávajú pod názvom modelu s predponou <code>batch/</code>, takže panel AI Spend zobrazuje zľavnenú sadzbu namiesto cenníkovej.';
-$string['settings:soapbox_deprecated_inuse'] = 'Soapbox je zastaraný. Nahrádza ho PresenterAI, samostatný plugin aktivity pre Moodle, ktorý robí všetko, čo robí Soapbox, objavuje sa vo výbere aktivít a umožňuje vybrať si medzi úložiskom S3 a vlastným úložiskom súborov Moodle, ako aj medzi jadrovým AI v Moodle a priamo nakonfigurovaným Claude, OpenAI či Gemini. V tomto vydaní sa nič nemení: vaše zadania, nahrávky, prepisy, skóre a spätná väzba zostávajú nedotknuté, nastavenie uchovávania platí presne ako doteraz a denná čistiaca úloha stále beží. Odstránenie kódu je naplánované na verziu 8.0.0 a žiadne vydanie ho neodstráni skôr, než bude PresenterAI vedieť importovať existujúce nahrávky a skóre. Databázové tabuľky sa odstránia samostatne a neskôr, pretože Soapbox nezapisuje do hodnotení žiadnu položku, takže tieto tabuľky sú jedinou kópiou záznamu o prezentácii študenta. Čo robiť: prestaňte odteraz stavať nové kurzy na Soapboxe, po vydaní nainštalujte PresenterAI popri ňom a používajte ho na novú prácu a existujúce kurzy so Soapboxom nechajte bežať, kým nebude k dispozícii import. Vašim študentom zatiaľ netreba nič oznamovať.';
 $string['settings:soapbox_deprecated_off'] = 'Soapbox je zastaraný a nie je nikde na tejto stránke zapnutý. Nechajte ho vypnutý. Nahrádza ho PresenterAI, samostatný plugin aktivity pre Moodle, ktorý robí rovnakú prácu s možnosťou výberu úložiska a poskytovateľa AI. Odstránenie kódu je naplánované na verziu 8.0.0.';
 $string['survey_admin:add_option'] = '+ Pridať možnosť';
 $string['survey_admin:add_question'] = '+ Pridať otázku';
@@ -2905,7 +2898,6 @@ $string['settingspage:reset_prompt_template'] = 'Obnoviť predvolenú šablónu'
 $string['settingspage:token_analytics_blurb'] = 'Sledujte spotrebu tokenov a náklady naprieč kurzami a poskytovateľmi.';
 $string['settingspage:token_analytics_link'] = 'Zobraziť analytiku tokenov';
 $string['settingspage:token_analytics_title'] = 'Náklady na tokeny a analytika';
-$string['soapbox:assign_deprecated'] = 'Soapbox nahrádza PresenterAI, samostatná aktivita, ktorá sa objaví vo výbere aktivít. Vaše zadania ani nahrávky, skóre a spätná väzba vašich učiacich sa tým nie sú dotknuté a fungujú ďalej. Dnes nie je potrebné robiť nič. Keď bude PresenterAI vydaná, novú prezentačnú prácu vytvárajte tam, nie tu. Vašim učiacim sa zatiaľ netreba nič oznamovať.';
 $string['task:collect_meta_ai_batches'] = 'Zhromaždiť dokončené dávkové reporty Learning Radar';
 $string['modelregistry:col_eol'] = 'Koniec životnosti';
 $string['modelregistry:drift_eol_horizon'] = 'Hlási oznámené vyradenia v priebehu {$a} dní.';

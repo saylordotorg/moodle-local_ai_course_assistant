@@ -895,7 +895,10 @@ class objective_manager {
      * @return array
      */
     public static function extract_via_llm(int $courseid, int $userid = 0): array {
-        $topics = context_builder::get_course_topics_text($courseid);
+        // The teacher who runs the import can see hidden sections; the objectives describe what learners get, so list
+        // the course as it is published: nothing hidden, and the same as before 7.12.2 for restricted content (a
+        // course that unlocks units in sequence still gets objectives for all of them).
+        $topics = context_builder::get_course_topics_text($courseid, published: true);
         if (trim($topics) === '') {
             return [];
         }

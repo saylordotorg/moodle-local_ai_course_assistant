@@ -250,6 +250,7 @@ final class lang_completeness_test extends \basic_testcase {
         'settingspage:adv_legacy',
         'settingspage:nav_label',
         'settingspage:redirect',
+        'settingspage:redirect_notice',
         'settingspage:essentials_intro',
         'settingspage:models_intro',
         'settingspage:features_intro',
@@ -303,6 +304,77 @@ final class lang_completeness_test extends \basic_testcase {
         // holds, or whose hold cannot be checked (7.12.1). Same ruling: English only until the next batch.
         'soapbox:assignment_held',
         'soapbox:assignment_held_unchecked',
+        // Eight existing admin and teacher descriptions whose English was corrected in 7.12.2 because it no
+        // longer matched the code (spend caps, the failover chain, the Soapbox deprecation notices). Their 45
+        // old translations said the wrong thing, so the locale lines were REMOVED and Moodle falls back to the
+        // accurate English: an honest fallback beats a stale translation (the 7.8.9 ruling for Bambara and
+        // Wolof). Not deferred debt in the usual sense: when a translation batch covers them, add the key back
+        // to the locale files and delete it from here.
+        'settings:spend_cap_site_desc',
+        'settings:spend_cap_chat_desc',
+        'settings:spend_cap_rag_desc',
+        'settings:spend_cap_analytics_desc',
+        'settings:spend_guard_heading_desc',
+        'settings:spend_failover_chain_desc',
+        'settings:soapbox_deprecated_inuse',
+        'soapbox:assign_deprecated',
+        // The privacy declarations for every place learner data goes (7.12.2, CONTRIB-10574 #340). Same ruling.
+        'privacy:metadata:ai_provider:firstname',
+        'privacy:metadata:ai_provider:history',
+        'privacy:metadata:ai_provider:learnerprofile',
+        'privacy:metadata:ai_provider:submission',
+        'privacy:metadata:ai_provider:videoframes',
+        'privacy:metadata:voice_provider:recording',
+        'privacy:metadata:voice_provider:instructions',
+        'privacy:metadata:zendesk:coursecontext',
+        'privacy:metadata:soapbox_storage',
+        'privacy:metadata:soapbox_storage:recording',
+        'privacy:metadata:soapbox_storage:slidedeck',
+        'privacy:metadata:soapbox_storage:frames',
+        'privacy:metadata:soapbox_storage:objectkey',
+        'privacy:metadata:soapbox_storage:ipaddress',
+        'privacy:metadata:whatsapp_delivery',
+        'privacy:metadata:whatsapp_delivery:phonenumber',
+        'privacy:metadata:whatsapp_delivery:message',
+        'privacy:metadata:embedding_provider',
+        'privacy:metadata:embedding_provider:query',
+        'privacy:metadata:analytics_export',
+        'privacy:metadata:analytics_export:learner',
+        'privacy:metadata:analytics_export:usage',
+        'privacy:metadata:analytics_export:feedback',
+        'privacy:metadata:analytics_export:survey',
+        'privacy:metadata:analytics_export:transcript',
+        'privacy:metadata:analytics_export:radarreport',
+        'privacy:metadata:talking_avatar',
+        'privacy:metadata:talking_avatar:audio',
+        'privacy:metadata:talking_avatar:video',
+        'privacy:metadata:talking_avatar:ipaddress',
+        'privacy:metadata:core_ai',
+        // The same declarations, completed after review (7.12.2 fix round 1). Same ruling.
+        'privacy:metadata:ai_provider:otherproviders',
+        'privacy:metadata:voice_provider:ipaddress',
+        'privacy:metadata:zendesk:ticket',
+        'privacy:metadata:radar_webhook:email',
+        'privacy:metadata:browser_speech',
+        'privacy:metadata:browser_speech:audio',
+        'privacy:metadata:browser_speech:text',
+        'privacy:metadata:widget_cdn',
+        'privacy:metadata:widget_cdn:ipaddress',
+        'privacy:metadata:widget_cdn:useragent',
+        'privacy:metadata:preference:avatar',
+        'privacy:metadata:preference:consent_given',
+        'privacy:metadata:preference:digest_optin',
+        'privacy:metadata:preference:intro_dismissed',
+        'privacy:metadata:preference:last_courseid',
+        'privacy:metadata:preference:outreach_milestones',
+        // And the usability-testing form (7.12.2 fix round 2). Same ruling.
+        'privacy:metadata:usertesting_form',
+        'privacy:metadata:usertesting_form:courseid',
+        'privacy:metadata:usertesting_form:usage',
+        'privacy:metadata:usertesting_form:userid',
+        // The one-time course rebuild that upgrade step 2026101903 queues (7.12.2 review follow-up). An admin-screen
+        // task name, English only like the strings above.
+        'task:rebuild_course_index',
     ];
 
     /**

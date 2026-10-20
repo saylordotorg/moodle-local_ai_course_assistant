@@ -298,13 +298,15 @@ final class voice_learner_journey_test extends \advanced_testcase {
             'The endpoint must carry the minted credential, or the browser has nothing to connect with.'
         );
 
-        // The credential is this learner's, in this course -- not a shared one.
+        // The credential is a fresh one-minute token. Since 7.12.2 (CONTRIB-10574
+        // #340) it carries no learner or course id: the proxy never read them.
         parse_str((string) parse_url($result['endpoint'], PHP_URL_QUERY), $qs);
         $parts = explode('.', (string) ($qs['token'] ?? ''));
         $this->assertCount(3, $parts, 'The endpoint must carry a three-part JWT.');
         $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
-        $this->assertSame((int) $learner->id, (int) $payload['sub']);
-        $this->assertSame((int) $course->id, (int) $payload['courseid']);
+        $this->assertSame('xai', $payload['provider']);
+        $this->assertArrayNotHasKey('sub', $payload, 'The token names the learner.');
+        $this->assertArrayNotHasKey('courseid', $payload, 'The token names the course.');
     }
 
     /**
@@ -444,9 +446,13 @@ final class voice_learner_journey_test extends \advanced_testcase {
 
         $heavy = $this->become_a_learner_on($course);
         $this->assert_this_is_an_entitled_learner((int) $course->id);
+        $heavylast = [];
         for ($i = 0; $i < 6; $i++) {
-            get_realtime_token::execute((int) $course->id);
+            $heavylast = get_realtime_token::execute((int) $course->id);
         }
+        parse_str((string) parse_url($heavylast['endpoint'], PHP_URL_QUERY), $heavyqs);
+        $heavyparts = explode('.', (string) ($heavyqs['token'] ?? ''));
+        $heavypayload = json_decode(base64_decode(strtr($heavyparts[1] ?? '', '-_', '+/')), true);
 
         $second = $this->become_a_learner_on($course);
         $this->assertNotSame((int) $heavy->id, (int) $second->id);
@@ -462,10 +468,17 @@ final class voice_learner_journey_test extends \advanced_testcase {
         parse_str((string) parse_url($result['endpoint'], PHP_URL_QUERY), $qs);
         $parts = explode('.', (string) ($qs['token'] ?? ''));
         $payload = json_decode(base64_decode(strtr($parts[1] ?? '', '-_', '+/')), true);
-        $this->assertSame(
-            (int) $second->id,
-            (int) ($payload['sub'] ?? 0),
-            'The second learner was handed a credential minted for somebody else.'
+        $this->assertSame('xai', $payload['provider'] ?? '', 'The second learner was handed no usable credential.');
+        $this->assertGreaterThanOrEqual(time() - 5, (int) ($payload['iat'] ?? 0), 'The credential is not freshly minted.');
+        $this->assertNotSame(
+            '',
+            (string) ($payload['nonce'] ?? ''),
+            'The second learner\'s credential carries no nonce.'
+        );
+        $this->assertNotSame(
+            $heavypayload['nonce'] ?? null,
+            $payload['nonce'] ?? null,
+            'The second learner was handed the first learner\'s credential (same nonce) instead of one minted for them.'
         );
     }
 

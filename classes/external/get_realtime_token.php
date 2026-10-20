@@ -250,9 +250,11 @@ class get_realtime_token extends external_api {
             }
             $now = time();
             $header = self::b64url(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
+            // CONTRIB-10574 #340 (7.12.2): only the claims the proxy checks
+            // (services/xai_rt_proxy/worker.js reads exp, nbf, provider, nonce
+            // and voice). The token used to carry sub (the learner's user id)
+            // and courseid, which nothing read, in a URL the admin's proxy logs.
             $payload = self::b64url(json_encode([
-                'sub'      => (int)$USER->id,
-                'courseid' => (int)$params['courseid'],
                 'provider' => 'xai',
                 'voice'    => $cfg['voice'],
                 'iat'      => $now,

@@ -60,11 +60,12 @@ class synthesia_provider extends base_provider {
             $base . '/v2/agents/' . rawurlencode($agentid) . '/sessions',
             ['Authorization: ' . $this->cfg('api_key')],
             [
+                // CONTRIB-10574 #340 (7.12.2): no metadata block. It used to
+                // carry sola_user (the learner's Moodle user id) and sola_course,
+                // and nothing ever read either back: the session-ended webhook
+                // matches on the vendor's own session id. A user id sent for no
+                // purpose is personal data the vendor didn't need.
                 'language' => $context['lang'] ?? 'en',
-                'metadata' => [
-                    'sola_course' => (int) ($context['courseid'] ?? 0),
-                    'sola_user' => (int) ($context['userid'] ?? 0),
-                ],
                 'opening_line' => $context['greeting'] ?? '',
             ]
         );

@@ -31,7 +31,9 @@ defined('MOODLE_INTERNAL') || die();
  * @return bool
  */
 function xmldb_local_ai_course_assistant_upgrade($oldversion) {
-    global $DB;
+    // Every Moodle global a step reads is declared here. Step 2026100102 read $CFG without it, which on
+    // every site bound a null host id and claimed nothing (#339, reported from a Moodle 5.2.3 log); a test now scans this function for it.
+    global $DB, $CFG;
 
     $dbman = $DB->get_manager();
 
@@ -2039,33 +2041,11 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // data request. No account means an administrator or mailing
         // destination that is not a Moodle user, which is what the nullable
         // column is for.
-        $table = new xmldb_table('local_ai_course_assistant_email_optout');
-        if ($dbman->table_exists($table)) {
-            $sql = "SELECT o.id, MIN(u.id) AS userid, COUNT(u.id) AS matches
-                      FROM {local_ai_course_assistant_email_optout} o
-                      JOIN {user} u
-                        ON LOWER(u.email) = o.email
-                       AND u.deleted = 0
-                       AND u.mnethostid = :mnethostid
-                     WHERE o.userid IS NULL
-                  GROUP BY o.id";
-
-            $claimed = 0;
-            $rs = $DB->get_recordset_sql($sql, ['mnethostid' => $CFG->mnet_localhost_id]);
-            foreach ($rs as $row) {
-                if ((int) $row->matches !== 1) {
-                    // Ambiguous: leave it null rather than pick one.
-                    continue;
-                }
-                $DB->set_field('local_ai_course_assistant_email_optout',
-                    'userid', (int) $row->userid, ['id' => (int) $row->id]);
-                $claimed++;
-            }
-            $rs->close();
-
-            if ($claimed > 0) {
-                mtrace("SOLA: claimed {$claimed} email opt-out row(s) for their owner (#284).");
-            }
+        // email_optout::claim_owners() holds the rule and the query, so this step and the repair in 2026101902
+        // run the same code.
+        $claimed = \local_ai_course_assistant\email_optout::claim_owners();
+        if ($claimed > 0) {
+            mtrace("SOLA: claimed {$claimed} email opt-out row(s) for their owner (#284).");
         }
 
         upgrade_plugin_savepoint(true, 2026100102, 'local', 'ai_course_assistant');
@@ -2339,6 +2319,40 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         unset_config('prompt_budget_auto_tune', 'local_ai_course_assistant');
 
         upgrade_plugin_savepoint(true, 2026101803, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026101902) {
+        // Issue #339 (7.12.2): claim the email opt-outs again.
+        //
+        // Step 2026100102 reads the host id of this site from the config, and the function that holds it had not
+        // declared that global, so on every Moodle version the query bound a null host and matched no account (the reviewer's log happened to be from 5.2.3). A site that
+        // ran the step there passed its savepoint having claimed nothing, and that step will never run again.
+        // This one runs the same back-fill once more for every site that is below this build, whether it ran the
+        // old step with the null host or has not reached it yet. Only rows that still have no owner are looked
+        // at, a row with two live accounts behind its address stays unowned, and a repeat claims nothing.
+        $claimed = \local_ai_course_assistant\email_optout::claim_owners();
+        if ($claimed > 0) {
+            mtrace("SOLA: claimed {$claimed} email opt-out row(s) for their owner (#339).");
+        }
+
+        upgrade_plugin_savepoint(true, 2026101902, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026101903) {
+        // Issue #341 (7.12.2): course-level chunks (course and section summaries) indexed before this build can
+        // carry the summary of a hidden or restricted section, which every learner in the course could retrieve.
+        // The extractor now leaves those sections out, but an existing chunk would only be replaced by a clean
+        // reindex. Delete them and queue one rebuild per affected course: the nightly index only visits visible
+        // courses with an active enrolment, which would leave a shared supplemental course without its summaries.
+        // FAQ and activity chunks are untouched. A repeat deletes only what has been rebuilt since, which is
+        // already correct, and doesn't queue a course twice.
+        $reset = \local_ai_course_assistant\content_indexer::reset_course_level_chunks();
+        if ($reset['deleted'] > 0) {
+            mtrace("SOLA: removed {$reset['deleted']} course-level RAG chunk(s) for rebuilding (#341); "
+                . "queued {$reset['queued']} course rebuild(s).");
+        }
+
+        upgrade_plugin_savepoint(true, 2026101903, 'local', 'ai_course_assistant');
     }
 
     return true;

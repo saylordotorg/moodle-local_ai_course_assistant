@@ -171,6 +171,58 @@ class email_optout {
     }
 
     /**
+     * Give every unowned opt-out row an owner, where exactly one account holds its address.
+     *
+     * The back-fill behind upgrade steps 2026100102 and 2026101902 (issues #284 and #339). It applies the rule
+     * {@see resolve_userid()} applies to a new row: the address, lower-cased, belongs to exactly one account
+     * that is not deleted and sits on this site's mnet host. Two such accounts mean no single owner and no
+     * account means a mailing destination that is not a Moodle user; either way the row keeps its null owner.
+     *
+     * Only rows whose userid is still null are looked at, and a row is written only when it gains an owner, so
+     * a second run claims nothing and a row that already has an owner is never reassigned.
+     *
+     * Step 2026100102 once read the host id from $CFG without declaring it, which on every Moodle version bound a null
+     * and claimed nothing (#339). Both steps now call this, so the declaration lives in one place.
+     *
+     * @return int How many rows were given an owner.
+     */
+    public static function claim_owners(): int {
+        global $CFG, $DB;
+
+        if (!$DB->get_manager()->table_exists('local_ai_course_assistant_email_optout')) {
+            return 0;
+        }
+
+        $sql = "SELECT o.id, MIN(u.id) AS userid, COUNT(u.id) AS matches
+                  FROM {local_ai_course_assistant_email_optout} o
+                  JOIN {user} u
+                    ON LOWER(u.email) = o.email
+                   AND u.deleted = 0
+                   AND u.mnethostid = :mnethostid
+                 WHERE o.userid IS NULL
+              GROUP BY o.id";
+
+        $claimed = 0;
+        $rs = $DB->get_recordset_sql($sql, ['mnethostid' => $CFG->mnet_localhost_id]);
+        foreach ($rs as $row) {
+            if ((int) $row->matches !== 1) {
+                // Ambiguous: leave it null rather than pick one.
+                continue;
+            }
+            $DB->set_field(
+                'local_ai_course_assistant_email_optout',
+                'userid',
+                (int) $row->userid,
+                ['id' => (int) $row->id]
+            );
+            $claimed++;
+        }
+        $rs->close();
+
+        return $claimed;
+    }
+
+    /**
      * Mint an HMAC unsubscribe token. Validates back to (email, type) via
      * {@see verify()}. Same shape as digest_unsubscribe_token but keyed
      * on email + type, so it works for non-Moodle-user destinations too.

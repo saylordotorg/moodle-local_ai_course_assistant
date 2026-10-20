@@ -34,7 +34,25 @@ use local_ai_course_assistant\reminder_manager;
  * @copyright  2025 AI Course Assistant
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\core_userlist_provider, \core_privacy\local\request\plugin\provider {
+class provider implements
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\request\plugin\provider,
+    \core_privacy\local\request\user_preference_provider {
+    /**
+     * The plugin's user preferences, by name, with the suffix of their privacy string.
+     */
+    private const PREFERENCES = [
+        'local_ai_course_assistant_avatar' => 'avatar',
+        'local_ai_course_assistant_last_courseid' => 'last_courseid',
+        'local_ai_course_assistant_intro_dismissed' => 'intro_dismissed',
+        'aica_sola_consent_given' => 'consent_given',
+        'sola_outreach_milestones' => 'outreach_milestones',
+    ];
+
+    /** The per-course digest opt-in preference is this prefix followed by the course id. */
+    private const DIGEST_OPTIN_PREFIX = 'local_ai_course_assistant_digest_optin_';
+
     /**
      * Describe the type of data stored.
      *
@@ -324,24 +342,47 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         // forwards learner-authored content to the admin-configured AI provider
         // to generate tutoring responses; voice content to the configured speech
         // provider; and, when escalation is enabled, contact details to Zendesk.
+        //
+        // CONTRIB-10574 #340 (7.12.2): an audit of every outbound call found data
+        // these three sent that their fields didn't name. The AI provider also
+        // gets the learner's first name, the earlier turns, the saved goals,
+        // memory, profile and mastery (context_builder), essays and Soapbox
+        // transcripts and slides (score_essay, score_speech, slide vision) and
+        // the still frames of a Soapbox video (soapbox_gesture_vision). The voice
+        // provider also gets a whole Soapbox recording for transcription
+        // (soapbox_scorer) and, for live voice, the tutoring instructions built
+        // for the learner (get_realtime_token). Zendesk also gets the course name
+        // and the page the learner was on (zendesk_client::format_ticket_body).
         $collection->add_external_location_link('ai_provider', [
             'message' => 'privacy:metadata:ai_provider:message',
             'coursecontext' => 'privacy:metadata:ai_provider:coursecontext',
+            'firstname' => 'privacy:metadata:ai_provider:firstname',
+            'history' => 'privacy:metadata:ai_provider:history',
+            'learnerprofile' => 'privacy:metadata:ai_provider:learnerprofile',
+            'submission' => 'privacy:metadata:ai_provider:submission',
+            'videoframes' => 'privacy:metadata:ai_provider:videoframes',
+            'otherproviders' => 'privacy:metadata:ai_provider:otherproviders',
         ], 'privacy:metadata:ai_provider');
 
         $collection->add_external_location_link('voice_provider', [
             'audio' => 'privacy:metadata:voice_provider:audio',
             'text' => 'privacy:metadata:voice_provider:text',
+            'recording' => 'privacy:metadata:voice_provider:recording',
+            'instructions' => 'privacy:metadata:voice_provider:instructions',
+            'ipaddress' => 'privacy:metadata:voice_provider:ipaddress',
         ], 'privacy:metadata:voice_provider');
 
         $collection->add_external_location_link('zendesk', [
             'name' => 'privacy:metadata:zendesk:name',
             'email' => 'privacy:metadata:zendesk:email',
             'message' => 'privacy:metadata:zendesk:message',
+            'coursecontext' => 'privacy:metadata:zendesk:coursecontext',
+            'ticket' => 'privacy:metadata:zendesk:ticket',
         ], 'privacy:metadata:zendesk');
 
         $collection->add_external_location_link('radar_webhook', [
             'report' => 'privacy:metadata:radar_webhook:report',
+            'email' => 'privacy:metadata:radar_webhook:email',
         ], 'privacy:metadata:radar_webhook');
 
         // CONTRIB-10574 #271. The Python sandbox loads its runtime straight
@@ -356,7 +397,142 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             'useragent' => 'privacy:metadata:code_sandbox_runtime:useragent',
         ], 'privacy:metadata:code_sandbox_runtime');
 
+        // CONTRIB-10574 #340 (7.12.2). Every destination below was found by
+        // auditing each outbound call; tests/privacy/external_locations_test.php
+        // pins the list field by field and fails when a file starts calling out
+        // without being accounted for.
+        //
+        // Soapbox object storage (soapbox_storage): the browser PUTs the
+        // recording, the slide deck and the still-frame sheet to presigned URLs
+        // on the administrator's S3 bucket, and plays them back from it. Object
+        // keys are prefix/courseid/userid/random (make_object_key() and friends).
+        $collection->add_external_location_link('soapbox_storage', [
+            'recording' => 'privacy:metadata:soapbox_storage:recording',
+            'slidedeck' => 'privacy:metadata:soapbox_storage:slidedeck',
+            'frames' => 'privacy:metadata:soapbox_storage:frames',
+            'objectkey' => 'privacy:metadata:soapbox_storage:objectkey',
+            'ipaddress' => 'privacy:metadata:soapbox_storage:ipaddress',
+        ], 'privacy:metadata:soapbox_storage');
+
+        // WhatsApp reminders (reminder_manager::send_whatsapp_reminder()): the
+        // learner's number and the reminder text, to Twilio or to the generic
+        // provider at whatsapp_api_url.
+        $collection->add_external_location_link('whatsapp_delivery', [
+            'phonenumber' => 'privacy:metadata:whatsapp_delivery:phonenumber',
+            'message' => 'privacy:metadata:whatsapp_delivery:message',
+        ], 'privacy:metadata:whatsapp_delivery');
+
+        // Embedding and rerank service (rag_retriever, history_selector,
+        // voyage_reranker): may be a different vendor from the chat provider.
+        $collection->add_external_location_link('embedding_provider', [
+            'query' => 'privacy:metadata:embedding_provider:query',
+        ], 'privacy:metadata:embedding_provider');
+
+        // The Redash analytics export: redash_export.php is pulled by the
+        // configured analytics platform with a key, and redash_client pushes the
+        // Learning Radar question and answer to it.
+        $collection->add_external_location_link('analytics_export', [
+            'learner' => 'privacy:metadata:analytics_export:learner',
+            'usage' => 'privacy:metadata:analytics_export:usage',
+            'feedback' => 'privacy:metadata:analytics_export:feedback',
+            'survey' => 'privacy:metadata:analytics_export:survey',
+            'transcript' => 'privacy:metadata:analytics_export:transcript',
+            'radarreport' => 'privacy:metadata:analytics_export:radarreport',
+        ], 'privacy:metadata:analytics_export');
+
+        // Talking avatar vendors (D-ID, HeyGen, Tavus, Synthesia): the session
+        // runs in an iframe allowed the microphone and camera, so the learner's
+        // browser talks to the vendor directly.
+        $collection->add_external_location_link('talking_avatar', [
+            'audio' => 'privacy:metadata:talking_avatar:audio',
+            'video' => 'privacy:metadata:talking_avatar:video',
+            'ipaddress' => 'privacy:metadata:talking_avatar:ipaddress',
+        ], 'privacy:metadata:talking_avatar');
+
+        // Widget CDN mode (hook_callbacks, chat_widget.mustache): with cdn_url
+        // set, every learner's browser loads sola.min.js and sola.min.css from
+        // that location on each course page. Same reasoning as the sandbox
+        // runtime above. Off by default (cdn_url is empty).
+        $collection->add_external_location_link('widget_cdn', [
+            'ipaddress' => 'privacy:metadata:widget_cdn:ipaddress',
+            'useragent' => 'privacy:metadata:widget_cdn:useragent',
+        ], 'privacy:metadata:widget_cdn');
+
+        // Browser speech (speech.js, voice.js, soapbox.js, audio_player.js): when
+        // the browser's own recognition or voices are used, the browser vendor
+        // may process the audio or text on its servers. The plugin can't see or
+        // control that, but it chooses to use it, so it is declared.
+        $collection->add_external_location_link('browser_speech', [
+            'audio' => 'privacy:metadata:browser_speech:audio',
+            'text' => 'privacy:metadata:browser_speech:text',
+        ], 'privacy:metadata:browser_speech');
+
+        // Usability-testing external form (chat.js handleUserTesting): with
+        // usertesting_external_url set, the learner's browser opens that URL with
+        // {{userid}}, {{courseid}}, {{messages}} and {{session_minutes}} filled in.
+        $collection->add_external_location_link('usertesting_form', [
+            'userid' => 'privacy:metadata:usertesting_form:userid',
+            'courseid' => 'privacy:metadata:usertesting_form:courseid',
+            'usage' => 'privacy:metadata:usertesting_form:usage',
+        ], 'privacy:metadata:usertesting_form');
+
+        // The 'coreai' chat provider routes requests through Moodle's AI
+        // subsystem, which sends them on and keeps its own record.
+        $collection->add_subsystem_link('core_ai', [], 'privacy:metadata:core_ai');
+
+        // User preferences (save_avatar_preference, hook_callbacks,
+        // dismiss_intro, record_consent, set_digest_optin, digest_unsubscribe,
+        // settings_user.php). Exported by export_user_preferences().
+        foreach (self::PREFERENCES as $name => $stringid) {
+            $collection->add_user_preference($name, 'privacy:metadata:preference:' . $stringid);
+        }
+        $collection->add_user_preference(
+            self::DIGEST_OPTIN_PREFIX . 'COURSEID',
+            'privacy:metadata:preference:digest_optin'
+        );
+
         return $collection;
+    }
+
+    /**
+     * Export the plugin's user preferences that this user has set.
+     *
+     * @param int $userid The user whose preferences are exported.
+     * @return void
+     */
+    public static function export_user_preferences(int $userid) {
+        global $DB;
+        $component = 'local_ai_course_assistant';
+        foreach (self::PREFERENCES as $name => $stringid) {
+            $value = get_user_preferences($name, null, $userid);
+            if ($value === null) {
+                continue;
+            }
+            if ($name === 'aica_sola_consent_given' && is_numeric($value)) {
+                $value = transform::datetime((int) $value);
+            }
+            writer::export_user_preference(
+                $component,
+                $name,
+                $value,
+                get_string('privacy:metadata:preference:' . $stringid, $component)
+            );
+        }
+        $rows = $DB->get_records_select(
+            'user_preferences',
+            'userid = :userid AND ' . $DB->sql_like('name', ':prefix'),
+            ['userid' => $userid, 'prefix' => $DB->sql_like_escape(self::DIGEST_OPTIN_PREFIX) . '%'],
+            'name ASC',
+            'id, name, value'
+        );
+        foreach ($rows as $row) {
+            writer::export_user_preference(
+                $component,
+                $row->name,
+                $row->value,
+                get_string('privacy:metadata:preference:digest_optin', $component)
+            );
+        }
     }
 
     /**

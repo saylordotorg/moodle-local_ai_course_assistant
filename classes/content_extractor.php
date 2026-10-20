@@ -131,6 +131,15 @@ TXT;
         // a retrieved chunk still says which part of the course it came from.
         $modinfo = get_fast_modinfo($courseid);
         foreach ($modinfo->get_section_info_all() as $section) {
+            // Issue #341: a hidden section, or one behind an access restriction, is left out (summary and
+            // title). This document has no cmid, so retrieval can't tell which section a passage came from
+            // and filter it per learner; the scheduled indexer runs as an administrator, so without this a
+            // hidden section's text reached every learner in the course. The safe trade: a learner who meets
+            // a restriction also loses that section's summary here. Its activities are still indexed and
+            // filtered per learner by rag_visibility.
+            if (!self::section_open_to_everyone($section)) {
+                continue;
+            }
             $summary = trim(html_to_text((string) ($section->summary ?? ''), 0, false));
             if ($summary === '') {
                 continue;
@@ -155,6 +164,65 @@ TXT;
             'section' => '',
             'text'    => $text,
         ];
+    }
+
+    /**
+     * Whether a section is shown to every learner: not hidden and not behind a restriction.
+     *
+     * A delegated section (a subsection, Moodle 4.5+) also inherits hiding and restrictions from the
+     * course module that delegates it and from that module's own section, so those are checked too.
+     *
+     * @param \section_info $section
+     * @param int $depth Recursion guard for nested delegation.
+     * @return bool
+     */
+    private static function section_open_to_everyone(\section_info $section, int $depth = 0): bool {
+        if (!$section->visible || self::has_access_restriction($section->availability ?? null)) {
+            return false;
+        }
+        if (!method_exists($section, 'is_delegated') || !$section->is_delegated()) {
+            return true;
+        }
+        if ($depth >= 5) {
+            return false;
+        }
+        try {
+            $delegate = $section->get_component_instance();
+            if (!$delegate instanceof \core_courseformat\sectiondelegatemodule) {
+                // A delegate of a kind we can't inspect: fail closed.
+                return false;
+            }
+            $cm = $delegate->get_cm();
+            $parent = $delegate->get_parent_section();
+        } catch (\Throwable $e) {
+            return false;
+        }
+        if (!$cm->visible || self::has_access_restriction($cm->availability ?? null) || $parent === null) {
+            return false;
+        }
+        return self::section_open_to_everyone($parent, $depth + 1);
+    }
+
+    /**
+     * Whether a section's stored availability JSON restricts access at all.
+     *
+     * Empty, or a tree with no conditions (what the editor can leave behind once every
+     * restriction is removed), is no restriction. Anything else, unreadable JSON included,
+     * counts as restricted: this decides whether text is shown to everyone, so it fails closed.
+     *
+     * @param string|null $availability The section's availability column.
+     * @return bool
+     */
+    private static function has_access_restriction(?string $availability): bool {
+        $raw = trim((string) $availability);
+        if ($raw === '') {
+            return false;
+        }
+        $tree = json_decode($raw, true);
+        if (!is_array($tree)) {
+            return true;
+        }
+        return !empty($tree['c']);
     }
 
     /**
@@ -323,7 +391,20 @@ TXT;
                 return self::extract_book($instance, $courseid, $DB);
 
             case 'assign':
-                $record = $DB->get_record('assign', ['id' => $instance, 'course' => $courseid], 'intro, introformat');
+                $record = $DB->get_record(
+                    'assign',
+                    ['id' => $instance, 'course' => $courseid],
+                    'intro, introformat, alwaysshowdescription, allowsubmissionsfromdate'
+                );
+                // Issue #341: an assignment set to show its description only from the submission date hides it from
+                // learners until then, though the activity itself is visible. Not indexed until that date; the next
+                // index after it sees new text (a new content hash) and adds it.
+                if (
+                    $record && empty($record->alwaysshowdescription)
+                    && (int) $record->allowsubmissionsfromdate > time()
+                ) {
+                    return '';
+                }
                 if ($record && !empty($record->intro)) {
                     return self::clean_html($record->intro, $record->introformat);
                 }

@@ -1768,21 +1768,15 @@ $string['settings:max_content_per_resource_desc'] = 'Iye àmì àkóónú tí ó
 $string['settings:max_total_content'] = 'Àkóónú gbogbogbò tí ó pọ̀ jùlọ (àmì)';
 $string['settings:max_total_content_desc'] = 'Iye àmì àkóónú ìdálẹ́kọ̀ọ́ gbogbogbò tí ó pọ̀ jùlọ tí a fi sínú àṣẹ ẹ̀rọ. Iye kékeré ń dín ìwọ̀n àṣẹ kù kí ó sì mú ìdáhùn yára.';
 $string['settings:spend_guard_heading'] = 'Ààbò ìnáwó àti olùtúnṣe';
-$string['settings:spend_guard_heading_desc'] = 'Gbé àwọn ààlà ìnáwó LLM kalẹ̀ fún àsìkò kọ̀ọ̀kan. Nígbà tí a dé ààlà, [[tutorshort]] ń dá àwọn ìbéèrè dúró tàbí ó ń yíjú sí olùpèsè tí ó tọ́ láti inú ẹ̀wọ̀n ìdúró rẹ. Wo <a href="{$a}">ojú ìwé ìnáwó tokens</a> fún ipò ìnáwó lọ́wọ́lọ́wọ́ àti àwọn ìmọ̀ràn olùtúnṣe.';
 $string['settings:spend_cap_period'] = 'Àsìkò ààlà ìnáwó';
 $string['settings:spend_cap_period_desc'] = 'Ìgbà mélòó ni a tún ààlà ìnáwó bẹ̀rẹ̀. Ó bá kàlẹ́ndà mu: tí oṣù ń bẹ̀rẹ̀ ní ọjọ́ 1, tí ọ̀sẹ̀ ní Mọ́ńdè, àti tí ọjọ́ ní ọ̀gànjọ́.';
 $string['settings:spend_cap_site'] = 'Ààlà ìnáwó fún gbogbo ojúlé (USD)';
-$string['settings:spend_cap_site_desc'] = 'Ààlà àpapọ̀ ní USD fún gbogbo ìdálẹ́kọ̀ọ́ àti agbára nínú àsìkò lọ́wọ́lọ́wọ́. <code>0</code> = kò ní ààlà. Àwọn ààlà agbára kọ̀ọ̀kan nísàlẹ̀ ni ó ní ipò kìíní bí a bá gbé wọn kalẹ̀.';
 $string['settings:spend_cap_chat'] = 'Ààlà ìjíròrò (USD)';
-$string['settings:spend_cap_chat_desc'] = 'Ààlà fún ìjíròrò àti ìdánwò akẹ́kọ̀ọ́ nìkan. <code>0</code> = a ń lo ààlà gbogbo ojúlé.';
 $string['settings:spend_cap_voice'] = 'Ààlà ohùn (USD)';
 $string['settings:spend_cap_voice_desc'] = 'Ààlà fún ohùn (Realtime + TTS + STT). Ohùn ni ó sábà jẹ́ ìnáwó tí ó tóbi jùlọ — há a kọ́kọ́.';
 $string['settings:spend_cap_rag'] = 'Ààlà RAG (USD)';
-$string['settings:spend_cap_rag_desc'] = 'Ààlà fún àwọn ìpè embedding tí ó ṣẹlẹ̀ nígbà tí a ń tọ́jú àkọsílẹ̀ ìdálẹ́kọ̀ọ́.';
 $string['settings:spend_cap_analytics'] = 'Ààlà ìtúpalẹ̀ (USD)';
-$string['settings:spend_cap_analytics_desc'] = 'Ààlà fún àwọn ìbéèrè Learning Radar ti àwọn olùṣàkóso.';
 $string['settings:spend_failover_chain'] = 'Ẹ̀wọ̀n ìdúró';
-$string['settings:spend_failover_chain_desc'] = 'Nígbà tí a dé ààlà, [[tutorshort]] ń dán àwọn olùpèsè wọ̀nyí wò lẹ́sẹẹsẹ. Àkọsílẹ̀ kan ní ìlà kọ̀ọ̀kan, ní ìrísí <code>capability:label</code>. Àwọn àmì ń tọ́ka sí àkọsílẹ̀ nínú Àwọn olùpèsè àti kọ́kọ́rọ́ (fún <code>chat</code> / <code>analytics</code>) tàbí Àwọn olùpèsè ohùn (fún <code>voice</code>). Àwọn ìlà tí ó bẹ̀rẹ̀ pẹ̀lú <code>#</code> jẹ́ àlàyé. Àpẹẹrẹ:<br><code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>';
 $string['settings:failover_per_call_enabled'] = 'Yíjú sí ìdúró ní ìpè kọ̀ọ̀kan (v5.5.0)';
 $string['settings:failover_per_call_enabled_desc'] = 'Nígbà tí a ṣí i, ìpè ìjíròrò kọ̀ọ̀kan ń fi olùpèsè àkọ́kọ́ sínú ìdìpọ̀ ẹ̀wọ̀n ìdúró. Bí àsìkò bá tán nínú ìpè kan tàbí àṣìṣe 5xx bá ṣẹlẹ̀, [[tutorshort]] ń yíjú sí àkọsílẹ̀ tí ó tẹ̀lé nínú <strong>ẹ̀wọ̀n ìdúró</strong> lókè kí ó sì ṣí ìdìmọ́ ìṣẹ́jú 15 fún olùpèsè tí ó kùnà. Ìyípadà kọ̀ọ̀kan ń kọ ìlà àyẹ̀wò (<code>failover_fallthrough</code>); lẹ́yìn tí o ṣí i, wo Ìṣàkóso -> [[tutorshort]] -> Àkọsílẹ̀ àyẹ̀wò láti fi ìdí rẹ̀ múlẹ̀ pé ẹ̀wọ̀n ń ṣiṣẹ́. A pa á ní àbáyanjẹ; ṣí i kìkì lẹ́yìn tí a ti fọwọ́sí ẹ̀wọ̀n náà àti tí ilé-ẹ̀kọ́ rẹ ti fi ìdí rẹ̀ múlẹ̀ pé àwọn àdéhùn ṣíṣe àkọsílẹ̀ tí a nílò wà fún olùpèsè kọ̀ọ̀kan nínú ẹ̀wọ̀n náà.';
 $string['settings:failover_timeout_chat'] = 'Ìdúró: àsìkò ìdúró ìjíròrò (ìṣẹ́jú-àáyá)';
@@ -2782,7 +2776,6 @@ $string['settings:radar_batch_enabled'] = 'Fi àwọn ìjábọ̀ tí a ṣètò
 $string['settings:radar_batch_enabled_desc'] = 'Ó wà ní pípa ní ìbẹ̀rẹ̀. Nígbà tí ó bá ṣiṣẹ́, a ó fi ìjábọ̀ tí a ṣètò kọ̀ọ̀kan ránṣẹ́ ní iye owó batch, a ó sì gbé e wá nígbà tí olùpèsè bá parí rẹ̀, èyí tí ó lè jẹ́ àkókò yòówù nínú wákàtí 24; ètò náà yóò fi ipò "a ti fi ránṣẹ́" hàn títí di ìgbà náà. Àwọn ètò tí olùpèsè wọn kò ní ìpele batch yóò máa ṣiṣẹ́ ní ọ̀nà tààrà, nítorí náà a kì í pàdánù ìjábọ̀ kankan nítorí ìṣètò yìí. Pípa á yóò dá gbogbo ètò padà sí ọ̀nà tààrà ní ìṣiṣẹ́ tó kàn, a ó sì ṣì kó batch yòówù tí ó wà lọ́nà jọ, a ó sì gbé e wá.';
 $string['settings:radar_batch_heading'] = 'Learning Radar: ìpele batch aláìtààrà';
 $string['settings:radar_batch_heading_desc'] = 'A lè fi àwọn ìjábọ̀ Learning Radar tí a ṣètò ránṣẹ́ sí ìpele batch aláìtààrà ti olùpèsè AI, èyí tí ó ń ná 50% kéré sí i lórí àwọn token ìwọlé àti ìjáde, ní pàṣípààrọ̀ fún ìdáhùn tí ó lè gba tó wákàtí 24. Àwọn ìjábọ̀ TÍ A ṢÈTÒ nìkan ni ó tóótun: Learning Radar ojú-ẹsẹ̀ tí o ń ṣe láti ojú-ìwé yìí ń tú ìdáhùn rẹ̀ jáde sí aṣàwákiri rẹ, ó sì máa ń wà ní ọ̀nà tààrà nígbà gbogbo, bákan náà ni gbogbo ẹ̀ya tí ó dojú kọ akẹ́kọ̀ọ́. A ń ṣàkọsílẹ̀ ìnáwó batch lórí orúkọ àwòṣe kan tí ó ní <code>batch/</code> ní ìbẹ̀rẹ̀ rẹ̀, nítorí náà dashboard AI Spend ń fi iye owó tí a dín kù hàn dípò iye owó àkọsílẹ̀.';
-$string['settings:soapbox_deprecated_inuse'] = 'A ti kọ Soapbox sílẹ̀. PresenterAI ni ó ń rọ́pò rẹ̀, plugin iṣẹ́ Moodle ọ̀tọ̀ kan tí ó ń ṣe gbogbo ohun tí Soapbox ń ṣe, tí ó ń farahàn nínú aṣàyàn iṣẹ́, tí ó sì ń jẹ́ kí o yàn láàrin bọ́kẹ́tì S3 àti ibi ìpamọ́ fáìlì tí Moodle fúnra rẹ̀, àti láàrin Moodle core AI àti Claude, OpenAI tàbí Gemini tí a ṣètò tààrà. Kò sí ohun tí ó yípadà nínú ìtúsílẹ̀ yìí: àwọn iṣẹ́-àyànfúnni rẹ, àwọn ìgbàsílẹ̀, àwọn àkọsílẹ̀ ọ̀rọ̀, àwọn àmì àti èsì rẹ kò yí padà, ìṣètò pípamọ́ ṣì ń ṣiṣẹ́ gẹ́gẹ́ bí ti tẹ́lẹ̀ gan-an, iṣẹ́ ìwẹ̀nùmọ́ ojoojúmọ́ sì ṣì ń ṣiṣẹ́. A ti ṣètò láti yọ kóòdù náà kúrò ní v8.0.0, kò sì sí ìtúsílẹ̀ tí yóò yọ ọ́ kúrò títí tí PresenterAI yóò fi lè gbé àwọn ìgbàsílẹ̀ àti àmì tí ó ti wà wọlé. A ó sọ àwọn tábìlì database nù ní ọ̀tọ̀ àti lẹ́yìn náà, nítorí Soapbox kì í kọ ìwọlé gradebook kankan, nítorí náà àwọn tábìlì wọ̀nyí nìkan ni ẹ̀dà àkọsílẹ̀ ìgbékalẹ̀ akẹ́kọ̀ọ́ kan. Ohun tí o gbọ́dọ̀ ṣe: dá kíkọ́ àwọn ẹ̀kọ́ tuntun lórí Soapbox dúró báyìí, fi PresenterAI sí i lẹ́gbẹ̀ẹ́ rẹ̀ nígbà tí a bá tú u sílẹ̀ kí o sì lò ó fún iṣẹ́ tuntun, kí o sì fi àwọn ẹ̀kọ́ Soapbox tí o ti ní sílẹ̀ kí wọ́n máa ṣiṣẹ́ títí tí ìgbéwọlé yóò fi wà. Kò pọn dandan kí o sọ ohunkóhun fún àwọn akẹ́kọ̀ọ́ rẹ síbẹ̀.';
 $string['settings:soapbox_deprecated_off'] = 'A ti kọ Soapbox sílẹ̀, a kò sì mú un ṣiṣẹ́ níbikíbi lórí ojú-òpó yìí. Fi sílẹ̀ ní pípa. PresenterAI ni ó ń rọ́pò rẹ̀, plugin iṣẹ́ Moodle ọ̀tọ̀ kan tí ó ń ṣe iṣẹ́ kan náà pẹ̀lú àṣàyàn ibi ìpamọ́ àti olùpèsè AI. A ti ṣètò láti yọ kóòdù náà kúrò ní v8.0.0.';
 $string['survey_admin:add_option'] = '+ Fi àṣàyàn kún';
 $string['survey_admin:add_question'] = '+ Fi ìbéèrè kún';
@@ -2926,7 +2919,6 @@ $string['settingspage:reset_prompt_template'] = 'Tún padà sí àwòṣe àìp�
 $string['settingspage:token_analytics_blurb'] = 'Ṣọ́ ìlò token àti àwọn ìnáwó kọjá àwọn kọ́ọ̀sì àti àwọn olùpèsè.';
 $string['settingspage:token_analytics_link'] = 'Wo Analytics Token';
 $string['settingspage:token_analytics_title'] = 'Iye-owó Token àti Analytics';
-$string['soapbox:assign_deprecated'] = 'PresenterAI ń rọ́pò Soapbox, iṣẹ́ ọ̀tọ̀ tí yóò farahàn nínú àṣàyàn iṣẹ́. Àwọn iṣẹ́-àyànfúnni rẹ, àti àwọn àkọsílẹ̀ ohùn, àmì àti èsì àwọn akẹ́kọ̀ọ́ rẹ, kò ní ipa kankan, wọ́n sì ń bá iṣẹ́ wọn lọ. Kò sí ohun tí o ní láti ṣe lónìí. Nígbà tí a bá tú PresenterAI síta, kọ́ àwọn iṣẹ́ ìgbékalẹ̀ tuntun síbẹ̀ dípò níbí. Kò sí ohun tí o gbọ́dọ̀ sọ fún àwọn akẹ́kọ̀ọ́ rẹ ná.';
 $string['task:collect_meta_ai_batches'] = 'Kó àwọn ìròyìn ìdìpọ̀ Learning Radar tí ó ti parí jọ';
 $string['modelregistry:col_eol'] = 'Òpin ìgbà ìlò';
 $string['modelregistry:drift_eol_horizon'] = 'A ń ròyìn àwọn ìfẹ̀yìntì tí a kéde láàrin ọjọ́ {$a}.';

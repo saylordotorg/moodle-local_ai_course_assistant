@@ -1741,21 +1741,15 @@ $string['settings:max_content_per_resource_desc'] = 'Her sayfadan veya kitap bö
 $string['settings:max_total_content'] = 'En fazla toplam içerik (karakter)';
 $string['settings:max_total_content_desc'] = 'Sistem istemine eklenen ders içeriğinin en fazla toplam karakter sayısı. Düşük değerler istem boyutunu küçültür ve yanıtları hızlandırır.';
 $string['settings:spend_guard_heading'] = 'Harcama koruması ve iyileştirici';
-$string['settings:spend_guard_heading_desc'] = 'Dönem başına LLM harcama sınırları belirleyin. Bir sınıra ulaşıldığında [[tutorshort]] istekleri askıya alır veya yedek zincirinizdeki daha ucuz bir sağlayıcıya geçer. Güncel harcama durumu ve iyileştirici önerileri için <a href="{$a}">Token maliyeti sayfasına</a> bakın.';
 $string['settings:spend_cap_period'] = 'Harcama sınırı dönemi';
 $string['settings:spend_cap_period_desc'] = 'Harcama sınırının ne sıklıkla sıfırlanacağı. Takvimle hizalıdır: aylık ayın 1\'inde, haftalık pazartesi, günlük gece yarısı başlar.';
 $string['settings:spend_cap_site'] = 'Site geneli harcama sınırı (USD)';
-$string['settings:spend_cap_site_desc'] = 'Geçerli dönemde tüm dersler ve özellikler için toplam USD sınırı. <code>0</code> = sınırsız. Aşağıdaki özellik bazlı sınırlar, ayarlandıklarında önceliklidir.';
 $string['settings:spend_cap_chat'] = 'Sohbet sınırı (USD)';
-$string['settings:spend_cap_chat_desc'] = 'Yalnızca öğrenci sohbeti ve sınavları için sınır. <code>0</code> = site geneli sınır kullanılır.';
 $string['settings:spend_cap_voice'] = 'Ses sınırı (USD)';
 $string['settings:spend_cap_voice_desc'] = 'Ses için sınır (Realtime + TTS + STT). Ses genellikle en büyük gider kalemidir — önce onu sınırlayın.';
 $string['settings:spend_cap_rag'] = 'RAG sınırı (USD)';
-$string['settings:spend_cap_rag_desc'] = 'Ders dizinleme sırasında yapılan gömme çağrıları için sınır.';
 $string['settings:spend_cap_analytics'] = 'Analitik sınırı (USD)';
-$string['settings:spend_cap_analytics_desc'] = 'Yönetici Learning Radar sorguları için sınır.';
 $string['settings:spend_failover_chain'] = 'Yedek zinciri';
-$string['settings:spend_failover_chain_desc'] = 'Bir sınıra ulaşıldığında [[tutorshort]] bu sağlayıcıları sırayla dener. Her satırda bir kayıt, <code>capability:label</code> biçiminde. Etiketler, Sağlayıcılar ve anahtarlar tablosundaki (<code>chat</code> / <code>analytics</code> için) ya da Ses sağlayıcılarındaki (<code>voice</code> için) kayıtlara karşılık gelir. <code>#</code> ile başlayan satırlar açıklamadır. Örnek:<br><code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>';
 $string['settings:failover_per_call_enabled'] = 'Çağrı başına yedeğe geçiş (v5.5.0)';
 $string['settings:failover_per_call_enabled_desc'] = 'Açıkken her sohbet çağrısı, birincil sağlayıcıyı bir yedek zinciri sarmalayıcısıyla kuşatır. Bir çağrıda zaman aşımı ya da 5xx hatası oluşursa [[tutorshort]] yukarıdaki <strong>yedek zincirindeki</strong> bir sonraki kayda geçer ve başarısız olan sağlayıcı için 15 dakikalık bir devre açar. Her geçiş bir denetim satırı yazar (<code>failover_fallthrough</code>); açtıktan sonra zincirin çalıştığını doğrulamak için Yönetim -> [[tutorshort]] -> Denetim günlüğü sayfasına bakın. Varsayılan olarak kapalıdır; yalnızca zincir doğrulandıktan ve kurumunuz zincirdeki her sağlayıcı için gerekli veri işleme sözleşmelerinin bulunduğunu onayladıktan sonra açın.';
 $string['settings:failover_timeout_chat'] = 'Yedeğe geçiş: sohbet zaman aşımı (saniye)';
@@ -2762,7 +2756,6 @@ $string['settings:radar_batch_enabled'] = 'Zamanlanmış raporları toplu iş ka
 $string['settings:radar_batch_enabled_desc'] = 'Varsayılan olarak kapalıdır. Açıkken her zamanlanmış rapor toplu iş ücretiyle gönderilir ve sağlayıcı tamamladığında, yani 24 saat içinde herhangi bir anda teslim edilir; o ana kadar zamanlama "gönderildi" durumunu gösterir. Sağlayıcısında toplu iş katmanı bulunmayan zamanlamalar eşzamanlı çalışmayı sürdürür, bu nedenle bu ayar yüzünden hiçbir rapor kaybolmaz. Ayarı kapatmak, bir sonraki çalıştırmada her zamanlamayı eşzamanlı yola döndürür; hâlâ işlemde olan toplu işler ise yine toplanıp teslim edilir.';
 $string['settings:radar_batch_heading'] = 'Öğrenme Radarı: çevrimdışı toplu iş katmanı';
 $string['settings:radar_batch_heading_desc'] = 'Zamanlanmış Öğrenme Radarı raporları, AI sağlayıcısının çevrimdışı toplu iş katmanına gönderilebilir; bu katman hem girdi hem çıktı jetonlarında %50 daha ucuzdur ve karşılığında 24 saate varan bir bekleme süresi ister. Yalnızca ZAMANLANMIŞ raporlar uygundur: bu sayfadan çalıştırdığınız anlık Öğrenme Radarı yanıtını tarayıcınıza akıtır ve her zaman eşzamanlı kalır; öğrenene dönük her özellik de öyle. Toplu iş harcaması <code>batch/</code> önekli bir model adına kaydedilir, böylece AI Harcama panosu liste fiyatı yerine indirimli oranı gösterir.';
-$string['settings:soapbox_deprecated_inuse'] = 'Soapbox kullanımdan kaldırıldı. Yerini PresenterAI alıyor; bu, Soapbox\'ın yaptığı her şeyi yapan, etkinlik seçicide görünen ve bir S3 klasörü ile Moodle\'ın kendi dosya depolaması arasında, ayrıca Moodle çekirdek AI ile doğrudan yapılandırılan Claude, OpenAI veya Gemini arasında seçim yapmanıza olanak veren ayrı bir Moodle etkinlik eklentisidir. Bu sürümde hiçbir şey değişmiyor: ödevleriniz, kayıtlarınız, yazıya dökümleriniz, puanlarınız ve geri bildirimleriniz olduğu gibi kalır, saklama ayarı tam olarak eskisi gibi geçerlidir ve günlük temizlik görevi çalışmayı sürdürür. Kodun v8.0.0 sürümünde kaldırılması planlanıyor ve PresenterAI mevcut kayıtları ile puanları içe aktarabilene kadar hiçbir sürüm onu kaldırmayacak. Veritabanı tabloları ayrıca ve daha sonra silinir, çünkü Soapbox not defterine hiçbir kayıt yazmaz; dolayısıyla bu tablolar bir öğrenenin sunum kaydının tek kopyasıdır. Yapmanız gerekenler: Soapbox üzerine yeni ders kurmayı şimdi bırakın, PresenterAI yayımlandığında onu Soapbox\'ın yanına kurun ve yeni çalışmalarınızda kullanın, mevcut Soapbox derslerinizi ise içe aktarma hazır olana kadar çalışır durumda bırakın. Öğrenenlerinize henüz bir şey söylemeniz gerekmiyor.';
 $string['settings:soapbox_deprecated_off'] = 'Soapbox kullanımdan kaldırıldı ve bu sitede hiçbir yerde açık değil. Kapalı bırakın. Yerini PresenterAI alıyor; bu, aynı işi depolama ve AI sağlayıcısı seçenekleriyle yapan ayrı bir Moodle etkinlik eklentisidir. Kodun v8.0.0 sürümünde kaldırılması planlanıyor.';
 $string['survey_admin:add_option'] = '+ Seçenek ekle';
 $string['survey_admin:add_question'] = '+ Soru ekle';
@@ -2906,7 +2899,6 @@ $string['settingspage:reset_prompt_template'] = 'Varsayılan şablona sıfırla'
 $string['settingspage:token_analytics_blurb'] = 'Dersler ve sağlayıcılar genelinde jeton kullanımını ve maliyetleri izleyin.';
 $string['settingspage:token_analytics_link'] = 'Jeton analizlerini görüntüle';
 $string['settingspage:token_analytics_title'] = 'Jeton Maliyeti ve Analizler';
-$string['soapbox:assign_deprecated'] = 'Soapbox\'ın yerini, etkinlik seçicide görünecek ayrı bir etkinlik olan PresenterAI alıyor. Ödevleriniz ile öğrenenlerinizin kayıtları, puanları ve geri bildirimleri bundan etkilenmez ve çalışmaya devam eder. Bugün yapmanız gereken bir şey yok. PresenterAI yayımlandığında yeni sunum çalışmalarını burada değil orada oluşturun. Öğrenenlerinize şimdilik bir şey söylemenize gerek yok.';
 $string['task:collect_meta_ai_batches'] = 'Tamamlanan Öğrenme Radarı toplu raporlarını topla';
 $string['modelregistry:col_eol'] = 'Ömür sonu';
 $string['modelregistry:drift_eol_horizon'] = '{$a} gün içindeki duyurulmuş emeklilikler bildiriliyor.';

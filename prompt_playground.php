@@ -86,11 +86,14 @@ if ($go && $courseid > 0) {
     if ($livemode) {
         try {
             $topk = (int) (get_config('local_ai_course_assistant', 'rag_topk') ?: 5);
+            // Unfiltered on purpose: this administrator page shows what the
+            // index holds and which chunks win, hidden activities included.
             $chunks = \local_ai_course_assistant\rag_retriever::retrieve(
                 $courseid,
                 $query,
                 $topk,
-                $pageid
+                $pageid,
+                \local_ai_course_assistant\rag_retriever::UNFILTERED
             );
         } catch (\Throwable $e) {
             $ragerror = $e->getMessage();

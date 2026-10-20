@@ -1433,7 +1433,14 @@ function local_ai_course_assistant_ragbench_judge_arm(array $qitems, int $topk, 
     $scored = 0;
     $errors = 0;
     foreach ($qitems as $q) {
-        $res = \local_ai_course_assistant\rag_retriever::retrieve($q['courseid'], $q['question'], $topk, 0);
+        // Unfiltered on purpose: a CLI run has no learner, and recall is measured over the whole index.
+        $res = \local_ai_course_assistant\rag_retriever::retrieve(
+            $q['courseid'],
+            $q['question'],
+            $topk,
+            0,
+            \local_ai_course_assistant\rag_retriever::UNFILTERED
+        );
         $passages = array_map(fn($r) => (string) $r['content'], $res);
         if (empty($passages)) {
             // Retrieval returned nothing -> zero relevance for this question.
