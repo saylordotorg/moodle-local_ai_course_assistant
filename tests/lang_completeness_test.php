@@ -367,6 +367,11 @@ final class lang_completeness_test extends \basic_testcase {
         'privacy:metadata:preference:intro_dismissed',
         'privacy:metadata:preference:last_courseid',
         'privacy:metadata:preference:outreach_milestones',
+        // And the usability-testing form (7.12.2 fix round 2). Same ruling.
+        'privacy:metadata:usertesting_form',
+        'privacy:metadata:usertesting_form:courseid',
+        'privacy:metadata:usertesting_form:usage',
+        'privacy:metadata:usertesting_form:userid',
     ];
 
     /**

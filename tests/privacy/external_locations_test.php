@@ -31,6 +31,12 @@ use core_privacy\local\metadata\types\subsystem_link;
  * file pins the full list, field by field, and the guard at the bottom fails
  * when a file starts calling out without saying where its data goes.
  *
+ * Limits of the guards: they work per file, so a new outbound call in a file
+ * that is already listed passes (re-read the reason when you edit one); inline
+ * <script> blocks printed by top-level PHP pages (talking_avatar_viewer.php) are
+ * not scanned as browser code; speechSynthesis is not a pattern (read-aloud is
+ * declared under browser_speech by hand); and see the per-scan notes below.
+ *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -62,6 +68,7 @@ final class external_locations_test extends \advanced_testcase {
         'talking_avatar' => ['audio', 'video', 'ipaddress'],
         'widget_cdn' => ['ipaddress', 'useragent'],
         'browser_speech' => ['audio', 'text'],
+        'usertesting_form' => ['userid', 'courseid', 'usage'],
     ];
 
     /**
@@ -128,10 +135,14 @@ final class external_locations_test extends \advanced_testcase {
      * as the PHP allowlist: "declared:<link>" or "not personal: <why>".
      */
     private const BROWSER_ALLOWLIST = [
+        'amd/src/chat.js' => 'declared:usertesting_form',
+        'amd/src/learning_radar.js' => 'not personal: opens the Redash query staff just created, in a new tab',
         'amd/src/realtime.js' => 'declared:voice_provider',
+        'amd/src/rubric_admin.js' => 'not personal: goes to a sample-rubric page of this site chosen from a select',
         'amd/src/sandbox.js' => 'declared:code_sandbox_runtime',
-        'amd/src/soapbox.js' => 'declared:browser_speech',
+        'amd/src/soapbox.js' => 'declared:browser_speech,soapbox_storage',
         'amd/src/speech.js' => 'declared:browser_speech',
+        'amd/src/student_mode.js' => 'not personal: reloads the current page of this site with a query flag',
         'amd/src/ui.js' => 'declared:talking_avatar',
         'amd/src/voice.js' => 'declared:browser_speech',
         'templates/chat_widget.mustache' => 'declared:widget_cdn',
@@ -141,13 +152,18 @@ final class external_locations_test extends \advanced_testcase {
      * JavaScript (comments stripped) that opens a connection or loads code from elsewhere.
      *
      * Not seen: a fetch() or XMLHttpRequest to a URL held in a variable, such as
-     * the presigned S3 upload in soapbox.js (declared as soapbox_storage).
+     * the presigned S3 upload in soapbox.js (declared as soapbox_storage). A
+     * navigation to a site-relative literal ('/local/...') isn't flagged.
      */
     private const JS_PATTERNS = [
         '/new\s+WebSocket\s*\(/',
         '/createElement\s*\(\s*[\'"](?:script|iframe)[\'"]/i',
         '/SpeechRecognition/',
         '/(?:fetch\s*\(|\.src\s*=|\.open\s*\()\s*(?:[\'"\x60][A-Z]+[\'"\x60]\s*,\s*)?[\'"\x60](?:https?|wss?):\/\//i',
+        // A new window or a navigation to a URL the code builds: it may carry data.
+        '/\bwindow\.open\s*\(\s*+(?![\'"\x60])\S/',
+        '/\blocation\.href\s*=(?!=)\s*+(?![\'"\x60]\/(?!\/))/',
+        '/\blocation\.(?:assign|replace)\s*\(\s*+(?![\'"\x60]\/(?!\/))/',
     ];
 
     /**
@@ -461,6 +477,14 @@ final class external_locations_test extends \advanced_testcase {
         $this->assertTrue(self::template_calls_out("<script src=\"{{cdn_js_url}}\" defer></script>\n"));
         $this->assertTrue(self::template_calls_out("<link rel=\"stylesheet\" href=\"https://cdn.example/x.css\" />\n"));
         $this->assertTrue(self::template_calls_out("<iframe src=\"{{url}}\"></iframe>\n"));
+        $this->assertTrue(self::js_calls_out("window.open(url, '_blank');\n"));
+        $this->assertFalse(self::js_calls_out("window.open('/local/x.php', '_blank');\n"));
+        $this->assertTrue(self::js_calls_out("window.location.href = base + '?a=' + id;\n"));
+        $this->assertTrue(self::js_calls_out("location.href = 'https://example.com/?u=1';\n"));
+        $this->assertFalse(self::js_calls_out("var here = window.location.href;\nif (location.href == x) {}\n"));
+        $this->assertFalse(self::js_calls_out("window.location.href = '/local/ai_course_assistant/x.php';\n"));
+        $this->assertTrue(self::js_calls_out("window.location.assign(target);\n"));
+        $this->assertTrue(self::js_calls_out("location.replace('//evil.example/x');\n"));
     }
 
     /**

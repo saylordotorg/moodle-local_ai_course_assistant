@@ -467,6 +467,15 @@ class provider implements
             'text' => 'privacy:metadata:browser_speech:text',
         ], 'privacy:metadata:browser_speech');
 
+        // Usability-testing external form (chat.js handleUserTesting): with
+        // usertesting_external_url set, the learner's browser opens that URL with
+        // {{userid}}, {{courseid}}, {{messages}} and {{session_minutes}} filled in.
+        $collection->add_external_location_link('usertesting_form', [
+            'userid' => 'privacy:metadata:usertesting_form:userid',
+            'courseid' => 'privacy:metadata:usertesting_form:courseid',
+            'usage' => 'privacy:metadata:usertesting_form:usage',
+        ], 'privacy:metadata:usertesting_form');
+
         // The 'coreai' chat provider routes requests through Moodle's AI
         // subsystem, which sends them on and keeps its own record.
         $collection->add_subsystem_link('core_ai', [], 'privacy:metadata:core_ai');

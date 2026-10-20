@@ -146,7 +146,7 @@ final class realtime_token_test extends \advanced_testcase {
         );
     }
 
-    public function test_xai_jwt_carries_user_and_course_claims(): void {
+    public function test_xai_jwt_carries_only_the_claims_the_proxy_checks(): void {
         $this->resetAfterTest();
         $this->configure_xai_voice();
         [$course, $user] = $this->enrolled_student();
@@ -161,8 +161,12 @@ final class realtime_token_test extends \advanced_testcase {
         $this->assertCount(3, $parts, 'JWT must be header.payload.signature.');
 
         $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
-        $this->assertEquals((int)$user->id, $payload['sub']);
-        $this->assertEquals((int)$course->id, $payload['courseid']);
+        // CONTRIB-10574 #340: the token names no learner and no course. It
+        // travels in the WSS URL to the administrator's proxy, which reads only
+        // exp, nbf, provider, nonce and voice.
+        $this->assertArrayNotHasKey('sub', $payload);
+        $this->assertArrayNotHasKey('courseid', $payload);
+        $this->assertSame(['provider', 'voice', 'iat', 'nbf', 'exp', 'nonce'], array_keys($payload));
         $this->assertEquals('xai', $payload['provider']);
         $this->assertEquals('alloy', $payload['voice']);
         $this->assertGreaterThan(time() - 5, $payload['iat']);
