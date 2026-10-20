@@ -350,6 +350,23 @@ final class lang_completeness_test extends \basic_testcase {
         'privacy:metadata:talking_avatar:video',
         'privacy:metadata:talking_avatar:ipaddress',
         'privacy:metadata:core_ai',
+        // The same declarations, completed after review (7.12.2 fix round 1). Same ruling.
+        'privacy:metadata:ai_provider:otherproviders',
+        'privacy:metadata:voice_provider:ipaddress',
+        'privacy:metadata:zendesk:ticket',
+        'privacy:metadata:radar_webhook:email',
+        'privacy:metadata:browser_speech',
+        'privacy:metadata:browser_speech:audio',
+        'privacy:metadata:browser_speech:text',
+        'privacy:metadata:widget_cdn',
+        'privacy:metadata:widget_cdn:ipaddress',
+        'privacy:metadata:widget_cdn:useragent',
+        'privacy:metadata:preference:avatar',
+        'privacy:metadata:preference:consent_given',
+        'privacy:metadata:preference:digest_optin',
+        'privacy:metadata:preference:intro_dismissed',
+        'privacy:metadata:preference:last_courseid',
+        'privacy:metadata:preference:outreach_milestones',
     ];
 
     /**

@@ -38,28 +38,39 @@ use core_privacy\local\metadata\types\subsystem_link;
  */
 final class external_locations_test extends \advanced_testcase {
     /**
-     * Every external destination and exactly the personal data sent to it.
+     * Every external destination and the personal data the 7.12.2 audit found sent to it.
      *
-     * A field listed here that the code does not send is as wrong as a field
-     * the code sends that is missing, so the comparison is exact.
+     * The comparison with get_metadata() is exact, so neither can change without
+     * the other. That only proves the two agree: a field missing from BOTH (data
+     * the code sends that nobody listed) isn't caught here. The audit table in
+     * the 7.12.2 task report is the evidence for the list itself, and the scans
+     * below catch a new outbound call site, not new data on an existing one.
      */
     private const EXPECTED = [
         'ai_provider' => [
             'message', 'coursecontext', 'firstname', 'history', 'learnerprofile', 'submission', 'videoframes',
+            'otherproviders',
         ],
-        'voice_provider' => ['audio', 'text', 'recording', 'instructions'],
-        'zendesk' => ['name', 'email', 'message', 'coursecontext'],
-        'radar_webhook' => ['report'],
+        'voice_provider' => ['audio', 'text', 'recording', 'instructions', 'ipaddress'],
+        'zendesk' => ['name', 'email', 'message', 'coursecontext', 'ticket'],
+        'radar_webhook' => ['report', 'email'],
         'code_sandbox_runtime' => ['ipaddress', 'useragent'],
         'soapbox_storage' => ['recording', 'slidedeck', 'frames', 'objectkey', 'ipaddress'],
         'whatsapp_delivery' => ['phonenumber', 'message'],
         'embedding_provider' => ['query'],
         'analytics_export' => ['learner', 'usage', 'feedback', 'survey', 'transcript', 'radarreport'],
         'talking_avatar' => ['audio', 'video', 'ipaddress'],
+        'widget_cdn' => ['ipaddress', 'useragent'],
+        'browser_speech' => ['audio', 'text'],
     ];
 
     /**
-     * Files under classes/ and the plugin root that make outbound HTTP calls.
+     * Files under classes/, admin/ and the plugin root that make outbound HTTP calls.
+     *
+     * Known gaps of the pattern scan: `new \curl;` without parentheses, a class
+     * instantiated through a variable (`new $class()`), and `file_get_contents()`
+     * or `fopen()` of a URL held in a variable aren't seen. Every such call in the
+     * tree today is also in a file listed here for another reason, or none exists.
      *
      * Each reason is either "declared:" followed by the destination(s) above it
      * sends personal data to, or "not personal:" followed by why nothing about a
@@ -90,6 +101,8 @@ final class external_locations_test extends \advanced_testcase {
         'classes/soapbox_storage_probe.php' => 'not personal: writes and reads back a test object holding no learner data',
         'classes/talking_avatar/base_provider.php' => 'declared:talking_avatar',
         'classes/zendesk_client.php' => 'declared:zendesk',
+        'admin/cli/generate_conversational_fixtures.php' => 'not personal: a model writes questions about course content',
+        'admin/cli/run_rag_fixture_benchmark.php' => 'not personal: scores retrieval on fixture questions and course content',
         'soapbox_transcribe.php' => 'declared:voice_provider',
         'transcribe.php' => 'declared:voice_provider',
         'tts.php' => 'declared:voice_provider',
@@ -105,6 +118,44 @@ final class external_locations_test extends \advanced_testcase {
         '/\b(?:fsockopen|stream_socket_client)\s*\(/i',
         '/\\\\core\\\\http_client\b/i',
         '/\bdownload_file_content\s*\(/i',
+    ];
+
+    /**
+     * Browser-side code (amd/src, templates) that reaches another host from the learner's browser.
+     *
+     * Both misses found in review of the first 7.12.2 pass (the widget CDN and
+     * browser speech) were browser-side, which the PHP scan can't see. Same rule
+     * as the PHP allowlist: "declared:<link>" or "not personal: <why>".
+     */
+    private const BROWSER_ALLOWLIST = [
+        'amd/src/realtime.js' => 'declared:voice_provider',
+        'amd/src/sandbox.js' => 'declared:code_sandbox_runtime',
+        'amd/src/soapbox.js' => 'declared:browser_speech',
+        'amd/src/speech.js' => 'declared:browser_speech',
+        'amd/src/ui.js' => 'declared:talking_avatar',
+        'amd/src/voice.js' => 'declared:browser_speech',
+        'templates/chat_widget.mustache' => 'declared:widget_cdn',
+    ];
+
+    /**
+     * JavaScript (comments stripped) that opens a connection or loads code from elsewhere.
+     *
+     * Not seen: a fetch() or XMLHttpRequest to a URL held in a variable, such as
+     * the presigned S3 upload in soapbox.js (declared as soapbox_storage).
+     */
+    private const JS_PATTERNS = [
+        '/new\s+WebSocket\s*\(/',
+        '/createElement\s*\(\s*[\'"](?:script|iframe)[\'"]/i',
+        '/SpeechRecognition/',
+        '/(?:fetch\s*\(|\.src\s*=|\.open\s*\()\s*(?:[\'"\x60][A-Z]+[\'"\x60]\s*,\s*)?[\'"\x60](?:https?|wss?):\/\//i',
+    ];
+
+    /**
+     * Mustache markup (comments stripped) that loads a script, stylesheet or frame from a variable or another host.
+     */
+    private const TEMPLATE_PATTERNS = [
+        '/<(?:script|iframe)\b[^>]*\bsrc\s*=\s*["\']?\s*(?:\{\{|https?:|\/\/)/i',
+        '/<link\b[^>]*\bhref\s*=\s*["\']?\s*(?:\{\{|https?:|\/\/)/i',
     ];
 
     /**
@@ -193,7 +244,7 @@ final class external_locations_test extends \advanced_testcase {
     }
 
     /**
-     * The PHP files the guard scans: everything under classes/ plus the plugin root.
+     * The PHP files the guard scans: everything under classes/ and admin/, plus the plugin root.
      *
      * @param string $root The plugin directory.
      * @return array Paths relative to the plugin directory.
@@ -201,6 +252,12 @@ final class external_locations_test extends \advanced_testcase {
     private static function scanned_files(string $root): array {
         $files = [];
         $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root . '/classes', \FilesystemIterator::SKIP_DOTS));
+        foreach ($it as $file) {
+            if ($file->isFile() && substr($file->getFilename(), -4) === '.php') {
+                $files[] = substr($file->getPathname(), strlen($root) + 1);
+            }
+        }
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root . '/admin', \FilesystemIterator::SKIP_DOTS));
         foreach ($it as $file) {
             if ($file->isFile() && substr($file->getFilename(), -4) === '.php') {
                 $files[] = substr($file->getPathname(), strlen($root) + 1);
@@ -290,6 +347,200 @@ final class external_locations_test extends \advanced_testcase {
             }
         }
         $this->assertSame([], $bad);
+    }
+
+    /**
+     * Whether JavaScript source reaches another host, ignoring comments.
+     *
+     * @param string $source JavaScript source.
+     * @return bool
+     */
+    public static function js_calls_out(string $source): bool {
+        $code = preg_replace('~/\*.*?\*/~s', '', $source);
+        $code = preg_replace('~^\s*//.*$~m', '', $code);
+        foreach (self::JS_PATTERNS as $pattern) {
+            if (preg_match($pattern, $code)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Whether a Mustache template loads something from a variable or another host, ignoring comments.
+     *
+     * @param string $source Template source.
+     * @return bool
+     */
+    public static function template_calls_out(string $source): bool {
+        $code = preg_replace('~\{\{!.*?\}\}~s', '', $source);
+        $code = preg_replace('~<!--.*?-->~s', '', $code);
+        foreach (self::TEMPLATE_PATTERNS as $pattern) {
+            if (preg_match($pattern, $code)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * The browser-side guard: a script or template that reaches another host must say where data goes.
+     *
+     * @return void
+     */
+    public function test_every_browser_file_that_calls_out_is_on_the_allowlist(): void {
+        $root = dirname(__DIR__, 2);
+        $unlisted = [];
+        $stale = [];
+        $files = [];
+        foreach (glob($root . '/amd/src/*.js') as $f) {
+            $files['amd/src/' . basename($f)] = self::js_calls_out((string) file_get_contents($f));
+        }
+        foreach (glob($root . '/templates/*.mustache') as $f) {
+            $files['templates/' . basename($f)] = self::template_calls_out((string) file_get_contents($f));
+        }
+        $this->assertNotEmpty($files, 'No browser files found, so this scan proves nothing.');
+        foreach ($files as $rel => $out) {
+            if ($out && !isset(self::BROWSER_ALLOWLIST[$rel])) {
+                $unlisted[] = $rel;
+            } else if (!$out && isset(self::BROWSER_ALLOWLIST[$rel])) {
+                $stale[] = $rel;
+            }
+        }
+        $this->assertSame(
+            [],
+            $unlisted,
+            "These browser files reach another host and are not in BROWSER_ALLOWLIST:\n  " . implode("\n  ", $unlisted)
+                . "\nDeclare the destination in classes/privacy/provider.php get_metadata() and list the file"
+                . " as 'declared:<name>', or as 'not personal: <why>'."
+        );
+        $this->assertSame([], $stale, 'BROWSER_ALLOWLIST names files that no longer call out: ' . implode(', ', $stale));
+    }
+
+    /**
+     * Every browser allowlist reason is well formed, and a declared one names real destinations.
+     *
+     * @return void
+     */
+    public function test_every_browser_allowlist_reason_names_a_declared_destination(): void {
+        $declared = self::declared();
+        $bad = [];
+        foreach (self::BROWSER_ALLOWLIST as $rel => $reason) {
+            if (strpos($reason, 'not personal: ') === 0 && strlen($reason) > strlen('not personal: ')) {
+                continue;
+            }
+            if (strpos($reason, 'declared:') !== 0) {
+                $bad[] = $rel . ' (reason must start with declared: or not personal:)';
+                continue;
+            }
+            foreach (explode(',', substr($reason, strlen('declared:'))) as $name) {
+                if (!isset($declared[trim($name)])) {
+                    $bad[] = $rel . ' (' . trim($name) . ' is not declared)';
+                }
+            }
+        }
+        $this->assertSame([], $bad);
+    }
+
+    /**
+     * The browser scanners: comments don't count, and each kind of reach does.
+     *
+     * @return void
+     */
+    public function test_the_browser_scanners_see_calls_and_ignore_comments(): void {
+        $this->assertFalse(self::js_calls_out("/* new WebSocket(u) */\n// SpeechRecognition\nvar a = 1;\n"));
+        $this->assertFalse(self::js_calls_out("fetch(M.cfg.wwwroot + '/x.php');\n"));
+        $this->assertTrue(self::js_calls_out("var ws = new WebSocket(url);\n"));
+        $this->assertTrue(self::js_calls_out("var s = document.createElement('script');\n"));
+        $this->assertTrue(self::js_calls_out("var f = document.createElement(\"iframe\");\n"));
+        $this->assertTrue(self::js_calls_out("var r = new window.webkitSpeechRecognition();\n"));
+        $this->assertTrue(self::js_calls_out("fetch('https://example.com/collect');\n"));
+        $this->assertTrue(self::js_calls_out("xhr.open('POST', 'https://example.com/x');\n"));
+        $this->assertTrue(self::js_calls_out("img.src = 'https://example.com/p.gif';\n"));
+        $this->assertFalse(self::template_calls_out("{{! <script src=\"{{x}}\"></script> }}\n<div></div>\n"));
+        $this->assertTrue(self::template_calls_out("<script src=\"{{cdn_js_url}}\" defer></script>\n"));
+        $this->assertTrue(self::template_calls_out("<link rel=\"stylesheet\" href=\"https://cdn.example/x.css\" />\n"));
+        $this->assertTrue(self::template_calls_out("<iframe src=\"{{url}}\"></iframe>\n"));
+    }
+
+    /**
+     * Every plugin user preference the code sets is declared.
+     *
+     * @return void
+     */
+    public function test_every_user_preference_is_declared(): void {
+        $names = [];
+        foreach (provider::get_metadata(new collection('local_ai_course_assistant'))->get_collection() as $item) {
+            if ($item instanceof \core_privacy\local\metadata\types\user_preference) {
+                $names[] = $item->get_name();
+            }
+        }
+        sort($names);
+        $this->assertSame([
+            'aica_sola_consent_given',
+            'local_ai_course_assistant_avatar',
+            'local_ai_course_assistant_digest_optin_COURSEID',
+            'local_ai_course_assistant_intro_dismissed',
+            'local_ai_course_assistant_last_courseid',
+            'sola_outreach_milestones',
+        ], $names);
+
+        // And the code sets no preference that isn't on the list.
+        $root = dirname(__DIR__, 2);
+        $set = [];
+        foreach (self::scanned_files($root) as $rel) {
+            $src = (string) file_get_contents($root . '/' . $rel);
+            if (preg_match_all("/set_user_preference\\(\\s*'([a-z0-9_]+)'/i", $src, $m)) {
+                foreach ($m[1] as $name) {
+                    $set[$name] = true;
+                }
+            }
+        }
+        $missing = [];
+        foreach (array_keys($set) as $name) {
+            $declared = in_array($name, $names, true)
+                || ($name === 'local_ai_course_assistant_digest_optin_');
+            if (!$declared) {
+                $missing[] = $name;
+            }
+        }
+        $this->assertNotEmpty($set, 'Found no set_user_preference call, so this check proves nothing.');
+        $this->assertSame([], $missing, 'Preferences set but not declared: ' . implode(', ', $missing));
+    }
+
+    /**
+     * A user's preferences are exported with a readable description; another user's are not.
+     *
+     * @return void
+     */
+    public function test_user_preferences_are_exported(): void {
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $other = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        set_user_preference('local_ai_course_assistant_avatar', 'avatar_03', $user);
+        set_user_preference('local_ai_course_assistant_last_courseid', $course->id, $user);
+        set_user_preference('local_ai_course_assistant_intro_dismissed', 1, $user);
+        set_user_preference('aica_sola_consent_given', 1760000000, $user);
+        set_user_preference('sola_outreach_milestones', '1', $user);
+        set_user_preference('local_ai_course_assistant_digest_optin_' . $course->id, '1', $user);
+        set_user_preference('local_ai_course_assistant_avatar', 'avatar_07', $other);
+
+        provider::export_user_preferences($user->id);
+        $writer = \core_privacy\local\request\writer::with_context(\context_system::instance());
+        $prefs = $writer->get_user_preferences('local_ai_course_assistant');
+
+        $this->assertSame('avatar_03', $prefs->local_ai_course_assistant_avatar->value);
+        $this->assertSame((string) $course->id, (string) $prefs->local_ai_course_assistant_last_courseid->value);
+        $this->assertSame('1', (string) $prefs->local_ai_course_assistant_intro_dismissed->value);
+        $consent = \core_privacy\local\request\transform::datetime(1760000000);
+        $this->assertSame($consent, $prefs->aica_sola_consent_given->value);
+        $this->assertSame('1', (string) $prefs->sola_outreach_milestones->value);
+        $digest = 'local_ai_course_assistant_digest_optin_' . $course->id;
+        $this->assertSame('1', (string) $prefs->$digest->value);
+        foreach ((array) $prefs as $name => $pref) {
+            $this->assertNotSame('', trim((string) $pref->description), "No description for {$name}");
+        }
     }
 
     /**

@@ -34,7 +34,25 @@ use local_ai_course_assistant\reminder_manager;
  * @copyright  2025 AI Course Assistant
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\core_userlist_provider, \core_privacy\local\request\plugin\provider {
+class provider implements
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\request\plugin\provider,
+    \core_privacy\local\request\user_preference_provider {
+    /**
+     * The plugin's user preferences, by name, with the suffix of their privacy string.
+     */
+    private const PREFERENCES = [
+        'local_ai_course_assistant_avatar' => 'avatar',
+        'local_ai_course_assistant_last_courseid' => 'last_courseid',
+        'local_ai_course_assistant_intro_dismissed' => 'intro_dismissed',
+        'aica_sola_consent_given' => 'consent_given',
+        'sola_outreach_milestones' => 'outreach_milestones',
+    ];
+
+    /** The per-course digest opt-in preference is this prefix followed by the course id. */
+    private const DIGEST_OPTIN_PREFIX = 'local_ai_course_assistant_digest_optin_';
+
     /**
      * Describe the type of data stored.
      *
@@ -343,6 +361,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             'learnerprofile' => 'privacy:metadata:ai_provider:learnerprofile',
             'submission' => 'privacy:metadata:ai_provider:submission',
             'videoframes' => 'privacy:metadata:ai_provider:videoframes',
+            'otherproviders' => 'privacy:metadata:ai_provider:otherproviders',
         ], 'privacy:metadata:ai_provider');
 
         $collection->add_external_location_link('voice_provider', [
@@ -350,6 +369,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             'text' => 'privacy:metadata:voice_provider:text',
             'recording' => 'privacy:metadata:voice_provider:recording',
             'instructions' => 'privacy:metadata:voice_provider:instructions',
+            'ipaddress' => 'privacy:metadata:voice_provider:ipaddress',
         ], 'privacy:metadata:voice_provider');
 
         $collection->add_external_location_link('zendesk', [
@@ -357,10 +377,12 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             'email' => 'privacy:metadata:zendesk:email',
             'message' => 'privacy:metadata:zendesk:message',
             'coursecontext' => 'privacy:metadata:zendesk:coursecontext',
+            'ticket' => 'privacy:metadata:zendesk:ticket',
         ], 'privacy:metadata:zendesk');
 
         $collection->add_external_location_link('radar_webhook', [
             'report' => 'privacy:metadata:radar_webhook:report',
+            'email' => 'privacy:metadata:radar_webhook:email',
         ], 'privacy:metadata:radar_webhook');
 
         // CONTRIB-10574 #271. The Python sandbox loads its runtime straight
@@ -427,11 +449,81 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             'ipaddress' => 'privacy:metadata:talking_avatar:ipaddress',
         ], 'privacy:metadata:talking_avatar');
 
+        // Widget CDN mode (hook_callbacks, chat_widget.mustache): with cdn_url
+        // set, every learner's browser loads sola.min.js and sola.min.css from
+        // that location on each course page. Same reasoning as the sandbox
+        // runtime above. Off by default (cdn_url is empty).
+        $collection->add_external_location_link('widget_cdn', [
+            'ipaddress' => 'privacy:metadata:widget_cdn:ipaddress',
+            'useragent' => 'privacy:metadata:widget_cdn:useragent',
+        ], 'privacy:metadata:widget_cdn');
+
+        // Browser speech (speech.js, voice.js, soapbox.js, audio_player.js): when
+        // the browser's own recognition or voices are used, the browser vendor
+        // may process the audio or text on its servers. The plugin can't see or
+        // control that, but it chooses to use it, so it is declared.
+        $collection->add_external_location_link('browser_speech', [
+            'audio' => 'privacy:metadata:browser_speech:audio',
+            'text' => 'privacy:metadata:browser_speech:text',
+        ], 'privacy:metadata:browser_speech');
+
         // The 'coreai' chat provider routes requests through Moodle's AI
         // subsystem, which sends them on and keeps its own record.
         $collection->add_subsystem_link('core_ai', [], 'privacy:metadata:core_ai');
 
+        // User preferences (save_avatar_preference, hook_callbacks,
+        // dismiss_intro, record_consent, set_digest_optin, digest_unsubscribe,
+        // settings_user.php). Exported by export_user_preferences().
+        foreach (self::PREFERENCES as $name => $stringid) {
+            $collection->add_user_preference($name, 'privacy:metadata:preference:' . $stringid);
+        }
+        $collection->add_user_preference(
+            self::DIGEST_OPTIN_PREFIX . 'COURSEID',
+            'privacy:metadata:preference:digest_optin'
+        );
+
         return $collection;
+    }
+
+    /**
+     * Export the plugin's user preferences that this user has set.
+     *
+     * @param int $userid The user whose preferences are exported.
+     * @return void
+     */
+    public static function export_user_preferences(int $userid) {
+        global $DB;
+        $component = 'local_ai_course_assistant';
+        foreach (self::PREFERENCES as $name => $stringid) {
+            $value = get_user_preferences($name, null, $userid);
+            if ($value === null) {
+                continue;
+            }
+            if ($name === 'aica_sola_consent_given' && is_numeric($value)) {
+                $value = transform::datetime((int) $value);
+            }
+            writer::export_user_preference(
+                $component,
+                $name,
+                $value,
+                get_string('privacy:metadata:preference:' . $stringid, $component)
+            );
+        }
+        $rows = $DB->get_records_select(
+            'user_preferences',
+            'userid = :userid AND ' . $DB->sql_like('name', ':prefix'),
+            ['userid' => $userid, 'prefix' => $DB->sql_like_escape(self::DIGEST_OPTIN_PREFIX) . '%'],
+            'name ASC',
+            'id, name, value'
+        );
+        foreach ($rows as $row) {
+            writer::export_user_preference(
+                $component,
+                $row->name,
+                $row->value,
+                get_string('privacy:metadata:preference:digest_optin', $component)
+            );
+        }
     }
 
     /**
