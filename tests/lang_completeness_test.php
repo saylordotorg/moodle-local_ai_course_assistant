@@ -372,6 +372,9 @@ final class lang_completeness_test extends \basic_testcase {
         'privacy:metadata:usertesting_form:courseid',
         'privacy:metadata:usertesting_form:usage',
         'privacy:metadata:usertesting_form:userid',
+        // The one-time course rebuild that upgrade step 2026101903 queues (7.12.2 review follow-up). An admin-screen
+        // task name, English only like the strings above.
+        'task:rebuild_course_index',
     ];
 
     /**

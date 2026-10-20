@@ -635,6 +635,37 @@ class content_indexer {
     }
 
     /**
+     * Delete every course-level chunk and queue a rebuild of each course that had one (upgrade step 2026101903).
+     *
+     * The nightly index only visits visible courses with an active enrolment, so a supplemental course an
+     * administrator shared on purpose (it needs no enrolment), or a course whose enrolments have all lapsed, would
+     * lose its course and section summaries until someone pressed Reindex. Each affected course gets one ad hoc
+     * task that reindexes it: unchanged activity chunks are skipped by their hash, so the cost is the course-level
+     * text. A course that already has a queued rebuild isn't queued twice, so a repeat upgrade adds nothing.
+     *
+     * @return array ['deleted' => rows removed, 'queued' => rebuild tasks queued]
+     */
+    public static function reset_course_level_chunks(): array {
+        global $DB;
+        $courseids = $DB->get_fieldset_sql(
+            "SELECT DISTINCT courseid
+               FROM {local_ai_course_assistant_chunks}
+              WHERE modtype = :coursetype AND (cmid IS NULL OR cmid = 0) AND courseid > :siteid
+           ORDER BY courseid",
+            ['coursetype' => 'course', 'siteid' => (int) SITEID]
+        );
+        $deleted = self::delete_course_level_chunks();
+        $queued = 0;
+        foreach ($courseids as $courseid) {
+            $task = new \local_ai_course_assistant\task\rebuild_course_index();
+            $task->set_custom_data(['courseid' => (int) $courseid]);
+            \core\task\manager::queue_adhoc_task($task, true);
+            $queued++;
+        }
+        return ['deleted' => $deleted, 'queued' => $queued];
+    }
+
+    /**
      * Check whether a course has any indexed (embedded) chunks.
      *
      * @param int $courseid

@@ -826,7 +826,22 @@ class rag_retriever {
                 ($rawcand === false || $rawcand === '') ? 20 : (int) $rawcand
             );
         }
+        // Issue #341: the learner is going to lose the chunks of hidden and restricted activities, so fetch twice
+        // top-k, and drop them below before stage 2. Otherwise a course whose best matches are hidden would leave
+        // the turn with one or two passages, and the reranker would be sent text the learner may never see.
+        if ($foruserid !== self::UNFILTERED) {
+            $hydratelimit = max($hydratelimit, $topk * 2);
+        }
         $scored = self::hydrate_content(array_slice($scored, 0, $hydratelimit));
+        if (empty($scored)) {
+            return [];
+        }
+
+        // Drop what this user may not see, on the hydrated candidates and before stage 2, so that hidden text never
+        // reaches the reranker's vendor. After every cache read: the caches above hold vectors per course, never
+        // per user, so visibility is decided fresh on each call. Before expansion, so a hidden activity's siblings
+        // are never fetched.
+        $scored = self::visible_to($scored, $courseid, $foruserid);
         if (empty($scored)) {
             return [];
         }
@@ -839,15 +854,6 @@ class rag_retriever {
         }
 
         $final = $final ?? array_slice($scored, 0, $topk);
-
-        // Issue #341: drop what this user may not see, on the final top-k only (no
-        // refill), and after every cache read: the caches above hold vectors per
-        // course, never per user, so visibility is decided fresh on each call.
-        // Before expansion, so a hidden activity's siblings are never fetched.
-        $final = self::visible_to($final, $courseid, $foruserid);
-        if (empty($final)) {
-            return [];
-        }
 
         // Parent-document expansion (opt-in). Selection above is unchanged;
         // here we optionally widen each hit to a neighbour window or full page.
@@ -975,7 +981,7 @@ class rag_retriever {
     /**
      * Keep only the chunks one user may see; see rag_visibility for the rules.
      *
-     * @param array $rows Final hydrated rows.
+     * @param array $rows Hydrated candidate rows.
      * @param int $courseid The course being chatted in.
      * @param int $foruserid A user id, NO_USER or UNFILTERED.
      * @return array The kept rows, in order.

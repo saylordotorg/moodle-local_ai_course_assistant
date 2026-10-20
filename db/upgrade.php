@@ -2342,12 +2342,14 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // Issue #341 (7.12.2): course-level chunks (course and section summaries) indexed before this build can
         // carry the summary of a hidden or restricted section, which every learner in the course could retrieve.
         // The extractor now leaves those sections out, but an existing chunk would only be replaced by a clean
-        // reindex. Delete them; the next scheduled index (or a reindex on the RAG page) rebuilds them under the
-        // new rule. FAQ and activity chunks are untouched. A repeat deletes only what has been rebuilt since,
-        // which is already correct and is rebuilt again.
-        $deleted = \local_ai_course_assistant\content_indexer::delete_course_level_chunks();
-        if ($deleted > 0) {
-            mtrace("SOLA: removed {$deleted} course-level RAG chunk(s) for rebuilding (#341).");
+        // reindex. Delete them and queue one rebuild per affected course: the nightly index only visits visible
+        // courses with an active enrolment, which would leave a shared supplemental course without its summaries.
+        // FAQ and activity chunks are untouched. A repeat deletes only what has been rebuilt since, which is
+        // already correct, and doesn't queue a course twice.
+        $reset = \local_ai_course_assistant\content_indexer::reset_course_level_chunks();
+        if ($reset['deleted'] > 0) {
+            mtrace("SOLA: removed {$reset['deleted']} course-level RAG chunk(s) for rebuilding (#341); "
+                . "queued {$reset['queued']} course rebuild(s).");
         }
 
         upgrade_plugin_savepoint(true, 2026101903, 'local', 'ai_course_assistant');

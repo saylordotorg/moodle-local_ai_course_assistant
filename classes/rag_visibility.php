@@ -24,7 +24,7 @@ namespace local_ai_course_assistant;
  * sections and activities behind availability restrictions. Retrieval scores by
  * course, so without this a learner's prompt could carry a staged answer key.
  * The index is left as it is (staff ground on it too); the decision is made per
- * request, for the user asking, on the final top-k only.
+ * request, for the user asking, on the hydrated candidates before the reranker sees them.
  *
  * Rules, in order:
  *  1. A site FAQ chunk (site course, modtype faq, no cmid) is kept: it is one
@@ -43,9 +43,11 @@ namespace local_ai_course_assistant;
  *     hidden sections, availability (dates, groups, grades) and the
  *     viewhiddenactivities capability that keeps staff seeing drafts.
  *
- * Survivors keep their order and fields; nothing is refilled, so a turn may get
- * fewer than top-k passages. Modinfo is built once per course per call and never
- * kept across calls, so no user's visibility can reach another user.
+ * Survivors keep their order and fields. Retrieval fetches twice top-k (the rerank
+ * candidate count when that is wider) before this runs, but nothing is refilled
+ * beyond that, so a course whose best matches are nearly all hidden can still give
+ * a turn fewer than top-k passages. Modinfo is built once per course per call and
+ * never kept across calls, so no user's visibility can reach another user.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell / Saylor University

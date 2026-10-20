@@ -492,9 +492,12 @@ final class rag_visibility_test extends \advanced_testcase {
     }
 
     /**
-     * With reranking on, the filter runs on the reranked top-k and keeps the reranker's order and scores.
+     * With reranking on, the filter runs before the reranker, so it only ever sees what the learner may see.
+     *
+     * The reranker's answer is built for the two visible candidates. Had the hidden chunk still been sent, the same
+     * answer would have been read against three candidates and mapped to different chunks.
      */
-    public function test_retrieve_with_rerank_filters_the_reranked_set(): void {
+    public function test_retrieve_with_rerank_sends_the_reranker_only_visible_chunks(): void {
         $course = $this->getDataGenerator()->create_course();
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $this->configure_rag();
@@ -510,12 +513,11 @@ final class rag_visibility_test extends \advanced_testcase {
         $this->store_chunk((int) $course->id, 0, 'Course overview', [0.6, 0.4, 0.0]);
 
         // Mocked responses are served last in, first out: the rerank answer is queued before the embedding.
-        // Cosine order is hidden, visible, overview; the reranker puts the overview first.
+        // Cosine order of the visible candidates is the page, then the overview; the reranker puts the overview first.
         \curl::mock_response(json_encode([
             'data' => [
-                ['index' => 2, 'relevance_score' => 0.9],
-                ['index' => 0, 'relevance_score' => 0.8],
-                ['index' => 1, 'relevance_score' => 0.7],
+                ['index' => 1, 'relevance_score' => 0.9],
+                ['index' => 0, 'relevance_score' => 0.7],
             ],
             'usage' => ['total_tokens' => 5],
         ]));
@@ -524,6 +526,34 @@ final class rag_visibility_test extends \advanced_testcase {
 
         $this->assertSame(['Course overview', 'Visible page'], $this->contents($out));
         $this->assertSame([0.9, 0.7], array_column($out, 'score'));
+    }
+
+    /**
+     * Hidden chunks among the best matches don't leave the turn short while visible ones are on hand.
+     *
+     * Two hidden chunks outscore two visible ones and top-k is 2. Fetching only top-k and filtering afterwards would
+     * return nothing; retrieval fetches twice top-k before it filters.
+     */
+    public function test_hidden_best_matches_do_not_crowd_visible_chunks_out_of_the_turn(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $this->configure_rag();
+        $visible = $this->page($course);
+        $hidden = $this->page($course, ['visible' => 0]);
+        $this->store_chunk((int) $course->id, $hidden, 'HIDDEN key one', [1.0, 0.0, 0.0]);
+        $this->store_chunk((int) $course->id, $hidden, 'HIDDEN key two', [0.95, 0.05, 0.0], 1);
+        $this->store_chunk((int) $course->id, $visible, 'Visible page one', [0.9, 0.1, 0.0]);
+        $this->store_chunk((int) $course->id, $visible, 'Visible page two', [0.8, 0.2, 0.0], 1);
+
+        $this->mock_query_embedding([1.0, 0.0, 0.0]);
+        $out = rag_retriever::retrieve((int) $course->id, 'question three answer', 2, 0, (int) $student->id);
+
+        $this->assertSame(['Visible page one', 'Visible page two'], $this->contents($out));
+
+        // Staff still get their own top two, hidden drafts included.
+        $this->mock_query_embedding([1.0, 0.0, 0.0]);
+        $staff = rag_retriever::retrieve((int) $course->id, 'question three answer', 2, 0, (int) get_admin()->id);
+        $this->assertSame(['HIDDEN key one', 'HIDDEN key two'], $this->contents($staff));
     }
 
     /**

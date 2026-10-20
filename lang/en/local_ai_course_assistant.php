@@ -3451,6 +3451,7 @@ $string['embedmigration:faq_reembed'] = 'Re-embed the FAQ';
 $string['embedmigration:faq_reembedded'] = 'Re-embedded the FAQ: {$a} chunk(s).';
 $string['embedmigration:faq_error'] = 'The FAQ could not be re-embedded: {$a}';
 $string['task:migrate_course_embeddings'] = 'Migrate one course to a new embedding model';
+$string['task:rebuild_course_index'] = 'Rebuild one course\'s RAG index after the 7.12.2 visibility change';
 $string['settings:embed_migration_provider_inherit'] = 'Use the provider configured above';
 
 // Python sandbox runtime location (v7.6.1, CONTRIB-10574 #271).

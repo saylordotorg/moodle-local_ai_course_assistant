@@ -17,12 +17,15 @@
 namespace local_ai_course_assistant;
 
 /**
- * Upgrade step 2026101903 removes course-level chunks so they are rebuilt without hidden sections (#341).
+ * Upgrade step 2026101903 removes course-level chunks so they are rebuilt without hidden sections (#341), and
+ * queues a rebuild for each course it cleaned, so a course the nightly index never visits isn't left without them.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_ai_course_assistant\content_indexer::delete_course_level_chunks
+ * @covers     \local_ai_course_assistant\content_indexer::reset_course_level_chunks
+ * @covers     \local_ai_course_assistant\task\rebuild_course_index
  */
 final class course_level_chunk_cleanup_upgrade_test extends \advanced_testcase {
     /** @var string Plugin component. */
@@ -90,7 +93,7 @@ final class course_level_chunk_cleanup_upgrade_test extends \advanced_testcase {
         $page = $this->row(42, 7, 'page', 'A page body');
         $faq = $this->row(SITEID, 0, faq_manager::MODTYPE, 'How do certificates work?');
 
-        $this->expectOutputRegex('/SOLA: removed 3 course-level RAG chunk\(s\) for rebuilding/');
+        $this->expectOutputRegex('/SOLA: removed 3 course-level RAG chunk\(s\) for rebuilding \(#341\); queued 2 course rebuild/');
         $this->upgrade_from(self::BEFORE);
 
         foreach ([$a, $ashadow, $b] as $id) {
@@ -100,9 +103,41 @@ final class course_level_chunk_cleanup_upgrade_test extends \advanced_testcase {
         $this->assertTrue($DB->record_exists(self::TABLE, ['id' => $faq]), 'FAQ chunks are untouched');
         $this->assertGreaterThanOrEqual(self::CLEANUP, (int) get_config(self::PLUGIN, 'version'), 'the savepoint was reached');
 
-        // A second pass has nothing left to delete.
+        // One rebuild per course that had course-level rows, none for the site course or for activities.
+        $this->assertSame([42, 43], $this->queued_courseids());
+
+        // A second pass has nothing left to delete and doesn't queue a course twice.
         $this->upgrade_from(self::BEFORE);
         $this->assertSame(0, content_indexer::delete_course_level_chunks());
         $this->assertSame(2, $DB->count_records(self::TABLE));
+        $this->assertSame([42, 43], $this->queued_courseids());
+    }
+
+    /**
+     * The courses that have a queued rebuild, in order.
+     *
+     * @return int[]
+     */
+    private function queued_courseids(): array {
+        $ids = [];
+        foreach (\core\task\manager::get_adhoc_tasks(\local_ai_course_assistant\task\rebuild_course_index::class) as $task) {
+            $ids[] = (int) $task->get_custom_data()->courseid;
+        }
+        sort($ids);
+        return $ids;
+    }
+
+    /**
+     * A shared supplemental course with no enrolments is rebuilt even though the nightly index never visits it.
+     */
+    public function test_a_course_with_no_enrolments_still_gets_a_rebuild_queued(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $this->row((int) $course->id, null, 'course', 'Shared reference course overview');
+
+        $reset = content_indexer::reset_course_level_chunks();
+
+        $this->assertSame(['deleted' => 1, 'queued' => 1], $reset);
+        $this->assertSame([(int) $course->id], $this->queued_courseids());
     }
 }
