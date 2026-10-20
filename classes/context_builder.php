@@ -995,13 +995,16 @@ class context_builder {
      *
      * @param int $courseid
      * @param int $maxchars Total character budget for the block.
+     * @param int $userid Whose view of the course to list (0 = the current user). A caller that works as staff
+     *                    but needs the learners' outline, such as the objectives import, passes a plain user.
      * @return string
      */
     public static function get_course_topics_text(
         int $courseid,
-        int $maxchars = self::TOPICS_MAX_CHARS
+        int $maxchars = self::TOPICS_MAX_CHARS,
+        int $userid = 0
     ): string {
-        return self::build_course_topics($courseid, $maxchars);
+        return self::build_course_topics($courseid, $maxchars, $userid);
     }
 
     /**

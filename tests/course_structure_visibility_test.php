@@ -111,4 +111,27 @@ final class course_structure_visibility_test extends \advanced_testcase {
         $this->assertStringNotContainsString('RESTRICTEDSECTION', $topics);
         $this->assertStringNotContainsString('GROUPPAGE', $topics);
     }
+
+    /**
+     * A teacher running the objectives import still lists the course as a plain user sees it.
+     *
+     * The import asks the model for learning objectives, which describe what learners get, so the block is built for a
+     * plain user even though the logged-in teacher could see the restricted section.
+     */
+    public function test_topics_text_for_a_named_plain_user_hides_the_restricted_section_from_a_teacher(): void {
+        $this->resetAfterTest();
+        [$course, , , $teacher] = $this->setup_course();
+        $this->setUser($teacher);
+
+        $asteacher = context_builder::get_course_topics_text((int) $course->id);
+        $asplain = context_builder::get_course_topics_text(
+            (int) $course->id,
+            userid: (int) \core_user::get_noreply_user()->id
+        );
+
+        $this->assertStringContainsString('RESTRICTEDSECTION', $asteacher, 'the teacher\'s own view lists it');
+        $this->assertStringNotContainsString('RESTRICTEDSECTION', $asplain);
+        $this->assertStringNotContainsString('GROUPPAGE', $asplain);
+        $this->assertStringContainsString('OPENPAGE', $asplain);
+    }
 }

@@ -181,7 +181,7 @@ class email_optout {
      * Only rows whose userid is still null are looked at, and a row is written only when it gains an owner, so
      * a second run claims nothing and a row that already has an owner is never reassigned.
      *
-     * Step 2026100102 once read the host id from $CFG without declaring it, which on Moodle 5.2 bound a null
+     * Step 2026100102 once read the host id from $CFG without declaring it, which on every Moodle version bound a null
      * and claimed nothing (#339). Both steps now call this, so the declaration lives in one place.
      *
      * @return int How many rows were given an owner.

@@ -895,7 +895,9 @@ class objective_manager {
      * @return array
      */
     public static function extract_via_llm(int $courseid, int $userid = 0): array {
-        $topics = context_builder::get_course_topics_text($courseid);
+        // The teacher who runs the import can see hidden sections; the objectives describe what learners get, so list
+        // the course as a plain user sees it.
+        $topics = context_builder::get_course_topics_text($courseid, userid: (int) \core_user::get_noreply_user()->id);
         if (trim($topics) === '') {
             return [];
         }

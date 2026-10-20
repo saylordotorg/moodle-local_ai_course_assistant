@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 function xmldb_local_ai_course_assistant_upgrade($oldversion) {
     // Every Moodle global a step reads is declared here. Step 2026100102 read $CFG without it, which on
-    // Moodle 5.2 bound a null host id and claimed nothing (#339); a test now scans this function for it.
+    // every site bound a null host id and claimed nothing (#339, reported from a Moodle 5.2.3 log); a test now scans this function for it.
     global $DB, $CFG;
 
     $dbman = $DB->get_manager();
@@ -2325,7 +2325,7 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // Issue #339 (7.12.2): claim the email opt-outs again.
         //
         // Step 2026100102 reads the host id of this site from the config, and the function that holds it had not
-        // declared that global, so on Moodle 5.2 the query bound a null host and matched no account. A site that
+        // declared that global, so on every Moodle version the query bound a null host and matched no account (the reviewer's log happened to be from 5.2.3). A site that
         // ran the step there passed its savepoint having claimed nothing, and that step will never run again.
         // This one runs the same back-fill once more for every site that is below this build, whether it ran the
         // old step with the null host or has not reached it yet. Only rows that still have no owner are looked

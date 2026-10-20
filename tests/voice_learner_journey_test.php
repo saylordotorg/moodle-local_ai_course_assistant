@@ -446,9 +446,13 @@ final class voice_learner_journey_test extends \advanced_testcase {
 
         $heavy = $this->become_a_learner_on($course);
         $this->assert_this_is_an_entitled_learner((int) $course->id);
+        $heavylast = [];
         for ($i = 0; $i < 6; $i++) {
-            get_realtime_token::execute((int) $course->id);
+            $heavylast = get_realtime_token::execute((int) $course->id);
         }
+        parse_str((string) parse_url($heavylast['endpoint'], PHP_URL_QUERY), $heavyqs);
+        $heavyparts = explode('.', (string) ($heavyqs['token'] ?? ''));
+        $heavypayload = json_decode(base64_decode(strtr($heavyparts[1] ?? '', '-_', '+/')), true);
 
         $second = $this->become_a_learner_on($course);
         $this->assertNotSame((int) $heavy->id, (int) $second->id);
@@ -466,6 +470,16 @@ final class voice_learner_journey_test extends \advanced_testcase {
         $payload = json_decode(base64_decode(strtr($parts[1] ?? '', '-_', '+/')), true);
         $this->assertSame('xai', $payload['provider'] ?? '', 'The second learner was handed no usable credential.');
         $this->assertGreaterThanOrEqual(time() - 5, (int) ($payload['iat'] ?? 0), 'The credential is not freshly minted.');
+        $this->assertNotSame(
+            '',
+            (string) ($payload['nonce'] ?? ''),
+            'The second learner\'s credential carries no nonce.'
+        );
+        $this->assertNotSame(
+            $heavypayload['nonce'] ?? null,
+            $payload['nonce'] ?? null,
+            'The second learner was handed the first learner\'s credential (same nonce) instead of one minted for them.'
+        );
     }
 
     /**
