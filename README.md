@@ -4,9 +4,9 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 
 ## Demo video
 
-[![A tour of SOLA: Saylor University's AI learning assistant](https://img.youtube.com/vi/BAjV5dmTCWU/maxresdefault.jpg)](https://youtu.be/BAjV5dmTCWU)
+[![A tour of SOLA: Saylor University's AI learning assistant](https://img.youtube.com/vi/MDGpVUEbj2U/maxresdefault.jpg)](https://youtu.be/MDGpVUEbj2U)
 
-A 3-minute tour, recorded on Saylor University's live Degrees site in a hidden test course with fake demo students. The learner half is shown in student view: answers drawn only from the course's own content, Socratic guidance, Quiz Me, Study Plan, and 46 languages with automatic detection. The admin half covers mastery tracking, provider settings and guardrails, analytics, Learning Radar, and cost tracking.
+A short tour, recorded on Saylor University's development site on version 7.12 in a demo course with no student data. The learner half is shown in student view: answers drawn from the course's own content, Quiz Me, Study Plan, and replies in the learner's own language across 46 language packs. The admin half covers the settings hub with its five task pages, the Providers and keys table, and automatic model upgrades.
 
 ## Version 7.12.2
 
