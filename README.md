@@ -8,10 +8,10 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 
 A short tour, recorded on Saylor University's development site on version 7.12 in a demo course with no student data. The learner half is shown in student view: answers drawn from the course's own content, Quiz Me, Study Plan, and replies in the learner's own language across 46 language packs. The admin half covers the settings hub with its five task pages, the Providers and keys table, and automatic model upgrades.
 
-## Version 7.12.2
+## Version 7.12.3
 
 **Release Date:** October 2026
-**Plugin build:** 2026101903
+**Plugin build:** 2026103001
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1. `version.php` declares support through 5.2.
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+
