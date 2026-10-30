@@ -43,8 +43,9 @@ final class anomaly_digest_webhook_test extends \advanced_testcase {
     }
 
     /**
-     * Turn the digest on and give it something to report: negative ratings up from 5 to 6 week over week,
-     * with the threshold at 0 so any rise is an alert. The webhook host is trusted so the address check
+     * Turn the digest on and give it something to report: negative ratings up from 5 to 15 week over week
+     * (the digest ignores fewer than 10, or a rise of fewer than 5), with the threshold at 0 so any rise past
+     * those floors is an alert. The webhook host is trusted so the address check
      * accepts it without a DNS lookup.
      */
     private function make_the_digest_alert(): void {
@@ -61,7 +62,7 @@ final class anomaly_digest_webhook_test extends \advanced_testcase {
                 'rating' => -1, 'timecreated' => $now - (10 * 86400),
             ]);
         }
-        for ($i = 0; $i < 6; $i++) {
+        for ($i = 0; $i < 15; $i++) {
             $DB->insert_record('local_ai_course_assistant_msg_ratings', (object) [
                 'messageid' => 200 + $i, 'userid' => $user->id, 'courseid' => $course->id,
                 'rating' => -1, 'timecreated' => $now - (3 * 86400),
@@ -192,7 +193,9 @@ final class anomaly_digest_webhook_test extends \advanced_testcase {
         $this->assertSame(self::SLACK, secrets::get('anomaly_digest_slack_webhook'));
         $this->assertSame(self::TEAMS, secrets::get('anomaly_digest_teams_webhook'));
 
-        // After the upgrade the digest posts to the decrypted URLs, not to the ciphertext.
+        // After the upgrade the digest posts to the decrypted URLs, not to the ciphertext. The first run
+        // sent the alert, so clear its cooldown or the digest would stay quiet.
+        unset_config('anomaly_digest_last_negative_ratings', 'local_ai_course_assistant');
         \curl::mock_response('ok');
         \curl::mock_response('ok');
         $this->assertSame(0, $this->run_digest());

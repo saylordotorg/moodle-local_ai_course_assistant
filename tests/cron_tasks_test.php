@@ -681,8 +681,8 @@ final class cron_tasks_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $u1 = $this->getDataGenerator()->create_user();
         $u2 = $this->getDataGenerator()->create_user();
-        // Seed 6 negative ratings in the recent 7-day window vs 5 in the prior.
-        // 20% increase — over 0% threshold, under 50%.
+        // Seed 15 negative ratings in the recent 7-day window vs 5 in the prior: +200%, over the
+        // 0% threshold, and past the digest's floors (10 ratings, a rise of 5).
         $now = time();
         $msgseq = 1;
         for ($i = 0; $i < 5; $i++) {
@@ -693,7 +693,7 @@ final class cron_tasks_test extends \advanced_testcase {
                 'timecreated' => $now - (10 * 86400),
             ]);
         }
-        for ($i = 0; $i < 6; $i++) {
+        for ($i = 0; $i < 15; $i++) {
             // Recent window: last 7 days.
             $DB->insert_record('local_ai_course_assistant_msg_ratings', (object)[
                 'messageid' => $msgseq++, 'userid' => $u2->id,
