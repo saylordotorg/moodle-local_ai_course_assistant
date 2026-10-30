@@ -375,6 +375,9 @@ final class lang_completeness_test extends \basic_testcase {
         // The one-time course rebuild that upgrade step 2026101903 queues (7.12.2 review follow-up). An admin-screen
         // task name, English only like the strings above.
         'task:rebuild_course_index',
+        // The settings-page truncation warning for an automatic budget (7.12.4). Admin-only copy about a setting whose
+        // wrong move makes things worse; English like the other budget text until a translator can check it.
+        'settings:prompt_truncated_warning_auto',
     ];
 
     /**

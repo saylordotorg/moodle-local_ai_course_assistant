@@ -21,6 +21,7 @@ use local_ai_course_assistant\tests\settings_tree;
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/fixtures/settings_tree.php');
+require_once(__DIR__ . '/fixtures/prompt_metrics_seed.php');
 
 /**
  * The settings menu layout (7.10.0): five task pages and an Advanced group.
@@ -558,6 +559,8 @@ final class settings_layout_test extends \advanced_testcase {
         // Both conditions met: a truncation in the last 7 days, and an automatic budget with no model window to
         // derive it from (no model name, no backend_context_tokens).
         set_config('prompt_truncation_seen', time() - HOURSECS, 'local_ai_course_assistant');
+        // The truncation notice is built only when cuts are frequent: 5 of 30 recent turns.
+        \local_ai_course_assistant\tests\prompt_metrics_seed::turns(30, 5);
         set_config('prompt_budget_mode', 'auto', 'local_ai_course_assistant');
         set_config('model', '', 'local_ai_course_assistant');
         set_config('backend_context_tokens', 0, 'local_ai_course_assistant');

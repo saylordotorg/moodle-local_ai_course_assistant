@@ -453,19 +453,38 @@ if ($hassiteconfig) {
         ));
     }
 
+    // Warn only when cuts are frequent. One cut in thousands of turns is an edge
+    // case, not a budget that is too small, and raising the number can do harm
+    // (see the auto-mode text). The aggregate is read only when a cut was seen in
+    // the last 7 days, so the log files are not scanned on every admin page.
     $trunclast = (int) get_config('local_ai_course_assistant', 'prompt_truncation_seen');
     if ($trunclast > 0 && (time() - $trunclast) < (7 * DAYSECS)) {
-        $settings->add(new admin_setting_description(
-            'local_ai_course_assistant/prompt_truncation_warning',
-            '',
-            $OUTPUT->notification(
-                \local_ai_course_assistant\branding::str(
-                    'settings:prompt_truncated_warning',
-                    userdate($trunclast)
-                ),
-                \core\output\notification::NOTIFY_WARNING
-            )
-        ));
+        $cutagg = \local_ai_course_assistant\prompt_metrics_logger::aggregate();
+        if (\local_ai_course_assistant\prompt_metrics_logger::content_cuts_are_frequent($cutagg)) {
+            // In automatic mode with the number left at its default the model's
+            // window decides the budget, and typing any other number would replace
+            // that with a fixed limit. Raising the number is only the right advice
+            // when the budget is fixed, was typed, or no window is known.
+            $rawbudget = get_config('local_ai_course_assistant', 'prompt_budget_chars');
+            $budgetisdefault = $rawbudget === false || $rawbudget === ''
+                || (int) $rawbudget === \local_ai_course_assistant\context_builder::DEFAULT_BUDGET_CHARS;
+            $windowdecides = (string) get_config('local_ai_course_assistant', 'prompt_budget_mode') !== 'fixed'
+                && $budgetisdefault
+                && \local_ai_course_assistant\context_builder::resolve_window_tokens(0) > 0;
+            $warning = $windowdecides
+                ? \local_ai_course_assistant\branding::str('settings:prompt_truncated_warning_auto', (object) [
+                    'when' => userdate($trunclast),
+                    'pct' => $cutagg['pct_content_cut'],
+                    'cut' => $cutagg['content_cut_turns'],
+                    'samples' => $cutagg['samples'],
+                ])
+                : \local_ai_course_assistant\branding::str('settings:prompt_truncated_warning', userdate($trunclast));
+            $settings->add(new admin_setting_description(
+                'local_ai_course_assistant/prompt_truncation_warning',
+                '',
+                $OUTPUT->notification($warning, \core\output\notification::NOTIFY_WARNING)
+            ));
+        }
     }
     // v5.10.0: backend context window (max_model_len) for self-hosted/small
     // backends. 0 = hosted/unlimited (no clamping). When set, the system-prompt
