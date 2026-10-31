@@ -2,7 +2,7 @@ The AI Course Assistant (also known as the Saylor Online Learning Assistant or S
 
 Developed at Saylor University and open-sourced under the GNU GPL v3, with simple white-labeling for other institutions. Used in production on Saylor's Learn and Degrees sites.
 
-Works with Moodle 4.5 and later. version.php declares support through Moodle 5.2, and continuous integration tests every release against Moodle 4.5, 5.0 and 5.1 on PHP 8.1 through 8.3, with both MariaDB and PostgreSQL.
+Works with Moodle 4.5 and later. version.php declares support through Moodle 5.3, and continuous integration tests every release against Moodle 4.5, 5.0, 5.1 and 5.3 on PHP 8.1 through 8.3, with both MariaDB and PostgreSQL.
 
 Available in 46 languages. The learner interface, the conversation starters and the speech input and output are all localized. The assistant also detects the language a learner writes in and replies in it, automatically and per message, so a student can ask about an English-language course in their own language and read the answer in their own language.
 
