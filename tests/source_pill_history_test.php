@@ -65,6 +65,12 @@ final class source_pill_history_test extends \advanced_testcase {
     public function test_an_activity_name_with_an_ampersand_is_not_double_escaped(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
+        // A real enrolled learner, not whoever the test harness happens to be: the pill is resolved for the current
+        // user, and the default test user's access to a course differs between Moodle versions (the pill fell
+        // back to the course link on 5.3).
+        $learner = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($learner->id, $course->id, 'student');
+        $this->setUser($learner);
         $page = $this->getDataGenerator()->create_module('page', ['course' => $course->id, 'name' => 'Q&A Review']);
         $pill = get_history::source_pill((int) $course->id, 'activity:' . $page->cmid, 0);
         $this->assertSame('Q&A Review', $pill['source_title'], 'The client sets it with textContent, so it must arrive raw.');
@@ -104,6 +110,12 @@ final class source_pill_history_test extends \advanced_testcase {
     public function test_history_returns_the_pill_with_this_learners_link(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
+        // A real enrolled learner, not whoever the test harness happens to be: the pill is resolved for the current
+        // user, and the default test user's access to a course differs between Moodle versions (the pill fell
+        // back to the course link on 5.3).
+        $learner = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($learner->id, $course->id, 'student');
+        $this->setUser($learner);
         $page = $this->getDataGenerator()->create_module('page', ['course' => $course->id, 'name' => 'Understanding Economic Systems']);
         $pill = get_history::source_pill((int) $course->id, 'activity:' . $page->cmid, 0);
         $this->assertSame('activity', $pill['source_type']);
@@ -115,6 +127,12 @@ final class source_pill_history_test extends \advanced_testcase {
     public function test_a_page_pill_links_to_the_page_the_learner_was_on(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
+        // A real enrolled learner, not whoever the test harness happens to be: the pill is resolved for the current
+        // user, and the default test user's access to a course differs between Moodle versions (the pill fell
+        // back to the course link on 5.3).
+        $learner = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($learner->id, $course->id, 'student');
+        $this->setUser($learner);
         $page = $this->getDataGenerator()->create_module('page', ['course' => $course->id]);
         $pill = get_history::source_pill((int) $course->id, 'page', (int) $page->cmid);
         $this->assertSame('page', $pill['source_type']);
