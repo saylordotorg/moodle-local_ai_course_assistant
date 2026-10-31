@@ -36,6 +36,12 @@ class prompt_metrics_logger {
     /** Number of days kept on disk. */
     public const RETENTION_DAYS = 7;
 
+    /** Share of turns, in percent, that must lose retrieved course content before the settings page warns. */
+    public const FREQUENT_CUT_PCT = 2.0;
+
+    /** Fewest turns in the window before a share means anything: one cut in ten turns is not a trend. */
+    public const FREQUENT_CUT_MIN_SAMPLES = 20;
+
     /**
      * Append one record for a single chat turn. Best-effort — never throws.
      *
@@ -100,6 +106,22 @@ class prompt_metrics_logger {
     }
 
     /**
+     * Whether losing retrieved course content is frequent enough to warn about.
+     *
+     * A single cut in thousands of turns is an edge case (a long page on a
+     * course with unusually long chunks), not a budget that is too small, and
+     * the warning's advice can do harm when it is not needed. It needs enough
+     * turns to read a share from, and a share above FREQUENT_CUT_PCT.
+     *
+     * @param array $agg Result of {@see aggregate()}.
+     * @return bool
+     */
+    public static function content_cuts_are_frequent(array $agg): bool {
+        return (int) ($agg['samples'] ?? 0) >= self::FREQUENT_CUT_MIN_SAMPLES
+            && (float) ($agg['pct_content_cut'] ?? 0) > self::FREQUENT_CUT_PCT;
+    }
+
+    /**
      * Aggregate the last N days of records.
      *
      * @param int $days Window in days (default RETENTION_DAYS).
@@ -112,6 +134,8 @@ class prompt_metrics_logger {
      *     pct_dropped: float,
      *     dropped_by_section: array<string, int>,
      *     truncated_by_section: array<string, int>,
+     *     content_cut_turns: int,
+     *     pct_content_cut: float,
      *     by_cat_avg: array<string, int>,
      *     last_seen: int|null
      * }
@@ -128,6 +152,8 @@ class prompt_metrics_logger {
             'pct_dropped'   => 0.0,
             'dropped_by_section'   => [],
             'truncated_by_section' => [],
+            'content_cut_turns'    => 0,
+            'pct_content_cut'      => 0.0,
             'by_cat_avg'    => ['identity' => 0, 'context' => 0, 'learner' => 0, 'behavior' => 0, 'markers' => 0, 'safety' => 0],
             'last_seen'     => null,
         ];
@@ -139,6 +165,7 @@ class prompt_metrics_logger {
         $maxtotal = 0;
         $truncatedturns = 0;
         $droppedturns = 0;
+        $contentcutturns = 0;
         $droppedsections = [];
         $truncatedsections = [];
         $catsums = ['identity' => 0, 'context' => 0, 'learner' => 0, 'behavior' => 0, 'markers' => 0, 'safety' => 0];
@@ -177,6 +204,14 @@ class prompt_metrics_logger {
                 foreach ((array) ($row['truncated_names'] ?? []) as $name) {
                     $truncatedsections[$name] = ($truncatedsections[$name] ?? 0) + 1;
                 }
+                // A turn counts once if its retrieved course content was cut
+                // either way, which is what the settings-page warning is about.
+                if (
+                    in_array('course_content', (array) ($row['dropped_names'] ?? []), true)
+                    || in_array('course_content', (array) ($row['truncated_names'] ?? []), true)
+                ) {
+                    $contentcutturns++;
+                }
                 if (isset($row['cats']) && is_array($row['cats'])) {
                     foreach ($row['cats'] as $cat => $chars) {
                         if (isset($catsums[$cat])) {
@@ -197,6 +232,8 @@ class prompt_metrics_logger {
         $out['max_total']     = $maxtotal;
         $out['pct_truncated'] = round(100.0 * $truncatedturns / $samples, 1);
         $out['pct_dropped']   = round(100.0 * $droppedturns / $samples, 1);
+        $out['content_cut_turns'] = $contentcutturns;
+        $out['pct_content_cut']   = round(100.0 * $contentcutturns / $samples, 1);
         foreach ($catsums as $cat => $sum) {
             $out['by_cat_avg'][$cat] = (int) round($sum / $samples);
         }
