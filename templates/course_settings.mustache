@@ -137,19 +137,6 @@
         "showessaylink": false,
         "essayurl": "/local/ai_course_assistant/essay_feedback.php?courseid=2",
         "essaylinklabel": "Essay feedback",
-        "soapboxtitle": "Soapbox",
-        "soapboxhelp": "Learners get a dedicated page to record a speech.",
-        "soapboxselect": {"hasid": true, "id": "aica-soapbox-on", "name": "soapbox_on",
-            "selectclass": "form-control form-control-sm sola-cs-select-pedagogy", "options": []},
-        "showsoapbox": false,
-        "soapboxlevellabel": "Course type",
-        "soapboxlevelselect": {"hasid": true, "id": "aica-soapbox-level", "name": "soapbox_level",
-            "selectclass": "form-control form-control-sm sola-cs-select-level", "options": []},
-        "soapboxlevelhelp": "Tailors the AI coaching.",
-        "soapboxurl": "/local/ai_course_assistant/soapbox.php?courseid=2",
-        "soapboxlinklabel": "Soapbox",
-        "soapboxrubricurl": "/local/ai_course_assistant/rubric_admin.php?courseid=2&type=speech",
-        "soapboxrubriclabel": "Edit speech rubric",
         "wetitle": "Worked examples",
         "wehelp": "Adds a worked-example starter.",
         "weselect": {"hasid": true, "id": "aica-we-on", "name": "we_on",
@@ -475,32 +462,6 @@
                                target="_blank">{{essaylinklabel}} &rarr;</a>
                         </div>
                         {{/showessaylink}}
-                    </div>
-                </div>
-
-                {{! Soapbox speech practice. }}
-                <div class="form-group row mt-2">
-                    <label class="col-sm-3 col-form-label" for="aica-soapbox-on">{{soapboxtitle}}</label>
-                    <div class="col-sm-9">
-                        {{#soapboxselect}}
-                        {{> local_ai_course_assistant/course_settings_select}}
-                        {{/soapboxselect}}
-                        <small class="form-text text-muted">{{soapboxhelp}}</small>
-                        {{#showsoapbox}}
-                        <div class="mt-2">
-                            <label for="aica-soapbox-level" class="sola-cs-level-label">{{soapboxlevellabel}}</label>
-                            {{#soapboxlevelselect}}
-                            {{> local_ai_course_assistant/course_settings_select}}
-                            {{/soapboxlevelselect}}
-                            <small class="form-text text-muted">{{soapboxlevelhelp}}</small>
-                        </div>
-                        <div class="mt-2 d-flex flex-wrap sola-cs-linkrow">
-                            <a href="{{soapboxurl}}" class="btn btn-sm btn-outline-secondary"
-                               target="_blank">{{soapboxlinklabel}} &rarr;</a>
-                            <a href="{{soapboxrubricurl}}" class="btn btn-sm btn-outline-secondary"
-                               target="_blank">{{soapboxrubriclabel}} &rarr;</a>
-                        </div>
-                        {{/showsoapbox}}
                     </div>
                 </div>
 

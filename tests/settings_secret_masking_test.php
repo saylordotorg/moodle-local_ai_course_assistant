@@ -66,7 +66,7 @@ final class settings_secret_masking_test extends \advanced_testcase {
     ];
 
     /** The fewest credential settings the scan must see in settings.php (the real count, less one). */
-    private const MIN_CHECKED = 14;
+    private const MIN_CHECKED = 13;
 
     /**
      * Names that match a hint but are NOT credentials, with the reason.

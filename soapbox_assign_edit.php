@@ -36,6 +36,10 @@ $course = get_course($courseid);
 $context = context_course::instance($courseid);
 require_capability('local/ai_course_assistant:manage', $context);
 
+// Soapbox is replaced by the PresenterAI activity (7.12.5). The old page stays
+// below untouched, but nobody reaches it: show a notice and a link back instead.
+\local_ai_course_assistant\soapbox_retired::notice_and_exit($course, new moodle_url('/local/ai_course_assistant/soapbox_assign_edit.php', ['courseid' => $courseid]));
+
 $listurl = new moodle_url('/local/ai_course_assistant/soapbox_assign.php', ['courseid' => $courseid]);
 $pageurl = new moodle_url(
     '/local/ai_course_assistant/soapbox_assign_edit.php',

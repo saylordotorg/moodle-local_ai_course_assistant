@@ -193,6 +193,9 @@ final class lang_completeness_test extends \basic_testcase {
      * that went unnoticed.
      */
     private const KNOWN_UNTRANSLATED = [
+        // 7.12.5: the notice at the retired Soapbox page addresses. English first.
+        'soapbox:replaced',
+        'soapbox:replaced_title',
         // The video rubric tab. NOT deferred translation debt: the tab was specced
         // and cut, so nothing in the product can reach these. rubric_admin.php
         // whitelists conversation, pronunciation and speech only, and clamps an

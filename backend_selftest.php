@@ -35,7 +35,6 @@ $syscontext = context_system::instance();
 require_capability('moodle/site:config', $syscontext);
 
 $run = optional_param('run', 0, PARAM_BOOL);
-$runstorage = optional_param('runstorage', 0, PARAM_BOOL);
 
 $pageurl = new moodle_url('/local/ai_course_assistant/backend_selftest.php');
 $PAGE->set_url($pageurl);
@@ -83,20 +82,7 @@ echo $OUTPUT->single_button(
     'get'
 );
 
-// Soapbox object storage. Separate button because it performs real writes and
-// deletes against the configured bucket, which an admin should opt into rather
-// than have happen as a side effect of testing the chat backend.
-echo $OUTPUT->heading(get_string('selftest:storage_title', 'local_ai_course_assistant'), 3);
-echo html_writer::tag('p', get_string('selftest:storage_intro', 'local_ai_course_assistant'));
-
-if ($runstorage && confirm_sesskey()) {
-    $rendertable(\local_ai_course_assistant\soapbox_storage_probe::run_all());
-}
-
-echo $OUTPUT->single_button(
-    new moodle_url($pageurl, ['runstorage' => 1, 'sesskey' => sesskey()]),
-    get_string('selftest:storage_run', 'local_ai_course_assistant'),
-    'get'
-);
+// The Soapbox object-storage probe was removed from this page in 7.12.5 (PresenterAI replaces
+// Soapbox). The probe class stays for the cleanup task's own use.
 
 echo $OUTPUT->footer();

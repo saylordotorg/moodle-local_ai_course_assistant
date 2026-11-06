@@ -53,7 +53,26 @@ final class settings_layout_test extends \advanced_testcase {
      *
      * @var string[]
      */
-    private const REMOVED_ON_PURPOSE = ['prompt_budget_auto_tune'];
+    // Removed from the admin tree on purpose: prompt_budget_auto_tune, and in 7.12.5 every soapbox_* setting
+    // (PresenterAI replaces Soapbox; stored values stay).
+    private const REMOVED_ON_PURPOSE = [
+        'prompt_budget_auto_tune',
+        'soapbox_enabled',
+        'soapbox_gesture_vision',
+        'soapbox_max_recordings',
+        'soapbox_max_seconds',
+        'soapbox_retention_days',
+        'soapbox_slide_vision',
+        'soapbox_storage_bucket',
+        'soapbox_storage_key',
+        'soapbox_storage_prefix',
+        'soapbox_storage_region',
+        'soapbox_storage_secret',
+        'soapbox_stt_mode',
+        'soapbox_video_quality',
+        'soapbox_vision_model',
+        'soapbox_vision_provider',
+    ];
 
     /**
      * Rebuild the real admin tree as an administrator and return the plugin category.

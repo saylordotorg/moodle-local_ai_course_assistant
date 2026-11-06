@@ -8,10 +8,10 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 
 A short tour, recorded on Saylor University's development site on version 7.12 in a demo course with no student data. The learner half is shown in student view: answers drawn from the course's own content, Quiz Me, Study Plan, and replies in the learner's own language across 46 language packs. The admin half covers the settings hub with its five task pages, the Providers and keys table, and automatic model upgrades.
 
-## Version 7.12.4
+## Version 7.12.5
 
-**Release Date:** October 2026
-**Plugin build:** 2026103002
+**Release Date:** November 2026
+**Plugin build:** 2026110601
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0, 5.1 and 5.3. `version.php` declares support through 5.3.
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+
@@ -89,7 +89,7 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 ### Practice and Assessment
 - **Practice Quizzes:** Generated from the course's own material, answered inside the drawer, with per-question feedback and a score summary. These are practice only and separate from the course's Moodle quizzes
 - **Flashcards:** Generated from a page or activity, with spaced-repetition review
-- **Spoken Presentation Practice (Soapbox):** Learners record a talk against an instructor-configured assignment; it is transcribed and scored against a rubric with per-criterion feedback. Audio is deleted on a retention schedule, and only the transcript and score are kept. Four speaking levels including three ESL tiers
+- **Spoken presentations:** The PresenterAI activity plugin replaces SOLA's old Soapbox tool. Soapbox is hidden in SOLA; its stored recordings still follow the retention schedule and the privacy export and delete tools.
 - **Essay Feedback:** Rubric-based scoring with per-criterion commentary
 - **Academic Integrity:** The assistant is unavailable while a learner has a Moodle quiz attempt in progress. On by default for every quiz, checked on the server against the learner's live attempts rather than against whatever page the browser reports, and applied to every surface including voice. A teacher can exempt an individual quiz
 
@@ -130,7 +130,7 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 - **Failure Alerts:** The unanswered-question alert counts failed replies as failures (they used to look like answers) and also fires when a set number of replies fail anywhere on the site, naming the most common provider message. Off by default.
 - **Read-Only Audit Access:** `local/ai_course_assistant:viewaudit` opens the audit log without `moodle/site:config`. No role has it by default.
 - **Spend Reporting:** An optional token-authenticated endpoint reports per-provider monthly spend for external dashboards, and reports how many rows it could not price so a real zero is distinguishable from a silent one. Off by default
-- **Settings Organized by Task (v7.10.0):** The settings menu has five task pages (Essentials, Models and keys, Features, Safety and privacy, Cost and reliability) and an **Advanced** group of five pages (Retrieval; Reranking and documents; Prompt, voice and display; Integrations and governance; Soapbox, avatars and legacy), instead of the 11 flat pages of earlier releases. Nothing was renamed, deleted or given a new default, so a site that changes nothing behaves the same. Old settings URLs redirect to the page that replaced them
+- **Settings Organized by Task (v7.10.0):** The settings menu has five task pages (Essentials, Models and keys, Features, Safety and privacy, Cost and reliability) and an **Advanced** group of five pages (Retrieval; Reranking and documents; Prompt, voice and display; Integrations and governance; Avatars and legacy), instead of the 11 flat pages of earlier releases. Nothing was renamed, deleted or given a new default, so a site that changes nothing behaves the same. Old settings URLs redirect to the page that replaced them
 - **Settings Usage Report:** `admin/cli/settings_usage_report.php` lists every setting as default, changed, secret set, secret unset or not stored, so you can see which settings your site has never touched. It never prints a stored value or a secret. `--json` for machines, `--per-course` for per-course overrides, `--tables` for row counts
 - **Find and Replace a Key Everywhere (v7.11.0):** `admin/cli/rotate_key.php --list` shows every place an AI key is stored (Providers and keys rows, the pasted-key settings, voice provider rows, the legacy `apikey` copy and per-course keys) by its last four characters and a fingerprint, never the key. Name the old key by its last four, give the new key in an environment variable or on standard input (never on the command line), and the command is a dry run until you add `--apply`, which replaces the key in every place in one transaction. It refuses an ambiguous old key, a new key whose prefix belongs to another vendor, and a key forced in `config.php`. A Reports > Status check lists keys stored in two or more places, and a course settings row with no key (as after a restore) no longer shows a saved key
 - **Off-Topic Management:** Configure limits and lockout duration
@@ -172,7 +172,7 @@ All admin pages live under one hub: **Site administration → Plugins → Local 
 | **Advanced > Reranking and documents** | Reranking, switching embedding models, which document types are indexed |
 | **Advanced > Prompt, voice and display** | Model call details, prompt budget and debugging, history, voice and speech providers, widget appearance |
 | **Advanced > Integrations and governance** | Support and Zendesk, analytics export, CDN, remote configuration, signed policy bundles, vendor data and price drift, benchmarks, optimizer weights |
-| **Advanced > Soapbox, avatars and legacy** | Deprecated Soapbox, talking-avatar vendors and other parked settings |
+| **Advanced > Soapbox, avatars and legacy** | Talking-avatar vendors and other parked settings |
 
 Every page opens with a row of links to the other pages. A bookmark to an older page name (for example `admin/settings.php?section=local_ai_course_assistant_ai`) redirects to the page that replaced it, and the old Safety and moderation page is now Safety and privacy. Course-level settings (base URL, system prompt, temperature and monthly spend cap) are on each course's AI settings page, under a **More options** section that stays closed until one of them has a value.
 
