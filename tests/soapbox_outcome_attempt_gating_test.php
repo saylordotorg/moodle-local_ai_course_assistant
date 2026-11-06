@@ -65,6 +65,7 @@ final class soapbox_outcome_attempt_gating_test extends \advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         set_config('soapbox_enabled', 1, 'local_ai_course_assistant');
+        set_config('soapbox_legacy_reenable', 1, 'local_ai_course_assistant');
         set_config('provider', 'stub', 'local_ai_course_assistant');
         provider\stub_provider::reset();
 

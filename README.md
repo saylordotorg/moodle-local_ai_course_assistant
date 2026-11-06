@@ -172,7 +172,7 @@ All admin pages live under one hub: **Site administration → Plugins → Local 
 | **Advanced > Reranking and documents** | Reranking, switching embedding models, which document types are indexed |
 | **Advanced > Prompt, voice and display** | Model call details, prompt budget and debugging, history, voice and speech providers, widget appearance |
 | **Advanced > Integrations and governance** | Support and Zendesk, analytics export, CDN, remote configuration, signed policy bundles, vendor data and price drift, benchmarks, optimizer weights |
-| **Advanced > Soapbox, avatars and legacy** | Talking-avatar vendors and other parked settings |
+| **Advanced > Avatars and legacy** | Talking-avatar vendors and other parked settings |
 
 Every page opens with a row of links to the other pages. A bookmark to an older page name (for example `admin/settings.php?section=local_ai_course_assistant_ai`) redirects to the page that replaced it, and the old Safety and moderation page is now Safety and privacy. Course-level settings (base URL, system prompt, temperature and monthly spend cap) are on each course's AI settings page, under a **More options** section that stays closed until one of them has a value.
 
