@@ -54,6 +54,7 @@ final class score_speech_test extends \advanced_testcase {
     public function test_returns_too_short_for_a_tiny_transcript(): void {
         $course = $this->getDataGenerator()->create_course();
         set_config('soapbox_enabled', 1, 'local_ai_course_assistant');
+        set_config('soapbox_legacy_reenable', 1, 'local_ai_course_assistant');
 
         $result = score_speech::execute((int) $course->id, 'too short', '', '', 0, 0);
 
@@ -64,6 +65,7 @@ final class score_speech_test extends \advanced_testcase {
     public function test_too_short_boundary_is_40_characters(): void {
         $course = $this->getDataGenerator()->create_course();
         set_config('soapbox_enabled', 1, 'local_ai_course_assistant');
+        set_config('soapbox_legacy_reenable', 1, 'local_ai_course_assistant');
 
         // 39 chars -> too_short; the gate is mb_strlen < 40.
         $thirtynine = str_pad('a', 39, 'a');

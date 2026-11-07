@@ -65,7 +65,11 @@ $context = $courseid > 0 ? context_course::instance($courseid) : context_system:
 require_capability('local/ai_course_assistant:use', $context);
 
 // Soapbox must be enabled for the course.
-if ($courseid > 0 && !\local_ai_course_assistant\feature_flags::resolve('soapbox', $courseid)) {
+// courseid 0 used to skip this check, so the site-wide switch is tested too.
+if (
+    !\local_ai_course_assistant\feature_flags::soapbox_legacy_enabled()
+    || ($courseid > 0 && !\local_ai_course_assistant\feature_flags::resolve('soapbox', $courseid))
+) {
     http_response_code(403);
     echo json_encode(['error' => get_string('soapbox:disabled', 'local_ai_course_assistant')]);
     exit;

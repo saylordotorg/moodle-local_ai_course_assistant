@@ -248,6 +248,11 @@ $jsstrings = [
 
 $typetabs = [];
 foreach (['conversation', 'pronunciation', 'speech'] as $tabtype) {
+    // The speech rubric only fed Soapbox, which PresenterAI replaces (7.12.5). Hide its
+    // tab unless the admin is already on it by direct link.
+    if ($tabtype === 'speech' && $type !== 'speech') {
+        continue;
+    }
     $typetabs[] = [
         'url' => (new moodle_url(
             '/local/ai_course_assistant/rubric_admin.php',

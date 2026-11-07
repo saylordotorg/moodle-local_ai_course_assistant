@@ -133,4 +133,35 @@ final class feature_flags_test extends \advanced_testcase {
         $this->assertTrue(feature_flags::resolve('mastery', (int)$course1->id));
         $this->assertFalse(feature_flags::resolve('mastery', (int)$course2->id));
     }
+
+    public function test_soapbox_is_off_even_when_every_stored_switch_is_on(): void {
+        // Soapbox is retired (7.12.5): the stored switches no longer turn it on, and score_speech refuses.
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course();
+        set_config('soapbox_enabled', '1', 'local_ai_course_assistant');
+        set_config('soapbox_enabled_course_' . $course->id, '1', 'local_ai_course_assistant');
+
+        $this->assertFalse(feature_flags::resolve('soapbox', (int) $course->id));
+        $this->assertFalse(feature_flags::resolve_with_source('soapbox', (int) $course->id)['enabled']);
+
+        $result = \local_ai_course_assistant\external\score_speech::execute(
+            (int) $course->id,
+            str_repeat('word ', 30),
+            '',
+            '',
+            0,
+            0
+        );
+        $this->assertFalse($result['success']);
+        $this->assertSame('disabled', $result['message']);
+
+        // The hidden CLI escape hatch turns it back on.
+        set_config('soapbox_legacy_reenable', '1', 'local_ai_course_assistant');
+        $this->assertTrue(feature_flags::resolve('soapbox', (int) $course->id));
+        // Other features are unaffected by the hatch's absence.
+        unset_config('soapbox_legacy_reenable', 'local_ai_course_assistant');
+        set_config('mastery_enabled', '1', 'local_ai_course_assistant');
+        $this->assertTrue(feature_flags::resolve('mastery', (int) $course->id));
+    }
 }

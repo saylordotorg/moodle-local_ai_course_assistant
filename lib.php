@@ -195,60 +195,8 @@ function local_ai_course_assistant_extend_navigation_course(
             new pix_icon('i/completion-manual-enabled', '')
         );
     }
-    // v6.7.0: learner-facing Soapbox link. Unlike the admin nodes above, this is
-    // shown to any enrolled learner (capability :use) when Soapbox is enabled for
-    // the course, so students in speech courses have a discoverable way in.
-    if (
-        has_capability('local/ai_course_assistant:use', $context)
-            && \local_ai_course_assistant\feature_flags::resolve('soapbox', $course->id)
-    ) {
-        $navigation->add(
-            get_string('soapbox:link', 'local_ai_course_assistant'),
-            new moodle_url('/local/ai_course_assistant/soapbox.php', ['courseid' => $course->id]),
-            navigation_node::TYPE_SETTING,
-            null,
-            'aicasoapbox',
-            new pix_icon('i/audio', '')
-        );
-
-        // v6.8.19: Soapbox video/audio presentation assignments. Instructors get
-        // a link to the assignment manager; learners get a direct link to each
-        // visible assignment so individual assignments are reachable in-course.
-        if (has_capability('local/ai_course_assistant:manage', $context)) {
-            $navigation->add(
-                get_string('soapbox:assign_manage', 'local_ai_course_assistant'),
-                new moodle_url('/local/ai_course_assistant/soapbox_assign.php', ['courseid' => $course->id]),
-                navigation_node::TYPE_SETTING,
-                null,
-                'aicasoapboxassign',
-                new pix_icon('i/settings', '')
-            );
-        }
-        $assignments = \local_ai_course_assistant\soapbox_assignment_manager::get_course_assignments(
-            $course->id,
-            false
-        );
-        // v7.4.3: an assignment placed on the course page as a url activity must not
-        // ALSO appear here, or the same thing is listed twice in two places with no
-        // indication they are the same. Resolved in one query for the whole course --
-        // this callback runs on every course page load, so a lookup per assignment
-        // would add a query per assignment to every view.
-        $placed = \local_ai_course_assistant\soapbox_course_link::placed_in_course($course->id);
-
-        foreach ($assignments as $assign) {
-            if (isset($placed[$assign->id])) {
-                continue;
-            }
-            $navigation->add(
-                format_string($assign->name),
-                new moodle_url('/local/ai_course_assistant/soapbox_present.php', ['id' => $assign->id]),
-                navigation_node::TYPE_SETTING,
-                null,
-                'aicasoapboxassign_' . $assign->id,
-                new pix_icon('i/video', '')
-            );
-        }
-    }
+    // Soapbox nav links (learner page, assignment manager, per-assignment links) were
+    // removed in 7.12.5: PresenterAI replaces Soapbox. The pages stay as notices.
 }
 
 /**

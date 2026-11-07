@@ -114,6 +114,7 @@ final class soapbox_learner_journey_test extends \advanced_testcase {
         $generator->enrol_user($this->peer->id, $this->courseid, 'student');
 
         set_config('soapbox_enabled', 1, 'local_ai_course_assistant');
+        set_config('soapbox_legacy_reenable', 1, 'local_ai_course_assistant');
         set_config('provider', 'stub', 'local_ai_course_assistant');
         set_config('apikey', 'test-key-not-used-by-the-stub', 'local_ai_course_assistant');
         // AWS's own published example credentials. soapbox_storage::is_configured()

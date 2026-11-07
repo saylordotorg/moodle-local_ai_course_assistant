@@ -47,6 +47,10 @@ class feature_flags {
      * @return bool
      */
     public static function resolve(string $feature, int $courseid): bool {
+        // Soapbox is retired (7.12.5): off everywhere, whatever the stored switches say, unless the hidden CLI-only soapbox_legacy_reenable is '1'.
+        if ($feature === 'soapbox' && !self::soapbox_legacy_enabled()) {
+            return false;
+        }
         $override = get_config('local_ai_course_assistant', $feature . '_enabled_course_' . $courseid);
         if ($override === '1') {
             return true;
@@ -67,6 +71,10 @@ class feature_flags {
      *               source ∈ {'override', 'global', 'default'}
      */
     public static function resolve_with_source(string $feature, int $courseid): array {
+        // Soapbox is retired (7.12.5): see resolve().
+        if ($feature === 'soapbox' && !self::soapbox_legacy_enabled()) {
+            return ['enabled' => false, 'source' => 'default'];
+        }
         $override = get_config('local_ai_course_assistant', $feature . '_enabled_course_' . $courseid);
         if ($override === '1') {
             return ['enabled' => true, 'source' => 'override'];
@@ -76,5 +84,14 @@ class feature_flags {
         }
         $global = (bool) get_config('local_ai_course_assistant', $feature . '_enabled');
         return ['enabled' => $global, 'source' => $global ? 'global' : 'default'];
+    }
+
+    /**
+     * Whether the hidden CLI-only escape hatch for retired Soapbox is on (no settings UI sets it).
+     *
+     * @return bool
+     */
+    public static function soapbox_legacy_enabled(): bool {
+        return get_config('local_ai_course_assistant', 'soapbox_legacy_reenable') === '1';
     }
 }

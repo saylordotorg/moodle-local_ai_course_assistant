@@ -266,7 +266,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'flashcards_on'           => 'flashcards_enabled_course_',
         'sandbox_on'              => 'code_sandbox_enabled_course_',
         'essay_on'                => 'essay_feedback_enabled_course_',
-        'soapbox_on'              => 'soapbox_enabled_course_',
         'we_on'                   => 'worked_examples_enabled_course_',
         ] as $field => $cfgprefix
     ) {
@@ -277,15 +276,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             unset_config($cfgprefix . $courseid, 'local_ai_course_assistant');
         }
     }
-    // v6.7.0: Soapbox course-type/level (general speech vs ESL beginner/advanced).
-    // Tailors the AI coaching register and the default sample rubric.
-    $soapboxlevel = optional_param('soapbox_level', '', PARAM_ALPHANUMEXT);
-    $validlevels = array_keys(\local_ai_course_assistant\rubric_manager::speech_presets());
-    if (in_array($soapboxlevel, $validlevels, true) && $soapboxlevel !== \local_ai_course_assistant\rubric_manager::SPEECH_LEVEL_GENERAL) {
-        set_config('soapbox_level_course_' . $courseid, $soapboxlevel, 'local_ai_course_assistant');
-    } else {
-        unset_config('soapbox_level_course_' . $courseid, 'local_ai_course_assistant');
-    }
+    // Soapbox per-course settings are no longer on this form (PresenterAI replaces it), so
+    // they are neither saved nor cleared here: stored values stay for the cleanup task.
     // Digest email keeps its checkbox semantics — it's a per-course delivery
     // toggle, not a feature on/off.
     set_config(
@@ -391,22 +383,17 @@ $socraticraw  = get_config('local_ai_course_assistant', 'socratic_mode_course_' 
 $fcraw        = get_config('local_ai_course_assistant', 'flashcards_enabled_course_' . $courseid);
 $sbraw        = get_config('local_ai_course_assistant', 'code_sandbox_enabled_course_' . $courseid);
 $essraw       = get_config('local_ai_course_assistant', 'essay_feedback_enabled_course_' . $courseid);
-$sbxraw       = get_config('local_ai_course_assistant', 'soapbox_enabled_course_' . $courseid);
 $weraw        = get_config('local_ai_course_assistant', 'worked_examples_enabled_course_' . $courseid);
 $socraticgbl  = (bool) get_config('local_ai_course_assistant', 'socratic_mode_enabled');
 $fcgbl        = (bool) get_config('local_ai_course_assistant', 'flashcards_enabled');
 $sbgbl        = (bool) get_config('local_ai_course_assistant', 'code_sandbox_enabled');
 $essgbl       = (bool) get_config('local_ai_course_assistant', 'essay_feedback_enabled');
-$sbxgbl       = (bool) get_config('local_ai_course_assistant', 'soapbox_enabled');
 $wegbl        = (bool) get_config('local_ai_course_assistant', 'worked_examples_enabled');
 
 // Resolved booleans that decide whether a feature's secondary link is shown.
 $fcon       = \local_ai_course_assistant\feature_flags::resolve('flashcards', $courseid);
 $sbon       = \local_ai_course_assistant\feature_flags::resolve('code_sandbox', $courseid);
 $esson      = \local_ai_course_assistant\feature_flags::resolve('essay_feedback', $courseid);
-$sbxon      = \local_ai_course_assistant\feature_flags::resolve('soapbox', $courseid);
-$sbxlevel   = (string) (get_config('local_ai_course_assistant', 'soapbox_level_course_' . $courseid)
-    ?: \local_ai_course_assistant\rubric_manager::SPEECH_LEVEL_GENERAL);
 $digeston   = (bool) get_config('local_ai_course_assistant', 'digest_email_enabled_course_' . $courseid);
 $extresraw  = get_config('local_ai_course_assistant', 'external_resources_enabled_course_' . $courseid);
 $extresglobal = (bool) get_config('local_ai_course_assistant', 'external_resources_enabled');
@@ -513,16 +500,6 @@ $keyph = $haskey
 // the course already holds a value in one of the four, so a stored override is never hidden.
 // Decided here, as a yes/no, so the stored row itself never goes near the template context.
 $moreoptionsopen = course_config_manager::has_more_options_values($current);
-
-// Soapbox course type, shown only once Soapbox resolves to on for this course.
-$soapboxleveloptions = [];
-foreach (\local_ai_course_assistant\rubric_manager::speech_presets() as $lvkey => $lvdef) {
-    $soapboxleveloptions[] = [
-        'value' => $lvkey,
-        'label' => get_string($lvdef['label_key'], 'local_ai_course_assistant'),
-        'selected' => ($sbxlevel === $lvkey),
-    ];
-}
 
 // External resources opt-in.
 $extresoptions = [
@@ -769,35 +746,6 @@ $templatedata = [
         ['courseid' => $courseid]
     ))->out(false),
     'essaylinklabel' => get_string('essay_feedback:link', 'local_ai_course_assistant'),
-
-    // Soapbox speech practice.
-    'soapboxtitle' => get_string('soapbox:title', 'local_ai_course_assistant'),
-    'soapboxhelp' => get_string('soapbox:toggle_help', 'local_ai_course_assistant'),
-    'soapboxselect' => $pedagogyselect(
-        'soapbox_on',
-        'aica-soapbox-on',
-        $pedagogyoptions($sbxraw, $sbxgbl)
-    ),
-    'showsoapbox' => (bool) $sbxon,
-    'soapboxlevellabel' => get_string('soapbox:level_label', 'local_ai_course_assistant'),
-    'soapboxlevelselect' => [
-        'hasid' => true,
-        'id' => 'aica-soapbox-level',
-        'name' => 'soapbox_level',
-        'selectclass' => 'form-control form-control-sm sola-cs-select-level',
-        'options' => $soapboxleveloptions,
-    ],
-    'soapboxlevelhelp' => get_string('soapbox:level_help', 'local_ai_course_assistant'),
-    'soapboxurl' => (new moodle_url(
-        '/local/ai_course_assistant/soapbox.php',
-        ['courseid' => $courseid]
-    ))->out(false),
-    'soapboxlinklabel' => get_string('soapbox:link', 'local_ai_course_assistant'),
-    'soapboxrubricurl' => (new moodle_url(
-        '/local/ai_course_assistant/rubric_admin.php',
-        ['courseid' => $courseid, 'type' => 'speech']
-    ))->out(false),
-    'soapboxrubriclabel' => get_string('soapbox:edit_rubric', 'local_ai_course_assistant'),
 
     // Worked examples.
     'wetitle' => get_string('worked_examples:starter', 'local_ai_course_assistant'),

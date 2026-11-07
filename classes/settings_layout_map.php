@@ -350,14 +350,6 @@ final class settings_layout_map {
         'adv_legacy' => [
             'parent' => 'advanced',
             'sections' => [
-                ['existing', 'soapbox_heading', [
-                    'soapbox_deprecated_notice', 'soapbox_enabled', 'soapbox_stt_mode',
-                    'soapbox_rubric_link', 'soapbox_max_seconds', 'soapbox_max_recordings',
-                    'soapbox_retention_days', 'soapbox_video_quality', 'soapbox_slide_vision',
-                    'soapbox_gesture_vision', 'soapbox_vision_provider', 'soapbox_vision_model',
-                    'soapbox_storage_bucket', 'soapbox_storage_region', 'soapbox_storage_prefix',
-                    'soapbox_storage_key', 'soapbox_storage_secret'
-                ]],
                 ['existing', 'talking_avatar_heading', [
                     'talking_avatar_enabled', 'talking_avatar_provider', 'cdn_bundle_url',
                     'did_api_key', 'did_persona_id', 'heygen_api_key', 'heygen_persona_id',
