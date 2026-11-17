@@ -98,6 +98,28 @@ final class branding_hardcoded_test extends \advanced_testcase {
         $this->assertStringNotContainsString('[[tutorshort]]', $text);
     }
 
+    public function test_a_stored_task_set_with_tokens_reaches_learners_resolved(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->rebrand();
+
+        $DB->delete_records('local_ai_course_assistant_ut_tasks');
+        $now = time();
+        $DB->insert_record('local_ai_course_assistant_ut_tasks', (object) [
+            'courseid' => 0,
+            'title' => 'Test',
+            'tasks' => json_encode(usertesting_manager::DEFAULT_TASKS),
+            'external_url' => '',
+            'active' => 1,
+            'timecreated' => $now,
+            'timemodified' => $now,
+        ]);
+
+        $text = json_encode(usertesting_manager::get_active_taskset(0)->tasks);
+        $this->assertStringContainsString('Ask Atlas to explain', $text);
+        $this->assertStringNotContainsString('[[tutorshort]]', $text);
+    }
+
     public function test_the_cost_anomaly_email_is_named_for_the_configured_assistant(): void {
         $this->resetAfterTest(true);
         $this->rebrand();

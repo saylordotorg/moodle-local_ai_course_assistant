@@ -125,6 +125,13 @@ class usertesting_manager {
 
         if (is_array($taskset->tasks)) {
             $taskset->tasks = self::normalize_tasks($taskset->tasks);
+            // Resolve brand tokens for display, so a stored [[tutorshort]] never
+            // reaches a learner as raw text. The raw getter stays untouched.
+            $taskset->tasks = array_map(static function ($task) {
+                return is_array($task) ? array_map(static function ($v) {
+                    return is_string($v) ? branding::apply($v) : $v;
+                }, $task) : $task;
+            }, $taskset->tasks);
         }
 
         return $taskset;
