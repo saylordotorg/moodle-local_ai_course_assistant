@@ -1945,6 +1945,56 @@ define([
     let helpI18nApplied = false;
 
     /**
+     * The brand-token map the server put on the widget root (data-brandtokens),
+     * e.g. {"tutorshort": "Atlas", "tutorname": "...", ...}. Empty when absent.
+     *
+     * @param {HTMLElement|null} root The widget root element.
+     * @return {Object<string, string>} Token name to configured value.
+     */
+    const brandTokensOf = function(root) {
+        if (!root) {
+            return {};
+        }
+        try {
+            const map = JSON.parse(root.dataset.brandtokens || '{}');
+            return (map && typeof map === 'object') ? map : {};
+        } catch (e) {
+            return {};
+        }
+    };
+
+    /**
+     * The configured short product name, from the widget root.
+     *
+     * @param {HTMLElement|null} root The widget root element.
+     * @return {string} The short name ('SOLA' only when the root carries none).
+     */
+    const brandShortName = function(root) {
+        return (root && root.dataset.shortname) || brandTokensOf(root).tutorshort || 'SOLA';
+    };
+
+    /**
+     * Resolve a bundled translation against the configured brand: EVERY {$a}
+     * becomes the short name and every [[token]] its configured value. Shared
+     * by applyI18n and applyHelpPanelI18n so the two can't drift apart.
+     *
+     * @param {string} str The string to resolve (falsy values pass through).
+     * @param {HTMLElement|null} root The widget root element.
+     * @return {string} The resolved string.
+     */
+    const resolveBrandText = function(str, root) {
+        if (!str) {
+            return str;
+        }
+        const brand = brandTokensOf(root);
+        let outstr = String(str).split('{$a}').join(brandShortName(root));
+        Object.keys(brand).forEach(function(tok) {
+            outstr = outstr.split('[[' + tok + ']]').join(String(brand[tok]));
+        });
+        return outstr;
+    };
+
+    /**
      * Retranslate the help panel into the language chosen inside the widget.
      *
      * The panel is rendered server-side in the PAGE language -- partly via
@@ -1989,22 +2039,8 @@ define([
         }
 
         require(['local_ai_course_assistant/i18n_help'], function(HelpI18n) {
-            let brand = {};
-            try {
-                brand = JSON.parse(root.dataset.brandtokens || '{}');
-            } catch (e) {
-                brand = {};
-            }
-            const shortname = root.dataset.shortname || brand.tutorshort || 'SOLA';
             const resolve = function(str) {
-                if (!str) {
-                    return str;
-                }
-                let outstr = str.split('{$a}').join(shortname);
-                Object.keys(brand).forEach(function(tok) {
-                    outstr = outstr.split('[[' + tok + ']]').join(brand[tok]);
-                });
-                return outstr;
+                return resolveBrandText(str, root);
             };
 
             targets.forEach(function(el) {
@@ -2041,14 +2077,11 @@ define([
             return;
         }
         const lang = (langCode || 'en').substring(0, 2).toLowerCase();
-        const shortname = root.dataset.shortname || 'SOLA';
 
+        // Every {$a} and every [[token]] resolves to the configured brand, so a
+        // rebranded site never sees the default short name in a tooltip.
         const resolve = function(key) {
-            let str = I18nStrings.get(lang, key);
-            if (str && str.indexOf('{$a}') !== -1) {
-                str = str.replace('{$a}', shortname);
-            }
-            return str;
+            return resolveBrandText(I18nStrings.get(lang, key), root);
         };
 
         root.querySelectorAll('[data-i18n-key]').forEach(function(el) {
@@ -3857,7 +3890,7 @@ define([
             getInstructions: function(baseInstructions, selection) {
                 var phrase = extractPronunciationPhrase(selection);
                 var instructions = baseInstructions ? (baseInstructions + '\n\n') : '';
-                instructions += Realtime.ELL_INSTRUCTIONS;
+                instructions += Realtime.ellInstructions(assistantName);
                 if (phrase) {
                     instructions += '\n\nThe student wants to practice pronouncing: "' + phrase +
                         '". Begin by welcoming the student, briefly explain the exercise, say this phrase clearly, then ask them to repeat it.';
@@ -5297,7 +5330,8 @@ define([
                 addAssistantMsg(msg, null, {skipHistory: true});
                 return;
             }).catch(function() {
-                addAssistantMsg('SOLA is paused during quizzes to support academic integrity. Good luck!', null, {skipHistory: true});
+                addAssistantMsg(brandShortName(document.getElementById('local-ai-course-assistant'))
+                    + ' is paused during quizzes to support academic integrity. Good luck!', null, {skipHistory: true});
             });
             UI.setInputEnabled(false);
             return;

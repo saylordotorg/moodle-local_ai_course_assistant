@@ -128,7 +128,7 @@ PROMPT;
 
         $transcript = '';
         foreach ($messages as $m) {
-            $role = $m->role === 'user' ? 'Student' : 'SOLA';
+            $role = $m->role === 'user' ? 'Student' : branding::short_name();
             $text = trim($m->message);
             if (strlen($text) > 500) {
                 $text = substr($text, 0, 500) . '...';

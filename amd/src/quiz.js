@@ -108,7 +108,8 @@ define(['core/str', 'local_ai_course_assistant/ui'], function(Str, UI) {
                 UI.appendIntroCard(panel, 'aica-intro-quiz',
                     'How quizzes work',
                     'Pick how many questions you want, what topic to cover, '
-                    + 'and how challenging the questions should be. SOLA will '
+                    + 'and how challenging the questions should be. '
+                    + (typeof UI.brandShortName === 'function' ? UI.brandShortName() : 'SOLA') + ' will '
                     + 'generate a fresh quiz from your course material every '
                     + 'time. Your answers feed your study plan but are never '
                     + 'shared.');

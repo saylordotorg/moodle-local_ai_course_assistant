@@ -95,6 +95,31 @@ define([
     /** Minimum pixel movement to count as a drag (suppresses subsequent click) */
     const DRAG_THRESHOLD = 8;
 
+    /**
+     * The configured short product name (Essentials > Branding), read from the
+     * widget root. Learner-facing text built in JS uses this instead of a
+     * literal name so a rebranded site never shows the default.
+     *
+     * @return {string} The short name; 'SOLA' only when the root carries none.
+     */
+    const brandShortName = function() {
+        const root = document.getElementById('local-ai-course-assistant');
+        if (root && root.dataset.shortname) {
+            return root.dataset.shortname;
+        }
+        if (root && root.dataset.brandtokens) {
+            try {
+                const map = JSON.parse(root.dataset.brandtokens);
+                if (map && map.tutorshort) {
+                    return String(map.tutorshort);
+                }
+            } catch (e) {
+                // Fall through to the default.
+            }
+        }
+        return 'SOLA';
+    };
+
     // -----------------------------------------------------------------------
     // SVG avatar system — generates inline face SVGs from user preferences
     // -----------------------------------------------------------------------
@@ -3792,7 +3817,7 @@ define([
             if (!savedItems.length) {
                 const emptySaved = document.createElement('div');
                 emptySaved.className = 'aica-history-panel__empty';
-                emptySaved.textContent = panel.dataset.savedEmptyLabel || 'Save a SOLA response to see it here.';
+                emptySaved.textContent = panel.dataset.savedEmptyLabel || 'Save an AI response to see it here.';
                 list.appendChild(emptySaved);
                 return;
             }
@@ -4480,9 +4505,9 @@ define([
         // future section renames do not falsify the tour again.
         appendIntroCard(content, 'aica-intro-settings',
             'Settings tour',
-            'Pick a language, choose an avatar, set how SOLA explains things, '
+            'Pick a language, choose an avatar, set how ' + brandShortName() + ' explains things, '
             + 'and tune voice and accessibility options. Changes here only affect '
-            + 'how SOLA appears for you. Every setting has a sensible default — '
+            + 'how ' + brandShortName() + ' appears for you. Every setting has a sensible default — '
             + 'feel free to tweak only the ones that help you, and revisit later.');
 
         // ── Language (top of settings) ──
@@ -4749,7 +4774,8 @@ define([
         levelLabel.style.fontWeight = '500';
         levelWrap.appendChild(levelLabel);
         var levelHelp = document.createElement('div');
-        levelHelp.textContent = 'How simply should SOLA explain things? The course content stays the same — only the way SOLA explains it changes.';
+        levelHelp.textContent = 'How simply should ' + brandShortName() + ' explain things? The course content stays the same — only the way '
+            + brandShortName() + ' explains it changes.';
         levelHelp.style.fontSize = '12px';
         levelHelp.style.color = '#666';
         levelHelp.style.marginBottom = '6px';
@@ -4784,7 +4810,7 @@ define([
             voiceSection.className = 'aica-settings-panel__section';
             const voiceHead = document.createElement('h3');
             voiceHead.className = 'aica-settings-panel__section-title';
-            voiceHead.textContent = 'SOLA Voice';
+            voiceHead.textContent = brandShortName() + ' Voice';
             voiceSection.appendChild(voiceHead);
             const voiceSelect = document.createElement('select');
             voiceSelect.className = 'aica-settings-panel__select';
@@ -5246,7 +5272,7 @@ define([
         ratingSection.className = 'aica-settings-panel__section';
         const ratingLabel = document.createElement('div');
         ratingLabel.className = 'aica-settings-panel__section-title';
-        ratingLabel.textContent = 'How would you rate SOLA?';
+        ratingLabel.textContent = 'How would you rate ' + brandShortName() + '?';
         ratingSection.appendChild(ratingLabel);
 
         const starsRow = document.createElement('div');
@@ -5320,7 +5346,8 @@ define([
             setTimeout(function() {
                 content.innerHTML = '<div style="text-align:center;padding:2rem 1rem">' +
                     '<div style="font-size:2rem;margin-bottom:0.5rem">Thank you!</div>' +
-                    '<p style="color:#6c757d">Your feedback helps us improve SOLA.</p></div>';
+                    '<p style="color:#6c757d"></p></div>';
+                content.querySelector('p').textContent = 'Your feedback helps us improve ' + brandShortName() + '.';
                 footer.style.display = 'none';
                 setTimeout(function() { panel.remove(); }, 2000);
             }, 500);
@@ -6070,7 +6097,7 @@ define([
             var hint = document.createElement('div');
             hint.style.cssText = 'font-size:12px;color:#94a3b8;text-align:center;margin-bottom:16px;font-style:italic';
             if (task.type === 'action_then_rate') {
-                hint.textContent = 'Close this panel to interact with SOLA, then come back to rate.';
+                hint.textContent = 'Close this panel to interact with ' + brandShortName() + ', then come back to rate.';
             }
             if (hint.textContent) { content.appendChild(hint); }
 
@@ -6186,7 +6213,7 @@ define([
                 pauseBtn.type = 'button';
                 pauseBtn.style.cssText = 'flex:1;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;' +
                     'font-weight:600;cursor:pointer;color:#475569;background:#fff;transition:all 0.15s';
-                pauseBtn.textContent = 'Go to SOLA';
+                pauseBtn.textContent = 'Go to ' + brandShortName();
                 pauseBtn.addEventListener('click', function() { panel.remove(); });
                 footer.appendChild(pauseBtn);
             }
@@ -6257,7 +6284,8 @@ define([
                     doneContent.appendChild(doneH);
                     var doneP = document.createElement('p');
                     doneP.style.cssText = 'font-size:13px;color:#64748b;margin:0 0 20px';
-                    doneP.textContent = 'Thank you for your feedback. Your responses help us improve SOLA for all students.';
+                    doneP.textContent = 'Thank you for your feedback. Your responses help us improve ' + brandShortName()
+                        + ' for all students.';
                     doneContent.appendChild(doneP);
                     var doneBtn = document.createElement('button');
                     doneBtn.type = 'button';
@@ -6612,7 +6640,7 @@ define([
             frame.className = 'aica-talking-avatar-panel__frame';
             frame.src = json.embed_url;
             frame.allow = 'microphone; camera; autoplay';
-            frame.title = 'SOLA talking avatar';
+            frame.title = brandShortName() + ' talking avatar';
             panel.appendChild(frame);
         }).catch(function() {
             const loading = panel.querySelector('.aica-talking-avatar-panel__loading');
@@ -6629,6 +6657,7 @@ define([
     return {
         initUI: initUI,
         appendIntroCard: appendIntroCard,
+        brandShortName: brandShortName,
         isOpen: isOpen,
         toggleTalkingAvatar: toggleTalkingAvatar,
         toggleDrawer: toggleDrawer,

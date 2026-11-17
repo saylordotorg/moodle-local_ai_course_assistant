@@ -161,9 +161,12 @@ final class language_support {
         // anything else a caller supplies is reduced to a value the browser may claim.
         $source = $source === self::SOURCE_LOCKED ? $source : self::normalise_source($source);
         $langname = self::name($lang);
+        // The configured short name, so the model never tells a learner on a
+        // rebranded site about 'their SOLA language'.
+        $brand = branding::short_name();
 
         $out = "\n\n## Multilingual Support\n"
-            . "You are fluent in the top 100 world languages. SOLA officially supports these "
+            . "You are fluent in the top 100 world languages. {$brand} officially supports these "
             . count(self::names()) . ": "
             . implode(', ', array_map(static function (string $code, string $name): string {
                 return "{$name} ({$code})";
@@ -178,13 +181,13 @@ final class language_support {
         }
 
         if ($source === self::SOURCE_PINNED && $lang !== '') {
-            return $out . "\n**IMPORTANT: The student saved {$langname} ({$lang}) as their SOLA language. "
+            return $out . "\n**IMPORTANT: The student saved {$langname} ({$lang}) as their {$brand} language. "
                 . "Respond in {$langname} for every message, whatever language the student writes in and whatever "
                 . "language earlier turns were in. Do not ask about switching language.**";
         }
 
         if ($source === self::SOURCE_SAVED && $lang !== '') {
-            $out .= "\n**Reply language. The student saved {$langname} ({$lang}) as their SOLA language.** "
+            $out .= "\n**Reply language. The student saved {$langname} ({$lang}) as their {$brand} language.** "
                 . "Before you write anything, decide what language the student's LATEST message is written in. "
                 . "Ignore the language of earlier turns and of the course material.\n"
                 . "1. If it is {$langname}, or you cannot tell (a very short message, a name, a number, code, "
@@ -210,8 +213,8 @@ final class language_support {
                 . "Do not change language on your own. Reply with exactly this and nothing else:\n"
                 . "[SOLA_LANG_SWITCH]xx[/SOLA_LANG_SWITCH]\n"
                 . "followed by one or two short sentences written in THAT language (the one the student wrote in), "
-                . "saying you noticed they wrote in it, that their SOLA language is currently {$langname}, and asking "
-                . "whether they would like to switch SOLA to it. Replace xx with its two-letter code from the list "
+                . "saying you noticed they wrote in it, that their {$brand} language is currently {$langname}, and asking "
+                . "whether they would like to switch {$brand} to it. Replace xx with its two-letter code from the list "
                 . "above. Add no suggestion block, no source marker and no answer to the question: "
                 . "the student will confirm, and the question will be sent again. This is the one reply that does not "
                 . "end with the suggestion block, whatever other instructions say.\n"
@@ -229,7 +232,7 @@ final class language_support {
         }
 
         // Nothing saved: follow the question, then the browser default.
-        $out .= "\n**Reply language.** The student has not chosen a SOLA language. "
+        $out .= "\n**Reply language.** The student has not chosen a {$brand} language. "
             . "Answer in the language their LATEST message is written in, whichever of the supported languages it is, "
             . "and ignore the language of earlier turns. "
             . "If you cannot tell (a very short message, a name, a number or code), "

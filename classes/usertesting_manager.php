@@ -43,7 +43,7 @@ class usertesting_manager {
     const DEFAULT_TASKS = [
         [
             'type' => 'action_then_rate',
-            'instruction' => 'Ask SOLA to explain a concept from your current course. After reading the response, rate how helpful it was.',
+            'instruction' => 'Ask [[tutorshort]] to explain a concept from your current course. After reading the response, rate how helpful it was.',
             'rating_label' => 'How helpful was the explanation?',
             'min' => 1,
             'max' => 5,
@@ -53,8 +53,8 @@ class usertesting_manager {
         ],
         [
             'type' => 'action_then_rate',
-            'instruction' => 'Ask SOLA a follow up question about the same topic. Rate how well it built on the previous answer.',
-            'rating_label' => 'How well did SOLA handle the follow up?',
+            'instruction' => 'Ask [[tutorshort]] a follow up question about the same topic. Rate how well it built on the previous answer.',
+            'rating_label' => 'How well did [[tutorshort]] handle the follow up?',
             'min' => 1,
             'max' => 5,
             'min_label' => 'Poorly',
@@ -73,8 +73,8 @@ class usertesting_manager {
         ],
         [
             'type' => 'action_then_rate',
-            'instruction' => 'Ask SOLA something that is NOT related to your course (e.g. a recipe, celebrity gossip). Observe how it responds.',
-            'rating_label' => 'Did SOLA handle the off topic question appropriately?',
+            'instruction' => 'Ask [[tutorshort]] something that is NOT related to your course (e.g. a recipe, celebrity gossip). Observe how it responds.',
+            'rating_label' => 'Did [[tutorshort]] handle the off topic question appropriately?',
             'min' => 1,
             'max' => 5,
             'min_label' => 'Poorly handled',
@@ -83,17 +83,17 @@ class usertesting_manager {
         ],
         [
             'type' => 'free_response',
-            'instruction' => 'Think about your overall experience with SOLA. What is the most valuable thing it does for your learning?',
+            'instruction' => 'Think about your overall experience with [[tutorshort]]. What is the most valuable thing it does for your learning?',
             'follow_up' => '',
         ],
         [
             'type' => 'free_response',
-            'instruction' => 'What is one feature or improvement you wish SOLA had?',
+            'instruction' => 'What is one feature or improvement you wish [[tutorshort]] had?',
             'follow_up' => '',
         ],
         [
             'type' => 'multiple_choice',
-            'instruction' => 'How likely are you to recommend SOLA to a classmate?',
+            'instruction' => 'How likely are you to recommend [[tutorshort]] to a classmate?',
             'options' => ['Definitely would', 'Probably would', 'Not sure', 'Probably not', 'Definitely not'],
         ],
         [
@@ -453,7 +453,21 @@ class usertesting_manager {
         ]);
 
         if (!$exists) {
-            self::create_taskset(0, 'SOLA Usability Test', self::DEFAULT_TASKS);
+            self::create_taskset(0, branding::str('usertesting_admin:default_title'), self::default_tasks());
         }
+    }
+
+    /**
+     * DEFAULT_TASKS with brand tokens resolved, so the seeded and previewed
+     * tasks name the configured assistant.
+     *
+     * @return array
+     */
+    public static function default_tasks(): array {
+        return array_map(static function (array $task): array {
+            return array_map(static function ($v) {
+                return is_string($v) ? branding::apply($v) : $v;
+            }, $task);
+        }, self::DEFAULT_TASKS);
     }
 }

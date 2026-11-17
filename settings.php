@@ -41,7 +41,7 @@ if ($hassiteconfig) {
     $pluginfo   = core_plugin_manager::instance()->get_plugin_info('local_ai_course_assistant');
     $release    = $pluginfo ? htmlspecialchars($pluginfo->release, ENT_QUOTES) : '?';
     $versionnum = $pluginfo ? htmlspecialchars($pluginfo->versiondisk, ENT_QUOTES) : '?';
-    $shortname  = htmlspecialchars(get_config('local_ai_course_assistant', 'short_name') ?: 'SOLA', ENT_QUOTES);
+    $shortname  = htmlspecialchars(\local_ai_course_assistant\branding::short_name(), ENT_QUOTES);
     $versionbanner = '<div class="sola-admin-version">'
         . '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
         . '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>'

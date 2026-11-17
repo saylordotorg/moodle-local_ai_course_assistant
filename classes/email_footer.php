@@ -127,7 +127,7 @@ class email_footer {
         try {
             return branding::short_name();
         } catch (\Throwable $e) {
-            return (string) (get_config('local_ai_course_assistant', 'short_name') ?: 'SOLA');
+            return 'SOLA';
         }
     }
 }

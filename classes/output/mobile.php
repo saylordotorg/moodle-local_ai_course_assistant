@@ -67,7 +67,7 @@ class mobile {
             ];
         }
 
-        $displayname = get_config('local_ai_course_assistant', 'display_name') ?: 'SOLA';
+        $displayname = \local_ai_course_assistant\branding::display_name();
         $firstname = $USER->firstname;
         $course = get_course($courseid);
 

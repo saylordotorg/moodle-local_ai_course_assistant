@@ -168,7 +168,7 @@ usertesting_manager::ensure_default_taskset();
 // Raw, not repaired: this editor posts back whatever it is seeded with.
 $taskset = usertesting_manager::get_active_taskset_raw($courseid);
 $is_inherited = ($taskset && (int) $taskset->courseid !== $courseid && $courseid > 0);
-$tasks = $taskset ? $taskset->tasks : usertesting_manager::DEFAULT_TASKS;
+$tasks = $taskset ? $taskset->tasks : usertesting_manager::default_tasks();
 $title = $taskset
     ? $taskset->title
     : \local_ai_course_assistant\branding::str('usertesting_admin:default_title');

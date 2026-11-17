@@ -228,7 +228,7 @@ class run_anomaly_digest extends \core\task\scheduled_task {
      * @return string
      */
     private static function build_body(array $alerts, bool $withcomments): string {
-        $out = "SOLA Anomaly Digest\n";
+        $out = \local_ai_course_assistant\branding::short_name() . " Anomaly Digest\n";
         foreach ($alerts as $alert) {
             $out .= "\n• " . $alert['line'] . "\n";
             $detail = $alert['detail'];

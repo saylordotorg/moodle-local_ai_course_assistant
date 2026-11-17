@@ -357,11 +357,11 @@ class cost_anomaly_detector {
             return false;
         }
 
-        $subject = '[SOLA cost anomaly] Today ($' . number_format($eval['today_usd'], 2)
+        $subject = '[' . branding::short_name() . ' cost anomaly] Today ($' . number_format($eval['today_usd'], 2)
             . ') is ' . $eval['ratio'] . 'x the rolling 7-day median ($'
             . number_format($eval['median_usd'], 2) . ')';
 
-        $body  = "SOLA daily cost anomaly detected.\n\n";
+        $body  = branding::short_name() . " daily cost anomaly detected.\n\n";
         $body .= sprintf("Today's spend:      \$%.4f\n", $eval['today_usd']);
         $body .= sprintf("7-day median:       \$%.4f\n", $eval['median_usd']);
         $body .= sprintf("Ratio:              %.2fx\n", $eval['ratio']);

@@ -215,7 +215,7 @@ class health_check {
             }
             if ($tables === 0) {
                 return self::fail($name, 'privacy provider declares no database_table items '
-                    . '(GDPR Articles 15 and 17 will silently omit SOLA tables).');
+                    . '(GDPR Articles 15 and 17 will silently omit ' . branding::short_name() . ' tables).');
             }
             return self::pass($name, "privacy provider declares {$tables} database_table item(s).");
         } catch (\Throwable $e) {
@@ -245,11 +245,11 @@ class health_check {
             }
         }
         if ($stuck) {
-            return self::fail($name, 'Stuck SOLA cron tasks: ' . implode(', ', $stuck)
+            return self::fail($name, 'Stuck ' . branding::short_name() . ' cron tasks: ' . implode(', ', $stuck)
                 . '. Run them by hand with admin/cli/scheduled_task.php --execute=<class> '
                 . 'and capture the exception.');
         }
-        return self::pass($name, count($rows) . ' SOLA scheduled tasks healthy (no faildelay over 1h).');
+        return self::pass($name, count($rows) . ' ' . branding::short_name() . ' scheduled tasks healthy (no faildelay over 1h).');
     }
 
     /**

@@ -340,7 +340,7 @@ class get_realtime_token extends external_api {
      */
     private static function mode_block(string $mode, string $topic, string $phrase, string $pagetitle): string {
         if (strtolower($mode) === 'ell') {
-            $out = "\n\n" . 'You are SOLA in a real-time voice conversation. Keep responses brief (2-3 sentences). '
+            $out = "\n\n" . 'You are ' . \local_ai_course_assistant\branding::short_name() . ' in a real-time voice conversation. Keep responses brief (2-3 sentences). '
                 . '[ELL Coaching Mode] You are an English conversation and pronunciation coach. '
                 . 'Wait for the user to speak first, then respond. '
                 . 'While having natural conversation: gently correct grammar errors by modeling the correct form '

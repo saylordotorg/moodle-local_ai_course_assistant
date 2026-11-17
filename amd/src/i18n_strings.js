@@ -33,7 +33,7 @@ define([], function() {
     // Canonical English source. Also used as fallback when a key is missing
     // for the requested language.
     const EN = {
-        open:                   'Open SOLA',
+        open:                   'Open {$a}',
         close:                  'Close chat',
         change_avatar:          'Change avatar',
         settings_panel:         'Settings',
@@ -93,7 +93,7 @@ define([], function() {
         en: EN,
         // ---LANG-PACKS-START---
         ar: {
-            open:                    'فتح SOLA',
+            open:                    'فتح {$a}',
             close:                   'إغلاق الدردشة',
             change_avatar:           'تغيير الصورة الرمزية',
             settings_panel:          'الإعدادات',
@@ -145,7 +145,7 @@ define([], function() {
             source_from:             'من: {$a}',
         },
         am: {
-            open:                    'SOLA ክፈት',
+            open:                    '{$a} ክፈት',
             close:                   'ቻቱን ዝጋ',
             change_avatar:           'አቫታር ቀይር',
             settings_panel:          'ቅንብሮች',
@@ -197,7 +197,7 @@ define([], function() {
             source_from:             'ምንጭ፦ {$a}',
         },
         bg: {
-            open:                    'Отваряне на SOLA',
+            open:                    'Отваряне на {$a}',
             close:                   'Затваряне на чата',
             change_avatar:           'Смяна на аватар',
             settings_panel:          'Настройки',
@@ -249,7 +249,7 @@ define([], function() {
             source_from:             'От: {$a}',
         },
         bm: {
-            open:                    'SOLA dayɛlɛ',
+            open:                    '{$a} dayɛlɛ',
             close:                   'Kumakanbali datugu',
             change_avatar:           'Avatar yɛlɛma',
             settings_panel:          'Laadili',
@@ -301,7 +301,7 @@ define([], function() {
             source_from:             'Sɔrɔyɔrɔ: {$a}',
         },
         bn: {
-            open:                    'SOLA খুলুন',
+            open:                    '{$a} খুলুন',
             close:                   'চ্যাট বন্ধ করুন',
             change_avatar:           'অবতার পরিবর্তন করুন',
             settings_panel:          'সেটিংস',
@@ -353,7 +353,7 @@ define([], function() {
             source_from:             'উৎস: {$a}',
         },
         cs: {
-            open:                    'Otevřít SOLA',
+            open:                    'Otevřít {$a}',
             close:                   'Zavřít chat',
             change_avatar:           'Změnit avatar',
             settings_panel:          'Nastavení',
@@ -405,7 +405,7 @@ define([], function() {
             source_from:             'Zdroj: {$a}',
         },
         da: {
-            open:                    'Åbn SOLA',
+            open:                    'Åbn {$a}',
             close:                   'Luk chat',
             change_avatar:           'Skift avatar',
             settings_panel:          'Indstillinger',
@@ -457,7 +457,7 @@ define([], function() {
             source_from:             'Fra: {$a}',
         },
         de: {
-            open:                    'SOLA öffnen',
+            open:                    '{$a} öffnen',
             close:                   'Chat schließen',
             change_avatar:           'Avatar ändern',
             settings_panel:          'Einstellungen',
@@ -509,7 +509,7 @@ define([], function() {
             source_from:             'Quelle: {$a}',
         },
         el: {
-            open:                    'Άνοιγμα SOLA',
+            open:                    'Άνοιγμα {$a}',
             close:                   'Κλείσιμο συνομιλίας',
             change_avatar:           'Αλλαγή avatar',
             settings_panel:          'Ρυθμίσεις',
@@ -561,7 +561,7 @@ define([], function() {
             source_from:             'Από: {$a}',
         },
         es: {
-            open:                    'Abrir SOLA',
+            open:                    'Abrir {$a}',
             close:                   'Cerrar chat',
             change_avatar:           'Cambiar avatar',
             settings_panel:          'Configuración',
@@ -613,7 +613,7 @@ define([], function() {
             source_from:             'De: {$a}',
         },
         fi: {
-            open:                    'Avaa SOLA',
+            open:                    'Avaa {$a}',
             close:                   'Sulje keskustelu',
             change_avatar:           'Vaihda avatar',
             settings_panel:          'Asetukset',
@@ -665,7 +665,7 @@ define([], function() {
             source_from:             'Lähde: {$a}',
         },
         fr: {
-            open:                    'Ouvrir SOLA',
+            open:                    'Ouvrir {$a}',
             close:                   'Fermer le chat',
             change_avatar:           'Changer d\'avatar',
             settings_panel:          'Paramètres',
@@ -717,7 +717,7 @@ define([], function() {
             source_from:             'Source : {$a}',
         },
         ha: {
-            open:                    'Bude SOLA',
+            open:                    'Bude {$a}',
             close:                   'Rufe tattaunawa',
             change_avatar:           'Canza hoton',
             settings_panel:          'Saitunan',
@@ -769,7 +769,7 @@ define([], function() {
             source_from:             'Daga: {$a}',
         },
         he: {
-            open:                    'פתח את SOLA',
+            open:                    'פתח את {$a}',
             close:                   'סגור צ\'אט',
             change_avatar:           'שנה אוואטר',
             settings_panel:          'הגדרות',
@@ -821,7 +821,7 @@ define([], function() {
             source_from:             'מתוך: {$a}',
         },
         hi: {
-            open:                    'SOLA खोलें',
+            open:                    '{$a} खोलें',
             close:                   'चैट बंद करें',
             change_avatar:           'अवतार बदलें',
             settings_panel:          'सेटिंग',
@@ -873,7 +873,7 @@ define([], function() {
             source_from:             'स्रोत: {$a}',
         },
         hu: {
-            open:                    'SOLA megnyitása',
+            open:                    '{$a} megnyitása',
             close:                   'Csevegés bezárása',
             change_avatar:           'Avatar módosítása',
             settings_panel:          'Beállítások',
@@ -925,7 +925,7 @@ define([], function() {
             source_from:             'Forrás: {$a}',
         },
         id: {
-            open:                    'Buka SOLA',
+            open:                    'Buka {$a}',
             close:                   'Tutup chat',
             change_avatar:           'Ganti avatar',
             settings_panel:          'Pengaturan',
@@ -977,7 +977,7 @@ define([], function() {
             source_from:             'Dari: {$a}',
         },
         ig: {
-            open:                    'Meghee SOLA',
+            open:                    'Meghee {$a}',
             close:                   'Mechie chat',
             change_avatar:           'Gbanwee avatar',
             settings_panel:          'Ntọala',
@@ -1029,7 +1029,7 @@ define([], function() {
             source_from:             'Sitere na: {$a}',
         },
         it: {
-            open:                    'Apri SOLA',
+            open:                    'Apri {$a}',
             close:                   'Chiudi chat',
             change_avatar:           'Cambia avatar',
             settings_panel:          'Impostazioni',
@@ -1081,7 +1081,7 @@ define([], function() {
             source_from:             'Fonte: {$a}',
         },
         ja: {
-            open:                    'SOLAを開く',
+            open:                    '{$a}を開く',
             close:                   'チャットを閉じる',
             change_avatar:           'アバターを変更',
             settings_panel:          '設定',
@@ -1133,7 +1133,7 @@ define([], function() {
             source_from:             '出典：{$a}',
         },
         ko: {
-            open:                    'SOLA 열기',
+            open:                    '{$a} 열기',
             close:                   '채팅 닫기',
             change_avatar:           '아바타 변경',
             settings_panel:          '설정',
@@ -1185,7 +1185,7 @@ define([], function() {
             source_from:             '출처: {$a}',
         },
         ms: {
-            open:                    'Buka SOLA',
+            open:                    'Buka {$a}',
             close:                   'Tutup chat',
             change_avatar:           'Tukar avatar',
             settings_panel:          'Tetapan',
@@ -1237,7 +1237,7 @@ define([], function() {
             source_from:             'Daripada: {$a}',
         },
         nb: {
-            open:                    'Åpne SOLA',
+            open:                    'Åpne {$a}',
             close:                   'Lukk chat',
             change_avatar:           'Bytt avatar',
             settings_panel:          'Innstillinger',
@@ -1289,7 +1289,7 @@ define([], function() {
             source_from:             'Fra: {$a}',
         },
         ne: {
-            open:                    'SOLA खोल्नुहोस्',
+            open:                    '{$a} खोल्नुहोस्',
             close:                   'च्याट बन्द गर्नुहोस्',
             change_avatar:           'अवतार परिवर्तन गर्नुहोस्',
             settings_panel:          'सेटिङहरू',
@@ -1341,7 +1341,7 @@ define([], function() {
             source_from:             'स्रोत: {$a}',
         },
         nl: {
-            open:                    'SOLA openen',
+            open:                    '{$a} openen',
             close:                   'Chat sluiten',
             change_avatar:           'Avatar wijzigen',
             settings_panel:          'Instellingen',
@@ -1393,7 +1393,7 @@ define([], function() {
             source_from:             'Van: {$a}',
         },
         om: {
-            open:                    'SOLA bani',
+            open:                    '{$a} bani',
             close:                   'Haasawa cufii',
             change_avatar:           'Fakkii jijjiiri',
             settings_panel:          'Qindaa\'ina',
@@ -1445,7 +1445,7 @@ define([], function() {
             source_from:             'Madda: {$a}',
         },
         pa: {
-            open:                    'SOLA ਖੋਲ੍ਹੋ',
+            open:                    '{$a} ਖੋਲ੍ਹੋ',
             close:                   'ਚੈਟ ਬੰਦ ਕਰੋ',
             change_avatar:           'ਅਵਤਾਰ ਬਦਲੋ',
             settings_panel:          'ਸੈਟਿੰਗਾਂ',
@@ -1497,7 +1497,7 @@ define([], function() {
             source_from:             'ਸਰੋਤ: {$a}',
         },
         pl: {
-            open:                    'Otwórz SOLA',
+            open:                    'Otwórz {$a}',
             close:                   'Zamknij czat',
             change_avatar:           'Zmień awatar',
             settings_panel:          'Ustawienia',
@@ -1549,7 +1549,7 @@ define([], function() {
             source_from:             'Źródło: {$a}',
         },
         pt: {
-            open:                    'Abrir SOLA',
+            open:                    'Abrir {$a}',
             close:                   'Fechar chat',
             change_avatar:           'Alterar avatar',
             settings_panel:          'Configurações',
@@ -1601,7 +1601,7 @@ define([], function() {
             source_from:             'De: {$a}',
         },
         ro: {
-            open:                    'Deschideți SOLA',
+            open:                    'Deschideți {$a}',
             close:                   'Închideți chatul',
             change_avatar:           'Schimbați avatarul',
             settings_panel:          'Setări',
@@ -1653,7 +1653,7 @@ define([], function() {
             source_from:             'Sursa: {$a}',
         },
         ru: {
-            open:                    'Открыть SOLA',
+            open:                    'Открыть {$a}',
             close:                   'Закрыть чат',
             change_avatar:           'Изменить аватар',
             settings_panel:          'Настройки',
@@ -1705,7 +1705,7 @@ define([], function() {
             source_from:             'Источник: {$a}',
         },
         sk: {
-            open:                    'Otvoriť SOLA',
+            open:                    'Otvoriť {$a}',
             close:                   'Zatvoriť chat',
             change_avatar:           'Zmeniť avatar',
             settings_panel:          'Nastavenia',
@@ -1757,7 +1757,7 @@ define([], function() {
             source_from:             'Zdroj: {$a}',
         },
         so: {
-            open:                    'Fur SOLA',
+            open:                    'Fur {$a}',
             close:                   'Xidh wada-hadalka',
             change_avatar:           'Beddel avatar-ka',
             settings_panel:          'Dejimaha',
@@ -1809,7 +1809,7 @@ define([], function() {
             source_from:             'Laga soo xigtay: {$a}',
         },
         sv: {
-            open:                    'Öppna SOLA',
+            open:                    'Öppna {$a}',
             close:                   'Stäng chatten',
             change_avatar:           'Byt avatar',
             settings_panel:          'Inställningar',
@@ -1861,7 +1861,7 @@ define([], function() {
             source_from:             'Från: {$a}',
         },
         sw: {
-            open:                    'Fungua SOLA',
+            open:                    'Fungua {$a}',
             close:                   'Funga mazungumzo',
             change_avatar:           'Badilisha picha',
             settings_panel:          'Mipangilio',
@@ -1913,7 +1913,7 @@ define([], function() {
             source_from:             'Kutoka: {$a}',
         },
         ta: {
-            open:                    'SOLA-வை திற',
+            open:                    '{$a}-வை திற',
             close:                   'அரட்டையை மூடு',
             change_avatar:           'அவதாரத்தை மாற்று',
             settings_panel:          'அமைப்புகள்',
@@ -1965,7 +1965,7 @@ define([], function() {
             source_from:             'ஆதாரம்: {$a}',
         },
         th: {
-            open:                    'เปิด SOLA',
+            open:                    'เปิด {$a}',
             close:                   'ปิดแชท',
             change_avatar:           'เปลี่ยนอวาตาร์',
             settings_panel:          'การตั้งค่า',
@@ -2017,7 +2017,7 @@ define([], function() {
             source_from:             'จาก: {$a}',
         },
         tl: {
-            open:                    'Buksan ang SOLA',
+            open:                    'Buksan ang {$a}',
             close:                   'Isara ang chat',
             change_avatar:           'Baguhin ang avatar',
             settings_panel:          'Mga Setting',
@@ -2069,7 +2069,7 @@ define([], function() {
             source_from:             'Mula sa: {$a}',
         },
         tr: {
-            open:                    'SOLA\'yı aç',
+            open:                    '{$a}\'yı aç',
             close:                   'Sohbeti kapat',
             change_avatar:           'Avatarı değiştir',
             settings_panel:          'Ayarlar',
@@ -2121,7 +2121,7 @@ define([], function() {
             source_from:             'Kaynak: {$a}',
         },
         uk: {
-            open:                    'Відкрити SOLA',
+            open:                    'Відкрити {$a}',
             close:                   'Закрити чат',
             change_avatar:           'Змінити аватар',
             settings_panel:          'Налаштування',
@@ -2173,7 +2173,7 @@ define([], function() {
             source_from:             'Джерело: {$a}',
         },
         vi: {
-            open:                    'Mở SOLA',
+            open:                    'Mở {$a}',
             close:                   'Đóng chat',
             change_avatar:           'Thay đổi hình đại diện',
             settings_panel:          'Cài đặt',
@@ -2225,7 +2225,7 @@ define([], function() {
             source_from:             'Nguồn: {$a}',
         },
         wo: {
-            open:                    'Ubbi SOLA',
+            open:                    'Ubbi {$a}',
             close:                   'Tëj wax-ak-wax bi',
             change_avatar:           'Soppal avatar bi',
             settings_panel:          'Réglages',
@@ -2277,7 +2277,7 @@ define([], function() {
             source_from:             'Jóge: {$a}',
         },
         yo: {
-            open:                    'Ṣí SOLA',
+            open:                    'Ṣí {$a}',
             close:                   'Pa ìjíròrò dé',
             change_avatar:           'Yí avatar padà',
             settings_panel:          'Àwọn Ètò',
@@ -2329,7 +2329,7 @@ define([], function() {
             source_from:             'Orísun: {$a}',
         },
         zh: {
-            open:                    '打开 SOLA',
+            open:                    '打开 {$a}',
             close:                   '关闭聊天',
             change_avatar:           '更换头像',
             settings_panel:          '设置',
@@ -2381,7 +2381,7 @@ define([], function() {
             source_from:             '来源：{$a}',
         },
         zu: {
-            open:                    'Vula SOLA',
+            open:                    'Vula {$a}',
             close:                   'Vala ingxoxo',
             change_avatar:           'Shintsha i-avatar',
             settings_panel:          'Izilungiselelo',

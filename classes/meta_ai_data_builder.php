@@ -29,7 +29,7 @@ namespace local_ai_course_assistant;
  */
 class meta_ai_data_builder {
     private const SYSTEM_PROMPT = <<<'PROMPT'
-You are an analytics assistant for an institution's AI learning assistant (SOLA).
+You are an analytics assistant for an institution's AI learning assistant ([[tutorshort]]).
 
 You have access to:
 1. Anonymized conversation transcripts between students and the AI tutor (with provider and model metadata per message)
@@ -65,7 +65,7 @@ PROMPT;
             $courseids = $courseids > 0 ? [$courseids] : [];
         }
 
-        $parts = [self::SYSTEM_PROMPT];
+        $parts = [branding::apply(self::SYSTEM_PROMPT)];
 
         // Aggregate stats first (cheap, gives the LLM numerical context).
         $parts[] = "\n\n## Aggregate Statistics\n\n" . self::build_aggregate_stats($courseids, $since, $filterprovider);
@@ -401,7 +401,7 @@ PROMPT;
                 $who = anonymizer::name((int) $msg->userid);
             } else {
                 $provlabel = $msg->provider ? " [{$msg->provider}" . ($msg->model_name ? "/{$msg->model_name}" : "") . "]" : "";
-                $who = "SOLA{$provlabel}";
+                $who = branding::short_name() . $provlabel;
             }
 
             $date = userdate($msg->timecreated, '%Y-%m-%d %H:%M');

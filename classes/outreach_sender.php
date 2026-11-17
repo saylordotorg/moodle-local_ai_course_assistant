@@ -117,7 +117,7 @@ class outreach_sender {
                 return self::block("user {$userid} email is opted out");
             }
             $reason = 'You receive these from time to time when you hit a '
-                . 'milestone or finish a streak in your SOLA-supported course.';
+                . 'milestone or finish a streak in your ' . branding::short_name() . '-supported course.';
             $bodytextf = email_footer::append_text(
                 $bodytext,
                 (string) $user->email,

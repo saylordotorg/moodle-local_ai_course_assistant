@@ -383,8 +383,9 @@ class spend_guard {
 
         $scope = $courseid > 0 ? "course $courseid" : 'site-wide';
         $scope .= $capability ? " / {$capability}" : ' / all capabilities';
-        $subject = '[SOLA spend guard] ' . strtoupper($level) . ' — ' . $scope;
-        $body = "SOLA spend has crossed a configured threshold.\n\n"
+        $brand = branding::short_name();
+        $subject = '[' . $brand . ' spend guard] ' . strtoupper($level) . ' — ' . $scope;
+        $body = "{$brand} spend has crossed a configured threshold.\n\n"
             . "Scope: {$scope}\n"
             . "Period: " . self::period_label() . " (since " . userdate(self::period_start()) . ")\n"
             . sprintf(
@@ -400,7 +401,7 @@ class spend_guard {
 
         // v5.4.3: per-recipient unsubscribe footer + opt-out check.
         $reason = 'You receive this alert because your address is configured '
-            . 'as a SOLA spend-guard recipient.';
+            . 'as a ' . $brand . ' spend-guard recipient.';
         foreach (array_filter(array_map('trim', explode(',', $recipients))) as $email) {
             if (email_optout::is_opted_out($email, email_optout::TYPE_SPEND_ALERT)) {
                 continue;

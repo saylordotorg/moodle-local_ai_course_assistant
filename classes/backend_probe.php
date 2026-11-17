@@ -56,7 +56,7 @@ final class backend_probe {
         if ($configured === 0) {
             return self::row(
                 self::STATUS_WARN,
-                "The backend reports a {$detected}-token window but SOLA clamping is off (Backend context window = 0). "
+                "The backend reports a {$detected}-token window but " . branding::short_name() . " clamping is off (Backend context window = 0). "
                 . "Consider setting it to {$detected} so prompts cannot overflow."
             );
         }
@@ -140,7 +140,7 @@ final class backend_probe {
         $configured = get_config('local_ai_course_assistant', 'provider') ?: 'auto';
         if ($available) {
             $note = ($configured === 'auto')
-                ? 'Auto routes chat through it when no SOLA key is set.'
+                ? 'Auto routes chat through it when no ' . branding::short_name() . ' key is set.'
                 : "Chat provider is set to '{$configured}', so core_ai is available but not in use.";
             return self::row(
                 self::STATUS_PASS,
@@ -150,12 +150,12 @@ final class backend_probe {
         if (!class_exists('\\core_ai\\manager')) {
             return self::row(
                 self::STATUS_PASS,
-                'Moodle core_ai subsystem not present (needs Moodle 4.5+); SOLA uses its own providers.'
+                'Moodle core_ai subsystem not present (needs Moodle 4.5+); ' . branding::short_name() . ' uses its own providers.'
             );
         }
         return self::row(
             self::STATUS_PASS,
-            'Moodle core_ai is present but has no configured AI provider; SOLA uses its own providers. '
+            'Moodle core_ai is present but has no configured AI provider; ' . branding::short_name() . ' uses its own providers. '
             . 'Configure one under Site admin > AI to route chat through it.'
         );
     }
