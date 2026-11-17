@@ -75,7 +75,7 @@ class run_integrity_checks extends \core\task\scheduled_task {
         }
 
         $sitename = format_string($CFG->shortname ?? 'Moodle');
-        $displayname = get_config('local_ai_course_assistant', 'display_name') ?: 'SOLA';
+        $displayname = \local_ai_course_assistant\branding::display_name();
         $subject = "[{$displayname}] Integrity Check Failed: {$results['failed']} issue(s) on {$sitename}";
 
         // Build report body.
@@ -110,7 +110,7 @@ class run_integrity_checks extends \core\task\scheduled_task {
 
         // v5.4.3: append unsubscribe footer + check opt-out per recipient.
         $reason = 'You receive this report because your address is configured '
-            . 'as the SOLA integrity-report destination.';
+            . 'as the ' . \local_ai_course_assistant\branding::short_name() . ' integrity-report destination.';
 
         // Send using Moodle messaging.
         if (!empty($email)) {
@@ -143,7 +143,7 @@ class run_integrity_checks extends \core\task\scheduled_task {
                 $touser->id = -1;
                 $touser->firstaccess = 0;
                 $touser->username = 'integrity_report';
-                $touser->firstname = 'SOLA';
+                $touser->firstname = \local_ai_course_assistant\branding::short_name();
                 $touser->lastname = 'Admin';
                 $touser->maildisplay = 1;
                 $touser->mailformat = 1;

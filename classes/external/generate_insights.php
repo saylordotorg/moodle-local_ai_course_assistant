@@ -160,7 +160,8 @@ class generate_insights extends external_api {
 
         // Build the AI prompt.
         $institution = get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University';
-        $systemprompt = "You are a product analyst for SOLA ({$institution} Online Learning Assistant), "
+        $brand = \local_ai_course_assistant\branding::short_name();
+        $systemprompt = "You are a product analyst for {$brand} ({$institution} Online Learning Assistant), "
             . "an AI-powered learning coach embedded in Moodle course pages. "
             . "Analyze the following user feedback, survey responses, and usability testing data "
             . "for the course \"{$course->fullname}\".\n\n"
@@ -168,7 +169,7 @@ class generate_insights extends external_api {
             . "1. **Key Issues** — Problems or pain points users are experiencing\n"
             . "2. **Feature Requests** — Features or improvements users are asking for (explicitly or implicitly)\n"
             . "3. **Positive Highlights** — What users like and what's working well\n"
-            . "4. **Recommendations** — Specific, actionable suggestions for the SOLA team, prioritized by impact\n\n"
+            . "4. **Recommendations** — Specific, actionable suggestions for the {$brand} team, prioritized by impact\n\n"
             . "Be concise and data-driven. Reference specific feedback when possible. "
             . "If a theme appears in multiple data sources, note that. "
             . "Format your response in Markdown.";

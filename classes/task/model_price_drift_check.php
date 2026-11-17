@@ -600,7 +600,7 @@ class model_price_drift_check extends \core\task\scheduled_task {
             return false;
         }
 
-        $subject = '[SOLA price drift] ' . (int) ($counts['missing'] ?? 0) . ' unpriced model(s) in traffic, '
+        $subject = '[' . \local_ai_course_assistant\branding::short_name() . ' price drift] ' . (int) ($counts['missing'] ?? 0) . ' unpriced model(s) in traffic, '
             . (int) ($counts['mismatch'] ?? 0) . ' price mismatch(es), '
             . (int) ($counts['eol'] ?? 0) . ' model(s) reaching end of life';
         $body = self::alert_body($summary);
@@ -702,7 +702,7 @@ class model_price_drift_check extends \core\task\scheduled_task {
      */
     private static function alert_body(array $summary): string {
         $counts = $summary['counts'] ?? [];
-        $body = "SOLA model price drift check\n\n";
+        $body = \local_ai_course_assistant\branding::short_name() . " model price drift check\n\n";
         $body .= sprintf("Tolerance:            %.2f%%\n", (float) ($summary['tolerance_pct'] ?? 0));
         $body .= sprintf("Sources OK / failed:  %d / %d\n",
             (int) ($counts['sources_ok'] ?? 0), (int) ($counts['sources_failed'] ?? 0));

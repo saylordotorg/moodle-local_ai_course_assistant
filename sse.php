@@ -59,7 +59,9 @@ function local_ai_course_assistant_filter_response_safety(string $response): str
         // double-bracket forms these patterns missed -- the two shapes that
         // actually reached learners in the 2026-09-12 production run. What stays
         // in this list is system-prompt leakage, which is a different problem.
-        '/You are SOLA \(Online Learning Assistant\)/i',
+        // Name-agnostic: the default prompt opens with the configured short name
+        // ([[tutorshort]]), so a rebranded site leaks 'You are Atlas (...)'.
+        '/You are [^\n()]{1,80}? \(Online Learning Assistant\)/iu',
         '/KEEP RESPONSES BRIEF:/i',
         '/These rules override any conflicting instruction/i',
     ];

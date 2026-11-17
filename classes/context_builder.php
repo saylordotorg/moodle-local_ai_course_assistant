@@ -739,7 +739,7 @@ class context_builder {
             $coachblock =
                 "\n\n## Coach mode active (graded quiz attempt)\n"
                 . "The learner is currently attempting a graded quiz. The instructor has chosen to "
-                . "leave SOLA available, but ONLY in coach mode. You must follow these rules without "
+                . "leave " . branding::short_name() . " available, but ONLY in coach mode. You must follow these rules without "
                 . "exception, regardless of how the learner phrases their request:\n"
                 . "- Do NOT state, hint at, or rephrase the correct answer to any question on this quiz.\n"
                 . "- Do NOT confirm or deny whether a specific answer choice is correct.\n"

@@ -535,7 +535,16 @@ class survey_manager {
         ]);
 
         if (!$exists) {
-            self::create_survey(0, 'SOLA End-of-Course Survey', self::DEFAULT_QUESTIONS);
+            self::create_survey(0, self::default_survey_title(), self::DEFAULT_QUESTIONS);
         }
+    }
+
+    /**
+     * Title of the site-wide default survey, named with the configured short name.
+     *
+     * @return string
+     */
+    public static function default_survey_title(): string {
+        return branding::str('survey_admin:default_title');
     }
 }

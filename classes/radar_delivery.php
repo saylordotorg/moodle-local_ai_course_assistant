@@ -167,7 +167,7 @@ class radar_delivery {
             $recipient->alternatename = '';
         }
 
-        $subject = "SOLA Learning Radar — {$subjectprefix}";
+        $subject = branding::short_name() . " Learning Radar — {$subjectprefix}";
 
         // v5.4.3: per-recipient opt-out check + unsubscribe footer.
         // Recipients who clicked the unsubscribe link in a prior report
@@ -176,7 +176,7 @@ class radar_delivery {
             return false;
         }
         $reason = 'You receive this report because your address is configured '
-            . 'as a SOLA Learning Radar recipient.';
+            . 'as a ' . branding::short_name() . ' Learning Radar recipient.';
 
         $payload = self::format($format, $query, $response, $meta);
 
@@ -198,7 +198,7 @@ class radar_delivery {
         $tmpdir = make_temp_directory('sola_radar');
         $tmpfile = $tmpdir . '/' . uniqid('radar_', true) . '_' . $filename;
         file_put_contents($tmpfile, $payload);
-        $body = "Your SOLA Learning Radar report is attached.\n\n"
+        $body = "Your " . branding::short_name() . " Learning Radar report is attached.\n\n"
             . "Query: {$query}\n\nAll student data is anonymized.";
         $body = email_footer::append_text(
             $body,

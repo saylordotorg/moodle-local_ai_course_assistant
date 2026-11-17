@@ -263,18 +263,19 @@ class unanswered_monitor {
         $failing = array_slice($eval['failing'], 0, self::MAX_COURSES_IN_EMAIL);
         $worst = $failing[0] ?? null;
 
+        $brand = branding::short_name();
         if ($worst !== null) {
-            $subject = '[SOLA] ' . count($eval['failing']) . ' course(s) asking but not answering';
+            $subject = '[' . $brand . '] ' . count($eval['failing']) . ' course(s) asking but not answering';
             $subject .= ' — ' . ($worst['shortname'] ?: ('courseid ' . $worst['courseid']))
                 . ' answered ' . $worst['answered'] . '/' . $worst['asked'];
         } else {
-            $subject = '[SOLA] ' . (int) ($eval['failed_total'] ?? 0) . ' failed repl'
+            $subject = '[' . $brand . '] ' . (int) ($eval['failed_total'] ?? 0) . ' failed repl'
                 . ((int) ($eval['failed_total'] ?? 0) === 1 ? 'y' : 'ies') . ' in the last ' . $eval['window_hours'] . ' hours';
         }
 
         $body  = $worst !== null
-            ? "Learners are asking SOLA questions and not getting answers.\n\n"
-            : "SOLA replies are failing for learners.\n\n";
+            ? "Learners are asking {$brand} questions and not getting answers.\n\n"
+            : "{$brand} replies are failing for learners.\n\n";
         $body .= sprintf("Window:            last %d hours\n", $eval['window_hours']);
         if ($worst !== null) {
             $body .= sprintf("Alert threshold:   answer rate below %.0f%% with at least %d questions\n",
@@ -325,11 +326,11 @@ class unanswered_monitor {
 
         $body .= "\nUsual causes, most common first:\n";
         $body .= "  1. The provider is rejecting calls — expired key, organisation spend cap,\n";
-        $body .= "     retired model. Check the sse_error rows in the SOLA audit log; since\n";
+        $body .= "     retired model. Check the sse_error rows in the {$brand} audit log; since\n";
         $body .= "     v6.9.7 they carry the provider's own message in a `detail` field.\n";
         $body .= "  2. A per-course provider override pointing at a provider with no\n";
         $body .= "     credentials configured.\n";
-        $body .= "  3. The site or course is over a SOLA spend cap.\n\n";
+        $body .= "  3. The site or course is over a {$brand} spend cap.\n\n";
         $body .= "This detector exists because none of the other monitors catch a silent\n";
         $body .= "provider failure: they watch spend going UP, and a dead provider costs\n";
         $body .= "nothing. In August 2026 that gap hid a nine-day outage across ten courses.\n\n";

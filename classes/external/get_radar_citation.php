@@ -69,7 +69,7 @@ class get_radar_citation extends external_api {
 
         $who = $row->role === 'user'
             ? anonymizer::name((int) $row->userid)
-            : ('SOLA' . ($row->provider
+            : (\local_ai_course_assistant\branding::short_name() . ($row->provider
                 ? " ({$row->provider}" . ($row->model_name ? "/{$row->model_name}" : '') . ')'
                 : ''));
 

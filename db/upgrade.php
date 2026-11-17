@@ -375,8 +375,8 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             $now = time();
             $DB->insert_record('local_ai_course_assistant_ut_tasks', (object) [
                 'courseid' => 0,
-                'title' => 'SOLA Usability Test',
-                'tasks' => json_encode(\local_ai_course_assistant\usertesting_manager::DEFAULT_TASKS),
+                'title' => \local_ai_course_assistant\branding::str('usertesting_admin:default_title'),
+                'tasks' => json_encode(\local_ai_course_assistant\usertesting_manager::default_tasks()),
                 'external_url' => '',
                 'active' => 1,
                 'timecreated' => $now,

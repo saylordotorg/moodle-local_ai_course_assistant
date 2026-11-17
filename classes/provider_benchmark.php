@@ -623,7 +623,7 @@ class provider_benchmark {
      * @return string
      */
     public static function export_markdown(array $payload): string {
-        $brand = (string) ($payload['site_brand'] ?? 'SOLA');
+        $brand = (string) ($payload['site_brand'] ?? self::brand());
         $when = userdate((int) ($payload['generated_at'] ?? time()), '%Y-%m-%d %H:%M %Z');
         $out = "# {$brand} Provider Benchmark\n\n_Generated {$when}_\n\n";
 

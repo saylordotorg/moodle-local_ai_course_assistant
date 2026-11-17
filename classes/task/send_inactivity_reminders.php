@@ -56,7 +56,7 @@ class send_inactivity_reminders extends \core\task\scheduled_task {
         $rawthreshold = get_config('local_ai_course_assistant', 'inactivity_threshold_days');
         $threshold = ($rawthreshold === false || $rawthreshold === '') ? 7 : (int) $rawthreshold;
         $cutoff = time() - ($threshold * 86400);
-        $display_name = get_config('local_ai_course_assistant', 'display_name') ?: 'SOLA';
+        $display_name = \local_ai_course_assistant\branding::display_name();
 
         // Find users with active email reminders who haven't accessed their course recently.
         $sql = "SELECT r.id, r.userid, r.courseid, r.destination, r.last_sent,

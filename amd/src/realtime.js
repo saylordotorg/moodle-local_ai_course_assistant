@@ -24,10 +24,13 @@
 define([], function() {
 
     /**
-     * ELL coaching instructions for voice mode.
+     * ELL coaching instructions for voice mode. The assistant's name is the
+     * {$a} placeholder, filled with the configured short name by
+     * ellInstructions(), so a rebranded site never tells the model (and so the
+     * learner) the default name.
      * @type {string}
      */
-    var ELL_INSTRUCTIONS = 'You are SOLA in a real-time voice conversation. Keep responses brief (2–3 sentences). ' +
+    var ELL_INSTRUCTIONS = 'You are {$a} in a real-time voice conversation. Keep responses brief (2–3 sentences). ' +
         '[ELL Coaching Mode] You are an English conversation and pronunciation coach. ' +
         'Wait for the user to speak first, then respond. ' +
         'While having natural conversation: gently correct grammar errors by modeling the correct form ' +
@@ -929,11 +932,22 @@ define([], function() {
         ws.send(JSON.stringify({type: 'response.create'}));
     };
 
+    /**
+     * The ELL coaching instructions with the assistant's configured name.
+     *
+     * @param {string} name The configured short name.
+     * @return {string} The instructions.
+     */
+    var ellInstructions = function(name) {
+        return ELL_INSTRUCTIONS.split('{$a}').join(name || 'the learning assistant');
+    };
+
     return {
         connect: connect,
         disconnect: disconnect,
         isConnected: isConnected,
         sendText: sendText,
         ELL_INSTRUCTIONS: ELL_INSTRUCTIONS,
+        ellInstructions: ellInstructions,
     };
 });
