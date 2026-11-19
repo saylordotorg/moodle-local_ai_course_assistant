@@ -1,0 +1,13 @@
+Hi Volodymyr,
+
+I've uploaded SOLA 8.0.0 (build 2026111700), which supersedes 7.12.2. It now declares Moodle 4.5 to 5.3, and CI runs 4.5, 5.0, 5.1 and 5.3 on MariaDB and Postgres.
+
+What changed since 7.12.2:
+- 8.0.0: every learner, admin and model-facing use of the assistant's name now follows the branding settings. A site that renamed the assistant still saw "SOLA" in the chat button tooltip and a few other places. There's no new setting, no schema change and no new upgrade step.
+- 7.12.5: the old Soapbox speech tool is retired. Its UI is hidden and its endpoints refuse. No table or data is dropped, and the cleanup task and the privacy provider (export and delete) keep working.
+- 7.12.4 and 7.12.3: two admin notices are quieter (the prompt-truncation warning and the anomaly digest). Neither adds a setting, table or upgrade step.
+
+The four findings from your 19 October comment (#339 to #342) were fixed in 7.12.2 and are unchanged here. Full notes: https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/tag/v8.0.0
+
+Thanks,
+Tom

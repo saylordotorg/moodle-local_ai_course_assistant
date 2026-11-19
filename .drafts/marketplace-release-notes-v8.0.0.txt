@@ -1,0 +1,21 @@
+SOLA 8.0.0 (build 2026111700). Supports Moodle 4.5 to 5.3. This version follows 7.12.4 and includes 7.12.5.
+
+8.0.0: a renamed assistant no longer says "SOLA"
+Sites that renamed the assistant under Essentials > Branding still saw "SOLA" in places, most visibly in the tooltip on the floating chat button. The server rendered the configured name, but the widget's translation step then replaced it with a bundled label that hardcoded "SOLA" in all 46 languages. Every learner, admin and model-facing use of the name now follows the four branding settings:
+- The chat button tooltip and screen reader label, in all 46 languages and in each language's own word order.
+- Text the widget builds in JavaScript: the settings tour, explanation-style help, the Voice heading, the rating panel, usability-test hints, the talking-avatar frame title and the quiz intro.
+- What the model is told about itself: voice-mode coaching, quiz coach mode and the reply-language prompt. The scrub that removes a leaked system-prompt identity line no longer depends on the name.
+- Learner and admin emails (milestone, inactivity reminder, cost anomaly, spend guard, unanswered questions, price drift, anomaly digest, integrity report, Learning Radar), health checks, the backend self-test, the analytics and insights prompts, the mobile view and the settings banner.
+- The default end-of-course survey and usability test, including stored task sets that carry a brand token.
+Sites that never changed the branding settings look the same as before. There's no new setting, no schema change and no new upgrade step. Purge caches after upgrading so browsers load the new JavaScript. An existing default survey or usability test keeps the title it was created with.
+
+7.12.5: Soapbox speech practice is retired
+The Soapbox speech tool is hidden from settings, course settings, navigation and the rubric editor, and its server endpoints refuse. Old Soapbox pages check login and capability, then show a notice with a link back to the course. No table or data is dropped: the cleanup task, playback and the privacy provider (export and delete) keep working, so recordings are still removed on schedule. A hidden CLI-only setting (soapbox_legacy_reenable) turns it back on for sites that need it.
+
+Moodle 5.3
+Moodle 5.3 is now declared as supported and runs in CI (MariaDB and Postgres), alongside 4.5, 5.0 and 5.1.
+
+Testing
+Full PHPUnit suite on MySQL (Moodle 4.5, PHP 8.3): 3242 tests, 0 failures. CI on the release commit passed on Moodle 4.5, 5.0, 5.1 and 5.3 with MariaDB and Postgres, PHP 8.1 to 8.3. New tests pin the branding fix (tests/branding_hardcoded_test.php and tests/js/branding-literal-check.js). Release notes: https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/tag/v8.0.0
+
+Video tour for partners (about 2.5 minutes, covers branding as a setting and the settings hub): https://youtu.be/tNkYit2VA_s
