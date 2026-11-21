@@ -56,13 +56,60 @@ class token_cost_manager {
         'o3'                => ['input' => 10.00, 'output' => 40.00],
 
         // ── OpenAI Realtime (voice) ─────────────────────────────────────────
+        // v8.1.1: every audio model below carries an AUDIO marker in its name
+        // (tts, audio, realtime, live, transcribe, whisper, stt, speech), and
+        // model_registry only lets such a name match a key that is itself an audio
+        // key (see is_audio_model()). Before that, gemini-2.5-flash-preview-tts
+        // matched the gemini-2.5-flash chat card and gpt-4o-mini-tts matched the
+        // gpt-4o-mini chat card, so speech was priced as chat text.
+        //
+        // A rate card row holds one input and one output rate, and a realtime
+        // or live session mixes audio and text both ways. Every realtime/live row
+        // below therefore carries the AUDIO rates, which are the dearer pair, so
+        // text turns priced through it are over-counted rather than under-counted.
+        // The text rates are recorded in the comments for the day a usage record
+        // separates them.
+        //
+        // gpt-4o-realtime: the price SOLA has always used. It is also the name
+        // sse.php's log-only realtime logger writes on EVERY realtime row,
+        // whatever model the session really used, with duration x 50 written as
+        // prompt tokens and no completion tokens. estimate_cost() prices such a
+        // prompt-only realtime row at the OUTPUT rate (see
+        // UNSEPARATED_DUPLEX_SEGMENTS), so it is no longer priced as text input.
         'gpt-4o-realtime'   => ['input' => 5.00, 'output' => 20.00],
+        // OpenAI pricing page (developers.openai.com/api/docs/pricing), fetched
+        // 2026-11-21, USD per 1M tokens. Audio in $10 (cached $0.30), audio out
+        // $20; text in $0.60 (cached $0.06), text out $2.40.
+        'gpt-realtime-2.1-mini' => ['input' => 10.00, 'output' => 20.00],
+        'gpt-realtime-mini' => ['input' => 10.00, 'output' => 20.00],
+        // Same page, same date. Audio in $32 (cached $0.40), audio out $64; text
+        // in $4 (cached $0.40), text out $24 for 2.1 and 2, $16 for 1.5 and the
+        // original gpt-realtime. The bare 'gpt-realtime' key is also the catch-all
+        // for a future gpt-realtime-N: priced at the full model's audio rate,
+        // which over-counts a cheaper newcomer rather than under-counting it.
+        'gpt-realtime-2.1'  => ['input' => 32.00, 'output' => 64.00],
+        'gpt-realtime-2'    => ['input' => 32.00, 'output' => 64.00],
+        'gpt-realtime-1.5'  => ['input' => 32.00, 'output' => 64.00],
+        'gpt-realtime'      => ['input' => 32.00, 'output' => 64.00],
+        // NOT priced: gpt-live-1.1 and gpt-live-1. They bill per minute of
+        // session ($0.05 active, $0.02 standby, per second) and no usage record
+        // in SOLA says how long a session was active versus on standby, so they
+        // stay unpriced and show in the unpriced-models banner if used.
 
         // ── OpenAI TTS ──────────────────────────────────────────────────────
-        // TTS-1 charges per character (~$15/M chars). Approximated as per-token
-        // at ~4 chars/token for consistency with the token-based rate card.
+        // TTS-1 charges per character. Approximated as per-token at ~4
+        // chars/token for consistency with the token-based rate card (tts.php
+        // logs ceil(chars / 4) as prompt tokens for OpenAI). OpenAI pricing page,
+        // 2026-11-21: tts-1 $15 per 1M characters (= $60 per 1M of these
+        // tokens), tts-1-hd $30 per 1M characters (= $120).
         'tts-1'             => ['input' => 60.00, 'output' => 0.00],
         'tts-1-hd'          => ['input' => 120.00, 'output' => 0.00],
+        // OpenAI pricing page, 2026-11-21: text in $0.60, audio out $12.00 per
+        // 1M tokens. OpenAI's speech endpoint returns bare audio with no usage
+        // block, so tts.php records only the text estimate and no audio tokens;
+        // estimate_cost() then adds a conservative audio estimate (see
+        // AUDIO_TOKENS_PER_TEXT_TOKEN) instead of pricing the text alone.
+        'gpt-4o-mini-tts'   => ['input' => 0.60, 'output' => 12.00],
 
         // ── OpenAI Embeddings ───────────────────────────────────────────────
         'text-embedding-3-small' => ['input' => 0.02, 'output' => 0.00],
@@ -111,7 +158,20 @@ class token_cost_manager {
         // STT telemetry writers = $0.006/min, OpenAI's published Whisper rate.
         // The old 0.36 was the PER-HOUR price entered as a per-1M-token rate,
         // underpricing STT by a factor of 16.7.
+        // Confirmed on the OpenAI pricing page 2026-11-21: whisper-1 $0.006/min.
         'whisper'           => ['input' => 6.00, 'output' => 0.00],
+        // The newer transcription models, on the same 1000-tokens-per-minute
+        // convention, so $X per minute is $X * 1000 per 1M tokens. OpenAI
+        // pricing page, 2026-11-21; the page labels these per-minute figures
+        // "estimated" (the models bill by token underneath), and the two gpt-4o
+        // ones are given as "about". gpt-transcribe $0.0045/min,
+        // gpt-live-transcribe $0.017/min, gpt-4o-mini-transcribe ~$0.003/min,
+        // gpt-4o-transcribe ~$0.006/min. Without their own keys the two gpt-4o
+        // names matched the gpt-4o-mini and gpt-4o chat cards.
+        'gpt-transcribe'         => ['input' => 4.50, 'output' => 0.00],
+        'gpt-live-transcribe'    => ['input' => 17.00, 'output' => 0.00],
+        'gpt-4o-mini-transcribe' => ['input' => 3.00, 'output' => 0.00],
+        'gpt-4o-transcribe'      => ['input' => 6.00, 'output' => 0.00],
 
         // ── Self-hosted inference (free at the API boundary) ────────────────
         // v7.4.4: transcribe.php prefixes a self-hosted STT model with
@@ -192,6 +252,32 @@ class token_cost_manager {
         'gemini-1.5-pro'    => ['input' => 1.25, 'output' => 5.00],
         'gemini-pro'        => ['input' => 0.50, 'output' => 1.50],
 
+        // ── Google Gemini speech (TTS and Live) ───────────────────────────────
+        // Google pricing page, 2026-11-21 (aistudio.google.com/docs/pricing),
+        // USD per 1M tokens. Audio is 25 tokens per second.
+        //
+        // TTS: prompt tokens are the TEXT sent (input rate) and completion
+        // tokens are the AUDIO returned (output rate); gemini_tts records
+        // Google's own promptTokenCount and candidatesTokenCount in exactly those
+        // two columns, so each side is priced at its own rate.
+        // The page lists a 2027 price step for both TTS models (text $1.00, audio
+        // $18.00 and $12.00); it says only "2027", and the other Gemini 3.x rows
+        // on the same page step up on January 1, 2027, so that date is used. See
+        // SCHEDULED_RATE_CHANGES below.
+        'gemini-3.8-flash-tts'      => ['input' => 0.50, 'output' => 9.00],
+        'gemini-3.8-flash-lite-tts' => ['input' => 0.50, 'output' => 6.00],
+        // Live: audio in $3.00 (about $0.005/min), audio out $12.00 (about
+        // $0.018/min); text in $0.75, text out $4.50; image or video in $1.00.
+        // Audio rates carried, as for OpenAI Realtime above. No 2027 change listed.
+        'gemini-3.8-live'                   => ['input' => 3.00, 'output' => 12.00],
+        'gemini-3.8-live-extended-thinking' => ['input' => 3.00, 'output' => 12.00],
+        'gemini-3.1-flash-live-preview'     => ['input' => 3.00, 'output' => 12.00],
+        // NOT priced: gemini-2.5-flash-preview-tts, gemini-2.5-pro-preview-tts,
+        // gemini-3.1-flash-tts-preview and gemini-2.5-flash-native-audio-*.
+        // They retire on 2026-12-18 and 2027-03-31, no official price was
+        // collected for them, and they no longer fall through to a chat card, so
+        // they stay unpriced and show in the unpriced-models banner if used.
+
         // ── Mistral AI ────────────────────────────────────────────────────────
         'mistral-large'     => ['input' => 2.00, 'output' => 6.00],
         'mistral-medium'    => ['input' => 2.70, 'output' => 8.10],
@@ -248,6 +334,107 @@ class token_cost_manager {
         'abab5.5'           => ['input' => 0.50, 'output' => 0.50],
         'abab6.5'           => ['input' => 1.00, 'output' => 1.00],
     ];
+
+    /**
+     * Dated price steps for baseline keys, applied by {@see baseline_rate_cards()}.
+     *
+     * v8.1.1. key => list of ['from' => unix time (UTC), 'input' => float,
+     * 'output' => float], oldest first; the last step whose 'from' has passed
+     * replaces the key's rates in the baseline layer. Only the baseline layer is
+     * stepped: a registry row an admin typed for the same key wins as always,
+     * and it is then the admin's job to update it.
+     *
+     * The clock is "now" ({@see now()}), not the time of the usage row, because
+     * every spend consumer prices SUMS of tokens grouped by model and never sees
+     * a row's date. Consequence, chosen on purpose: once a step passes, usage
+     * recorded before it is re-priced at the new (higher) rate wherever it is
+     * summed again, for example a 30-day dashboard read in early January. That
+     * over-counts history and never under-counts current spend, which is the
+     * safe direction for spend caps. Monthly cap periods start on the 1st, so a
+     * January cap sees January rows only and is exact.
+     *
+     * Google pricing page, 2026-11-21: "2027" prices for the two Gemini TTS
+     * models. The page gives no day; the other Gemini 3.x rows on the same page
+     * step up on January 1, 2027, so 2027-01-01 00:00 UTC (1798761600) is used.
+     *
+     * @var array<string, array<int, array{from: int, input: float, output: float}>>
+     */
+    private const SCHEDULED_RATE_CHANGES = [
+        'gemini-3.8-flash-tts' => [
+            ['from' => 1798761600, 'input' => 1.00, 'output' => 18.00],
+        ],
+        'gemini-3.8-flash-lite-tts' => [
+            ['from' => 1798761600, 'input' => 1.00, 'output' => 12.00],
+        ],
+    ];
+
+    /**
+     * Name segments that mark a model as an audio model (speech in or out).
+     *
+     * v8.1.1. A model name is split on anything that is not a letter, digit or
+     * dot, and any segment in this list makes it an audio model. Segments, not
+     * substrings, so a word that merely contains one (an "olive" model) is not
+     * caught. {@see model_registry} refuses to price an audio model through a
+     * key that is not itself an audio key, so a speech model can never inherit
+     * a chat family's text price again (the 8.1.0 known bug:
+     * gemini-2.5-flash-preview-tts priced as gemini-2.5-flash chat text).
+     *
+     * @var string[]
+     */
+    public const AUDIO_NAME_SEGMENTS = ['tts', 'audio', 'realtime', 'live', 'transcribe', 'whisper', 'stt', 'speech'];
+
+    /**
+     * Baseline keys that are namespaces rather than model families.
+     *
+     * An audio model may match these even though they carry no audio marker:
+     * 'selfhosted-' prices any self-hosted model, Whisper included, at zero.
+     *
+     * @var string[]
+     */
+    public const NAMESPACE_PREFIXES = ['selfhosted-'];
+
+    /** @var string[] Segments of a text-in, audio-out (TTS) model name. */
+    private const UNSEPARATED_TTS_SEGMENTS = ['tts'];
+
+    /**
+     * Segments of a speech-both-ways (realtime or live session) model name.
+     *
+     * Checked after the transcription segments, so gpt-live-transcribe is a
+     * transcription model and not a live session.
+     *
+     * @var string[]
+     */
+    private const UNSEPARATED_DUPLEX_SEGMENTS = ['realtime', 'live'];
+
+    /** @var string[] Segments of a speech-to-text model name: input only, nothing to estimate. */
+    private const TRANSCRIPTION_SEGMENTS = ['transcribe', 'whisper', 'stt'];
+
+    /**
+     * Estimated audio tokens per text token, for a TTS usage record with no audio count.
+     *
+     * v8.1.1. OpenAI's speech endpoint returns bare audio, so tts.php can record
+     * only ceil(characters / 4) as prompt tokens and nothing as output; pricing
+     * that alone would bill gpt-4o-mini-tts at its $0.60 text rate and leave out
+     * the $12.00 audio, which is nearly all of the cost. Gemini usually reports
+     * both counts, but tts.php writes 0 output when it doesn't.
+     *
+     * Derivation, kept deliberately high: speech runs about 12 to 15 characters
+     * a second (120 to 150 words a minute), which is 3 to 3.75 of these text
+     * tokens a second. Gemini audio is 25 tokens a second (Google pricing page,
+     * 2026-11-21), so 6.7 to 8.3 audio tokens per text token, and 10 is above
+     * that range. OpenAI does not state gpt-4o-mini-tts audio tokens per second
+     * in the figures collected on 2026-11-21, so the same 10 is assumed for it
+     * (not verified). Applied only when the
+     * record has prompt tokens, NO completion tokens, and the model's output
+     * rate is above zero (tts-1 and tts-1-hd are priced per character and stay
+     * as they are). Spend queries price per-model SUMS, so a model whose rows
+     * are mixed (some with an audio count, some without) is priced as recorded;
+     * that mix only arises for Gemini when Google omits a count.
+     */
+    public const AUDIO_TOKENS_PER_TEXT_TOKEN = 10;
+
+    /** @var int|null Fixed clock for tests; null means the real time. */
+    private static ?int $clockfortesting = null;
 
     /**
      * Model prefixes whose reported completion_tokens EXCLUDES thinking tokens.
@@ -438,9 +625,134 @@ class token_cost_manager {
         if ($reasoningtokens > 0 && self::reasoning_billed_as_extra_output($modelname)) {
             $billableoutput += $reasoningtokens;
         }
-        $inputcost  = ($prompttokens / 1_000_000) * $rates['input'];
+        $inputrate = (float) $rates['input'];
+        // v8.1.1: an audio usage record that does not separate its two sides.
+        // See audio_usage_kind(); both branches over-count rather than
+        // under-count, and neither touches a record that has output tokens.
+        if ($prompttokens > 0 && $billableoutput === 0) {
+            $kind = self::audio_usage_kind($modelname);
+            if ($kind === 'tts' && (float) $rates['output'] > 0.0) {
+                $billableoutput = $prompttokens * self::AUDIO_TOKENS_PER_TEXT_TOKEN;
+            } else if ($kind === 'duplex') {
+                $inputrate = max($inputrate, (float) $rates['output']);
+            }
+        }
+        $inputcost  = ($prompttokens / 1_000_000) * $inputrate;
         $outputcost = ($billableoutput / 1_000_000) * $rates['output'];
         return $inputcost + $outputcost;
+    }
+
+    /**
+     * Is this an audio model (speech in or out), judged by its name?
+     *
+     * v8.1.1. See {@see AUDIO_NAME_SEGMENTS}. A `batch/` marker is ignored.
+     *
+     * @param string $modelname Model name or rate-card key.
+     * @return bool
+     */
+    public static function is_audio_model(string $modelname): bool {
+        return array_intersect(self::name_segments($modelname), self::AUDIO_NAME_SEGMENTS) !== [];
+    }
+
+    /**
+     * May a rate-card key price this model, as far as audio is concerned?
+     *
+     * v8.1.1. A text model may match any key. An audio model may match only a
+     * key that is itself audio, or a namespace key ({@see NAMESPACE_PREFIXES}).
+     * Both {@see model_registry::rate_for()} and
+     * {@see price_source::longest_prefix()} apply this, so "is this model
+     * priced?" has one answer everywhere.
+     *
+     * @param string $modelname
+     * @param string $key Rate-card key (prefix).
+     * @return bool
+     */
+    public static function key_may_price(string $modelname, string $key): bool {
+        if (!self::is_audio_model($modelname)) {
+            return true;
+        }
+        $key = strtolower(trim($key));
+        return in_array($key, self::NAMESPACE_PREFIXES, true) || self::is_audio_model($key);
+    }
+
+    /**
+     * How a prompt-only usage record of this model must be estimated.
+     *
+     * 'tts': text in, audio out, the audio count missing; the audio is estimated
+     * from the text ({@see AUDIO_TOKENS_PER_TEXT_TOKEN}).
+     * 'duplex': a realtime or live session logged as one token count (sse.php's
+     * realtime logger writes duration x 50 as prompt tokens); every token is
+     * priced at the dearer of the two rates.
+     * '' for anything else, including transcription, which is input only.
+     *
+     * @param string $modelname
+     * @return string
+     */
+    public static function audio_usage_kind(string $modelname): string {
+        $segments = self::name_segments($modelname);
+        if (array_intersect($segments, self::TRANSCRIPTION_SEGMENTS) !== []) {
+            return '';
+        }
+        if (array_intersect($segments, self::UNSEPARATED_TTS_SEGMENTS) !== []) {
+            return 'tts';
+        }
+        if (array_intersect($segments, self::UNSEPARATED_DUPLEX_SEGMENTS) !== []) {
+            return 'duplex';
+        }
+        return '';
+    }
+
+    /**
+     * Lowercase name segments, split on anything but letters, digits and dots.
+     *
+     * @param string $modelname
+     * @return string[]
+     */
+    private static function name_segments(string $modelname): array {
+        $name = strtolower(self::strip_batch_prefix($modelname));
+        return preg_split('/[^a-z0-9.]+/', $name, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+    }
+
+    /**
+     * The time pricing is resolved at: the real time, or the test clock.
+     *
+     * @return int Unix time.
+     */
+    public static function now(): int {
+        return self::$clockfortesting ?? time();
+    }
+
+    /**
+     * Fix the pricing clock for a test; null returns to the real time.
+     *
+     * @param int|null $time Unix time, or null.
+     * @return void
+     */
+    public static function set_clock_for_testing(?int $time): void {
+        self::$clockfortesting = $time;
+    }
+
+    /**
+     * A short string that changes whenever a scheduled price step takes effect.
+     *
+     * {@see model_registry} keeps its merged map for the life of a request and
+     * compares this to decide when to rebuild it, so a cron run that crosses
+     * midnight on a step date, or a test that moves the clock, sees the new rate.
+     *
+     * @param int|null $at Unix time; null means {@see now()}.
+     * @return string
+     */
+    public static function rate_schedule_signature(?int $at = null): string {
+        $at = $at ?? self::now();
+        $active = 0;
+        foreach (self::SCHEDULED_RATE_CHANGES as $steps) {
+            foreach ($steps as $step) {
+                if ($at >= (int) $step['from']) {
+                    $active++;
+                }
+            }
+        }
+        return (string) $active;
     }
 
     /**
@@ -461,10 +773,23 @@ class token_cost_manager {
      * a caller wanting "the price of this model" wants the merged view, which
      * is {@see get_rates()}.
      *
+     * v8.1.1: with every {@see SCHEDULED_RATE_CHANGES} step that has taken
+     * effect by $at applied.
+     *
+     * @param int|null $at Unix time; null means {@see now()}.
      * @return array<string, array{input: float, output: float}>
      */
-    public static function baseline_rate_cards(): array {
-        return self::$rate_cards;
+    public static function baseline_rate_cards(?int $at = null): array {
+        $at = $at ?? self::now();
+        $cards = self::$rate_cards;
+        foreach (self::SCHEDULED_RATE_CHANGES as $key => $steps) {
+            foreach ($steps as $step) {
+                if ($at >= (int) $step['from'] && isset($cards[$key])) {
+                    $cards[$key] = ['input' => (float) $step['input'], 'output' => (float) $step['output']];
+                }
+            }
+        }
+        return $cards;
     }
 
     /**

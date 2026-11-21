@@ -201,6 +201,14 @@ class rate_card_refresher {
             if ($model === 'sample_spec') {
                 continue;
             }
+            // v8.1.1: skip audio models. Their input/output_cost_per_token are
+            // TEXT prices; an upstream row would win over the committed audio
+            // baseline and price speech as text. Same rule as
+            // price_source::parse_litellm(), and model_registry ignores any
+            // upstream audio row written before this.
+            if (token_cost_manager::is_audio_model($model)) {
+                continue;
+            }
             $mode = isset($row['mode']) ? (string) $row['mode'] : 'chat';
             if (!isset(self::KEPT_MODES[$mode])) {
                 continue;

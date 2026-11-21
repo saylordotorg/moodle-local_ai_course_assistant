@@ -453,11 +453,20 @@ class price_source {
         $out = [];
         $skippedmode = 0;
         $skippedincomplete = 0;
+        $skippedaudio = 0;
         foreach ($decoded as $model => $row) {
             if (!is_string($model) || !is_array($row)) {
                 continue;
             }
             if ($model === 'sample_spec') {
+                continue;
+            }
+            // v8.1.1: an audio model's input/output_cost_per_token are its TEXT
+            // prices (audio sits in *_audio_token fields this schema has no room
+            // for), so taking them would price speech as text. The committed
+            // baseline carries audio rates for the models SOLA calls.
+            if (token_cost_manager::is_audio_model($model)) {
+                $skippedaudio++;
                 continue;
             }
             $mode = isset($row['mode']) ? (string) $row['mode'] : 'chat';
@@ -500,6 +509,9 @@ class price_source {
         }
         if ($skippedincomplete) {
             $notes[] = $skippedincomplete . ' entries skipped (missing a cost field).';
+        }
+        if ($skippedaudio) {
+            $notes[] = $skippedaudio . ' audio entries skipped (text prices only).';
         }
         return $out;
     }
@@ -886,7 +898,9 @@ class price_source {
      *
      * Same longest-prefix-wins rule the rate card itself uses, so "does this
      * model already have a price?" is answered the same way here as in
-     * {@see model_registry::rate_for()}.
+     * {@see model_registry::rate_for()}. v8.1.1: including the audio rule, so a
+     * source's gemini-2.5-flash-preview-tts is no longer counted as covered by
+     * the gemini-2.5-flash chat card ({@see token_cost_manager::key_may_price()}).
      *
      * @param string $model
      * @param string[] $keys
@@ -901,7 +915,8 @@ class price_source {
         $bestlen = 0;
         foreach ($keys as $key) {
             $key = strtolower((string) $key);
-            if ($key !== '' && str_starts_with($model, $key) && strlen($key) > $bestlen) {
+            if ($key !== '' && str_starts_with($model, $key) && strlen($key) > $bestlen
+                    && token_cost_manager::key_may_price($model, $key)) {
                 $best = $key;
                 $bestlen = strlen($key);
             }
