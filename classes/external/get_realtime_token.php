@@ -155,8 +155,10 @@ class get_realtime_token extends external_api {
                 . "sentences. Plain spoken language only: no markdown, no bracketed tags "
                 . "or markers in the SPOKEN portion of your reply. Pause naturally between "
                 . "ideas so the learner can interject. When the learner starts speaking, "
-                . "stop your current sentence and listen.\n\n"
-                . "Chip suggestions in voice mode: at the very END of each reply, after the "
+                . "stop your current sentence and listen.\n\n";
+            // 8.2.0: the chips block is kept apart because Gemini Live answers in audio only. With no text channel
+            // the marker would be spoken aloud, so a Gemini session gets $nochipsblock instead.
+            $chipsblock = "Chip suggestions in voice mode: at the very END of each reply, after the "
                 . "spoken portion, append the SOLA_NEXT block exactly as in chat: "
                 . "[SOLA_NEXT]<chip 1>||<chip 2>||<chip 3>||<chip 4>[/SOLA_NEXT]. The audio "
                 . "stream skips the brackets and pipes naturally — they exist only so the "
@@ -165,8 +167,10 @@ class get_realtime_token extends external_api {
                 . "to what was just discussed (e.g. \"Quiz me on this\", \"Give me an "
                 . "example\", \"Show me a real case\", \"What's next?\"). NEVER emit literal "
                 . "placeholder text like \"chip 1\" or \"suggestion 1\" — those are shapes "
-                . "to be replaced.\n\n"
-                . "Anchor the conversation in the course content. If the \"## Current Page "
+                . "to be replaced.\n\n";
+            $nochipsblock = "This voice session has no text channel: never say bracketed tags, markers, "
+                . "suggestion chips or anything meant for the screen.\n\n";
+            $voicetailrest = "Anchor the conversation in the course content. If the \"## Current Page "
                 . "Content\" section is present, treat that page as the default topic from "
                 . "the very first turn. Do NOT open with generic icebreakers like asking "
                 . "about the learner's favourite hobby, weekend, or unrelated personal "
@@ -176,7 +180,7 @@ class get_realtime_token extends external_api {
                 . "\"Awesome!\", \"Perfect!\", or any other one-word affirmation. Open directly "
                 . "with the answer or with a short relevant question.";
             if ($hascurrentpage) {
-                $voicetail .= "\n\nThe learner is currently on the page titled \"" . $pagetitleq
+                $voicetailrest .= "\n\nThe learner is currently on the page titled \"" . $pagetitleq
                     . "\". If they have not chosen a different topic, your first spoken turn "
                     . "should briefly summarise that page (one sentence) and ask which part "
                     . "they want to discuss.";
@@ -193,12 +197,14 @@ class get_realtime_token extends external_api {
             // The full text now goes to OpenAI server-side at mint time, and only
             // $voicetail — generic spoken-style guidance with no course or learner
             // data in it — is returned to the client.
-            $voicetail .= self::mode_block(
+            $voicetailrest .= self::mode_block(
                 (string) $params['mode'],
                 (string) $params['topic'],
                 (string) $params['phrase'],
                 $pagetitleq
             );
+            $audioonlytail = $voicetail . $nochipsblock . $voicetailrest;
+            $voicetail .= $chipsblock . $voicetailrest;
             $fullinstructions = $systemprompt . $voicetail;
             // OpenAI Realtime rejects session.instructions that contain a
             // reserved special token and fails the whole session with
@@ -209,6 +215,10 @@ class get_realtime_token extends external_api {
             // start. The surrounding instruction keeps its meaning.
             $fullinstructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $fullinstructions);
             $clientinstructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $voicetail);
+            // The same hygiene for the audio-only (Gemini Live) variant.
+            $audioonlyinstructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]',
+                $systemprompt . $audioonlytail);
+            $audioonlyclient = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $audioonlytail);
         } catch (\Throwable $e) {
             // Fail CLOSED. The old handler blanked the instructions and minted
             // anyway, so a prompt-build failure produced a live voice session
@@ -280,7 +290,7 @@ class get_realtime_token extends external_api {
 
         // Gemini Live (8.2.0): a single-use token locked to the model, the grounded instruction and audio output.
         if ($cfg['provider'] === 'gemini') {
-            return self::mint_gemini($cfg, $fullinstructions, $clientinstructions, (int) $USER->id,
+            return self::mint_gemini($cfg, $audioonlyinstructions, $audioonlyclient, (int) $USER->id,
                 (int) $params['courseid']);
         }
 

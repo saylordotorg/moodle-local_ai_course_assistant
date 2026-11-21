@@ -90,6 +90,10 @@ final class gemini_live_token_endpoint_test extends \advanced_testcase {
             'special tokens are neutralised as for OpenAI');
         $this->assertSame(['AUDIO'], $setup['generationConfig']['responseModalities']);
         $this->assertSame('models/gemini-3.8-live', $setup['model']);
+        // Audio only: the chip marker would be read aloud, so the Live prompt says so instead of asking for it.
+        $this->assertStringNotContainsString('append the SOLA_NEXT block', $setup['systemInstruction']['parts'][0]['text']);
+        $this->assertStringContainsString('no text channel', $setup['systemInstruction']['parts'][0]['text']);
+        $this->assertStringContainsString('no text channel', $result['instructions']);
 
         // One spend row, in the voice bucket, owned by the learner.
         $row = $DB->get_record('local_ai_course_assistant_msgs', ['id' => $result['sessionid']]);

@@ -25,7 +25,8 @@ define([
     'local_ai_course_assistant/markdown',
     'local_ai_course_assistant/quiz',
     'local_ai_course_assistant/repository',
-], function(Markdown, Quiz, Repository) {
+    'local_ai_course_assistant/avatar_motion',
+], function(Markdown, Quiz, Repository, AvatarMotion) {
 
     /** @type {HTMLElement} */
     let root = null;
@@ -182,7 +183,9 @@ define([
         var styles = HAIR_DEFS[gender] || HAIR_DEFS.n;
         var styleIdx = Math.min(p.styleIdx || 0, styles.length - 1);
         var hairSVG = styles[styleIdx].replace(/\{h\}/g, hair);
-        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">'
+        // Decorative: the transcript and captions carry the content, so screen readers skip it.
+        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"'
+            + ' aria-hidden="true" focusable="false">'
             + '<rect x="0" y="0" width="64" height="64" fill="white"/>'
             + '<circle cx="32" cy="60" r="22" fill="#94a3b8"/>'   // shirt (clipped)
             + hairSVG                                               // hair (behind head)
@@ -5625,8 +5628,85 @@ define([
     };
 
     /**
+     * Drive the SVG avatar from an AnalyserNode on the playback path until stopped (8.2.0).
+     *
+     * One loop for every voice: text to speech (an audio element or the shared AudioContext) and
+     * live voice (Gemini Live's playback analyser). Each frame the speech level opens the mouth
+     * (.aica-mouth-open / .aica-mouth-smile) and gives the header and toggle avatars a small lift
+     * and sway (avatar_motion). Runs only while avatarAnimAllowed(): the admin setting is on and
+     * the learner hasn't asked for reduced motion. Decorative only; captions and the transcript
+     * stay the primary channel.
+     *
+     * @param {AnalyserNode} analyser
+     * @param {Function|null} onStop Extra cleanup (closing a private AudioContext)
+     */
+    const runMouthSync = function(analyser, onStop) {
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.55;
+        var data = new Uint8Array(analyser.frequencyBinCount);
+        var rafId = null;
+        var alive = true;
+        var level = 0;
+        var heads = root.querySelectorAll('.aica-avatar-svg--toggle svg, .aica-avatar-svg--header svg');
+
+        var apply = function(l, timeMs) {
+            var m = AvatarMotion.mouth(l);
+            root.querySelectorAll('.aica-mouth-open').forEach(function(el) {
+                el.style.transform = m.open;
+                el.style.opacity = m.openOpacity;
+            });
+            root.querySelectorAll('.aica-mouth-smile').forEach(function(el) {
+                el.style.opacity = m.smileOpacity;
+            });
+            var t = AvatarMotion.head(l, timeMs);
+            heads.forEach(function(svg) {
+                svg.style.transform = t;
+            });
+        };
+
+        var resetMouth = function() {
+            if (!root) {
+                return;
+            }
+            root.querySelectorAll('.aica-mouth-open').forEach(function(el) {
+                el.style.transform = 'scaleY(0)';
+                el.style.opacity = '0';
+            });
+            root.querySelectorAll('.aica-mouth-smile').forEach(function(el) {
+                el.style.opacity = '';
+            });
+            heads.forEach(function(svg) {
+                svg.style.transform = '';
+            });
+        };
+
+        mouthSyncCleanup = function() {
+            alive = false;
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            mouthSyncCleanup = null;
+            resetMouth();
+            if (onStop) {
+                onStop();
+            }
+        };
+
+        var update = function(timeMs) {
+            if (!alive || !root) {
+                return;
+            }
+            analyser.getByteFrequencyData(data);
+            level = AvatarMotion.smooth(level, AvatarMotion.levelFromSpectrum(data));
+            apply(level, timeMs || 0);
+            rafId = requestAnimationFrame(update);
+        };
+        return update;
+    };
+
+    /**
      * Start Web Audio API driven mouth movement synced to an audio element.
-     * Drives the .aica-mouth-open and .aica-mouth-smile SVG elements in real-time.
      * Falls back gracefully when Web Audio is unavailable.
      *
      * @param {HTMLAudioElement} audioEl The audio element to analyse
@@ -5643,66 +5723,20 @@ define([
         try {
             var ctx = new AudioCtx();
             var analyser = ctx.createAnalyser();
-            analyser.fftSize = 256;
-            analyser.smoothingTimeConstant = 0.55;
             var src = ctx.createMediaElementSource(audioEl);
             src.connect(analyser);
             analyser.connect(ctx.destination);
-            var data = new Uint8Array(analyser.frequencyBinCount);
-            var rafId = null;
-            var alive = true;
-
-            var resetMouth = function() {
-                if (!root) {
-                    return;
-                }
-                root.querySelectorAll('.aica-mouth-open').forEach(function(el) {
-                    el.style.transform = 'scaleY(0)';
-                    el.style.opacity = '0';
-                });
-                root.querySelectorAll('.aica-mouth-smile').forEach(function(el) {
-                    el.style.opacity = '';
-                });
-            };
-
-            mouthSyncCleanup = function() {
-                alive = false;
-                if (rafId) {
-                    cancelAnimationFrame(rafId);
-                    rafId = null;
-                }
+            var update = runMouthSync(analyser, function() {
                 try {
                     ctx.close();
                 } catch (e) { /**/ }
-                mouthSyncCleanup = null;
-                resetMouth();
-            };
-
-            var update = function() {
-                if (!alive) {
-                    return;
-                }
-                analyser.getByteFrequencyData(data);
-                // Average energy in speech frequency range (~85–860 Hz for fftSize=256 at 44.1kHz).
-                var sum = 0;
-                for (var i = 2; i <= 20; i++) {
-                    sum += data[i];
-                }
-                var amp = Math.min(1, (sum / 19 / 90));
-                root.querySelectorAll('.aica-mouth-open').forEach(function(el) {
-                    el.style.transform = 'scaleY(' + amp + ')';
-                    el.style.opacity = amp > 0.08 ? '1' : '0';
-                });
-                root.querySelectorAll('.aica-mouth-smile').forEach(function(el) {
-                    el.style.opacity = String(Math.max(0.05, 1 - amp * 1.3));
-                });
-                rafId = requestAnimationFrame(update);
-            };
-
+            });
             if (ctx.state === 'suspended') {
-                ctx.resume().then(update);
+                ctx.resume().then(function() {
+                    update(0);
+                });
             } else {
-                update();
+                update(0);
             }
         } catch (e) {
             // Web Audio unavailable — CSS animation handles mouth for browser TTS.
@@ -5710,56 +5744,17 @@ define([
     };
 
     /**
-     * Start mouth sync from an already-created AnalyserNode (AudioContext TTS path).
-     * Used when the audio is played through a shared AudioContext (e.g. iOS TTS fix).
+     * Start mouth sync from an already-created AnalyserNode (the shared-AudioContext TTS path and,
+     * since 8.2.0, live voice, whose playback analyser lasts the whole session).
      *
-     * @param {AnalyserNode} analyser  Pre-configured analyser connected to audio source
+     * @param {AnalyserNode} analyser  Analyser connected to the audio being played
      */
     const startMouthSyncFromAnalyser = function(analyser) {
         stopMouthSync();
         if (!root || !analyser || !avatarAnimAllowed()) {
             return;
         }
-        analyser.fftSize = 256;
-        analyser.smoothingTimeConstant = 0.55;
-        var data = new Uint8Array(analyser.frequencyBinCount);
-        var rafId = null;
-        var alive = true;
-
-        var resetMouth = function() {
-            if (!root) { return; }
-            root.querySelectorAll('.aica-mouth-open').forEach(function(el) {
-                el.style.transform = 'scaleY(0)';
-                el.style.opacity = '0';
-            });
-            root.querySelectorAll('.aica-mouth-smile').forEach(function(el) {
-                el.style.opacity = '';
-            });
-        };
-
-        mouthSyncCleanup = function() {
-            alive = false;
-            if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-            mouthSyncCleanup = null;
-            resetMouth();
-        };
-
-        var update = function() {
-            if (!alive) { return; }
-            analyser.getByteFrequencyData(data);
-            var sum = 0;
-            for (var i = 2; i <= 20; i++) { sum += data[i]; }
-            var amp = Math.min(1, (sum / 19 / 90));
-            root.querySelectorAll('.aica-mouth-open').forEach(function(el) {
-                el.style.transform = 'scaleY(' + amp + ')';
-                el.style.opacity = amp > 0.08 ? '1' : '0';
-            });
-            root.querySelectorAll('.aica-mouth-smile').forEach(function(el) {
-                el.style.opacity = String(Math.max(0.05, 1 - amp * 1.3));
-            });
-            rafId = requestAnimationFrame(update);
-        };
-        update();
+        runMouthSync(analyser, null)(0);
     };
 
     /**
