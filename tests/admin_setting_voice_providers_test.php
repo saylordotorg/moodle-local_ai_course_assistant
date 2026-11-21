@@ -274,7 +274,7 @@ final class admin_setting_voice_providers_test extends \advanced_testcase {
         $setting = $this->setting();
         $setting->write_setting(['rows' => [$this->row('openai', 'sk-proj-VOICE-STORED-9999-IIII', '', 'stored-label')]]);
         $submitted = ['rows' => [
-            $this->row('gemini', 'sk-proj-VOICE-TYPED-4444-DDDD', '', 'SUBMITTED-LABEL-ONLY', 'SUBMITTED-RT'),
+            $this->row('elevenlabs', 'sk-proj-VOICE-TYPED-4444-DDDD', '', 'SUBMITTED-LABEL-ONLY', 'SUBMITTED-RT'),
         ]];
         $err = $setting->write_setting($submitted);
         $this->assertNotSame('', $err);
