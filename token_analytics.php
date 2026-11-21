@@ -82,7 +82,7 @@ $msgwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
 // display label by $categorylabels below, so the label is translatable
 // and the grouping key never changes with the viewer's language):
 // chat, quiz, <empty>           -> chat
-// voice                         -> voice_realtime
+// voice, gemini_live            -> voice_realtime
 // openai_tts, xai_tts,
 // gemini_tts                    -> voice_tts
 // openai_whisper, openai_stt,
@@ -108,7 +108,7 @@ $msgwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
 // anything else                 -> other
 
 $categorysql = "CASE
-    WHEN m.interaction_type IN ('voice')                                    THEN 'voice_realtime'
+    WHEN m.interaction_type IN ('voice','gemini_live')                      THEN 'voice_realtime'
     WHEN m.interaction_type IN ('openai_tts','xai_tts','gemini_tts')        THEN 'voice_tts'
     WHEN m.interaction_type IN ('openai_whisper','openai_stt','xai_stt','selfhosted_stt')    THEN 'voice_stt'
     WHEN m.interaction_type IN ('embedding','embed','rerank')               THEN 'rag'

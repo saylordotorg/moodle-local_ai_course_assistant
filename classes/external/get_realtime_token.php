@@ -22,7 +22,8 @@ use core_external\external_single_structure;
 use core_external\external_value;
 
 /**
- * External function to get an ephemeral token for OpenAI Realtime voice mode.
+ * External function to get an ephemeral token for live voice mode: OpenAI Realtime, xAI through the SOLA proxy, or
+ * Gemini Live (8.2.0). The site's key never reaches the browser on any of the three.
  *
  * @package    local_ai_course_assistant
  * @copyright  2025 AI Course Assistant
@@ -277,6 +278,12 @@ class get_realtime_token extends external_api {
             ];
         }
 
+        // Gemini Live (8.2.0): a single-use token locked to the model, the grounded instruction and audio output.
+        if ($cfg['provider'] === 'gemini') {
+            return self::mint_gemini($cfg, $fullinstructions, $clientinstructions, (int) $USER->id,
+                (int) $params['courseid']);
+        }
+
         // OpenAI: mint an ephemeral client secret so the key never reaches the browser.
         [$response, $httpcode] = self::call_openai_realtime((string) $cfg['apikey'], $fullinstructions);
 
@@ -306,6 +313,70 @@ class get_realtime_token extends external_api {
             'endpoint' => $cfg['endpoint'],
             // Voice-style tail only; the grounded prompt went to OpenAI at mint time.
             'instructions' => $clientinstructions,
+        ];
+    }
+
+    /**
+     * Mint a Gemini Live session: daily allowance, model, voice, the locked token, and the spend row.
+     *
+     * Everything before this (capability, mint throttle, realtime_enabled, the emergency switch and the voice spend
+     * cap inside voice_registry::resolve()) has already run, and resolve() only returns a Gemini row for Realtime
+     * while gemini_live_enabled is on.
+     *
+     * @param array $cfg From voice_registry::resolve().
+     * @param string $fullinstructions The grounded system instruction, special tokens already neutralised.
+     * @param string $clientinstructions The generic voice tail the browser may see.
+     * @param int $userid
+     * @param int $courseid
+     * @return array
+     */
+    private static function mint_gemini(array $cfg, string $fullinstructions, string $clientinstructions,
+            int $userid, int $courseid): array {
+        $gl = \local_ai_course_assistant\voice\gemini_live::class;
+        if (empty($cfg['apikey'])) {
+            throw new \moodle_exception('realtime:err_no_provider', 'local_ai_course_assistant');
+        }
+        $allowance = $gl::session_allowance($gl::max_session_seconds(), $gl::daily_seconds(),
+            $gl::seconds_used_today($userid));
+        if ($allowance <= 0) {
+            throw new \moodle_exception('realtime:err_gemini_daily_cap', 'local_ai_course_assistant');
+        }
+        $model = (string) ($cfg['model'] ?? '');
+        $voice = \local_ai_course_assistant\voice\gemini_tts::pick_voice(
+            (string) ($cfg['voice'] ?? ''),
+            \local_ai_course_assistant\voice_registry::default_voice_for('gemini'),
+            \local_ai_course_assistant\voice_registry::voices_for('gemini')
+        );
+        try {
+            $request = \local_ai_course_assistant\voice\gemini_live_token::build_request(
+                $model, $fullinstructions, $voice, $allowance, time());
+        } catch (\coding_exception $e) {
+            // A model id that isn't a plain name never reaches a URL or Google.
+            throw new \moodle_exception('realtime:err_gemini_model', 'local_ai_course_assistant');
+        }
+        $tokenclass = \local_ai_course_assistant\voice\gemini_live_token::class;
+        [$response, $httpcode] = $tokenclass::call((string) $cfg['apikey'], $request);
+        if ($httpcode !== 200) {
+            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
+                \local_ai_course_assistant\voice\gemini_live_token::error_message($httpcode, $response));
+        }
+        $token = \local_ai_course_assistant\voice\gemini_live_token::parse_response($response);
+        if ($token === '') {
+            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
+                'Unexpected response from the Gemini Live token endpoint.');
+        }
+        $sessionid = $gl::open_session($userid, $courseid, $model, $allowance);
+        return [
+            'token' => $token,
+            'voice' => $voice,
+            'provider' => 'gemini',
+            'endpoint' => (string) $cfg['endpoint'],
+            // Voice-style tail only; the grounded instruction is locked into the token server-side.
+            'instructions' => $clientinstructions,
+            'model' => $model,
+            'sessionid' => $sessionid,
+            'maxseconds' => $allowance,
+            'idleseconds' => $gl::idle_seconds(),
         ];
     }
 
@@ -442,7 +513,7 @@ class get_realtime_token extends external_api {
         return new external_single_structure([
             'token'    => new external_value(PARAM_RAW, 'Ephemeral session token (or raw API key for providers without ephemeral support)'),
             'voice'    => new external_value(PARAM_ALPHANUMEXT, 'Voice identifier'),
-            'provider' => new external_value(PARAM_ALPHANUMEXT, 'Provider id (openai|xai)'),
+            'provider' => new external_value(PARAM_ALPHANUMEXT, 'Provider id (openai|xai|gemini)'),
             // v5.1.3: was PARAM_URL, which Moodle\'s webservice layer rejects
             // for wss:// schemes — both providers return wss:// endpoints,
             // and the xAI proxy form additionally carries a JWT in its query
@@ -455,6 +526,11 @@ class get_realtime_token extends external_api {
             // course content, current page text, and a voice-mode tail. The
             // client passes this to the WebSocket via the first session.update.
             'instructions' => new external_value(PARAM_RAW, 'System instructions for the realtime session', VALUE_DEFAULT, ''),
+            // 8.2.0, Gemini Live only.
+            'model' => new external_value(PARAM_RAW, 'Live model id the token is locked to', VALUE_OPTIONAL),
+            'sessionid' => new external_value(PARAM_INT, 'Spend row to report usage against', VALUE_OPTIONAL),
+            'maxseconds' => new external_value(PARAM_INT, 'Session cap in seconds', VALUE_OPTIONAL),
+            'idleseconds' => new external_value(PARAM_INT, 'Idle timeout in seconds', VALUE_OPTIONAL),
         ]);
     }
 }

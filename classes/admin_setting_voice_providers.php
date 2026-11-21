@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class admin_setting_voice_providers extends admin_setting_keyed_rows {
 
-    /** @var string[] Voice providers: openai and xai (Realtime, TTS, STT) and gemini (TTS only, 8.1.0). */
+    /** @var string[] Voice providers: openai and xai (Realtime, TTS, STT) and gemini (TTS, 8.1.0; Live when on, 8.2.0). */
     private const PROVIDERS = ['openai', 'xai', 'gemini'];
 
     /**
