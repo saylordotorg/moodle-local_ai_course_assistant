@@ -225,6 +225,10 @@ final class lang_completeness_test extends \basic_testcase {
         'settings:gemini_live_daily_minutes_desc',
         'realtime:err_gemini_daily_cap',
         'realtime:err_gemini_model',
+        'realtime:err_gemini_unavailable',
+        // 8.2.0: the Realtime model column, and OpenAI's 2.1 Realtime models.
+        'providerkeys:col_rtmodel',
+        'providerkeys:err_rt_model',
         // The video rubric tab. NOT deferred translation debt: the tab was specced
         // and cut, so nothing in the product can reach these. rubric_admin.php
         // whitelists conversation, pronunciation and speech only, and clamps an

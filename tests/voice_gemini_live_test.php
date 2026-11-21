@@ -60,10 +60,13 @@ final class voice_gemini_live_test extends \advanced_testcase {
         $this->assertSame('gemini-3.8-live', voice_registry::model_for('gemini', 'realtime', '', $after));
         // Blank uses the catalog default; the row's TTS model column never reaches Live.
         set_config('gemini_live_model', '', 'local_ai_course_assistant');
-        $this->assertSame('gemini-3.8-live', voice_registry::model_for('gemini', 'realtime', 'gemini-3.8-flash-tts'));
+        $row = ['tts_model' => 'gemini-3.8-flash-tts', 'realtime_model' => ''];
+        $this->assertSame('', voice_registry::row_model($row, 'realtime'));
+        $this->assertSame('gemini-3.8-live',
+            voice_registry::model_for('gemini', 'realtime', voice_registry::row_model($row, 'realtime')));
         // And OpenAI Realtime is untouched by the Gemini setting.
         set_config('gemini_live_model', 'gemini-3.8-live', 'local_ai_course_assistant');
-        $this->assertSame('gpt-realtime-mini', voice_registry::model_for('openai', 'realtime', ''));
+        $this->assertSame('gpt-realtime-2.1-mini', voice_registry::model_for('openai', 'realtime', ''));
     }
 
     // ---------- the registry ----------

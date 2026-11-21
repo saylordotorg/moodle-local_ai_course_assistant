@@ -361,7 +361,7 @@ const runFor = async(label, src) => {
         chatSrc.includes("'local_ai_course_assistant/gemini_live'") &&
         /isGemini\s*=\s*result\.provider\s*===\s*'gemini'/.test(chatSrc));
     check('chat.min.js carries the same', chatMin.includes('"local_ai_course_assistant/gemini_live"') &&
-        chatMin.includes('recordLiveUsage') && chatMin.includes('realtime:err_gemini_daily_cap'));
+        chatMin.includes('recordLiveUsage') && chatMin.includes('realtime:err_gemini_'));
     check('repository.min.js has the usage call',
         read('amd', 'build', 'repository.min.js').includes('local_ai_course_assistant_record_live_usage'));
     const uiMin = read('amd', 'build', 'ui.min.js');

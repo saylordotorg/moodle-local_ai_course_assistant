@@ -525,6 +525,7 @@ class spend_guard {
                     'apikey'   => $row['apikey'],
                     'label'    => $label,
                     'tts_model' => $row['tts_model'] ?? '',
+                    'realtime_model' => $row['realtime_model'] ?? '',
                 ];
             }
         }

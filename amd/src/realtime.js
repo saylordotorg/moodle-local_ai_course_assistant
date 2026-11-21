@@ -635,8 +635,17 @@ define([], function() {
         // Provider/endpoint come in via callbacks for backwards compatibility
         // (older callers that only passed onTranscript/onStateChange keep working).
         var provider = callbacks.provider || 'openai';
-        var endpoint = callbacks.endpoint ||
-            'wss://api.openai.com/v1/realtime?model=gpt-realtime-mini';
+        // 8.2.0: no built-in model. The server sends the URL with the model voice_model_catalog resolved
+        // (a hard-coded one would outlive the model's shutdown).
+        var endpoint = callbacks.endpoint || '';
+        if (!endpoint) {
+            setState('disconnected');
+            if (onErrorCb) {
+                onErrorCb('Voice connection failed: the server sent no voice endpoint.');
+                onErrorCb = null;
+            }
+            return;
+        }
         // xAI now routes through the SOLA WebSocket proxy (services/xai_rt_proxy);
         // the proxy authenticates with a short-lived JWT embedded in the URL
         // and does the Bearer auth to xAI itself, so we must NOT pass the

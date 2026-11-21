@@ -201,7 +201,9 @@ final class gemini_live_token_endpoint_test extends \advanced_testcase {
             get_realtime_token::execute((int) $course->id);
             $this->fail('a 400 must refuse');
         } catch (\moodle_exception $e) {
+            $this->assertSame('realtime:err_gemini_unavailable', $e->errorcode);
             $this->assertStringNotContainsString(self::KEY, $e->getMessage() . ' ' . $e->debuginfo);
+            $this->assertStringContainsString('[redacted]', $e->debuginfo, 'Google\'s words, minus the key');
         }
         $this->assertSame(0, $DB->count_records('local_ai_course_assistant_msgs', ['interaction_type' => 'gemini_live']));
     }
@@ -210,8 +212,12 @@ final class gemini_live_token_endpoint_test extends \advanced_testcase {
         $this->configure();
         $course = $this->student();
         gemini_live_token::$test_http_response = ['body' => '{"unexpected":true}', 'http_code' => 200];
-        $this->expectException(\moodle_exception::class);
-        get_realtime_token::execute((int) $course->id);
+        try {
+            get_realtime_token::execute((int) $course->id);
+            $this->fail('a 200 without a token must refuse');
+        } catch (\moodle_exception $e) {
+            $this->assertSame('realtime:err_gemini_unavailable', $e->errorcode);
+        }
     }
 
     public function test_a_bad_model_setting_never_reaches_google(): void {

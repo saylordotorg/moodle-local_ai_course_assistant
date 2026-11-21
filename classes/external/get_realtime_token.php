@@ -366,13 +366,15 @@ class get_realtime_token extends external_api {
         }
         $tokenclass = \local_ai_course_assistant\voice\gemini_live_token::class;
         [$response, $httpcode] = $tokenclass::call((string) $cfg['apikey'], $request);
+        // The learner sees a plain message (and the browser falls back to the regular voice mode on any
+        // realtime:err_gemini_* code); Google's own words, with keys and tokens redacted, go to debuginfo.
         if ($httpcode !== 200) {
-            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                \local_ai_course_assistant\voice\gemini_live_token::error_message($httpcode, $response));
+            throw new \moodle_exception('realtime:err_gemini_unavailable', 'local_ai_course_assistant', '', null,
+                $tokenclass::error_message($httpcode, $response));
         }
-        $token = \local_ai_course_assistant\voice\gemini_live_token::parse_response($response);
+        $token = $tokenclass::parse_response($response);
         if ($token === '') {
-            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
+            throw new \moodle_exception('realtime:err_gemini_unavailable', 'local_ai_course_assistant', '', null,
                 'Unexpected response from the Gemini Live token endpoint.');
         }
         $sessionid = $gl::open_session($userid, $courseid, $model, $allowance);

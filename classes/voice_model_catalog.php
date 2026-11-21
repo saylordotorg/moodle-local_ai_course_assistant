@@ -106,10 +106,17 @@ class voice_model_catalog {
                     'tts-1-hd' => ['status' => self::CURRENT, 'shutdown' => null, 'replaced_by' => null],
                 ],
             ],
+            // 8.2.0: OpenAI's deprecation notice (fetched 2026-11-21 by the site owner) retires both Realtime
+            // models on 2027-01-20. The 2.1 models are the default from 8.2.0 on.
             self::REALTIME => [
-                'default' => 'gpt-realtime-mini',
+                'default' => 'gpt-realtime-2.1-mini',
                 'models' => [
-                    'gpt-realtime-mini' => ['status' => self::CURRENT, 'shutdown' => null, 'replaced_by' => null],
+                    'gpt-realtime-2.1-mini' => ['status' => self::CURRENT, 'shutdown' => null, 'replaced_by' => null],
+                    'gpt-realtime-2.1' => ['status' => self::CURRENT, 'shutdown' => null, 'replaced_by' => null],
+                    'gpt-realtime-mini' => ['status' => self::DEPRECATED, 'shutdown' => '2027-01-20',
+                        'replaced_by' => 'gpt-realtime-2.1-mini'],
+                    'gpt-realtime' => ['status' => self::DEPRECATED, 'shutdown' => '2027-01-20',
+                        'replaced_by' => 'gpt-realtime-2.1'],
                 ],
             ],
         ],

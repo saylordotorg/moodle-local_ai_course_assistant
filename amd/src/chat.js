@@ -3699,8 +3699,10 @@ define([
                 if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                     return;
                 }
-                // Gemini Live's daily allowance is used up: carry on in the regular voice mode.
-                if (err && err.errorcode === 'realtime:err_gemini_daily_cap' && canFallBack()) {
+                // Gemini Live couldn't mint (daily allowance used up, Google refused, bad model
+                // setting): carry on in the regular voice mode.
+                if (err && typeof err.errorcode === 'string' && err.errorcode.indexOf('realtime:err_gemini_') === 0 &&
+                        canFallBack()) {
                     fallBackToRegularVoice(selection);
                     return;
                 }
