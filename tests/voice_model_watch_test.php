@@ -83,6 +83,8 @@ final class voice_model_watch_test extends \advanced_testcase {
             ['gemini', 'tts', 'gemini-2.5-flash-preview-tts'],
             ['openai', 'tts', 'tts-1'],
             ['openai', 'realtime', 'gpt-realtime-2.1-mini'],
+            // 8.3.0: hosted speech to text on the openai row (no self-hosted server is configured).
+            ['openai', 'stt', 'whisper-1'],
             ['xai', 'tts', 'grok-tts'],
         ], $inuse, 'a Gemini row is TTS only, so its Live model is not in use');
         $this->assertSame([], voice_model_watch::models_in_use([]));

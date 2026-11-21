@@ -526,6 +526,7 @@ class spend_guard {
                     'label'    => $label,
                     'tts_model' => $row['tts_model'] ?? '',
                     'realtime_model' => $row['realtime_model'] ?? '',
+                    'stt_model' => $row['stt_model'] ?? '',
                 ];
             }
         }

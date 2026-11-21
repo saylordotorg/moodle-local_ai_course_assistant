@@ -37,6 +37,9 @@ final class voice_openai_realtime_model_test extends \advanced_testcase {
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
+        // 8.3.0: one test here resolves OpenAI text to speech (tts-1), which shuts down on 2027-01-06, so the class
+        // runs on a fixed day before it (voice_registry reads Moodle's clock).
+        $this->mock_clock_with_frozen(gmmktime(12, 0, 0, 11, 21, 2026));
     }
 
     protected function tearDown(): void {

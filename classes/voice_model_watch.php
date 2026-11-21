@@ -53,6 +53,11 @@ class voice_model_watch {
     public static function models_in_use(?array $rows = null): array {
         $legacy = $rows === null;
         $rows = $rows ?? voice_registry::parse_rows(false);
+        // Hosted speech to text is in use unless the self-hosted server is configured and nothing chose a row
+        // over it (voice_registry::resolve()).
+        $activestt = (string) (get_config('local_ai_course_assistant', 'voice_active_stt') ?: '');
+        $hostedstt = voice_registry::selfhosted_stt_config() === null
+            || ($activestt !== '' && $activestt !== voice_registry::SELFHOSTED_LABEL);
         $out = [];
         foreach ($rows as $row) {
             $provider = strtolower((string) ($row['provider'] ?? ''));
@@ -76,10 +81,20 @@ class voice_model_watch {
             if ($rt !== '' && voice_registry::supports($provider, voice_model_catalog::REALTIME)) {
                 $out[] = [$provider, voice_model_catalog::REALTIME, $rt];
             }
+            // 8.3.0: speech to text on a provider row (always the provider's own host), unless the self-hosted
+            // server takes every transcription. A self-hosted server's model is its own name and never listed.
+            $stt = voice_model_catalog::normalise(voice_registry::row_model($row, voice_model_catalog::STT));
+            $stt = $stt !== '' ? $stt : voice_model_catalog::default_model($provider, voice_model_catalog::STT);
+            if ($stt !== '' && $hostedstt && voice_registry::supports($provider, voice_model_catalog::STT)) {
+                $out[] = [$provider, voice_model_catalog::STT, $stt];
+            }
         }
         // The single-key fallback is OpenAI, on the catalog defaults.
         if ($legacy && $rows === [] && voice_registry::is_configured()) {
-            foreach ([voice_model_catalog::TTS, voice_model_catalog::REALTIME] as $cap) {
+            foreach ([voice_model_catalog::TTS, voice_model_catalog::REALTIME, voice_model_catalog::STT] as $cap) {
+                if ($cap === voice_model_catalog::STT && !$hostedstt) {
+                    continue;
+                }
                 $out[] = ['openai', $cap, voice_model_catalog::default_model('openai', $cap)];
             }
         }
@@ -200,8 +215,7 @@ class voice_model_watch {
             }
             $a = (object) ['provider' => $w['provider'], 'model' => $w['model'], 'date' => $w['shutdown'],
                 'days' => max(0, $w['days_left']), 'to' => $w['resolves_to'] !== '' ? $w['resolves_to'] : '-'];
-            $lines[] = '- ' . get_string($w['retired'] ? 'voicemodels:line_retired' : 'voicemodels:line_retiring',
-                'local_ai_course_assistant', $a);
+            $lines[] = '- ' . self::warning_line($w, $a);
             $flags[] = $flag;
         }
         foreach ($result['missing'] as $m) {
@@ -221,6 +235,30 @@ class voice_model_watch {
             set_config($flag, (string) $now, 'local_ai_course_assistant');
         }
         return count($lines);
+    }
+
+    /**
+     * The text of one shutdown warning.
+     *
+     * A model with a successor says what calls go to. One with none (OpenAI text to speech, 8.3.0) says nothing
+     * takes its place automatically and, for text to speech, recommends adding a Gemini text to speech row.
+     *
+     * @param array $w One retiring_within() item.
+     * @param \stdClass $a provider, model, date, days, to
+     * @return string
+     */
+    public static function warning_line(array $w, \stdClass $a): string {
+        if (empty($w['no_successor'])) {
+            return get_string($w['retired'] ? 'voicemodels:line_retired' : 'voicemodels:line_retiring',
+                'local_ai_course_assistant', $a);
+        }
+        $tts = $w['capability'] === voice_model_catalog::TTS;
+        if ($w['retired']) {
+            $key = $tts ? 'voicemodels:line_retired_tts_nosuccessor' : 'voicemodels:line_retired_nosuccessor';
+        } else {
+            $key = $tts ? 'voicemodels:line_retiring_tts_nosuccessor' : 'voicemodels:line_retiring_nosuccessor';
+        }
+        return branding::str($key, $a);
     }
 
     /**
