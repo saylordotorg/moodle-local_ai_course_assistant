@@ -94,7 +94,7 @@ class voice_model_watch {
      * What is worth telling an admin, from the models in use and the providers' lists. Pure.
      *
      * @param array[] $inuse From models_in_use().
-     * @param array<string, string[]> $listed provider => model ids it lists; a provider absent here wasn't read
+     * @param array $listed provider => string[] of model ids it lists; a provider absent here wasn't read
      * @param int $now
      * @return array{warnings: array[], missing: array[]}
      */

@@ -1848,7 +1848,8 @@ if ($hassiteconfig) {
     $settings->add(new \local_ai_course_assistant\admin_setting_voice_providers(
         'local_ai_course_assistant/voice_providers',
         get_string('settings:voice_providers', 'local_ai_course_assistant'),
-        get_string('settings:voice_providers_desc', 'local_ai_course_assistant')
+        // The description names the product ([[tutorshort]]), so it goes through branding like the others.
+        \local_ai_course_assistant\branding::str('settings:voice_providers_desc')
     ));
 
     $activechoices = ['' => get_string('settings:voice_active_default', 'local_ai_course_assistant')];
