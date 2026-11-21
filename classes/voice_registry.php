@@ -24,7 +24,8 @@ defined('MOODLE_INTERNAL') || die();
  * Admins configure one or more voice providers via the `voice_providers` admin
  * setting. Each row supplies a provider id (openai|xai|gemini), an API key, a human
  * label, default voice choices and, optionally, a text to speech model. Gemini rows
- * serve text to speech only. Three separate admin settings then pick
+ * serve text to speech, and Realtime through Gemini Live once gemini_live_enabled
+ * is on (8.2.0). Three separate admin settings then pick
  * which configured label is active for each capability:
  *   - voice_active_realtime
  *   - voice_active_tts
@@ -46,11 +47,22 @@ class voice_registry {
     /** @var string Reserved voice_active_stt value selecting the selfhosted Whisper server. */
     public const SELFHOSTED_LABEL = 'selfhosted';
 
-    /** @var array<string, string[]> What each voice provider can do. Gemini is text to speech only (v8.1.0). */
+    /**
+     * @var array<string, string[]> What each voice provider can always do. Gemini is text to speech (8.1.0) and,
+     *      once an admin switches it on, Realtime through Gemini Live (8.2.0, see OPT_IN_CAPABILITIES).
+     */
     public const PROVIDER_CAPABILITIES = [
         'openai' => [self::CAPABILITY_REALTIME, self::CAPABILITY_TTS, self::CAPABILITY_STT],
         'xai' => [self::CAPABILITY_REALTIME, self::CAPABILITY_TTS, self::CAPABILITY_STT],
         'gemini' => [self::CAPABILITY_TTS],
+    ];
+
+    /**
+     * @var array<string, array<string, string>> provider => capability => the checkbox setting that switches it on.
+     *      Gemini Live is off by default: audio goes to Google and it is billed for as long as a session is open.
+     */
+    public const OPT_IN_CAPABILITIES = [
+        'gemini' => [self::CAPABILITY_REALTIME => 'gemini_live_enabled'],
     ];
 
     /**
@@ -68,18 +80,23 @@ class voice_registry {
         if (!isset(self::PROVIDER_CAPABILITIES[$provider])) {
             return true;
         }
-        return in_array($capability, self::PROVIDER_CAPABILITIES[$provider], true);
+        if (in_array($capability, self::PROVIDER_CAPABILITIES[$provider], true)) {
+            return true;
+        }
+        $setting = self::OPT_IN_CAPABILITIES[$provider][$capability] ?? '';
+        return $setting !== '' && (bool) get_config('local_ai_course_assistant', $setting);
     }
 
     /**
      * Parse the voice_providers config into structured rows.
-     * Stored format: provider|apikey|label|realtime_voice|tts_voice|tts_model
+     * Stored format: provider|apikey|label|realtime_voice|tts_voice|tts_model|realtime_model
      *
-     * The sixth column (8.1.0) is optional: a line without it reads as before, with tts_model ''
-     * (the provider's default from voice_model_catalog).
+     * The sixth column (8.1.0) and the seventh (8.2.0) are optional: a line without them reads as before, with
+     * tts_model and realtime_model '' (the provider's default from voice_model_catalog).
      *
      * @param bool $reveal decrypt each row's key (false returns the stored form, for the settings page)
-     * @return array List of rows with keys: provider, apikey, label, realtime_voice, tts_voice, tts_model
+     * @return array List of rows with keys: provider, apikey, label, realtime_voice, tts_voice, tts_model,
+     *     realtime_model
      */
     public static function parse_rows(bool $reveal = true): array {
         $raw = get_config('local_ai_course_assistant', 'voice_providers') ?: '';
@@ -103,6 +120,7 @@ class voice_registry {
                 'realtime_voice' => $parts[3] ?? '',
                 'tts_voice'      => $parts[4] ?? '',
                 'tts_model'      => $parts[5] ?? '',
+                'realtime_model' => $parts[6] ?? '',
             ];
         }
         return $rows;
@@ -171,7 +189,7 @@ class voice_registry {
             if ($guardlevel === spend_guard::CAP_BLOCKED) {
                 $failover = spend_guard::resolve_failover('voice');
                 if ($failover !== null && self::supports($failover['provider'], $capability)) {
-                    $model = self::model_for($failover['provider'], $capability, (string) ($failover['tts_model'] ?? ''));
+                    $model = self::model_for($failover['provider'], $capability, self::row_model($failover, $capability));
                     return [
                         'provider' => $failover['provider'],
                         'apikey'   => $failover['apikey'],
@@ -270,7 +288,7 @@ class voice_registry {
             $voice = self::default_voice_for($row['provider']);
         }
 
-        $model = self::model_for($row['provider'], $capability, (string) ($row['tts_model'] ?? ''));
+        $model = self::model_for($row['provider'], $capability, self::row_model($row, $capability));
         return [
             'provider' => $row['provider'],
             'apikey'   => $row['apikey'],
@@ -282,14 +300,32 @@ class voice_registry {
     }
 
     /**
+     * The row's own model for a capability: tts_model for text to speech, realtime_model for Realtime, else ''.
+     *
+     * @param array $row A parsed row (or a failover lookup carrying the same keys).
+     * @param string $capability
+     * @return string
+     */
+    public static function row_model(array $row, string $capability): string {
+        if ($capability === self::CAPABILITY_TTS) {
+            return trim((string) ($row['tts_model'] ?? ''));
+        }
+        if ($capability === self::CAPABILITY_REALTIME) {
+            return trim((string) ($row['realtime_model'] ?? ''));
+        }
+        return '';
+    }
+
+    /**
      * The model a capability calls, resolved through voice_model_catalog at call time.
      *
-     * The row's model column applies to text to speech only. Realtime always starts from the catalog default,
-     * and STT models are chosen by transcribe.php, so '' is returned for STT.
+     * Text to speech and Realtime start from the row's model column for that capability (row_model()); a blank
+     * Gemini Live column falls back to the gemini_live_model setting (8.2.0). Blank means the catalog default, and a
+     * retired model is replaced by its successor. STT models are chosen by transcribe.php, so '' is returned for STT.
      *
      * @param string $provider
      * @param string $capability
-     * @param string $rowmodel The row's tts_model column.
+     * @param string $rowmodel The row's model column for this capability (row_model()).
      * @param int|null $now
      * @return string
      */
@@ -302,15 +338,19 @@ class voice_registry {
             // An unknown id is served as OpenAI (endpoint_for()).
             $provider = 'openai';
         }
-        $configured = $capability === self::CAPABILITY_TTS ? $rowmodel : '';
+        $configured = trim($rowmodel);
+        if ($configured === '' && $capability === self::CAPABILITY_REALTIME && $provider === 'gemini') {
+            $configured = trim((string) get_config('local_ai_course_assistant', 'gemini_live_model'));
+        }
         return voice_model_catalog::resolve_model($provider, $capability, $configured, $now);
     }
 
     /**
      * Map provider+capability to the correct HTTPS/WebSocket endpoint.
      *
-     * The OpenAI Realtime URL names its model, which comes from voice_model_catalog (today the same
-     * gpt-realtime-mini as before). A Gemini row has a text to speech endpoint only, built from the model.
+     * The OpenAI Realtime URL names its model, resolved through voice_model_catalog (the row's realtime_model, else
+     * the default gpt-realtime-2.1-mini since 8.2.0; gpt-realtime-mini and gpt-realtime retire on 2027-01-20). A
+     * Gemini row has a text to speech endpoint, built from the model, and the Live endpoint while Gemini Live is on.
      *
      * @param string $provider
      * @param string $capability
@@ -319,6 +359,11 @@ class voice_registry {
      */
     public static function endpoint_for(string $provider, string $capability, string $model = ''): string {
         if ($provider === 'gemini') {
+            if ($capability === self::CAPABILITY_REALTIME) {
+                // Gemini Live, only while it's switched on: the constrained endpoint for ephemeral tokens. The
+                // browser adds the token.
+                return self::supports('gemini', $capability) ? voice\gemini_live_token::WS_URL : '';
+            }
             if ($capability !== self::CAPABILITY_TTS) {
                 return '';
             }
@@ -528,12 +573,14 @@ class voice_registry {
      * both lists. A slightly coarse category beats an invisible row.
      *
      * @param string $provider Provider id from config; may be anything an admin typed.
-     * @param string $kind 'tts' or 'stt'.
+     * @param string $kind 'tts', 'stt' or 'live'.
      * @return string An interaction_type guaranteed to be in the billable set.
      */
     public static function interaction_type(string $provider, string $kind): string {
         $known = [
             'tts' => ['openai' => 'openai_tts', 'xai' => 'xai_tts', 'gemini' => 'gemini_tts'],
+            // 8.2.0: one row per Gemini Live session (voice\gemini_live).
+            'live' => ['gemini' => 'gemini_live'],
             'stt' => [
                 'openai' => 'openai_stt',
                 'xai' => 'xai_stt',

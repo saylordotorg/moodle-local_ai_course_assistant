@@ -220,6 +220,23 @@ final class lang_completeness_test extends \basic_testcase {
         'voicemodels:line_retiring',
         'voicemodels:line_retired',
         'voicemodels:line_missing',
+        // 8.2.0: Gemini Live. English first.
+        'settings:gemini_live_enabled',
+        'settings:gemini_live_enabled_desc',
+        'settings:gemini_live_model',
+        'settings:gemini_live_model_desc',
+        'settings:gemini_live_max_session_minutes',
+        'settings:gemini_live_max_session_minutes_desc',
+        'settings:gemini_live_idle_seconds',
+        'settings:gemini_live_idle_seconds_desc',
+        'settings:gemini_live_daily_minutes',
+        'settings:gemini_live_daily_minutes_desc',
+        'realtime:err_gemini_daily_cap',
+        'realtime:err_gemini_model',
+        'realtime:err_gemini_unavailable',
+        // 8.2.0: the Realtime model column, and OpenAI's 2.1 Realtime models.
+        'providerkeys:col_rtmodel',
+        'providerkeys:err_rt_model',
         // The video rubric tab. NOT deferred translation debt: the tab was specced
         // and cut, so nothing in the product can reach these. rubric_admin.php
         // whitelists conversation, pronunciation and speech only, and clamps an

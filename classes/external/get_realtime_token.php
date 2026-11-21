@@ -22,7 +22,8 @@ use core_external\external_single_structure;
 use core_external\external_value;
 
 /**
- * External function to get an ephemeral token for OpenAI Realtime voice mode.
+ * External function to get an ephemeral token for live voice mode: OpenAI Realtime, xAI through the SOLA proxy, or
+ * Gemini Live (8.2.0). The site's key never reaches the browser on any of the three.
  *
  * @package    local_ai_course_assistant
  * @copyright  2025 AI Course Assistant
@@ -154,8 +155,10 @@ class get_realtime_token extends external_api {
                 . "sentences. Plain spoken language only: no markdown, no bracketed tags "
                 . "or markers in the SPOKEN portion of your reply. Pause naturally between "
                 . "ideas so the learner can interject. When the learner starts speaking, "
-                . "stop your current sentence and listen.\n\n"
-                . "Chip suggestions in voice mode: at the very END of each reply, after the "
+                . "stop your current sentence and listen.\n\n";
+            // 8.2.0: the chips block is kept apart because Gemini Live answers in audio only. With no text channel
+            // the marker would be spoken aloud, so a Gemini session gets $nochipsblock instead.
+            $chipsblock = "Chip suggestions in voice mode: at the very END of each reply, after the "
                 . "spoken portion, append the SOLA_NEXT block exactly as in chat: "
                 . "[SOLA_NEXT]<chip 1>||<chip 2>||<chip 3>||<chip 4>[/SOLA_NEXT]. The audio "
                 . "stream skips the brackets and pipes naturally — they exist only so the "
@@ -164,8 +167,10 @@ class get_realtime_token extends external_api {
                 . "to what was just discussed (e.g. \"Quiz me on this\", \"Give me an "
                 . "example\", \"Show me a real case\", \"What's next?\"). NEVER emit literal "
                 . "placeholder text like \"chip 1\" or \"suggestion 1\" — those are shapes "
-                . "to be replaced.\n\n"
-                . "Anchor the conversation in the course content. If the \"## Current Page "
+                . "to be replaced.\n\n";
+            $nochipsblock = "This voice session has no text channel: never say bracketed tags, markers, "
+                . "suggestion chips or anything meant for the screen.\n\n";
+            $voicetailrest = "Anchor the conversation in the course content. If the \"## Current Page "
                 . "Content\" section is present, treat that page as the default topic from "
                 . "the very first turn. Do NOT open with generic icebreakers like asking "
                 . "about the learner's favourite hobby, weekend, or unrelated personal "
@@ -175,7 +180,7 @@ class get_realtime_token extends external_api {
                 . "\"Awesome!\", \"Perfect!\", or any other one-word affirmation. Open directly "
                 . "with the answer or with a short relevant question.";
             if ($hascurrentpage) {
-                $voicetail .= "\n\nThe learner is currently on the page titled \"" . $pagetitleq
+                $voicetailrest .= "\n\nThe learner is currently on the page titled \"" . $pagetitleq
                     . "\". If they have not chosen a different topic, your first spoken turn "
                     . "should briefly summarise that page (one sentence) and ask which part "
                     . "they want to discuss.";
@@ -192,12 +197,14 @@ class get_realtime_token extends external_api {
             // The full text now goes to OpenAI server-side at mint time, and only
             // $voicetail — generic spoken-style guidance with no course or learner
             // data in it — is returned to the client.
-            $voicetail .= self::mode_block(
+            $voicetailrest .= self::mode_block(
                 (string) $params['mode'],
                 (string) $params['topic'],
                 (string) $params['phrase'],
                 $pagetitleq
             );
+            $audioonlytail = $voicetail . $nochipsblock . $voicetailrest;
+            $voicetail .= $chipsblock . $voicetailrest;
             $fullinstructions = $systemprompt . $voicetail;
             // OpenAI Realtime rejects session.instructions that contain a
             // reserved special token and fails the whole session with
@@ -208,6 +215,10 @@ class get_realtime_token extends external_api {
             // start. The surrounding instruction keeps its meaning.
             $fullinstructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $fullinstructions);
             $clientinstructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $voicetail);
+            // The same hygiene for the audio-only (Gemini Live) variant.
+            $audioonlyinstructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]',
+                $systemprompt . $audioonlytail);
+            $audioonlyclient = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $audioonlytail);
         } catch (\Throwable $e) {
             // Fail CLOSED. The old handler blanked the instructions and minted
             // anyway, so a prompt-build failure produced a live voice session
@@ -277,6 +288,12 @@ class get_realtime_token extends external_api {
             ];
         }
 
+        // Gemini Live (8.2.0): a single-use token locked to the model, the grounded instruction and audio output.
+        if ($cfg['provider'] === 'gemini') {
+            return self::mint_gemini($cfg, $audioonlyinstructions, $audioonlyclient, (int) $USER->id,
+                (int) $params['courseid']);
+        }
+
         // OpenAI: mint an ephemeral client secret so the key never reaches the browser.
         [$response, $httpcode] = self::call_openai_realtime((string) $cfg['apikey'], $fullinstructions);
 
@@ -306,6 +323,72 @@ class get_realtime_token extends external_api {
             'endpoint' => $cfg['endpoint'],
             // Voice-style tail only; the grounded prompt went to OpenAI at mint time.
             'instructions' => $clientinstructions,
+        ];
+    }
+
+    /**
+     * Mint a Gemini Live session: daily allowance, model, voice, the locked token, and the spend row.
+     *
+     * Everything before this (capability, mint throttle, realtime_enabled, the emergency switch and the voice spend
+     * cap inside voice_registry::resolve()) has already run, and resolve() only returns a Gemini row for Realtime
+     * while gemini_live_enabled is on.
+     *
+     * @param array $cfg From voice_registry::resolve().
+     * @param string $fullinstructions The grounded system instruction, special tokens already neutralised.
+     * @param string $clientinstructions The generic voice tail the browser may see.
+     * @param int $userid
+     * @param int $courseid
+     * @return array
+     */
+    private static function mint_gemini(array $cfg, string $fullinstructions, string $clientinstructions,
+            int $userid, int $courseid): array {
+        $gl = \local_ai_course_assistant\voice\gemini_live::class;
+        if (empty($cfg['apikey'])) {
+            throw new \moodle_exception('realtime:err_no_provider', 'local_ai_course_assistant');
+        }
+        $allowance = $gl::session_allowance($gl::max_session_seconds(), $gl::daily_seconds(),
+            $gl::seconds_used_today($userid));
+        if ($allowance <= 0) {
+            throw new \moodle_exception('realtime:err_gemini_daily_cap', 'local_ai_course_assistant');
+        }
+        $model = (string) ($cfg['model'] ?? '');
+        $voice = \local_ai_course_assistant\voice\gemini_tts::pick_voice(
+            (string) ($cfg['voice'] ?? ''),
+            \local_ai_course_assistant\voice_registry::default_voice_for('gemini'),
+            \local_ai_course_assistant\voice_registry::voices_for('gemini')
+        );
+        try {
+            $request = \local_ai_course_assistant\voice\gemini_live_token::build_request(
+                $model, $fullinstructions, $voice, $allowance, time());
+        } catch (\coding_exception $e) {
+            // A model id that isn't a plain name never reaches a URL or Google.
+            throw new \moodle_exception('realtime:err_gemini_model', 'local_ai_course_assistant');
+        }
+        $tokenclass = \local_ai_course_assistant\voice\gemini_live_token::class;
+        [$response, $httpcode] = $tokenclass::call((string) $cfg['apikey'], $request);
+        // The learner sees a plain message (and the browser falls back to the regular voice mode on any
+        // realtime:err_gemini_* code); Google's own words, with keys and tokens redacted, go to debuginfo.
+        if ($httpcode !== 200) {
+            throw new \moodle_exception('realtime:err_gemini_unavailable', 'local_ai_course_assistant', '', null,
+                $tokenclass::error_message($httpcode, $response));
+        }
+        $token = $tokenclass::parse_response($response);
+        if ($token === '') {
+            throw new \moodle_exception('realtime:err_gemini_unavailable', 'local_ai_course_assistant', '', null,
+                'Unexpected response from the Gemini Live token endpoint.');
+        }
+        $sessionid = $gl::open_session($userid, $courseid, $model, $allowance);
+        return [
+            'token' => $token,
+            'voice' => $voice,
+            'provider' => 'gemini',
+            'endpoint' => (string) $cfg['endpoint'],
+            // Voice-style tail only; the grounded instruction is locked into the token server-side.
+            'instructions' => $clientinstructions,
+            'model' => $model,
+            'sessionid' => $sessionid,
+            'maxseconds' => $allowance,
+            'idleseconds' => $gl::idle_seconds(),
         ];
     }
 
@@ -442,7 +525,7 @@ class get_realtime_token extends external_api {
         return new external_single_structure([
             'token'    => new external_value(PARAM_RAW, 'Ephemeral session token (or raw API key for providers without ephemeral support)'),
             'voice'    => new external_value(PARAM_ALPHANUMEXT, 'Voice identifier'),
-            'provider' => new external_value(PARAM_ALPHANUMEXT, 'Provider id (openai|xai)'),
+            'provider' => new external_value(PARAM_ALPHANUMEXT, 'Provider id (openai|xai|gemini)'),
             // v5.1.3: was PARAM_URL, which Moodle\'s webservice layer rejects
             // for wss:// schemes — both providers return wss:// endpoints,
             // and the xAI proxy form additionally carries a JWT in its query
@@ -455,6 +538,11 @@ class get_realtime_token extends external_api {
             // course content, current page text, and a voice-mode tail. The
             // client passes this to the WebSocket via the first session.update.
             'instructions' => new external_value(PARAM_RAW, 'System instructions for the realtime session', VALUE_DEFAULT, ''),
+            // 8.2.0, Gemini Live only.
+            'model' => new external_value(PARAM_RAW, 'Live model id the token is locked to', VALUE_OPTIONAL),
+            'sessionid' => new external_value(PARAM_INT, 'Spend row to report usage against', VALUE_OPTIONAL),
+            'maxseconds' => new external_value(PARAM_INT, 'Session cap in seconds', VALUE_OPTIONAL),
+            'idleseconds' => new external_value(PARAM_INT, 'Idle timeout in seconds', VALUE_OPTIONAL),
         ]);
     }
 }

@@ -76,7 +76,7 @@ final class voice_model_catalog_test extends \advanced_testcase {
     public function test_empty_configured_means_the_provider_default(): void {
         $this->assertSame('gemini-3.8-flash-tts', voice_model_catalog::resolve_model('gemini', 'tts', '', self::AT));
         $this->assertSame('tts-1', voice_model_catalog::resolve_model('openai', 'tts', '  ', self::AT));
-        $this->assertSame('gpt-realtime-mini', voice_model_catalog::resolve_model('openai', 'realtime', '', self::AT));
+        $this->assertSame('gpt-realtime-2.1-mini', voice_model_catalog::resolve_model('openai', 'realtime', '', self::AT));
         $this->assertSame('grok-tts', voice_model_catalog::resolve_model('xai', 'tts', '', self::AT));
         // No default anywhere: nothing to call.
         $this->assertSame('', voice_model_catalog::resolve_model('xai', 'realtime', '', self::AT));

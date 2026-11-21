@@ -82,7 +82,7 @@ final class voice_model_watch_test extends \advanced_testcase {
         $this->assertSame([
             ['gemini', 'tts', 'gemini-2.5-flash-preview-tts'],
             ['openai', 'tts', 'tts-1'],
-            ['openai', 'realtime', 'gpt-realtime-mini'],
+            ['openai', 'realtime', 'gpt-realtime-2.1-mini'],
             ['xai', 'tts', 'grok-tts'],
         ], $inuse, 'a Gemini row is TTS only, so its Live model is not in use');
         $this->assertSame([], voice_model_watch::models_in_use([]));
@@ -113,7 +113,8 @@ final class voice_model_watch_test extends \advanced_testcase {
         $listed = [
             // Google still lists the old preview but not the successor the site would move to.
             'gemini' => ['gemini-2.5-flash-preview-tts', 'gemini-3.8-flash-lite-tts'],
-            'openai' => ['tts-1', 'gpt-realtime-mini'],
+            // 8.2.0: gpt-realtime-mini's successor is listed too, so only the Gemini gap is a finding.
+            'openai' => ['tts-1', 'gpt-realtime-mini', 'gpt-realtime-2.1-mini'],
         ];
         $missing = voice_model_watch::check($inuse, $listed, self::NOW)['missing'];
         $this->assertSame([[

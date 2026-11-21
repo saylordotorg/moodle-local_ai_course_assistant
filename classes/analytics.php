@@ -558,7 +558,7 @@ class analytics {
         return "({$alias}.role = 'assistant'
                  OR ({$alias}.role = 'system' AND {$alias}.interaction_type IN (
                      'embedding', 'rerank', 'quiz',
-                     'voice', 'openai_tts', 'xai_tts', 'gemini_tts',
+                     'voice', 'gemini_live', 'openai_tts', 'xai_tts', 'gemini_tts',
                      'openai_whisper', 'openai_stt', 'xai_stt', 'selfhosted_stt',
                      'flashcards', 'essay', 'insights',
                      'mastery_signal', 'student_profile', 'speech_score',

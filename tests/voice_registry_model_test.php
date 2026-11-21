@@ -51,8 +51,9 @@ final class voice_registry_model_test extends \advanced_testcase {
         $this->assertSame('tts-1', $tts['model'], 'the catalog default is the old literal');
         $this->assertSame('nova', $tts['voice']);
         $rt = voice_registry::resolve(voice_registry::CAPABILITY_REALTIME);
-        $this->assertSame('wss://api.openai.com/v1/realtime?model=gpt-realtime-mini', $rt['endpoint'], 'unchanged URL');
-        $this->assertSame('gpt-realtime-mini', $rt['model']);
+        // 8.2.0: the default moved to gpt-realtime-2.1-mini (gpt-realtime-mini retires on 2027-01-20).
+        $this->assertSame('wss://api.openai.com/v1/realtime?model=gpt-realtime-2.1-mini', $rt['endpoint']);
+        $this->assertSame('gpt-realtime-2.1-mini', $rt['model']);
         $this->assertSame('https://api.openai.com/v1/audio/transcriptions',
             voice_registry::resolve(voice_registry::CAPABILITY_STT)['endpoint']);
     }
@@ -62,7 +63,7 @@ final class voice_registry_model_test extends \advanced_testcase {
         $this->assertSame('tts-1-hd', voice_registry::parse_rows()[0]['tts_model']);
         $this->assertSame('tts-1-hd', voice_registry::resolve(voice_registry::CAPABILITY_TTS)['model']);
         // The TTS model never leaks into Realtime.
-        $this->assertSame('gpt-realtime-mini', voice_registry::resolve(voice_registry::CAPABILITY_REALTIME)['model']);
+        $this->assertSame('gpt-realtime-2.1-mini', voice_registry::resolve(voice_registry::CAPABILITY_REALTIME)['model']);
     }
 
     public function test_a_gemini_row_serves_text_to_speech_on_the_catalog_model(): void {
@@ -124,7 +125,7 @@ final class voice_registry_model_test extends \advanced_testcase {
         $tts = voice_registry::resolve(voice_registry::CAPABILITY_TTS);
         $this->assertSame('openai', $tts['provider']);
         $this->assertSame('tts-1', $tts['model']);
-        $this->assertSame('wss://api.openai.com/v1/realtime?model=gpt-realtime-mini',
+        $this->assertSame('wss://api.openai.com/v1/realtime?model=gpt-realtime-2.1-mini',
             voice_registry::resolve(voice_registry::CAPABILITY_REALTIME)['endpoint']);
     }
 

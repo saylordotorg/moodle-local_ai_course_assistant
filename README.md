@@ -8,10 +8,10 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 
 A 2:38 tour, recorded on version 8.0.0 on a Saylor test site in a demo course with no student data. It shows what SOLA does for learners (in student view): answers from the course, Quiz Me, Study Plan and 46 languages. Then it shows how an institution brands SOLA as its own with settings instead of a fork, the settings hub, and the Providers and keys table. Branding needs version 8.0.0 or later. Narration is AI-generated.
 
-## Version 8.1.0
+## Version 8.2.0
 
 **Release Date:** November 2026
-**Plugin build:** 2026112100
+**Plugin build:** 2026112101
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0, 5.1 and 5.3. `version.php` declares support through 5.3.
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+
@@ -97,6 +97,7 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 - **Speech Input:** Dictate questions instead of typing, in the same 46 languages as the interface
 - **Spoken Responses:** Text-to-speech playback of answers
 - **Live Voice Mode:** Optional two-way spoken conversation using OpenAI's Realtime API, with a live transcript and ELL coaching
+- **Gemini Live voice and a speaking avatar (v8.2.0):** Live voice can also run on Google's Gemini Live API, off by default (**Allow Gemini Live for voice mode** under **Advanced > Prompt, voice and display**, then pick a gemini row as the Active Realtime provider). The learner's audio and the course context go to Google; the site key never reaches the browser, which gets a single-use token locked to the model, the instructions and audio output. Google bills a live session for as long as it's open (roughly $0.70 to $1.40 an hour by third-party estimates), so each session has a length limit and an idle timeout, and each learner a daily allowance. If live voice can't start, the conversation continues in the regular voice mode. The built-in avatar's mouth and head now follow the voice for both live voice and read-aloud answers, with no extra download, unless avatar animation is off or the learner's system asks for reduced motion. OpenAI live voice now uses gpt-realtime-2.1-mini by default (gpt-realtime-mini and gpt-realtime shut down on 20 January 2027 and are moved to their successors from that date), and each voice provider row can name its own Realtime model
 - **Self-hosted Speech-to-Text:** Point at any OpenAI-compatible Whisper server for transcription at no per-minute cost
 - **Recording Size Limit:** Configurable (default 25 MB). Note that PHP's own `post_max_size` (default 8 MB) and `upload_max_filesize` (default 2 MB) are both below that, and the smaller limit always wins. The setting is under **Advanced > Prompt, voice and display**, and it prints your server's real values next to it, so you can see which number is actually in force before a learner finds out for you. Raise both to at least one megabyte above whatever you set here, in `php.ini`, for learners to get the full amount
 

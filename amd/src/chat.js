@@ -31,7 +31,32 @@ define([
     'local_ai_course_assistant/i18n_strings',
     'local_ai_course_assistant/path_map',
     'core/str',
-], function(UI, SSE, Repo, Speech, Realtime, Voice, I18nStrings, PathMap, Str) {
+    'local_ai_course_assistant/gemini_live',
+], function(UI, SSE, Repo, Speech, Realtime, Voice, I18nStrings, PathMap, Str, GeminiLive) {
+
+    /**
+     * The live voice session, whichever engine runs it: OpenAI/xAI Realtime or Gemini Live (8.2.0).
+     * Both modules have the same public API; get_realtime_token's provider decides which connects.
+     */
+    const Live = {
+        isConnected: function() {
+            return Realtime.isConnected() || GeminiLive.isConnected();
+        },
+        disconnect: function() {
+            if (Realtime.isConnected()) {
+                Realtime.disconnect();
+            }
+            // Also ends a Gemini session that is still connecting, and reports its usage.
+            GeminiLive.disconnect();
+        },
+        sendText: function(text) {
+            if (GeminiLive.isConnected()) {
+                GeminiLive.sendText(text);
+            } else {
+                Realtime.sendText(text);
+            }
+        },
+    };
 
     /** @type {Array} Quiz topics parsed from data attribute */
     let quizTopics = [];
@@ -1283,7 +1308,7 @@ define([
     };
 
     const hasActiveVoiceSession = function() {
-        return voiceSessionActive || Voice.isConnected() || Realtime.isConnected();
+        return voiceSessionActive || Voice.isConnected() || Live.isConnected();
     };
 
     const beginVoiceSession = function() {
@@ -1335,9 +1360,9 @@ define([
                 ? 'Start a voice conversation about "' + currentPageTitle + '" or another course topic. Your transcript will still show up in chat.'
                 : 'Start a voice conversation about this page or another course topic. Your transcript will still show up in chat.');
         let status = 'Ready when you are.';
-        if (sessionActive && !Voice.isConnected() && !Realtime.isConnected()) {
+        if (sessionActive && !Voice.isConnected() && !Live.isConnected()) {
             status = 'Voice chat is starting. You can end the session at any time.';
-        } else if (Voice.isConnected() || Realtime.isConnected()) {
+        } else if (Voice.isConnected() || Live.isConnected()) {
             status = 'Voice chat is live. Speak or type to continue.';
         } else if (!isVoiceFeatureEnabled(root)) {
             status = 'Voice chat is not enabled for this course yet.';
@@ -1362,9 +1387,7 @@ define([
         if (Voice.isConnected()) {
             Voice.disconnect();
         }
-        if (Realtime.isConnected()) {
-            Realtime.disconnect();
-        }
+        Live.disconnect();
         teardownVoiceSessionUi();
     };
 
@@ -1476,9 +1499,7 @@ define([
             if (Voice.isConnected()) {
                 Voice.disconnect();
             }
-            if (Realtime.isConnected()) {
-                Realtime.disconnect();
-            }
+            Live.disconnect();
             UI.clearSuggestions();
             UI.hideVoiceOverlay();
         }
@@ -2915,9 +2936,7 @@ define([
         if (Voice.isConnected()) {
             Voice.disconnect();
         }
-        if (Realtime.isConnected()) {
-            Realtime.disconnect();
-        }
+        Live.disconnect();
         UI.hideVoiceOverlay();
         UI.clearSuggestions();
         setBottomMode('chat', {force: true});
@@ -3516,7 +3535,7 @@ define([
         const root = config.root || document.getElementById('local-ai-course-assistant');
         const avatarUrl = root ? root.dataset.avatarurl : '';
 
-        if (Realtime.isConnected()) { Realtime.disconnect(); }
+        Live.disconnect();
         if (Voice.isConnected())    { Voice.disconnect(); }
 
         // Create AudioContext synchronously so iOS/WKWebView keeps playback unlocked.
@@ -3581,7 +3600,11 @@ define([
                 const result = results[0] || {};
                 const micStream = results[1];
                 const token = result.token;
-                const voice = getRealtimeVoicePreference(root, result.voice);
+                // 8.2.0: Gemini Live runs in its own module with the same API. Its voice is locked
+                // into the token server-side, so the learner's OpenAI voice choice doesn't apply.
+                const isGemini = result.provider === 'gemini';
+                const engine = isGemini ? GeminiLive : Realtime;
+                const voice = isGemini ? (result.voice || '') : getRealtimeVoicePreference(root, result.voice);
                 const baseInstructions = result.instructions || '';
                 const instructions = config.getInstructions
                     ? config.getInstructions(baseInstructions, selection)
@@ -3589,13 +3612,29 @@ define([
                 const initialText = config.getInitialText ? config.getInitialText(selection) : '';
                 let initialTextSent = false;
 
-                Realtime.connect(
+                engine.connect(
                     token,
                     instructions,
                     voice,
                     {
                         provider: result.provider,
                         endpoint: result.endpoint,
+                        // Gemini Live only (ignored by realtime.js).
+                        model: result.model || '',
+                        sessionId: result.sessionid || 0,
+                        maxSeconds: result.maxseconds || 0,
+                        idleSeconds: result.idleseconds || 0,
+                        onAnalyser: function(analyser) {
+                            // The avatar's mouth follows the live voice (honours the animation
+                            // setting and prefers-reduced-motion inside UI).
+                            UI.startMouthSyncFromAnalyser(analyser);
+                        },
+                        onUsage: function(usage) {
+                            UI.stopMouthSync();
+                            Repo.recordLiveUsage(courseId, usage).catch(function() {
+                                // Unreported sessions count in full against the daily allowance.
+                            });
+                        },
                         onTranscript: function(role, text) {
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                                 return;
@@ -3610,15 +3649,19 @@ define([
                             syncVoicePanel();
                             if (state === 'idle' && initialText && !initialTextSent) {
                                 initialTextSent = true;
-                                Realtime.sendText(initialText);
+                                engine.sendText(initialText);
                                 return;
                             }
                             if (state === 'disconnected') {
                                 teardownVoiceSessionUi();
                             }
                         },
-                        onError: function(msg) {
+                        onError: function(msg, info) {
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
+                                return;
+                            }
+                            if (isGemini && info && info.beforeStart && canFallBack()) {
+                                fallBackToRegularVoice(selection);
                                 return;
                             }
                             UI.setVoiceState('disconnected');
@@ -3635,7 +3678,7 @@ define([
                                     endSession();
                                     return;
                                 }
-                                Realtime.sendText(text);
+                                engine.sendText(text);
                             });
                         },
                         // v5.3.5: forward caller-supplied fallback chips so the
@@ -3656,10 +3699,41 @@ define([
                 if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                     return;
                 }
+                // Gemini Live couldn't mint (daily allowance used up, Google refused, bad model
+                // setting): carry on in the regular voice mode.
+                if (err && typeof err.errorcode === 'string' && err.errorcode.indexOf('realtime:err_gemini_') === 0 &&
+                        canFallBack()) {
+                    fallBackToRegularVoice(selection);
+                    return;
+                }
                 UI.setVoiceState('disconnected');
                 teardownVoiceSessionUi();
                 addAssistantMsg(formatRealtimeVoiceStartError(err));
             });
+        };
+
+        /**
+         * Whether a live session that can't start may continue in the regular (turn-based) voice
+         * mode: conversation only (pronunciation coaching needs live audio), and only where the
+         * browser supports it.
+         *
+         * @returns {boolean}
+         */
+        var canFallBack = function() {
+            return (config.mode || 'conversation') === 'conversation' && canUseLegacyVoiceChat(root);
+        };
+
+        /**
+         * Switch to the regular voice mode, saying so.
+         *
+         * @param {string} selection The topic the learner picked
+         */
+        var fallBackToRegularVoice = function(selection) {
+            UI.stopMouthSync();
+            UI.setVoiceState('disconnected');
+            teardownVoiceSessionUi();
+            addAssistantMsg('Live voice isn\'t available right now, so this conversation uses the regular voice mode.');
+            startLegacyPracticeSpeaking(root, selection);
         };
 
         if (config.autoStartSelection) {
@@ -3685,7 +3759,7 @@ define([
             return;
         }
 
-        if (Realtime.isConnected()) { Realtime.disconnect(); }
+        Live.disconnect();
 
         const avatarUrl = root ? root.dataset.avatarurl : '';
         const voice = getPreferredVoice(root);
@@ -5843,11 +5917,11 @@ define([
         }
 
         // Route typed text through the active voice session (Practice Speaking or Pronunciation).
-        if (Realtime.isConnected()) {
+        if (Live.isConnected()) {
             UI.clearInput();
             UI.autoResizeInput();
             UI.updateSendButton();
-            Realtime.sendText(text);
+            Live.sendText(text);
             return;
         }
         if (Voice.isConnected()) {

@@ -66,7 +66,13 @@ class voice_model_watch {
                     $out[] = [$provider, voice_model_catalog::TTS, $model];
                 }
             }
-            $rt = voice_model_catalog::default_model($provider, voice_model_catalog::REALTIME);
+            // 8.2.0: the row's own Realtime model (and, for Gemini Live, the gemini_live_model setting) before the
+            // catalog default, as voice_registry::model_for() reads them.
+            $rt = voice_model_catalog::normalise(voice_registry::row_model($row, voice_model_catalog::REALTIME));
+            if ($rt === '' && $provider === 'gemini') {
+                $rt = voice_model_catalog::normalise((string) get_config('local_ai_course_assistant', 'gemini_live_model'));
+            }
+            $rt = $rt !== '' ? $rt : voice_model_catalog::default_model($provider, voice_model_catalog::REALTIME);
             if ($rt !== '' && voice_registry::supports($provider, voice_model_catalog::REALTIME)) {
                 $out[] = [$provider, voice_model_catalog::REALTIME, $rt];
             }
@@ -88,7 +94,7 @@ class voice_model_watch {
      * What is worth telling an admin, from the models in use and the providers' lists. Pure.
      *
      * @param array[] $inuse From models_in_use().
-     * @param array<string, string[]> $listed provider => model ids it lists; a provider absent here wasn't read
+     * @param array $listed provider => string[] of model ids it lists; a provider absent here wasn't read
      * @param int $now
      * @return array{warnings: array[], missing: array[]}
      */
