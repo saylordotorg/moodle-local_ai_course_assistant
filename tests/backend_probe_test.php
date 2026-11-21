@@ -115,4 +115,29 @@ final class backend_probe_test extends \advanced_testcase {
         $r = backend_probe::check_floor_fits(8192, 768, 'en');
         $this->assertSame(backend_probe::STATUS_PASS, $r['status']);
     }
+
+    /**
+     * The Moodle AI row: a FAIL when chat is set to Moodle AI and core_ai can't
+     * generate text, a PASS otherwise, and the routing explained.
+     */
+    public function test_coreai_row(): void {
+        $this->resetAfterTest();
+        $fail = backend_probe::STATUS_FAIL;
+        $pass = backend_probe::STATUS_PASS;
+        $this->assertSame($fail, backend_probe::coreai_row(false, false, 'coreai', false)['status']);
+        $this->assertSame($pass, backend_probe::coreai_row(false, false, 'auto', false)['status']);
+        $this->assertSame($fail, backend_probe::coreai_row(true, false, 'coreai', false)['status']);
+        $this->assertSame($pass, backend_probe::coreai_row(true, false, 'auto', false)['status']);
+        $this->assertSame($pass, backend_probe::coreai_row(true, false, 'gemini', true)['status']);
+
+        $chosen = backend_probe::coreai_row(true, true, 'coreai', false);
+        $this->assertSame($pass, $chosen['status']);
+        $this->assertStringContainsString('AI usage policy', $chosen['message']);
+        $auto = backend_probe::coreai_row(true, true, 'auto', false);
+        $this->assertStringContainsString('Auto routes chat through it', $auto['message']);
+        $keyed = backend_probe::coreai_row(true, true, 'auto', true);
+        $this->assertStringContainsString('not in use', $keyed['message']);
+        $other = backend_probe::coreai_row(true, true, 'gemini', true);
+        $this->assertStringContainsString("set to 'gemini'", $other['message']);
+    }
 }

@@ -781,6 +781,10 @@ abstract class base_provider implements provider_interface {
             $provider = self::resolve_auto_provider($overrides);
             $overrides['provider'] = $provider;
         }
+        // The course this turn is for. Only coreai_provider reads it (so core_ai runs the
+        // action in the course context, where Moodle 5.x applies the course's AI tools
+        // setting); it rides along to the failover members, which may include coreai.
+        $overrides['courseid'] = $courseid;
 
         self::enforce_learner_guards($diagnostic, $courseid);
 
