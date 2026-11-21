@@ -197,7 +197,8 @@ final class spend_attribution_test extends \advanced_testcase {
         $src = file_get_contents($CFG->dirroot . '/local/ai_course_assistant/transcribe.php');
         $this->assertNotFalse($src);
 
-        $assign = strpos($src, "\$model = !empty(\$cfg['model'])");
+        // 8.3.0: the model comes from voice_registry::stt_model(), which never remaps a self-hosted name.
+        $assign = strpos($src, "\$model = \\local_ai_course_assistant\\voice_registry::stt_model(\$cfg);");
         $this->assertNotFalse($assign, 'transcribe.php no longer resolves a model name');
 
         $prefix = strpos($src, "'selfhosted-' . \$model", $assign);

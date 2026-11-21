@@ -41,18 +41,39 @@ final class voice_model_catalog_test extends \advanced_testcase {
         $this->assertSame('2026-12-18 00:00:00', gmdate('Y-m-d H:i:s', self::AT));
     }
 
-    /** Every deprecated entry has a parseable date and a successor that is in the catalog, under the same capability. */
+    /**
+     * Every deprecated entry has a parseable date and either a successor that is in the catalog, under the same
+     * capability, or an explicit no_successor flag (8.3.0). A default is current, unless the capability has no
+     * current model at all and its default is flagged no_successor (OpenAI text to speech from 8.3.0).
+     */
     public function test_the_shipped_catalog_is_consistent(): void {
         foreach (voice_model_catalog::MODELS as $provider => $caps) {
             foreach ($caps as $capability => $spec) {
                 $this->assertArrayHasKey($spec['default'], $spec['models'], "{$provider} {$capability} default is listed");
-                $this->assertSame(voice_model_catalog::CURRENT, $spec['models'][$spec['default']]['status'],
-                    "{$provider} {$capability} default is current");
+                $default = $spec['models'][$spec['default']];
+                $hascurrent = in_array(voice_model_catalog::CURRENT, array_column($spec['models'], 'status'), true);
+                if ($hascurrent) {
+                    // A deprecated default is allowed only while it has a listed successor (OpenAI STT: whisper-1
+                    // stays the default until 2027-02-26, then gives way to gpt-transcribe).
+                    $this->assertTrue($default['status'] === voice_model_catalog::CURRENT
+                        || isset($spec['models'][(string) ($default['replaced_by'] ?? '')]),
+                        "{$provider} {$capability} default is current, or has a listed successor");
+                } else {
+                    $this->assertTrue(!empty($default['no_successor']),
+                        "{$provider} {$capability} has no current model, so its default says there is no successor");
+                }
                 foreach ($spec['models'] as $model => $entry) {
                     $this->assertSame(voice_model_catalog::normalise($model), $model, 'ids are stored normalised');
                     if ($entry['status'] === voice_model_catalog::DEPRECATED) {
                         $this->assertNotNull(voice_model_catalog::shutdown_time($entry), "{$model} has a date");
-                        $this->assertArrayHasKey($entry['replaced_by'], $spec['models'], "{$model} successor is listed");
+                        if (!empty($entry['no_successor'])) {
+                            $this->assertNull($entry['replaced_by'], "{$model} has no successor, so names none");
+                        } else {
+                            $this->assertArrayHasKey($entry['replaced_by'], $spec['models'],
+                                "{$model} successor is listed");
+                        }
+                    } else {
+                        $this->assertTrue(empty($entry['no_successor']), "{$model} is current");
                     }
                 }
             }

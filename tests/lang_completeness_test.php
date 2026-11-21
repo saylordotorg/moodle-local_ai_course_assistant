@@ -237,6 +237,14 @@ final class lang_completeness_test extends \basic_testcase {
         // 8.2.0: the Realtime model column, and OpenAI's 2.1 Realtime models.
         'providerkeys:col_rtmodel',
         'providerkeys:err_rt_model',
+        // 8.3.0: OpenAI text to speech and speech to text retirements. English first.
+        'providerkeys:col_sttmodel',
+        'providerkeys:err_stt_model',
+        'voice:error_tts_retired',
+        'voicemodels:line_retiring_tts_nosuccessor',
+        'voicemodels:line_retired_tts_nosuccessor',
+        'voicemodels:line_retiring_nosuccessor',
+        'voicemodels:line_retired_nosuccessor',
         // The video rubric tab. NOT deferred translation debt: the tab was specced
         // and cut, so nothing in the product can reach these. rubric_admin.php
         // whitelists conversation, pronunciation and speech only, and clamps an

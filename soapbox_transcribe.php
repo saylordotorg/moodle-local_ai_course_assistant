@@ -170,7 +170,7 @@ if ($cfg['provider'] === 'xai') {
     }
     $model = 'grok-stt';
 } else {
-    $model = !empty($cfg['model']) ? $cfg['model'] : 'whisper-1';
+    $model = \local_ai_course_assistant\voice_registry::stt_model($cfg);
     $post = [
         'file'  => new CURLFile($tmpfile, $mimetype, $filename),
         'model' => $model,

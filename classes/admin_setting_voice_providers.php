@@ -58,6 +58,10 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
                 'placeholder' => 'blank = default'],
             ['name' => 'realtime_model', 'label' => 'providerkeys:col_rtmodel', 'type' => 'text',
                 'placeholder' => 'blank = default'],
+            // 8.3.0: speech to text model for an openai row (blank: whisper-1 until 2027-02-26, then
+            // gpt-transcribe). The self-hosted server's model stays its own setting.
+            ['name' => 'stt_model', 'label' => 'providerkeys:col_sttmodel', 'type' => 'text',
+                'placeholder' => 'blank = default'],
         ];
     }
 
@@ -78,6 +82,7 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
                 'tts_voice'      => $r['tts_voice'],
                 'tts_model'      => $r['tts_model'],
                 'realtime_model' => $r['realtime_model'],
+                'stt_model'      => $r['stt_model'],
             ];
         }
         return $rows;
@@ -95,7 +100,8 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
         foreach ($rows as $r) {
             $lines[] = preg_replace('~\|+$~', '',
                 $r['provider'] . '|' . $r['stored_key'] . '|' . $r['label'] . '|' . $r['realtime_voice'] . '|'
-                . $r['tts_voice'] . '|' . ($r['tts_model'] ?? '') . '|' . ($r['realtime_model'] ?? ''));
+                . $r['tts_voice'] . '|' . ($r['tts_model'] ?? '') . '|' . ($r['realtime_model'] ?? '') . '|'
+                . ($r['stt_model'] ?? ''));
         }
         return implode("\n", $lines);
     }
@@ -132,7 +138,8 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
             // column is one of them.
             foreach (['label' => 'providerkeys:col_label', 'realtime_voice' => 'providerkeys:col_rtvoice',
                     'tts_voice' => 'providerkeys:col_ttsvoice', 'tts_model' => 'providerkeys:col_ttsmodel',
-                    'realtime_model' => 'providerkeys:col_rtmodel'] as $field => $label) {
+                    'realtime_model' => 'providerkeys:col_rtmodel', 'stt_model' => 'providerkeys:col_sttmodel']
+                    as $field => $label) {
                 if (preg_match('~[|\r\n]~', $r[$field] ?? '')) {
                     $errors[] = get_string('providerkeys:err_badchar', $plugin,
                         (object) ['field' => get_string($label, $plugin), 'provider' => $p]);
@@ -147,6 +154,11 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
             $rtmodel = (string) ($r['realtime_model'] ?? '');
             if ($rtmodel !== '' && !preg_match('~^[a-z0-9][a-z0-9.\-]{0,99}$~', $rtmodel)) {
                 $errors[] = get_string('providerkeys:err_rt_model', $plugin, $p);
+            }
+            // The speech to text model goes into a multipart form field (8.3.0).
+            $sttmodel = (string) ($r['stt_model'] ?? '');
+            if ($sttmodel !== '' && !preg_match('~^[a-z0-9][a-z0-9.\-]{0,99}$~', $sttmodel)) {
+                $errors[] = get_string('providerkeys:err_stt_model', $plugin, $p);
             }
         }
         return $errors;

@@ -48,6 +48,21 @@ class voice_registry {
     public const SELFHOSTED_LABEL = 'selfhosted';
 
     /**
+     * @var string The model name sent to a self-hosted or custom transcription server when none is set. It is the
+     *      server's own name for its model, not OpenAI's, so the catalog never remaps it (8.3.0).
+     */
+    public const SELFHOSTED_DEFAULT_MODEL = 'whisper-1';
+
+    /** @var string The only host whose model names the voice catalog retires and remaps (8.3.0). */
+    public const OPENAI_HOST = 'api.openai.com';
+
+    /**
+     * @var array|null Set by resolve() when it found voice rows but every one it could use named a model its
+     *      provider has shut down with no successor (8.3.0); read by last_retired(). Reset on every resolve().
+     */
+    private static ?array $lastretired = null;
+
+    /**
      * @var array<string, string[]> What each voice provider can always do. Gemini is text to speech (8.1.0) and,
      *      once an admin switches it on, Realtime through Gemini Live (8.2.0, see OPT_IN_CAPABILITIES).
      */
@@ -89,14 +104,14 @@ class voice_registry {
 
     /**
      * Parse the voice_providers config into structured rows.
-     * Stored format: provider|apikey|label|realtime_voice|tts_voice|tts_model|realtime_model
+     * Stored format: provider|apikey|label|realtime_voice|tts_voice|tts_model|realtime_model|stt_model
      *
-     * The sixth column (8.1.0) and the seventh (8.2.0) are optional: a line without them reads as before, with
-     * tts_model and realtime_model '' (the provider's default from voice_model_catalog).
+     * The sixth column (8.1.0), the seventh (8.2.0) and the eighth (8.3.0) are optional: a line without them reads
+     * as before, with the model '' (the provider's default from voice_model_catalog).
      *
      * @param bool $reveal decrypt each row's key (false returns the stored form, for the settings page)
      * @return array List of rows with keys: provider, apikey, label, realtime_voice, tts_voice, tts_model,
-     *     realtime_model
+     *     realtime_model, stt_model
      */
     public static function parse_rows(bool $reveal = true): array {
         $raw = get_config('local_ai_course_assistant', 'voice_providers') ?: '';
@@ -121,6 +136,7 @@ class voice_registry {
                 'tts_voice'      => $parts[4] ?? '',
                 'tts_model'      => $parts[5] ?? '',
                 'realtime_model' => $parts[6] ?? '',
+                'stt_model'      => $parts[7] ?? '',
             ];
         }
         return $rows;
@@ -162,10 +178,18 @@ class voice_registry {
      * and returns a full endpoint+key+voice bundle. Returns null when no
      * provider is configured at all.
      *
+     * 8.3.0: a row whose model its provider has shut down with no successor (OpenAI text to speech from
+     * 2027-01-06) is never returned. The chosen row gives way to the next row that can serve the capability, in
+     * table order (a Gemini row for text to speech); when none can, the answer is null and last_retired() says
+     * which model and date stopped it, so the caller can tell the admin which setting to change.
+     *
      * @param string $capability One of the CAPABILITY_* constants.
-     * @return array|null ['provider', 'apikey', 'voice', 'endpoint']
+     * @param int|null $now Unix time the catalog's shutdown dates are compared with; null means now().
+     * @return array|null ['provider', 'apikey', 'voice', 'endpoint', 'label', 'model']
      */
-    public static function resolve(string $capability): ?array {
+    public static function resolve(string $capability, ?int $now = null): ?array {
+        $now = $now ?? self::now();
+        self::$lastretired = null;
         // Selfhosted Whisper STT (v6.2.0): free, so it bypasses the voice
         // spend guard entirely. It is the DEFAULT STT path whenever a server
         // URL is configured; an explicit paid label in voice_active_stt still
@@ -189,7 +213,12 @@ class voice_registry {
             if ($guardlevel === spend_guard::CAP_BLOCKED) {
                 $failover = spend_guard::resolve_failover('voice');
                 if ($failover !== null && self::supports($failover['provider'], $capability)) {
-                    $model = self::model_for($failover['provider'], $capability, self::row_model($failover, $capability));
+                    $model = self::model_for($failover['provider'], $capability, self::row_model($failover, $capability),
+                        $now);
+                    if (self::model_is_shut_down($failover['provider'], $capability, $model, $now)) {
+                        self::note_retired($failover['provider'], $capability, $model);
+                        return null;
+                    }
                     return [
                         'provider' => $failover['provider'],
                         'apikey'   => $failover['apikey'],
@@ -236,22 +265,39 @@ class voice_registry {
         // have. With only openai and xai rows this changes nothing.
         $hadrows = !empty($rows);
         $rows = array_values(array_filter($rows, static fn($r) => self::supports($r['provider'], $capability)));
-        $row = null;
+        // The chosen row first, then the others in table order (the first row is the fallback when nothing is
+        // chosen, as before). 8.3.0: a row whose model has been shut down with no successor is passed over, so the
+        // next configured row (a Gemini row, for OpenAI text to speech) serves instead.
+        $ordered = $rows;
         if ($activelabel !== false && $activelabel !== '') {
-            foreach ($rows as $r) {
+            foreach ($rows as $i => $r) {
                 if ($r['label'] === $activelabel) {
-                    $row = $r;
+                    $ordered = array_merge([$r], array_slice($rows, 0, $i), array_slice($rows, $i + 1));
                     break;
                 }
             }
         }
-        if ($row === null && !empty($rows)) {
-            // Fallback: first configured row.
-            $row = $rows[0];
+        $row = null;
+        $model = '';
+        foreach ($ordered as $r) {
+            $candidate = self::model_for($r['provider'], $capability, self::row_model($r, $capability), $now);
+            if (self::model_is_shut_down($r['provider'], $capability, $candidate, $now)) {
+                self::note_retired($r['provider'], $capability, $candidate);
+                continue;
+            }
+            if (self::$lastretired !== null) {
+                debugging('SOLA voice: ' . self::$lastretired['provider'] . ' shut down ' . self::$lastretired['model']
+                    . ' on ' . self::$lastretired['shutdown'] . ', so ' . $capability . ' uses the row "' . $r['label']
+                    . '" instead.', DEBUG_DEVELOPER);
+                self::$lastretired = null;
+            }
+            $row = $r;
+            $model = $candidate;
+            break;
         }
         if ($row === null && $hadrows) {
-            // Rows exist but none serves this capability: the legacy single key below must not quietly take
-            // over a site that configured its voice in the table.
+            // Rows exist but none serves this capability (or every one names a model that has been shut down): the
+            // legacy single key below must not quietly take over a site that configured its voice in the table.
             return null;
         }
 
@@ -267,7 +313,11 @@ class voice_registry {
             if (empty($legacykey)) {
                 return null;
             }
-            $model = self::model_for('openai', $capability, '');
+            $model = self::model_for('openai', $capability, '', $now);
+            if (self::model_is_shut_down('openai', $capability, $model, $now)) {
+                self::note_retired('openai', $capability, $model);
+                return null;
+            }
             return [
                 'provider' => 'openai',
                 'apikey'   => $legacykey,
@@ -288,7 +338,6 @@ class voice_registry {
             $voice = self::default_voice_for($row['provider']);
         }
 
-        $model = self::model_for($row['provider'], $capability, self::row_model($row, $capability));
         return [
             'provider' => $row['provider'],
             'apikey'   => $row['apikey'],
@@ -300,7 +349,91 @@ class voice_registry {
     }
 
     /**
-     * The row's own model for a capability: tts_model for text to speech, realtime_model for Realtime, else ''.
+     * Which model stopped the last resolve(), when every row it could use named a model the provider has shut down
+     * with no successor (8.3.0). Null when resolve() found something or failed for another reason.
+     *
+     * @return array|null ['provider', 'capability', 'model', 'shutdown' (YYYY-MM-DD)]
+     */
+    public static function last_retired(): ?array {
+        return self::$lastretired;
+    }
+
+    /**
+     * The error tts.php returns when the last resolve(CAPABILITY_TTS) stopped at a shut-down model (8.3.0), naming
+     * the model, the date and the setting to change. Null when that isn't why it failed.
+     *
+     * @return string|null
+     */
+    public static function retired_tts_message(): ?string {
+        $retired = self::$lastretired;
+        if ($retired === null || $retired['capability'] !== self::CAPABILITY_TTS) {
+            return null;
+        }
+        return branding::str('voice:error_tts_retired', (object) [
+            'provider' => $retired['provider'],
+            'model' => $retired['model'],
+            'date' => $retired['shutdown'],
+        ]);
+    }
+
+    /**
+     * The time shutdown dates are compared with: Moodle's clock, so a test can freeze it
+     * (advanced_testcase::mock_clock_with_frozen()).
+     *
+     * @return int
+     */
+    public static function now(): int {
+        return \core\di::get(\core\clock::class)->time();
+    }
+
+    /**
+     * Is the resolved model one its provider has shut down, with nothing callable in its place?
+     *
+     * Only for providers the catalog lists; an unknown provider id is looked up as OpenAI, as model_for() does.
+     *
+     * @param string $provider
+     * @param string $capability
+     * @param string $model Already resolved by model_for().
+     * @param int $now
+     * @return bool
+     */
+    private static function model_is_shut_down(string $provider, string $capability, string $model, int $now): bool {
+        if ($model === '') {
+            return false;
+        }
+        $provider = strtolower($provider);
+        if (!voice_model_catalog::has_provider($provider)) {
+            $provider = 'openai';
+        }
+        return voice_model_catalog::is_retired($provider, $capability, $model, $now);
+    }
+
+    /**
+     * Remember the first shut-down model resolve() passed over, for last_retired().
+     *
+     * @param string $provider
+     * @param string $capability
+     * @param string $model
+     * @return void
+     */
+    private static function note_retired(string $provider, string $capability, string $model): void {
+        if (self::$lastretired !== null) {
+            return;
+        }
+        $provider = strtolower($provider);
+        $catalogprovider = voice_model_catalog::has_provider($provider) ? $provider : 'openai';
+        $entry = voice_model_catalog::entry($catalogprovider, $capability, $model);
+        self::$lastretired = [
+            'provider' => $catalogprovider,
+            'capability' => $capability,
+            'model' => $model,
+            'shutdown' => (string) ($entry['shutdown'] ?? ''),
+        ];
+    }
+
+    /**
+     * The row's own model for a capability: tts_model for text to speech, realtime_model for Realtime, stt_model for
+     * speech to text (8.3.0), else ''.
      *
      * @param array $row A parsed row (or a failover lookup carrying the same keys).
      * @param string $capability
@@ -313,15 +446,21 @@ class voice_registry {
         if ($capability === self::CAPABILITY_REALTIME) {
             return trim((string) ($row['realtime_model'] ?? ''));
         }
+        if ($capability === self::CAPABILITY_STT) {
+            return trim((string) ($row['stt_model'] ?? ''));
+        }
         return '';
     }
 
     /**
      * The model a capability calls, resolved through voice_model_catalog at call time.
      *
-     * Text to speech and Realtime start from the row's model column for that capability (row_model()); a blank
-     * Gemini Live column falls back to the gemini_live_model setting (8.2.0). Blank means the catalog default, and a
-     * retired model is replaced by its successor. STT models are chosen by transcribe.php, so '' is returned for STT.
+     * Each capability starts from the row's model column for it (row_model()); a blank Gemini Live column falls
+     * back to the gemini_live_model setting (8.2.0). Blank means the catalog default, and a retired model is
+     * replaced by its successor. Since 8.3.0 that includes speech to text on OpenAI rows (whisper-1 until
+     * 2027-02-26, then gpt-transcribe); a provider with no speech to text entries (xAI) gets its row's model as
+     * typed, or ''. Only provider rows come through here, and they always talk to the provider's own host; the
+     * self-hosted server's model never does (stt_model()).
      *
      * @param string $provider
      * @param string $capability
@@ -330,9 +469,6 @@ class voice_registry {
      * @return string
      */
     public static function model_for(string $provider, string $capability, string $rowmodel, ?int $now = null): string {
-        if ($capability === self::CAPABILITY_STT) {
-            return '';
-        }
         $provider = strtolower($provider);
         if (!voice_model_catalog::has_provider($provider)) {
             // An unknown id is served as OpenAI (endpoint_for()).
@@ -342,7 +478,7 @@ class voice_registry {
         if ($configured === '' && $capability === self::CAPABILITY_REALTIME && $provider === 'gemini') {
             $configured = trim((string) get_config('local_ai_course_assistant', 'gemini_live_model'));
         }
-        return voice_model_catalog::resolve_model($provider, $capability, $configured, $now);
+        return voice_model_catalog::resolve_model($provider, $capability, $configured, $now ?? self::now());
     }
 
     /**
@@ -437,7 +573,8 @@ class voice_registry {
             'voice'    => '',
             'endpoint' => self::selfhosted_stt_endpoint($url),
             'label'    => self::SELFHOSTED_LABEL,
-            'model'    => $model !== '' ? $model : 'whisper-1',
+            // The server's own model name, never remapped by the voice catalog (stt_model()).
+            'model'    => $model !== '' ? $model : self::SELFHOSTED_DEFAULT_MODEL,
         ];
     }
 
@@ -460,6 +597,47 @@ class voice_registry {
             return $url . '/audio/transcriptions';
         }
         return $url . '/v1/audio/transcriptions';
+    }
+
+    /**
+     * The model name to post to a speech to text endpoint (8.3.0), for transcribe.php, soapbox_transcribe.php and
+     * soapbox_scorer.
+     *
+     * Only a provider row on api.openai.com is subject to the catalog's retirement mapping (whisper-1 and the 4o
+     * transcribe models to gpt-transcribe from 2027-02-26). A self-hosted Whisper server, or any other base URL,
+     * names its own models, and whisper-1 there is the server's name for whatever it has loaded, so it is sent
+     * exactly as configured (whisper-1 when blank), whatever the date. xAI's request has always named grok-stt.
+     *
+     * @param array $cfg resolve(CAPABILITY_STT) output.
+     * @param int|null $now
+     * @return string
+     */
+    public static function stt_model(array $cfg, ?int $now = null): string {
+        $provider = strtolower((string) ($cfg['provider'] ?? ''));
+        $configured = trim((string) ($cfg['model'] ?? ''));
+        if ($provider === 'xai') {
+            return 'grok-stt';
+        }
+        if ($provider === self::SELFHOSTED_LABEL || !self::is_openai_hosted((string) ($cfg['endpoint'] ?? ''))) {
+            return $configured !== '' ? $configured : self::SELFHOSTED_DEFAULT_MODEL;
+        }
+        return voice_model_catalog::resolve_model('openai', self::CAPABILITY_STT, $configured, $now ?? self::now());
+    }
+
+    /**
+     * Does this endpoint go to OpenAI's own API host (https://api.openai.com, default port, no user info)?
+     *
+     * @param string $endpoint
+     * @return bool
+     */
+    public static function is_openai_hosted(string $endpoint): bool {
+        $parts = parse_url(trim($endpoint));
+        if (!is_array($parts)) {
+            return false;
+        }
+        return strtolower((string) ($parts['scheme'] ?? '')) === 'https'
+            && strtolower((string) ($parts['host'] ?? '')) === self::OPENAI_HOST
+            && !isset($parts['port']) && !isset($parts['user']);
     }
 
     /**

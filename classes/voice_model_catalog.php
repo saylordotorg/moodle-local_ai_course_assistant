@@ -26,7 +26,8 @@ defined('MOODLE_INTERNAL') || die();
  * never reaches it: once a deprecated model's shutdown date (a UTC date) has passed, the call goes to the model
  * its replaced_by names, following the chain while each step is itself retired. A model this list doesn't know
  * is passed through untouched (an admin may name a model newer than this file), and an empty choice means the
- * provider's default.
+ * provider's default. A model retired with no vetted successor (OpenAI text to speech, 8.3.0) is not replaced at
+ * all: resolves_to_retired() says so and voice_registry moves on to the next configured provider row.
  *
  * Nothing here ever switches to a model that isn't in this list. The voice_model_watch task only warns.
  *
@@ -65,7 +66,8 @@ class voice_model_catalog {
      * provider => capability => ['default' => model, 'models' => [model => entry]].
      *
      * An entry is ['status' => current|deprecated, 'shutdown' => 'YYYY-MM-DD' (UTC) or null,
-     * 'replaced_by' => model or null]. Ids are lowercase.
+     * 'replaced_by' => model or null]. A deprecated entry with no vetted successor says so with
+     * 'no_successor' => true and 'replaced_by' => null (8.3.0, OpenAI text to speech). Ids are lowercase.
      *
      * @var array<string, array<string, array{default: string, models: array<string, array>}>>
      */
@@ -99,11 +101,44 @@ class voice_model_catalog {
             ],
         ],
         'openai' => [
+            // 8.3.0: OpenAI's deprecation notice (fetched 2026-11-21 by the site owner) shuts down all three speech
+            // models on 2027-01-06. The notice names gpt-realtime-2.1-mini as the replacement, but that is a
+            // Realtime (WebSocket) model, not a model for POST /v1/audio/speech, so there is no same-provider drop-in
+            // and no automatic successor: from the shutdown date voice_registry passes an OpenAI text to speech row
+            // over for the next configured row (a Gemini row), and with none, tts.php says which setting to change.
+            // tts-1 stays the default so nothing changes before that date.
             self::TTS => [
                 'default' => 'tts-1',
                 'models' => [
-                    'tts-1' => ['status' => self::CURRENT, 'shutdown' => null, 'replaced_by' => null],
-                    'tts-1-hd' => ['status' => self::CURRENT, 'shutdown' => null, 'replaced_by' => null],
+                    'tts-1' => ['status' => self::DEPRECATED, 'shutdown' => '2027-01-06', 'replaced_by' => null,
+                        'no_successor' => true],
+                    'tts-1-hd' => ['status' => self::DEPRECATED, 'shutdown' => '2027-01-06', 'replaced_by' => null,
+                        'no_successor' => true],
+                    'gpt-4o-mini-tts' => ['status' => self::DEPRECATED, 'shutdown' => '2027-01-06',
+                        'replaced_by' => null, 'no_successor' => true],
+                ],
+            ],
+            // 8.3.0: speech to text through POST /v1/audio/transcriptions, for rows on api.openai.com only. A
+            // self-hosted or custom server's model name (often whisper-1 too) is never looked up here; see
+            // voice_registry::stt_model(). The notice names gpt-transcribe (same endpoint) or gpt-live-transcribe
+            // (Realtime) as replacements; gpt-transcribe is the one SOLA's multipart upload can use. whisper-1 stays
+            // the default so nothing changes before 2027-02-26.
+            self::STT => [
+                'default' => 'whisper-1',
+                'models' => [
+                    'gpt-transcribe' => ['status' => self::CURRENT, 'shutdown' => null, 'replaced_by' => null],
+                    'gpt-4o-mini-transcribe-2025-12-15' => ['status' => self::CURRENT, 'shutdown' => null,
+                        'replaced_by' => null],
+                    'whisper-1' => ['status' => self::DEPRECATED, 'shutdown' => '2027-02-26',
+                        'replaced_by' => 'gpt-transcribe'],
+                    'gpt-4o-transcribe' => ['status' => self::DEPRECATED, 'shutdown' => '2027-02-26',
+                        'replaced_by' => 'gpt-transcribe'],
+                    'gpt-4o-mini-transcribe' => ['status' => self::DEPRECATED, 'shutdown' => '2027-02-26',
+                        'replaced_by' => 'gpt-transcribe'],
+                    'gpt-4o-transcribe-diarize' => ['status' => self::DEPRECATED, 'shutdown' => '2027-02-26',
+                        'replaced_by' => 'gpt-transcribe'],
+                    'gpt-4o-mini-transcribe-2025-03-20' => ['status' => self::DEPRECATED, 'shutdown' => '2027-01-20',
+                        'replaced_by' => 'gpt-4o-mini-transcribe-2025-12-15'],
                 ],
             ],
             // 8.2.0: OpenAI's deprecation notice (fetched 2026-11-21 by the site owner) retires both Realtime
@@ -221,6 +256,41 @@ class voice_model_catalog {
     }
 
     /**
+     * Is this a model the provider retires with no vetted successor (8.3.0)?
+     *
+     * For such a model the catalog never picks a replacement on its own. Once it is retired, a caller must not
+     * send it: voice_registry passes the row over for the next configured one.
+     *
+     * @param string $provider
+     * @param string $capability
+     * @param string $model
+     * @return bool
+     */
+    public static function has_no_successor(string $provider, string $capability, string $model): bool {
+        $entry = self::entry($provider, $capability, $model);
+        return $entry !== null && !empty($entry['no_successor']);
+    }
+
+    /**
+     * Is resolve_model()'s answer for this configured model one the provider has shut down (8.3.0)?
+     *
+     * True only when the catalog has nothing callable to offer: the model is retired and neither a successor nor
+     * a current default exists. A caller that gets true must not make the call.
+     *
+     * @param string $provider
+     * @param string $capability
+     * @param string $configured As passed to resolve_model().
+     * @param int|null $now
+     * @return bool
+     */
+    public static function resolves_to_retired(string $provider, string $capability, string $configured,
+            ?int $now = null): bool {
+        $now = $now ?? time();
+        return self::is_retired($provider, $capability, self::resolve_model($provider, $capability, $configured, $now),
+            $now);
+    }
+
+    /**
      * The shutdown moment of an entry: 00:00 UTC on its shutdown date, or null when it has none.
      *
      * Midnight at the start of the day, so a model is never called on the day the provider turns it off.
@@ -318,7 +388,9 @@ class voice_model_catalog {
         if ($default !== '' && !self::is_retired($provider, $capability, $default, $now)) {
             return $default;
         }
-        // The catalog itself is inconsistent (its default is retired). Say what is being sent rather than guess.
+        // Nothing callable is left: a model with no successor whose default is retired too (OpenAI text to speech
+        // from 2027-01-06), or an inconsistent catalog. Say what it is rather than guess; callers check
+        // resolves_to_retired() and don't send it.
         return $model;
     }
 
@@ -386,8 +458,8 @@ class voice_model_catalog {
      * @param int|null $now
      * @param array|null $only [[provider, capability, model], ...] to limit the list to models in use; null = all
      * @return array[] Each: provider, capability, model, shutdown (date), shutdown_time, days_left (negative when
-     *                 past), retired (bool), replaced_by (the declared successor), resolves_to (what resolve_model
-     *                 sends after shutdown)
+     *                 past), retired (bool), replaced_by (the declared successor), no_successor (bool, 8.3.0),
+     *                 resolves_to (what resolve_model answers after shutdown)
      */
     public static function retiring_within(int $days, ?int $now = null, ?array $only = null): array {
         $now = $now ?? time();
@@ -423,6 +495,7 @@ class voice_model_catalog {
                         'days_left' => (int) floor(($at - $now) / DAYSECS),
                         'retired' => $now >= $at,
                         'replaced_by' => (string) ($entry['replaced_by'] ?? ''),
+                        'no_successor' => !empty($entry['no_successor']),
                         'resolves_to' => self::resolve_model($provider, $capability, $model, max($now, $at)),
                     ];
                 }

@@ -37,6 +37,13 @@ require_once(__DIR__ . '/fixtures/settings_tree.php');
  */
 final class provider_key_sources_test extends \advanced_testcase {
 
+    protected function setUp(): void {
+        parent::setUp();
+        // 8.3.0: the voice tests here resolve OpenAI text to speech, which OpenAI shuts down on 2027-01-06. They are
+        // about keys, not dates, so they run on a fixed day before it (voice_registry reads Moodle's clock).
+        $this->mock_clock_with_frozen(gmmktime(12, 0, 0, 11, 21, 2026));
+    }
+
     private function cfg(string $name, string $value): void {
         set_config($name, $value, 'local_ai_course_assistant');
     }

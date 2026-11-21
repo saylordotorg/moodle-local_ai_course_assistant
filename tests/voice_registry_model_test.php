@@ -30,6 +30,9 @@ final class voice_registry_model_test extends \advanced_testcase {
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
+        // 8.3.0: these pin the pre-shutdown behavior (tts-1, whisper-1), so they run on a fixed day before OpenAI's
+        // 2027 shutdowns; voice_openai_retirements_test covers the days after.
+        $this->mock_clock_with_frozen(gmmktime(12, 0, 0, 11, 21, 2026));
     }
 
     private function rows(string ...$lines): void {

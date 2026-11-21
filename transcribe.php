@@ -172,11 +172,14 @@ if ($cfg['provider'] === 'xai') {
     }
     $model = 'grok-stt';
 } else {
-    // OpenAI protocol: hosted OpenAI (whisper-1) or an OpenAI compatible
-    // selfhosted server (faster-whisper / whisper-server). The model name
-    // comes from the registry so selfhosted servers can name the Whisper
-    // model they have loaded.
-    $model = !empty($cfg['model']) ? $cfg['model'] : 'whisper-1';
+    // OpenAI protocol: hosted OpenAI or an OpenAI compatible selfhosted
+    // server (faster-whisper / whisper-server). The model name comes from the
+    // registry so selfhosted servers can name the Whisper model they have
+    // loaded. 8.3.0: on api.openai.com it is resolved through the voice model
+    // catalog at call time (whisper-1 until OpenAI shuts it down on
+    // 2027-02-26, then gpt-transcribe, same endpoint and multipart shape); a
+    // selfhosted or custom server's name is never remapped.
+    $model = \local_ai_course_assistant\voice_registry::stt_model($cfg);
     // v7.4.4: self-hosted Whisper is FREE, but pricing keys off model_name, not
     // interaction_type -- and 'whisper-1' (or any name a self-hosted server
     // reports) matches the 'whisper' rate-card prefix, so free transcription was
