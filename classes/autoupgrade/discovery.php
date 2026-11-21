@@ -314,9 +314,11 @@ class discovery {
      *
      * @param string $provider
      * @param array $cred apikey, baseurl.
+     * @param bool $allmethods Gemini only: keep models that don't offer generateContent (Live models), for the
+     *        voice model watch (8.1.0). Chat discovery leaves it false.
      * @return string[]
      */
-    public function list_models(string $provider, array $cred): array {
+    public function list_models(string $provider, array $cred, bool $allmethods = false): array {
         $key = (string) $cred['apikey'];
         $base = rtrim((string) ($cred['baseurl'] ?? ''), '/');
         switch ($provider) {
@@ -357,7 +359,7 @@ class discovery {
         if ($status < 200 || $status >= 300) {
             throw new \moodle_exception('error', 'local_ai_course_assistant', '', null, "Model list returned HTTP {$status}");
         }
-        return self::parse_list($provider, (string) $body);
+        return self::parse_list($provider, (string) $body, $allmethods);
     }
 
     /**
@@ -365,9 +367,10 @@ class discovery {
      *
      * @param string $provider
      * @param string $body
+     * @param bool $allmethods Gemini only: keep models whatever generation methods they list.
      * @return string[]
      */
-    public static function parse_list(string $provider, string $body): array {
+    public static function parse_list(string $provider, string $body, bool $allmethods = false): array {
         $data = json_decode($body, true);
         if (!is_array($data)) {
             return [];
@@ -376,7 +379,7 @@ class discovery {
         if ($provider === 'gemini') {
             foreach ((array) ($data['models'] ?? []) as $m) {
                 $methods = (array) ($m['supportedGenerationMethods'] ?? []);
-                if (!in_array('generateContent', $methods, true)) {
+                if (!$allmethods && !in_array('generateContent', $methods, true)) {
                     continue;
                 }
                 $ids[] = model_capabilities::normalise((string) ($m['name'] ?? ''));

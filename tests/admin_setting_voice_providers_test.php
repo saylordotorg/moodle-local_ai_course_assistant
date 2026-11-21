@@ -231,22 +231,28 @@ final class admin_setting_voice_providers_test extends \advanced_testcase {
         $this->assertDoesNotMatchRegularExpression('~voice_registry::parse_rows\(\s*(true)?\s*\)~', $src);
     }
 
-    public function test_only_openai_and_xai_are_accepted_and_a_key_is_required(): void {
+    /** 8.1.0: gemini joined openai and xai (text to speech only); anything else is still refused. */
+    public function test_only_openai_xai_and_gemini_are_accepted_and_a_key_is_required(): void {
         $this->resetAfterTest();
         $setting = $this->setting();
-        $err = $setting->write_setting(['rows' => [$this->row('gemini', 'AIza-1234567890-abcd')]]);
-        $this->assertStringContainsString('gemini', $err);
+        $err = $setting->write_setting(['rows' => [$this->row('elevenlabs', 'el-1234567890-abcd')]]);
+        $this->assertStringContainsString('elevenlabs', $err);
         $this->assertStringContainsString('openai', $err, 'the message says which providers are valid');
         $this->assertStringContainsString('xai', $err);
+        $this->assertStringContainsString('gemini', $err);
         $this->assertSame('', $this->stored(), 'nothing saved');
         $this->assertStringContainsString('openai', $setting->write_setting(['rows' => [$this->row('openai')]]));
         $this->assertSame('', $this->stored(), 'nothing saved');
-        // Both valid providers save.
+        $this->assertStringContainsString('gemini', $setting->write_setting(['rows' => [$this->row('gemini')]]),
+            'a gemini row needs a key too');
+        $this->assertSame('', $this->stored(), 'nothing saved');
+        // All three valid providers save.
         $this->assertSame('', $setting->write_setting(['rows' => [
             $this->row('openai', 'sk-proj-VOICE-OK-7777-GGGG'),
             $this->row('xai', 'xai-VOICE-OK-8888-HHHH'),
+            $this->row('gemini', 'AIza-VOICE-OK-9999-IIII'),
         ]]));
-        $this->assertCount(2, voice_registry::parse_rows(false));
+        $this->assertCount(3, voice_registry::parse_rows(false));
     }
 
     /** A key that landed in the provider column (a tampered post) is named "unrecognized", never repeated. */

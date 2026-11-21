@@ -196,6 +196,22 @@ final class lang_completeness_test extends \basic_testcase {
         // 7.12.5: the notice at the retired Soapbox page addresses. English first.
         'soapbox:replaced',
         'soapbox:replaced_title',
+        // 8.1.0: Gemini text to speech, the voice model catalog and the voice model watch. English first.
+        // The first two changed meaning (gemini joined the voice providers), so their 45 old translations,
+        // which still said openai and xai only, were removed.
+        'providerkeys:err_voice_provider',
+        'settings:voice_providers_desc',
+        'providerkeys:col_ttsmodel',
+        'providerkeys:err_tts_model',
+        'task:voice_model_watch',
+        'voicemodels:mail_fallback_subject',
+        'voicemodels:mail_fallback_body',
+        'voicemodels:mail_fallback_failed_body',
+        'voicemodels:mail_watch_subject',
+        'voicemodels:mail_watch_body',
+        'voicemodels:line_retiring',
+        'voicemodels:line_retired',
+        'voicemodels:line_missing',
         // The video rubric tab. NOT deferred translation debt: the tab was specced
         // and cut, so nothing in the product can reach these. rubric_admin.php
         // whitelists conversation, pronunciation and speech only, and clamps an

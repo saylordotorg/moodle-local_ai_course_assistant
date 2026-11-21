@@ -558,7 +558,7 @@ class analytics {
         return "({$alias}.role = 'assistant'
                  OR ({$alias}.role = 'system' AND {$alias}.interaction_type IN (
                      'embedding', 'rerank', 'quiz',
-                     'voice', 'openai_tts', 'xai_tts',
+                     'voice', 'openai_tts', 'xai_tts', 'gemini_tts',
                      'openai_whisper', 'openai_stt', 'xai_stt', 'selfhosted_stt',
                      'flashcards', 'essay', 'insights',
                      'mastery_signal', 'student_profile', 'speech_score',
@@ -1827,7 +1827,7 @@ class analytics {
         $sql = "SELECT COUNT(m.id)
                   FROM {local_ai_course_assistant_msgs} m
                  WHERE m.courseid = :courseid
-                   AND m.interaction_type IN ('openai_tts', 'xai_tts'){$timewhere}";
+                   AND m.interaction_type IN ('openai_tts', 'xai_tts', 'gemini_tts'){$timewhere}";
         $ttsplays = (int) $DB->count_records_sql($sql, $params);
 
         $active = (int) $overview['active_students'];

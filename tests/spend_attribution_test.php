@@ -109,7 +109,7 @@ final class spend_attribution_test extends \advanced_testcase {
     public function test_voice_interaction_type_is_always_billable(): void {
         $this->resetAfterTest();
 
-        $billable = ['voice', 'openai_tts', 'xai_tts', 'openai_whisper', 'openai_stt',
+        $billable = ['voice', 'openai_tts', 'xai_tts', 'gemini_tts', 'openai_whisper', 'openai_stt',
                      'xai_stt', 'selfhosted_stt'];
 
         // Known providers keep their specific type...
