@@ -705,7 +705,7 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $this->post([
             provider_keys::SETTING => ['rows' => [['provider' => 'openai', 'newkey' => $typedrow, 'keepid' => '',
                 'models' => '', 'temperature' => '99', 'baseurl' => '']], 'present' => '1'],
-            'voice_providers' => ['rows' => [['provider' => 'gemini', 'newkey' => $typedvoice, 'keepid' => '',
+            'voice_providers' => ['rows' => [['provider' => 'elevenlabs', 'newkey' => $typedvoice, 'keepid' => '',
                 'label' => '', 'realtime_voice' => '', 'tts_voice' => '']], 'present' => '1'],
             'anomaly_digest_slack_webhook' => $typedhook,
             'embed_apikey' => $typedsingle,
@@ -749,7 +749,7 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $this->assert_clean(['provider table' => $html, 'the page JavaScript' => $this->page_js()], 'after a failed save');
 
         $voice = new admin_setting_voice_providers('local_ai_course_assistant/voice_providers', 'v', 'd');
-        $voicesubmitted = ['rows' => [['provider' => 'gemini', 'newkey' => $typed, 'keepid' => '', 'label' => '',
+        $voicesubmitted = ['rows' => [['provider' => 'elevenlabs', 'newkey' => $typed, 'keepid' => '', 'label' => '',
             'realtime_voice' => '', 'tts_voice' => '']]];
         $this->assertNotSame('', $voice->write_setting($voicesubmitted));
         $this->reset_page_js();
