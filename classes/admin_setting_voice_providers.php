@@ -19,10 +19,12 @@ namespace local_ai_course_assistant;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Admin setting for the voice_providers table: openai or xai rows with a key, a label and default voices.
+ * Admin setting for the voice_providers table: openai, xai or gemini rows with a key, a label, default voices
+ * and an optional text to speech model.
  *
- * Stored format (unchanged, read by voice_registry): provider|key|label|realtime_voice|tts_voice, with the
- * key encrypted. It shares the row editor with the Providers and keys table, so the page never carries a
+ * Stored format (read by voice_registry): provider|key|label|realtime_voice|tts_voice|tts_model, with the
+ * key encrypted. The tts_model column (8.1.0) is left off when empty, so a row without one is stored exactly as
+ * before. It shares the row editor with the Providers and keys table, so the page never carries a
  * key or ciphertext, a blank key keeps the stored one, and the config log shows the key column masked.
  *
  * @package    local_ai_course_assistant
@@ -31,8 +33,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class admin_setting_voice_providers extends admin_setting_keyed_rows {
 
-    /** @var string[] The only providers with WebSocket Realtime, TTS and STT endpoints today. */
-    private const PROVIDERS = ['openai', 'xai'];
+    /** @var string[] Voice providers: openai and xai (Realtime, TTS, STT) and gemini (TTS only, 8.1.0). */
+    private const PROVIDERS = ['openai', 'xai', 'gemini'];
 
     /**
      * The columns after the key.
@@ -51,7 +53,9 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
             ['name' => 'realtime_voice', 'label' => 'providerkeys:col_rtvoice', 'type' => 'text',
                 'placeholder' => 'e.g. shimmer, eve'],
             ['name' => 'tts_voice', 'label' => 'providerkeys:col_ttsvoice', 'type' => 'text',
-                'placeholder' => 'e.g. shimmer, eve'],
+                'placeholder' => 'e.g. shimmer, eve, Kore'],
+            ['name' => 'tts_model', 'label' => 'providerkeys:col_ttsmodel', 'type' => 'text',
+                'placeholder' => 'blank = default'],
         ];
     }
 
@@ -70,6 +74,7 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
                 'label'          => $r['label'],
                 'realtime_voice' => $r['realtime_voice'],
                 'tts_voice'      => $r['tts_voice'],
+                'tts_model'      => $r['tts_model'],
             ];
         }
         return $rows;
@@ -86,7 +91,8 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
         $lines = [];
         foreach ($rows as $r) {
             $lines[] = preg_replace('~\|+$~', '',
-                $r['provider'] . '|' . $r['stored_key'] . '|' . $r['label'] . '|' . $r['realtime_voice'] . '|' . $r['tts_voice']);
+                $r['provider'] . '|' . $r['stored_key'] . '|' . $r['label'] . '|' . $r['realtime_voice'] . '|'
+                . $r['tts_voice'] . '|' . ($r['tts_model'] ?? ''));
         }
         return implode("\n", $lines);
     }
@@ -122,11 +128,16 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
             // These go between pipes on one line, so a pipe or a line break would shift a column, and the key
             // column is one of them.
             foreach (['label' => 'providerkeys:col_label', 'realtime_voice' => 'providerkeys:col_rtvoice',
-                    'tts_voice' => 'providerkeys:col_ttsvoice'] as $field => $label) {
-                if (preg_match('~[|\r\n]~', $r[$field])) {
+                    'tts_voice' => 'providerkeys:col_ttsvoice', 'tts_model' => 'providerkeys:col_ttsmodel'] as $field => $label) {
+                if (preg_match('~[|\r\n]~', $r[$field] ?? '')) {
                     $errors[] = get_string('providerkeys:err_badchar', $plugin,
                         (object) ['field' => get_string($label, $plugin), 'provider' => $p]);
                 }
+            }
+            // The model goes into a request URL path (Gemini) or body, so only a plain model id is accepted.
+            $model = (string) ($r['tts_model'] ?? '');
+            if ($model !== '' && !preg_match('~^(models/)?[a-z0-9][a-z0-9.\-]{0,99}$~i', $model)) {
+                $errors[] = get_string('providerkeys:err_tts_model', $plugin, $p);
             }
         }
         return $errors;

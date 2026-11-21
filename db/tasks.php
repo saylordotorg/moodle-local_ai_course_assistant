@@ -327,4 +327,15 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        // v8.1.0: warn about voice models in use that retire within 45 days, and about catalog voice
+        // models a provider no longer lists. Reads model lists only; never switches a model.
+        'classname' => \local_ai_course_assistant\task\voice_model_watch::class,
+        'blocking' => 0,
+        'minute' => '55',
+        'hour' => '3',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];

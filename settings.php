@@ -1852,9 +1852,14 @@ if ($hassiteconfig) {
     ));
 
     $activechoices = ['' => get_string('settings:voice_active_default', 'local_ai_course_assistant')];
+    // 8.1.0: a Gemini row serves text to speech only, so Realtime and STT don't offer it.
+    $realtimechoices = $activechoices;
     foreach (\local_ai_course_assistant\voice_registry::parse_rows(false) as $row) {
         $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
         $activechoices[$label] = $label . ' (' . $row['provider'] . ')';
+        if (\local_ai_course_assistant\voice_registry::supports($row['provider'], 'realtime')) {
+            $realtimechoices[$label] = $activechoices[$label];
+        }
     }
 
     $settings->add(new admin_setting_configselect(
@@ -1862,7 +1867,7 @@ if ($hassiteconfig) {
         get_string('settings:voice_active_realtime', 'local_ai_course_assistant'),
         get_string('settings:voice_active_realtime_desc', 'local_ai_course_assistant'),
         '',
-        $activechoices
+        $realtimechoices
     ));
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/voice_active_tts',
@@ -1878,6 +1883,9 @@ if ($hassiteconfig) {
     $sttchoices[\local_ai_course_assistant\voice_registry::SELFHOSTED_LABEL] =
         get_string('settings:voice_active_stt_selfhosted', 'local_ai_course_assistant');
     foreach (\local_ai_course_assistant\voice_registry::parse_rows(false) as $row) {
+        if (!\local_ai_course_assistant\voice_registry::supports($row['provider'], 'stt')) {
+            continue;
+        }
         $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
         $sttchoices[$label] = $label . ' (' . $row['provider'] . ')';
     }

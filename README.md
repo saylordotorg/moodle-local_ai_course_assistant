@@ -8,10 +8,10 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 
 A 2:38 tour, recorded on version 8.0.0 on a Saylor test site in a demo course with no student data. It shows what SOLA does for learners (in student view): answers from the course, Quiz Me, Study Plan and 46 languages. Then it shows how an institution brands SOLA as its own with settings instead of a fork, the settings hub, and the Providers and keys table. Branding needs version 8.0.0 or later. Narration is AI-generated.
 
-## Version 8.0.0
+## Version 8.1.0
 
 **Release Date:** November 2026
-**Plugin build:** 2026111700
+**Plugin build:** 2026112100
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0, 5.1 and 5.3. `version.php` declares support through 5.3.
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+

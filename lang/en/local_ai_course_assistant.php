@@ -3011,7 +3011,7 @@ $string['settings:spend_cap_period_daily'] = 'Daily';
 $string['settings:spend_cap_period_weekly'] = 'Weekly';
 $string['settings:spend_cap_period_monthly'] = 'Monthly';
 $string['settings:voice_providers'] = 'Voice providers';
-$string['settings:voice_providers_desc'] = 'Add one row per voice API. Valid provider IDs: openai, xai (these are the only providers with WebSocket Realtime + TTS + STT today). The Label is a friendly name you use to pick the active provider for each capability below. Realtime voice and TTS voice can be left blank to use the provider default (shimmer for OpenAI, eve for xAI). A saved key is never shown again, only its last four characters. To replace one, press Change and type the new key. Saving rewrites this list; lines that start with # aren\'t kept.';
+$string['settings:voice_providers_desc'] = 'Add one row per voice API. Valid provider IDs: openai and xai (Realtime, TTS and STT) and gemini (TTS only; a gemini row is never used for Realtime or STT). TTS model is optional: leave it blank for the provider default (tts-1 for OpenAI, gemini-3.8-flash-tts for Gemini). A model that the provider has shut down is replaced at call time by the successor [[tutorshort]] knows for it, and a daily task emails a warning 45 days before a model in use shuts down. The Label is a friendly name you use to pick the active provider for each capability below. Realtime voice and TTS voice can be left blank to use the provider default (shimmer for OpenAI, eve for xAI, Kore for Gemini). A saved key is never shown again, only its last four characters. To replace one, press Change and type the new key. Saving rewrites this list; lines that start with # aren\'t kept.';
 $string['settings:voice_active_default'] = '(use first configured or legacy fallback)';
 $string['settings:voice_active_stt_default'] = '(selfhosted if configured, else first row or legacy fallback)';
 $string['settings:voice_active_stt_selfhosted'] = 'Selfhosted Whisper server (free, uses the URL below)';
@@ -3745,7 +3745,7 @@ $string['providerkeys:col_label'] = 'Label';
 $string['providerkeys:col_rtvoice'] = 'Realtime voice';
 $string['providerkeys:col_ttsvoice'] = 'TTS voice';
 $string['providerkeys:add_voice'] = '+ Add voice provider';
-$string['providerkeys:err_voice_provider'] = '"{$a}" isn\'t a voice provider. Voice providers are openai or xai.';
+$string['providerkeys:err_voice_provider'] = '"{$a}" isn\'t a voice provider. Voice providers are openai, xai and gemini (gemini is text to speech only).';
 $string['providerkeys:last4_hint'] = 'Saved key ends in {$a}.';
 $string['providerkeys:saved_url_hint'] = 'A URL is saved.';
 $string['providerkeys:err_webhook_url'] = '{$a} must be a web address that starts with http:// or https:// and has no spaces. Nothing was saved.';
@@ -3815,3 +3815,23 @@ $string['check:key_places_unreadable'] = 'The places where API keys are stored c
 // --- v7.12.1: Soapbox assignments PresenterAI's importer holds ---
 $string['soapbox:assignment_held'] = 'This assignment was not deleted. Its recordings were moved to PresenterAI, which uses the same stored files, so they cannot be deleted from Soapbox.';
 $string['soapbox:assignment_held_unchecked'] = 'This assignment was not deleted because Soapbox could not check whether its recordings were moved to PresenterAI. Nothing was changed. Try again later, or ask a site administrator.';
+
+// --- v8.1.0: voice model catalog, Gemini text to speech and the voice model watch ---
+$string['providerkeys:col_ttsmodel'] = 'TTS model';
+$string['providerkeys:err_tts_model'] = 'The TTS model of a {$a} row must be a plain model ID, such as gemini-3.8-flash-tts or tts-1.';
+$string['task:voice_model_watch'] = 'Warn about voice models that are being retired';
+$string['voicemodels:mail_fallback_subject'] = '[[[tutorshort]]] Voice model {$a->from} was refused by {$a->provider}';
+$string['voicemodels:mail_fallback_body'] = '{$a->provider} answered that the text to speech model {$a->from} doesn\'t exist. [[tutorshort]] retried on {$a->to}, the successor it knows for that model, and that worked. Speech keeps working on {$a->to} for now. Set the TTS model of the voice row to {$a->to}, or another current model, here:
+{$a->url}';
+$string['voicemodels:mail_fallback_failed_body'] = '{$a->provider} answered that the text to speech model {$a->from} doesn\'t exist. [[tutorshort]] retried on {$a->to}, the successor it knows for that model, and that failed too, so learners get the browser voice instead. Check the voice row and its key here:
+{$a->url}';
+$string['voicemodels:mail_watch_subject'] = '[[[tutorshort]]] Voice models that need attention';
+$string['voicemodels:mail_watch_body'] = 'The daily voice model check found:
+
+{$a->lines}
+
+[[tutorshort]] never moves to a model it doesn\'t know. After a shutdown date it calls the successor named above. To choose a model yourself, set the TTS model of the voice row here:
+{$a->url}';
+$string['voicemodels:line_retiring'] = '{$a->provider} shuts down {$a->model} on {$a->date} (in {$a->days} days). From then on, calls go to {$a->to}.';
+$string['voicemodels:line_retired'] = '{$a->provider} shut down {$a->model} on {$a->date}. Calls now go to {$a->to}.';
+$string['voicemodels:line_missing'] = '{$a->provider} no longer lists {$a->model}, a model this site calls or would call next. Text to speech may fail until the voice row names a model the provider still offers.';
