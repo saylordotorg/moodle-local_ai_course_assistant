@@ -1226,6 +1226,63 @@ final class failover_chain_test extends \advanced_testcase {
     }
 
     /**
+     * A member that declines a turn on purpose (the Moodle AI provider when a
+     * learner hasn't accepted the AI usage policy, or AI is off for the course)
+     * hands the turn to the next member and never opens its own circuit, however
+     * often and by however many learners it happens: it says nothing about the
+     * provider, and core_ai is one circuit for the whole site.
+     */
+    public function test_a_declined_turn_falls_through_without_touching_the_circuit(): void {
+        $this->resetAfterTest();
+        $this->assertSame('skip', failover_chain::circuit_effect(
+            new coreai_declined_exception(coreai_declined_exception::POLICY, 'accept the policy')
+        ));
+        $this->assertSame('skip', failover_chain::circuit_effect(new chat_refused_exception('refused')));
+
+        $primary = new class implements provider_interface {
+            public int $callcount = 0;
+            public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
+                $this->callcount++;
+                throw new coreai_declined_exception(coreai_declined_exception::POLICY, 'accept the policy');
+            }
+            public function chat_completion_stream(string $s, array $m, callable $cb, array $options = []): void {
+                $this->chat_completion($s, $m, $options);
+            }
+            public function get_last_token_usage(): ?array {
+                return null;
+            }
+            public function get_last_finish_reason(): ?string {
+                return null;
+            }
+        };
+        $fallback = self::fake_provider('FALLBACK-OUT', false);
+        $turns = failover_chain::REFUSALS_TO_OPEN + failover_chain::FAILURES_TO_OPEN + 2;
+        for ($i = 1; $i <= $turns; $i++) {
+            $chain = new failover_chain($primary, 'coreai-primary', [
+                ['provider' => $fallback, 'label' => 'direct-fallback'],
+            ], ['audit' => true, 'courseid' => 0, 'userid' => $i]);
+            $this->assertSame('FALLBACK-OUT', $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]));
+        }
+        $this->assertSame($turns, $primary->callcount, 'the primary is still asked every turn');
+        $this->assertSame([], self::audit_details(failover_chain::AUDIT_EVENT_CIRCUIT_OPEN));
+        $this->assertSame(
+            array_fill(0, $turns, 'unaffected'),
+            array_column(self::audit_details(failover_chain::AUDIT_EVENT_FALLTHROUGH), 'circuit')
+        );
+
+        // With nothing behind it, the learner gets the member's own notice.
+        $alone = new failover_chain($primary, 'coreai-primary', [
+            ['provider' => self::fake_provider('X', true), 'label' => 'broken-fallback'],
+        ], ['audit' => false]);
+        try {
+            $alone->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+            $this->fail('expected the decline to surface');
+        } catch (coreai_declined_exception $e) {
+            $this->assertSame('accept the policy', $e->getMessage());
+        }
+    }
+
+    /**
      * Build an in-memory provider_interface implementation for tests.
      * If $shouldfail is true, every chat_completion call throws.
      *

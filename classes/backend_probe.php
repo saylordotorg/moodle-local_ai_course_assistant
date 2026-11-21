@@ -136,27 +136,69 @@ final class backend_probe {
      * provider default would resolve. Network-free.
      */
     public static function probe_coreai(): array {
-        $available = \local_ai_course_assistant\provider\coreai_provider::is_available();
-        $configured = get_config('local_ai_course_assistant', 'provider') ?: 'auto';
-        if ($available) {
-            $note = ($configured === 'auto')
-                ? 'Auto routes chat through it when no ' . branding::short_name() . ' key is set.'
-                : "Chat provider is set to '{$configured}', so core_ai is available but not in use.";
+        return self::coreai_row(
+            class_exists('\\core_ai\\manager'),
+            \local_ai_course_assistant\provider\coreai_provider::is_available(),
+            (string) (get_config('local_ai_course_assistant', 'provider') ?: 'auto'),
+            (string) (\local_ai_course_assistant\secrets::get('apikey') ?: '') !== ''
+        );
+    }
+
+    /**
+     * The core_ai row for given facts. Pure, so each case can be tested.
+     *
+     * This row used to be PASS whatever the facts, so a site with the chat
+     * provider set to Moodle AI and nothing in core_ai able to generate text was
+     * told all was well while every turn failed.
+     *
+     * @param bool $present Whether core_ai exists (Moodle 4.5+).
+     * @param bool $available Whether core_ai can run generate_text (coreai_provider::is_available()).
+     * @param string $configured The site chat provider setting ('auto' when unset).
+     * @param bool $haskey Whether a site chat key is saved (it keeps 'auto' on a direct provider).
+     * @return array{status:string,message:string}
+     */
+    public static function coreai_row(bool $present, bool $available, string $configured, bool $haskey): array {
+        $short = branding::short_name();
+        $chosen = $configured === 'coreai';
+        $auto = ($configured === 'auto' || $configured === '') && !$haskey;
+        if (!$present) {
+            if ($chosen) {
+                return self::row(
+                    self::STATUS_FAIL,
+                    'Chat provider is set to Moodle AI, but this Moodle has no core_ai subsystem (needs Moodle 4.5+).'
+                );
+            }
             return self::row(
                 self::STATUS_PASS,
-                "Moodle core_ai is available with a configured provider. {$note}"
+                "Moodle core_ai subsystem not present (needs Moodle 4.5+); {$short} uses its own providers."
             );
         }
-        if (!class_exists('\\core_ai\\manager')) {
+        if (!$available) {
+            $what = 'Moodle core_ai has no enabled, configured provider with the Generate text action turned on';
+            if ($chosen) {
+                return self::row(
+                    self::STATUS_FAIL,
+                    "Chat provider is set to Moodle AI, but {$what}, so every chat turn will fail. "
+                    . 'Set one up under Site admin > AI > AI providers.'
+                );
+            }
             return self::row(
                 self::STATUS_PASS,
-                'Moodle core_ai subsystem not present (needs Moodle 4.5+); ' . branding::short_name() . ' uses its own providers.'
+                "{$what}; {$short} uses its own providers. Configure one under Site admin > AI to route chat through it."
+            );
+        }
+        if ($chosen || $auto) {
+            $how = $chosen ? 'Chat provider is set to Moodle AI' : "Auto routes chat through it because no {$short} key is set";
+            return self::row(
+                self::STATUS_PASS,
+                "Moodle core_ai can generate text. {$how}. Learners must accept Moodle's AI usage policy first, "
+                . "and courses or activities with Moodle's AI tools turned off are passed to the next provider "
+                . 'in the failover chain, if there is one.'
             );
         }
         return self::row(
             self::STATUS_PASS,
-            'Moodle core_ai is present but has no configured AI provider; ' . branding::short_name() . ' uses its own providers. '
-            . 'Configure one under Site admin > AI to route chat through it.'
+            "Moodle core_ai can generate text, but the chat provider is set to '{$configured}', so it is not in use."
         );
     }
 

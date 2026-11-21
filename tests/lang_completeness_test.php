@@ -193,6 +193,14 @@ final class lang_completeness_test extends \basic_testcase {
      * that went unnoticed.
      */
     private const KNOWN_UNTRANSLATED = [
+        // The Moodle AI (core_ai) provider's notices: the AI usage policy, AI turned off for a
+        // course, core_ai's per-user hourly limit, and the policy page. English first.
+        'coreai:context_off',
+        'coreai:policy_accepted',
+        'coreai:policy_already',
+        'coreai:policy_needed',
+        'coreai:policy_unavailable',
+        'coreai:user_limit',
         // 7.12.5: the notice at the retired Soapbox page addresses. English first.
         'soapbox:replaced',
         'soapbox:replaced_title',
