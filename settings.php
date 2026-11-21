@@ -1848,13 +1848,20 @@ if ($hassiteconfig) {
     $settings->add(new \local_ai_course_assistant\admin_setting_voice_providers(
         'local_ai_course_assistant/voice_providers',
         get_string('settings:voice_providers', 'local_ai_course_assistant'),
-        get_string('settings:voice_providers_desc', 'local_ai_course_assistant')
+        // The description names the product ([[tutorshort]]), so it goes through branding like the others.
+        \local_ai_course_assistant\branding::str('settings:voice_providers_desc')
     ));
 
     $activechoices = ['' => get_string('settings:voice_active_default', 'local_ai_course_assistant')];
+    // 8.1.0: a Gemini row serves text to speech only, so Realtime and STT don't offer it. 8.2.0: Realtime offers it
+    // while gemini_live_enabled is on (voice_registry::supports()).
+    $realtimechoices = $activechoices;
     foreach (\local_ai_course_assistant\voice_registry::parse_rows(false) as $row) {
         $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
         $activechoices[$label] = $label . ' (' . $row['provider'] . ')';
+        if (\local_ai_course_assistant\voice_registry::supports($row['provider'], 'realtime')) {
+            $realtimechoices[$label] = $activechoices[$label];
+        }
     }
 
     $settings->add(new admin_setting_configselect(
@@ -1862,8 +1869,49 @@ if ($hassiteconfig) {
         get_string('settings:voice_active_realtime', 'local_ai_course_assistant'),
         get_string('settings:voice_active_realtime_desc', 'local_ai_course_assistant'),
         '',
-        $activechoices
+        $realtimechoices
     ));
+    // 8.2.0: Gemini Live. Off by default; while it's off a gemini row stays text to speech only and the Realtime
+    // choice above doesn't offer it. The key comes from the gemini row, so there is no key field here.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/gemini_live_enabled',
+        get_string('settings:gemini_live_enabled', 'local_ai_course_assistant'),
+        get_string('settings:gemini_live_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/gemini_live_model',
+        get_string('settings:gemini_live_model', 'local_ai_course_assistant'),
+        get_string('settings:gemini_live_model_desc', 'local_ai_course_assistant',
+            \local_ai_course_assistant\voice_model_catalog::default_model('gemini', 'realtime')),
+        '',
+        '/^$|^[a-z0-9][a-z0-9.\-]{0,99}$/'
+    ));
+    $settings->add(new \local_ai_course_assistant\admin_setting_bounded_int(
+        'local_ai_course_assistant/gemini_live_max_session_minutes',
+        get_string('settings:gemini_live_max_session_minutes', 'local_ai_course_assistant'),
+        get_string('settings:gemini_live_max_session_minutes_desc', 'local_ai_course_assistant'),
+        (string) \local_ai_course_assistant\voice\gemini_live::DEFAULT_MAX_MINUTES,
+        \local_ai_course_assistant\voice\gemini_live::MAX_MINUTES_RANGE[0],
+        \local_ai_course_assistant\voice\gemini_live::MAX_MINUTES_RANGE[1]
+    ));
+    $settings->add(new \local_ai_course_assistant\admin_setting_bounded_int(
+        'local_ai_course_assistant/gemini_live_idle_seconds',
+        get_string('settings:gemini_live_idle_seconds', 'local_ai_course_assistant'),
+        get_string('settings:gemini_live_idle_seconds_desc', 'local_ai_course_assistant'),
+        (string) \local_ai_course_assistant\voice\gemini_live::DEFAULT_IDLE_SECONDS,
+        \local_ai_course_assistant\voice\gemini_live::IDLE_RANGE[0],
+        \local_ai_course_assistant\voice\gemini_live::IDLE_RANGE[1]
+    ));
+    $settings->add(new \local_ai_course_assistant\admin_setting_bounded_int(
+        'local_ai_course_assistant/gemini_live_daily_minutes',
+        get_string('settings:gemini_live_daily_minutes', 'local_ai_course_assistant'),
+        get_string('settings:gemini_live_daily_minutes_desc', 'local_ai_course_assistant'),
+        (string) \local_ai_course_assistant\voice\gemini_live::DEFAULT_DAILY_MINUTES,
+        \local_ai_course_assistant\voice\gemini_live::DAILY_RANGE[0],
+        \local_ai_course_assistant\voice\gemini_live::DAILY_RANGE[1]
+    ));
+
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/voice_active_tts',
         get_string('settings:voice_active_tts', 'local_ai_course_assistant'),
@@ -1878,6 +1926,9 @@ if ($hassiteconfig) {
     $sttchoices[\local_ai_course_assistant\voice_registry::SELFHOSTED_LABEL] =
         get_string('settings:voice_active_stt_selfhosted', 'local_ai_course_assistant');
     foreach (\local_ai_course_assistant\voice_registry::parse_rows(false) as $row) {
+        if (!\local_ai_course_assistant\voice_registry::supports($row['provider'], 'stt')) {
+            continue;
+        }
         $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
         $sttchoices[$label] = $label . ' (' . $row['provider'] . ')';
     }
@@ -3476,6 +3527,10 @@ if ($hassiteconfig) {
 
         // Voice.
         'realtime_enabled' => ['realtime_key_from', 'realtime_apikey', 'realtime_voice'],
+        'gemini_live_enabled' => [
+            'gemini_live_model', 'gemini_live_max_session_minutes', 'gemini_live_idle_seconds',
+            'gemini_live_daily_minutes',
+        ],
         'stt_selfhosted_enabled' => [
             'stt_selfhosted_url', 'stt_selfhosted_model',
             'stt_selfhosted_apikey', 'stt_selfhosted_warm',

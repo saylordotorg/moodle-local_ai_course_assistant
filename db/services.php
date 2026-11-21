@@ -199,8 +199,17 @@ $functions = [
     ],
     'local_ai_course_assistant_get_realtime_token' => [
         'classname'    => \local_ai_course_assistant\external\get_realtime_token::class,
-        'description'  => 'Get an ephemeral token for OpenAI Realtime voice mode.',
+        'description'  => 'Get a short-lived token for live voice mode (OpenAI Realtime, xAI or Gemini Live).',
         'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
+    // 8.2.0: the browser reports a Gemini Live session's length and Google's token counts when it ends, onto the
+    // spend row get_realtime_token wrote when it minted the session.
+    'local_ai_course_assistant_record_live_usage' => [
+        'classname'    => \local_ai_course_assistant\external\record_live_usage::class,
+        'description'  => 'Record the length and token use of a Gemini Live voice session.',
+        'type'         => 'write',
         'ajax'         => true,
         'capabilities' => 'local/ai_course_assistant:use',
     ],

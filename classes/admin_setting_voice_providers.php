@@ -19,10 +19,12 @@ namespace local_ai_course_assistant;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Admin setting for the voice_providers table: openai or xai rows with a key, a label and default voices.
+ * Admin setting for the voice_providers table: openai, xai or gemini rows with a key, a label, default voices
+ * and an optional text to speech model.
  *
- * Stored format (unchanged, read by voice_registry): provider|key|label|realtime_voice|tts_voice, with the
- * key encrypted. It shares the row editor with the Providers and keys table, so the page never carries a
+ * Stored format (read by voice_registry): provider|key|label|realtime_voice|tts_voice|tts_model, with the
+ * key encrypted. The tts_model column (8.1.0) is left off when empty, so a row without one is stored exactly as
+ * before. It shares the row editor with the Providers and keys table, so the page never carries a
  * key or ciphertext, a blank key keeps the stored one, and the config log shows the key column masked.
  *
  * @package    local_ai_course_assistant
@@ -31,8 +33,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class admin_setting_voice_providers extends admin_setting_keyed_rows {
 
-    /** @var string[] The only providers with WebSocket Realtime, TTS and STT endpoints today. */
-    private const PROVIDERS = ['openai', 'xai'];
+    /** @var string[] Voice providers: openai and xai (Realtime, TTS, STT) and gemini (TTS, 8.1.0; Live when on, 8.2.0). */
+    private const PROVIDERS = ['openai', 'xai', 'gemini'];
 
     /**
      * The columns after the key.
@@ -51,7 +53,15 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
             ['name' => 'realtime_voice', 'label' => 'providerkeys:col_rtvoice', 'type' => 'text',
                 'placeholder' => 'e.g. shimmer, eve'],
             ['name' => 'tts_voice', 'label' => 'providerkeys:col_ttsvoice', 'type' => 'text',
-                'placeholder' => 'e.g. shimmer, eve'],
+                'placeholder' => 'e.g. shimmer, eve, Kore'],
+            ['name' => 'tts_model', 'label' => 'providerkeys:col_ttsmodel', 'type' => 'text',
+                'placeholder' => 'blank = default'],
+            ['name' => 'realtime_model', 'label' => 'providerkeys:col_rtmodel', 'type' => 'text',
+                'placeholder' => 'blank = default'],
+            // 8.3.0: speech to text model for an openai row (blank: whisper-1 until 2027-02-26, then
+            // gpt-transcribe). The self-hosted server's model stays its own setting.
+            ['name' => 'stt_model', 'label' => 'providerkeys:col_sttmodel', 'type' => 'text',
+                'placeholder' => 'blank = default'],
         ];
     }
 
@@ -70,6 +80,9 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
                 'label'          => $r['label'],
                 'realtime_voice' => $r['realtime_voice'],
                 'tts_voice'      => $r['tts_voice'],
+                'tts_model'      => $r['tts_model'],
+                'realtime_model' => $r['realtime_model'],
+                'stt_model'      => $r['stt_model'],
             ];
         }
         return $rows;
@@ -86,7 +99,9 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
         $lines = [];
         foreach ($rows as $r) {
             $lines[] = preg_replace('~\|+$~', '',
-                $r['provider'] . '|' . $r['stored_key'] . '|' . $r['label'] . '|' . $r['realtime_voice'] . '|' . $r['tts_voice']);
+                $r['provider'] . '|' . $r['stored_key'] . '|' . $r['label'] . '|' . $r['realtime_voice'] . '|'
+                . $r['tts_voice'] . '|' . ($r['tts_model'] ?? '') . '|' . ($r['realtime_model'] ?? '') . '|'
+                . ($r['stt_model'] ?? ''));
         }
         return implode("\n", $lines);
     }
@@ -122,11 +137,28 @@ class admin_setting_voice_providers extends admin_setting_keyed_rows {
             // These go between pipes on one line, so a pipe or a line break would shift a column, and the key
             // column is one of them.
             foreach (['label' => 'providerkeys:col_label', 'realtime_voice' => 'providerkeys:col_rtvoice',
-                    'tts_voice' => 'providerkeys:col_ttsvoice'] as $field => $label) {
-                if (preg_match('~[|\r\n]~', $r[$field])) {
+                    'tts_voice' => 'providerkeys:col_ttsvoice', 'tts_model' => 'providerkeys:col_ttsmodel',
+                    'realtime_model' => 'providerkeys:col_rtmodel', 'stt_model' => 'providerkeys:col_sttmodel']
+                    as $field => $label) {
+                if (preg_match('~[|\r\n]~', $r[$field] ?? '')) {
                     $errors[] = get_string('providerkeys:err_badchar', $plugin,
                         (object) ['field' => get_string($label, $plugin), 'provider' => $p]);
                 }
+            }
+            // The model goes into a request URL path (Gemini) or body, so only a plain model id is accepted.
+            $model = (string) ($r['tts_model'] ?? '');
+            if ($model !== '' && !preg_match('~^(models/)?[a-z0-9][a-z0-9.\-]{0,99}$~i', $model)) {
+                $errors[] = get_string('providerkeys:err_tts_model', $plugin, $p);
+            }
+            // The Realtime model goes into the OpenAI WebSocket URL's query or Gemini's token setup (8.2.0).
+            $rtmodel = (string) ($r['realtime_model'] ?? '');
+            if ($rtmodel !== '' && !preg_match('~^[a-z0-9][a-z0-9.\-]{0,99}$~', $rtmodel)) {
+                $errors[] = get_string('providerkeys:err_rt_model', $plugin, $p);
+            }
+            // The speech to text model goes into a multipart form field (8.3.0).
+            $sttmodel = (string) ($r['stt_model'] ?? '');
+            if ($sttmodel !== '' && !preg_match('~^[a-z0-9][a-z0-9.\-]{0,99}$~', $sttmodel)) {
+                $errors[] = get_string('providerkeys:err_stt_model', $plugin, $p);
             }
         }
         return $errors;

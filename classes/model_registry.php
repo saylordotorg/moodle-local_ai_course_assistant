@@ -144,6 +144,17 @@ class model_registry {
     private static ?string $legacysig = null;
 
     /**
+     * v8.1.1: the scheduled-price signature the caches were built at.
+     *
+     * {@see token_cost_manager::rate_schedule_signature()}. A dated price step
+     * changes the baseline layer, so a cache built before the step must not be
+     * served after it, even inside one long request.
+     *
+     * @var string|null
+     */
+    private static ?string $schedulesig = null;
+
+    /**
      * The merged prefix => rates map, baseline < legacy blob < models table.
      *
      * Cached for the life of the request: get_rates() is called once per
@@ -154,7 +165,8 @@ class model_registry {
      */
     public static function effective_rates(): array {
         $raw = self::legacy_raw();
-        if (self::$ratecache === null || self::$legacysig !== $raw) {
+        if (self::$ratecache === null || self::$legacysig !== $raw
+                || self::$schedulesig !== token_cost_manager::rate_schedule_signature()) {
             self::build_cache($raw);
         }
         return self::$ratecache;
@@ -214,7 +226,8 @@ class model_registry {
      */
     public static function effective_eol(): array {
         $raw = self::legacy_raw();
-        if (self::$eolcache === null || self::$legacysig !== $raw) {
+        if (self::$eolcache === null || self::$legacysig !== $raw
+                || self::$schedulesig !== token_cost_manager::rate_schedule_signature()) {
             self::build_cache($raw);
         }
         return self::$eolcache;
@@ -534,16 +547,31 @@ class model_registry {
         self::$provcache = null;
         self::$eolcache = null;
         self::$legacysig = null;
+        self::$schedulesig = null;
     }
 
     /**
      * Longest matching prefix for a model name, or null when nothing matches.
      *
+     * v8.1.1: an audio model (speech in or out, judged by its name) may only
+     * match an audio key or a namespace key such as 'selfhosted-'
+     * ({@see token_cost_manager::key_may_price()}). Without this,
+     * gemini-2.5-flash-preview-tts took the gemini-2.5-flash chat price and
+     * gpt-4o-mini-tts the gpt-4o-mini one: speech billed as cheap chat text, an
+     * under-count no banner reported because the model looked priced. An audio
+     * model with no audio key now resolves to null, so it is reported as
+     * unpriced instead.
+     *
      * @param string $model
      * @return string|null
      */
     private static function match_prefix(string $model): ?string {
-        return self::longest_key($model, array_keys(self::effective_rates()));
+        $keys = array_keys(self::effective_rates());
+        if (token_cost_manager::is_audio_model($model)) {
+            $keys = array_values(array_filter($keys,
+                static fn($key): bool => token_cost_manager::key_may_price($model, (string) $key)));
+        }
+        return self::longest_key($model, $keys);
     }
 
     /**
@@ -630,6 +658,18 @@ class model_registry {
                 // correct, and beats overwriting a real number with null.
                 continue;
             }
+            // v8.1.1: the automatic upstream feed's row for an AUDIO model is
+            // not trusted. LiteLLM's input/output fields hold TEXT token prices
+            // (audio prices sit in separate *_audio_token fields this schema
+            // cannot hold), so an upstream 'gpt-realtime' row would read $4/$16
+            // and, as the table layer, beat the $32/$64 audio baseline. Both
+            // LiteLLM parsers now skip audio models; this drops any such row a
+            // site already has. Only 'upstream': a 'drift' row is one an admin
+            // chose to apply, and a 'manual' or 'bundle' row still wins.
+            if (strtolower((string) $row->source) === 'upstream'
+                    && token_cost_manager::is_audio_model($prefix)) {
+                continue;
+            }
             $rates[$prefix] = [
                 'input'  => (float) $row->input_rate,
                 'output' => $row->output_rate === null ? 0.0 : (float) $row->output_rate,
@@ -646,6 +686,7 @@ class model_registry {
         self::$provcache = $prov;
         self::$eolcache = $eol;
         self::$legacysig = $legacyraw;
+        self::$schedulesig = token_cost_manager::rate_schedule_signature();
     }
 
     /**

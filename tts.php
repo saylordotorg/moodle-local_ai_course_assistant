@@ -15,8 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * OpenAI TTS proxy endpoint.
- * Accepts POST {text, sesskey, courseid}, returns JSON {audio: base64, type: 'audio/mpeg'}.
+ * Text to speech proxy endpoint (OpenAI, xAI, and Gemini since 8.1.0).
+ * Accepts POST {text, sesskey, courseid}, returns JSON {audio: base64, type: 'audio/mpeg' or 'audio/wav'}.
+ *
+ * The model is resolved through voice_model_catalog at call time, so a model the provider has shut down is never
+ * sent. If the provider still answers that a configured model doesn't exist, the call is retried once on the
+ * catalog's successor, and admins are told.
  *
  * @package    local_ai_course_assistant
  * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
@@ -50,7 +54,7 @@ if ($courseid > 0) {
 
 // Rate limit: 30 TTS requests per 60 seconds per user. TTS is a per-character
 // spend vector; without this cap an authenticated learner can burn an unbounded
-// amount of OpenAI or xAI credit.
+// amount of OpenAI, xAI or Gemini credit.
 if (\local_ai_course_assistant\rate_limiter::is_rate_limited($USER->id, 'tts', 30, 60)) {
     http_response_code(429);
     header('Retry-After: 60');
@@ -58,60 +62,103 @@ if (\local_ai_course_assistant\rate_limiter::is_rate_limited($USER->id, 'tts', 3
     exit;
 }
 
-// Resolve active TTS provider via the voice_providers registry.
+// Resolve active TTS provider via the voice_providers registry. This is also
+// where the spend cap (failover or pause) and the emergency kill switch apply.
 $cfg = \local_ai_course_assistant\voice_registry::resolve(
     \local_ai_course_assistant\voice_registry::CAPABILITY_TTS
 );
 if ($cfg === null) {
+    // 8.3.0: every row that could speak names a model its provider has shut down with no successor (OpenAI text
+    // to speech from 2027-01-06). The retired model is never called; the answer says which setting to change, and
+    // the same goes to the server log for an administrator.
+    $message = \local_ai_course_assistant\voice_registry::retired_tts_message();
+    if ($message !== null) {
+        \local_ai_course_assistant\security::log_operational_failure('TTS not sent: ' . $message);
+        http_response_code(503);
+        echo json_encode(['error' => $message]);
+        exit;
+    }
     http_response_code(503);
     echo json_encode(['error' => get_string('error_no_tts_key', 'local_ai_course_assistant')]);
     exit;
 }
 
-$voiceparam = optional_param('voice', '', PARAM_ALPHA);
-$voice = $voiceparam !== '' ? $voiceparam : $cfg['voice'];
+$provider = (string) $cfg['provider'];
+$voice = \local_ai_course_assistant\voice\tts_request::voice(
+    $provider,
+    optional_param('voice', '', PARAM_ALPHA),
+    (string) $cfg['voice']
+);
+$lang = optional_param('lang', 'en', PARAM_ALPHA) ?: 'en';
+// The catalog-resolved model (8.1.0). Before 8.1.0 this was the literal tts-1 / grok-tts, which are the catalog
+// defaults, so a row without a model behaves as before.
+$model = (string) ($cfg['model'] ?? '');
 
 // Truncate text to avoid excessive API costs.
 $text = mb_substr(trim($text), 0, 4096);
 
-// Build provider-specific request body.
-if ($cfg['provider'] === 'xai') {
-    // xAI TTS: {text, voice_id, language}. Returns raw audio.
-    $body = json_encode([
-        'text'     => $text,
-        'voice_id' => $voice,
-        'language' => optional_param('lang', 'en', PARAM_ALPHA) ?: 'en',
-    ]);
-    $model = 'grok-tts';
-} else {
-    // OpenAI TTS: {model, voice, input, format}. Returns raw audio.
-    $body = json_encode([
-        'model'  => 'tts-1',
-        'voice'  => $voice,
-        'input'  => $text,
-        'format' => 'mp3',
-    ]);
-    $model = 'tts-1';
+/**
+ * Send one text to speech request.
+ *
+ * @param array $request tts_request::build() output.
+ * @return array{0: int, 1: string|false} HTTP status (0 when refused before sending) and body.
+ */
+function local_ai_course_assistant_tts_send(array $request): array {
+    global $CFG;
+    if ($request['url'] === '' || !\local_ai_course_assistant\security::is_safe_provider_url($request['url'])) {
+        return [0, false];
+    }
+    require_once($CFG->libdir . '/filelib.php'); // For \curl.
+    $curl = new \curl();
+    $curl->setopt(array_merge([
+        'CURLOPT_RETURNTRANSFER' => true,
+        'CURLOPT_TIMEOUT'        => $request['timeout'],
+        'CURLOPT_HTTPHEADER'     => $request['headers'],
+        // Pin to the validated IP, closing the DNS-rebinding window.
+    ], \local_ai_course_assistant\security::resolve_pin_options($request['url'])));
+    $response = $curl->post($request['url'], $request['body']);
+    return [(int) ($curl->get_info()['http_code'] ?? 0), $response];
 }
 
-if (!\local_ai_course_assistant\security::is_safe_provider_url($cfg['endpoint'])) {
+$request = \local_ai_course_assistant\voice\tts_request::build($cfg, $model, $text, $voice, $lang);
+if ($request['url'] === '' || !\local_ai_course_assistant\security::is_safe_provider_url($request['url'])) {
     http_response_code(502);
     echo json_encode(['error' => 'TTS endpoint failed SSRF validation']);
     exit;
 }
-require_once($CFG->libdir . '/filelib.php'); // For \curl.
-$curl = new \curl();
-$curl->setopt(array_merge([
-    'CURLOPT_RETURNTRANSFER' => true,
-    'CURLOPT_TIMEOUT'        => 30,
-    'CURLOPT_HTTPHEADER'     => [
-        'Authorization: Bearer ' . $cfg['apikey'],
-        'Content-Type: application/json',
-    ],
-    // Pin to the validated IP, closing the DNS-rebinding window.
-], \local_ai_course_assistant\security::resolve_pin_options($cfg['endpoint'])));
-$response = $curl->post($cfg['endpoint'], $body);
-$httpcode = (int) ($curl->get_info()['http_code'] ?? 0);
+[$httpcode, $response] = local_ai_course_assistant_tts_send($request);
+
+// 8.1.0: the provider says the model doesn't exist (shut down early, renamed, or mistyped). Retry ONCE on the
+// catalog's successor; never on a model outside the catalog. xAI's body carries no model, so this is for the
+// providers that name one.
+if ($httpcode !== 200 && $provider !== 'xai' && $model !== ''
+        && \local_ai_course_assistant\voice_model_catalog::is_model_not_found($httpcode, (string) $response)) {
+    $catalogprovider = \local_ai_course_assistant\voice_model_catalog::has_provider($provider) ? $provider : 'openai';
+    $fallback = \local_ai_course_assistant\voice_model_catalog::fallback_after_not_found(
+        $catalogprovider,
+        \local_ai_course_assistant\voice_model_catalog::TTS,
+        $model
+    );
+    if ($fallback !== null) {
+        $retrycfg = $cfg;
+        if ($provider === 'gemini') {
+            $retrycfg['endpoint'] = \local_ai_course_assistant\voice_registry::endpoint_for('gemini', 'tts', $fallback);
+        }
+        $retry = \local_ai_course_assistant\voice\tts_request::build($retrycfg, $fallback, $text, $voice, $lang);
+        [$httpcode, $response] = local_ai_course_assistant_tts_send($retry);
+        $worked = $httpcode === 200
+            && \local_ai_course_assistant\voice\tts_request::extract_audio($provider, $response) !== null;
+        \local_ai_course_assistant\voice_model_watch::record_fallback(
+            $provider,
+            \local_ai_course_assistant\voice_model_catalog::TTS,
+            $model,
+            $fallback,
+            $worked,
+            (int) $USER->id
+        );
+        $model = $fallback;
+    }
+}
 
 if ($httpcode !== 200) {
     http_response_code(502);
@@ -122,16 +169,20 @@ if ($httpcode !== 200) {
 // Some providers/proxies return HTTP 200 with a JSON error or empty body (e.g.
 // a moderation refusal). Returning that as base64 "audio" makes the client
 // decode garbage and silently fall back to the browser voice with no
-// diagnostic. Audio (mp3) never starts with '{', so reject a non-audio 200.
-if ($response === false || $response === '' || $response[0] === '{') {
+// diagnostic. extract_audio() rejects a non-audio 200 (mp3 never starts with
+// '{'; a Gemini answer must carry inline audio data).
+$audio = \local_ai_course_assistant\voice\tts_request::extract_audio($provider, $response);
+if ($audio === null) {
     http_response_code(502);
     echo json_encode(['error' => 'TTS provider returned no audio']);
     exit;
 }
 
-// Log TTS cost: approximate tokens from character count (~4 chars/token).
+// Log TTS cost. Gemini reports its own token counts; otherwise approximate from
+// the character count (~4 chars/token), as before.
 $charcount = mb_strlen($text);
-$approxtokens = (int) ceil($charcount / 4);
+$prompttokens = $audio['prompt_tokens'] ?? (int) ceil($charcount / 4);
+$outputtokens = $audio['output_tokens'] ?? 0;
 try {
     $conv = $DB->get_record('local_ai_course_assistant_convs', [
         'userid' => $USER->id,
@@ -148,11 +199,11 @@ try {
             // F81: the capability suffix belongs in interaction_type (arg 11),
             // where spend_guard's voice bucket and token_analytics' categories
             // read it -- not welded onto the provider name.
-            $cfg['provider'],
-            $approxtokens,
-            0,
+            $provider,
+            $prompttokens,
+            $outputtokens,
             $model,
-            \local_ai_course_assistant\voice_registry::interaction_type($cfg['provider'], 'tts')
+            \local_ai_course_assistant\voice_registry::interaction_type($provider, 'tts')
         );
     }
 } catch (\Throwable $e) {
@@ -161,6 +212,6 @@ try {
 }
 
 echo json_encode([
-    'audio' => base64_encode($response),
-    'type'  => 'audio/mpeg',
+    'audio' => base64_encode($audio['audio']),
+    'type'  => $audio['type'],
 ]);

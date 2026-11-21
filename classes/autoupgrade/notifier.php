@@ -113,6 +113,56 @@ class notifier {
     }
 
     /**
+     * A voice model call was refused as an unknown model and retried on its catalog successor (8.1.0).
+     *
+     * Once per provider, old and new model: the same refusal on every learner's speak button must not become an
+     * email each.
+     *
+     * @param string $provider
+     * @param string $from The configured model the provider refused.
+     * @param string $to The catalog successor that was tried instead.
+     * @param bool $worked Whether the retry produced audio.
+     * @return int Emails sent.
+     */
+    public static function voice_model_fallback(string $provider, string $from, string $to, bool $worked): int {
+        $flag = 'voice_model_fallback_' . substr(sha1($provider . '|' . $from . '|' . $to . '|' . (int) $worked), 0, 16);
+        if (get_config('local_ai_course_assistant', $flag)) {
+            return 0;
+        }
+        $a = (object) [
+            'provider' => $provider,
+            'from' => $from,
+            'to' => $to,
+            'url' => (new \moodle_url('/admin/settings.php',
+                ['section' => 'local_ai_course_assistant_adv_prompt']))->out(false),
+        ];
+        $sent = self::send(
+            branding::str('voicemodels:mail_fallback_subject', $a),
+            branding::str($worked ? 'voicemodels:mail_fallback_body' : 'voicemodels:mail_fallback_failed_body', $a)
+        );
+        set_config($flag, (string) time(), 'local_ai_course_assistant');
+        return $sent;
+    }
+
+    /**
+     * The daily voice model report: models in use that retire soon, and catalog models a provider no longer lists.
+     *
+     * @param string $lines One finding per line, already worded.
+     * @return int Emails sent.
+     */
+    public static function voice_model_report(string $lines): int {
+        $a = (object) [
+            'lines' => $lines,
+            'url' => (new \moodle_url('/admin/settings.php',
+                ['section' => 'local_ai_course_assistant_adv_prompt']))->out(false),
+        ];
+        return self::send(
+            branding::str('voicemodels:mail_watch_subject', $a),
+            branding::str('voicemodels:mail_watch_body', $a)
+        );
+    }
+
+    /**
      * Placeholders shared by the switch emails.
      *
      * @param \stdClass $switch

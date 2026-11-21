@@ -107,6 +107,7 @@ final class external_locations_test extends \advanced_testcase {
         'classes/soapbox_storage.php' => 'declared:soapbox_storage',
         'classes/soapbox_storage_probe.php' => 'not personal: writes and reads back a test object holding no learner data',
         'classes/talking_avatar/base_provider.php' => 'declared:talking_avatar',
+        'classes/voice/gemini_live_token.php' => 'declared:voice_provider',
         'classes/zendesk_client.php' => 'declared:zendesk',
         'admin/cli/generate_conversational_fixtures.php' => 'not personal: a model writes questions about course content',
         'admin/cli/run_rag_fixture_benchmark.php' => 'not personal: scores retrieval on fixture questions and course content',
@@ -136,6 +137,7 @@ final class external_locations_test extends \advanced_testcase {
      */
     private const BROWSER_ALLOWLIST = [
         'amd/src/chat.js' => 'declared:usertesting_form',
+        'amd/src/gemini_live.js' => 'declared:voice_provider',
         'amd/src/learning_radar.js' => 'not personal: opens the Redash query staff just created, in a new tab',
         'amd/src/realtime.js' => 'declared:voice_provider',
         'amd/src/rubric_admin.js' => 'not personal: goes to a sample-rubric page of this site chosen from a select',

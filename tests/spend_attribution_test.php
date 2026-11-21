@@ -109,7 +109,7 @@ final class spend_attribution_test extends \advanced_testcase {
     public function test_voice_interaction_type_is_always_billable(): void {
         $this->resetAfterTest();
 
-        $billable = ['voice', 'openai_tts', 'xai_tts', 'openai_whisper', 'openai_stt',
+        $billable = ['voice', 'gemini_live', 'openai_tts', 'xai_tts', 'gemini_tts', 'openai_whisper', 'openai_stt',
                      'xai_stt', 'selfhosted_stt'];
 
         // Known providers keep their specific type...
@@ -197,7 +197,8 @@ final class spend_attribution_test extends \advanced_testcase {
         $src = file_get_contents($CFG->dirroot . '/local/ai_course_assistant/transcribe.php');
         $this->assertNotFalse($src);
 
-        $assign = strpos($src, "\$model = !empty(\$cfg['model'])");
+        // 8.3.0: the model comes from voice_registry::stt_model(), which never remaps a self-hosted name.
+        $assign = strpos($src, "\$model = \\local_ai_course_assistant\\voice_registry::stt_model(\$cfg);");
         $this->assertNotFalse($assign, 'transcribe.php no longer resolves a model name');
 
         $prefix = strpos($src, "'selfhosted-' . \$model", $assign);

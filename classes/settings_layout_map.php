@@ -290,8 +290,9 @@ final class settings_layout_map {
                     'realtime_enabled', 'realtime_key_from', 'realtime_apikey', 'realtime_voice'
                 ]],
                 ['existing', 'voice_providers_heading', [
-                    'voice_providers', 'voice_active_realtime', 'voice_active_tts',
-                    'voice_active_stt', 'max_audio_mb'
+                    'voice_providers', 'voice_active_realtime', 'gemini_live_enabled', 'gemini_live_model',
+                    'gemini_live_max_session_minutes', 'gemini_live_idle_seconds', 'gemini_live_daily_minutes',
+                    'voice_active_tts', 'voice_active_stt', 'max_audio_mb'
                 ]],
                 ['existing', 'stt_selfhosted_heading', [
                     'stt_selfhosted_enabled', 'stt_selfhosted_url', 'stt_selfhosted_model',

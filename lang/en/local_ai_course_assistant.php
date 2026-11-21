@@ -230,6 +230,12 @@ $string['chat:error_auth'] = 'Authentication error. Please contact your administ
 $string['chat:error_ratelimit'] = 'Too many requests. Please wait a moment and try again.';
 $string['chat:error_unavailable'] = 'The AI service is temporarily unavailable. Please try again later.';
 $string['chat:error_notconfigured'] = 'The AI Course Assistant has not been configured yet. Please contact your administrator.';
+$string['coreai:context_off'] = 'Moodle\'s AI tools are turned off for this course, so [[tutorshort]] can\'t answer here. If you think that\'s a mistake, please let your teacher know.';
+$string['coreai:policy_accepted'] = 'Thanks. You\'ve accepted the AI usage policy, so [[tutorshort]] can answer through Moodle\'s AI now.';
+$string['coreai:policy_already'] = 'You\'ve already accepted the AI usage policy.';
+$string['coreai:policy_needed'] = 'Before [[tutorshort]] can answer here through Moodle\'s AI, you need to accept this site\'s AI usage policy. [Read and accept the AI usage policy]({$a}), then send your message again.';
+$string['coreai:policy_unavailable'] = 'This site has no Moodle AI usage policy to accept.';
+$string['coreai:user_limit'] = 'You\'ve used up your Moodle AI requests for this hour. Please try again later.';
 $string['chat:mic'] = 'Speak your question';
 $string['chat:mic_error'] = 'Microphone error. Please check your browser permissions.';
 $string['chat:mic_unsupported'] = 'Speech input is not supported in this browser.';
@@ -2159,6 +2165,19 @@ $string['settings:voice_providers_heading'] = 'Voice providers (Realtime, TTS, S
 $string['settings:voice_providers_heading_desc'] = 'Configure one or more voice API providers. These settings are independent of the chat provider above and the RAG embedding provider. Voice has its own provider list because only OpenAI and xAI currently expose WebSocket Realtime, TTS, and STT endpoints. Use the dropdowns below to choose which registered provider drives each capability. If no rows are defined, the legacy single-key fallback (the OpenAI key above, whether pasted or chosen from a provider row, or the primary OpenAI key) is used. A site running Together AI / Anthropic / DeepSeek / Gemini / Mistral for chat must configure at least one row here for voice to work. Adding an OpenAI or xAI key here also turns on the speak button, the Conversation Practice chip (for courses that enable it) and the speech-to-text fallback, even when Voice Mode is off.';
 $string['settings:voice_active_realtime'] = 'Active Realtime provider';
 $string['settings:voice_active_realtime_desc'] = 'Which configured voice provider handles Realtime Voice Agent sessions.';
+$string['settings:gemini_live_enabled'] = 'Allow Gemini Live for voice mode';
+$string['settings:gemini_live_enabled_desc'] = 'Lets a gemini row in Voice providers run live, two-way voice mode through Google\'s Gemini Live API, with an animated avatar that follows the voice. Off by default. After turning it on, save, then pick the gemini row as the Active Realtime provider (Voice Mode must be on too). What it sends: the learner\'s microphone audio and the course context in the system instruction go to Google. What it costs: Google bills a live session for as long as it is open, roughly $0.70 to $1.40 per hour of conversation (third-party estimates, not checked against Google\'s price list), which is why the limits below exist. The site key never reaches the browser: each session gets a single-use token that stops working shortly after the session limit. If live voice can\'t start, learners get the regular voice mode instead.';
+$string['settings:gemini_live_model'] = 'Gemini Live model';
+$string['settings:gemini_live_model_desc'] = 'Leave blank to use the default from the voice model catalog ({$a}). A Realtime model typed on the gemini row in Voice providers wins over this. A model Google has shut down is replaced by its successor when a session starts. Lowercase model ids only.';
+$string['settings:gemini_live_max_session_minutes'] = 'Longest Gemini Live session (minutes)';
+$string['settings:gemini_live_max_session_minutes_desc'] = 'A live session ends at this length, and its token stops working 30 seconds later, so the limit holds even if someone changes the page in their browser. 1 to 30. At the rough rate above, a 10-minute session costs about $0.12 to $0.23.';
+$string['settings:gemini_live_idle_seconds'] = 'End an idle Gemini Live session after (seconds)';
+$string['settings:gemini_live_idle_seconds_desc'] = 'A session in which nobody has spoken for this long ends by itself, so a forgotten tab doesn\'t keep running up the bill. 15 to 600.';
+$string['settings:gemini_live_daily_minutes'] = 'Gemini Live minutes per learner per day';
+$string['settings:gemini_live_daily_minutes_desc'] = 'Counted on the server, from midnight in the server\'s time zone. A session the browser never reports counts its full length, and a new session is cut short to fit what is left. 0 means no daily limit. 0 to 600.';
+$string['realtime:err_gemini_daily_cap'] = 'You\'ve used today\'s live voice time. Try again tomorrow, or use regular voice mode.';
+$string['realtime:err_gemini_unavailable'] = 'Live voice couldn\'t start right now.';
+$string['realtime:err_gemini_model'] = 'The Gemini Live model setting isn\'t a valid model id.';
 $string['settings:voice_active_tts'] = 'Active TTS provider';
 $string['settings:voice_active_tts_desc'] = 'Which configured voice provider handles text-to-speech playback of AI responses.';
 $string['settings:voice_active_stt'] = 'Active STT provider';
@@ -3011,7 +3030,7 @@ $string['settings:spend_cap_period_daily'] = 'Daily';
 $string['settings:spend_cap_period_weekly'] = 'Weekly';
 $string['settings:spend_cap_period_monthly'] = 'Monthly';
 $string['settings:voice_providers'] = 'Voice providers';
-$string['settings:voice_providers_desc'] = 'Add one row per voice API. Valid provider IDs: openai, xai (these are the only providers with WebSocket Realtime + TTS + STT today). The Label is a friendly name you use to pick the active provider for each capability below. Realtime voice and TTS voice can be left blank to use the provider default (shimmer for OpenAI, eve for xAI). A saved key is never shown again, only its last four characters. To replace one, press Change and type the new key. Saving rewrites this list; lines that start with # aren\'t kept.';
+$string['settings:voice_providers_desc'] = 'Add one row per voice API. Valid provider IDs: openai and xai (Realtime, TTS and STT) and gemini (TTS, and Realtime through Gemini Live when Allow Gemini Live is on; a gemini row is never used for STT). TTS model is optional: leave it blank for the provider default (tts-1 for OpenAI, gemini-3.8-flash-tts for Gemini). Realtime model is optional too: blank uses gpt-realtime-2.1-mini for OpenAI, and for Gemini the Gemini Live model setting. STT model (openai rows) is optional: blank uses whisper-1 until OpenAI shuts it down on 26 February 2027, then gpt-transcribe; the self-hosted server keeps its own model setting, which is never changed. A model that the provider has shut down is replaced at call time by the successor [[tutorshort]] knows for it, and a daily task emails a warning 45 days before a model in use shuts down. <strong>OpenAI retires its text-to-speech models (tts-1, tts-1-hd and gpt-4o-mini-tts) on 6 January 2027 and offers no replacement for the same request.</strong> From that date [[tutorshort]] stops calling them and uses the next row that can speak. Before then, add a gemini row (gemini-3.8-flash-lite-tts is the cheaper Gemini text-to-speech model) and choose it as the Active TTS provider below. The Label is a friendly name you use to pick the active provider for each capability below. Realtime voice and TTS voice can be left blank to use the provider default (shimmer for OpenAI, eve for xAI, Kore for Gemini). A saved key is never shown again, only its last four characters. To replace one, press Change and type the new key. Saving rewrites this list; lines that start with # aren\'t kept.';
 $string['settings:voice_active_default'] = '(use first configured or legacy fallback)';
 $string['settings:voice_active_stt_default'] = '(selfhosted if configured, else first row or legacy fallback)';
 $string['settings:voice_active_stt_selfhosted'] = 'Selfhosted Whisper server (free, uses the URL below)';
@@ -3745,7 +3764,7 @@ $string['providerkeys:col_label'] = 'Label';
 $string['providerkeys:col_rtvoice'] = 'Realtime voice';
 $string['providerkeys:col_ttsvoice'] = 'TTS voice';
 $string['providerkeys:add_voice'] = '+ Add voice provider';
-$string['providerkeys:err_voice_provider'] = '"{$a}" isn\'t a voice provider. Voice providers are openai or xai.';
+$string['providerkeys:err_voice_provider'] = '"{$a}" isn\'t a voice provider. Voice providers are openai, xai and gemini (gemini is text to speech only).';
 $string['providerkeys:last4_hint'] = 'Saved key ends in {$a}.';
 $string['providerkeys:saved_url_hint'] = 'A URL is saved.';
 $string['providerkeys:err_webhook_url'] = '{$a} must be a web address that starts with http:// or https:// and has no spaces. Nothing was saved.';
@@ -3815,3 +3834,34 @@ $string['check:key_places_unreadable'] = 'The places where API keys are stored c
 // --- v7.12.1: Soapbox assignments PresenterAI's importer holds ---
 $string['soapbox:assignment_held'] = 'This assignment was not deleted. Its recordings were moved to PresenterAI, which uses the same stored files, so they cannot be deleted from Soapbox.';
 $string['soapbox:assignment_held_unchecked'] = 'This assignment was not deleted because Soapbox could not check whether its recordings were moved to PresenterAI. Nothing was changed. Try again later, or ask a site administrator.';
+
+// --- v8.1.0: voice model catalog, Gemini text to speech and the voice model watch ---
+$string['providerkeys:col_ttsmodel'] = 'TTS model';
+$string['providerkeys:col_rtmodel'] = 'Realtime model';
+$string['providerkeys:err_rt_model'] = 'The Realtime model of a {$a} row must be a plain lowercase model ID, such as gpt-realtime-2.1-mini or gemini-3.8-live.';
+$string['providerkeys:err_tts_model'] = 'The TTS model of a {$a} row must be a plain model ID, such as gemini-3.8-flash-tts or tts-1.';
+$string['task:voice_model_watch'] = 'Warn about voice models that are being retired';
+$string['voicemodels:mail_fallback_subject'] = '[[[tutorshort]]] Voice model {$a->from} was refused by {$a->provider}';
+$string['voicemodels:mail_fallback_body'] = '{$a->provider} answered that the text to speech model {$a->from} doesn\'t exist. [[tutorshort]] retried on {$a->to}, the successor it knows for that model, and that worked. Speech keeps working on {$a->to} for now. Set the TTS model of the voice row to {$a->to}, or another current model, here:
+{$a->url}';
+$string['voicemodels:mail_fallback_failed_body'] = '{$a->provider} answered that the text to speech model {$a->from} doesn\'t exist. [[tutorshort]] retried on {$a->to}, the successor it knows for that model, and that failed too, so learners get the browser voice instead. Check the voice row and its key here:
+{$a->url}';
+$string['voicemodels:mail_watch_subject'] = '[[[tutorshort]]] Voice models that need attention';
+$string['voicemodels:mail_watch_body'] = 'The daily voice model check found:
+
+{$a->lines}
+
+[[tutorshort]] never moves to a model it doesn\'t know. After a shutdown date it calls the successor named above, or, where a line says there is none, the next voice row that can do the job. To choose a model yourself, set the model of the voice row here:
+{$a->url}';
+$string['voicemodels:line_retiring'] = '{$a->provider} shuts down {$a->model} on {$a->date} (in {$a->days} days). From then on, calls go to {$a->to}.';
+$string['voicemodels:line_retired'] = '{$a->provider} shut down {$a->model} on {$a->date}. Calls now go to {$a->to}.';
+$string['voicemodels:line_missing'] = '{$a->provider} no longer lists {$a->model}, a model this site calls or would call next. Text to speech may fail until the voice row names a model the provider still offers.';
+
+// --- v8.3.0: OpenAI text to speech and speech to text retirements ---
+$string['providerkeys:col_sttmodel'] = 'STT model';
+$string['providerkeys:err_stt_model'] = 'The STT model of a {$a} row must be a plain lowercase model ID, such as gpt-transcribe or whisper-1.';
+$string['voice:error_tts_retired'] = '{$a->provider} shut down the text to speech model {$a->model} on {$a->date}, so [[tutorshort]] no longer calls it, and no other voice row can speak. An administrator needs to add a Gemini row under Voice providers (Advanced > Prompt, voice and display) and choose it as the Active TTS provider.';
+$string['voicemodels:line_retiring_tts_nosuccessor'] = '{$a->provider} shuts down the text to speech model {$a->model} on {$a->date} (in {$a->days} days) and offers no replacement for the same request. From that date [[tutorshort]] stops calling it and uses the next voice row that can speak; with none, speech stops with an error. Add a Gemini row under Voice providers (gemini-3.8-flash-lite-tts is the cheaper Gemini text to speech model) and choose it as the Active TTS provider.';
+$string['voicemodels:line_retired_tts_nosuccessor'] = '{$a->provider} shut down the text to speech model {$a->model} on {$a->date}. [[tutorshort]] no longer calls it and uses the next voice row that can speak; with none, speech stops with an error. Add a Gemini row under Voice providers (gemini-3.8-flash-lite-tts is the cheaper Gemini text to speech model) and choose it as the Active TTS provider.';
+$string['voicemodels:line_retiring_nosuccessor'] = '{$a->provider} shuts down {$a->model} on {$a->date} (in {$a->days} days) and [[tutorshort]] knows no replacement for it. From that date it stops calling it and uses the next voice row that can do the job. Choose another provider for it before then.';
+$string['voicemodels:line_retired_nosuccessor'] = '{$a->provider} shut down {$a->model} on {$a->date} and [[tutorshort]] knows no replacement for it, so it uses the next voice row that can do the job. Choose another provider for it.';

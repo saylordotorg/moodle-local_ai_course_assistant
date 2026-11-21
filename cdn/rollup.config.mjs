@@ -70,8 +70,8 @@ export function buildBundle() {
     // "Unknown module" at runtime and the whole widget fails to init. path_map
     // (v5.9.0) is depended on by chat; omitting it broke the CDN drawer on prod.
     const modules = [
-        'markdown', 'audio_player', 'sse_client', 'speech', 'realtime',
-        'voice', 'repository', 'quiz', 'i18n_strings', 'ui', 'path_map', 'chat',
+        'markdown', 'audio_player', 'sse_client', 'speech', 'realtime', 'gemini_live',
+        'voice', 'repository', 'quiz', 'i18n_strings', 'avatar_motion', 'ui', 'path_map', 'chat',
     ];
 
     const amdSources = modules.map(name => {
