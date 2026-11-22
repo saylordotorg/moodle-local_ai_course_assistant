@@ -510,11 +510,19 @@ class failover_chain implements provider_interface {
      *  - 'counted': anything else (rate limits, 5xx, timeouts, empty streams).
      *    These come and go, so the circuit opens only on the second in a row
      *    inside FAILURE_WINDOW seconds.
+     *  - 'skip': the member refused the turn on purpose before asking anyone
+     *    (chat_refused_exception, e.g. coreai_declined_exception: this learner
+     *    hasn't accepted Moodle's AI policy, or AI is off for this course). It
+     *    says nothing about the provider, so it never counts toward any run;
+     *    the turn just moves on to the next member.
      *
      * @param \Throwable $error
-     * @return string 'none', 'immediate' or 'counted'
+     * @return string 'none', 'immediate', 'counted' or 'skip'
      */
     public static function circuit_effect(\Throwable $error): string {
+        if ($error instanceof chat_refused_exception) {
+            return 'skip';
+        }
         if ($error instanceof model_not_found_exception) {
             return 'immediate';
         }
@@ -558,6 +566,9 @@ class failover_chain implements provider_interface {
         $effect = self::circuit_effect($error);
         $scope = self::circuit_scope($entry['label'], $entry['provider']);
         $runs = self::runs_key($entry['label'], $entry['provider']);
+        if ($effect === 'skip') {
+            return 'unaffected';
+        }
         if ($effect === 'none') {
             // Not the provider's fault, unless it refuses everything: see REFUSALS_TO_OPEN.
             $userid = (int) ($this->options['userid'] ?? 0);

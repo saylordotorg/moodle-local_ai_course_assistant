@@ -295,6 +295,27 @@ define(['core/ajax'], function(Ajax) {
     };
 
     /**
+     * Report a Gemini Live session's length and Google's token counts when it ends (8.2.0).
+     *
+     * @param {number} courseid
+     * @param {Object} usage {sessionId, durationSec, promptTokens, responseTokens}
+     * @returns {Promise}
+     */
+    const recordLiveUsage = function(courseid, usage) {
+        usage = usage || {};
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_record_live_usage',
+            args: {
+                courseid: courseid,
+                sessionid: parseInt(usage.sessionId, 10) || 0,
+                durationsec: parseInt(usage.durationSec, 10) || 0,
+                prompttokens: parseInt(usage.promptTokens, 10) || 0,
+                responsetokens: parseInt(usage.responseTokens, 10) || 0,
+            },
+        }])[0];
+    };
+
+    /**
      * Submit user feedback.
      *
      * @param {number} courseid
@@ -541,6 +562,7 @@ define(['core/ajax'], function(Ajax) {
         generateQuiz: generateQuiz,
         saveAvatarPreference: saveAvatarPreference,
         getRealtimeToken: getRealtimeToken,
+        recordLiveUsage: recordLiveUsage,
         submitFeedback: submitFeedback,
         getSurvey: getSurvey,
         submitSurveyResponse: submitSurveyResponse,

@@ -761,14 +761,27 @@ final class voice_learner_journey_test extends \advanced_testcase {
                 // that stops at the condition cannot tell those two apart,
                 // and neither can a later 'exit;' looked up by offset, which
                 // happily matches some other guard's exit further down.
-                "if (\$response === false || \$response === '' || \$response[0] === '{') {\n"
+                //
+                // 8.1.0 moved the test of the body into tts_request::extract_audio() (one place for every
+                // provider, Gemini's JSON answer included), so tts.php must call it and stop on null before the
+                // audio is encoded. What extract_audio() refuses is pinned below for the providers that send bytes.
+                '$audio = \local_ai_course_assistant\voice\tts_request::extract_audio($provider, $response);',
+                "if (\$audio === null) {\n"
                     . "    http_response_code(502);\n"
                     . "    echo json_encode(['error' => 'TTS provider returned no audio']);\n"
                     . "    exit;\n"
                     . '}',
-                'base64_encode($response)',
+                "base64_encode(\$audio['audio'])",
             ],
             'tts.php'
         );
+        foreach (['openai', 'xai'] as $provider) {
+            foreach ([false, '', '{"error":{"message":"refused"}}'] as $body) {
+                $this->assertNull(\local_ai_course_assistant\voice\tts_request::extract_audio($provider, $body),
+                    $provider . ' answered 200 with ' . var_export($body, true) . ', which is not audio');
+            }
+            $this->assertSame("\xFF\xFBmp3",
+                \local_ai_course_assistant\voice\tts_request::extract_audio($provider, "\xFF\xFBmp3")['audio']);
+        }
     }
 }

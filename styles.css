@@ -4007,6 +4007,16 @@ a.aica-history-panel__source:hover {
     display: block;
     width: 100%;
     height: 100%;
+    /* 8.2.0: the voice-driven lift and sway (avatar_motion.js) pivot near the chin. */
+    transform-origin: 50% 80%;
+}
+
+/* The voice-driven head motion is set inline by ui.js, which already skips it for reduced
+   motion; this is the belt to that brace. */
+@media (prefers-reduced-motion: reduce) {
+    .aica-avatar-svg svg {
+        transform: none !important;
+    }
 }
 
 /* Preset avatar img (when no generated SVG) */

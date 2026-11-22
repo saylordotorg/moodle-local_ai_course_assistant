@@ -69,7 +69,7 @@ class soapbox_scorer {
         $mimetypes = ['mp4' => 'video/mp4', 'webm' => 'video/webm', 'ogg' => 'audio/ogg',
             'm4a' => 'audio/mp4', 'oga' => 'audio/ogg', 'mov' => 'video/quicktime'];
         $mime = $mimetypes[strtolower($ext)] ?? 'application/octet-stream';
-        $model = !empty($cfg['model']) ? $cfg['model'] : 'whisper-1';
+        $model = voice_registry::stt_model($cfg);
         $post = ['file' => new \CURLFile($tmpfile, $mime, basename($tmpfile)), 'model' => $model];
 
         $curl = new \curl();

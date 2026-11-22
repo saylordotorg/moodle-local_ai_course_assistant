@@ -246,10 +246,14 @@ final class spend_predicate_coverage_test extends \advanced_testcase {
             'slide_vision'      => 'soapbox_slide_vision::design_note',
             'gesture_vision'    => 'soapbox_gesture_vision::observe',
             'model_bench'       => 'run_model_benchmark via flush_bench_spend',
-            // Seven voice types have been in the predicate since v7.3.3.
+            // Seven voice types have been in the predicate since v7.3.3; gemini_tts joined in v8.1.0.
             'voice'           => 'voice_registry::interaction_type fallback',
             'openai_tts'      => 'tts.php via voice_registry::interaction_type',
             'xai_tts'         => 'tts.php via voice_registry::interaction_type',
+            // v8.1.0: Gemini text to speech.
+            'gemini_tts'      => 'tts.php via voice_registry::interaction_type',
+            // v8.2.0: Gemini Live sessions (one row per session, filled by record_live_usage).
+            'gemini_live'     => 'voice\\gemini_live::open_session via voice_registry::interaction_type',
             'openai_whisper'  => 'transcribe.php via voice_registry::interaction_type',
             'openai_stt'      => 'transcribe.php via voice_registry::interaction_type',
             'xai_stt'         => 'transcribe.php via voice_registry::interaction_type',
