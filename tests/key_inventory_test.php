@@ -201,12 +201,13 @@ final class key_inventory_test extends \advanced_testcase {
         rsort($sorted);
         $this->assertSame($sorted, $counts, 'most places first');
         $first = reset($groups);
-        $this->assertSame(key_inventory::fingerprint(self::SHARED), key($groups));
+        // A fingerprint of 12 digits is an integer array key in PHP, so compare as strings.
+        $this->assertSame(key_inventory::fingerprint(self::SHARED), (string) key($groups));
         $this->assertSame(6, count($first['places']));
         $this->assertSame('SHRD', $first['last4']);
         $this->assertSame('openai', $first['vendor'], 'the key prefix names the vendor');
         foreach ($groups as $fp => $group) {
-            $this->assertSame($fp, $group['fingerprint']);
+            $this->assertSame((string) $fp, $group['fingerprint']);
             $this->assertSame(['fingerprint', 'last4', 'vendor', 'places'], array_keys($group));
         }
         $this->assertSame('', $groups[key_inventory::fingerprint(self::STT)]['vendor'], 'no prefix and no provider');

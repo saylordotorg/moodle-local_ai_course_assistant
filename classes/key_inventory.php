@@ -84,7 +84,9 @@ class key_inventory {
     /**
      * The places grouped by key, most places first.
      *
-     * Keyed by fingerprint. Each group is ['fingerprint', 'last4', 'vendor', 'places']: vendor is the vendor the
+     * Keyed by fingerprint (a fingerprint that happens to be all digits comes back as an integer key, as PHP does
+     * for any numeric string; read the string from each group's 'fingerprint' value when the type matters).
+     * Each group is ['fingerprint', 'last4', 'vendor', 'places']: vendor is the vendor the
      * key's own prefix names (course_key_guard::owner_of_key()), else the one provider id every place shares,
      * else ''. Groups with the same number of places keep the order of their first place.
      *
