@@ -81,8 +81,16 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
     var sentenceBuffer = '';
     /** @type {string} Accumulates tokens to find and hide the SOLA_NEXT block from transcript */
     var displayBuffer = '';
-    /** @type {number} How many chars of displayBuffer have already been emitted to transcript */
-    var displayEmitted = 0;
+    /** @type {{push: function(string): string}|null} Decides what of the streamed reply the transcript shows */
+    var displayFilter = null;
+    /** @type {number} Seconds of silence before the mic stops listening (8.3.1) */
+    var idleSeconds = 10;
+    /** @type {number|null} Timer for the silence limit, armed while listening */
+    var idleTimer = null;
+    /** @type {boolean} True from the moment the silence limit stopped the mic until the learner resumes */
+    var idleStopped = false;
+    /** @type {Function|null} Called once when the silence limit stops the mic */
+    var onIdleStopCb = null;
     /** @type {number|null} Timer to restart recognition after TTS ends */
     var restartTimer = null;
     /** @type {string} Derived TTS proxy URL */
@@ -129,8 +137,60 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
      */
     var setState = function(state) {
         currentState = state;
+        // The silence limit only runs while the mic is open waiting for the learner (8.3.1).
+        if (state === 'listening') {
+            armIdle();
+        } else {
+            clearIdle();
+        }
         if (onStateChangeCb) {
             onStateChangeCb(state);
+        }
+    };
+
+    var clearIdle = function() {
+        if (idleTimer) {
+            clearTimeout(idleTimer);
+            idleTimer = null;
+        }
+    };
+
+    /**
+     * Start (or restart) the silence countdown. When it runs out with nobody having spoken, the mic stops,
+     * nothing restarts it, and the owner is told so it can offer a Resume button.
+     */
+    var armIdle = function() {
+        clearIdle();
+        if (!connected || idleSeconds <= 0) {
+            return;
+        }
+        idleTimer = setTimeout(function() {
+            idleTimer = null;
+            if (!connected || currentState !== 'listening') {
+                return;
+            }
+            idleStopped = true;
+            if (restartTimer) {
+                clearTimeout(restartTimer);
+                restartTimer = null;
+            }
+            if (recognition) {
+                try { recognition.abort(); } catch (e) { /**/ }
+            }
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                try { mediaRecorder.stop(); } catch (e) { /**/ }
+            }
+            setState('idle');
+            if (onIdleStopCb) {
+                onIdleStopCb();
+            }
+        }, idleSeconds * 1000);
+    };
+
+    /** The learner is speaking: restart the countdown. */
+    var touchIdle = function() {
+        if (idleTimer && currentState === 'listening') {
+            armIdle();
         }
     };
 
@@ -189,7 +249,92 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
     var stripSolaTags = function(text) {
         text = text.replace(/\[SOLA_NEXT\][\s\S]*?\[\/SOLA_NEXT\]/g, '');
         text = text.replace(/\[SOLA_NEXT\][\s\S]*/g, '');
-        return text;
+        return stripMarkers(text);
+    };
+
+    /**
+     * Citation and source markers the model puts in a reply: [[c:1]] (which passage it used) and
+     * [SOURCE:activity:522] (what the answer came from). The chat panel turns them into its source pill;
+     * this voice mode has nowhere to show one, and a marker must never be shown raw or read aloud (8.3.1).
+     * A marker arrives over several tokens, so a partly arrived one is held back, never shown or spoken.
+     */
+    var MARKER_RE = /\s*(?:\[\[c:\d+\]\]|\[{1,3}SOURCE:[^[\]]*\]{1,3})/gi;
+    var MARKER_PREFIX_RE = /^\[{1,3}(?:c(?::\d*)?|S(?:O(?:U(?:R(?:C(?:E(?::[^[\]]*)?)?)?)?)?)?)?\]{0,2}$/i;
+
+    /**
+     * Remove every complete marker, and the space before it.
+     * @param {string} text
+     * @returns {string}
+     */
+    var stripMarkers = function(text) {
+        return String(text).replace(MARKER_RE, '');
+    };
+
+    /**
+     * Where a marker that has only partly arrived begins, or -1 when the text doesn't end in one.
+     * @param {string} text
+     * @returns {number}
+     */
+    var markerHoldStart = function(text) {
+        var i = text.lastIndexOf('[');
+        if (i === -1) {
+            return -1;
+        }
+        // Step back over a run of opening brackets: "[[c:" starts at the first one.
+        while (i > 0 && text.charAt(i - 1) === '[') {
+            i--;
+        }
+        var tail = text.slice(i);
+        if (!MARKER_PREFIX_RE.test(tail)) {
+            return -1;
+        }
+        // A marker that is already whole is not "partly arrived": stripMarkers() removes it.
+        if (/^\[\[c:\d+\]\]$/.test(tail)) {
+            return -1;
+        }
+        var src = /^(\[{1,3})SOURCE:[^[\]]*(\]{1,3})$/i.exec(tail);
+        if (src && src[1].length === src[2].length) {
+            return -1;
+        }
+        return i;
+    };
+
+    /**
+     * What the transcript shows of a streamed reply: nothing from [SOLA_NEXT] on, no marker, no half marker,
+     * and trailing spaces held until the next word arrives (a marker after them would otherwise leave a gap).
+     * push() takes the next token and returns the new text to show, or ''.
+     * @returns {{push: function(string): string}}
+     */
+    var makeDisplayFilter = function() {
+        var raw = '';
+        var emitted = 0;
+        return {
+            push: function(token) {
+                raw += token;
+                var end = raw.indexOf('[SOLA_NEXT]');
+                if (end === -1) {
+                    var tag = '[SOLA_NEXT]';
+                    var hold = 0;
+                    for (var pi = 1; pi <= tag.length && pi <= raw.length; pi++) {
+                        if (raw.slice(-pi) === tag.slice(0, pi)) {
+                            hold = pi;
+                        }
+                    }
+                    end = raw.length - hold;
+                }
+                var mh = markerHoldStart(raw.slice(0, end));
+                if (mh !== -1) {
+                    end = mh;
+                }
+                var clean = stripMarkers(raw.slice(0, end)).replace(/\s+$/, '');
+                if (clean.length <= emitted) {
+                    return '';
+                }
+                var out = clean.slice(emitted);
+                emitted = clean.length;
+                return out;
+            }
+        };
     };
 
     /** Minimum characters before emitting an early clause (comma/semicolon/colon split) */
@@ -203,17 +348,22 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
      * @returns {string|null}
      */
     var extractSentence = function() {
+        // A marker that has only partly arrived stays in the buffer: a colon or full stop inside
+        // "[SOURCE:Unit 1: Computer Programming]" must never end a spoken sentence.
+        var hold = markerHoldStart(sentenceBuffer);
+        var head = hold === -1 ? sentenceBuffer : sentenceBuffer.slice(0, hold);
+        var tail = hold === -1 ? '' : sentenceBuffer.slice(hold);
         // Full sentence boundary (period, exclamation, question mark).
-        var m = sentenceBuffer.match(/^([\s\S]+?[.!?])(\s+)([\s\S]*)$/);
+        var m = head.match(/^([\s\S]+?[.!?])(\s+)([\s\S]*)$/);
         if (m) {
-            sentenceBuffer = m[3];
+            sentenceBuffer = m[3] + tail;
             return m[1].trim();
         }
         // Early clause split on comma/semicolon/colon if buffer is long enough.
-        if (sentenceBuffer.length >= EARLY_EMIT_MIN) {
-            var c = sentenceBuffer.match(/^([\s\S]{20,}?[,;:])(\s+)([\s\S]*)$/);
+        if (head.length >= EARLY_EMIT_MIN) {
+            var c = head.match(/^([\s\S]{20,}?[,;:])(\s+)([\s\S]*)$/);
             if (c) {
-                sentenceBuffer = c[3];
+                sentenceBuffer = c[3] + tail;
                 return c[1].trim();
             }
         }
@@ -308,7 +458,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
      * Called when TTS finishes or SSE completes with nothing to play.
      */
     scheduleRecognitionRestart = function() {
-        if (!connected) {
+        if (!connected || idleStopped) {
             return;
         }
         if (restartTimer) {
@@ -449,7 +599,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         }
         sentenceBuffer = '';
         displayBuffer = '';
-        displayEmitted = 0;
+        displayFilter = makeDisplayFilter();
 
         var postBody = {
             sesskey:  cfg.sessKey  || '',
@@ -478,28 +628,13 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
                 if (!connected) {
                     return;
                 }
-                // Accumulate for display. Only emit text that precedes [SOLA_NEXT] —
-                // the tag spans many tokens so single-token regex never matches.
-                // Also hold back any partial tag prefix at the end to prevent leaking.
+                // Accumulate for display: nothing from [SOLA_NEXT] on, and no citation or source marker
+                // (8.3.1: the markers used to show raw, and were read aloud).
                 displayBuffer += token;
-                var solaStart = displayBuffer.indexOf('[SOLA_NEXT]');
-                var visEnd;
-                if (solaStart !== -1) {
-                    visEnd = solaStart;
-                } else {
-                    var tag = '[SOLA_NEXT]';
-                    var hold = 0;
-                    for (var pi = 1; pi <= tag.length && pi <= displayBuffer.length; pi++) {
-                        if (displayBuffer.slice(-pi) === tag.slice(0, pi)) {
-                            hold = pi;
-                        }
-                    }
-                    visEnd = displayBuffer.length - hold;
+                var shown = displayFilter.push(token);
+                if (shown && onTranscriptCb) {
+                    onTranscriptCb('assistant', shown);
                 }
-                if (visEnd > displayEmitted && onTranscriptCb) {
-                    onTranscriptCb('assistant', displayBuffer.slice(displayEmitted, visEnd));
-                }
-                displayEmitted = visEnd;
                 sentenceBuffer += token;
                 maybeSendSentence();
             },
@@ -519,7 +654,9 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
                     }
                 }
                 // Flush remaining buffer as final sentence.
-                var remaining = stripSolaTags(sentenceBuffer).trim();
+                var remaining = stripSolaTags(sentenceBuffer);
+                var heldAt = markerHoldStart(remaining);
+                remaining = (heldAt === -1 ? remaining : remaining.slice(0, heldAt)).trim();
                 sentenceBuffer = '';
                 if (remaining) {
                     ttsQueue.push(remaining);
@@ -602,6 +739,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
 
             if (level > 15) {                 // ~6 % of max — speech onset threshold
                 speechDetected = true;
+                touchIdle();
                 if (silenceTimer) {
                     clearTimeout(silenceTimer);
                     silenceTimer = null;
@@ -746,6 +884,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         };
 
         recognition.onresult = function(event) {
+            touchIdle();
             var finalText = '';
             for (var i = event.resultIndex; i < event.results.length; i++) {
                 if (event.results[i].isFinal) {
@@ -811,6 +950,9 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         onStateChangeCb = callbacks.onStateChange  || null;
         onErrorCb       = callbacks.onError        || null;
         onSuggestionsCb = callbacks.onSuggestions  || null;
+        onIdleStopCb    = callbacks.onIdleStop     || null;
+        idleSeconds     = Number(config.idleSeconds) > 0 ? Number(config.idleSeconds) : 10;
+        idleStopped     = false;
 
         cfg = {
             courseId: config.courseId || 0,
@@ -924,6 +1066,8 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
      */
     var disconnect = function() {
         connected = false;
+        clearIdle();
+        idleStopped = false;
 
         // Stop recognition.
         if (recognition) {
@@ -993,11 +1137,30 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         processUtterance(text);
     };
 
+    /**
+     * Start listening again after the silence limit stopped the mic (the Resume button).
+     */
+    var resumeListening = function() {
+        if (!connected || !idleStopped) { return; }
+        idleStopped = false;
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(function() {/**/});
+        }
+        scheduleRecognitionRestart();
+    };
+
     return {
         connect:          connect,
         disconnect:       disconnect,
         isConnected:      isConnected,
         sendText:         sendText,
+        resumeListening:  resumeListening,
         ELL_INSTRUCTIONS: ELL_INSTRUCTIONS,
+        // Pure helpers, exposed so tests/js can check them without a browser.
+        _test: {
+            stripMarkers: stripMarkers,
+            markerHoldStart: markerHoldStart,
+            makeDisplayFilter: makeDisplayFilter,
+        },
     };
 });

@@ -3569,9 +3569,14 @@ define([
 
         const chips = (config.chips && config.chips.length) ? config.chips.slice() : ['Free conversation'];
         var sessionStarted = false;
+        // 8.3.1: true from the moment the silence limit stopped listening until the learner resumes. The socket is
+        // closed (no more spend) but the overlay stays, with a Resume button.
+        var stoppedForSilence = false;
+        var resumingAfterSilence = false;
         var startSession = function(selection) {
             if (sessionStarted) { return; }
             sessionStarted = true;
+            stoppedForSilence = false;
             UI.clearSuggestions();
             UI.setVoiceState('connecting');
             let acquiredMicStream = null;
@@ -3609,7 +3614,10 @@ define([
                 const instructions = config.getInstructions
                     ? config.getInstructions(baseInstructions, selection)
                     : baseInstructions;
-                const initialText = config.getInitialText ? config.getInitialText(selection) : '';
+                // A resumed session carries on the conversation: it must not send the opening prompt again.
+                const initialText = (config.getInitialText && !resumingAfterSilence)
+                    ? config.getInitialText(selection) : '';
+                resumingAfterSilence = false;
                 let initialTextSent = false;
 
                 engine.connect(
@@ -3624,6 +3632,36 @@ define([
                         sessionId: result.sessionid || 0,
                         maxSeconds: result.maxseconds || 0,
                         idleSeconds: result.idleseconds || 0,
+                        onIdleStop: function() {
+                            if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
+                                return;
+                            }
+                            // Marked before the session closes, so the 'disconnected' state that follows keeps
+                            // the overlay instead of tearing it down.
+                            stoppedForSilence = true;
+                            sessionStarted = false;
+                            offerVoiceResume(root, function() {
+                                // The engine closed its audio context with the session; Resume is a tap, so a
+                                // new one can be made here (iOS needs it inside the gesture).
+                                audioCtx = null;
+                                if (AudioContextClass) {
+                                    try {
+                                        audioCtx = new AudioContextClass({sampleRate: 24000});
+                                        if (audioCtx.state === 'suspended') {
+                                            audioCtx.resume().catch(function() {/**/});
+                                        }
+                                    } catch (e) {
+                                        audioCtx = null;
+                                    }
+                                }
+                                if (!audioCtx) {
+                                    addAssistantMsg('Audio playback is not available in this browser.');
+                                    return;
+                                }
+                                resumingAfterSilence = true;
+                                startSession(selection);
+                            }, endSession);
+                        },
                         onAnalyser: function(analyser) {
                             // The avatar's mouth follows the live voice (honours the animation
                             // setting and prefers-reduced-motion inside UI).
@@ -3645,6 +3683,12 @@ define([
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                                 return;
                             }
+                            if (state === 'disconnected' && stoppedForSilence) {
+                                // Stopped for silence: the overlay stays, with its Resume button.
+                                UI.setVoiceState('idle');
+                                syncVoicePanel();
+                                return;
+                            }
                             UI.setVoiceState(state);
                             syncVoicePanel();
                             if (state === 'idle' && initialText && !initialTextSent) {
@@ -3652,7 +3696,7 @@ define([
                                 engine.sendText(initialText);
                                 return;
                             }
-                            if (state === 'disconnected') {
+                            if (state === 'disconnected' && !stoppedForSilence) {
                                 teardownVoiceSessionUi();
                             }
                         },
@@ -3747,6 +3791,32 @@ define([
     };
 
     /**
+     * A voice mode stopped listening because nobody spoke (8.3.1): say so and offer Resume. The words come from
+     * the language strings the widget root carries (voiceidlestopped, voiceresume, voiceresumearia).
+     *
+     * @param {HTMLElement} root The widget root
+     * @param {Function} onResume Called when the learner taps Resume
+     * @param {Function} onEnd Called when the learner chooses to end the conversation
+     */
+    const offerVoiceResume = function(root, onResume, onEnd) {
+        const data = (root && root.dataset) || {};
+        const stopped = data.voiceidlestopped || 'Stopped listening to save credits. Tap Resume when you are ready.';
+        const resume = data.voiceresume || 'Resume';
+        const aria = {};
+        aria[resume] = data.voiceresumearia || 'Resume voice conversation';
+        UI.setVoiceState('idle');
+        UI.appendVoiceTranscript('assistant', '\n(' + stopped + ')');
+        UI.showSuggestions([resume, 'End conversation'], function(text) {
+            UI.clearSuggestions();
+            if (text === resume) {
+                onResume();
+                return;
+            }
+            onEnd();
+        }, aria);
+    };
+
+    /**
      * Start a legacy Practice Speaking session (SSE + TTS + browser STT/fallback).
      *
      * @param {HTMLElement} root
@@ -3819,8 +3889,18 @@ define([
                             Voice.sendText(text);
                         });
                     },
+                    onIdleStop: function() {
+                        if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
+                            return;
+                        }
+                        // 8.3.1: nobody spoke for the silence limit. The mic is closed; Resume opens it again.
+                        offerVoiceResume(root, function() {
+                            Voice.resumeListening();
+                        }, endSession);
+                    },
                 },
                 {
+                    idleSeconds: Number(root && root.dataset.voiceidleseconds) || 10,
                     courseId: courseId,
                     sessKey:  sessKey,
                     sseUrl:   sseUrl,

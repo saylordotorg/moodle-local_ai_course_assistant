@@ -51,7 +51,47 @@ define([], function() {
     var SPEECH_RMS = 0.02;
     /** Default caps when the server sends none. */
     var DEFAULT_MAX_SECONDS = 600;
-    var DEFAULT_IDLE_SECONDS = 90;
+    /** How often the silence limit is checked, and how long a pending model answer holds it off. */
+    var IDLE_CHECK_MS = 250;
+    var REPLY_WAIT_MS = 20000;
+    /** Seconds of silence before listening stops (8.3.1: 5; the server sends the configured value). */
+    var DEFAULT_IDLE_SECONDS = 5;
+
+    /**
+     * Citation and source markers ([[c:1]], [SOURCE:activity:522]) never reach the transcript (8.3.1). A marker
+     * arrives over several chunks, so a partly arrived one is held back. push() takes the next chunk and returns
+     * the text to show, or ''.
+     *
+     * @return {{push: function(string): string}}
+     */
+    var makeMarkerFilter = function() {
+        var markerRe = /\s*(?:\[\[c:\d+\]\]|\[{1,3}SOURCE:[^[\]]*\]{1,3})/gi;
+        var prefixRe = /^\[{1,3}(?:c(?::\d*)?|S(?:O(?:U(?:R(?:C(?:E(?::[^[\]]*)?)?)?)?)?)?)?\]{0,2}$/i;
+        var raw = '';
+        var emitted = 0;
+        return {
+            push: function(chunk) {
+                raw += chunk;
+                var end = raw.length;
+                var i = raw.lastIndexOf('[');
+                if (i !== -1) {
+                    while (i > 0 && raw.charAt(i - 1) === '[') {
+                        i--;
+                    }
+                    if (prefixRe.test(raw.slice(i))) {
+                        end = i;
+                    }
+                }
+                var clean = raw.slice(0, end).replace(markerRe, '').replace(/\s+$/, '');
+                if (clean.length <= emitted) {
+                    return '';
+                }
+                var out = clean.slice(emitted);
+                emitted = clean.length;
+                return out;
+            }
+        };
+    };
 
     var ELL_INSTRUCTIONS = 'You are {$a} in a real-time voice conversation. Keep responses brief (2-3 sentences). ' +
         '[ELL Coaching Mode] You are an English conversation and pronunciation coach.';
@@ -308,6 +348,10 @@ define([], function() {
     var sessionStartMs = 0;
     /** @type {number} */
     var lastActivityMs = 0;
+    /** @type {number} When a learner turn went out and the model hasn't started to answer, else 0. */
+    var replyPendingSince = 0;
+    /** @type {{push: function(string): string}} */
+    var modelTextFilter = makeMarkerFilter();
     /** @type {{prompt: number, response: number}} */
     var usageTotal = {prompt: 0, response: 0};
     /** @type {boolean} */
@@ -416,6 +460,27 @@ define([], function() {
         }
     };
 
+    /**
+     * Pass both sides' transcripts on, and note what they say about whose turn it is (8.3.1): a learner turn
+     * means the model's answer is on its way; model text means it has started to answer.
+     *
+     * @param {Object} ev One classified server message
+     */
+    var handleTranscripts = function(ev) {
+        if (ev.userText && cb.onTranscript) {
+            lastActivityMs = Date.now();
+            replyPendingSince = Date.now();
+            cb.onTranscript('user', ev.userText);
+        }
+        if (ev.modelText) {
+            replyPendingSince = 0;
+            var shown = modelTextFilter.push(ev.modelText);
+            if (shown && cb.onTranscript) {
+                cb.onTranscript('assistant', shown);
+            }
+        }
+    };
+
     var handleEvents = function(ev) {
         if (ev.error) {
             fail(ev.error);
@@ -437,27 +502,26 @@ define([], function() {
             // Barge-in: the learner spoke over the model. Drop everything queued.
             stopPlayback();
             modelTurnOpen = false;
+            modelTextFilter = makeMarkerFilter();
             setState('listening');
         }
         if (ev.audio.length) {
+            replyPendingSince = 0;
             modelTurnOpen = true;
             ev.audio.forEach(function(a) {
                 enqueueAudio(a.data, a.mime);
             });
         }
-        if (ev.userText && cb.onTranscript) {
-            lastActivityMs = Date.now();
-            cb.onTranscript('user', ev.userText);
-        }
-        if (ev.modelText && cb.onTranscript) {
-            cb.onTranscript('assistant', ev.modelText);
-        }
+        handleTranscripts(ev);
         if (ev.usage) {
             usageTotal.prompt += ev.usage.prompt;
             usageTotal.response += ev.usage.response;
         }
         if (ev.turnComplete) {
             modelTurnOpen = false;
+            replyPendingSince = 0;
+            modelTextFilter = makeMarkerFilter();
+            lastActivityMs = Date.now();
             if (!playing.length && currentState === 'speaking') {
                 setState('idle');
             }
@@ -505,16 +569,24 @@ define([], function() {
             disconnect();
         }, maxMs);
         timers.idle = setInterval(function() {
-            if (playing.length || modelTurnOpen) {
+            // While the model is speaking or about to answer (up to 20 s), nobody is "idle": hold the
+            // clock at zero so the silence count starts when the model stops, not when it started.
+            var waiting = replyPendingSince && Date.now() - replyPendingSince < REPLY_WAIT_MS;
+            if (playing.length || modelTurnOpen || waiting) {
+                lastActivityMs = Date.now();
                 return;
             }
             if (Date.now() - lastActivityMs > limits.idleSeconds * 1000) {
-                if (cb.onTranscript) {
+                // Stop listening so an open microphone doesn't keep running up the bill. The owner
+                // (chat.js) offers a Resume button; without one the old end-of-session note shows.
+                if (cb.onIdleStop) {
+                    cb.onIdleStop();
+                } else if (cb.onTranscript) {
                     cb.onTranscript('assistant', '\n(The live voice session ended because nobody spoke for a while.)');
                 }
                 disconnect();
             }
-        }, 1000);
+        }, IDLE_CHECK_MS);
     };
 
     var startMic = function() {
@@ -587,6 +659,8 @@ define([], function() {
         micStreamIn = micStreamParam || null;
         started = false;
         modelTurnOpen = false;
+        replyPendingSince = 0;
+        modelTextFilter = makeMarkerFilter();
         usageTotal = {prompt: 0, response: 0};
         usageReported = false;
         limits = {
@@ -751,6 +825,7 @@ define([], function() {
             stopPlayback();
         }
         lastActivityMs = Date.now();
+        replyPendingSince = Date.now();
         if (cb.onTranscript) {
             cb.onTranscript('user', text);
         }
@@ -778,6 +853,7 @@ define([], function() {
             usageCounts: usageCounts,
             classify: classify,
             arrayBufferToBase64: arrayBufferToBase64,
+            makeMarkerFilter: makeMarkerFilter,
         },
     };
 });

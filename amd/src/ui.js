@@ -5517,7 +5517,7 @@ define([
      * @param {string[]} suggestions  Array of suggestion strings (up to 4)
      * @param {Function} onSelect     Called with the clicked suggestion text
      */
-    const showSuggestions = function(suggestions, onSelect) {
+    const showSuggestions = function(suggestions, onSelect, ariaLabels) {
         if (!messagesContainer || !suggestions.length) {
             return;
         }
@@ -5531,6 +5531,9 @@ define([
             btn.className = 'aica-suggestion';
             btn.type = 'button';
             btn.textContent = text;
+            if (ariaLabels && ariaLabels[text]) {
+                btn.setAttribute('aria-label', ariaLabels[text]);
+            }
             btn.addEventListener('click', function() {
                 onSelect(text);
             });
