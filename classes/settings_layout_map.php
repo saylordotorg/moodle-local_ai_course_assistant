@@ -292,6 +292,7 @@ final class settings_layout_map {
                 ['existing', 'voice_providers_heading', [
                     'voice_providers', 'voice_active_realtime', 'gemini_live_enabled', 'gemini_live_model',
                     'gemini_live_max_session_minutes', 'gemini_live_idle_seconds', 'gemini_live_daily_minutes',
+                    'voice_idle_seconds',
                     'voice_active_tts', 'voice_active_stt', 'max_audio_mb'
                 ]],
                 ['existing', 'stt_selfhosted_heading', [

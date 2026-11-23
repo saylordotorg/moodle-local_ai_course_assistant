@@ -163,13 +163,13 @@ final class voice_gemini_live_test extends \advanced_testcase {
 
     public function test_the_cap_settings_default_safely_and_are_clamped(): void {
         $this->assertSame(600, gemini_live::max_session_seconds());
-        $this->assertSame(90, gemini_live::idle_seconds());
+        $this->assertSame(5, gemini_live::idle_seconds());
         $this->assertSame(1800, gemini_live::daily_seconds());
         set_config('gemini_live_max_session_minutes', 500, 'local_ai_course_assistant');
         set_config('gemini_live_idle_seconds', 1, 'local_ai_course_assistant');
         set_config('gemini_live_daily_minutes', 'abc', 'local_ai_course_assistant');
         $this->assertSame(1800, gemini_live::max_session_seconds(), 'clamped to 30 minutes');
-        $this->assertSame(15, gemini_live::idle_seconds());
+        $this->assertSame(3, gemini_live::idle_seconds());
         $this->assertSame(1800, gemini_live::daily_seconds(), 'junk reads as the default');
         $this->assertFalse(gemini_live::enabled(), 'off by default');
     }

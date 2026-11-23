@@ -2355,5 +2355,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026101903, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026112200) {
+        // 8.3.1: Gemini Live stops listening after 5 seconds of silence by default (it was 90), and the other voice
+        // modes after 10. A site that still has exactly the old default of 90 never chose it, so it moves to the
+        // new default; any other value was chosen and stays. See voice_idle::migrate_old_gemini_live_default().
+        if (\local_ai_course_assistant\voice\voice_idle::migrate_old_gemini_live_default()) {
+            mtrace('SOLA: Gemini Live silence limit moved from the old default of 90 seconds to 5 (8.3.1).');
+        }
+
+        upgrade_plugin_savepoint(true, 2026112200, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

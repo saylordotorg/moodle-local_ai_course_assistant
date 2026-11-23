@@ -27,7 +27,8 @@ defined('MOODLE_INTERNAL') || die();
  * third-party sources), so three limits apply, each an admin setting with a safe default:
  *   - gemini_live_max_session_minutes: the browser ends the session at this length, and the token itself dies
  *     shortly after (gemini_live_token::EXPIRY_GRACE), so a modified browser can't hold it open longer;
- *   - gemini_live_idle_seconds: the browser ends a session in which nobody has spoken for this long;
+ *   - gemini_live_idle_seconds: the browser ends a session in which nobody has spoken for this long (8.3.1: 5 seconds
+ *     by default, and the learner taps Resume to carry on);
  *   - gemini_live_daily_minutes: per learner per day (server time zone midnight). Counted on the server from the
  *     session rows written at mint time: a session the browser reported counts its reported length, one it never
  *     reported counts its full cap. A new session's cap is cut to what is left of the day.
@@ -47,8 +48,8 @@ class gemini_live {
     /** @var int Default session cap in minutes. */
     public const DEFAULT_MAX_MINUTES = 10;
 
-    /** @var int Default idle timeout in seconds. */
-    public const DEFAULT_IDLE_SECONDS = 90;
+    /** @var int Default idle timeout in seconds (8.3.1: 5; it was 90 before, see voice_idle::migrate_old_gemini_live_default()). */
+    public const DEFAULT_IDLE_SECONDS = 5;
 
     /** @var int Default daily minutes per learner (0 = no daily cap). */
     public const DEFAULT_DAILY_MINUTES = 30;
@@ -57,7 +58,7 @@ class gemini_live {
     public const MAX_MINUTES_RANGE = [1, 30];
 
     /** @var int[] Idle timeout bounds in seconds. */
-    public const IDLE_RANGE = [15, 600];
+    public const IDLE_RANGE = [3, 600];
 
     /** @var int[] Daily minutes bounds. */
     public const DAILY_RANGE = [0, 600];

@@ -285,6 +285,8 @@ class get_realtime_token extends external_api {
                 'endpoint' => $proxyurl . $sep . 'token=' . rawurlencode($jwt),
                 // Voice-style tail only; see the security note above.
                 'instructions' => $clientinstructions,
+                // 8.3.1: the browser stops listening after this many seconds of silence (the learner taps Resume).
+                'idleseconds' => \local_ai_course_assistant\voice\voice_idle::seconds(),
             ];
         }
 
@@ -323,6 +325,8 @@ class get_realtime_token extends external_api {
             'endpoint' => $cfg['endpoint'],
             // Voice-style tail only; the grounded prompt went to OpenAI at mint time.
             'instructions' => $clientinstructions,
+            // 8.3.1: the browser stops listening after this many seconds of silence (the learner taps Resume).
+            'idleseconds' => \local_ai_course_assistant\voice\voice_idle::seconds(),
         ];
     }
 

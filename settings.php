@@ -1904,6 +1904,14 @@ if ($hassiteconfig) {
         \local_ai_course_assistant\voice\gemini_live::IDLE_RANGE[1]
     ));
     $settings->add(new \local_ai_course_assistant\admin_setting_bounded_int(
+        'local_ai_course_assistant/voice_idle_seconds',
+        get_string('settings:voice_idle_seconds', 'local_ai_course_assistant'),
+        get_string('settings:voice_idle_seconds_desc', 'local_ai_course_assistant'),
+        (string) \local_ai_course_assistant\voice\voice_idle::DEFAULT_SECONDS,
+        \local_ai_course_assistant\voice\voice_idle::RANGE[0],
+        \local_ai_course_assistant\voice\voice_idle::RANGE[1]
+    ));
+    $settings->add(new \local_ai_course_assistant\admin_setting_bounded_int(
         'local_ai_course_assistant/gemini_live_daily_minutes',
         get_string('settings:gemini_live_daily_minutes', 'local_ai_course_assistant'),
         get_string('settings:gemini_live_daily_minutes_desc', 'local_ai_course_assistant'),
