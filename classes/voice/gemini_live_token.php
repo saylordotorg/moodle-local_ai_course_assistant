@@ -31,11 +31,11 @@ defined('MOODLE_INTERNAL') || die();
  * field. Response: the token is the "name" field ("auth_tokens/..."). The browser connects to
  * BidiGenerateContentConstrained with ?access_token=<token>.
  *
- * UNVERIFIED: this shape was written from memory of Google's ephemeral token documentation and the google-genai SDKs
- * (auth_tokens.create with live_connect_constraints, lock_additional_fields), not checked against a live call. In
- * particular the exact fieldMask paths, whether "model" belongs in the mask, and whether the setup sits under
- * bidiGenerateContentSetup.setup are best guesses. Everything that could be wrong is in this class, so a live check
- * that fails is fixed here and in its test, nowhere else.
+ * VERIFIED against a live call on 2026-11-23: the session settings sit DIRECTLY under bidiGenerateContentSetup. The
+ * nested form this class first used (bidiGenerateContentSetup.setup) is refused by Google with HTTP 400 ('Unknown
+ * name "setup" at auth_token.bidi_generate_content_setup'), which made every Live start fall back to the regular
+ * voice mode; the flat form with the fieldMask below returns HTTP 200 and a token. Everything that could be wrong is
+ * in this class, so a live check that fails is fixed here and in its test, nowhere else.
  *
  * Pure functions apart from call(), which tests short-circuit with $test_http_response.
  *
@@ -127,7 +127,7 @@ class gemini_live_token {
             'uses' => 1,
             'expireTime' => self::rfc3339($now + $maxsessionseconds + self::EXPIRY_GRACE),
             'newSessionExpireTime' => self::rfc3339($now + self::NEW_SESSION_WINDOW),
-            'bidiGenerateContentSetup' => ['setup' => $setup],
+            'bidiGenerateContentSetup' => $setup,
             'fieldMask' => implode(',', self::LOCKED_FIELDS),
         ];
     }
