@@ -116,7 +116,10 @@ final class voice_gemini_live_test extends \advanced_testcase {
         $this->assertSame(1, $req['uses']);
         $this->assertSame('2026-11-21T10:01:00Z', $req['newSessionExpireTime'], 'one minute to start the session');
         $this->assertSame('2026-11-21T10:10:30Z', $req['expireTime'], 'dies 30 s after the session cap');
-        $setup = $req['bidiGenerateContentSetup']['setup'];
+        // Google refuses a nested "setup" (HTTP 400 'Unknown name "setup"', seen live 2026-11-23): the settings sit
+        // directly under bidiGenerateContentSetup.
+        $this->assertArrayNotHasKey('setup', $req['bidiGenerateContentSetup'], 'no nested setup key');
+        $setup = $req['bidiGenerateContentSetup'];
         $this->assertSame('models/gemini-3.8-live', $setup['model']);
         $this->assertSame(['AUDIO'], $setup['generationConfig']['responseModalities']);
         $this->assertSame('Kore', $setup['generationConfig']['speechConfig']['voiceConfig']['prebuiltVoiceConfig']['voiceName']);

@@ -83,7 +83,8 @@ final class gemini_live_token_endpoint_test extends \advanced_testcase {
 
         // The grounded prompt went to Google inside the locked token request instead.
         $req = gemini_live_token::$last_request;
-        $setup = $req['bidiGenerateContentSetup']['setup'];
+        $this->assertArrayNotHasKey('setup', $req['bidiGenerateContentSetup'], 'no nested setup key (Google answers 400)');
+        $setup = $req['bidiGenerateContentSetup'];
         $this->assertStringContainsString('Biology Zeta Course', $setup['systemInstruction']['parts'][0]['text']);
         $this->assertStringContainsString('## Voice mode', $setup['systemInstruction']['parts'][0]['text']);
         $this->assertStringNotContainsString('<|im_start|>', $setup['systemInstruction']['parts'][0]['text'],

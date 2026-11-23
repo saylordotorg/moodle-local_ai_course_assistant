@@ -94,7 +94,8 @@ final class voice_idle_test extends \advanced_testcase {
         $this->assertStringContainsString('migrate_old_gemini_live_default()', $upgrade);
 
         $version = file_get_contents($CFG->dirroot . '/local/ai_course_assistant/version.php');
-        $this->assertStringContainsString('2026112200', $version, 'the step runs at this build');
+        $this->assertSame(1, preg_match('/\$plugin->version\s*=\s*(\d{10})/', $version, $m));
+        $this->assertGreaterThanOrEqual(2026112200, (int) $m[1], 'the step runs at this build or later');
 
         $settings = file_get_contents($CFG->dirroot . '/local/ai_course_assistant/settings.php');
         $this->assertStringContainsString("'local_ai_course_assistant/voice_idle_seconds'", $settings);
