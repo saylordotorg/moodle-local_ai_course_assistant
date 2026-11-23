@@ -872,6 +872,12 @@ class hook_callbacks {
             'quizcoachmode'      => $quizcoachmode,
             'quizcmid'           => $quizcmid,
             'realtimeenabled'         => $realtimeenabled,
+            // 8.3.1: the silence limit of the regular and OpenAI/xAI voice modes (Gemini Live gets its own from the token)
+            // and the words for the Resume prompt shown when a voice mode stops listening.
+            'voiceidleseconds'        => \local_ai_course_assistant\voice\voice_idle::seconds(),
+            'voiceidlestopped'        => get_string('voice:idle_stopped', 'local_ai_course_assistant'),
+            'voiceresume'             => get_string('voice:resume', 'local_ai_course_assistant'),
+            'voiceresumearia'         => get_string('voice:resume_aria', 'local_ai_course_assistant'),
             'ellpronunciationenabled' => $realtimeenabled,
             'talkingavatarenabled'    => $talkingavatarenabled,
             'ttsurl'             => $ttsurl,

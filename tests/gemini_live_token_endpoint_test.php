@@ -76,7 +76,7 @@ final class gemini_live_token_endpoint_test extends \advanced_testcase {
         $this->assertSame('gemini-3.8-live', $result['model']);
         $this->assertSame('Puck', $result['voice']);
         $this->assertSame(600, $result['maxseconds']);
-        $this->assertSame(90, $result['idleseconds']);
+        $this->assertSame(5, $result['idleseconds']);
         $this->assertStringNotContainsString(self::KEY, json_encode($result), 'the site key never reaches the browser');
         $this->assertStringNotContainsString('Biology Zeta Course', $result['instructions'],
             'the grounded prompt is not handed to the browser');

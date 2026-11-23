@@ -106,6 +106,49 @@ define([], function() {
     var SESSION_WARN_MS = SESSION_CAP_MS - 60 * 1000;
 
     /** Control tags that may ride along the text channel but must never display. */
+    /**
+     * Citation and source markers ([[c:1]], [SOURCE:activity:522]) never reach the transcript (8.3.1). A marker
+     * arrives over several chunks, so a partly arrived one is held back. push() takes the next chunk and returns
+     * the text to show, or ''.
+     *
+     * @return {{push: function(string): string}}
+     */
+    var makeMarkerFilter = function() {
+        var markerRe = /\s*(?:\[\[c:\d+\]\]|\[{1,3}SOURCE:[^[\]]*\]{1,3})/gi;
+        var prefixRe = /^\[{1,3}(?:c(?::\d*)?|S(?:O(?:U(?:R(?:C(?:E(?::[^[\]]*)?)?)?)?)?)?)?\]{0,2}$/i;
+        var raw = '';
+        var emitted = 0;
+        return {
+            push: function(chunk) {
+                raw += chunk;
+                var end = raw.length;
+                var i = raw.lastIndexOf('[');
+                if (i !== -1) {
+                    while (i > 0 && raw.charAt(i - 1) === '[') {
+                        i--;
+                    }
+                    if (prefixRe.test(raw.slice(i))) {
+                        end = i;
+                    }
+                }
+                var clean = raw.slice(0, end).replace(markerRe, '').replace(/\s+$/, '');
+                if (clean.length <= emitted) {
+                    return '';
+                }
+                var out = clean.slice(emitted);
+                emitted = clean.length;
+                return out;
+            }
+        };
+    };
+
+    var markerFilter = makeMarkerFilter();
+    /** Seconds of silence before listening stops (8.3.1: the server sends the configured value, default 10). */
+    var idleSeconds = 10;
+    var idleTimer = null;
+    var lastActivityMs = 0;
+    var onIdleStopCb = null;
+
     var TRANSCRIPT_TAGS = ['[SOLA_NEXT]', '[SOURCE'];
 
     /**
@@ -376,6 +419,7 @@ define([], function() {
                 var rms = Math.sqrt(sum / raw.length);
 
                 if (rms >= SPEECH_THRESHOLD) {
+                    lastActivityMs = Date.now();
                     if (!speechActive) {
                         // Flush pre-speech buffer first to avoid clipping utterance start.
                         for (var pi = 0; pi < prefillBuffer.length; pi++) {
@@ -512,7 +556,11 @@ define([], function() {
                     // a bare "[" never flashes before the full marker arrives.
                     var cleanEnd = safeTranscriptEnd(assistantTranscript);
                     if (cleanEnd > transcriptEmitted && onTranscriptCb) {
-                        onTranscriptCb('assistant', assistantTranscript.slice(transcriptEmitted, cleanEnd));
+                        // 8.3.1: citation markers ([[c:1]]) never show either.
+                        var shownText = markerFilter.push(assistantTranscript.slice(transcriptEmitted, cleanEnd));
+                        if (shownText) {
+                            onTranscriptCb('assistant', shownText);
+                        }
                     }
                     transcriptEmitted = cleanEnd;
                 }
@@ -523,6 +571,7 @@ define([], function() {
                 break;
 
             case 'conversation.item.input_audio_transcription.completed':
+                lastActivityMs = Date.now();
                 if (msg.transcript && onTranscriptCb) {
                     onTranscriptCb('user', msg.transcript);
                 }
@@ -538,6 +587,7 @@ define([], function() {
                     if (greetingFallbackTimer) { clearTimeout(greetingFallbackTimer); greetingFallbackTimer = null; }
                     assistantTranscript = '';
                     transcriptEmitted = 0;
+                    markerFilter = makeMarkerFilter();
                     break;
                 }
                 // v5.3.5: parse SOLA_NEXT chips out of the assistant transcript.
@@ -579,6 +629,7 @@ define([], function() {
                 }
                 assistantTranscript = '';
                 transcriptEmitted = 0;
+                markerFilter = makeMarkerFilter();
                 break;
 
             case 'error':
@@ -620,10 +671,13 @@ define([], function() {
         onStateChangeCb = callbacks.onStateChange  || null;
         onErrorCb       = callbacks.onError        || null;
         onSuggestionsCb = callbacks.onSuggestions  || null;
+        onIdleStopCb    = callbacks.onIdleStop     || null;
+        idleSeconds     = Number(callbacks.idleSeconds) > 0 ? Number(callbacks.idleSeconds) : 10;
         fallbackChips = (callbacks.fallbackChips && callbacks.fallbackChips.length)
             ? callbacks.fallbackChips.slice() : null;
         assistantTranscript = '';
         transcriptEmitted = 0;
+        markerFilter = makeMarkerFilter();
         awaitingGreeting = false;
         micHot = false;
         if (greetingFallbackTimer) { clearTimeout(greetingFallbackTimer); greetingFallbackTimer = null; }
@@ -738,6 +792,26 @@ define([], function() {
                 }
             }, 10000);
 
+            // ── Silence limit (8.3.1) ──
+            // While the model is answering, or the opening greeting is still playing, nobody is idle: the
+            // clock is held at zero, so the count starts when the model stops. After idleSeconds of silence
+            // the mic stops, the session closes (no more spend) and the owner offers a Resume button.
+            lastActivityMs = Date.now();
+            if (idleTimer) { clearInterval(idleTimer); }
+            idleTimer = setInterval(function() {
+                if (!ws || ws.readyState !== WebSocket.OPEN) { return; }
+                if (!micHot || responseActive || currentSource || awaitingGreeting || currentState === 'speaking') {
+                    lastActivityMs = Date.now();
+                    return;
+                }
+                if (Date.now() - lastActivityMs > idleSeconds * 1000) {
+                    if (onIdleStopCb) {
+                        onIdleStopCb();
+                    }
+                    disconnect();
+                }
+            }, 250);
+
             // ── 15-minute session cap ──
             // Warn at 14 min, auto-disconnect at 15 min to control API costs.
             sessionWarnTimer = setTimeout(function() {
@@ -786,6 +860,8 @@ define([], function() {
                 }
                 onErrorCb(reason);
             }
+            // The socket is gone: nothing is left to stop for silence.
+            if (idleTimer) { clearInterval(idleTimer); idleTimer = null; }
             setState('disconnected');
         });
     };
@@ -798,6 +874,7 @@ define([], function() {
         // asynchronously after ws.close() never surfaces a spurious error message
         // (e.g. code 1005 / 1000) for intentional disconnects.
         onErrorCb = null;
+        if (idleTimer) { clearInterval(idleTimer); idleTimer = null; }
         responseActive = false;
         fallbackChips = null;
         awaitingGreeting = false;
@@ -958,5 +1035,6 @@ define([], function() {
         sendText: sendText,
         ELL_INSTRUCTIONS: ELL_INSTRUCTIONS,
         ellInstructions: ellInstructions,
+        _test: {makeMarkerFilter: makeMarkerFilter},
     };
 });
