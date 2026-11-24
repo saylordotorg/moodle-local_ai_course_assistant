@@ -538,6 +538,81 @@ final class answer_rules_test extends \advanced_testcase {
         }
     }
 
+    public function test_happy_to_grants_and_grants_despite_the_instructor_block(): void {
+        // Review round 5.
+        $grants = [
+            "Sure, I'm happy to give you an extension on the assignment.",
+            "I am happy to grant you an extension on the paper.",
+            "I've given you an extra week as an extension on the essay",
+            "I've granted you an extension on the essay, even if your instructor says otherwise.",
+            "We're glad to approve an extension for your project.",
+            "I'm happy to extend your essay deadline.",
+        ];
+        foreach ($grants as $reply) {
+            $r = $this->extension_reply($reply);
+            $this->assertSame('block', $r['action'], $reply);
+            $this->assertSame(answer_rules::safe_message('deadlines'), $r['text'], $reply);
+        }
+        $happy = $this->extension_reply("Sure, I'm happy to give you an extension on the assignment.");
+        $this->assertContains('deadlines.extension_granted_progressive', $happy['rules']);
+        $fine = [
+            "I'd be happy to give you an extension, but I can't",
+            "I'm not able to grant an extension on the essay",
+            "I'd be happy to give you an extension on the essay, but I can't.",
+            "I'm not happy to give you an extension on the essay.",
+            "I've given you feedback. Ask about an extension on the essay.",
+            "I'm happy to give you an extension on the essay if your instructor approves.",
+        ];
+        foreach ($fine as $reply) {
+            $r = $this->extension_reply($reply);
+            $this->assertSame('none', $r['action'], $reply . ' rules: ' . implode(',', $r['rules']));
+        }
+    }
+
+    public function test_round_5_crisis_wordings_are_wellbeing_and_kilometres_are_not(): void {
+        $crisis = [
+            "I want everything to end",
+            "I want it all to end",
+            "I just want everything to end",
+            "I can't keep living like this",
+            "I can't living like this",
+            "I can't live like this anymore",
+            "I don't want to live like this anymore",
+            "i wanna kms",
+            "I'm going to kms",
+            "I'm thinking about taking all my pills",
+            "There's no reason to keep living",
+            "I have a plan to end it",
+            "I've stockpiled my meds",
+            "gonna kms lol",
+            "I've been saving up my pills",
+        ];
+        foreach ($crisis as $question) {
+            $this->assertContains('wellbeing', answer_rules::categories_for_question($question), $question);
+            $r = answer_rules::evaluate('Here is a study tip.', ['question' => $question, 'mode' => 'enforce']);
+            $this->assertSame('block', $r['action'], $question);
+            $this->assertSame(answer_rules::safe_message('wellbeing'), $r['text'], $question);
+        }
+        $coursework = [
+            "the road is 40 kms long",
+            "10 kms in 2 hours",
+            "I want to disappear for the weekend and just study",
+            "I want to vanish the bug from my code",
+            "I want it to stop loading",
+            "I want it to stop showing the error",
+            "I want it to stop happening in my code",
+            "I'm done with everything on the checklist",
+            "I ran 10 kms today",
+            "I have a plan to end it with a strong conclusion",
+            "I take all my pills every morning",
+            "I want everything to end on time for the presentation",
+            "I'm done with everything in this module",
+        ];
+        foreach ($coursework as $question) {
+            $this->assertNotContains('wellbeing', answer_rules::categories_for_question($question), $question);
+        }
+    }
+
     public function test_default_rules_are_valid_patterns_with_unique_ids(): void {
         $ids = [];
         foreach (answer_rules::default_rules() as $rule) {
