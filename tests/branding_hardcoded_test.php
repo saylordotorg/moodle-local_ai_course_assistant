@@ -152,11 +152,11 @@ final class branding_hardcoded_test extends \advanced_testcase {
     }
 
     public function test_the_prompt_leak_scrub_catches_a_rebranded_identity_line(): void {
-        // sse.php is an endpoint and can't be included, so read the scrub
+        // The scrub lives in classes/response_safety.php (moved out of sse.php in 8.4.0); read the
         // pattern from its source and run it.
-        $src = file_get_contents(__DIR__ . '/../sse.php');
+        $src = file_get_contents(__DIR__ . '/../classes/response_safety.php');
         $this->assertSame(1, preg_match("~'(/You are [^']*Online Learning Assistant[^']*)',~", $src, $m),
-            'the identity-line scrub pattern is missing from sse.php');
+            'the identity-line scrub pattern is missing from response_safety.php');
         $pattern = $m[1];
         foreach (['SOLA', 'Atlas', 'Example Tutor'] as $name) {
             $this->assertSame(1, preg_match($pattern, "You are {$name} (Online Learning Assistant), an AI coach"),
