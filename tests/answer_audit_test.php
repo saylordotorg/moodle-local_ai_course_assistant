@@ -88,6 +88,7 @@ final class answer_audit_test extends \advanced_testcase {
 
     protected function tearDown(): void {
         answer_audit::$locktimeout = answer_audit::DEFAULT_LOCK_TIMEOUT;
+        answer_audit::$beforeredact = null;
         parent::tearDown();
     }
 
@@ -838,5 +839,98 @@ final class answer_audit_test extends \advanced_testcase {
         $this->assert_redacted($orphan2, 'userlist erasure reaches rows with no conversation');
         $this->assert_live($keep['auditid'], 'a course outside the userlist context');
         $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $c2->id));
+    }
+
+    // Task 2 review round 1.
+
+    public function test_course_deletion_redacts_before_the_messages_go(): void {
+        global $DB;
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $a = $this->answered((int) $user->id, (int) $course->id);
+        $courseid = (int) $course->id;
+
+        // What still exists at the moment the observer redacts.
+        $seen = null;
+        answer_audit::$beforeredact = function() use (&$seen, $courseid) {
+            global $DB;
+            if ($seen === null) {
+                $seen = [
+                    'msgs' => $DB->count_records('local_ai_course_assistant_msgs', ['courseid' => $courseid]),
+                    'convs' => $DB->count_records('local_ai_course_assistant_convs', ['courseid' => $courseid]),
+                ];
+            }
+        };
+
+        delete_course($course->id, false);
+
+        $this->assertNotNull($seen, 'the observer must redact');
+        $this->assertSame(2, $seen['msgs'], 'redaction must run while the messages still exist');
+        $this->assertSame(1, $seen['convs'], 'and while the conversation still exists');
+        $this->assert_redacted($a['auditid']);
+        $this->assertSame(0, $DB->count_records('local_ai_course_assistant_msgs', ['courseid' => $courseid]));
+    }
+
+    public function test_cap_trim_survives_a_redaction_failure(): void {
+        global $DB;
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $first = $this->answered((int) $user->id, (int) $course->id, 'First');
+        $convid = (int) $first['conv']->id;
+        for ($i = 0; $i < 49; $i++) {
+            conversation_manager::add_message($convid, (int) $user->id, (int) $course->id, 'user', "q $i");
+            conversation_manager::add_message($convid, (int) $user->id, (int) $course->id, 'assistant', "a $i");
+        }
+        $this->assertSame(100, $DB->count_records('local_ai_course_assistant_msgs', ['conversationid' => $convid]));
+
+        // Redaction fails on the turn that goes over the cap.
+        answer_audit::$beforeredact = function() {
+            throw new \dml_write_exception('simulated audit failure');
+        };
+        $id = conversation_manager::add_message($convid, (int) $user->id, (int) $course->id, 'user', 'over the cap');
+        $this->assertDebuggingCalled();
+        $this->assertGreaterThan(0, $id, 'add_message still returns the new id');
+        $this->assertTrue($DB->record_exists('local_ai_course_assistant_msgs', ['id' => $id]));
+        $this->assertSame(101, $DB->count_records('local_ai_course_assistant_msgs', ['conversationid' => $convid]),
+            'no message is deleted without its audit text being redacted');
+        $this->assertTrue($DB->record_exists('local_ai_course_assistant_msgs', ['id' => $first['msgid']]));
+        $this->assert_live($first['auditid']);
+
+        // The next turn, with the audit healthy again, trims the backlog as normal.
+        answer_audit::$beforeredact = null;
+        conversation_manager::add_message($convid, (int) $user->id, (int) $course->id, 'assistant', 'next');
+        $this->assertSame(100, $DB->count_records('local_ai_course_assistant_msgs', ['conversationid' => $convid]));
+        $this->assertFalse($DB->record_exists('local_ai_course_assistant_msgs', ['id' => $first['msgid']]));
+        $this->assert_redacted($first['auditid'], 'trimmed on the next successful turn');
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $course->id));
+    }
+
+    public function test_redact_for_conversations_chunks_like_the_single_call(): void {
+        global $DB;
+        $a = answer_audit::record($this->row(7, ['conversationid' => 11, 'messageid' => 1]));
+        $b = answer_audit::record($this->row(7, ['conversationid' => 12, 'messageid' => 2]));
+        $c = answer_audit::record($this->row(7, ['conversationid' => 900, 'messageid' => 3]));
+        $keep = answer_audit::record($this->row(7, ['conversationid' => 1001, 'messageid' => 4]));
+        $vid = answer_audit::append_verdict($c, ['status' => 'warn',
+            'claims' => [['text' => 'Drop me', 'type' => 'fact', 'status' => 'unsupported']]]);
+
+        // Ids 1..1000 span two chunks of 500; 900 and its verdict are in the second. Duplicates and zero ignored.
+        $ids = array_merge(range(1, 1000), [11, 0]);
+        $queries = [];
+        answer_audit::$beforeredact = function($select) use (&$queries) {
+            $queries[] = $select;
+        };
+        $this->assertSame(4, answer_audit::redact_for_conversations($ids));
+        $this->assertCount(2, $queries, 'one query per chunk of 500, not one per conversation');
+
+        foreach ([$a, $b, $c, $vid] as $id) {
+            $this->assertEquals(1, $DB->get_field(self::TABLE, 'redacted', ['id' => $id]));
+        }
+        $this->assertStringNotContainsString('Drop me', $DB->get_field(self::TABLE, 'claims', ['id' => $vid]));
+        $this->assertEquals(0, $DB->get_field(self::TABLE, 'redacted', ['id' => $keep]));
+        $this->assertSame(0, answer_audit::redact_for_conversations([]));
+        $this->assertSame(0, answer_audit::redact_for_conversations([11]), 'already redacted');
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain(7));
     }
 }

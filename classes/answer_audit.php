@@ -69,6 +69,13 @@ class answer_audit {
     /** @var int Seconds record() waits for the course lock (tests lower it). */
     public static int $locktimeout = self::DEFAULT_LOCK_TIMEOUT;
 
+    /**
+     * @var \Closure|null Test seam: called at the start of every redaction with ($select, $params), before any
+     *     row is changed. Tests use it to see what still exists when redaction runs, or to make it fail. Never
+     *     set outside tests.
+     */
+    public static ?\Closure $beforeredact = null;
+
     /** @var string[] Verdict statuses. */
     public const STATUSES = ['ok', 'warn', 'blocked', 'needs_review', 'check_failed'];
 
@@ -232,6 +239,26 @@ class answer_audit {
         foreach (array_chunk($msgids, 500) as $chunk) {
             [$in, $params] = $DB->get_in_or_equal($chunk);
             $total += self::redact_where("messageid $in", $params);
+        }
+        return $total;
+    }
+
+    /**
+     * Redact the rows of many conversations, in chunks of 500 (the retention task's bulk path).
+     *
+     * @param int[] $convids
+     * @return int rows redacted
+     */
+    public static function redact_for_conversations(array $convids): int {
+        global $DB;
+        $convids = array_values(array_unique(array_filter(array_map('intval', $convids))));
+        if (!$convids) {
+            return 0;
+        }
+        $total = 0;
+        foreach (array_chunk($convids, 500) as $chunk) {
+            [$in, $params] = $DB->get_in_or_equal($chunk);
+            $total += self::redact_where("conversationid $in", $params);
         }
         return $total;
     }
@@ -464,6 +491,9 @@ class answer_audit {
      */
     private static function redact_where(string $select, array $params): int {
         global $DB;
+        if (self::$beforeredact) {
+            (self::$beforeredact)($select, $params);
+        }
         $count = 0;
         $now = time();
         $rs = $DB->get_recordset_select(self::TABLE, "redacted = 0 AND $select", $params, 'id ASC', 'id, claims');

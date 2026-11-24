@@ -226,9 +226,17 @@ class conversation_manager {
             );
             if (!empty($oldest)) {
                 // 8.4.0: the answer audit loses the text of a trimmed answer before the answer itself goes.
-                answer_audit::redact_for_messages(array_keys($oldest));
-                [$insql, $inparams] = $DB->get_in_or_equal(array_keys($oldest));
-                $DB->delete_records_select('local_ai_course_assistant_msgs', "id {$insql}", $inparams);
+                // The new message is already stored, so nothing here may throw out of add_message (callers
+                // need the id). If redaction fails the trim is skipped for this turn (never delete without
+                // redacting); the next message's trim covers the backlog, since it removes every row over 100.
+                try {
+                    answer_audit::redact_for_messages(array_keys($oldest));
+                    [$insql, $inparams] = $DB->get_in_or_equal(array_keys($oldest));
+                    $DB->delete_records_select('local_ai_course_assistant_msgs', "id {$insql}", $inparams);
+                } catch (\Throwable $e) {
+                    debugging('SOLA: conversation cap trim skipped for conversation ' . $conversationid
+                        . ' (answer audit redaction failed): ' . get_class($e), DEBUG_DEVELOPER);
+                }
             }
         }
 

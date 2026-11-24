@@ -111,6 +111,18 @@ class observer {
             return;
         }
 
+        // The answer audit ('local_ai_course_assistant_answer_audit') keeps its rows and loses its text. FIRST,
+        // before anything below deletes messages or conversations: if the request dies part way (a timeout on a
+        // big course), the text must already be gone, because once the course is gone nothing reaches it again.
+        try {
+            answer_audit::redact_for_course($courseid);
+        } catch (\Throwable $e) {
+            debugging(
+                "SOLA: could not redact the answer audit for deleted course {$courseid}: " . $e->getMessage(),
+                DEBUG_DEVELOPER
+            );
+        }
+
         // Media before rows. The generic sweep below deletes sbx_rec rows, and
         // soapbox_cleanup finds expired media by walking exactly those rows, so
         // deleting them first stranded every recording, slide deck and frame
@@ -178,16 +190,6 @@ class observer {
                     DEBUG_DEVELOPER
                 );
             }
-        }
-
-        // The answer audit ('local_ai_course_assistant_answer_audit') keeps its rows and loses its text.
-        try {
-            answer_audit::redact_for_course($courseid);
-        } catch (\Throwable $e) {
-            debugging(
-                "SOLA: could not redact the answer audit for deleted course {$courseid}: " . $e->getMessage(),
-                DEBUG_DEVELOPER
-            );
         }
 
         // The sweep above deletes this course's RAG chunks, so the cached vector
