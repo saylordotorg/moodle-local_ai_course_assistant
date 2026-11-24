@@ -74,6 +74,12 @@
 - [ ] Step 1: Tests: `test_send_message_answer_is_recorded_when_mode_on`, `test_send_message_block_rule_replaces_the_returned_text`, `test_send_message_mode_off_changes_nothing`, `test_send_message_record_failure_does_not_break_the_answer`.
 - [ ] Step 2: FAIL. Step 3: Because the answer is returned whole, apply rules before returning (block/correct/warn directly, no `replace` event); call `record_answer` after the save, wrapped in try/catch on `\Throwable`; queue the claim check as in Task 6. Step 4: PASS. Step 5: Commit.
 
+### Task 5c: Output scrub on the send_message path
+**Files:** Create `classes/response_safety.php`; modify `sse.php` (call through a thin wrapper), `classes/external/send_message.php`, `tests/response_safety_test.php`, `tests/send_message_service_test.php`.
+**Interfaces:** Produces `response_safety::filter(string $text): string` (the body of `local_ai_course_assistant_filter_response_safety` from `sse.php`, behavior unchanged); `sse.php` keeps `local_ai_course_assistant_filter_response_safety()` as a wrapper so existing callers and tests keep working.
+- [ ] Step 1: Tests: the existing sse.php scrub cases pass through the class unchanged (leaked prompt fragment, PII pattern, credential pattern); `test_send_message_scrubs_leaked_prompt_and_credentials_before_saving` (stored == returned == scrubbed); `test_send_message_retry_text_is_scrubbed_too`.
+- [ ] Step 2: FAIL. Step 3: Move the function body into the class; call it in `send_message` after `protocol_markers::strip()` and inside the retry closure, mirroring `sse.php`. Step 4: PASS. Step 5: Commit.
+
 ### Task 6: Claim check task
 **Files:** Create `classes/claim_checker.php`, `classes/task/check_answer_claims.php`, `tests/claim_checker_test.php`, `tests/task/check_answer_claims_test.php`; modify `sse.php` (queue after record), `classes/analytics.php`, `settings.php`.
 **Interfaces:** `claim_checker::judge(string $question, string $answer, array $chunks, int $courseid): array{claims: array, status: string, severity: string}`; `claim_checker::severity_for(array $claim, array $categories): string`; task custom data `['auditid' => int]`; settings `answer_check_sample_percent` (default 100 with retrieval, 10 without) and `answer_check_model`/provider reuse the `mastery_classifier_*` resolution pattern.
