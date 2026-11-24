@@ -1,0 +1,246 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/answer_audit
+
+    The answer audit page (8.4.0): chain status, filter form, export links, the list of recorded answers, one
+    answer in detail, and the counts report. Every value is plain text and escaped here; nothing is triple-stached.
+
+    Context variables required for this template:
+    * formaction string - URL the GET filter form submits to.
+    * courseid int - Course id for the hidden form field.
+    * verdictoptions array - value, label, selected.
+    * ruleoptions array - value, label, selected.
+    * from string - YYYY-MM-DD or empty.
+    * to string - YYYY-MM-DD or empty.
+    * chainok bool - Whether the course's hash chain verified.
+    * chaintext string - The chain status line.
+    * csvurl string - CSV export URL (with sesskey).
+    * jsonurl string - JSON export URL (with sesskey).
+    * hasrows bool
+    * rows array - id, time, learner, activity, verdict, rules, redacted, question, detailurl.
+    * rowcount string
+    * hasdetail bool
+    * detail object - see answer_audit_report::detail().
+    * hastopics bool
+    * topics array - topic, not_in_course, contradicted, total.
+    * hasrulesreport bool
+    * rulesreport array - rule, hits, hitrate, reviewed, falsealarms, falsealarmrate.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Tom Caswell & David Ta / Saylor University
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "formaction": "https://example.com/local/ai_course_assistant/answer_audit.php?courseid=2",
+        "courseid": 2,
+        "verdictoptions": [{"value": "", "label": "Any", "selected": true}],
+        "ruleoptions": [{"value": "", "label": "Any", "selected": true}],
+        "from": "",
+        "to": "",
+        "chainok": true,
+        "chaintext": "The audit trail checks out.",
+        "csvurl": "#",
+        "jsonurl": "#",
+        "hasrows": true,
+        "rows": [{"id": 7, "time": "24/11/26, 10:00", "learner": "Student 12", "activity": "Unit 1",
+            "verdict": "Needs review", "rules": "deadlines.date:warn", "redacted": false,
+            "question": "When is the final due?", "detailurl": "#"}],
+        "rowcount": "1 answer.",
+        "hasdetail": false,
+        "hastopics": true,
+        "topics": [{"topic": "Unit 1", "not_in_course": 2, "contradicted": 1, "total": 3}],
+        "hasrulesreport": true,
+        "rulesreport": [{"rule": "deadlines.date", "hits": 4, "hitrate": "10.0%", "reviewed": 2, "falsealarms": 1,
+            "falsealarmrate": "50.0%"}]
+    }
+}}
+<div class="local-ai-course-assistant-answer-audit">
+    <p class="text-muted">{{#str}}answeraudit:intro, local_ai_course_assistant{{/str}}</p>
+
+    <div class="alert {{#chainok}}alert-success{{/chainok}}{{^chainok}}alert-danger{{/chainok}}" role="status">
+        {{chaintext}}
+    </div>
+
+    {{#hasdetail}}
+    {{#detail}}
+    <section class="mb-4" aria-labelledby="aica-aa-detail">
+        <h3 id="aica-aa-detail">{{#str}}answeraudit:detail_heading, local_ai_course_assistant, {{id}}{{/str}}</h3>
+        <p><a href="{{backurl}}">{{#str}}answeraudit:back, local_ai_course_assistant{{/str}}</a></p>
+        <dl class="row">
+            <dt class="col-sm-3">{{#str}}answeraudit:col_time, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9">{{time}}</dd>
+            <dt class="col-sm-3">{{#str}}answeraudit:col_learner, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9">{{learner}}</dd>
+            <dt class="col-sm-3">{{#str}}answeraudit:col_activity, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9">{{activity}}</dd>
+            <dt class="col-sm-3">{{#str}}answeraudit:model, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9">{{provider}} {{model}} {{mode}}</dd>
+            <dt class="col-sm-3">{{#str}}answeraudit:question, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9 aica-id-prewrap">{{#hasquestion}}{{question}}{{/hasquestion}}{{^hasquestion}}<em>{{#str}}answeraudit:text_removed, local_ai_course_assistant{{/str}}</em>{{/hasquestion}}</dd>
+            <dt class="col-sm-3">{{#str}}answeraudit:answer, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9 aica-id-prewrap">{{#hasanswer}}{{answer}}{{/hasanswer}}{{^hasanswer}}<em>{{#str}}answeraudit:text_removed, local_ai_course_assistant{{/str}}</em>{{/hasanswer}}</dd>
+            <dt class="col-sm-3">{{#str}}answeraudit:categories, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9">{{categories}}</dd>
+            <dt class="col-sm-3">{{#str}}answeraudit:col_rules, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9">{{rules}}</dd>
+            <dt class="col-sm-3">{{#str}}answeraudit:validators, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9">{{validators}}</dd>
+            <dt class="col-sm-3">{{#str}}answeraudit:citations, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9">{{citations}}</dd>
+            <dt class="col-sm-3">{{#str}}answeraudit:passages, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9">
+                {{#haspassages}}<ul class="list-unstyled mb-0">{{#passages}}<li>{{activity}} ({{score}})</li>{{/passages}}</ul>{{/haspassages}}
+                {{^haspassages}}{{#str}}answeraudit:none, local_ai_course_assistant{{/str}}{{/haspassages}}
+            </dd>
+            <dt class="col-sm-3">{{#str}}answeraudit:rowhash, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9"><code>{{rowhash}}</code></dd>
+        </dl>
+        <h4>{{#str}}answeraudit:verdicts, local_ai_course_assistant{{/str}}</h4>
+        {{^hasverdicts}}<p>{{#str}}answeraudit:status_unchecked, local_ai_course_assistant{{/str}}</p>{{/hasverdicts}}
+        {{#verdicts}}
+        <div class="border rounded p-2 mb-2">
+            <p class="mb-1"><strong>{{status}}</strong> {{severity}} &middot; {{time}} &middot; {{judge_model}}</p>
+            {{#rules}}<p class="mb-1">{{rules}}</p>{{/rules}}
+            {{#hasclaims}}
+            <table class="generaltable table-sm mb-0">
+                <thead><tr>
+                    <th scope="col">{{#str}}answeraudit:claim, local_ai_course_assistant{{/str}}</th>
+                    <th scope="col">{{#str}}answeraudit:claim_status, local_ai_course_assistant{{/str}}</th>
+                </tr></thead>
+                <tbody>
+                {{#claims}}
+                    <tr>
+                        <td>{{#hastext}}{{text}}{{/hastext}}{{^hastext}}<em>{{#str}}answeraudit:text_removed, local_ai_course_assistant{{/str}}</em>{{/hastext}}</td>
+                        <td>{{status}} {{type}} {{severity}}</td>
+                    </tr>
+                {{/claims}}
+                </tbody>
+            </table>
+            {{/hasclaims}}
+        </div>
+        {{/verdicts}}
+    </section>
+    {{/detail}}
+    {{/hasdetail}}
+
+    <form method="get" action="{{formaction}}" class="mb-3">
+        <input type="hidden" name="courseid" value="{{courseid}}">
+        <div class="form-row align-items-end">
+            <div class="col-auto mb-2">
+                <label for="aica-aa-verdict" class="d-block small">{{#str}}answeraudit:filter_verdict, local_ai_course_assistant{{/str}}</label>
+                <select id="aica-aa-verdict" name="verdict" class="custom-select">
+                    {{#verdictoptions}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/verdictoptions}}
+                </select>
+            </div>
+            <div class="col-auto mb-2">
+                <label for="aica-aa-rule" class="d-block small">{{#str}}answeraudit:filter_rule, local_ai_course_assistant{{/str}}</label>
+                <select id="aica-aa-rule" name="rule" class="custom-select">
+                    {{#ruleoptions}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/ruleoptions}}
+                </select>
+            </div>
+            <div class="col-auto mb-2">
+                <label for="aica-aa-from" class="d-block small">{{#str}}answeraudit:filter_from, local_ai_course_assistant{{/str}}</label>
+                <input type="date" id="aica-aa-from" name="from" value="{{from}}" class="form-control">
+            </div>
+            <div class="col-auto mb-2">
+                <label for="aica-aa-to" class="d-block small">{{#str}}answeraudit:filter_to, local_ai_course_assistant{{/str}}</label>
+                <input type="date" id="aica-aa-to" name="to" value="{{to}}" class="form-control">
+            </div>
+            <div class="col-auto mb-2">
+                <input type="submit" class="btn btn-primary" value="{{#str}}apply, core{{/str}}">
+            </div>
+        </div>
+    </form>
+
+    <p>
+        <a class="btn btn-secondary" href="{{csvurl}}">{{#str}}answeraudit:export_csv, local_ai_course_assistant{{/str}}</a>
+        <a class="btn btn-secondary" href="{{jsonurl}}">{{#str}}answeraudit:export_json, local_ai_course_assistant{{/str}}</a>
+    </p>
+
+    {{^hasrows}}<p>{{#str}}answeraudit:norows, local_ai_course_assistant{{/str}}</p>{{/hasrows}}
+    {{#hasrows}}
+    <table class="generaltable table-sm">
+        <thead>
+            <tr>
+                <th scope="col">{{#str}}answeraudit:col_time, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:col_learner, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:col_activity, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:col_verdict, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:col_rules, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:question, local_ai_course_assistant{{/str}}</th>
+                <th scope="col"><span class="sr-only">{{#str}}answeraudit:open, local_ai_course_assistant{{/str}}</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#rows}}
+            <tr>
+                <td>{{time}}</td>
+                <td>{{learner}}</td>
+                <td>{{activity}}</td>
+                <td>{{verdict}}</td>
+                <td>{{rules}}</td>
+                <td>{{#redacted}}<em>{{#str}}answeraudit:text_removed, local_ai_course_assistant{{/str}}</em>{{/redacted}}{{^redacted}}{{question}}{{/redacted}}</td>
+                <td><a href="{{detailurl}}">{{#str}}answeraudit:open, local_ai_course_assistant{{/str}}</a></td>
+            </tr>
+            {{/rows}}
+        </tbody>
+    </table>
+    {{/hasrows}}
+    <p class="text-muted small">{{rowcount}}</p>
+
+    <section class="mt-4" aria-labelledby="aica-aa-report">
+        <h3 id="aica-aa-report">{{#str}}answeraudit:report_heading, local_ai_course_assistant{{/str}}</h3>
+        <h4>{{#str}}answeraudit:topics_heading, local_ai_course_assistant{{/str}}</h4>
+        {{^hastopics}}<p>{{#str}}answeraudit:topics_none, local_ai_course_assistant{{/str}}</p>{{/hastopics}}
+        {{#hastopics}}
+        <table class="generaltable table-sm">
+            <thead><tr>
+                <th scope="col">{{#str}}answeraudit:col_activity, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:col_contradicted, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:col_not_in_course, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:col_total, local_ai_course_assistant{{/str}}</th>
+            </tr></thead>
+            <tbody>
+            {{#topics}}
+                <tr><td>{{topic}}</td><td>{{contradicted}}</td><td>{{not_in_course}}</td><td>{{total}}</td></tr>
+            {{/topics}}
+            </tbody>
+        </table>
+        {{/hastopics}}
+        <h4>{{#str}}answeraudit:rules_heading, local_ai_course_assistant{{/str}}</h4>
+        {{^hasrulesreport}}<p>{{#str}}answeraudit:rules_none, local_ai_course_assistant{{/str}}</p>{{/hasrulesreport}}
+        {{#hasrulesreport}}
+        <table class="generaltable table-sm">
+            <thead><tr>
+                <th scope="col">{{#str}}answeraudit:col_rule, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:col_hits, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:col_hitrate, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:col_reviewed, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:col_falsealarms, local_ai_course_assistant{{/str}}</th>
+                <th scope="col">{{#str}}answeraudit:col_falsealarmrate, local_ai_course_assistant{{/str}}</th>
+            </tr></thead>
+            <tbody>
+            {{#rulesreport}}
+                <tr><td>{{rule}}</td><td>{{hits}}</td><td>{{hitrate}}</td><td>{{reviewed}}</td><td>{{falsealarms}}</td><td>{{falsealarmrate}}</td></tr>
+            {{/rulesreport}}
+            </tbody>
+        </table>
+        {{/hasrulesreport}}
+    </section>
+</div>

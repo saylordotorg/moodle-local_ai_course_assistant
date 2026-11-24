@@ -197,9 +197,6 @@ final class settings_layout_map {
                     'audit_retention_days', 'conversation_retention_days',
                     'validators_runtime_mode', 'csp_course_pages_mode'
                 ]],
-                ['existing', 'answer_safety_heading', [
-                    'answer_safety_mode', 'answer_safety_rules', 'answer_safety_wellbeing_message'
-                ]],
             ],
         ],
         'cost' => [
@@ -276,11 +273,6 @@ final class settings_layout_map {
                     'backend_context_tokens', 'enable_thinking', 'ssrf_trusted_endpoints',
                     'xai_proxy_url', 'xai_proxy_jwt_secret'
                 ]],
-                // 8.4.0: the answer safety claim check's tuning (the mode itself is on the Safety page).
-                ['new', 'answercheck', [
-                    'answer_check_sample_percent_retrieved', 'answer_check_sample_percent_general',
-                    'answer_check_daily_cap', 'answer_check_provider', 'answer_check_model'
-                ]],
                 ['new', 'promptbudget', [
                     'prompt_budget_mode', 'prompt_budget_chars', 'prompt_budget_nowindow_warning',
                     'prompt_truncation_warning', 'current_page_content_maxchars', 'prompt_verbosity', 'prompt_debug_enabled',
@@ -310,6 +302,23 @@ final class settings_layout_map {
                 ['new', 'appearance', [
                     'display_mode', 'avatar_animation_enabled', 'position', 'avatar_color',
                     'avatar_fill'
+                ]],
+            ],
+        ],
+        // 8.4.0: one group for answer safety: the mode, rulebook and wellbeing wording, the claim check's tuning,
+        // and a link to the answer audit page. Off by default, so it sits under Advanced.
+        'adv_answer_safety' => [
+            'parent' => 'advanced',
+            'sections' => [
+                ['existing', 'answer_safety_heading', [
+                    'answer_safety_mode', 'answer_safety_rules', 'answer_safety_wellbeing_message'
+                ]],
+                ['new', 'answercheck', [
+                    'answer_check_sample_percent_retrieved', 'answer_check_sample_percent_general',
+                    'answer_check_daily_cap', 'answer_check_provider', 'answer_check_model'
+                ]],
+                ['new', 'answeraudit', [
+                    'answer_audit_link'
                 ]],
             ],
         ],

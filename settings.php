@@ -1715,6 +1715,16 @@ if ($hassiteconfig) {
         '',
         PARAM_TEXT
     ));
+    // 8.4.0: the answer audit page (answer_audit.php): a course picker when opened without a course.
+    $answerauditurl = new moodle_url('/local/ai_course_assistant/answer_audit.php');
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/answer_audit_link',
+        s(get_string('settings:answer_audit_link', 'local_ai_course_assistant')),
+        '<a href="' . $answerauditurl->out() . '" class="btn btn-sm btn-outline-secondary">'
+        . s(get_string('answeraudit:dashboard_link', 'local_ai_course_assistant')) . ' &rarr;</a>'
+        . '<p class="text-muted mt-1 sola-admin-blurb">'
+        . s(get_string('settings:answer_audit_link_desc', 'local_ai_course_assistant')) . '</p>'
+    ));
     // 8.4.0: the background claim check (claim_checker), for courses in Watch or Enforce. Deterministic sampling
     // by audit row; a site-wide daily cap on queued checks; the judge's provider and model resolve as the mastery
     // classifier's pair does (both set = that provider row, otherwise the course's chat provider).

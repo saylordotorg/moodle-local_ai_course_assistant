@@ -148,6 +148,12 @@ $nav = [
     ['url' => (new moodle_url('/local/ai_course_assistant/analytics.php', ['courseid' => $courseid, 'range' => $range]))->out(false),
      'label' => get_string('instructor_dashboard:nav_analytics', $strman)],
 ];
+// 8.4.0: the answer audit, shown once the course has recorded answers (answer safety on now or before).
+if ($DB->record_exists(\local_ai_course_assistant\answer_audit::TABLE, ['courseid' => $courseid, 'kind' => 'answer'])
+        || \local_ai_course_assistant\answer_audit::is_enabled($courseid)) {
+    $nav[] = ['url' => (new moodle_url('/local/ai_course_assistant/answer_audit.php', ['courseid' => $courseid]))->out(false),
+        'label' => get_string('answeraudit:dashboard_link', $strman)];
+}
 
 // Period selector options.
 $periodmap = [7 => '7d', 30 => '30d', 90 => '90d', 0 => get_string('instructor_dashboard:period_all', $strman)];

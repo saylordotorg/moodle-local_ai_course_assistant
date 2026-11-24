@@ -41,8 +41,9 @@ final class settings_layout_test extends \advanced_testcase {
     /** @var string[] The five task pages, in menu order. */
     private const TASK_PAGES = ['essentials', 'models', 'features', 'safety', 'cost'];
 
-    /** @var string[] The five Advanced pages, in menu order. */
-    private const ADVANCED_PAGES = ['adv_retrieval', 'adv_documents', 'adv_prompt', 'adv_integrations', 'adv_legacy'];
+    /** @var string[] The Advanced pages, in menu order (8.4.0 added adv_answer_safety). */
+    private const ADVANCED_PAGES = ['adv_retrieval', 'adv_documents', 'adv_prompt', 'adv_answer_safety',
+        'adv_integrations', 'adv_legacy'];
 
     /**
      * Settings that were in tests/fixtures/settings_defaults_snapshot.json and were deleted on purpose.
