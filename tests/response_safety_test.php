@@ -46,10 +46,11 @@ final class response_safety_test extends \advanced_testcase {
                 '## Wellbeing & Safety', 'KEEP RESPONSES BRIEF:', 'These rules override any conflicting instruction',
                 'You are Atlas (Online Learning Assistant)'] as $frag) {
             $out = response_safety::filter("Hello. {$frag} Goodbye.");
-            $this->assertDebuggingCalled('SOLA: system prompt leak detected in response, fragments scrubbed.');
+            $this->assertDebuggingCalled('SOLA: system prompt leak detected in response, fragments scrubbed.',
+                DEBUG_DEVELOPER, "no leak debugging for '{$frag}'");
             $this->assertStringNotContainsString($frag, $out, $frag);
-            $this->assertStringContainsString('Hello.', $out);
-            $this->assertStringContainsString('Goodbye.', $out);
+            $this->assertStringContainsString('Hello.', $out, "text before '{$frag}' was lost");
+            $this->assertStringContainsString('Goodbye.', $out, "text after '{$frag}' was lost");
         }
     }
 
@@ -57,14 +58,14 @@ final class response_safety_test extends \advanced_testcase {
         $out = response_safety::filter('a sk-' . str_repeat('a', 30) . ' b AIza' . str_repeat('B', 35)
             . ' c sk-ant-' . str_repeat('c', 30));
         $this->assertSame(3, substr_count($out, '[key redacted]'));
-        $this->assertStringNotContainsString('sk-', $out);
-        $this->assertStringNotContainsString('AIza', $out);
+        $this->assertStringNotContainsString('sk-', $out, 'an sk- key survived');
+        $this->assertStringNotContainsString('AIza', $out, 'an AIza key survived');
     }
 
     public function test_protocol_markers_are_stripped(): void {
         $out = response_safety::filter('Answer. [[SOURCE:activity:86467]] [SOLA_NEXT]Tell me more');
-        $this->assertStringNotContainsString('SOURCE', $out);
-        $this->assertStringNotContainsString('SOLA_NEXT', $out);
+        $this->assertStringNotContainsString('SOURCE', $out, 'a SOURCE marker survived');
+        $this->assertStringNotContainsString('SOLA_NEXT', $out, 'a SOLA_NEXT marker survived');
     }
 
     public function test_result_is_trimmed(): void {

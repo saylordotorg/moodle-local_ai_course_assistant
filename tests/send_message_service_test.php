@@ -480,20 +480,31 @@ final class send_message_service_test extends \advanced_testcase {
     public function test_send_message_runtime_guard_block_mode_still_wins(): void {
         global $DB;
         set_config('validators_runtime_mode', 'block', 'local_ai_course_assistant');
-        $leak = 'Here you go. My API key is sk-ant-' . str_repeat('a', 40) . '.';
+        // An AWS access key id: credential_leak_validator fails on it, and response_safety's three key regexes
+        // (sk-, sk-ant-, AIza) do not touch it, so the guard, not the scrub, is what must remove it.
+        $awskey = 'AKIA' . str_repeat('Q', 16);
+        $leak = 'Here you go. My access key id is ' . $awskey . '.';
+        $safe = "I generated a response but SOLA's safety review held it back (credential_leak). "
+            . "Could you try rephrasing your question, or ask a course instructor for help?";
         foreach (['off', 'enforce'] as $mode) {
             $DB->delete_records('local_ai_course_assistant_msgs');
             $this->use_stub($mode, [$leak]);
             $result = send_message::execute((int) $this->course->id, self::PLAIN_Q, 0);
             $this->assertTrue($result['success']);
-            $this->assertStringNotContainsString('sk-ant-', $result['response'], $mode . ': the guard replaced it');
-            $this->assertNotSame('', trim($result['response']));
+            // Mode off: runtime_guard's own fallback. Enforce: the failed validator is also a block rule, so the
+            // rules' general safe text is delivered over it.
+            $this->assertSame($mode === 'off' ? $safe : answer_rules::safe_message(answer_rules::VALIDATOR_CATEGORY),
+                $result['response'], $mode . ': block mode returns the safe fallback');
+            $this->assertStringNotContainsString($awskey, $result['response'], $mode);
             $this->assertSame($result['response'], $this->stored_answer()->message,
                 $mode . ': the returned and stored text agree');
         }
         $rows = $this->audit_rows();
         $this->assertCount(1, $rows, 'only the enforce turn is recorded');
-        $this->assertContains('credential_leak', array_column(json_decode((string) $rows[0]->validators, true), 'name'));
+        $byname = array_column(json_decode((string) $rows[0]->validators, true), 'severity', 'name');
+        $this->assertSame('fail', $byname['credential_leak'] ?? null, 'the credential_leak validator failed');
+        $this->assertStringNotContainsString($awskey, (string) $rows[0]->answer);
+        $this->assertContains(['id' => 'validator.credential_leak', 'action' => 'block'], $this->audit_rules($rows[0]));
     }
 
     public function test_send_message_wellbeing_question_in_enforce_returns_the_safe_text(): void {
