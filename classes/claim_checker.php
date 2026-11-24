@@ -320,23 +320,70 @@ class claim_checker {
      *     1-based passage number or 0
      */
     public static function judge(string $question, string $answer, array $chunks, int $courseid, int $userid = 0): array {
-        $out = ['claims' => [], 'status' => 'check_failed', 'severity' => 'low', 'question_wellbeing' => false,
+        try {
+            $provider = self::judge_provider($courseid);
+        } catch (\Throwable $e) {
+            debugging('claim_checker: judge failed: ' . get_class($e), DEBUG_DEVELOPER);
+            return self::failed_judgement();
+        }
+        return self::judge_with($provider, $question, $answer, $chunks,
+            static function($provider) use ($userid, $courseid): void {
+                // Logged right after the call, ahead of every early return: an unusable reply still cost money.
+                // The type is a literal on purpose: spend_predicate_coverage_test reads it from the call.
+                // Accepted: if the learner cleared the chat during the call, this ledger row recreates an empty
+                // conversation holding only the marker (no learner text), as the mastery classifier's row does.
+                conversation_manager::log_ancillary_usage($provider, $userid, $courseid, 'answer_check',
+                    '[Answer check] claims judged');
+            });
+    }
+
+    /**
+     * The judge's provider for a course (see resolve_provider()). Public for admin/cli/answer_safety_eval.php's
+     * --real mode; it builds the provider and never returns or prints a key.
+     *
+     * @param int $courseid
+     * @return \local_ai_course_assistant\provider\provider_interface
+     */
+    public static function judge_provider(int $courseid) {
+        return self::resolve_provider($courseid);
+    }
+
+    /**
+     * The result of a judgement that could not be made.
+     *
+     * @return array
+     */
+    private static function failed_judgement(): array {
+        return ['claims' => [], 'status' => 'check_failed', 'severity' => 'low', 'question_wellbeing' => false,
             'reason' => 'error', 'judge_model' => null, 'judge_cost' => null];
+    }
+
+    /**
+     * judge() with a given provider. Never throws. $aftercall runs right after the provider answers, before the reply
+     * is read (judge() logs the spend there); an exception from it is a check_failed like a provider failure.
+     * answer_safety_eval passes no $aftercall, so an evaluation writes no spend row.
+     *
+     * @param \local_ai_course_assistant\provider\provider_interface $provider
+     * @param string $question
+     * @param string $answer
+     * @param array $chunks as judge()
+     * @param callable|null $aftercall function(provider_interface $provider): void
+     * @return array as judge()
+     */
+    public static function judge_with($provider, string $question, string $answer, array $chunks,
+            ?callable $aftercall = null): array {
+        $out = self::failed_judgement();
         $chunks = array_values(array_slice(array_filter($chunks,
             static fn($c): bool => is_array($c) && trim((string) ($c['content'] ?? '')) !== ''), 0, self::MAX_CHUNKS));
         try {
-            $provider = self::resolve_provider($courseid);
             $response = $provider->chat_completion(
                 self::system_prompt($chunks !== []),
                 [['role' => 'user', 'content' => self::user_message($question, $answer, $chunks)]],
                 ['response_schema' => self::schema(), 'max_tokens' => 1500]
             );
-            // Logged right after the call, ahead of every early return: an unusable reply still cost money.
-            // The type is a literal on purpose: spend_predicate_coverage_test reads it from the call.
-            // Accepted: if the learner cleared the chat during the call, this ledger row recreates an empty
-            // conversation holding only the marker (no learner text), as the mastery classifier's row does.
-            conversation_manager::log_ancillary_usage($provider, $userid, $courseid, 'answer_check',
-                '[Answer check] claims judged');
+            if ($aftercall !== null) {
+                $aftercall($provider);
+            }
             $usage = $provider->get_last_token_usage();
             if (is_array($usage)) {
                 $out['judge_model'] = isset($usage['model']) ? (string) $usage['model'] : null;
