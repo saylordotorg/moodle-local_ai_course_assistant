@@ -2412,5 +2412,12 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026112301, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026112302) {
+        // 8.4.0: the review queue's outcome column (confirmed_bad, false_alarm, content_gap, rule_too_strict).
+        \local_ai_course_assistant\review_queue::add_outcome_field();
+
+        upgrade_plugin_savepoint(true, 2026112302, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

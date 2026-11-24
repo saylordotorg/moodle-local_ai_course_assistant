@@ -32,6 +32,8 @@
     * ratings_heading, ratings_summary, has_low_rated, ratings_low_label, ratings_low_module, ratings_low_count, ratings_low_rows
     * gap_heading, gap_summary, has_gap_sample, gap_sample_label, gap_sample
     * has_review, review_heading, review_intro, review_empty, review_cols, review_rows
+    * review_formaction, review_courseid, review_range, review_gapdays, review_sesskey, review_labels
+      (review_queue::template_context(); each row has a resolve form and, for claim and rule items, a detail)
 
     Example context (json):
     {
@@ -56,7 +58,17 @@
         "has_gap_sample": true, "gap_sample_label": "Show sample", "gap_sample": [{"name": "Learner 7"}],
         "has_review": true, "review_heading": "Needs review", "review_intro": "Flagged exchanges.", "review_empty": "Nothing to review.",
         "review_cols": {"when": "When", "source": "Source", "who": "Who", "summary": "Summary"},
-        "review_rows": [{"when": "2026-06-17 09:00", "sourcelabel": "Hallucination", "who": "Learner 7", "summary": "...", "resolveurl": "#", "resolve_label": "Resolve"}]
+        "review_formaction": "#", "review_courseid": 2, "review_range": 30, "review_gapdays": 7, "review_sesskey": "x",
+        "review_labels": {"resolve": "Mark resolved", "outcome": "Outcome", "outcome_none": "No outcome", "note": "Note", "detail": "Details", "question": "Question", "answer": "Answer", "claims": "Claims", "rules": "Rules fired", "text_removed": "Text removed", "priority": "High priority"},
+        "review_rows": [
+            {"when": "2026-06-17 09:00", "sourcelabel": "Negative rating", "who": "Learner 7", "summary": "...", "priority_high": false, "source": "rating", "sourceid": 4, "formid": "aica-review-rating-4", "outcome_required": false, "has_detail": false,
+             "outcomes": [{"value": "confirmed_bad", "label": "Confirmed bad"}, {"value": "false_alarm", "label": "False alarm"}]},
+            {"when": "2026-06-17 09:05", "sourcelabel": "Answer claim", "who": "Learner 7", "summary": "Contradicted claim", "priority_high": true, "source": "claim", "sourceid": 9, "formid": "aica-review-claim-9", "outcome_required": true, "has_detail": true,
+             "outcomes": [{"value": "content_gap", "label": "Content gap"}, {"value": "rule_too_strict", "label": "Rule too strict"}],
+             "detail": {"redacted": false, "question": "When is the final due?", "answer": "Friday.", "has_verdict": true, "verdict": "needs_review, high severity", "has_claims": true,
+                 "claims": [{"text": "The final is due Friday.", "has_text": true, "status": "contradicted", "severity": "high", "evidence": "Unit 2 schedule"}],
+                 "has_rules": true, "rules": [{"id": "deadlines.date", "action": "warn"}], "passages": "Course passages retrieved: 2"}}
+        ]
     }
 }}
 <div class="aica-id-dashboard">
@@ -188,10 +200,59 @@
         {{#review_rows}}
             <tr>
                 <td><small>{{when}}</small></td>
-                <td><span class="badge badge-secondary">{{sourcelabel}}</span></td>
+                <td>
+                    <span class="badge badge-secondary">{{sourcelabel}}</span>
+                    {{#priority_high}}<span class="badge badge-danger">{{review_labels.priority}}</span>{{/priority_high}}
+                </td>
                 <td>{{who}}</td>
-                <td><small>{{summary}}</small></td>
-                <td><a href="{{resolveurl}}" class="btn btn-sm btn-outline-success">{{resolve_label}}</a></td>
+                <td>
+                    <small>{{summary}}</small>
+                    {{#has_detail}}
+                    <details class="aica-id-details">
+                        <summary class="aica-id-summary">{{review_labels.detail}}</summary>
+                        {{#detail}}
+                        {{#has_verdict}}<p><small>{{verdict}}</small></p>{{/has_verdict}}
+                        {{#redacted}}<p class="text-muted"><small>{{review_labels.text_removed}}</small></p>{{/redacted}}
+                        {{^redacted}}
+                        <p><strong>{{review_labels.question}}</strong><br><span class="aica-id-prewrap">{{question}}</span></p>
+                        <p><strong>{{review_labels.answer}}</strong><br><span class="aica-id-prewrap">{{answer}}</span></p>
+                        {{/redacted}}
+                        {{#has_claims}}
+                        <p><strong>{{review_labels.claims}}</strong></p>
+                        <ul>
+                            {{#claims}}<li><small>{{#has_text}}{{text}} {{/has_text}}[{{status}}, {{severity}}] {{evidence}}</small></li>{{/claims}}
+                        </ul>
+                        {{/has_claims}}
+                        {{#has_rules}}
+                        <p><strong>{{review_labels.rules}}</strong></p>
+                        <ul>
+                            {{#rules}}<li><small><code>{{id}}</code> ({{action}})</small></li>{{/rules}}
+                        </ul>
+                        {{/has_rules}}
+                        <p><small>{{passages}}</small></p>
+                        {{/detail}}
+                    </details>
+                    {{/has_detail}}
+                </td>
+                <td>
+                    <form method="post" action="{{review_formaction}}" class="aica-id-resolve">
+                        <input type="hidden" name="courseid" value="{{review_courseid}}">
+                        <input type="hidden" name="range" value="{{review_range}}">
+                        <input type="hidden" name="gapdays" value="{{review_gapdays}}">
+                        <input type="hidden" name="action" value="resolvereview">
+                        <input type="hidden" name="source" value="{{source}}">
+                        <input type="hidden" name="sourceid" value="{{sourceid}}">
+                        <input type="hidden" name="sesskey" value="{{review_sesskey}}">
+                        <label for="{{formid}}-outcome" class="aica-id-inline-label">{{review_labels.outcome}}</label>
+                        <select name="outcome" id="{{formid}}-outcome" class="custom-select custom-select-sm"{{#outcome_required}} required{{/outcome_required}}>
+                            <option value="">{{review_labels.outcome_none}}</option>
+                            {{#outcomes}}<option value="{{value}}">{{label}}</option>{{/outcomes}}
+                        </select>
+                        <label for="{{formid}}-note" class="aica-id-inline-label">{{review_labels.note}}</label>
+                        <input type="text" name="note" id="{{formid}}-note" class="form-control form-control-sm" maxlength="1000">
+                        <button type="submit" class="btn btn-sm btn-outline-success">{{review_labels.resolve}}</button>
+                    </form>
+                </td>
             </tr>
         {{/review_rows}}
         </tbody>

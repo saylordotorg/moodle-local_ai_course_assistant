@@ -29,8 +29,13 @@ namespace local_ai_course_assistant;
  *                    (`local_ai_course_assistant_convs.id`)
  *   - 'integrity'  : an audit row flagged by the integrity classifier
  *                    (`local_ai_course_assistant_audit.id`)
+ *   - 'claim'      : 8.4.0, an answer whose latest background verdict found a
+ *                    serious contradicted claim or the wellbeing model flag
+ *   - 'rule'       : 8.4.0, an answer that recorded a guidance rule
+ *                    (both keyed by the ANSWER row's `answer_audit.id`, and
+ *                    derived from the audit rather than stored)
  *
- * Resolution state lives in `local_ai_course_assistant_review_res`. A
+ * Resolution state (with the teacher's outcome since 8.4.0) lives in `local_ai_course_assistant_review_res`. A
  * UNIQUE index on `(source, sourceid)` guarantees idempotent resolves.
  *
  * @package    local_ai_course_assistant
@@ -38,6 +43,24 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class review_queue {
+    /** @var string */
+    private const COMPONENT = 'local_ai_course_assistant';
+
+    /** @var string[] every source a row can have */
+    public const SOURCES = ['rating', 'offtopic', 'integrity', 'claim', 'rule'];
+
+    /** @var string[] 8.4.0 sources derived from the answer audit; their sourceid is the answer row's id */
+    public const ANSWER_SOURCES = ['claim', 'rule'];
+
+    /** @var string[] a teacher's outcome on resolve (required for claim and rule items) */
+    public const OUTCOMES = ['confirmed_bad', 'false_alarm', 'content_gap', 'rule_too_strict'];
+
+    /** @var string[] verdict statuses that can make a claim item */
+    private const CLAIM_STATUSES = ['needs_review', 'blocked'];
+
+    /** @var int the answer is cut to this many characters in the detail */
+    public const ANSWER_CHARS = 1500;
+
     /**
      * Pending (unresolved) queue rows for a course, newest first.
      *
@@ -158,28 +181,352 @@ class review_queue {
             /* ignored */
         }
 
-        // Sort newest-first across all sources, then cap.
+        // 4. 8.4.0: claim and rule items, derived from the answer audit (never inserted on their own).
+        foreach (self::answer_items($courseid, $limit, $resolvedkeys) as $item) {
+            $rows[] = $item;
+        }
+
+        // Wellbeing flags first, then newest-first across all sources, then cap.
         usort($rows, static function ($a, $b) {
+            $pa = (int) ($a['priority'] ?? 0);
+            $pb = (int) ($b['priority'] ?? 0);
+            if ($pa !== $pb) {
+                return $pb - $pa;
+            }
             return $b['when'] - $a['when'];
         });
         return array_slice($rows, 0, $limit);
     }
 
     /**
-     * Mark a queue row resolved. Idempotent — a duplicate resolve is a
-     * no-op.
+     * Claim and rule items for a course, from the answer audit.
      *
-     * @param string $source 'rating' | 'offtopic' | 'integrity'
+     * One item per answer row, keyed by the ANSWER row's id (never a verdict row's). `claim`: the answer's latest
+     * verdict is needs_review or blocked and carries a contradicted claim of high or medium severity, or the
+     * wellbeing model flag (priority 1, listed first). `rule`: the answer row recorded a guidance rule with action
+     * block, warn or correct, or (only while the course's mode is watch) watch; never when a claim item exists for
+     * that answer, resolved or not. Failed checks (status check_failed, rule ids starting claim_check.) are not
+     * content findings and never make an item.
+     *
+     * @param int $courseid
+     * @param int $limit
+     * @param array $resolvedkeys "source:sourceid" => true
+     * @return array[]
+     */
+    private static function answer_items(int $courseid, int $limit, array $resolvedkeys): array {
+        global $DB;
+        $items = [];
+        $claimanswers = [];
+        try {
+            $mode = answer_rules::mode($courseid);
+            $cms = null;
+
+            // Latest verdict per answer, of this course, with an answer row of this course.
+            [$statusin, $statusparams] = $DB->get_in_or_equal(self::CLAIM_STATUSES, SQL_PARAMS_NAMED, 'st');
+            $vsql = "SELECT v.id AS vid, v.supersedes AS aid, v.status, v.severity, v.claims, v.rules AS vrules,
+                            v.timecreated AS vwhen
+                       FROM {" . answer_audit::TABLE . "} v
+                       JOIN {" . answer_audit::TABLE . "} a ON a.id = v.supersedes AND a.kind = :akind
+                                AND a.courseid = v.courseid
+                      WHERE v.courseid = :courseid AND v.kind = :vkind AND v.status $statusin
+                            AND v.id = (SELECT MAX(v2.id) FROM {" . answer_audit::TABLE . "} v2
+                                         WHERE v2.kind = :v2kind AND v2.supersedes = v.supersedes)
+                   ORDER BY v.id DESC";
+            $params = ['akind' => 'answer', 'vkind' => 'verdict', 'v2kind' => 'verdict', 'courseid' => $courseid]
+                + $statusparams;
+            $verdicts = [];
+            $rs = $DB->get_recordset_sql($vsql, $params);
+            foreach ($rs as $v) {
+                $claims = self::json_list($v->claims);
+                $vrules = self::content_rules(self::json_list($v->vrules));
+                $wellbeing = in_array(claim_checker::WELLBEING_MODEL_RULE, array_column($vrules, 'id'), true);
+                $serious = false;
+                foreach ($claims as $c) {
+                    if (($c['status'] ?? '') === 'contradicted' && in_array($c['severity'] ?? '', ['high', 'medium'], true)) {
+                        $serious = true;
+                        break;
+                    }
+                }
+                if (!$wellbeing && !$serious) {
+                    continue;
+                }
+                $claimanswers[(int) $v->aid] = true;
+                if (isset($resolvedkeys['claim:' . (int) $v->aid]) || count($verdicts) >= $limit) {
+                    continue;
+                }
+                $verdicts[(int) $v->aid] = ['verdict' => $v, 'claims' => $claims, 'vrules' => $vrules,
+                    'wellbeing' => $wellbeing];
+            }
+            $rs->close();
+
+            if ($verdicts) {
+                [$in, $inparams] = $DB->get_in_or_equal(array_keys($verdicts), SQL_PARAMS_NAMED, 'aid');
+                $answers = $DB->get_records_select(answer_audit::TABLE,
+                    "id $in AND kind = :kind AND courseid = :courseid",
+                    $inparams + ['kind' => 'answer', 'courseid' => $courseid]);
+                foreach ($verdicts as $aid => $found) {
+                    if (!isset($answers[$aid])) {
+                        continue;
+                    }
+                    $cms = $cms ?? self::course_cms($courseid);
+                    $items[] = self::claim_item($answers[$aid], $found, $cms);
+                }
+            }
+
+            // Answer rows that recorded a guidance rule.
+            $rsql = "SELECT id, userid, question, answer, chunks, rules, redacted, timecreated
+                       FROM {" . answer_audit::TABLE . "}
+                      WHERE courseid = :courseid AND kind = :kind AND rules IS NOT NULL
+                            AND " . $DB->sql_like('rules', ':hasaction') . "
+                   ORDER BY id DESC";
+            $rs = $DB->get_recordset_sql($rsql, ['courseid' => $courseid, 'kind' => 'answer',
+                'hasaction' => '%"action"%']);
+            $ruleitems = 0;
+            foreach ($rs as $a) {
+                if ($ruleitems >= $limit) {
+                    break;
+                }
+                $aid = (int) $a->id;
+                if (isset($claimanswers[$aid]) || isset($resolvedkeys['rule:' . $aid])) {
+                    continue;
+                }
+                $rules = self::content_rules(self::json_list($a->rules));
+                $actions = array_column($rules, 'action');
+                $strong = (bool) array_intersect($actions, ['block', 'warn', 'correct']);
+                $watch = in_array('watch', $actions, true) && $mode === 'watch';
+                if (!$strong && !$watch) {
+                    continue;
+                }
+                $latest = $DB->get_records(answer_audit::TABLE, ['kind' => 'verdict', 'supersedes' => $aid],
+                    'id DESC', 'id, status, severity', 0, 1);
+                $latest = $latest ? reset($latest) : null;
+                $items[] = self::rule_item($a, $rules, $latest);
+                $ruleitems++;
+            }
+            $rs->close();
+        } catch (\Throwable $e) {
+            debugging('review_queue: answer items skipped: ' . get_class($e), DEBUG_DEVELOPER);
+        }
+        return $items;
+    }
+
+    /**
+     * A claim item.
+     *
+     * @param \stdClass $a the answer row
+     * @param array $found verdict, claims, vrules, wellbeing
+     * @param array $cms cmid => activity name
+     * @return array
+     */
+    private static function claim_item(\stdClass $a, array $found, array $cms): array {
+        $v = $found['verdict'];
+        $rules = array_merge(self::content_rules(self::json_list($a->rules)), $found['vrules']);
+        $kind = get_string($found['wellbeing'] ? 'instructor_dashboard:review_kind_wellbeing'
+            : 'instructor_dashboard:review_kind_claim', self::COMPONENT);
+        $detail = self::detail($a, (string) $v->status, (string) ($v->severity ?? ''), $found['claims'], $rules, $cms);
+        return [
+            'source' => 'claim',
+            'sourceid' => (int) $a->id,
+            'when' => (int) $v->vwhen,
+            'summary' => self::summary($kind, $detail),
+            'who' => anonymizer::name((int) $a->userid),
+            'priority' => $found['wellbeing'] ? 1 : 0,
+            'detail' => $detail,
+        ];
+    }
+
+    /**
+     * A rule item.
+     *
+     * @param \stdClass $a the answer row
+     * @param array $rules the content rules it recorded
+     * @param \stdClass|null $latest its latest verdict, if any
+     * @return array
+     */
+    private static function rule_item(\stdClass $a, array $rules, ?\stdClass $latest): array {
+        $status = $latest && $latest->status !== 'check_failed' ? (string) $latest->status : '';
+        $severity = $latest && $latest->status !== 'check_failed' ? (string) ($latest->severity ?? '') : '';
+        $detail = self::detail($a, $status, $severity, [], $rules, []);
+        return [
+            'source' => 'rule',
+            'sourceid' => (int) $a->id,
+            'when' => (int) $a->timecreated,
+            'summary' => self::summary(get_string('instructor_dashboard:review_kind_rule', self::COMPONENT), $detail),
+            'who' => anonymizer::name((int) $a->userid),
+            'priority' => 0,
+            'detail' => $detail,
+        ];
+    }
+
+    /**
+     * The detail of an answer item: text only when the row is not redacted.
+     *
+     * @param \stdClass $a the answer row
+     * @param string $status verdict status, '' for none
+     * @param string $severity verdict severity, '' for none
+     * @param array $claims verdict claims
+     * @param array $rules [{id, action}]
+     * @param array $cms cmid => activity name
+     * @return array{redacted: bool, question: string, answer: string, status: string, severity: string,
+     *     claims: array, rules: array, passages: int}
+     */
+    private static function detail(\stdClass $a, string $status, string $severity, array $claims, array $rules,
+            array $cms): array {
+        $redacted = !empty($a->redacted) || ($a->question === null && $a->answer === null);
+        $chunkcms = [];
+        $passages = 0;
+        foreach (self::json_list($a->chunks) as $chunk) {
+            if (is_string($chunk['ref'] ?? null) && $chunk['ref'] !== '') {
+                $passages++;
+                $chunkcms[$chunk['ref']] = (int) ($chunk['cmid'] ?? 0);
+            }
+        }
+        $outclaims = [];
+        foreach ($claims as $c) {
+            $ref = is_string($c['evidence_ref'] ?? null) ? $c['evidence_ref'] : '';
+            $cmid = $chunkcms[$ref] ?? 0;
+            if ($ref === '') {
+                $evidence = get_string('instructor_dashboard:review_evidence_none', self::COMPONENT);
+            } else if ($cmid > 0 && isset($cms[$cmid])) {
+                $evidence = $cms[$cmid];
+            } else {
+                $evidence = get_string('instructor_dashboard:review_evidence_passage', self::COMPONENT);
+            }
+            $outclaims[] = [
+                'text' => $redacted ? '' : (string) ($c['text'] ?? ''),
+                'status' => (string) ($c['status'] ?? ''),
+                'severity' => (string) ($c['severity'] ?? ''),
+                'evidence' => $evidence,
+            ];
+        }
+        $outrules = [];
+        $seen = [];
+        foreach ($rules as $r) {
+            $key = $r['id'] . '|' . $r['action'];
+            if (!isset($seen[$key])) {
+                $seen[$key] = true;
+                $outrules[] = ['id' => $r['id'], 'action' => $r['action']];
+            }
+        }
+        return [
+            'redacted' => $redacted,
+            'question' => $redacted ? '' : (string) $a->question,
+            'answer' => $redacted ? '' : \core_text::substr((string) $a->answer, 0, self::ANSWER_CHARS),
+            'status' => $status,
+            'severity' => $severity,
+            'claims' => $outclaims,
+            'rules' => $outrules,
+            'passages' => $passages,
+        ];
+    }
+
+    /**
+     * The one-line summary: kind, verdict, rule ids, then the question or "text removed". At most 200 characters.
+     *
+     * @param string $kind
+     * @param array $detail
+     * @return string
+     */
+    private static function summary(string $kind, array $detail): string {
+        $parts = [$kind];
+        if ($detail['status'] !== '') {
+            $parts[] = get_string('instructor_dashboard:review_verdict', self::COMPONENT, (object) [
+                'status' => $detail['status'],
+                'severity' => $detail['severity'] !== '' ? $detail['severity'] : '-',
+            ]);
+        }
+        if ($detail['rules']) {
+            $parts[] = implode(', ', array_map(static fn(array $r): string => $r['id'] . ' (' . $r['action'] . ')',
+                $detail['rules']));
+        }
+        $parts[] = $detail['redacted'] ? get_string('instructor_dashboard:review_text_removed', self::COMPONENT)
+            : trim(preg_replace('/\s+/u', ' ', $detail['question']));
+        return \core_text::substr(implode(' · ', $parts), 0, 200);
+    }
+
+    /**
+     * Rules that are content findings: [{id, action}] with a string id that does not start claim_check., and an
+     * action other than none.
+     *
+     * @param array $rules
+     * @return array[]
+     */
+    private static function content_rules(array $rules): array {
+        $out = [];
+        foreach ($rules as $r) {
+            if (!is_array($r) || !is_string($r['id'] ?? null) || !is_string($r['action'] ?? null)) {
+                continue;
+            }
+            if (str_starts_with($r['id'], claim_checker::FAILED_RULE_PREFIX) || $r['action'] === 'none') {
+                continue;
+            }
+            $out[] = ['id' => $r['id'], 'action' => $r['action']];
+        }
+        return $out;
+    }
+
+    /**
+     * A JSON list column decoded, or [].
+     *
+     * @param string|null $json
+     * @return array
+     */
+    private static function json_list(?string $json): array {
+        $decoded = $json === null ? null : json_decode($json, true);
+        return is_array($decoded) ? array_values(array_filter($decoded, 'is_array')) : [];
+    }
+
+    /**
+     * Activity names of a course, by cmid.
+     *
+     * @param int $courseid
+     * @return array<int, string>
+     */
+    private static function course_cms(int $courseid): array {
+        try {
+            $out = [];
+            foreach (get_fast_modinfo($courseid)->get_cms() as $cm) {
+                $out[(int) $cm->id] = $cm->get_formatted_name();
+            }
+            return $out;
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Mark a queue row resolved. Idempotent: a duplicate resolve is a no-op.
+     *
+     * An unknown source is ignored, as before 8.4.0. An outcome other than '' or one of OUTCOMES is refused. A
+     * `claim` or `rule` item needs an outcome, and its answer row must belong to $courseid (so a teacher cannot
+     * resolve another course's item by editing the request).
+     *
+     * @param string $source 'rating' | 'offtopic' | 'integrity' | 'claim' | 'rule'
      * @param int $sourceid
      * @param int $courseid
      * @param int $userid Resolver's user id.
      * @param string $note Optional free-text note.
+     * @param string $outcome '' or one of OUTCOMES
      * @return void
+     * @throws \moodle_exception instructor_dashboard:review_bad_outcome, review_outcome_required, review_not_in_course
      */
-    public static function mark_resolved(string $source, int $sourceid, int $courseid, int $userid, string $note = ''): void {
+    public static function mark_resolved(string $source, int $sourceid, int $courseid, int $userid, string $note = '',
+            string $outcome = ''): void {
         global $DB;
-        if (!in_array($source, ['rating', 'offtopic', 'integrity'], true)) {
+        if (!in_array($source, self::SOURCES, true)) {
             return;
+        }
+        if ($outcome !== '' && !in_array($outcome, self::OUTCOMES, true)) {
+            throw new \moodle_exception('instructor_dashboard:review_bad_outcome', self::COMPONENT);
+        }
+        if (in_array($source, self::ANSWER_SOURCES, true)) {
+            if ($outcome === '') {
+                throw new \moodle_exception('instructor_dashboard:review_outcome_required', self::COMPONENT);
+            }
+            if (!$DB->record_exists(answer_audit::TABLE, ['id' => $sourceid, 'kind' => 'answer',
+                    'courseid' => $courseid])) {
+                throw new \moodle_exception('instructor_dashboard:review_not_in_course', self::COMPONENT);
+            }
         }
         if (
             $DB->record_exists(
@@ -195,7 +542,98 @@ class review_queue {
         $row->courseid = $courseid;
         $row->resolved_by = $userid;
         $row->note = $note !== '' ? $note : null;
+        $row->outcome = $outcome;
         $row->timecreated = time();
         $DB->insert_record('local_ai_course_assistant_review_res', $row);
+    }
+
+    /**
+     * Add the outcome column to the resolutions table if it is missing (upgrade step 2026112302). Safe to run twice.
+     *
+     * @return void
+     */
+    public static function add_outcome_field(): void {
+        global $DB;
+        $dbman = $DB->get_manager();
+        $table = new \xmldb_table('local_ai_course_assistant_review_res');
+        $field = new \xmldb_field('outcome', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, 'timecreated');
+        if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+    }
+
+    /**
+     * The review part of the instructor dashboard's template context: the rows (with a resolve form each and, for
+     * claim and rule items, the detail) and their labels. All text goes through Mustache escaping.
+     *
+     * @param array $pending pending_for_course() rows
+     * @param int $courseid
+     * @param int $range
+     * @param int $gapdays
+     * @return array
+     */
+    public static function template_context(array $pending, int $courseid, int $range, int $gapdays): array {
+        $str = static fn(string $id, $a = null): string => get_string('instructor_dashboard:' . $id, self::COMPONENT, $a);
+        $rows = [];
+        foreach ($pending as $row) {
+            $answeritem = in_array($row['source'], self::ANSWER_SOURCES, true);
+            $outcomes = [];
+            foreach (self::OUTCOMES as $outcome) {
+                $outcomes[] = ['value' => $outcome, 'label' => $str('review_outcome_' . $outcome)];
+            }
+            $out = [
+                'when' => userdate($row['when'], '%Y-%m-%d %H:%M'),
+                'sourcelabel' => $str('review_source_' . $row['source']),
+                'who' => $row['who'],
+                'summary' => $row['summary'],
+                'priority_high' => !empty($row['priority']),
+                'source' => $row['source'],
+                'sourceid' => (int) $row['sourceid'],
+                'formid' => 'aica-review-' . $row['source'] . '-' . (int) $row['sourceid'],
+                'outcome_required' => $answeritem,
+                'outcomes' => $outcomes,
+                'has_detail' => false,
+            ];
+            if ($answeritem && isset($row['detail'])) {
+                $d = $row['detail'];
+                $out['has_detail'] = true;
+                $out['detail'] = [
+                    'redacted' => $d['redacted'],
+                    'question' => $d['question'],
+                    'answer' => $d['answer'],
+                    'has_verdict' => $d['status'] !== '',
+                    'verdict' => $d['status'] !== '' ? $str('review_verdict', (object) ['status' => $d['status'],
+                        'severity' => $d['severity'] !== '' ? $d['severity'] : '-']) : '',
+                    'has_claims' => !empty($d['claims']),
+                    'claims' => array_map(static fn(array $c): array => $c + ['has_text' => $c['text'] !== ''],
+                        $d['claims']),
+                    'has_rules' => !empty($d['rules']),
+                    'rules' => $d['rules'],
+                    'passages' => $str('review_passages', $d['passages']),
+                ];
+            }
+            $rows[] = $out;
+        }
+        return [
+            'review_rows' => $rows,
+            'review_formaction' => (new \moodle_url('/local/ai_course_assistant/instructor_dashboard.php'))->out(false),
+            'review_courseid' => $courseid,
+            'review_range' => $range,
+            'review_gapdays' => $gapdays,
+            'review_sesskey' => sesskey(),
+            'review_labels' => [
+                'resolve' => $str('review_resolve'),
+                'outcome' => $str('review_outcome'),
+                'outcome_none' => $str('review_outcome_none'),
+                'note' => $str('review_note'),
+                'detail' => $str('review_detail'),
+                'question' => $str('review_detail_question'),
+                'answer' => $str('review_detail_answer'),
+                'claims' => $str('review_detail_claims'),
+                'rules' => $str('review_detail_rules'),
+                'text_removed' => $str('review_text_removed'),
+                'priority' => $str('review_priority_high'),
+            ],
+        ];
     }
 }

@@ -80,13 +80,21 @@ if ($action === 'resolvereview' && confirm_sesskey()) {
     $source = required_param('source', PARAM_ALPHA);
     $sourceid = required_param('sourceid', PARAM_INT);
     $note = optional_param('note', '', PARAM_TEXT);
-    \local_ai_course_assistant\review_queue::mark_resolved(
-        $source,
-        $sourceid,
-        $courseid,
-        (int) $USER->id,
-        $note
-    );
+    $outcome = optional_param('outcome', '', PARAM_ALPHAEXT);
+    try {
+        // 8.4.0: claim and rule items need an outcome, and their answer row must belong to this course;
+        // mark_resolved() checks both, so an edited request cannot resolve another course's item.
+        \local_ai_course_assistant\review_queue::mark_resolved(
+            $source,
+            $sourceid,
+            $courseid,
+            (int) $USER->id,
+            $note,
+            $outcome
+        );
+    } catch (\moodle_exception $e) {
+        redirect($pageurl, $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
+    }
     redirect(
         $pageurl,
         get_string('instructor_dashboard:review_resolved', 'local_ai_course_assistant'),
@@ -219,22 +227,9 @@ if ($showrealnames && !empty($gap['sample_userids'])) {
     }
 }
 
-// Needs-review queue rows.
-$reviewrows = [];
-foreach ($reviewqueue as $row) {
-    $reviewrows[] = [
-        'when' => userdate($row['when'], '%Y-%m-%d %H:%M'),
-        'sourcelabel' => get_string('instructor_dashboard:review_source_' . $row['source'], $strman),
-        'who' => $row['who'],
-        'summary' => $row['summary'],
-        'resolveurl' => (new moodle_url('/local/ai_course_assistant/instructor_dashboard.php', [
-            'courseid' => $courseid, 'range' => $range, 'gapdays' => $gapdays,
-            'action' => 'resolvereview', 'source' => $row['source'], 'sourceid' => $row['sourceid'],
-            'sesskey' => sesskey(),
-        ]))->out(false),
-        'resolve_label' => get_string('instructor_dashboard:review_resolve', $strman),
-    ];
-}
+// Needs-review queue rows (8.4.0: claim and rule items carry a detail; each row has a resolve form).
+$reviewctx = \local_ai_course_assistant\review_queue::template_context($reviewqueue, $courseid, $range, $gapdays);
+$reviewrows = $reviewctx['review_rows'];
 
 echo $OUTPUT->render_from_template('local_ai_course_assistant/instructor_dashboard', [
     'nav' => $nav,
@@ -297,6 +292,6 @@ echo $OUTPUT->render_from_template('local_ai_course_assistant/instructor_dashboa
         'summary' => get_string('instructor_dashboard:review_col_summary', $strman),
     ],
     'review_rows' => $reviewrows,
-]);
+] + $reviewctx);
 
 echo $OUTPUT->footer();

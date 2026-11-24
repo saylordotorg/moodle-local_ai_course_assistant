@@ -570,15 +570,16 @@
         <INDEX NAME="user_course_review" UNIQUE="false" FIELDS="userid, courseid, next_review"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_ai_course_assistant_review_res" COMMENT="Resolutions for needs-review queue items (low ratings, off-topic flags, integrity flags). v4.8.0+">
+    <TABLE NAME="local_ai_course_assistant_review_res" COMMENT="Resolutions for needs-review queue items (low ratings, off-topic flags, integrity flags; 8.4.0 claim and rule items from the answer audit). v4.8.0+">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="source" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="rating, offtopic, or integrity"/>
-        <FIELD NAME="sourceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID from the source table (msg_ratings.id, convs.id, audit.id)"/>
+        <FIELD NAME="source" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="rating, offtopic, integrity, claim or rule"/>
+        <FIELD NAME="sourceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID from the source table (msg_ratings.id, convs.id, audit.id; answer_audit.id of the answer row for claim and rule)"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="resolved_by" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="note" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="outcome" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="8.4.0: the teacher's outcome: confirmed_bad, false_alarm, content_gap, rule_too_strict, or empty"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

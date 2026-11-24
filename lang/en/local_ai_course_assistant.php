@@ -1629,6 +1629,33 @@ $string['instructor_dashboard:review_resolved']    = 'Marked resolved.';
 $string['instructor_dashboard:review_source_rating']    = 'Negative rating';
 $string['instructor_dashboard:review_source_offtopic']  = 'Off-topic';
 $string['instructor_dashboard:review_source_integrity'] = 'Integrity';
+// 8.4.0: claim and rule items from the answer audit, and the teacher's outcome.
+$string['instructor_dashboard:review_source_claim'] = 'Answer claim';
+$string['instructor_dashboard:review_source_rule'] = 'Guidance rule';
+$string['instructor_dashboard:review_kind_claim'] = 'Contradicted claim';
+$string['instructor_dashboard:review_kind_wellbeing'] = 'Wellbeing flag';
+$string['instructor_dashboard:review_kind_rule'] = 'Guidance rule';
+$string['instructor_dashboard:review_verdict'] = '{$a->status}, {$a->severity} severity';
+$string['instructor_dashboard:review_text_removed'] = 'Text removed';
+$string['instructor_dashboard:review_evidence_none'] = 'No course passage';
+$string['instructor_dashboard:review_evidence_passage'] = 'A course passage';
+$string['instructor_dashboard:review_passages'] = 'Course passages retrieved: {$a}';
+$string['instructor_dashboard:review_priority_high'] = 'High priority';
+$string['instructor_dashboard:review_outcome'] = 'Outcome';
+$string['instructor_dashboard:review_outcome_none'] = 'No outcome';
+$string['instructor_dashboard:review_outcome_confirmed_bad'] = 'Confirmed bad';
+$string['instructor_dashboard:review_outcome_false_alarm'] = 'False alarm';
+$string['instructor_dashboard:review_outcome_content_gap'] = 'Content gap';
+$string['instructor_dashboard:review_outcome_rule_too_strict'] = 'Rule too strict';
+$string['instructor_dashboard:review_note'] = 'Note';
+$string['instructor_dashboard:review_detail'] = 'Details';
+$string['instructor_dashboard:review_detail_question'] = 'Question';
+$string['instructor_dashboard:review_detail_answer'] = 'Answer';
+$string['instructor_dashboard:review_detail_claims'] = 'Claims';
+$string['instructor_dashboard:review_detail_rules'] = 'Rules fired';
+$string['instructor_dashboard:review_bad_outcome'] = 'That review outcome is not one SOLA knows.';
+$string['instructor_dashboard:review_outcome_required'] = 'Choose an outcome before you resolve this item.';
+$string['instructor_dashboard:review_not_in_course'] = 'That review item is not in this course.';
 
 // v4.4.0: course-page CSP setting.
 $string['settings:csp_course_pages_mode']      = 'Course-page Content-Security-Policy';
