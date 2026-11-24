@@ -400,19 +400,23 @@ class answer_audit {
     }
 
     /**
-     * Count a guidance-rule check that failed on the chat path (the answer was delivered as it was), in the SOC2
-     * audit log as RULES_FAILED_ACTION with reason rules_error. Details are the course id, the reason and an
+     * Count a guidance-rule check that failed on the chat path, in the SOC2 audit log as RULES_FAILED_ACTION with
+     * reason rules_error (the answer was delivered as it was, or blocked when a held correct's retry failed), or
+     * reason retry_skipped_spend (the held answer was blocked because the course is at its chat spend cap). Details are the course id, the reason and an
      * exception class only: never question, answer or exception text. Never throws.
      *
      * @param int $userid
      * @param int $courseid
-     * @param string $errorclass
+     * @param string $errorclass an exception class, or answer_flow::RETRY_SKIPPED_SPEND (logged as that reason, with
+     *     no error class)
      * @return void
      */
     public static function log_rules_error(int $userid, int $courseid, string $errorclass): void {
         try {
-            audit_logger::log(self::RULES_FAILED_ACTION, $userid, $courseid, ['courseid' => $courseid,
-                'reason' => 'rules_error', 'error_class' => substr($errorclass, 0, 120)]);
+            $details = $errorclass === answer_flow::RETRY_SKIPPED_SPEND
+                ? ['courseid' => $courseid, 'reason' => answer_flow::RETRY_SKIPPED_SPEND]
+                : ['courseid' => $courseid, 'reason' => 'rules_error', 'error_class' => substr($errorclass, 0, 120)];
+            audit_logger::log(self::RULES_FAILED_ACTION, $userid, $courseid, $details);
         } catch (\Throwable $ignore) {
             debugging('answer_audit: could not log a rules error: ' . get_class($ignore), DEBUG_DEVELOPER);
         }

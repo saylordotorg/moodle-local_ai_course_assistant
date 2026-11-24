@@ -1151,18 +1151,21 @@ try {
     // answer exactly as before and is counted (answer_audit::log_rules_error()).
     $answercheck = ['categories' => $answerplan['categories'], 'rules' => []];
     $answerreplace = null;
-    // A held reply is released below: the raw reply through the same scrub as a live stream (so the chips and
-    // source pill still work), or the checked text when something changed it.
-    $answerrelease = ($cleanresponse === $preguard) ? $fullresponse : $cleanresponse;
+    // A held reply is released below through answer_flow::release_text(): the raw reply (scrubbed as a live
+    // stream is, so the chips and source pill still work) only when the cleaning removed nothing but protocol
+    // markers and nothing after it changed the text; otherwise exactly the stored text.
+    $answerreleaseraw = $fullresponse;
+    $answerreleaseclean = $preguard;
     try {
         $answerchunks = \local_ai_course_assistant\runtime_guard::chunk_texts($retrievedchunks ?? []);
         if ($answerplan['mode'] !== 'off') {
             $answerretryraw = '';
+            $answerretryclean = '';
             $answerretry = null;
             if ($answerhold !== null) {
                 $answerretry = function (string $instruction) use ($provider, $systemprompt, $history, $streamoptions,
                         $answerhold, $cleanresponse, $message, $userid, $courseid, $answerchunks, &$answerretryraw,
-                        &$tokenusage): string {
+                        &$answerretryclean, &$tokenusage): string {
                     $retryhistory = $history;
                     $retryhistory[] = ['role' => 'assistant', 'content' => $cleanresponse];
                     $retryhistory[] = ['role' => 'user', 'content' => $instruction];
@@ -1182,6 +1185,8 @@ try {
                     $answerretryraw = $raw;
                     $text = trim(str_replace(['[OFF_TOPIC]', '[NEEDS_ESCALATION]'], '', $raw));
                     $text = local_ai_course_assistant_filter_response_safety($text);
+                    // The same cleaning as the main reply; release_text() compares against it.
+                    $answerretryclean = $text;
                     return \local_ai_course_assistant\runtime_guard::apply($text, [
                         'input'    => (string) ($message ?? ''),
                         'userid'   => (int) $userid,
@@ -1195,6 +1200,7 @@ try {
                 'buffered' => $answerhold !== null,
                 'validator_results' => \local_ai_course_assistant\runtime_guard::last_results(),
                 'chunks' => $answerchunks,
+                'courseid' => (int) $courseid,
             ], $answerretry);
             $answercheck = ['categories' => $answerfinal['categories'], 'rules' => $answerfinal['rules']];
             if ($answerfinal['error'] !== null) {
@@ -1202,11 +1208,12 @@ try {
                     (string) $answerfinal['error']);
             }
             if ($answerfinal['replace']) {
-                $answerrelease = ($answerfinal['action'] === 'correct' && $answerretryraw !== '')
-                    ? $answerretryraw : $answerfinal['text'];
                 if ($answerfinal['action'] === 'correct' && $answerretryraw !== '') {
-                    // The delivered answer is the retry: its markers give the source pill below.
+                    // The delivered answer is the retry: its markers give the source pill below, and the release
+                    // compares the retry's own raw and cleaned text with what is stored.
                     $fullresponse = $answerretryraw;
+                    $answerreleaseraw = $answerretryraw;
+                    $answerreleaseclean = $answerretryclean;
                 }
                 $cleanresponse = $answerfinal['text'];
                 if ($answerhold === null) {
@@ -1223,7 +1230,8 @@ try {
     if ($answerhold !== null) {
         // Release the held reply, before the save and the done event, through the same scrub as a live stream.
         $answerhold = null;
-        $streamemit($answerrelease);
+        $streamemit(\local_ai_course_assistant\answer_flow::release_text($answerreleaseraw, $answerreleaseclean,
+            $cleanresponse));
         $streamflush();
     }
 

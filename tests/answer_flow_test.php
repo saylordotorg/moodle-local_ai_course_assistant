@@ -49,10 +49,12 @@ final class answer_flow_test extends \advanced_testcase {
         parent::setUp();
         $this->resetAfterTest();
         answer_flow::$beforefinalize = null;
+        answer_flow::$spendcheck = null;
     }
 
     protected function tearDown(): void {
         answer_flow::$beforefinalize = null;
+        answer_flow::$spendcheck = null;
         parent::tearDown();
     }
 
@@ -301,6 +303,75 @@ final class answer_flow_test extends \advanced_testcase {
         $this->assertContains(['id' => 'validator.pii_echo', 'action' => 'block'], $out['rules']);
     }
 
+    // What a held answer releases (shared by the main reply and the correct retry).
+
+    public function test_release_keeps_the_raw_text_when_only_markers_were_removed(): void {
+        $raw = "Ask your instructor.\n[SOLA_NEXT]More||Quiz me[/SOLA_NEXT]";
+        $this->assertSame($raw, answer_flow::release_text($raw, 'Ask your instructor.', 'Ask your instructor.'),
+            'the chips still reach the browser (the stream filter scrubs them from the text)');
+    }
+
+    public function test_release_after_runtime_guard_block_is_the_stored_fallback(): void {
+        // validators_runtime_mode=block replaced the retry with its fallback: the learner sees the fallback that was
+        // checked and stored, never the raw retry runtime_guard rejected.
+        set_config('validators_runtime_mode', 'block', 'local_ai_course_assistant');
+        $rawretry = 'Ask your instructor. My API key is sk-ant-' . str_repeat('a', 40) . '.';
+        $clean = $rawretry;
+        $guarded = runtime_guard::apply($clean, ['input' => 'q']);
+        $this->assertNotSame($clean, $guarded, 'precondition: runtime_guard replaced the retry');
+
+        $this->mode('enforce');
+        $this->correct_rule();
+        $out = answer_flow::finalize('You get 500 zorkmid.', answer_flow::plan(self::GRADE_Q, 0),
+            ['question' => self::GRADE_Q, 'buffered' => true], fn() => $guarded);
+        $this->assertSame('correct', $out['action'], 'the fallback itself passes the rules');
+        $this->assertSame($guarded, $out['text']);
+        $this->assertSame($guarded, answer_flow::release_text($rawretry, $clean, $out['text']));
+    }
+
+    public function test_release_of_a_redacted_retry_is_the_clean_text(): void {
+        $raw = "Use key sk-abcdefghijklmnopqrstuvwxyz123 here.\n[SOLA_NEXT]a||b[/SOLA_NEXT][NEEDS_ESCALATION]";
+        $clean = 'Use key [key redacted] here.';
+        $this->assertSame($clean, answer_flow::release_text($raw, $clean, $clean),
+            'a credential the safety filter redacted is never released raw');
+        $this->assertSame('Blocked.', answer_flow::release_text('anything', 'x', 'Blocked.'));
+    }
+
+    public function test_correct_is_blocked_without_a_retry_when_the_course_is_at_its_cap(): void {
+        global $DB;
+        $this->mode('enforce');
+        $this->correct_rule();
+        $asked = [];
+        answer_flow::$spendcheck = function (int $courseid) use (&$asked): string {
+            $asked[] = $courseid;
+            return spend_guard::CAP_BLOCKED;
+        };
+        $calls = 0;
+        $retry = function () use (&$calls): string {
+            $calls++;
+            return 'fine';
+        };
+        $out = answer_flow::finalize('You get 500 zorkmid.', answer_flow::plan(self::GRADE_Q, 0),
+            ['question' => self::GRADE_Q, 'buffered' => true, 'courseid' => 12], $retry);
+        $this->assertSame([12], $asked);
+        $this->assertSame(0, $calls, 'no second model call for a course at its cap');
+        $this->assertSame('block', $out['action']);
+        $this->assertSame(answer_rules::safe_message('grades'), $out['text']);
+        $this->assertSame(answer_flow::RETRY_SKIPPED_SPEND, $out['error']);
+
+        answer_audit::log_rules_error(5, 12, $out['error']);
+        $row = $DB->get_record('local_ai_course_assistant_audit', ['action' => answer_audit::RULES_FAILED_ACTION],
+            '*', MUST_EXIST);
+        $this->assertSame(['courseid' => 12, 'reason' => 'retry_skipped_spend'], json_decode($row->details, true));
+
+        // A warning level is still under the cap: the retry runs.
+        answer_flow::$spendcheck = fn(int $courseid): string => spend_guard::CAP_WARN_95;
+        $out = answer_flow::finalize('You get 500 zorkmid.', answer_flow::plan(self::GRADE_Q, 0),
+            ['question' => self::GRADE_Q, 'buffered' => true, 'courseid' => 12], $retry);
+        $this->assertSame(1, $calls);
+        $this->assertSame('correct', $out['action']);
+    }
+
     // The held answer's keepalives.
 
     public function test_buffered_path_sends_keepalive_before_text(): void {
@@ -394,7 +465,8 @@ final class answer_flow_test extends \advanced_testcase {
         $firstcall = '$provider->chat_completion_stream($systemprompt, $history, $streamfilter, $streamoptions);';
         $guard = '$cleanresponse = \\local_ai_course_assistant\\runtime_guard::apply($cleanresponse, [';
         $finalize = '\\local_ai_course_assistant\\answer_flow::finalize(';
-        $release = '$streamemit($answerrelease);';
+        $release = '$streamemit(\\local_ai_course_assistant\\answer_flow::release_text($answerreleaseraw, '
+            . '$answerreleaseclean, $cleanresponse));';
         $save = '$assistantmsgid = conversation_manager::add_message(';
         $replace = "local_ai_course_assistant_sse_send(['replace' => \$answerreplace['text'], "
             . "'messageid' => (int) \$assistantmsgid, 'reason' => \$answerreplace['reason']]);";
@@ -422,6 +494,16 @@ final class answer_flow_test extends \advanced_testcase {
             $src);
         // A replace is only for an answer the learner already saw streamed.
         $this->assertStringContainsString('if ($answerhold === null) { $answerreplace = [', $src);
+        // Both the main reply and the correct retry are released through release_text(): the retry's raw text is
+        // never emitted directly, and the retry hands over its own cleaned text to compare against.
+        $this->assertSame(2, substr_count($src, '$streamemit('), 'the live stream and the one held release');
+        $this->assertStringNotContainsString('$streamemit($answerretryraw', $src);
+        $this->assertStringContainsString('$answerretryclean = $text; return \\local_ai_course_assistant\\runtime_guard::apply($text, [',
+            $src);
+        $this->assertStringContainsString('$answerreleaseraw = $answerretryraw; $answerreleaseclean = $answerretryclean;',
+            $src);
+        $this->assertStringContainsString("'courseid' => (int) \$courseid, ], \$answerretry);", $src,
+            'finalize gets the course, so the retry checks the spend cap');
         // The audit gets what the rules decided.
         $this->assertStringContainsString('\\local_ai_course_assistant\\runtime_guard::last_results(), $answercheck];', $src);
         $this->assertStringContainsString('answer_audit::log_rules_error(', $src);

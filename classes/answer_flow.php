@@ -48,6 +48,12 @@ class answer_flow {
     /** @var \Closure|null Test hook: called at the start of finalize()'s guarded block. */
     public static ?\Closure $beforefinalize = null;
 
+    /** @var \Closure|null Test hook: fn(int $courseid): string, a spend_guard level used instead of spend_guard::check(). */
+    public static ?\Closure $spendcheck = null;
+
+    /** @var string The error finalize() reports when the correct retry was skipped because the course is at its cap. */
+    public const RETRY_SKIPPED_SPEND = 'retry_skipped_spend';
+
     /** @var string[] Actions that deliver the reply unchanged. */
     private const DELIVER = ['none', 'watch'];
 
@@ -82,7 +88,8 @@ class answer_flow {
      * @param string $reply the answer as it would be delivered (after runtime_guard)
      * @param array $plan plan()'s result
      * @param array $ctx question (string), buffered (bool: the answer was held), validator_results
-     *     (runtime_guard::last_results()), chunks (retrieved text)
+     *     (runtime_guard::last_results()), chunks (retrieved text), courseid (int: the retry is skipped, and the
+     *     answer blocked, while spend_guard says the course's chat spend is blocked)
      * @param callable|null $retry fn(string $instruction): string, one more answer from the same provider path;
      *     used only for correct on a held answer
      * @return array{text: string, action: string, rules: array[], categories: string[], replace: bool,
@@ -121,7 +128,7 @@ class answer_flow {
             }
             $result['reason'] = self::reason($first['fired']);
             if ($action === 'correct') {
-                return self::correct($first, $evalctx, $retry, $result);
+                return self::correct($first, $evalctx, $retry, $result, (int) ($ctx['courseid'] ?? 0));
             }
             if (!is_string($first['text']) || $first['text'] === '') {
                 // Nothing to deliver instead: deliver the answer and say the check failed.
@@ -145,13 +152,19 @@ class answer_flow {
      * @param array $evalctx the evaluate() context
      * @param callable|null $retry
      * @param array $result finalize()'s result so far
+     * @param int $courseid
      * @return array
      */
-    private static function correct(array $first, array $evalctx, ?callable $retry, array $result): array {
+    private static function correct(array $first, array $evalctx, ?callable $retry, array $result,
+            int $courseid): array {
         $result['retried'] = true;
         $blocktext = answer_rules::safe_message(self::category_of($first['fired'], 'correct'));
         $again = null;
-        if ($retry !== null) {
+        if ($retry !== null && !self::retry_affordable($courseid)) {
+            // The model call that made this answer was allowed; a second one for a course at its cap is not.
+            $result['retried'] = false;
+            $result['error'] = self::RETRY_SKIPPED_SPEND;
+        } else if ($retry !== null) {
             try {
                 $again = $retry(self::correction_instruction($first['fired']));
             } catch (\Throwable $e) {
@@ -183,6 +196,46 @@ class answer_flow {
         $result['text'] = $blocktext;
         $result['replace'] = true;
         return $result;
+    }
+
+    /**
+     * Whether the course's chat spend still allows one more model call (the provider checked only the first one).
+     * A failed check counts as not affordable: the answer is then blocked, which is the safe side for a held answer
+     * that already broke a rule.
+     *
+     * @param int $courseid
+     * @return bool
+     */
+    private static function retry_affordable(int $courseid): bool {
+        try {
+            $level = self::$spendcheck ? (string) (self::$spendcheck)($courseid)
+                : spend_guard::check($courseid, 'chat', false);
+            // CAP_BLOCKED, as base_provider's own pre-call check: the 80% and 95% levels are warnings, still under cap.
+            return $level !== spend_guard::CAP_BLOCKED;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * The text to release for a held answer: the raw provider text when the only thing the cleaning removed was
+     * protocol markers (so the browser still gets the chips and the source pill, scrubbed by the stream filter as a
+     * live stream is), otherwise the final text the learner must see and the message row stores. Shared by the main
+     * reply and the correct retry so the two can't diverge.
+     *
+     * @param string $raw what the provider streamed
+     * @param string $clean the raw text after the marker removal and response safety filter, before runtime_guard
+     * @param string $final what is stored: after runtime_guard and the guidance rules
+     * @return string $raw or $final
+     */
+    public static function release_text(string $raw, string $clean, string $final): string {
+        if ($final !== $clean) {
+            // runtime_guard or a rule changed it: release exactly what was checked and stored.
+            return $final;
+        }
+        $markersonly = trim(protocol_markers::strip(str_replace(['[OFF_TOPIC]', '[NEEDS_ESCALATION]'], '', $raw)));
+        // Anything else the cleaning changed (a credential redacted, a prompt leak scrubbed): release the clean text.
+        return $markersonly === trim($clean) ? $raw : $final;
     }
 
     /**
