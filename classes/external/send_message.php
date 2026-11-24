@@ -25,6 +25,10 @@ use local_ai_course_assistant\context_builder;
 use local_ai_course_assistant\provider\base_provider;
 use local_ai_course_assistant\content_indexer;
 use local_ai_course_assistant\rag_retriever;
+use local_ai_course_assistant\answer_audit;
+use local_ai_course_assistant\answer_flow;
+use local_ai_course_assistant\protocol_markers;
+use local_ai_course_assistant\runtime_guard;
 
 /**
  * Send a message to the AI tutor (non-streaming fallback).
@@ -45,6 +49,10 @@ class send_message extends external_api {
      * this one passed null and raised a TypeError instead.
      */
     private const INTERACTION_TYPE = 'chat';
+
+    /** @var \Closure|null Test hook: called at the start of the guidance-rule check (after runtime_guard). */
+    public static ?\Closure $beforeanswercheck = null;
+
     /**
      * Parameter definition.
      *
@@ -282,6 +290,18 @@ class send_message extends external_api {
         $sourcetag = \local_ai_course_assistant\protocol_markers::derive_source((string) $response);
         $response = \local_ai_course_assistant\protocol_markers::strip($response);
 
+        // 8.4.0: the same protections as the streamed path (sse.php). runtime_guard runs with the retrieved chunks
+        // (a no-op unless validators_runtime_mode is set), then the guidance rules (answer_flow::finalize()). The
+        // answer is returned whole, so it is checked like a held answer: there is no replace event, and a correct
+        // rule may ask the same provider once more. What is stored is exactly what is returned.
+        $answercheck = self::check_answer((string) $response, $params, $userid, $provider, $systemprompt, $history,
+            $retrievedchunks, $tokenusage);
+        $response = $answercheck['text'];
+        if ($answercheck['retryraw'] !== null) {
+            // The learner gets the retry: its markers give the source pill.
+            $sourcetag = protocol_markers::derive_source($answercheck['retryraw']);
+        }
+
         // Save assistant response.
         //
         // v7.2.7: argument 11 is $interactiontype, which is typed `string` and
@@ -295,7 +315,7 @@ class send_message extends external_api {
         // token analytics and to every cost report. Matched to what sse.php
         // writes for an equivalent turn so rows from the two paths are
         // comparable.
-        conversation_manager::add_message(
+        $assistantmsgid = conversation_manager::add_message(
             $conv->id,
             $userid,
             $params['courseid'],
@@ -326,10 +346,117 @@ class send_message extends external_api {
             $sourcetag
         );
 
-        return [
+        $result = [
             'response' => $response,
             'success' => true,
         ];
+
+        // 8.4.0: the answer audit row, after the save and outside any transaction. It never throws into the
+        // response: record_answer() catches and counts its own failures, and this catch is the backstop.
+        try {
+            answer_audit::record_answer([
+                'messageid' => (int) $assistantmsgid,
+                'conversationid' => (int) $conv->id,
+                'userid' => (int) $userid,
+                'courseid' => (int) $params['courseid'],
+                'cmid' => ((int) $params['pageid']) ?: null,
+                'mode' => 'text',
+                'question' => (string) $params['message'],
+                'answer' => $response,
+                'model' => $tokenusage['model'] ?? null,
+                'provider' => (string) ($effectivecfg['provider'] ?? get_config('local_ai_course_assistant', 'provider')),
+            ], $retrievedchunks, [], $answercheck['validators'], $answercheck['checked']);
+        } catch (\Throwable $e) {
+            debugging('send_message: answer audit failed: ' . get_class($e), DEBUG_DEVELOPER);
+        }
+
+        return $result;
+    }
+
+    /**
+     * runtime_guard and the guidance rules on the finished reply (8.4.0), as sse.php applies them to a held answer.
+     *
+     * Mode off: nothing new (runtime_guard alone, which is itself off unless validators_runtime_mode is set). Watch:
+     * the rules run and what fired is returned for the audit row; the text never changes. Enforce: warn adds the
+     * check line, block swaps in the safe message, correct asks the same provider once more with the failure stated
+     * (skipped, and blocked, when the course's chat spend is blocked; a retry that fails or throws is blocked too).
+     * Any failure in the rule check delivers the reply as runtime_guard left it and is counted with
+     * answer_audit::log_rules_error() (exception class only, no learner text).
+     *
+     * @param string $response the reply with the protocol markers stripped
+     * @param array $params validated parameters
+     * @param int $userid
+     * @param base_provider $provider the provider that answered (used again for a correct retry)
+     * @param string $systemprompt
+     * @param array $history the history sent with the question
+     * @param array $retrievedchunks rag_retriever::retrieve() rows
+     * @param array|null $tokenusage the turn's usage; a retry's tokens are added to it (billed on the same row)
+     * @return array{text: string, validators: array[], checked: array, retryraw: ?string} text is what to store and
+     *     return; validators and checked go to answer_audit::record_answer(); retryraw is the delivered retry's raw
+     *     reply, or null when the first reply (or a safe message) is delivered
+     */
+    private static function check_answer(string $response, array $params, int $userid, base_provider $provider,
+            string $systemprompt, array $history, array $retrievedchunks, ?array &$tokenusage): array {
+        $courseid = (int) $params['courseid'];
+        $question = (string) $params['message'];
+        $guardctx = [
+            'input' => $question,
+            'userid' => $userid,
+            'courseid' => $courseid,
+            'rag_chunks' => runtime_guard::chunk_texts($retrievedchunks),
+        ];
+        $guarded = runtime_guard::apply($response, $guardctx);
+        $out = ['text' => $guarded, 'validators' => runtime_guard::last_results(),
+            'checked' => ['categories' => [], 'rules' => []], 'retryraw' => null];
+        try {
+            if (self::$beforeanswercheck) {
+                (self::$beforeanswercheck)();
+            }
+            $plan = answer_flow::plan($question, $courseid);
+            $out['checked']['categories'] = $plan['categories'];
+            if ($plan['mode'] === 'off') {
+                return $out;
+            }
+            $retryraw = null;
+            $retry = function (string $instruction) use ($provider, $systemprompt, $history, $guarded, $guardctx,
+                    &$tokenusage, &$retryraw): string {
+                $retryhistory = $history;
+                $retryhistory[] = ['role' => 'assistant', 'content' => $guarded];
+                $retryhistory[] = ['role' => 'user', 'content' => $instruction];
+                $raw = (string) $provider->chat_completion($systemprompt, $retryhistory);
+                $retryusage = $provider->get_last_token_usage();
+                foreach (['prompt_tokens', 'completion_tokens', 'reasoning_tokens'] as $k) {
+                    if (isset($retryusage[$k])) {
+                        $tokenusage[$k] = (int) ($tokenusage[$k] ?? 0) + (int) $retryusage[$k];
+                    }
+                }
+                $retryraw = $raw;
+                return runtime_guard::apply(protocol_markers::strip($raw), $guardctx);
+            };
+            $final = answer_flow::finalize($guarded, $plan, [
+                'question' => $question,
+                // The whole answer is checked before anything is returned: a held answer.
+                'buffered' => true,
+                'validator_results' => $out['validators'],
+                'chunks' => $guardctx['rag_chunks'],
+                'courseid' => $courseid,
+            ], $retry);
+            $out['checked'] = ['categories' => $final['categories'], 'rules' => $final['rules']];
+            if ($final['error'] !== null) {
+                answer_audit::log_rules_error($userid, $courseid, (string) $final['error']);
+            }
+            if (is_string($final['text']) && $final['text'] !== '') {
+                $out['text'] = $final['text'];
+            }
+            if ($final['action'] === 'correct' && $retryraw !== null) {
+                $out['retryraw'] = $retryraw;
+            }
+        } catch (\Throwable $e) {
+            $out['text'] = $guarded;
+            $out['retryraw'] = null;
+            answer_audit::log_rules_error($userid, $courseid, get_class($e));
+        }
+        return $out;
     }
 
     /**

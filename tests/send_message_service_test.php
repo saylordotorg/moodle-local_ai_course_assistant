@@ -17,6 +17,7 @@
 namespace local_ai_course_assistant;
 
 use local_ai_course_assistant\external\send_message;
+use local_ai_course_assistant\provider\stub_provider;
 
 /**
  * The non-streaming fallback endpoint must actually work.
@@ -62,6 +63,17 @@ final class send_message_service_test extends \advanced_testcase {
         // deliberate: it exercises everything around the provider, which is
         // where the defect lived.
         set_config('rag_enabled', 0, 'local_ai_course_assistant');
+    }
+
+    /**
+     * Reset the 8.4.0 test seams.
+     */
+    protected function tearDown(): void {
+        send_message::$beforeanswercheck = null;
+        answer_flow::$spendcheck = null;
+        answer_audit::$locktimeout = answer_audit::DEFAULT_LOCK_TIMEOUT;
+        stub_provider::reset();
+        parent::tearDown();
     }
 
     /**
@@ -205,5 +217,276 @@ final class send_message_service_test extends \advanced_testcase {
         $details = json_decode($row->details, true);
         $this->assertSame('user', $details['role']);
         $this->assertSame(strlen('What is management?'), $details['message_length']);
+    }
+
+    // 8.4.0: the guidance rules, runtime_guard and the answer audit on this path. The answer is returned whole, so it
+    // is checked like a held answer: no replace event, and a correct rule may retry once.
+
+    /** @var string A plain question in no risky category. */
+    private const PLAIN_Q = 'What is a balance sheet?';
+
+    /** @var string A grades question (risky). */
+    private const GRADE_Q = 'What grade will I get on the final exam?';
+
+    /**
+     * Answer through the in-process stub provider, with the answer safety mode set.
+     *
+     * @param string $mode off|watch|enforce
+     * @param array $replies the stub's replies in call order (a Throwable is thrown)
+     * @return void
+     */
+    private function use_stub(string $mode, array $replies): void {
+        stub_provider::reset();
+        stub_provider::$sequence = $replies;
+        set_config('provider', 'stub', 'local_ai_course_assistant');
+        set_config('apikey', 'stub-key', 'local_ai_course_assistant');
+        set_config('history_mode', 'recency', 'local_ai_course_assistant');
+        set_config('answer_safety_mode', $mode, 'local_ai_course_assistant');
+    }
+
+    /**
+     * A site rule whose action is correct, on the reply (no built-in rule corrects).
+     *
+     * @return void
+     */
+    private function correct_rule(): void {
+        set_config('answer_safety_rules', json_encode([[
+            'id' => 'site.no_zork', 'category' => 'grades', 'kind' => 'keyword', 'value' => 'zorkmid',
+            'applies_to' => 'reply', 'action' => 'correct',
+        ]]), 'local_ai_course_assistant');
+    }
+
+    /**
+     * The assistant message this turn stored.
+     *
+     * @return \stdClass
+     */
+    private function stored_answer(): \stdClass {
+        global $DB;
+        $rows = $DB->get_records('local_ai_course_assistant_msgs',
+            ['courseid' => $this->course->id, 'userid' => $this->student->id, 'role' => 'assistant'], 'id ASC');
+        $this->assertCount(1, $rows, 'one assistant message per turn');
+        return reset($rows);
+    }
+
+    /**
+     * The audit rows for the course.
+     *
+     * @return \stdClass[]
+     */
+    private function audit_rows(): array {
+        global $DB;
+        return array_values($DB->get_records(answer_audit::TABLE, ['courseid' => $this->course->id], 'id ASC'));
+    }
+
+    /**
+     * The rules recorded on an audit row, as [{id, action}].
+     *
+     * @param \stdClass $row
+     * @return array[]
+     */
+    private function audit_rules(\stdClass $row): array {
+        // Stored as canonical JSON (keys sorted); compare as {id, action}.
+        return array_map(static fn(array $r): array => ['id' => $r['id'], 'action' => $r['action']],
+            json_decode((string) $row->rules, true) ?: []);
+    }
+
+    public function test_send_message_answer_is_recorded_when_mode_on(): void {
+        $this->use_stub('watch', ['A balance sheet lists assets, liabilities and equity.']);
+        $result = send_message::execute((int) $this->course->id, self::PLAIN_Q, 0);
+        $this->assertTrue($result['success']);
+        $this->assertSame(['response', 'success'], array_keys($result), 'the return shape is unchanged');
+        $this->assertSame('A balance sheet lists assets, liabilities and equity.', $result['response']);
+
+        $msg = $this->stored_answer();
+        $rows = $this->audit_rows();
+        $this->assertCount(1, $rows);
+        $row = $rows[0];
+        $this->assertEquals($msg->id, $row->messageid);
+        $this->assertEquals($msg->conversationid, $row->conversationid);
+        $this->assertEquals($this->student->id, $row->userid);
+        $this->assertSame('text', $row->mode);
+        $this->assertSame(self::PLAIN_Q, $row->question);
+        $this->assertSame($result['response'], $row->answer, 'the audit holds what the learner got');
+        $this->assertSame('stub-model', $row->model);
+        $this->assertSame([], $this->audit_rules($row));
+        $this->assertTrue(answer_audit::verify_chain((int) $this->course->id)['ok']);
+    }
+
+    public function test_send_message_block_rule_replaces_the_returned_text(): void {
+        $this->use_stub('enforce', ['Good news: I guarantee you will pass this course.']);
+        $result = send_message::execute((int) $this->course->id, self::GRADE_Q, 0);
+        $this->assertTrue($result['success']);
+        $this->assertSame(answer_rules::safe_message('grades'), $result['response']);
+        $this->assertSame($result['response'], $this->stored_answer()->message,
+            'the stored message is exactly what the learner was returned');
+        $this->assertCount(1, stub_provider::$calls, 'a block never retries');
+        $row = $this->audit_rows()[0];
+        $this->assertSame($result['response'], $row->answer);
+        $this->assertContains(['id' => 'grades.guarantee', 'action' => 'block'], $this->audit_rules($row));
+        $this->assertContains('grades', json_decode((string) $row->categories, true));
+    }
+
+    public function test_send_message_warn_appends_the_warning_line(): void {
+        $reply = 'You should stop taking your medication before the exam.';
+        $this->use_stub('enforce', [$reply]);
+        $result = send_message::execute((int) $this->course->id, self::PLAIN_Q, 0);
+        $line = get_string('answer_rules:warn_line', 'local_ai_course_assistant');
+        $this->assertStringStartsWith($reply, $result['response']);
+        $this->assertStringContainsString($line, $result['response']);
+        $this->assertSame($result['response'], $this->stored_answer()->message);
+        $this->assertContains(['id' => 'advice.medical_legal_financial', 'action' => 'warn'],
+            $this->audit_rules($this->audit_rows()[0]));
+    }
+
+    public function test_send_message_mode_off_changes_nothing(): void {
+        global $DB;
+        $reply = 'Good news: I guarantee you will pass this course.';
+        $this->use_stub('off', [$reply]);
+        $result = send_message::execute((int) $this->course->id, self::GRADE_Q, 0);
+        $this->assertSame(['response' => $reply, 'success' => true], $result);
+        $this->assertSame($reply, $this->stored_answer()->message);
+        $this->assertSame([], $this->audit_rows(), 'off: no audit row');
+        $this->assertSame(0, $DB->count_records('local_ai_course_assistant_audit',
+            ['action' => answer_audit::RULES_FAILED_ACTION]));
+        $this->assertCount(1, stub_provider::$calls);
+    }
+
+    public function test_send_message_watch_records_but_never_changes_text(): void {
+        $reply = 'Good news: I guarantee you will pass this course.';
+        $this->use_stub('watch', [$reply]);
+        $result = send_message::execute((int) $this->course->id, self::GRADE_Q, 0);
+        $this->assertSame($reply, $result['response'], 'watch never changes what the learner sees');
+        $this->assertSame($reply, $this->stored_answer()->message);
+        $row = $this->audit_rows()[0];
+        $this->assertSame($reply, $row->answer);
+        $this->assertContains(['id' => 'grades.guarantee', 'action' => 'block'], $this->audit_rules($row),
+            'the rule that would have blocked is recorded');
+        $this->assertCount(1, stub_provider::$calls);
+    }
+
+    public function test_send_message_record_failure_does_not_break_the_answer(): void {
+        global $CFG, $DB;
+        $reply = 'A balance sheet lists assets, liabilities and equity.';
+        $this->use_stub('watch', [$reply]);
+        // A busy course lock: record() throws locktimeout inside record_answer().
+        $CFG->lock_factory = '\\core\\lock\\db_record_lock_factory';
+        $factory = \core\lock\lock_config::get_lock_factory(answer_audit::LOCK_TYPE);
+        $held = $factory->get_lock(answer_audit::lock_resource((int) $this->course->id), 0);
+        $this->assertNotFalse($held);
+        answer_audit::$locktimeout = 0;
+        try {
+            $result = send_message::execute((int) $this->course->id, self::PLAIN_Q, 0);
+        } finally {
+            $held->release();
+        }
+        $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
+        $this->assertSame(['response' => $reply, 'success' => true], $result);
+        $this->assertSame($reply, $this->stored_answer()->message);
+        $this->assertSame([], $this->audit_rows());
+        $logged = $DB->get_record('local_ai_course_assistant_audit', ['action' => answer_audit::RECORD_FAILED_ACTION],
+            '*', MUST_EXIST);
+        $this->assertSame('error', json_decode($logged->details, true)['reason']);
+        $this->assertStringNotContainsString('balance', $logged->details, 'no learner text in the log');
+
+        // Anything else in the new check that throws: the answer is delivered exactly as before, and counted.
+        $DB->delete_records('local_ai_course_assistant_msgs');
+        $this->use_stub('enforce', ['Good news: I guarantee you will pass this course.']);
+        send_message::$beforeanswercheck = function (): void {
+            throw new \RuntimeException('boom with learner text');
+        };
+        $result = send_message::execute((int) $this->course->id, self::GRADE_Q, 0);
+        $this->assertSame(['response' => 'Good news: I guarantee you will pass this course.', 'success' => true],
+            $result);
+        $this->assertSame($result['response'], $this->stored_answer()->message);
+        $failed = $DB->get_record('local_ai_course_assistant_audit', ['action' => answer_audit::RULES_FAILED_ACTION],
+            '*', MUST_EXIST);
+        $this->assertSame(['courseid' => (int) $this->course->id, 'reason' => 'rules_error',
+            'error_class' => 'RuntimeException'], json_decode($failed->details, true));
+    }
+
+    public function test_send_message_correct_retries_once_and_blocks_when_retry_fails(): void {
+        global $DB;
+        $this->correct_rule();
+
+        // A retry that passes is delivered, and stored.
+        $this->use_stub('enforce', ['You will get 500 zorkmid points.', 'Please ask your instructor about grades.']);
+        $result = send_message::execute((int) $this->course->id, self::GRADE_Q, 0);
+        $this->assertCount(2, stub_provider::$calls, 'one retry');
+        $retrymsgs = stub_provider::$calls[1]['messages'];
+        $this->assertSame('assistant', $retrymsgs[count($retrymsgs) - 2]['role']);
+        $this->assertStringContainsString('site.no_zork', end($retrymsgs)['content'], 'the failure is stated');
+        $this->assertSame('Please ask your instructor about grades.', $result['response']);
+        $this->assertSame($result['response'], $this->stored_answer()->message);
+        $this->assertEquals(200, $this->stored_answer()->prompt_tokens, 'the retry is billed on the same row');
+
+        // A retry that still breaks the rule: blocked, never a second retry.
+        $DB->delete_records('local_ai_course_assistant_msgs');
+        $this->use_stub('enforce', ['You will get 500 zorkmid points.', 'Still 500 zorkmid.', 'never asked']);
+        $result = send_message::execute((int) $this->course->id, self::GRADE_Q, 0);
+        $this->assertCount(2, stub_provider::$calls);
+        $this->assertSame(answer_rules::safe_message('grades'), $result['response']);
+        $this->assertSame($result['response'], $this->stored_answer()->message);
+
+        // A retry that throws (provider down): blocked, and the answer still returns.
+        $DB->delete_records('local_ai_course_assistant_msgs');
+        $this->use_stub('enforce', ['You will get 500 zorkmid points.',
+            new \moodle_exception('generalexceptionmessage', 'error', '', 'provider down')]);
+        $result = send_message::execute((int) $this->course->id, self::GRADE_Q, 0);
+        $this->assertTrue($result['success']);
+        $this->assertSame(answer_rules::safe_message('grades'), $result['response']);
+        $this->assertSame($result['response'], $this->stored_answer()->message);
+        $rows = $this->audit_rows();
+        $this->assertSame($result['response'], end($rows)->answer);
+        $this->assertContains(['id' => 'site.no_zork', 'action' => 'correct'], $this->audit_rules(end($rows)));
+    }
+
+    public function test_send_message_retry_skipped_at_spend_cap(): void {
+        global $DB;
+        $this->correct_rule();
+        $this->use_stub('enforce', ['You will get 500 zorkmid points.', 'Please ask your instructor.']);
+        $asked = [];
+        answer_flow::$spendcheck = function (int $courseid) use (&$asked): string {
+            $asked[] = $courseid;
+            return spend_guard::CAP_BLOCKED;
+        };
+        $result = send_message::execute((int) $this->course->id, self::GRADE_Q, 0);
+        $this->assertSame([(int) $this->course->id], $asked);
+        $this->assertCount(1, stub_provider::$calls, 'no second model call for a course at its cap');
+        $this->assertSame(answer_rules::safe_message('grades'), $result['response']);
+        $this->assertSame($result['response'], $this->stored_answer()->message);
+        $logged = $DB->get_record('local_ai_course_assistant_audit', ['action' => answer_audit::RULES_FAILED_ACTION],
+            '*', MUST_EXIST);
+        $this->assertSame(['courseid' => (int) $this->course->id, 'reason' => 'retry_skipped_spend'],
+            json_decode($logged->details, true));
+    }
+
+    public function test_send_message_runtime_guard_block_mode_still_wins(): void {
+        global $DB;
+        set_config('validators_runtime_mode', 'block', 'local_ai_course_assistant');
+        $leak = 'Here you go. My API key is sk-ant-' . str_repeat('a', 40) . '.';
+        foreach (['off', 'enforce'] as $mode) {
+            $DB->delete_records('local_ai_course_assistant_msgs');
+            $this->use_stub($mode, [$leak]);
+            $result = send_message::execute((int) $this->course->id, self::PLAIN_Q, 0);
+            $this->assertTrue($result['success']);
+            $this->assertStringNotContainsString('sk-ant-', $result['response'], $mode . ': the guard replaced it');
+            $this->assertNotSame('', trim($result['response']));
+            $this->assertSame($result['response'], $this->stored_answer()->message,
+                $mode . ': the returned and stored text agree');
+        }
+        $rows = $this->audit_rows();
+        $this->assertCount(1, $rows, 'only the enforce turn is recorded');
+        $this->assertContains('credential_leak', array_column(json_decode((string) $rows[0]->validators, true), 'name'));
+    }
+
+    public function test_send_message_wellbeing_question_in_enforce_returns_the_safe_text(): void {
+        $this->use_stub('enforce', ['Here is a study plan for the week.']);
+        $result = send_message::execute((int) $this->course->id, 'I want to kill myself, I cannot do this anymore', 0);
+        $this->assertTrue($result['success']);
+        $this->assertSame(answer_rules::safe_message('wellbeing'), $result['response']);
+        $this->assertSame($result['response'], $this->stored_answer()->message);
+        $row = $this->audit_rows()[0];
+        $this->assertContains(['id' => answer_rules::WELLBEING_RULE, 'action' => 'block'], $this->audit_rules($row));
     }
 }
