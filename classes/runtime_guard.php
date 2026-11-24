@@ -56,6 +56,9 @@ class runtime_guard {
      * The validator results of the last apply() call: one [validator, severity, messages] per validator that ran.
      * Empty when the mode is off, when a validator threw, or before any call.
      *
+     * Call it only right after apply() in the same flow: it is process-wide state, so any later apply() call
+     * (another answer, a background check) replaces it.
+     *
      * @return array[]
      */
     public static function last_results(): array {

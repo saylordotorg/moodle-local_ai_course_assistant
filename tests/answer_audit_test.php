@@ -1113,21 +1113,35 @@ final class answer_audit_test extends \advanced_testcase {
         $this->assertStringNotContainsString('1987', $rec->validators);
         $this->assertTrue(answer_audit::verify_chain((int) $turn['course']->id)['ok']);
 
-        // sse.php records it right after the assistant message is saved, outside any transaction, before done.
+        // sse.php takes the row right after the assistant message is saved and records it only AFTER the done event
+        // (record() can wait for the course lock), outside any transaction. The off-topic lockout, which sends its
+        // own done event and dies, records after that done event too.
         $src = $this->sse_source();
         $save = strpos($src, '$assistantmsgid = conversation_manager::add_message(');
-        $call = strpos($src, '\local_ai_course_assistant\answer_audit::record_answer([');
-        $done = strpos($src, "\$doneevent = ['done' => true, 'messageid' => \$assistantmsgid];");
+        $capture = strpos($src, '$answeraudit = [[');
+        $lockdone = strpos($src, "local_ai_course_assistant_sse_send(['done' => true, 'locked' => true, "
+            . "'locked_until' => \$lockeduntil]);");
+        $done = strpos($src, 'local_ai_course_assistant_sse_send($doneevent);');
+        $recordcall = '\\local_ai_course_assistant\\answer_audit::record_answer(...$answeraudit);';
         $this->assertNotFalse($save);
-        $this->assertNotFalse($call, 'sse.php must record each answer');
+        $this->assertNotFalse($capture, 'sse.php must take the audit row');
+        $this->assertNotFalse($lockdone);
         $this->assertNotFalse($done);
-        $this->assertTrue($save < $call && $call < $done, 'recorded after the save and before the done event');
-        $callsite = substr($src, $call, 900);
+        $this->assertSame(2, substr_count($src, $recordcall), 'recorded once on each path that ends a saved answer');
+        $this->assertSame(0, substr_count($src, 'answer_audit::record_answer(['), 'never recorded before a done event');
+        $this->assertTrue($save < $capture && $capture < $lockdone, 'taken after the save, before any done event');
+        $afterlock = strpos($src, $recordcall, $lockdone);
+        $this->assertTrue($afterlock !== false && $afterlock < strpos($src, 'die();', $lockdone),
+            'the lockout path records after its done event and before it dies');
+        $afterdone = strpos($src, $recordcall, $done);
+        $this->assertNotFalse($afterdone, 'save < done < record');
+        $this->assertSame(strrpos($src, $recordcall), $afterdone);
+        $callsite = substr($src, $capture, 900);
         foreach ([
             "'messageid' => (int) \$assistantmsgid,", "'conversationid' => (int) \$conv->id,",
             "'question' => (string) \$message,", "'answer' => \$cleanresponse,", "'model' => \$tokenusage['model'] ?? null,",
             "'provider' => \$providername,", "], \$retrievedchunks ?? [], \$citations ?? [], "
-                . "\\local_ai_course_assistant\\runtime_guard::last_results());",
+                . "\\local_ai_course_assistant\\runtime_guard::last_results()];",
         ] as $needle) {
             $this->assertStringContainsString($needle, $callsite);
         }
@@ -1192,5 +1206,34 @@ final class answer_audit_test extends \advanced_testcase {
         $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
 
         $this->assertSame(0, $DB->count_records(self::TABLE));
+
+        // Each drop is counted in the audit log, without debugging: course id, reason and class only, no text.
+        $logged = array_values($DB->get_records('local_ai_course_assistant_audit',
+            ['action' => answer_audit::RECORD_FAILED_ACTION], 'id ASC'));
+        $this->assertCount(3, $logged);
+        $this->assertSame(['courseid' => $courseid, 'reason' => 'error',
+            'error_class' => get_class(new \moodle_exception('locktimeout'))],
+            json_decode($logged[0]->details, true));
+        $this->assertSame(['courseid' => $courseid, 'reason' => 'error', 'error_class' => 'Error'],
+            json_decode($logged[1]->details, true));
+        $this->assertSame(get_class(new \coding_exception('x')), json_decode($logged[2]->details, true)['error_class']);
+        foreach ($logged as $rec) {
+            $this->assertEquals($courseid, $rec->courseid);
+            $this->assertStringNotContainsString('When did it start', $rec->details);
+            $this->assertStringNotContainsString('boom', $rec->details, 'no exception text');
+        }
+        $this->assertEquals($turn['user']->id, $logged[0]->userid);
+    }
+
+    public function test_missing_ids_are_counted_in_the_audit_log(): void {
+        global $DB;
+        set_config('answer_safety_mode', 'watch', 'local_ai_course_assistant');
+        $turn = $this->sse_turn(['messageid' => 0]);
+        $this->assertNull(answer_audit::record_answer($turn['row'], [], [], []));
+        $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
+        $rec = $DB->get_record('local_ai_course_assistant_audit', ['action' => answer_audit::RECORD_FAILED_ACTION],
+            '*', MUST_EXIST);
+        $this->assertSame(['courseid' => (int) $turn['course']->id, 'reason' => 'missing_ids'],
+            json_decode($rec->details, true));
     }
 }

@@ -76,6 +76,9 @@ class answer_audit {
      */
     public static ?\Closure $beforeredact = null;
 
+    /** @var string audit_logger action for an answer that could not be recorded. */
+    public const RECORD_FAILED_ACTION = 'answer_audit_record_failed';
+
     /** @var string[] Verdict statuses. */
     public const STATUSES = ['ok', 'warn', 'blocked', 'needs_review', 'check_failed'];
 
@@ -349,8 +352,10 @@ class answer_audit {
      *
      * Records nothing when is_enabled() is false, or when the message or conversation id is missing (a row without
      * them would escape the cap trim and the retention redaction, which find rows by those ids). Any failure,
-     * including a PHP Error, is caught and written to the developer debug log: the audit must never cost the learner
-     * the answer or the done event. Call it outside any delegated transaction (see record()).
+     * including a PHP Error, is caught, written to the developer debug log and counted as an audit_logger
+     * RECORD_FAILED_ACTION row (a skip for missing ids is counted too): the audit must never cost the learner the
+     * answer or the done event. sse.php calls it after the done event is sent, because record() can wait for the
+     * course lock. Call it outside any delegated transaction (see record()).
      *
      * @param array $row the record() fields except chunks, citations, categories, rules and validators
      * @param array $retrievedchunks rag_retriever::retrieve() rows
@@ -368,6 +373,7 @@ class answer_audit {
             if (empty($row['messageid']) || empty($row['conversationid'])) {
                 debugging('answer_audit: answer not recorded, message or conversation id missing (course '
                     . $courseid . ')', DEBUG_DEVELOPER);
+                self::log_dropped($row, ['reason' => 'missing_ids']);
                 return null;
             }
             $row['chunks'] = self::chunk_entries($retrievedchunks);
@@ -378,7 +384,26 @@ class answer_audit {
             return self::record($row);
         } catch (\Throwable $e) {
             debugging('answer_audit: answer not recorded: ' . get_class($e) . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+            self::log_dropped($row, ['reason' => 'error', 'error_class' => get_class($e)]);
             return null;
+        }
+    }
+
+    /**
+     * Count a dropped answer row in the SOC2 audit log (action RECORD_FAILED_ACTION), so watch mode can show how
+     * many answers went unrecorded without developer debugging on. Details are the course id, a reason and an
+     * exception class only: never question, answer or exception text. Never throws.
+     *
+     * @param array $row the row that was not recorded
+     * @param array $details reason, and error_class for an error
+     */
+    private static function log_dropped(array $row, array $details): void {
+        try {
+            $courseid = (int) ($row['courseid'] ?? 0);
+            audit_logger::log(self::RECORD_FAILED_ACTION, (int) ($row['userid'] ?? 0), $courseid,
+                ['courseid' => $courseid] + $details);
+        } catch (\Throwable $ignore) {
+            debugging('answer_audit: could not log a dropped row: ' . get_class($ignore), DEBUG_DEVELOPER);
         }
     }
 

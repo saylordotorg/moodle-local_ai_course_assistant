@@ -1173,9 +1173,10 @@ try {
         $sourcetag
     );
 
-    // 8.4.0: the answer audit row (only when answer_safety_mode is watch or enforce).
-    // record_answer() never throws and skips a turn without a message or conversation id.
-    \local_ai_course_assistant\answer_audit::record_answer([
+    // 8.4.0: what the answer audit row needs, taken now (last_results() belongs to the
+    // apply() call above). It is recorded only after the done event is sent, because
+    // record() can wait for the course lock and the learner must not wait for it.
+    $answeraudit = [[
         'messageid' => (int) $assistantmsgid,
         'conversationid' => (int) $conv->id,
         'userid' => (int) $userid,
@@ -1186,7 +1187,7 @@ try {
         'answer' => $cleanresponse,
         'model' => $tokenusage['model'] ?? null,
         'provider' => $providername,
-    ], $retrievedchunks ?? [], $citations ?? [], \local_ai_course_assistant\runtime_guard::last_results());
+    ], $retrievedchunks ?? [], $citations ?? [], \local_ai_course_assistant\runtime_guard::last_results()];
 
     // Queue the conversation-mastery classifier as an adhoc task so it runs
     // out of band. Only when mastery is turned on for the course AND the
@@ -1226,6 +1227,8 @@ try {
                 $lockoutmsg = get_string('chat:offtopic_ended', 'local_ai_course_assistant', $lockoutminutes);
                 local_ai_course_assistant_sse_send(['token' => "\n\n" . $lockoutmsg]);
                 local_ai_course_assistant_sse_send(['done' => true, 'locked' => true, 'locked_until' => $lockeduntil]);
+                // 8.4.0: record the answer after its done event (never throws).
+                \local_ai_course_assistant\answer_audit::record_answer(...$answeraudit);
                 die();
             }
         } else {
@@ -1297,6 +1300,10 @@ try {
         $doneevent['truncatednote'] = get_string('chat:truncated', 'local_ai_course_assistant');
     }
     local_ai_course_assistant_sse_send($doneevent);
+
+    // 8.4.0: record the answer after its done event, so a busy course lock never
+    // delays the learner. record_answer() never throws (failures are audit-logged).
+    \local_ai_course_assistant\answer_audit::record_answer(...$answeraudit);
 
     // Check if the student's learning profile needs updating. Runs
     // after the response is sent so it does not add latency. The
