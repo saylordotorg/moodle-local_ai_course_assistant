@@ -358,7 +358,7 @@ class send_message extends external_api {
         // 8.4.0: the answer audit row, after the save and outside any transaction. It never throws into the
         // response: record_answer() catches and counts its own failures, and this catch is the backstop.
         try {
-            answer_audit::record_answer([
+            $auditid = answer_audit::record_answer([
                 'messageid' => (int) $assistantmsgid,
                 'conversationid' => (int) $conv->id,
                 'userid' => (int) $userid,
@@ -370,6 +370,10 @@ class send_message extends external_api {
                 'model' => $tokenusage['model'] ?? null,
                 'provider' => (string) ($effectivecfg['provider'] ?? get_config('local_ai_course_assistant', 'provider')),
             ], $retrievedchunks, [], $answercheck['validators'], $answercheck['checked']);
+            // The background claim check for the recorded row (never throws; mode, sampling and daily cap apply).
+            if ($auditid) {
+                \local_ai_course_assistant\claim_checker::queue_for($auditid);
+            }
         } catch (\Throwable $e) {
             debugging('send_message: answer audit failed: ' . get_class($e), DEBUG_DEVELOPER);
         }

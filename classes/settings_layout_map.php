@@ -276,6 +276,11 @@ final class settings_layout_map {
                     'backend_context_tokens', 'enable_thinking', 'ssrf_trusted_endpoints',
                     'xai_proxy_url', 'xai_proxy_jwt_secret'
                 ]],
+                // 8.4.0: the answer safety claim check's tuning (the mode itself is on the Safety page).
+                ['new', 'answercheck', [
+                    'answer_check_sample_percent_retrieved', 'answer_check_sample_percent_general',
+                    'answer_check_daily_cap', 'answer_check_provider', 'answer_check_model'
+                ]],
                 ['new', 'promptbudget', [
                     'prompt_budget_mode', 'prompt_budget_chars', 'prompt_budget_nowindow_warning',
                     'prompt_truncation_warning', 'current_page_content_maxchars', 'prompt_verbosity', 'prompt_debug_enabled',

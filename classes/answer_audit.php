@@ -90,7 +90,7 @@ class answer_audit {
         'model', 'provider', 'chunks', 'citations', 'categories', 'rules', 'validators'];
 
     /** @var string[] Keys a verdict may carry. */
-    private const VERDICT_KEYS = ['status', 'severity', 'claims', 'judge_model', 'judge_cost'];
+    private const VERDICT_KEYS = ['status', 'severity', 'claims', 'rules', 'judge_model', 'judge_cost'];
 
     /** @var string[] Keys of one retrieved chunk. */
     private const CHUNK_KEYS = ['cmid', 'score', 'ref'];
@@ -166,7 +166,8 @@ class answer_audit {
      *
      * @param int $auditid the answer row
      * @param array $verdict status (ok|warn|blocked|needs_review|check_failed), severity,
-     *     claims [{text, type, status, evidence_ref, severity}], judge_model, judge_cost
+     *     claims [{text, type, status, evidence_ref, severity}], rules [{id, action}] (what the check flagged, or why
+     *     it failed), judge_model, judge_cost
      * @return int the new verdict row id
      */
     public static function append_verdict(int $auditid, array $verdict): int {
@@ -182,6 +183,7 @@ class answer_audit {
         }
         $verdict = self::scrub_utf8($verdict);
         $claims = self::checked_list($verdict['claims'] ?? null, self::CLAIM_KEYS, 'claims');
+        $rules = self::checked_list($verdict['rules'] ?? null, self::RULE_KEYS, 'rules');
 
         $original = $DB->get_record(self::TABLE, ['id' => $auditid], '*', MUST_EXIST);
         if ($original->kind !== 'answer') {
@@ -204,7 +206,7 @@ class answer_audit {
             'chunks' => null,
             'citations' => null,
             'categories' => null,
-            'rules' => null,
+            'rules' => self::json_or_null($rules),
             'validators' => null,
             'status' => $status,
             'severity' => self::str_or_null($verdict['severity'] ?? null, 20),

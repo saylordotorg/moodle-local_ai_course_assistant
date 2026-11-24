@@ -1715,6 +1715,45 @@ if ($hassiteconfig) {
         '',
         PARAM_TEXT
     ));
+    // 8.4.0: the background claim check (claim_checker), for courses in Watch or Enforce. Deterministic sampling
+    // by audit row; a site-wide daily cap on queued checks; the judge's provider and model resolve as the mastery
+    // classifier's pair does (both set = that provider row, otherwise the course's chat provider).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_sample_percent_retrieved',
+        get_string('settings:answer_check_sample_percent_retrieved', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_sample_percent_retrieved_desc', 'local_ai_course_assistant'),
+        '100',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_sample_percent_general',
+        get_string('settings:answer_check_sample_percent_general', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_sample_percent_general_desc', 'local_ai_course_assistant'),
+        '10',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_daily_cap',
+        get_string('settings:answer_check_daily_cap', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_daily_cap_desc', 'local_ai_course_assistant'),
+        '2000',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_provider',
+        get_string('settings:answer_check_provider', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_provider_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_ALPHANUMEXT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_model',
+        get_string('settings:answer_check_model', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_model_desc', 'local_ai_course_assistant'),
+        '',
+        // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
+        PARAM_TEXT
+    ));
 
     // v4.4.0: Optional Content-Security-Policy header on course pages where
     // the SOLA widget is active. Default off — admin opts in. Defense-in-

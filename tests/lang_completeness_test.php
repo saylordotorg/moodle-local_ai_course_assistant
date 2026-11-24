@@ -502,6 +502,21 @@ final class lang_completeness_test extends \basic_testcase {
         'answer_rules:safe_advice',
         'answer_rules:safe_integrity',
         'answer_rules:safe_general',
+        // 8.4.0: the claim check's admin settings, task name and spend category. English first, like the rest of
+        // the answer safety group.
+        'settings:answer_check_sample_percent_retrieved',
+        'settings:answer_check_sample_percent_retrieved_desc',
+        'settings:answer_check_sample_percent_general',
+        'settings:answer_check_sample_percent_general_desc',
+        'settings:answer_check_daily_cap',
+        'settings:answer_check_daily_cap_desc',
+        'settings:answer_check_provider',
+        'settings:answer_check_provider_desc',
+        'settings:answer_check_model',
+        'settings:answer_check_model_desc',
+        'layout:answercheck',
+        'task:check_answer_claims',
+        'token_analytics:cat_answer_check',
     ];
 
     /**

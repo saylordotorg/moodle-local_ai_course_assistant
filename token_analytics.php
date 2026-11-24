@@ -95,6 +95,7 @@ $msgwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
 // flashcards                    -> flashcards
 // essay                         -> essay
 // insights                      -> insights
+// answer_check                  -> answer_check (8.4.0 claim check judge)
 // model_bench                   -> other, deliberately. Benchmark spend is real
 //                                  invoiced money and this page is a money-truth
 //                                  consumer, so the rows ARE in scope here and must
@@ -119,6 +120,7 @@ $categorysql = "CASE
     WHEN m.interaction_type IN ('flashcards')                                THEN 'flashcards'
     WHEN m.interaction_type IN ('essay')                                     THEN 'essay'
     WHEN m.interaction_type IN ('insights')                                  THEN 'insights'
+    WHEN m.interaction_type IN ('answer_check')                              THEN 'answer_check'
     WHEN m.interaction_type IN ('premium_route')                            THEN 'premium_route'
     WHEN m.interaction_type IN ('quiz')                                     THEN 'quiz'
     WHEN m.interaction_type IN ('chat') OR m.interaction_type IS NULL OR m.interaction_type = '' THEN 'chat'
@@ -147,6 +149,7 @@ $categorylabels = [
     'flashcards'     => get_string('token_analytics:cat_flashcards', 'local_ai_course_assistant'),
     'essay'          => get_string('token_analytics:cat_essay', 'local_ai_course_assistant'),
     'insights'       => get_string('token_analytics:cat_insights', 'local_ai_course_assistant'),
+    'answer_check'   => get_string('token_analytics:cat_answer_check', 'local_ai_course_assistant'),
     'other'          => get_string('token_analytics:cat_other', 'local_ai_course_assistant'),
 ];
 

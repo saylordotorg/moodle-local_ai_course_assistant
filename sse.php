@@ -1316,8 +1316,11 @@ try {
                 $lockoutmsg = get_string('chat:offtopic_ended', 'local_ai_course_assistant', $lockoutminutes);
                 local_ai_course_assistant_sse_send(['token' => "\n\n" . $lockoutmsg]);
                 local_ai_course_assistant_sse_send(['done' => true, 'locked' => true, 'locked_until' => $lockeduntil]);
-                // 8.4.0: record the answer after its done event (never throws).
-                \local_ai_course_assistant\answer_audit::record_answer(...$answeraudit);
+                // 8.4.0: record the answer after its done event, then queue its claim check (neither throws).
+                $auditid = \local_ai_course_assistant\answer_audit::record_answer(...$answeraudit);
+                if ($auditid) {
+                    \local_ai_course_assistant\claim_checker::queue_for($auditid);
+                }
                 die();
             }
         } else {
@@ -1391,8 +1394,12 @@ try {
     local_ai_course_assistant_sse_send($doneevent);
 
     // 8.4.0: record the answer after its done event, so a busy course lock never
-    // delays the learner. record_answer() never throws (failures are audit-logged).
-    \local_ai_course_assistant\answer_audit::record_answer(...$answeraudit);
+    // delays the learner. record_answer() never throws (failures are audit-logged). The claim check is queued for
+    // the recorded row (queue_for() never throws either; it checks the mode, the sampling and the daily cap).
+    $auditid = \local_ai_course_assistant\answer_audit::record_answer(...$answeraudit);
+    if ($auditid) {
+        \local_ai_course_assistant\claim_checker::queue_for($auditid);
+    }
 
     // Check if the student's learning profile needs updating. Runs
     // after the response is sent so it does not add latency. The
