@@ -235,6 +235,9 @@ class review_queue {
             $params = ['akind' => 'answer', 'vkind' => 'verdict', 'v2kind' => 'verdict', 'courseid' => $courseid]
                 + $statusparams;
             $verdicts = [];
+            // Wellbeing flags are never capped here: they sort first, so a busy course must not push them out
+            // before pending_for_course() applies priority. Only the other claim items count toward $limit.
+            $capped = 0;
             $rs = $DB->get_recordset_sql($vsql, $params);
             foreach ($rs as $v) {
                 $claims = self::json_list($v->claims);
@@ -251,8 +254,11 @@ class review_queue {
                     continue;
                 }
                 $claimanswers[(int) $v->aid] = true;
-                if (isset($resolvedkeys['claim:' . (int) $v->aid]) || count($verdicts) >= $limit) {
+                if (isset($resolvedkeys['claim:' . (int) $v->aid]) || (!$wellbeing && $capped >= $limit)) {
                     continue;
+                }
+                if (!$wellbeing) {
+                    $capped++;
                 }
                 $verdicts[(int) $v->aid] = ['verdict' => $v, 'claims' => $claims, 'vrules' => $vrules,
                     'wellbeing' => $wellbeing];
@@ -486,7 +492,8 @@ class review_queue {
         try {
             $out = [];
             foreach (get_fast_modinfo($courseid)->get_cms() as $cm) {
-                $out[(int) $cm->id] = $cm->get_formatted_name();
+                // The raw name: the template escapes it (a formatted name would be escaped twice).
+                $out[(int) $cm->id] = (string) $cm->name;
             }
             return $out;
         } catch (\Throwable $e) {

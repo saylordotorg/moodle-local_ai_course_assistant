@@ -184,6 +184,46 @@ final class review_queue_answer_sources_test extends \advanced_testcase {
             'local_ai_course_assistant'), $rows[0]['summary']);
     }
 
+    public function test_a_wellbeing_flag_is_kept_first_in_a_busy_course(): void {
+        $wb = $this->answer((int) $this->course->id, [], 'I want to give up');
+        $this->verdict($wb, 'needs_review', 'high', [], [['id' => claim_checker::WELLBEING_MODEL_RULE,
+            'action' => 'review']]);
+        $this->waitForSecond();
+        for ($i = 0; $i < 51; $i++) {
+            $aid = $this->answer((int) $this->course->id);
+            $this->verdict($aid, 'needs_review', 'high', [$this->contradicted()]);
+        }
+        $rows = review_queue::pending_for_course((int) $this->course->id);
+        $this->assertCount(50, $rows);
+        $this->assertSame(['claim', $wb], [$rows[0]['source'], $rows[0]['sourceid']]);
+        $this->assertSame(1, $rows[0]['priority']);
+    }
+
+    public function test_an_activity_name_is_escaped_once(): void {
+        $page = $this->getDataGenerator()->create_module('page', ['course' => $this->course->id,
+            'name' => 'Q&A week 2']);
+        $aid = $this->answer((int) $this->course->id, [], 'When?', 'Friday',
+            [['cmid' => (int) $page->cmid, 'score' => 0.9, 'ref' => 'chunk:41']]);
+        $this->verdict($aid, 'needs_review', 'high', [$this->contradicted('high', 'chunk:41')]);
+        $pending = review_queue::pending_for_course((int) $this->course->id);
+        $this->assertSame('Q&A week 2', $pending[0]['detail']['claims'][0]['evidence']);
+        $html = $this->render($pending);
+        $this->assertStringContainsString('Q&amp;A week 2', $html);
+        $this->assertStringNotContainsString('&amp;amp;', $html);
+    }
+
+    public function test_only_claim_and_rule_rows_get_an_outcome_select(): void {
+        $this->rating((int) $this->course->id);
+        $html = $this->render(review_queue::pending_for_course((int) $this->course->id));
+        $this->assertStringNotContainsString('name="outcome"', $html);
+        $this->assertStringContainsString('name="note"', $html);
+
+        $this->answer((int) $this->course->id, [['id' => 'deadlines.date', 'action' => 'block']]);
+        $html = $this->render(review_queue::pending_for_course((int) $this->course->id));
+        $this->assertSame(1, substr_count($html, 'name="outcome"'));
+        $this->assertStringContainsString('required', $html);
+    }
+
     public function test_a_recorded_block_warn_or_correct_rule_is_a_rule_item(): void {
         $ids = [];
         foreach (['block', 'warn', 'correct'] as $action) {

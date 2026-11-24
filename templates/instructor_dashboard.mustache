@@ -243,11 +243,13 @@
                         <input type="hidden" name="source" value="{{source}}">
                         <input type="hidden" name="sourceid" value="{{sourceid}}">
                         <input type="hidden" name="sesskey" value="{{review_sesskey}}">
+                        {{#outcome_required}}
                         <label for="{{formid}}-outcome" class="aica-id-inline-label">{{review_labels.outcome}}</label>
-                        <select name="outcome" id="{{formid}}-outcome" class="custom-select custom-select-sm"{{#outcome_required}} required{{/outcome_required}}>
+                        <select name="outcome" id="{{formid}}-outcome" class="custom-select custom-select-sm" required>
                             <option value="">{{review_labels.outcome_none}}</option>
                             {{#outcomes}}<option value="{{value}}">{{label}}</option>{{/outcomes}}
                         </select>
+                        {{/outcome_required}}
                         <label for="{{formid}}-note" class="aica-id-inline-label">{{review_labels.note}}</label>
                         <input type="text" name="note" id="{{formid}}-note" class="form-control form-control-sm" maxlength="1000">
                         <button type="submit" class="btn btn-sm btn-outline-success">{{review_labels.resolve}}</button>
