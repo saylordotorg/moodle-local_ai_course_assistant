@@ -24,8 +24,13 @@ namespace local_ai_course_assistant;
  * holds every capability, so any course). Every read is scoped to the course: the detail view refuses an answer id
  * of another course, and a verdict id.
  *
- * Redaction: a row marked redacted never shows or exports its question, answer or claim text, even if text is still
- * in the row (a hand restore or an edit); its metadata, verdicts and hashes still show.
+ * Redaction: an answer is treated as redacted when its answer row OR its latest verdict row is marked redacted
+ * (is_redacted(), the same rule for the list, the detail view and the export). A redacted answer never shows or
+ * exports its question, answer or claim text, even if text is still in a row (a hand restore or an edit); its
+ * metadata, verdicts and hashes still show.
+ *
+ * Export: every matching answer, oldest first, streamed from a recordset (write_csv(), write_json()); there is no
+ * row cap, so an export never silently drops rows.
  *
  * Learners are named by `anonymizer::name()` only, as on the instructor dashboard; no user id is exported.
  *
@@ -46,9 +51,6 @@ class answer_audit_report {
 
     /** @var int Answers listed on the page. */
     public const PAGE_LIMIT = 200;
-
-    /** @var int Answers in one export. */
-    public const EXPORT_LIMIT = 5000;
 
     /** @var int Topics and rules in the counts report. */
     public const REPORT_TOP = 10;
@@ -121,8 +123,9 @@ class answer_audit_report {
     public static function rule_choices(int $courseid): array {
         global $DB;
         $ids = [];
-        $rs = $DB->get_recordset_select(answer_audit::TABLE, 'courseid = :courseid AND kind = :kind AND rules IS NOT NULL',
-            ['courseid' => $courseid, 'kind' => 'answer'], '', 'id, rules');
+        // Answer rows and verdict rows: the rule filter matches rules recorded on either.
+        $rs = $DB->get_recordset_select(answer_audit::TABLE, 'courseid = :courseid AND rules IS NOT NULL',
+            ['courseid' => $courseid], '', 'id, rules');
         foreach ($rs as $rec) {
             foreach (self::content_rules(self::json_list($rec->rules)) as $r) {
                 $ids[$r['id']] = true;
@@ -135,20 +138,29 @@ class answer_audit_report {
     }
 
     /**
-     * The export rows of a course's answers, oldest first, flat (one row per answer, its latest verdict inlined).
+     * Every matching export row of a course's answers, oldest first, flat (one row per answer, its latest verdict
+     * inlined), streamed from a recordset. No cap.
      *
      * @param int $courseid
      * @param array $filters verdict, rule, since, until (any may be missing)
-     * @param int $limit
-     * @return array[] keyed by COLUMNS
+     * @return \Generator<array> rows keyed by COLUMNS
      */
-    public static function export_rows(int $courseid, array $filters, int $limit = self::EXPORT_LIMIT): array {
+    public static function export_iter(int $courseid, array $filters): \Generator {
         $cms = self::course_cms($courseid);
-        $out = [];
-        foreach (self::collect($courseid, $filters, $limit, false) as [$a, $v]) {
-            $out[] = self::flat_row($a, $v, $cms);
+        foreach (self::collect($courseid, $filters, 0, false) as [$a, $v]) {
+            yield self::flat_row($a, $v, $cms);
         }
-        return $out;
+    }
+
+    /**
+     * Every matching export row, as an array (tests and small courses; the page streams export_iter()).
+     *
+     * @param int $courseid
+     * @param array $filters
+     * @return array[]
+     */
+    public static function export_rows(int $courseid, array $filters): array {
+        return iterator_to_array(self::export_iter($courseid, $filters), false);
     }
 
     /**
@@ -166,10 +178,10 @@ class answer_audit_report {
             throw new \moodle_exception('answeraudit:notfound', self::COMPONENT);
         }
         $cms = self::course_cms($courseid);
-        $redacted = !empty($a->redacted);
         $verdicts = [];
         $vrecs = $DB->get_records(answer_audit::TABLE,
             ['kind' => 'verdict', 'supersedes' => (int) $a->id, 'courseid' => $courseid], 'id ASC');
+        $redacted = self::is_redacted($a, $vrecs ? end($vrecs) : null);
         foreach ($vrecs as $v) {
             $vredacted = $redacted || !empty($v->redacted);
             $claims = [];
@@ -316,40 +328,42 @@ class answer_audit_report {
     }
 
     /**
-     * CSV text: a first row with the chain check, then the column names, then the rows, every cell formula-escaped.
+     * Write CSV to a stream: a first row with the chain check, then the column names, then every row, each cell
+     * formula-escaped.
      *
-     * @param array[] $rows export_rows()
+     * @param resource $handle
+     * @param iterable $rows export_iter() or export_rows()
      * @param array $chain answer_audit::verify_chain()
-     * @return string
+     * @return int rows written
      */
-    public static function to_csv(array $rows, array $chain): string {
-        $handle = fopen('php://temp', 'r+');
+    public static function write_csv($handle, iterable $rows, array $chain): int {
         fputcsv($handle, ['chain_verified', !empty($chain['ok']) ? 'yes' : 'no', 'broken_at',
             $chain['brokenat'] === null ? '' : (string) (int) $chain['brokenat']]);
         fputcsv($handle, self::COLUMNS);
+        $count = 0;
         foreach ($rows as $row) {
             $cells = [];
             foreach (self::COLUMNS as $col) {
                 $cells[] = transcript_report::csv_cell((string) ($row[$col] ?? ''));
             }
             fputcsv($handle, $cells);
+            $count++;
         }
-        rewind($handle);
-        $csv = (string) stream_get_contents($handle);
-        fclose($handle);
-        return $csv;
+        return $count;
     }
 
     /**
-     * JSON text: the chain check, the filters, then the rows.
+     * Write JSON to a stream: {chain, filters, rows: [...]}, one row at a time.
      *
-     * @param array[] $rows export_rows()
-     * @param array $chain answer_audit::verify_chain()
+     * @param resource $handle
+     * @param iterable $rows
+     * @param array $chain
      * @param array $filters
-     * @return string
+     * @return int rows written
      */
-    public static function to_json(array $rows, array $chain, array $filters): string {
-        return json_encode([
+    public static function write_json($handle, iterable $rows, array $chain, array $filters): int {
+        $flags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE;
+        $head = [
             'chain' => ['verified' => !empty($chain['ok']),
                 'broken_at' => $chain['brokenat'] === null ? null : (int) $chain['brokenat']],
             'filters' => [
@@ -358,8 +372,49 @@ class answer_audit_report {
                 'since' => (int) ($filters['since'] ?? 0),
                 'until' => (int) ($filters['until'] ?? 0),
             ],
-            'rows' => array_values($rows),
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+        ];
+        fwrite($handle, '{"chain":' . json_encode($head['chain'], $flags) . ',"filters":'
+            . json_encode($head['filters'], $flags) . ',"rows":[');
+        $count = 0;
+        foreach ($rows as $row) {
+            fwrite($handle, ($count ? ",\n" : "\n") . json_encode($row, $flags));
+            $count++;
+        }
+        fwrite($handle, "\n]}\n");
+        return $count;
+    }
+
+    /**
+     * CSV text (write_csv() into memory).
+     *
+     * @param iterable $rows
+     * @param array $chain
+     * @return string
+     */
+    public static function to_csv(iterable $rows, array $chain): string {
+        $handle = fopen('php://temp', 'r+');
+        self::write_csv($handle, $rows, $chain);
+        rewind($handle);
+        $out = (string) stream_get_contents($handle);
+        fclose($handle);
+        return $out;
+    }
+
+    /**
+     * JSON text (write_json() into memory).
+     *
+     * @param iterable $rows
+     * @param array $chain
+     * @param array $filters
+     * @return string
+     */
+    public static function to_json(iterable $rows, array $chain, array $filters): string {
+        $handle = fopen('php://temp', 'r+');
+        self::write_json($handle, $rows, $chain, $filters);
+        rewind($handle);
+        $out = (string) stream_get_contents($handle);
+        fclose($handle);
+        return $out;
     }
 
     /**
@@ -392,10 +447,10 @@ class answer_audit_report {
         }
 
         $rows = [];
-        $found = self::collect($courseid, $filters, self::PAGE_LIMIT + 1, true);
+        $found = iterator_to_array(self::collect($courseid, $filters, self::PAGE_LIMIT + 1, true), false);
         $truncated = count($found) > self::PAGE_LIMIT;
         foreach (array_slice($found, 0, self::PAGE_LIMIT) as [$a, $v]) {
-            $redacted = !empty($a->redacted);
+            $redacted = self::is_redacted($a, $v);
             $rules = self::content_rules(self::json_list($a->rules));
             $rows[] = [
                 'id' => (int) $a->id,
@@ -489,11 +544,11 @@ class answer_audit_report {
      *
      * @param int $courseid
      * @param array $filters
-     * @param int $limit
+     * @param int $limit 0 = every matching answer
      * @param bool $newestfirst
-     * @return array[] [answer record, latest verdict record or null]
+     * @return \Generator<array> [answer record, latest verdict record or null]
      */
-    private static function collect(int $courseid, array $filters, int $limit, bool $newestfirst): array {
+    private static function collect(int $courseid, array $filters, int $limit, bool $newestfirst): \Generator {
         global $DB;
         $verdict = (string) ($filters['verdict'] ?? '');
         $rule = (string) ($filters['rule'] ?? '');
@@ -508,11 +563,11 @@ class answer_audit_report {
             $params['until'] = (int) $filters['until'];
         }
         $latest = self::latest_verdicts($courseid);
-        $out = [];
+        $found = 0;
         $rs = $DB->get_recordset_select(answer_audit::TABLE, $where, $params, $newestfirst ? 'id DESC' : 'id ASC');
         try {
             foreach ($rs as $a) {
-                if (count($out) >= $limit) {
+                if ($limit > 0 && $found >= $limit) {
                     break;
                 }
                 $v = $latest[(int) $a->id] ?? null;
@@ -529,12 +584,23 @@ class answer_audit_report {
                         continue;
                     }
                 }
-                $out[] = [$a, $v];
+                $found++;
+                yield [$a, $v];
             }
         } finally {
             $rs->close();
         }
-        return $out;
+    }
+
+    /**
+     * Whether an answer is treated as redacted: its answer row or its latest verdict row is marked redacted.
+     *
+     * @param \stdClass $a answer row
+     * @param \stdClass|null $v latest verdict row
+     * @return bool
+     */
+    private static function is_redacted(\stdClass $a, ?\stdClass $v): bool {
+        return !empty($a->redacted) || ($v !== null && !empty($v->redacted));
     }
 
     /**
@@ -567,7 +633,7 @@ class answer_audit_report {
      * @return array
      */
     private static function flat_row(\stdClass $a, ?\stdClass $v, array $cms): array {
-        $redacted = !empty($a->redacted) || ($v && !empty($v->redacted));
+        $redacted = self::is_redacted($a, $v);
         $rules = self::content_rules(self::json_list($a->rules));
         if ($v) {
             foreach (self::content_rules(self::json_list($v->rules)) as $r) {
@@ -595,7 +661,7 @@ class answer_audit_report {
             'severity' => $v ? (string) ($v->severity ?? '') : '',
             'claims' => implode(' | ', $claims),
             'passages' => count(self::json_list($a->chunks)),
-            'redacted' => !empty($a->redacted) ? 1 : 0,
+            'redacted' => $redacted ? 1 : 0,
             'question' => $redacted ? '' : (string) ($a->question ?? ''),
             'answer' => $redacted ? '' : (string) ($a->answer ?? ''),
             'rowhash' => (string) $a->rowhash,

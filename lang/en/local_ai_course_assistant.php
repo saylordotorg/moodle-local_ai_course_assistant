@@ -4020,6 +4020,7 @@ $string['answeraudit:citations'] = 'Citations';
 $string['answeraudit:passages'] = 'Course passages retrieved';
 $string['answeraudit:none'] = 'None';
 $string['answeraudit:rowhash'] = 'Row hash';
+$string['answeraudit:prevhash'] = 'Previous row hash';
 $string['answeraudit:verdicts'] = 'Claim check verdicts';
 $string['answeraudit:claim'] = 'Claim';
 $string['answeraudit:claim_status'] = 'Status';

@@ -59,26 +59,29 @@ $format = optional_param('format', '', PARAM_ALPHA);
 
 if ($format === 'csv' || $format === 'json') {
     require_sesskey();
-    $rows = answer_audit_report::export_rows($courseid, $filters);
     $chain = answer_audit::verify_chain($courseid);
-    audit_logger::log('answer_audit_export', (int) $USER->id, $courseid, [
-        'format' => $format,
-        'rows' => count($rows),
-        'verdict' => $filters['verdict'] === '' ? null : $filters['verdict'],
-        'rule' => $filters['rule'] === '' ? null : $filters['rule'],
-        'since' => $filters['since'] ?: null,
-        'until' => $filters['until'] ?: null,
-        'chain_verified' => !empty($chain['ok']),
-    ]);
     $filename = clean_filename('sola-answer-audit-' . $course->shortname . '-' . date('Y-m-d')) . '.' . $format;
     \core\session\manager::write_close();
     header('Content-Type: ' . ($format === 'csv' ? 'text/csv' : 'application/json') . '; charset=utf-8');
     header('Content-Disposition: attachment; filename="' . $filename . '"');
     header('X-Content-Type-Options: nosniff');
     header('Cache-Control: no-store');
-    echo $format === 'csv'
-        ? answer_audit_report::to_csv($rows, $chain)
-        : answer_audit_report::to_json($rows, $chain, $filters);
+    // Every matching answer, streamed from the recordset: no cap, so nothing is dropped silently.
+    $out = fopen('php://output', 'w');
+    $rows = answer_audit_report::export_iter($courseid, $filters);
+    $count = $format === 'csv'
+        ? answer_audit_report::write_csv($out, $rows, $chain)
+        : answer_audit_report::write_json($out, $rows, $chain, $filters);
+    fclose($out);
+    audit_logger::log('answer_audit_export', (int) $USER->id, $courseid, [
+        'format' => $format,
+        'rows' => $count,
+        'verdict' => $filters['verdict'] === '' ? null : $filters['verdict'],
+        'rule' => $filters['rule'] === '' ? null : $filters['rule'],
+        'since' => $filters['since'] ?: null,
+        'until' => $filters['until'] ?: null,
+        'chain_verified' => !empty($chain['ok']),
+    ]);
     exit;
 }
 

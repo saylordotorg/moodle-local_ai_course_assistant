@@ -592,6 +592,7 @@ final class lang_completeness_test extends \basic_testcase {
         'answeraudit:passages',
         'answeraudit:none',
         'answeraudit:rowhash',
+        'answeraudit:prevhash',
         'answeraudit:verdicts',
         'answeraudit:claim',
         'answeraudit:claim_status',

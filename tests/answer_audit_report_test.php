@@ -308,6 +308,82 @@ final class answer_audit_report_test extends \advanced_testcase {
         $this->assertSame(6, $seen);
     }
 
+    public function test_export_has_no_row_cap_and_streams_every_row_oldest_first(): void {
+        $cid = (int) $this->course->id;
+        $ids = [];
+        for ($i = 0; $i < 7; $i++) {
+            $ids[] = $this->answer($cid, [], "question {$i}");
+        }
+        $rows = answer_audit_report::export_rows($cid, []);
+        $this->assertSame($ids, array_map(static fn(array $r): int => $r['id'], $rows), 'every row, oldest first');
+
+        $chain = answer_audit::verify_chain($cid);
+        $handle = fopen('php://temp', 'r+');
+        $this->assertSame(7, answer_audit_report::write_csv($handle, answer_audit_report::export_iter($cid, []), $chain));
+        rewind($handle);
+        $lines = array_filter(explode("\n", (string) stream_get_contents($handle)));
+        fclose($handle);
+        $this->assertCount(9, $lines, 'chain row, header row and 7 answers');
+        $this->assertStringStartsWith(end($ids) . ',', end($lines), 'the newest answer is in the export');
+
+        $handle = fopen('php://temp', 'r+');
+        $this->assertSame(7, answer_audit_report::write_json($handle, answer_audit_report::export_iter($cid, []),
+            $chain, []));
+        rewind($handle);
+        $decoded = json_decode((string) stream_get_contents($handle), true);
+        fclose($handle);
+        $this->assertTrue($decoded['chain']['verified']);
+        $this->assertSame($ids, array_column($decoded['rows'], 'id'));
+    }
+
+    public function test_a_redacted_latest_verdict_hides_the_answer_everywhere(): void {
+        global $DB, $OUTPUT, $PAGE;
+        $cid = (int) $this->course->id;
+        $PAGE->set_url('/local/ai_course_assistant/answer_audit.php', ['courseid' => $cid]);
+        $aid = $this->answer($cid, [], 'VERDICTREDACTEDQ');
+        $vid = $this->verdict($aid, 'needs_review', [$this->claim('contradicted', 'VERDICTREDACTEDCLAIM')]);
+        $DB->set_field(answer_audit::TABLE, 'redacted', 1, ['id' => $vid]);
+
+        $row = answer_audit_report::export_rows($cid, [])[0];
+        $this->assertSame(1, $row['redacted']);
+        $this->assertSame('', $row['question']);
+        $this->assertSame('', $row['answer']);
+        $this->assertStringNotContainsString('VERDICTREDACTEDCLAIM', $row['claims']);
+
+        $detail = answer_audit_report::detail($cid, $aid);
+        $this->assertTrue($detail['redacted']);
+        $this->assertSame('', $detail['question']);
+        $this->assertSame('', $detail['answer']);
+
+        $ctx = answer_audit_report::template_context($cid, answer_audit_report::parse_filters('', '', '', ''), $aid);
+        $html = $OUTPUT->render_from_template('local_ai_course_assistant/answer_audit', $ctx);
+        $this->assertStringNotContainsString('VERDICTREDACTEDQ', $html);
+        $this->assertStringNotContainsString('VERDICTREDACTEDCLAIM', $html);
+    }
+
+    public function test_rule_choices_include_rules_recorded_only_on_a_verdict(): void {
+        $cid = (int) $this->course->id;
+        $aid = $this->answer($cid);
+        answer_audit::append_verdict($aid, ['status' => 'needs_review', 'severity' => 'high', 'claims' => [],
+            'rules' => [['id' => 'wellbeing.model_flag', 'action' => 'flag']]]);
+        $this->assertSame(['wellbeing.model_flag'], answer_audit_report::rule_choices($cid));
+        $this->assertSame([$aid], $this->ids(answer_audit_report::export_rows($cid, ['rule' => 'wellbeing.model_flag'])));
+    }
+
+    public function test_detail_shows_both_hashes(): void {
+        global $OUTPUT, $PAGE;
+        $cid = (int) $this->course->id;
+        $PAGE->set_url('/local/ai_course_assistant/answer_audit.php', ['courseid' => $cid]);
+        $first = $this->answer($cid);
+        $second = $this->answer($cid);
+        $d1 = answer_audit_report::detail($cid, $first);
+        $ctx = answer_audit_report::template_context($cid, answer_audit_report::parse_filters('', '', '', ''), $second);
+        $html = $OUTPUT->render_from_template('local_ai_course_assistant/answer_audit', $ctx);
+        $this->assertStringContainsString($ctx['detail']['rowhash'], $html);
+        $this->assertSame($d1['rowhash'], $ctx['detail']['prevhash']);
+        $this->assertStringContainsString('<code>' . $d1['rowhash'] . '</code>', $html);
+    }
+
     // Counts report.
 
     public function test_report_lists_unsupported_topics_by_activity_from_the_latest_verdict(): void {
