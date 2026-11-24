@@ -47,6 +47,40 @@ use local_ai_course_assistant\validators\second_person_validator;
  */
 class runtime_guard {
     /**
+     * @var array[] The validator results of the last apply() call, each [validator, severity, messages]. Kept in
+     *     memory for the answer audit (8.4.0); never stored as is, because a credential_leak message quotes the token.
+     */
+    private static array $lastresults = [];
+
+    /**
+     * The validator results of the last apply() call: one [validator, severity, messages] per validator that ran.
+     * Empty when the mode is off, when a validator threw, or before any call.
+     *
+     * @return array[]
+     */
+    public static function last_results(): array {
+        return self::$lastresults;
+    }
+
+    /**
+     * The text of each retrieved chunk, for the 'rag_chunks' context key (8.4.0: sse.php passes them, so the
+     * numeric hallucination check has something to compare against).
+     *
+     * @param array $retrievedchunks rag_retriever::retrieve() rows
+     * @return string[]
+     */
+    public static function chunk_texts(array $retrievedchunks): array {
+        $texts = [];
+        foreach ($retrievedchunks as $chunk) {
+            $text = is_array($chunk) ? (string) ($chunk['content'] ?? '') : (string) $chunk;
+            if (trim($text) !== '') {
+                $texts[] = $text;
+            }
+        }
+        return $texts;
+    }
+
+    /**
      * Apply the runtime validators to an assistant response.
      *
      * @param string $response The model's response text (post-marker scrub).
@@ -55,6 +89,7 @@ class runtime_guard {
      * @return string The (possibly modified) response.
      */
     public static function apply(string $response, array $context = []): string {
+        self::$lastresults = [];
         $mode = (string) (get_config('local_ai_course_assistant', 'validators_runtime_mode') ?: 'off');
         if ($mode !== 'annotate' && $mode !== 'block') {
             return $response;
@@ -84,6 +119,9 @@ class runtime_guard {
             debugging('runtime_guard: validator threw: ' . $e->getMessage(), DEBUG_DEVELOPER);
             return $response;
         }
+        self::$lastresults = array_map(static function ($r) {
+            return ['validator' => $r->validator, 'severity' => $r->severity, 'messages' => $r->messages];
+        }, $results);
 
         $fails = [];
         foreach ($results as $r) {

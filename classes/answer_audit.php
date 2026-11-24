@@ -333,6 +333,115 @@ class answer_audit {
     }
 
     /**
+     * Whether answers in this course are recorded (8.4.0). Reads the site setting `answer_safety_mode`
+     * (off by default; watch and enforce record). Task 4 adds the per-course override.
+     *
+     * @param int $courseid
+     * @return bool
+     */
+    public static function is_enabled(int $courseid): bool {
+        $mode = (string) get_config('local_ai_course_assistant', 'answer_safety_mode');
+        return $mode === 'watch' || $mode === 'enforce';
+    }
+
+    /**
+     * Record one answer from the chat path (sse.php), never throwing.
+     *
+     * Records nothing when is_enabled() is false, or when the message or conversation id is missing (a row without
+     * them would escape the cap trim and the retention redaction, which find rows by those ids). Any failure,
+     * including a PHP Error, is caught and written to the developer debug log: the audit must never cost the learner
+     * the answer or the done event. Call it outside any delegated transaction (see record()).
+     *
+     * @param array $row the record() fields except chunks, citations, categories, rules and validators
+     * @param array $retrievedchunks rag_retriever::retrieve() rows
+     * @param array $citations the citation entries sent in the meta event
+     * @param array $validatorresults runtime_guard::last_results()
+     * @return int|null the new row id, or null when nothing was recorded
+     */
+    public static function record_answer(array $row, array $retrievedchunks, array $citations,
+            array $validatorresults): ?int {
+        try {
+            $courseid = (int) ($row['courseid'] ?? 0);
+            if (!self::is_enabled($courseid)) {
+                return null;
+            }
+            if (empty($row['messageid']) || empty($row['conversationid'])) {
+                debugging('answer_audit: answer not recorded, message or conversation id missing (course '
+                    . $courseid . ')', DEBUG_DEVELOPER);
+                return null;
+            }
+            $row['chunks'] = self::chunk_entries($retrievedchunks);
+            $row['citations'] = self::citation_entries($citations);
+            $row['categories'] = [];
+            $row['rules'] = [];
+            $row['validators'] = self::validator_entries($validatorresults);
+            return self::record($row);
+        } catch (\Throwable $e) {
+            debugging('answer_audit: answer not recorded: ' . get_class($e) . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return null;
+        }
+    }
+
+    /**
+     * The audit's chunk entries: cmid, score (4 places) and a ref, `chunk:<id>` when the retriever gave the chunk's
+     * id, else `sha1:<hash of its text>` (a merged parent passage has no single id).
+     *
+     * @param array $retrievedchunks
+     * @return array[]
+     */
+    public static function chunk_entries(array $retrievedchunks): array {
+        $out = [];
+        foreach ($retrievedchunks as $chunk) {
+            if (!is_array($chunk)) {
+                continue;
+            }
+            $cmid = (int) ($chunk['cmid'] ?? 0);
+            $out[] = [
+                'cmid' => $cmid ?: null,
+                'score' => round((float) ($chunk['score'] ?? 0), 4),
+                'ref' => !empty($chunk['id']) ? 'chunk:' . (int) $chunk['id'] : 'sha1:' . sha1((string) ($chunk['content'] ?? '')),
+            ];
+        }
+        return $out;
+    }
+
+    /**
+     * The audit's citation entries: index and cmid only (no urls or titles).
+     *
+     * @param array $citations
+     * @return array[]
+     */
+    public static function citation_entries(array $citations): array {
+        $out = [];
+        foreach ($citations as $c) {
+            if (!is_array($c)) {
+                continue;
+            }
+            $cmid = (int) ($c['cmid'] ?? 0);
+            $out[] = ['index' => (int) ($c['index'] ?? 0), 'cmid' => $cmid ?: null];
+        }
+        return $out;
+    }
+
+    /**
+     * The audit's validator entries: [{name, severity}]. A list, not a map keyed by validator, because a name such
+     * as credential_leak is refused as a field name; messages are left out because they can quote what was caught.
+     *
+     * @param array $results runtime_guard::last_results()
+     * @return array[]
+     */
+    public static function validator_entries(array $results): array {
+        $out = [];
+        foreach ($results as $r) {
+            if (!is_array($r) || !isset($r['validator'])) {
+                continue;
+            }
+            $out[] = ['name' => (string) $r['validator'], 'severity' => (string) ($r['severity'] ?? '')];
+        }
+        return $out;
+    }
+
+    /**
      * A course's rows for export, oldest first, JSON columns decoded.
      *
      * @param int $courseid

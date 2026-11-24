@@ -1103,10 +1103,13 @@ try {
     // via `validators_runtime_mode` (annotate / block). On fail, either
     // appends a warning line ('annotate') or replaces with a safe
     // fallback ('block'). Audit-logged in either case.
+    // 8.4.0: the retrieved chunks' text goes in as rag_chunks, so the numeric
+    // hallucination check has something to compare against (it was a no-op here).
     $cleanresponse = \local_ai_course_assistant\runtime_guard::apply($cleanresponse, [
         'input'    => (string) ($message ?? ''),
         'userid'   => (int) $userid,
         'courseid' => (int) $courseid,
+        'rag_chunks' => \local_ai_course_assistant\runtime_guard::chunk_texts($retrievedchunks ?? []),
     ]);
 
     // Save the clean assistant response (without markers), recording which provider was used.
@@ -1169,6 +1172,21 @@ try {
         isset($tokenusage['reasoning_tokens']) ? (int) $tokenusage['reasoning_tokens'] : null,
         $sourcetag
     );
+
+    // 8.4.0: the answer audit row (only when answer_safety_mode is watch or enforce).
+    // record_answer() never throws and skips a turn without a message or conversation id.
+    \local_ai_course_assistant\answer_audit::record_answer([
+        'messageid' => (int) $assistantmsgid,
+        'conversationid' => (int) $conv->id,
+        'userid' => (int) $userid,
+        'courseid' => (int) $courseid,
+        'cmid' => $pageid ?: null,
+        'mode' => 'text',
+        'question' => (string) $message,
+        'answer' => $cleanresponse,
+        'model' => $tokenusage['model'] ?? null,
+        'provider' => $providername,
+    ], $retrievedchunks ?? [], $citations ?? [], \local_ai_course_assistant\runtime_guard::last_results());
 
     // Queue the conversation-mastery classifier as an adhoc task so it runs
     // out of band. Only when mastery is turned on for the course AND the

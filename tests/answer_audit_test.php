@@ -933,4 +933,264 @@ final class answer_audit_test extends \advanced_testcase {
         $this->assertSame(0, answer_audit::redact_for_conversations([11]), 'already redacted');
         $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain(7));
     }
+
+    // Task 3: recording each answer from sse.php, and runtime_guard seeing the retrieved chunks.
+
+    /**
+     * Two retrieved chunks in rag_retriever's shape: one with its chunk id, one without (merged parents).
+     *
+     * @return array
+     */
+    private function retrieved(): array {
+        return [
+            ['id' => 77, 'content' => 'The course was first offered in 1998 and revised in 2015.', 'score' => 0.8123456,
+                'cmid' => 42, 'modtype' => 'page', 'chunkindex' => 0, 'courseid' => 7],
+            ['content' => 'Unit 9 holds the final exam.', 'score' => 0.5, 'cmid' => null, 'modtype' => 'course',
+                'chunkindex' => 3, 'courseid' => 7],
+        ];
+    }
+
+    /**
+     * The sse.php source with whitespace folded, for pinning call sites (sse.php is a script a test can't load).
+     *
+     * @return string
+     */
+    private function sse_source(): string {
+        global $CFG;
+        return preg_replace('/\s+/', ' ', file_get_contents($CFG->dirroot . '/local/ai_course_assistant/sse.php'));
+    }
+
+    /**
+     * A conversation with a saved question and answer, and the arguments sse.php passes to record_answer().
+     *
+     * @param array $overrides row overrides
+     * @return array{conv: \stdClass, msgid: int, row: array, user: \stdClass, course: \stdClass}
+     */
+    private function sse_turn(array $overrides = []): array {
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        $conv = conversation_manager::get_or_create_conversation((int) $user->id, (int) $course->id);
+        conversation_manager::add_message((int) $conv->id, (int) $user->id, (int) $course->id, 'user', 'When did it start?');
+        $msgid = conversation_manager::add_message((int) $conv->id, (int) $user->id, (int) $course->id, 'assistant',
+            'It started in 1998.');
+        $row = array_merge([
+            'messageid' => $msgid,
+            'conversationid' => (int) $conv->id,
+            'userid' => (int) $user->id,
+            'courseid' => (int) $course->id,
+            'cmid' => 42,
+            'mode' => 'text',
+            'question' => 'When did it start?',
+            'answer' => 'It started in 1998.',
+            'model' => 'gemini-2.5-flash',
+            'provider' => 'gemini',
+        ], $overrides);
+        return ['conv' => $conv, 'msgid' => $msgid, 'row' => $row, 'user' => $user, 'course' => $course];
+    }
+
+    public function test_is_enabled_reads_answer_safety_mode(): void {
+        unset_config('answer_safety_mode', 'local_ai_course_assistant');
+        $this->assertFalse(answer_audit::is_enabled(7), 'off by default');
+        foreach (['off' => false, 'watch' => true, 'enforce' => true, 'nonsense' => false] as $mode => $expected) {
+            set_config('answer_safety_mode', $mode, 'local_ai_course_assistant');
+            $this->assertSame($expected, answer_audit::is_enabled(7), $mode);
+        }
+    }
+
+    public function test_runtime_guard_gets_rag_chunks_so_numeric_check_runs(): void {
+        set_config('validators_runtime_mode', 'annotate', 'local_ai_course_assistant');
+        $texts = runtime_guard::chunk_texts($this->retrieved());
+        $this->assertSame(['The course was first offered in 1998 and revised in 2015.', 'Unit 9 holds the final exam.'],
+            $texts);
+
+        // 1987 appears in no chunk and not in the question: the numeric check warns.
+        $answer = 'The course was first offered in 1987.';
+        $out = runtime_guard::apply($answer, ['input' => 'When did it start?', 'userid' => 5, 'courseid' => 7,
+            'rag_chunks' => $texts]);
+        $byname = array_column(runtime_guard::last_results(), null, 'validator');
+        $this->assertSame('warn', $byname['hallucination']['severity']);
+        $this->assertStringContainsString('1987', implode(' ', $byname['hallucination']['messages']));
+        // A warning is not a block: annotate leaves the answer exactly as it was, as before 8.4.0.
+        $this->assertSame($answer, $out);
+
+        // A year that is in the chunks passes.
+        runtime_guard::apply('It was revised in 2015.', ['input' => 'x', 'rag_chunks' => $texts]);
+        $byname = array_column(runtime_guard::last_results(), null, 'validator');
+        $this->assertSame('pass', $byname['hallucination']['severity']);
+
+        // And sse.php hands the retrieved chunks to the guard (before 8.4.0 it did not, so this check never ran).
+        $this->assertStringContainsString(
+            "'rag_chunks' => \\local_ai_course_assistant\\runtime_guard::chunk_texts(\$retrievedchunks ?? []),",
+            $this->sse_source());
+    }
+
+    public function test_last_results_lists_validators(): void {
+        set_config('validators_runtime_mode', 'annotate', 'local_ai_course_assistant');
+        unset_config('validators_runtime_memory_leak_enabled', 'local_ai_course_assistant');
+        runtime_guard::apply('A plain answer.', ['input' => 'hi']);
+        $results = runtime_guard::last_results();
+        $this->assertSame(['pii_echo', 'credential_leak', 'hallucination', 'second_person'],
+            array_column($results, 'validator'));
+        foreach ($results as $r) {
+            $this->assertSame(['validator', 'severity', 'messages'], array_keys($r));
+            $this->assertSame('pass', $r['severity']);
+        }
+
+        // A failing call lists the failure; the next call starts again.
+        runtime_guard::apply('My API key is sk-ant-' . str_repeat('a', 40) . '.', ['input' => 'x']);
+        $byname = array_column(runtime_guard::last_results(), null, 'validator');
+        $this->assertSame('fail', $byname['credential_leak']['severity']);
+
+        // Off runs nothing, so it lists nothing (never the previous call's results).
+        set_config('validators_runtime_mode', 'off', 'local_ai_course_assistant');
+        runtime_guard::apply('My API key is sk-ant-' . str_repeat('a', 40) . '.', ['input' => 'x']);
+        $this->assertSame([], runtime_guard::last_results());
+    }
+
+    public function test_validators_runtime_modes_behave_as_before_with_chunks(): void {
+        $texts = runtime_guard::chunk_texts($this->retrieved());
+        $leak = 'My API key is sk-ant-' . str_repeat('a', 40) . ' since 1987.';
+
+        set_config('validators_runtime_mode', 'annotate', 'local_ai_course_assistant');
+        $out = runtime_guard::apply($leak, ['input' => 'x', 'rag_chunks' => $texts]);
+        $this->assertStringEndsWith("\n\n_⚠ Response review: credential_leak_", $out,
+            'only blocking results are named; the numeric warning is not');
+
+        set_config('validators_runtime_mode', 'block', 'local_ai_course_assistant');
+        $out = runtime_guard::apply($leak, ['input' => 'x', 'rag_chunks' => $texts]);
+        $this->assertStringContainsString('safety review held it back (credential_leak)', $out);
+
+        set_config('validators_runtime_mode', 'block', 'local_ai_course_assistant');
+        $warnonly = 'It began in 1987.';
+        $this->assertSame($warnonly, runtime_guard::apply($warnonly, ['input' => 'x', 'rag_chunks' => $texts]),
+            'a numeric warning never blocks');
+    }
+
+    public function test_sse_records_row_for_assistant_message(): void {
+        global $DB;
+        set_config('answer_safety_mode', 'watch', 'local_ai_course_assistant');
+        set_config('validators_runtime_mode', 'annotate', 'local_ai_course_assistant');
+        $turn = $this->sse_turn();
+        $retrieved = $this->retrieved();
+        runtime_guard::apply('It started in 1987.', ['input' => 'When did it start?',
+            'rag_chunks' => runtime_guard::chunk_texts($retrieved)]);
+        $citations = [
+            ['index' => 0, 'cmid' => 42, 'modtype' => 'page', 'score' => 0.8123, 'url' => 'https://x/mod/page/view.php?id=42',
+                'title' => 'Intro'],
+            ['index' => 1, 'cmid' => null, 'modtype' => 'course', 'score' => 0.5, 'url' => 'https://x/course', 'title' => ''],
+        ];
+
+        $id = answer_audit::record_answer($turn['row'], $retrieved, $citations, runtime_guard::last_results());
+
+        $this->assertNotNull($id);
+        $rec = $DB->get_record(self::TABLE, ['id' => $id], '*', MUST_EXIST);
+        $this->assertSame('answer', $rec->kind);
+        $this->assertEquals($turn['msgid'], $rec->messageid);
+        $this->assertEquals($turn['conv']->id, $rec->conversationid);
+        $this->assertEquals($turn['user']->id, $rec->userid);
+        $this->assertEquals($turn['course']->id, $rec->courseid);
+        $this->assertEquals(42, $rec->cmid);
+        $this->assertSame('text', $rec->mode);
+        $this->assertSame('When did it start?', $rec->question);
+        $this->assertSame('It started in 1998.', $rec->answer);
+        $this->assertSame('gemini-2.5-flash', $rec->model);
+        $this->assertSame('gemini', $rec->provider);
+        $this->assertSame([
+            ['cmid' => 42, 'ref' => 'chunk:77', 'score' => 0.8123],
+            ['cmid' => null, 'ref' => 'sha1:' . sha1('Unit 9 holds the final exam.'), 'score' => 0.5],
+        ], json_decode($rec->chunks, true));
+        $this->assertSame([['cmid' => 42, 'index' => 0], ['cmid' => null, 'index' => 1]],
+            json_decode($rec->citations, true), 'cmid and index only: no urls or titles');
+        $this->assertSame([], json_decode($rec->categories, true));
+        $this->assertSame([], json_decode($rec->rules, true));
+        // Validator names and severities only: credential_leak's messages quote the leaked token, so they stay out.
+        $this->assertSame([
+            ['name' => 'pii_echo', 'severity' => 'pass'],
+            ['name' => 'credential_leak', 'severity' => 'pass'],
+            ['name' => 'hallucination', 'severity' => 'warn'],
+            ['name' => 'second_person', 'severity' => 'pass'],
+        ], json_decode($rec->validators, true));
+        $this->assertStringNotContainsString('1987', $rec->validators);
+        $this->assertTrue(answer_audit::verify_chain((int) $turn['course']->id)['ok']);
+
+        // sse.php records it right after the assistant message is saved, outside any transaction, before done.
+        $src = $this->sse_source();
+        $save = strpos($src, '$assistantmsgid = conversation_manager::add_message(');
+        $call = strpos($src, '\local_ai_course_assistant\answer_audit::record_answer([');
+        $done = strpos($src, "\$doneevent = ['done' => true, 'messageid' => \$assistantmsgid];");
+        $this->assertNotFalse($save);
+        $this->assertNotFalse($call, 'sse.php must record each answer');
+        $this->assertNotFalse($done);
+        $this->assertTrue($save < $call && $call < $done, 'recorded after the save and before the done event');
+        $callsite = substr($src, $call, 900);
+        foreach ([
+            "'messageid' => (int) \$assistantmsgid,", "'conversationid' => (int) \$conv->id,",
+            "'question' => (string) \$message,", "'answer' => \$cleanresponse,", "'model' => \$tokenusage['model'] ?? null,",
+            "'provider' => \$providername,", "], \$retrievedchunks ?? [], \$citations ?? [], "
+                . "\\local_ai_course_assistant\\runtime_guard::last_results());",
+        ] as $needle) {
+            $this->assertStringContainsString($needle, $callsite);
+        }
+        $this->assertStringNotContainsString('start_delegated_transaction', $src);
+    }
+
+    public function test_not_recorded_when_mode_off(): void {
+        global $DB;
+        unset_config('answer_safety_mode', 'local_ai_course_assistant');
+        $turn = $this->sse_turn();
+        $this->assertNull(answer_audit::record_answer($turn['row'], $this->retrieved(), [], []));
+        set_config('answer_safety_mode', 'off', 'local_ai_course_assistant');
+        $this->assertNull(answer_audit::record_answer($turn['row'], $this->retrieved(), [], []));
+        $this->assertSame(0, $DB->count_records(self::TABLE));
+        $this->assertDebuggingNotCalled();
+    }
+
+    public function test_not_recorded_when_messageid_or_conversationid_missing(): void {
+        global $DB;
+        set_config('answer_safety_mode', 'enforce', 'local_ai_course_assistant');
+        $turn = $this->sse_turn();
+        foreach ([['messageid' => 0], ['messageid' => null], ['conversationid' => 0], ['conversationid' => null]] as $bad) {
+            $this->assertNull(answer_audit::record_answer(array_merge($turn['row'], $bad), [], [], []));
+            $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
+        }
+        $row = $turn['row'];
+        unset($row['messageid']);
+        $this->assertNull(answer_audit::record_answer($row, [], [], []));
+        $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
+        $this->assertSame(0, $DB->count_records(self::TABLE));
+    }
+
+    public function test_an_exception_inside_record_does_not_propagate(): void {
+        global $CFG, $DB;
+        set_config('answer_safety_mode', 'watch', 'local_ai_course_assistant');
+        $turn = $this->sse_turn();
+        $courseid = (int) $turn['course']->id;
+
+        // A busy course lock: record() throws locktimeout. The db-record factory doesn't hand one process the
+        // same lock twice (MySQL named locks would).
+        $CFG->lock_factory = '\\' . answer_audit_test_lock_factory::class;
+        $factory = \core\lock\lock_config::get_lock_factory(answer_audit::LOCK_TYPE);
+        $held = $factory->get_lock(answer_audit::lock_resource($courseid), 0);
+        $this->assertNotFalse($held);
+        answer_audit::$locktimeout = 1;
+        try {
+            $this->assertNull(answer_audit::record_answer($turn['row'], $this->retrieved(), [], []));
+        } finally {
+            $held->release();
+        }
+        $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
+
+        // A PHP Error (not an Exception) thrown inside record() is caught too.
+        answer_audit_test_lock_factory::$onlock = function() {
+            throw new \Error('boom inside record');
+        };
+        $this->assertNull(answer_audit::record_answer($turn['row'], $this->retrieved(), [], []));
+        $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
+
+        // A row record() refuses (no userid) is caught as well.
+        $this->assertNull(answer_audit::record_answer(array_merge($turn['row'], ['userid' => 0]), [], [], []));
+        $this->assertDebuggingCalled(null, DEBUG_DEVELOPER);
+
+        $this->assertSame(0, $DB->count_records(self::TABLE));
+    }
 }
