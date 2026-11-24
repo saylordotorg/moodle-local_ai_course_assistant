@@ -292,8 +292,8 @@ class send_message extends external_api {
 
         // 8.4.0: the same protections as the streamed path (sse.php). runtime_guard runs with the retrieved chunks
         // (a no-op unless validators_runtime_mode is set), then the guidance rules (answer_flow::finalize()). The
-        // answer is returned whole, so it is checked like a held answer: there is no replace event, and a correct
-        // rule may ask the same provider once more. What is stored is exactly what is returned.
+        // answer is returned whole, so there is no replace event. As in sse.php, a correct rule retries only on a
+        // held (risky, enforce) question and warns otherwise. What is stored is exactly what is returned.
         $answercheck = self::check_answer((string) $response, $params, $userid, $provider, $systemprompt, $history,
             $retrievedchunks, $tokenusage);
         $response = $answercheck['text'];
@@ -378,8 +378,9 @@ class send_message extends external_api {
      *
      * Mode off: nothing new (runtime_guard alone, which is itself off unless validators_runtime_mode is set). Watch:
      * the rules run and what fired is returned for the audit row; the text never changes. Enforce: warn adds the
-     * check line, block swaps in the safe message, correct asks the same provider once more with the failure stated
-     * (skipped, and blocked, when the course's chat spend is blocked; a retry that fails or throws is blocked too).
+     * check line, block swaps in the safe message, correct (only on a question sse.php would hold: risky, in enforce;
+     * otherwise it warns) asks the same provider once more with the failure stated (skipped, and blocked, when the
+     * course's chat spend is blocked; a retry that fails or throws is blocked too).
      * Any failure in the rule check delivers the reply as runtime_guard left it and is counted with
      * answer_audit::log_rules_error() (exception class only, no learner text).
      *
@@ -408,6 +409,7 @@ class send_message extends external_api {
         $guarded = runtime_guard::apply($response, $guardctx);
         $out = ['text' => $guarded, 'validators' => runtime_guard::last_results(),
             'checked' => ['categories' => [], 'rules' => []], 'retryraw' => null];
+        $decided = false;
         try {
             if (self::$beforeanswercheck) {
                 (self::$beforeanswercheck)();
@@ -435,25 +437,31 @@ class send_message extends external_api {
             };
             $final = answer_flow::finalize($guarded, $plan, [
                 'question' => $question,
-                // The whole answer is checked before anything is returned: a held answer.
-                'buffered' => true,
+                // Held exactly when sse.php would hold it (a risky question in enforce mode): only then may a correct
+                // rule retry; otherwise it is downgraded to warn, as on the streamed path.
+                'buffered' => $plan['hold'],
                 'validator_results' => $out['validators'],
                 'chunks' => $guardctx['rag_chunks'],
                 'courseid' => $courseid,
             ], $retry);
+            // The decision is applied before anything else can throw, so the catch below never undoes a block.
+            $decided = true;
             $out['checked'] = ['categories' => $final['categories'], 'rules' => $final['rules']];
+            if ($final['replace']) {
+                // finalize() sets replace exactly when the text to deliver differs from the reply.
+                $out['text'] = (string) $final['text'];
+                if ($final['action'] === 'correct' && $retryraw !== null) {
+                    $out['retryraw'] = $retryraw;
+                }
+            }
             if ($final['error'] !== null) {
                 answer_audit::log_rules_error($userid, $courseid, (string) $final['error']);
             }
-            if (is_string($final['text']) && $final['text'] !== '') {
-                $out['text'] = $final['text'];
-            }
-            if ($final['action'] === 'correct' && $retryraw !== null) {
-                $out['retryraw'] = $retryraw;
-            }
         } catch (\Throwable $e) {
-            $out['text'] = $guarded;
-            $out['retryraw'] = null;
+            if (!$decided) {
+                $out['text'] = $guarded;
+                $out['retryraw'] = null;
+            }
             answer_audit::log_rules_error($userid, $courseid, get_class($e));
         }
         return $out;

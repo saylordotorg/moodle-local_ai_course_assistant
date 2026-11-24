@@ -410,9 +410,11 @@ final class send_message_service_test extends \advanced_testcase {
         $this->correct_rule();
 
         // A retry that passes is delivered, and stored.
-        $this->use_stub('enforce', ['You will get 500 zorkmid points.', 'Please ask your instructor about grades.']);
+        $this->use_stub('enforce', ['You will get 500 zorkmid points. [SOURCE:course]',
+            "Please ask your instructor about grades.\n[SOURCE:general]"]);
         $result = send_message::execute((int) $this->course->id, self::GRADE_Q, 0);
         $this->assertCount(2, stub_provider::$calls, 'one retry');
+        $this->assertSame('general', $this->stored_answer()->source, 'the source pill comes from the delivered retry');
         $retrymsgs = stub_provider::$calls[1]['messages'];
         $this->assertSame('assistant', $retrymsgs[count($retrymsgs) - 2]['role']);
         $this->assertStringContainsString('site.no_zork', end($retrymsgs)['content'], 'the failure is stated');
@@ -439,6 +441,20 @@ final class send_message_service_test extends \advanced_testcase {
         $rows = $this->audit_rows();
         $this->assertSame($result['response'], end($rows)->answer);
         $this->assertContains(['id' => 'site.no_zork', 'action' => 'correct'], $this->audit_rules(end($rows)));
+    }
+
+    public function test_send_message_correct_on_a_non_risky_question_downgrades_to_warn_without_a_retry(): void {
+        $this->correct_rule();
+        $reply = 'A balance sheet is worth 500 zorkmid points.';
+        $this->use_stub('enforce', [$reply, 'never asked']);
+        $result = send_message::execute((int) $this->course->id, self::PLAIN_Q, 0);
+        $this->assertCount(1, stub_provider::$calls, 'no retry: the question is not risky, so the answer is not held');
+        $this->assertStringStartsWith($reply, $result['response']);
+        $this->assertStringContainsString(get_string('answer_rules:warn_line', 'local_ai_course_assistant'),
+            $result['response']);
+        $this->assertSame($result['response'], $this->stored_answer()->message);
+        $this->assertContains(['id' => 'site.no_zork', 'action' => 'correct'],
+            $this->audit_rules($this->audit_rows()[0]));
     }
 
     public function test_send_message_retry_skipped_at_spend_cap(): void {
