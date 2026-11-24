@@ -1141,7 +1141,7 @@ final class answer_audit_test extends \advanced_testcase {
             "'messageid' => (int) \$assistantmsgid,", "'conversationid' => (int) \$conv->id,",
             "'question' => (string) \$message,", "'answer' => \$cleanresponse,", "'model' => \$tokenusage['model'] ?? null,",
             "'provider' => \$providername,", "], \$retrievedchunks ?? [], \$citations ?? [], "
-                . "\\local_ai_course_assistant\\runtime_guard::last_results()];",
+                . "\\local_ai_course_assistant\\runtime_guard::last_results(), \$answercheck];",
         ] as $needle) {
             $this->assertStringContainsString($needle, $callsite);
         }

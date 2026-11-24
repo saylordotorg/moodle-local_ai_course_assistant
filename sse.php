@@ -358,6 +358,17 @@ function local_ai_course_assistant_sse_send(array $data): void {
     flush();
 }
 
+/**
+ * Send an SSE keepalive comment (8.4.0): keeps a held answer's connection open; the browser's parser skips it.
+ */
+function local_ai_course_assistant_sse_keepalive(): void {
+    echo \local_ai_course_assistant\answer_hold::KEEPALIVE_FRAME;
+    if (ob_get_level() > 0) {
+        ob_flush();
+    }
+    flush();
+}
+
 try {
     $userid = $USER->id;
 
@@ -930,6 +941,18 @@ try {
         }
     }
 
+    // 8.4.0: guidance rules. The question is categorised here, before the model call (cheap and deterministic).
+    // A risky question in enforce mode is HELD: no token reaches the browser until the whole reply has been
+    // checked below, and keepalive comments keep the connection open meanwhile. Everything else streams as before
+    // and is checked after the stream, with a replace event if the rules change it. Mode off: nothing new happens.
+    $answerplan = \local_ai_course_assistant\answer_flow::plan((string) $message, (int) $courseid);
+    $answerhold = $answerplan['hold'] ? new \local_ai_course_assistant\answer_hold(function (string $frame): void {
+        local_ai_course_assistant_sse_keepalive();
+    }) : null;
+    if ($answerhold !== null) {
+        $answerhold->start();
+    }
+
     // v5.5.4 security fix: scrub known control markers from each chunk
     // before it reaches the client. The post-stream filter still runs on
     // $fullresponse for the audit-saved + UI-rendered version, but the
@@ -938,8 +961,16 @@ try {
     // flags, SOLA_NEXT chip payloads). We use a small carry-over buffer
     // so markers split across chunk boundaries are still caught.
     $carry = '';
-    $streamfilter = function (string $chunk) use (&$fullresponse, &$carry) {
+    $streamfilter = function (string $chunk) use (&$fullresponse, &$streamemit, &$answerhold) {
         $fullresponse .= $chunk;
+        if ($answerhold !== null) {
+            $answerhold->tick();
+            return;
+        }
+        $streamemit($chunk);
+    };
+    // Scrub and send one piece of the reply (the live stream, or a held reply when it is released).
+    $streamemit = function (string $chunk) use (&$carry) {
         // Combine carry-over with new chunk so split markers reassemble.
         $buf = $carry . $chunk;
         // Hold back the trailing bytes as carry so a marker straddling
@@ -1105,12 +1136,96 @@ try {
     // fallback ('block'). Audit-logged in either case.
     // 8.4.0: the retrieved chunks' text goes in as rag_chunks, so the numeric
     // hallucination check has something to compare against (it was a no-op here).
+    $preguard = $cleanresponse;
     $cleanresponse = \local_ai_course_assistant\runtime_guard::apply($cleanresponse, [
         'input'    => (string) ($message ?? ''),
         'userid'   => (int) $userid,
         'courseid' => (int) $courseid,
         'rag_chunks' => \local_ai_course_assistant\runtime_guard::chunk_texts($retrievedchunks ?? []),
     ]);
+
+    // 8.4.0: guidance rules on the finished reply (answer_flow::finalize(); mode from answer_flow::plan() above).
+    // watch: rules fired are recorded, the text never changes. enforce: warn adds the check line, block swaps in
+    // the safe message, correct (held answers only) asks the same provider once more with the failure stated and
+    // blocks if that fails too. The stored message is what the learner finally sees. Any failure here delivers the
+    // answer exactly as before and is counted (answer_audit::log_rules_error()).
+    $answercheck = ['categories' => $answerplan['categories'], 'rules' => []];
+    $answerreplace = null;
+    // A held reply is released below: the raw reply through the same scrub as a live stream (so the chips and
+    // source pill still work), or the checked text when something changed it.
+    $answerrelease = ($cleanresponse === $preguard) ? $fullresponse : $cleanresponse;
+    try {
+        $answerchunks = \local_ai_course_assistant\runtime_guard::chunk_texts($retrievedchunks ?? []);
+        if ($answerplan['mode'] !== 'off') {
+            $answerretryraw = '';
+            $answerretry = null;
+            if ($answerhold !== null) {
+                $answerretry = function (string $instruction) use ($provider, $systemprompt, $history, $streamoptions,
+                        $answerhold, $cleanresponse, $message, $userid, $courseid, $answerchunks, &$answerretryraw,
+                        &$tokenusage): string {
+                    $retryhistory = $history;
+                    $retryhistory[] = ['role' => 'assistant', 'content' => $cleanresponse];
+                    $retryhistory[] = ['role' => 'user', 'content' => $instruction];
+                    $raw = '';
+                    $provider->chat_completion_stream($systemprompt, $retryhistory,
+                        function (string $chunk) use (&$raw, $answerhold) {
+                            $raw .= $chunk;
+                            $answerhold->tick();
+                        }, $streamoptions);
+                    // The retry is billed on the same message row.
+                    $retryusage = $provider->get_last_token_usage();
+                    foreach (['prompt_tokens', 'completion_tokens', 'reasoning_tokens'] as $k) {
+                        if (isset($retryusage[$k])) {
+                            $tokenusage[$k] = (int) ($tokenusage[$k] ?? 0) + (int) $retryusage[$k];
+                        }
+                    }
+                    $answerretryraw = $raw;
+                    $text = trim(str_replace(['[OFF_TOPIC]', '[NEEDS_ESCALATION]'], '', $raw));
+                    $text = local_ai_course_assistant_filter_response_safety($text);
+                    return \local_ai_course_assistant\runtime_guard::apply($text, [
+                        'input'    => (string) ($message ?? ''),
+                        'userid'   => (int) $userid,
+                        'courseid' => (int) $courseid,
+                        'rag_chunks' => $answerchunks,
+                    ]);
+                };
+            }
+            $answerfinal = \local_ai_course_assistant\answer_flow::finalize($cleanresponse, $answerplan, [
+                'question' => (string) ($message ?? ''),
+                'buffered' => $answerhold !== null,
+                'validator_results' => \local_ai_course_assistant\runtime_guard::last_results(),
+                'chunks' => $answerchunks,
+            ], $answerretry);
+            $answercheck = ['categories' => $answerfinal['categories'], 'rules' => $answerfinal['rules']];
+            if ($answerfinal['error'] !== null) {
+                \local_ai_course_assistant\answer_audit::log_rules_error((int) $userid, (int) $courseid,
+                    (string) $answerfinal['error']);
+            }
+            if ($answerfinal['replace']) {
+                $answerrelease = ($answerfinal['action'] === 'correct' && $answerretryraw !== '')
+                    ? $answerretryraw : $answerfinal['text'];
+                if ($answerfinal['action'] === 'correct' && $answerretryraw !== '') {
+                    // The delivered answer is the retry: its markers give the source pill below.
+                    $fullresponse = $answerretryraw;
+                }
+                $cleanresponse = $answerfinal['text'];
+                if ($answerhold === null) {
+                    $answerreplace = ['text' => $cleanresponse,
+                        'reason' => $answerfinal['reason'] !== '' ? $answerfinal['reason'] : $answerfinal['action']];
+                }
+            }
+        }
+    } catch (\Throwable $e) {
+        $answercheck = ['categories' => $answerplan['categories'], 'rules' => []];
+        $answerreplace = null;
+        \local_ai_course_assistant\answer_audit::log_rules_error((int) $userid, (int) $courseid, get_class($e));
+    }
+    if ($answerhold !== null) {
+        // Release the held reply, before the save and the done event, through the same scrub as a live stream.
+        $answerhold = null;
+        $streamemit($answerrelease);
+        $streamflush();
+    }
 
     // Save the clean assistant response (without markers), recording which provider was used.
     //
@@ -1173,6 +1288,13 @@ try {
         $sourcetag
     );
 
+    // 8.4.0: the rules changed an answer the learner already saw streamed: swap it in the browser, before any done
+    // event. The stored message above already holds this text.
+    if ($answerreplace !== null) {
+        local_ai_course_assistant_sse_send(['replace' => $answerreplace['text'],
+            'messageid' => (int) $assistantmsgid, 'reason' => $answerreplace['reason']]);
+    }
+
     // 8.4.0: what the answer audit row needs, taken now (last_results() belongs to the
     // apply() call above). It is recorded only after the done event is sent, because
     // record() can wait for the course lock and the learner must not wait for it.
@@ -1187,7 +1309,7 @@ try {
         'answer' => $cleanresponse,
         'model' => $tokenusage['model'] ?? null,
         'provider' => $providername,
-    ], $retrievedchunks ?? [], $citations ?? [], \local_ai_course_assistant\runtime_guard::last_results()];
+    ], $retrievedchunks ?? [], $citations ?? [], \local_ai_course_assistant\runtime_guard::last_results(), $answercheck];
 
     // Queue the conversation-mastery classifier as an adhoc task so it runs
     // out of band. Only when mastery is turned on for the course AND the

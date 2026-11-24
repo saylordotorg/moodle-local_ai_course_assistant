@@ -6182,6 +6182,19 @@ define([
                 // so they never appear in the typewriter.
                 UI.updateStreamContent(stripStreamingDecorators(fullText));
             },
+            onReplace: function(data) {
+                // 8.4.0: a guidance rule changed the answer already streamed (blocked, or a check line added). The
+                // server saved the new text; show it in place of what streamed, and let onDone finish as usual.
+                if (!data || typeof data.replace !== 'string') {
+                    return;
+                }
+                if (!fullText) {
+                    UI.startStreaming(null);
+                }
+                if (UI.replaceStreamContent(data.replace, data.messageid)) {
+                    fullText = data.replace;
+                }
+            },
             onDone: function(doneData) {
                 UI.showTyping(false);
                 if (fullText) {

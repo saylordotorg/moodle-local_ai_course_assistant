@@ -2775,6 +2775,36 @@ define([
     };
 
     /**
+     * Swap the text of the message being streamed (8.4.0 replace event).
+     *
+     * A guidance rule blocked or warned on an answer that was already streamed: the server saved the new text and
+     * sends it before the done event. The text goes through the same sanitising render path as every assistant
+     * answer, the typewriter is moved to its end so the old text is not replayed, and the element is marked
+     * data-replaced="1". A replace for a different message id than the element already knows is ignored.
+     *
+     * @param {string} text The text the learner should see.
+     * @param {number|string|null} messageid The saved message id from the server.
+     * @return {HTMLElement|null} The message element, or null when nothing was changed.
+     */
+    const replaceStreamContent = function(text, messageid) {
+        if (!streamingEl || typeof text !== 'string') {
+            return null;
+        }
+        const id = (messageid === undefined || messageid === null) ? '' : String(messageid);
+        if (id && streamingEl.dataset.messageid && streamingEl.dataset.messageid !== id) {
+            return null;
+        }
+        typewriterFull = text;
+        typewriterPos = text.length;
+        const content = streamingEl.querySelector('.local-ai-course-assistant__message-content');
+        if (content) {
+            content.innerHTML = renderAssistantHtml(text);
+        }
+        streamingEl.dataset.replaced = '1';
+        return streamingEl;
+    };
+
+    /**
      * Mark an assistant message as cut off by the output-token limit.
      *
      * v7.7.6. The server stores such a turn as 'truncated' and sends this note
@@ -6665,6 +6695,7 @@ define([
         updateStreamContent: updateStreamContent,
         finishStreaming: finishStreaming,
         markMessageTruncated: markMessageTruncated,
+        replaceStreamContent: replaceStreamContent,
         setStreamCitations: setStreamCitations,
         renderMasteryChip: renderMasteryChip,
         hideMasteryChip: hideMasteryChip,

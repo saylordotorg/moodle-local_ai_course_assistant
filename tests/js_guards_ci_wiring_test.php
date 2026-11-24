@@ -70,6 +70,24 @@ final class js_guards_ci_wiring_test extends \basic_testcase {
     }
 
     /**
+     * The 8.4.0 answer replace guard is in the globbed directory and checks the built bundles too.
+     *
+     * The replace event is the only thing that swaps a streamed answer a guidance rule blocked; a source-only
+     * handler changes nothing, because Moodle serves amd/build.
+     *
+     * @return void
+     */
+    public function test_answer_replace_guard_is_wired(): void {
+        $path = dirname(__DIR__) . '/tests/js/answer-replace-check.js';
+        $this->assertFileExists($path, 'tests/js/answer-replace-check.js is gone, so nothing checks the replace event');
+        $src = file_get_contents($path);
+        foreach (["'build', 'sse_client.min.js'", "'build', 'chat.min.js'", "'build', 'ui.min.js'",
+                'planted defect is caught', 'process.exit(1)'] as $needle) {
+            $this->assertStringContainsString($needle, $src);
+        }
+    }
+
+    /**
      * The guards are plain node, with nothing to install.
      *
      * The CI job deliberately has no dependency step. A script that grew an

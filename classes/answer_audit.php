@@ -79,6 +79,9 @@ class answer_audit {
     /** @var string audit_logger action for an answer that could not be recorded. */
     public const RECORD_FAILED_ACTION = 'answer_audit_record_failed';
 
+    /** @var string audit_logger action for a guidance-rule check that failed on the chat path (answer delivered). */
+    public const RULES_FAILED_ACTION = 'answer_rules_failed';
+
     /** @var string[] Verdict statuses. */
     public const STATUSES = ['ok', 'warn', 'blocked', 'needs_review', 'check_failed'];
 
@@ -360,10 +363,12 @@ class answer_audit {
      * @param array $retrievedchunks rag_retriever::retrieve() rows
      * @param array $citations the citation entries sent in the meta event
      * @param array $validatorresults runtime_guard::last_results()
+     * @param array $checked what the guidance rules decided (answer_flow::finalize()): categories (string[]) and
+     *     rules ([{id, action}]); empty when the rules did not run
      * @return int|null the new row id, or null when nothing was recorded
      */
     public static function record_answer(array $row, array $retrievedchunks, array $citations,
-            array $validatorresults): ?int {
+            array $validatorresults, array $checked = []): ?int {
         try {
             $courseid = (int) ($row['courseid'] ?? 0);
             if (!self::is_enabled($courseid)) {
@@ -377,14 +382,39 @@ class answer_audit {
             }
             $row['chunks'] = self::chunk_entries($retrievedchunks);
             $row['citations'] = self::citation_entries($citations);
-            $row['categories'] = [];
+            $row['categories'] = array_values(array_map('strval', is_array($checked['categories'] ?? null)
+                ? $checked['categories'] : []));
             $row['rules'] = [];
+            foreach (is_array($checked['rules'] ?? null) ? $checked['rules'] : [] as $rule) {
+                if (is_array($rule) && isset($rule['id'], $rule['action'])) {
+                    $row['rules'][] = ['id' => (string) $rule['id'], 'action' => (string) $rule['action']];
+                }
+            }
             $row['validators'] = self::validator_entries($validatorresults);
             return self::record($row);
         } catch (\Throwable $e) {
             debugging('answer_audit: answer not recorded: ' . get_class($e) . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
             self::log_dropped($row, ['reason' => 'error', 'error_class' => get_class($e)]);
             return null;
+        }
+    }
+
+    /**
+     * Count a guidance-rule check that failed on the chat path (the answer was delivered as it was), in the SOC2
+     * audit log as RULES_FAILED_ACTION with reason rules_error. Details are the course id, the reason and an
+     * exception class only: never question, answer or exception text. Never throws.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @param string $errorclass
+     * @return void
+     */
+    public static function log_rules_error(int $userid, int $courseid, string $errorclass): void {
+        try {
+            audit_logger::log(self::RULES_FAILED_ACTION, $userid, $courseid, ['courseid' => $courseid,
+                'reason' => 'rules_error', 'error_class' => substr($errorclass, 0, 120)]);
+        } catch (\Throwable $ignore) {
+            debugging('answer_audit: could not log a rules error: ' . get_class($ignore), DEBUG_DEVELOPER);
         }
     }
 
