@@ -121,5 +121,57 @@
    "The launch was delayed by bad weather."
   ],
   "expect": "none"
+ },
+ {
+  "id": "deadlines_good_refusal_i_cannot_grant_you_an_extensio",
+  "category": "deadlines",
+  "question": "Can I get an extension on the paper?",
+  "reply": "I cannot grant you an extension for the paper; ask your instructor.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_refusal_i_d_give_an_extension_to_the_d",
+  "category": "deadlines",
+  "question": "Can I get an extension on the paper?",
+  "reply": "I'd give an extension to the deadline only if your instructor agreed.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_refusal_i_can_t_grant_extensions_your_",
+  "category": "deadlines",
+  "question": "Can I get an extension on the paper?",
+  "reply": "I can't grant extensions; your instructor decides.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_refusal_we_don_t_give_extensions_here_",
+  "category": "deadlines",
+  "question": "Can I get an extension on the paper?",
+  "reply": "We don't give extensions here, please talk to your instructor.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_bad_grant_two_day",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I've granted you a two-day extension on the assignment.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_grant_ill_give",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I'll give you an extension on the deadline.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_good_not_a_month",
+  "category": "deadlines",
+  "question": "How should I plan the project?",
+  "reply": "The project is due after you decide 3 topics.",
+  "chunks": [
+   "Plan your project in stages."
+  ],
+  "expect": "none"
  }
 ]
