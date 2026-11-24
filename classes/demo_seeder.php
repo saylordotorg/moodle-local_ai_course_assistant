@@ -436,6 +436,8 @@ class demo_seeder {
             );
             foreach ($batch as $u) {
                 $lastid = max($lastid, (int) $u->id);
+                // 8.4.0: the answer audit drops the text of the user's rows before their messages go.
+                answer_audit::redact_for_user((int) $u->id);
                 $DB->delete_records_select(
                     'local_ai_course_assistant_msg_ratings',
                     'messageid IN (SELECT id FROM {local_ai_course_assistant_msgs} WHERE userid = ?)',

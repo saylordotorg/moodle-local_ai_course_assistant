@@ -225,6 +225,8 @@ class conversation_manager {
                 $excess
             );
             if (!empty($oldest)) {
+                // 8.4.0: the answer audit loses the text of a trimmed answer before the answer itself goes.
+                answer_audit::redact_for_messages(array_keys($oldest));
                 [$insql, $inparams] = $DB->get_in_or_equal(array_keys($oldest));
                 $DB->delete_records_select('local_ai_course_assistant_msgs', "id {$insql}", $inparams);
             }
@@ -652,6 +654,8 @@ class conversation_manager {
             'messageid IN (SELECT id FROM {local_ai_course_assistant_msgs} WHERE conversationid = :convid)',
             ['convid' => $conversationid]
         );
+        // 8.4.0: the answer audit keeps its rows (metadata, verdicts, hashes) and drops their text.
+        answer_audit::redact_for_conversation($conversationid);
         $DB->delete_records('local_ai_course_assistant_msgs', ['conversationid' => $conversationid]);
         $DB->delete_records('local_ai_course_assistant_convs', ['id' => $conversationid]);
     }
@@ -682,6 +686,10 @@ class conversation_manager {
     public static function delete_user_data(int $userid): array {
         global $DB;
         $counts = [];
+
+        // 0. 8.4.0: the answer audit keeps the user's rows (metadata, verdicts, hashes) and drops their text,
+        // in every course, before the messages they describe go.
+        $counts['answer_audit_redacted'] = answer_audit::redact_for_user($userid);
 
         // 1. Messages (FK to conversations).
         $convids = $DB->get_fieldset_select('local_ai_course_assistant_convs', 'id', 'userid = ?', [$userid]);
@@ -779,6 +787,10 @@ class conversation_manager {
     public static function delete_course_data(int $courseid, ?int $userid = null): array {
         global $DB;
         $counts = [];
+
+        // 8.4.0: the answer audit keeps its rows (metadata, verdicts, hashes) and drops their text, for the
+        // course or for the one learner in it, before the messages they describe go.
+        $counts['answer_audit_redacted'] = answer_audit::redact_for_course($courseid, $userid ?: null);
 
         // Conversation messages first (FK to convs).
         $convparams = ['courseid' => $courseid];

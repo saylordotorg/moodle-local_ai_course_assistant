@@ -55,6 +55,11 @@ class conversation_retention extends \core\task\scheduled_task {
             mtrace('conversation_retention: nothing to purge (cutoff ' . $days . 'd).');
             return;
         }
+        // 8.4.0: the answer audit keeps these conversations' rows (metadata, verdicts, hashes) and drops their
+        // text before the messages go. One bounded update per stale conversation.
+        foreach ($convids as $convid) {
+            \local_ai_course_assistant\answer_audit::redact_for_conversation((int) $convid);
+        }
         [$insql, $params] = $DB->get_in_or_equal($convids);
         $DB->delete_records_select(
             'local_ai_course_assistant_msgs',

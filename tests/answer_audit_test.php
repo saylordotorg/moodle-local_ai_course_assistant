@@ -558,4 +558,285 @@ final class answer_audit_test extends \advanced_testcase {
         $this->expectException(\coding_exception::class);
         answer_audit::rows_for_export(7, ['sql' => '1=1']);
     }
+
+    // Task 2: every path that deletes msgs rows redacts the matching audit rows first.
+
+    /**
+     * A conversation with one question and one answer, and the audit row for that answer.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @param string $text distinctive text put in the question and the answer
+     * @return array{conv: \stdClass, msgid: int, auditid: int}
+     */
+    private function answered(int $userid, int $courseid, string $text = 'Secret question'): array {
+        $conv = conversation_manager::get_or_create_conversation($userid, $courseid);
+        conversation_manager::add_message((int) $conv->id, $userid, $courseid, 'user', $text . ' asked');
+        $msgid = conversation_manager::add_message((int) $conv->id, $userid, $courseid, 'assistant', $text . ' answered');
+        $auditid = answer_audit::record($this->row($courseid, [
+            'messageid' => $msgid,
+            'conversationid' => (int) $conv->id,
+            'userid' => $userid,
+            'question' => $text . ' asked',
+            'answer' => $text . ' answered',
+        ]));
+        return ['conv' => $conv, 'msgid' => $msgid, 'auditid' => $auditid];
+    }
+
+    /**
+     * Assert an audit row still exists, has lost its text and kept its metadata.
+     *
+     * @param int $auditid
+     * @param string $why
+     */
+    private function assert_redacted(int $auditid, string $why = ''): void {
+        global $DB;
+        $rec = $DB->get_record(self::TABLE, ['id' => $auditid]);
+        $this->assertNotFalse($rec, 'the audit row must stay (tombstone), not be deleted. ' . $why);
+        $this->assertEquals(1, $rec->redacted, 'the row must be redacted. ' . $why);
+        $this->assertNull($rec->question, $why);
+        $this->assertNull($rec->answer, $why);
+        $this->assertNotEmpty($rec->rowhash);
+        $this->assertNotEmpty($rec->texthash);
+        $this->assertNotNull($rec->rules, 'metadata stays');
+        $this->assertNotNull($rec->chunks, 'sources stay');
+    }
+
+    /**
+     * Assert an audit row still carries its text.
+     *
+     * @param int $auditid
+     * @param string $why
+     */
+    private function assert_live(int $auditid, string $why = ''): void {
+        global $DB;
+        $rec = $DB->get_record(self::TABLE, ['id' => $auditid], '*', MUST_EXIST);
+        $this->assertEquals(0, $rec->redacted, $why);
+        $this->assertNotNull($rec->question, $why);
+        $this->assertNotNull($rec->answer, $why);
+    }
+
+    public function test_clear_conversation_redacts_audit_text(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $u1 = $this->getDataGenerator()->create_user();
+        $u2 = $this->getDataGenerator()->create_user();
+        $mine = $this->answered((int) $u1->id, (int) $course->id);
+        $theirs = $this->answered((int) $u2->id, (int) $course->id);
+        $vid = answer_audit::append_verdict($mine['auditid'], ['status' => 'warn', 'severity' => 'low',
+            'claims' => [['text' => 'Claim to drop', 'type' => 'fact', 'status' => 'unsupported']]]);
+
+        conversation_manager::clear_conversation((int) $mine['conv']->id, (int) $u1->id);
+
+        $this->assert_redacted($mine['auditid'], 'cleared conversation');
+        global $DB;
+        $v = $DB->get_record(self::TABLE, ['id' => $vid], '*', MUST_EXIST);
+        $this->assertEquals(1, $v->redacted);
+        $this->assertStringNotContainsString('Claim to drop', (string) $v->claims);
+        $this->assert_live($theirs['auditid'], 'another learner\'s conversation is untouched');
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $course->id));
+    }
+
+    public function test_user_deletion_redacts_and_keeps_chain(): void {
+        $c1 = $this->getDataGenerator()->create_course();
+        $c2 = $this->getDataGenerator()->create_course();
+        $u1 = $this->getDataGenerator()->create_user();
+        $u2 = $this->getDataGenerator()->create_user();
+        $a = $this->answered((int) $u1->id, (int) $c1->id);
+        $b = $this->answered((int) $u1->id, (int) $c2->id);
+        $keep = $this->answered((int) $u2->id, (int) $c1->id);
+
+        // Through core: delete_user() -> before_user_deleted hook -> hook_callbacks::on_user_deleted.
+        delete_user($u1);
+
+        $this->assert_redacted($a['auditid'], 'course 1');
+        $this->assert_redacted($b['auditid'], 'course 2');
+        $this->assert_live($keep['auditid'], 'another learner is untouched');
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $c1->id));
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $c2->id));
+    }
+
+    public function test_delete_user_data_redacts_on_its_own(): void {
+        // The hook also runs the privacy provider, which could hide a gap here; call the manager alone.
+        $course = $this->getDataGenerator()->create_course();
+        $u1 = $this->getDataGenerator()->create_user();
+        $u2 = $this->getDataGenerator()->create_user();
+        $a = $this->answered((int) $u1->id, (int) $course->id);
+        $keep = $this->answered((int) $u2->id, (int) $course->id);
+
+        conversation_manager::delete_user_data((int) $u1->id);
+
+        $this->assert_redacted($a['auditid']);
+        $this->assert_live($keep['auditid']);
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $course->id));
+    }
+
+    public function test_retention_task_redacts(): void {
+        global $DB;
+        set_config('conversation_retention_days', 30, 'local_ai_course_assistant');
+        $course = $this->getDataGenerator()->create_course();
+        $u1 = $this->getDataGenerator()->create_user();
+        $u2 = $this->getDataGenerator()->create_user();
+        $stale = $this->answered((int) $u1->id, (int) $course->id);
+        $fresh = $this->answered((int) $u2->id, (int) $course->id);
+        $DB->set_field('local_ai_course_assistant_convs', 'timemodified', time() - 90 * 86400,
+            ['id' => $stale['conv']->id]);
+
+        $this->expectOutputRegex('/conversation_retention/');
+        (new \local_ai_course_assistant\task\conversation_retention())->execute();
+
+        $this->assertFalse($DB->record_exists('local_ai_course_assistant_convs', ['id' => $stale['conv']->id]));
+        $this->assert_redacted($stale['auditid'], 'stale conversation purged by retention');
+        $this->assert_live($fresh['auditid'], 'a fresh conversation is untouched');
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $course->id));
+    }
+
+    public function test_course_deletion_redacts(): void {
+        // delete_course_data() is what privacy's delete_data_for_all_users_in_context() calls (context expiry,
+        // where no course_deleted event fires); the observer path is covered by the test above.
+        $c1 = $this->getDataGenerator()->create_course();
+        $c2 = $this->getDataGenerator()->create_course();
+        $u1 = $this->getDataGenerator()->create_user();
+        $u2 = $this->getDataGenerator()->create_user();
+        $a1 = $this->answered((int) $u1->id, (int) $c1->id);
+        $a2 = $this->answered((int) $u2->id, (int) $c1->id);
+        $other = $this->answered((int) $u1->id, (int) $c2->id);
+
+        // Scoped to one learner first.
+        conversation_manager::delete_course_data((int) $c1->id, (int) $u1->id);
+        $this->assert_redacted($a1['auditid'], 'the learner in the course');
+        $this->assert_live($a2['auditid'], 'another learner in the same course');
+        $this->assert_live($other['auditid'], 'the same learner in another course');
+
+        // Then the whole course, through the privacy provider's context purge.
+        \local_ai_course_assistant\privacy\provider::delete_data_for_all_users_in_context(
+            \context_course::instance($c1->id));
+        $this->assert_redacted($a2['auditid'], 'whole-course purge');
+        $this->assert_live($other['auditid'], 'another course');
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $c1->id));
+    }
+
+    public function test_cap_trim_redacts_trimmed_messages(): void {
+        global $DB;
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $first = $this->answered((int) $user->id, (int) $course->id, 'First');
+        $conv = $first['conv'];
+        $last = null;
+        // 50 more pairs: 102 learner-visible rows, so the cap trims the oldest two (the first pair).
+        for ($i = 0; $i < 50; $i++) {
+            conversation_manager::add_message((int) $conv->id, (int) $user->id, (int) $course->id, 'user', "q $i");
+            $last = conversation_manager::add_message((int) $conv->id, (int) $user->id, (int) $course->id,
+                'assistant', "a $i");
+        }
+        $lastaudit = answer_audit::record($this->row((int) $course->id, [
+            'messageid' => $last, 'conversationid' => (int) $conv->id, 'userid' => (int) $user->id]));
+
+        $this->assertFalse($DB->record_exists('local_ai_course_assistant_msgs', ['id' => $first['msgid']]),
+            'the cap must have trimmed the first answer');
+        $this->assert_redacted($first['auditid'], 'trimmed by the cap');
+        $this->assert_live($lastaudit, 'a kept answer is untouched');
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $course->id));
+    }
+
+    public function test_clear_demo_students_redacts(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $demo = $this->getDataGenerator()->create_user(['username' => 'demo_student_audit1']);
+        $real = $this->getDataGenerator()->create_user(['username' => 'realstudent']);
+        $a = $this->answered((int) $demo->id, (int) $course->id);
+        $keep = $this->answered((int) $real->id, (int) $course->id);
+
+        demo_seeder::clear_demo_students();
+
+        $this->assert_redacted($a['auditid']);
+        $this->assert_live($keep['auditid']);
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $course->id));
+    }
+
+    public function test_privacy_export_contains_audit_metadata_for_user(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $other = $this->getDataGenerator()->create_user();
+        $live = $this->answered((int) $user->id, (int) $course->id, 'Live');
+        $vid = answer_audit::append_verdict($live['auditid'], ['status' => 'needs_review', 'severity' => 'high',
+            'claims' => [['text' => 'Live claim', 'type' => 'date', 'status' => 'contradicted',
+                'evidence_ref' => 'chunk:7', 'severity' => 'high']], 'judge_model' => 'gpt-4o-mini']);
+        $gone = answer_audit::record($this->row((int) $course->id, ['userid' => (int) $user->id,
+            'messageid' => 987654, 'conversationid' => 987654, 'question' => 'Gone asked', 'answer' => 'Gone answered']));
+        answer_audit::redact_for_messages([987654]);
+        $theirs = $this->answered((int) $other->id, (int) $course->id, 'Theirs');
+
+        $context = \context_course::instance($course->id);
+        $contextlist = new \core_privacy\local\request\approved_contextlist($user, 'local_ai_course_assistant',
+            [$context->id]);
+        \local_ai_course_assistant\privacy\provider::export_user_data($contextlist);
+
+        $writer = \core_privacy\local\request\writer::with_context($context);
+        $plugin = get_string('pluginname', 'local_ai_course_assistant');
+
+        $row = $writer->get_data([$plugin, 'answer_audit', $live['auditid']]);
+        $this->assertNotEmpty($row, 'a live answer row is exported');
+        $this->assertSame('Live asked', $row->question, 'the learner\'s own question is theirs to see');
+        $this->assertSame('Live answered', $row->answer);
+        $this->assertSame('answer', $row->kind);
+        $this->assertEquals([['id' => 'r1', 'action' => 'warn']], $row->rules, 'rules fired');
+        $this->assertSame(42, $row->chunks[0]['cmid'], 'sources');
+        $this->assertNotEmpty($row->timecreated);
+        $this->assertNotEmpty($row->rowhash);
+        $this->assertObjectNotHasProperty('userid', $row);
+
+        $verdict = $writer->get_data([$plugin, 'answer_audit', $vid]);
+        $this->assertNotEmpty($verdict, 'a verdict row is exported');
+        $this->assertSame('needs_review', $verdict->status);
+        $this->assertSame('contradicted', $verdict->claims[0]['status']);
+
+        $tomb = $writer->get_data([$plugin, 'answer_audit', $gone]);
+        $this->assertNotEmpty($tomb, 'a redacted row is still exported as metadata');
+        $this->assertSame(1, $tomb->redacted);
+        $this->assertNull($tomb->question);
+        $this->assertNull($tomb->answer);
+        $this->assertNotEmpty($tomb->timeredacted);
+        $this->assertEquals([['id' => 'r1', 'action' => 'warn']], $tomb->rules);
+        $this->assertStringNotContainsString('Gone', json_encode($tomb));
+
+        $this->assertEmpty($writer->get_data([$plugin, 'answer_audit', $theirs['auditid']]),
+            'another learner\'s row is not in this export');
+    }
+
+    public function test_privacy_delete_removes_text(): void {
+        global $DB;
+        $c1 = $this->getDataGenerator()->create_course();
+        $c2 = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $other = $this->getDataGenerator()->create_user();
+        $a = $this->answered((int) $user->id, (int) $c1->id);
+        // A row whose conversation is already gone: erasure must not depend on the conversation existing.
+        $orphan = answer_audit::record($this->row((int) $c1->id, ['userid' => (int) $user->id,
+            'messageid' => 555555, 'conversationid' => 555555]));
+        $elsewhere = $this->answered((int) $user->id, (int) $c2->id);
+        $keep = $this->answered((int) $other->id, (int) $c1->id);
+        $count = $DB->count_records(self::TABLE);
+
+        $ctx1 = \context_course::instance($c1->id);
+        \local_ai_course_assistant\privacy\provider::delete_data_for_user(
+            new \core_privacy\local\request\approved_contextlist($user, 'local_ai_course_assistant', [$ctx1->id]));
+
+        $this->assert_redacted($a['auditid'], 'erasure in the approved course');
+        $this->assert_redacted($orphan, 'erasure reaches rows with no conversation');
+        $this->assert_live($elsewhere['auditid'], 'a course outside the approved contexts');
+        $this->assert_live($keep['auditid'], 'another learner');
+        $this->assertSame($count, $DB->count_records(self::TABLE), 'erasure never deletes audit rows');
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $c1->id));
+
+        // delete_data_for_users (a userlist in one course context).
+        $orphan2 = answer_audit::record($this->row((int) $c2->id, ['userid' => (int) $other->id,
+            'messageid' => 666666, 'conversationid' => 666666]));
+        $ctx2 = \context_course::instance($c2->id);
+        \local_ai_course_assistant\privacy\provider::delete_data_for_users(
+            new \core_privacy\local\request\approved_userlist($ctx2, 'local_ai_course_assistant',
+                [(int) $user->id, (int) $other->id]));
+        $this->assert_redacted($elsewhere['auditid'], 'userlist erasure');
+        $this->assert_redacted($orphan2, 'userlist erasure reaches rows with no conversation');
+        $this->assert_live($keep['auditid'], 'a course outside the userlist context');
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $c2->id));
+    }
 }
