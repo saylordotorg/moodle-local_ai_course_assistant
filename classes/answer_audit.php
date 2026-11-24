@@ -336,15 +336,14 @@ class answer_audit {
     }
 
     /**
-     * Whether answers in this course are recorded (8.4.0). Reads the site setting `answer_safety_mode`
-     * (off by default; watch and enforce record). Task 4 adds the per-course override.
+     * Whether answers in this course are recorded (8.4.0): whenever answer_rules::mode() is watch or enforce
+     * (the course's own override, else the site setting `answer_safety_mode`, off by default).
      *
      * @param int $courseid
      * @return bool
      */
     public static function is_enabled(int $courseid): bool {
-        $mode = (string) get_config('local_ai_course_assistant', 'answer_safety_mode');
-        return $mode === 'watch' || $mode === 'enforce';
+        return answer_rules::mode($courseid) !== 'off';
     }
 
     /**

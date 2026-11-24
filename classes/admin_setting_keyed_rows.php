@@ -73,6 +73,25 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
     abstract protected function add_label_key(): string;
 
     /**
+     * Whether the table has a secret key column after its first column. A table without one (the answer safety
+     * rules, 8.4.0) uses the same row editor with no key cell, and no key is read from the form.
+     *
+     * @return bool
+     */
+    protected function has_key_column(): bool {
+        return true;
+    }
+
+    /**
+     * What a failed save adds after the problems.
+     *
+     * @return string
+     */
+    protected function resubmit_note(): string {
+        return get_string('providerkeys:err_resubmit', 'local_ai_course_assistant');
+    }
+
+    /**
      * Create the setting.
      *
      * @param string $name
@@ -151,6 +170,11 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
             if ($row[$first] === '') {
                 continue;
             }
+            if (!$this->has_key_column()) {
+                $row['stored_key'] = '';
+                $rows[] = $row;
+                continue;
+            }
             $newkey = trim((string) ($p['newkey'] ?? ''));
             $keepid = (string) ($p['keepid'] ?? '');
             if ($newkey !== '' && preg_match('~[|\r\n]~', $newkey)) {
@@ -177,7 +201,7 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
         }
         $errors = array_merge($keyerrors, $this->validate($rows));
         if ($errors) {
-            return implode(' ', $errors) . ' ' . get_string('providerkeys:err_resubmit', 'local_ai_course_assistant');
+            return implode(' ', $errors) . ' ' . $this->resubmit_note();
         }
         $this->config_write($this->name, $this->store($rows));
         return '';
@@ -207,7 +231,7 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
         $heads = [];
         foreach ($columns as $i => $column) {
             $heads[] = ['label' => get_string($column['label'], 'local_ai_course_assistant'), 'iskey' => false];
-            if ($i === 0) {
+            if ($i === 0 && $this->has_key_column()) {
                 $heads[] = ['label' => get_string('providerkeys:col_key', 'local_ai_course_assistant'), 'iskey' => true];
             }
         }
@@ -278,7 +302,7 @@ abstract class admin_setting_keyed_rows extends \admin_setting {
                 'istext' => $column['type'] === 'text',
                 'placeholder' => $column['placeholder'] ?? '',
                 'options' => [],
-                'iskeynext' => $i === 0,
+                'iskeynext' => $i === 0 && $this->has_key_column(),
                 'readonly' => $readonly,
             ];
             if ($cell['isselect']) {

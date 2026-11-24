@@ -85,6 +85,9 @@ class course_setting_transfer {
         // "not used" rather than to an error.
         'supplemental_courses_course_',
         'digest_email_enabled_course_',
+        // Answer safety (8.4.0): off, watch or enforce for this course. A copy keeps its source's checking, the
+        // same as the other per-course feature switches; it holds no learner data.
+        'answer_safety_mode_course_',
     ];
 
     /**

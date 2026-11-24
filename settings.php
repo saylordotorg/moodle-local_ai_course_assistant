@@ -1683,6 +1683,39 @@ if ($hassiteconfig) {
         ]
     ));
 
+    // 8.4.0: answer safety. Guidance rules checked against the question and the answer, and the answer audit
+    // trail. Off by default, so the upgrade changes nothing. A course can override the mode through
+    // course_config_manager::set_answer_safety_mode() (config key answer_safety_mode_course_<id>).
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/answer_safety_heading',
+        get_string('settings:answer_safety_heading', 'local_ai_course_assistant'),
+        get_string('settings:answer_safety_heading_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/answer_safety_mode',
+        get_string('settings:answer_safety_mode', 'local_ai_course_assistant'),
+        get_string('settings:answer_safety_mode_desc', 'local_ai_course_assistant'),
+        'off',
+        [
+            'off'     => get_string('settings:answer_safety_mode_off', 'local_ai_course_assistant'),
+            'watch'   => get_string('settings:answer_safety_mode_watch', 'local_ai_course_assistant'),
+            'enforce' => get_string('settings:answer_safety_mode_enforce', 'local_ai_course_assistant'),
+        ]
+    ));
+    $settings->add(new \local_ai_course_assistant\admin_setting_answer_rules(
+        'local_ai_course_assistant/answer_safety_rules',
+        get_string('settings:answer_safety_rules', 'local_ai_course_assistant'),
+        get_string('settings:answer_safety_rules_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/answer_safety_wellbeing_message',
+        get_string('settings:answer_safety_wellbeing_message', 'local_ai_course_assistant'),
+        get_string('settings:answer_safety_wellbeing_message_desc', 'local_ai_course_assistant',
+            get_string('answer_rules:safe_wellbeing', 'local_ai_course_assistant')),
+        '',
+        PARAM_TEXT
+    ));
+
     // v4.4.0: Optional Content-Security-Policy header on course pages where
     // the SOLA widget is active. Default off — admin opts in. Defense-in-
     // depth against arbitrary scripts pasted into Site administration →

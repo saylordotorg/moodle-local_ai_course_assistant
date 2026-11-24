@@ -476,7 +476,9 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $this->assertTrue($has('s_local_ai_course_assistant_voice_providers'), "voice table is on a page ($when)");
         if ($forced) {
             $note = s(get_string('providerkeys:forced_note', 'local_ai_course_assistant'));
-            $this->assertSame(2, substr_count($html, $note), "both forced tables say they are set in config.php ($when)");
+            // The two key tables, plus the answer safety rules table (8.4.0, same editor, no key column), which this
+            // test forces too so that no editor on any page has an add button or loads the script.
+            $this->assertSame(3, substr_count($html, $note), "every forced table says it is set in config.php ($when)");
             $this->assertSame(0, substr_count($html, 'sola-kr-add'), "a forced table has no add button ($when)");
             $this->assertSame(0, substr_count($html, 'sola-kr-change'), "a forced table has no change button ($when)");
             $this->assertSame(0, substr_count($html, 'sola-kr-remove'), "a forced table has no remove button ($when)");
@@ -788,6 +790,7 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
         $rows = ['f-openai', 'f-claude', 'f-gemini', 'f-voice-a', 'f-voice-b'];
         $CFG->forced_plugin_settings['local_ai_course_assistant'][provider_keys::SETTING] = implode("\n", $providerlines);
         $CFG->forced_plugin_settings['local_ai_course_assistant']['voice_providers'] = implode("\n", $voicelines);
+        $CFG->forced_plugin_settings['local_ai_course_assistant']['answer_safety_rules'] = '';
         try {
             $this->render_and_check('forced tables, first load', $rows, false, [], true);
             $this->assertStringNotContainsString('m-openai', $this->render_all_pages()['html'],
@@ -815,7 +818,8 @@ final class settings_no_secret_in_page_test extends \advanced_testcase {
             $this->render_and_check('forced tables, after a save attempt', $rows, false, [], true);
         } finally {
             unset($CFG->forced_plugin_settings['local_ai_course_assistant'][provider_keys::SETTING],
-                $CFG->forced_plugin_settings['local_ai_course_assistant']['voice_providers']);
+                $CFG->forced_plugin_settings['local_ai_course_assistant']['voice_providers'],
+                $CFG->forced_plugin_settings['local_ai_course_assistant']['answer_safety_rules']);
         }
     }
 

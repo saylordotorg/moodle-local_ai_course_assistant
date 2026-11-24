@@ -197,6 +197,9 @@ final class settings_layout_map {
                     'audit_retention_days', 'conversation_retention_days',
                     'validators_runtime_mode', 'csp_course_pages_mode'
                 ]],
+                ['existing', 'answer_safety_heading', [
+                    'answer_safety_mode', 'answer_safety_rules', 'answer_safety_wellbeing_message'
+                ]],
             ],
         ],
         'cost' => [
