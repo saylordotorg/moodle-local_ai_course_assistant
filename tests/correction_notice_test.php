@@ -348,19 +348,66 @@ final class correction_notice_test extends \advanced_testcase {
         $this->assertFalse(correction_notice::recently_sent((int) $this->getDataGenerator()->create_user()->id));
     }
 
-    public function test_a_learners_own_row_tagged_correction_does_not_count_for_the_rate_limit(): void {
+    /**
+     * Forged spellings of the reserved type: every case, with spaces.
+     *
+     * @return array
+     */
+    public static function forged_types(): array {
+        return [['correction'], ['Correction'], ['CORRECTION'], [' correction'], ['correction '], ['cOrReCtIoN']];
+    }
+
+    /**
+     * @dataProvider forged_types
+     * @param string $forged
+     */
+    public function test_no_caller_but_correction_notice_can_store_the_correction_type(string $forged): void {
+        global $DB;
+        $this->assertSame('chat', conversation_manager::request_interaction_type($forged), 'the sse.php normaliser');
+        $this->assertSame('chat', conversation_manager::unreserved_interaction_type($forged));
         $conv = conversation_manager::get_or_create_conversation((int) $this->user->id, (int) $this->course->id);
-        // A user row can never be a correction; only assistant rows are looked at.
-        conversation_manager::add_message((int) $conv->id, (int) $this->user->id, (int) $this->course->id, 'user',
-            'hello', 0, '', null, null, null, correction_notice::INTERACTION_TYPE);
+        $u = conversation_manager::add_message((int) $conv->id, (int) $this->user->id, (int) $this->course->id,
+            'user', 'hello', 0, '', null, null, null, $forged);
+        $a = conversation_manager::add_message((int) $conv->id, (int) $this->user->id, (int) $this->course->id,
+            'assistant', 'hi', 0, '', null, null, null, conversation_manager::request_interaction_type($forged));
+        foreach ([$u, $a] as $id) {
+            $this->assertSame('chat', $DB->get_field('local_ai_course_assistant_msgs', 'interaction_type',
+                ['id' => $id]));
+        }
         $this->assertFalse(correction_notice::recently_sent((int) $this->user->id));
+    }
+
+    public function test_request_interaction_type_keeps_other_types(): void {
+        $this->assertSame('voice', conversation_manager::request_interaction_type('voice'));
+        $this->assertSame('voice', conversation_manager::request_interaction_type('Voice'));
+        $this->assertSame('chat', conversation_manager::request_interaction_type(''));
+        $this->assertSame('quiz', conversation_manager::unreserved_interaction_type('quiz'));
+    }
+
+    public function test_a_forged_row_neither_suppresses_a_real_correction_nor_escapes_the_cap(): void {
+        global $DB;
+        $conv = conversation_manager::get_or_create_conversation((int) $this->user->id, (int) $this->course->id);
+        $cid = (int) $conv->id;
+        // 60 forged pairs, as a learner sending interaction_type=Correction would write them.
+        for ($i = 0; $i < 60; $i++) {
+            conversation_manager::add_message($cid, (int) $this->user->id, (int) $this->course->id, 'user', "q{$i}",
+                0, '', null, null, null, conversation_manager::request_interaction_type('Correction'));
+            conversation_manager::add_message($cid, (int) $this->user->id, (int) $this->course->id, 'assistant',
+                "a{$i}", 0, '', null, null, null, 'CORRECTION');
+        }
+        $this->assertSame(100, $DB->count_records('local_ai_course_assistant_msgs', ['conversationid' => $cid]),
+            'the cap trims forged rows like any other');
+        $turn = $this->turn();
+        $this->assertNotNull(correction_notice::send($this->verdict($turn['auditid'])),
+            'forged rows do not rate limit a real correction away');
     }
 
     public function test_sse_never_takes_correction_from_the_request(): void {
         global $CFG;
         $src = file_get_contents($CFG->dirroot . '/local/ai_course_assistant/sse.php');
         $this->assertMatchesRegularExpression(
-            '/if \(\$interactiontype === correction_notice::INTERACTION_TYPE\) \{\s*\$interactiontype = \'chat\';/',
+            '/\$interactiontype = optional_param\(\'interaction_type\'[^\n]*\n(?:\/\/[^\n]*\n)*'
+            . '\$interactiontype = conversation_manager::request_interaction_type\(\$interactiontype\);/',
             $src, 'a learner must not be able to tag their own rows as corrections (they would escape the cap)');
     }
 
@@ -480,8 +527,9 @@ final class correction_notice_test extends \advanced_testcase {
         $courseid = (int) $this->course->id;
         $add = function(string $role, string $text, string $type = 'chat') use ($DB, $cid, $uid, $courseid): int {
             static $t = 1000000;
-            $id = conversation_manager::add_message($cid, $uid, $courseid, $role, $text, 0, '', null, null, null,
-                $type);
+            $id = $type === correction_notice::INTERACTION_TYPE
+                ? conversation_manager::add_correction_message($cid, $uid, $courseid, $text)
+                : conversation_manager::add_message($cid, $uid, $courseid, $role, $text);
             $DB->set_field('local_ai_course_assistant_msgs', 'timecreated', $t++, ['id' => $id]);
             return $id;
         };
@@ -545,5 +593,23 @@ final class correction_notice_test extends \advanced_testcase {
         $this->assertSame(1, (int) $row['asked']);
         $this->assertSame(1, (int) $row['answered']);
     }
-}
 
+    public function test_analytics_do_not_count_or_sample_a_correction(): void {
+        $turn = $this->turn();
+        $cid = (int) $this->course->id;
+        $before = [
+            analytics::get_provider_comparison($cid),
+            analytics::get_overview($cid)['total_messages'],
+            analytics::get_common_prompts($cid),
+        ];
+        $this->assertNotNull(correction_notice::send($this->verdict($turn['auditid'])));
+        $after = [
+            analytics::get_provider_comparison($cid),
+            analytics::get_overview($cid)['total_messages'],
+            analytics::get_common_prompts($cid),
+        ];
+        $this->assertSame($before, $after, 'a correction is not a provider answer, a message or sampled text');
+        $this->assertSame([], array_values(array_filter(analytics::get_provider_comparison($cid),
+            fn($r) => $r['provider'] === 'unknown' && $r['response_count'] > 1)));
+    }
+}

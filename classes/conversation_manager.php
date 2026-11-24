@@ -68,6 +68,53 @@ class conversation_manager {
         return $conv;
     }
 
+    /** @var bool Set only by add_correction_message() while it writes. */
+    private static bool $writingcorrection = false;
+
+    /**
+     * An interaction type with the reserved correction type taken out: 'correction' in any case, with or without
+     * surrounding spaces, becomes 'chat'. Every other value is returned unchanged.
+     *
+     * @param string $type
+     * @return string
+     */
+    public static function unreserved_interaction_type(string $type): string {
+        return strtolower(trim($type)) === correction_notice::INTERACTION_TYPE ? 'chat' : $type;
+    }
+
+    /**
+     * An interaction type taken from a request (sse.php): lowercased and trimmed, the reserved correction type
+     * mapped to 'chat', empty meaning 'chat'.
+     *
+     * @param string $type the PARAM_ALPHA value
+     * @return string
+     */
+    public static function request_interaction_type(string $type): string {
+        $type = strtolower(trim($type));
+        return $type === '' ? 'chat' : self::unreserved_interaction_type($type);
+    }
+
+    /**
+     * Store a correction message (8.4.0): the ONLY way a msgs row gets interaction type 'correction'. Role
+     * assistant, no tokens, provider, model, cmid or source. Used by correction_notice only.
+     *
+     * @param int $conversationid
+     * @param int $userid
+     * @param int $courseid
+     * @param string $message
+     * @return int the message id
+     */
+    public static function add_correction_message(int $conversationid, int $userid, int $courseid,
+            string $message): int {
+        self::$writingcorrection = true;
+        try {
+            return self::add_message($conversationid, $userid, $courseid, 'assistant', $message, 0, '', null, null,
+                null, correction_notice::INTERACTION_TYPE);
+        } finally {
+            self::$writingcorrection = false;
+        }
+    }
+
     /**
      * Add a message to a conversation.
      *
@@ -135,6 +182,10 @@ class conversation_manager {
         // analytics alike. role='user' rows still carry neither.
         $record->model_name        = ($role !== 'user' && $modelname !== null && $modelname !== '') ? $modelname : null;
         $record->provider          = ($role !== 'user' && $provider !== '') ? $provider : null;
+        // 8.4.0: 'correction' is reserved for add_correction_message(). Any other caller asking for it, in any
+        // case or with spaces (MySQL compares case-insensitively, so 'Correction' would match), gets 'chat'.
+        $interactiontype = self::$writingcorrection ? correction_notice::INTERACTION_TYPE
+            : self::unreserved_interaction_type($interactiontype);
         $record->interaction_type  = $interactiontype ?: 'chat';
         $record->cmid              = $cmid ?: null;
         // v7.8.4: the source pill, so a reloaded answer can show it again (#310).

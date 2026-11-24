@@ -30,7 +30,6 @@ define('AJAX_SCRIPT', true);
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/lib/filelib.php'); // Required for \curl class used by embedding providers.
 
-use local_ai_course_assistant\correction_notice;
 use local_ai_course_assistant\conversation_manager;
 use local_ai_course_assistant\context_builder;
 use local_ai_course_assistant\provider\base_provider;
@@ -85,11 +84,10 @@ $firstgen        = optional_param('firstgen', 0, PARAM_BOOL);      // First-gene
 $readinglevel    = optional_param('readinglevel', '', PARAM_ALPHA); // Accessibility: '', 'simple', 'standard'.
 $completion      = optional_param('completion', 0, PARAM_INT);      // Course completion percentage (0-100).
 $interactiontype = optional_param('interaction_type', 'chat', PARAM_ALPHA); // Interaction mode: chat, voice, quiz, etc.
-// 8.4.0: 'correction' is written only by correction_notice. Taken from a request it would let a learner tag their
-// own rows so the conversation cap skips them and real corrections are rate limited away.
-if ($interactiontype === correction_notice::INTERACTION_TYPE) {
-    $interactiontype = 'chat';
-}
+// 8.4.0: 'correction' is written only by correction_notice. Taken from a request (in any case: MySQL compares
+// case-insensitively) it would let a learner tag their own rows so the conversation cap skips them and real
+// corrections are rate limited away. add_message() maps it again for any other caller.
+$interactiontype = conversation_manager::request_interaction_type($interactiontype);
 $logonly         = optional_param('log_only', 0, PARAM_BOOL);              // Log a system message without AI call.
 $clientprovider  = optional_param('provider', '', PARAM_ALPHA);            // Admin LLM picker override.
 // Admin LLM picker model override. Model ids are vendor slugs containing dots and

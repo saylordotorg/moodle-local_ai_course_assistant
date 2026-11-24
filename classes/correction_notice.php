@@ -20,8 +20,8 @@ namespace local_ai_course_assistant;
  * The correction message (8.4.0): a short assistant message telling the learner an earlier answer may be wrong.
  *
  * claim_checker::check() calls send_safely() right after it appends a verdict that has a claim contradicted at high
- * severity. The message is stored with conversation_manager::add_message() as role `assistant`, interaction type
- * `correction`, in the SAME conversation as the answer, and is seen the next time the widget loads the history or
+ * severity. The message is stored with conversation_manager::add_correction_message() as role `assistant`,
+ * interaction type `correction`, in the SAME conversation as the answer, and is seen the next time the widget loads the history or
  * the learner sends a message; nothing is pushed. It carries no tokens, no provider, no model and no source pill,
  * so no analytics count it as spend or as a model answer, and the classifier never sees it (that runs on the chat
  * path only). The conversation cap neither counts nor trims it (conversation_manager::add_message()); it goes when
@@ -40,7 +40,8 @@ namespace local_ai_course_assistant;
  */
 class correction_notice {
 
-    /** @var string msgs.interaction_type of a correction. sse.php never accepts it from a request. */
+    /** @var string msgs.interaction_type of a correction. Only conversation_manager::add_correction_message() writes
+     * it; add_message() maps it (any case) to 'chat' for every other caller, and sse.php normalises the request. */
     public const INTERACTION_TYPE = 'correction';
 
     /** @var int At most one correction per learner in this many seconds. */
@@ -163,8 +164,7 @@ class correction_notice {
 
         // Role assistant, no tokens, no provider, no model, no cmid, no source: not spend, not a model answer,
         // no source pill.
-        return conversation_manager::add_message($convid, $userid, $courseid, 'assistant', self::message_text($claim),
-            0, '', null, null, null, self::INTERACTION_TYPE);
+        return conversation_manager::add_correction_message($convid, $userid, $courseid, self::message_text($claim));
     }
 
     /**
