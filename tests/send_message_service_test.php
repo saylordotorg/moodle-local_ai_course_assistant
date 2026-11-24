@@ -505,4 +505,58 @@ final class send_message_service_test extends \advanced_testcase {
         $row = $this->audit_rows()[0];
         $this->assertContains(['id' => answer_rules::WELLBEING_RULE, 'action' => 'block'], $this->audit_rules($row));
     }
+
+    /**
+     * A credential-shaped string the scrub redacts.
+     *
+     * @return string
+     */
+    private function fake_key(): string {
+        return 'sk-ant-' . str_repeat('a', 40);
+    }
+
+    public function test_send_message_scrubs_leaked_prompt_and_credentials_before_saving(): void {
+        global $DB;
+        $reply = 'A balance sheet lists assets. ## Off-topic Detection Key ' . $this->fake_key()
+            . ' KEEP RESPONSES BRIEF: done.';
+        foreach (['off', 'watch', 'enforce'] as $mode) {
+            $DB->delete_records('local_ai_course_assistant_msgs');
+            $this->use_stub($mode, [$reply]);
+            $result = send_message::execute((int) $this->course->id, self::PLAIN_Q, 0);
+            $this->assertDebuggingCalled();
+            $this->assertTrue($result['success']);
+            $this->assertStringNotContainsString('sk-ant-', $result['response'], $mode);
+            $this->assertStringNotContainsString('Off-topic Detection', $result['response'], $mode);
+            $this->assertStringNotContainsString('KEEP RESPONSES BRIEF', $result['response'], $mode);
+            $this->assertStringContainsString('[key redacted]', $result['response'], $mode);
+            $this->assertSame($result['response'], $this->stored_answer()->message, $mode . ': stored == returned');
+        }
+        $rows = $this->audit_rows();
+        $this->assertCount(2, $rows, 'watch and enforce are audited');
+        $this->assertSame($result['response'], end($rows)->answer, 'the audit row holds the final, scrubbed text');
+        $this->assertStringNotContainsString('sk-ant-', (string) end($rows)->answer);
+    }
+
+    public function test_send_message_retry_text_is_scrubbed_too(): void {
+        $this->correct_rule();
+        $this->use_stub('enforce', ['You will get 500 zorkmid points.',
+            'Please ask your instructor about grades. Key ' . $this->fake_key() . ' ## Off-topic Detection']);
+        $result = send_message::execute((int) $this->course->id, self::GRADE_Q, 0);
+        $this->assertDebuggingCalled();
+        $this->assertCount(2, stub_provider::$calls, 'one retry');
+        $this->assertSame('Please ask your instructor about grades. Key [key redacted]', trim($result['response']));
+        $this->assertSame($result['response'], $this->stored_answer()->message);
+        $rows = $this->audit_rows();
+        $this->assertSame($result['response'], end($rows)->answer);
+    }
+
+    public function test_send_message_scrub_runs_before_runtime_guard_and_rules(): void {
+        // With the guard in block mode, a raw credential would make it replace the whole reply. The scrub
+        // runs first, so the guard sees the redacted text and the reply survives (redacted).
+        set_config('validators_runtime_mode', 'block', 'local_ai_course_assistant');
+        $this->use_stub('off', ['Here you go. My API key is ' . $this->fake_key() . '.']);
+        $result = send_message::execute((int) $this->course->id, self::PLAIN_Q, 0);
+        $this->assertSame('Here you go. My API key is [key redacted].', $result['response']);
+        $this->assertSame($result['response'], $this->stored_answer()->message);
+    }
 }

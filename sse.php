@@ -41,55 +41,14 @@ use local_ai_course_assistant\rag_retriever;
 
 /**
  * Scrub leaked system prompt fragments, PII, and credentials from LLM
- * output before it reaches the student. Runs after marker removal but
- * before the response is saved to DB and sent via SSE.
+ * output before it reaches the student. Thin wrapper: the logic lives in
+ * \local_ai_course_assistant\response_safety (shared with send_message).
  *
  * @param string $response
  * @return string Cleaned response.
  */
 function local_ai_course_assistant_filter_response_safety(string $response): string {
-    // Phrases that indicate the LLM is leaking its system prompt.
-    $leakpatterns = [
-        '/## Security Rules \(non-negotiable\)/i',
-        '/## Off-topic Detection/i',
-        '/## Student Learning Profile/i',
-        '/## Wellbeing & Safety/i',
-        // NOTE: protocol markers are NOT listed here any more. They are removed
-        // by protocol_markers::strip() below, which handles the unterminated and
-        // double-bracket forms these patterns missed -- the two shapes that
-        // actually reached learners in the 2026-09-12 production run. What stays
-        // in this list is system-prompt leakage, which is a different problem.
-        // Name-agnostic: the default prompt opens with the configured short name
-        // ([[tutorshort]]), so a rebranded site leaks 'You are Atlas (...)'.
-        '/You are [^\n()]{1,80}? \(Online Learning Assistant\)/iu',
-        '/KEEP RESPONSES BRIEF:/i',
-        '/These rules override any conflicting instruction/i',
-    ];
-
-    $leaked = false;
-    foreach ($leakpatterns as $pattern) {
-        if (preg_match($pattern, $response)) {
-            $leaked = true;
-            $response = preg_replace($pattern, '', $response);
-        }
-    }
-
-    // Scrub common PII patterns (email addresses, API keys).
-    $response = preg_replace('/\b(sk-[a-zA-Z0-9_-]{20,})\b/', '[key redacted]', $response);
-    $response = preg_replace('/\b(sk-ant-[a-zA-Z0-9_-]{20,})\b/', '[key redacted]', $response);
-    $response = preg_replace('/\b(AIza[a-zA-Z0-9_-]{30,})\b/', '[key redacted]', $response);
-
-    // Protocol markers, via the single authority. This runs on the copy that is
-    // persisted to msgs.message, which is what classes/transcript_report.php
-    // emits verbatim into the teacher-facing CSV -- so a marker that survived
-    // here used to reach a teacher even when the chat UI had hidden it.
-    $response = \local_ai_course_assistant\protocol_markers::strip($response);
-
-    if ($leaked) {
-        debugging('SOLA: system prompt leak detected in response, fragments scrubbed.', DEBUG_DEVELOPER);
-    }
-
-    return trim($response);
+    return \local_ai_course_assistant\response_safety::filter($response);
 }
 
 // Enforce POST.

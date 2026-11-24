@@ -28,6 +28,7 @@ use local_ai_course_assistant\rag_retriever;
 use local_ai_course_assistant\answer_audit;
 use local_ai_course_assistant\answer_flow;
 use local_ai_course_assistant\protocol_markers;
+use local_ai_course_assistant\response_safety;
 use local_ai_course_assistant\runtime_guard;
 
 /**
@@ -289,6 +290,9 @@ class send_message extends external_api {
         // v7.8.4: take the source pill from the raw reply first (#310).
         $sourcetag = \local_ai_course_assistant\protocol_markers::derive_source((string) $response);
         $response = \local_ai_course_assistant\protocol_markers::strip($response);
+        // 8.4.0: the output scrub sse.php always had (leaked prompt fragments, credentials). It runs before
+        // runtime_guard and the guidance rules, so what is guarded, audited, stored and returned is the scrubbed text.
+        $response = response_safety::filter((string) $response);
 
         // 8.4.0: the same protections as the streamed path (sse.php). runtime_guard runs with the retrieved chunks
         // (a no-op unless validators_runtime_mode is set), then the guidance rules (answer_flow::finalize()). The
@@ -433,7 +437,8 @@ class send_message extends external_api {
                     }
                 }
                 $retryraw = $raw;
-                return runtime_guard::apply(protocol_markers::strip($raw), $guardctx);
+                $scrubbed = response_safety::filter(protocol_markers::strip($raw));
+                return runtime_guard::apply($scrubbed, $guardctx);
             };
             $final = answer_flow::finalize($guarded, $plan, [
                 'question' => $question,
