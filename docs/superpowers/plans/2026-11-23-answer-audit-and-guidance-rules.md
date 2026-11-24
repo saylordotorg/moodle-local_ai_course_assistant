@@ -68,6 +68,12 @@
 - [ ] Step 2: Run `node tests/js/answer-replace-check.js`; FAIL. Step 3: Implement client; in `sse.php`, when `categories_for_question` is risky and mode is `enforce`, hold tokens (send keepalive comments every 10 s), evaluate, then send the final text (corrected once or blocked); otherwise stream as today, evaluate after, and send `replace` on block. Step 4: PASS plus rebuild AMD (`grunt amd` as in earlier releases); commit src and build.
 - [ ] Step 5: PHPUnit: `test_buffered_path_sends_keepalive_before_text` if the sse send function can be exercised; otherwise cover through a live check in Task 10.
 
+### Task 5b: Cover the non-streaming send_message path
+**Files:** Modify `classes/external/send_message.php` (assistant save ~:298), `tests/send_message_service_test.php` additions.
+**Interfaces:** Consumes `runtime_guard::apply`, `answer_audit::record_answer`, `answer_rules::evaluate`, `answer_rules::categories_for_question`, `correction_notice` (Task 7 later). Produces: the Moodle-app and `repository.js` answers get the same rules, audit row and claim-check queueing as streamed answers; `meta_ai_sse.php` stays excluded and the settings help text says so.
+- [ ] Step 1: Tests: `test_send_message_answer_is_recorded_when_mode_on`, `test_send_message_block_rule_replaces_the_returned_text`, `test_send_message_mode_off_changes_nothing`, `test_send_message_record_failure_does_not_break_the_answer`.
+- [ ] Step 2: FAIL. Step 3: Because the answer is returned whole, apply rules before returning (block/correct/warn directly, no `replace` event); call `record_answer` after the save, wrapped in try/catch on `\Throwable`; queue the claim check as in Task 6. Step 4: PASS. Step 5: Commit.
+
 ### Task 6: Claim check task
 **Files:** Create `classes/claim_checker.php`, `classes/task/check_answer_claims.php`, `tests/claim_checker_test.php`, `tests/task/check_answer_claims_test.php`; modify `sse.php` (queue after record), `classes/analytics.php`, `settings.php`.
 **Interfaces:** `claim_checker::judge(string $question, string $answer, array $chunks, int $courseid): array{claims: array, status: string, severity: string}`; `claim_checker::severity_for(array $claim, array $categories): string`; task custom data `['auditid' => int]`; settings `answer_check_sample_percent` (default 100 with retrieval, 10 without) and `answer_check_model`/provider reuse the `mastery_classifier_*` resolution pattern.
