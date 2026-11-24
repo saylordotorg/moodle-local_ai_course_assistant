@@ -133,7 +133,7 @@ class answer_rules {
     private const WELLBEING_PHRASES = [
         // English.
         'kill myself', 'killing myself', 'hang myself', 'end my life', 'ending my life', 'take my own life',
-        'taking my own life', 'wish i was dead', 'wish i were dead', 'better off without me', 'better off dead',
+        'taking my own life', 'wish i was dead', 'wish i were dead', 'better off without me',
         // Spanish.
         'quiero morir', 'quiero morirme', 'suicidarme', 'quitarme la vida', 'no quiero vivir', 'quiero hacerme daño',
         // French.
@@ -153,13 +153,17 @@ class answer_rules {
      * @var string "I" as learners type it, at a word boundary: i, i'm, im, i've, ive, i'd, i'll, ill. (Curly
      *     apostrophes are straightened before matching.)
      */
-    private const I = "\\b(?:i(?:'m|'ve|'d|'ll)?|im|ive|ill)\\b";
+    private const I = "\\b(?:i(?:'m|'ve|'d|'ll)?|im|ive|ill(?<!mentally\\sill)(?<!terminally\\sill)(?<!chronically\\sill)"
+        . "(?<!the\\sill))\\b";
 
     /** @var string Words that may sit between "I" and a crisis phrase without changing who it is about. */
     private const IGAP = '(?:\s+(?:am|was|will|have|been|keep|keeps|just|really|honestly|still|so|seriously|sometimes|'
         . 'often|again|literally|actually|kind\s+of|started|start|starting|want\s+to|wanna|going\s+to|gonna|might|'
         . 'could|plan(?:ning)?\s+to|feel(?:ing)?(?:\s+like)?|felt(?:\s+like)?|think(?:ing)?\s+(?:about|of)|'
         . "considering|can't\\s+stop|cant\\s+stop|cannot\\s+stop|can't|cant|cannot))*";
+
+    /** @var string After "cut myself": a slice of cake, cutting myself off from social media, some slack. */
+    private const NOT_A_CUT = '(?!\s+(?:a\s+|some\s+)?(?:slice|piece|break|slack|off|out|loose|short)\b)';
 
     /** @var string Hurting oneself, in the forms learners write (cutting, burning, hurting, harming). */
     private const SELF_HURT = '(?:hurt(?:ing)?|harm(?:ing)?|cut(?:ting)?|burn(?:ing|t)?)\s+myself';
@@ -175,7 +179,9 @@ class answer_rules {
      * guard is added that could also drop a genuine crisis sentence. Known false positives that remain, accepted
      * for a safety rule in enforce mode: "I'm thinking about suicide for my essay topic" (no guard word right after),
      * "I don't want to be here anymore" said about a class, "My life is not worth living" quoted from a text, and
-     * "I can't go on anymore" about a task.
+     * "I can't go on anymore" about a task, a quoted line such as "The poem says I want to die young" (a guard on
+     * "says" or "young" could hide a learner's own words), "What does better off dead mean" without quotes, and "no
+     * point in living" said about a character.
      *
      * @return string[]
      */
@@ -198,12 +204,13 @@ class answer_rules {
                 . '(?:suicide|killing\s+myself|ending\s+(?:it|my\s+life))\b' . $coursework,
             $i . '\s+commit(?:ting)?\s+suicide\b',
             self::I . $clause . "\\s+(?:want(?:ing)?\\s+to|wanna)\\s+die\\b"
-                . '(?!\s+(?:my\s+|your\s+|the\s+|her\s+|his\s+)?(?:hair|beard|clothes|shirt|fabric|wool|it|them)\b)',
+                . '(?!\s+(?:my\s+|your\s+|the\s+|her\s+|his\s+)?(?:hair|beard|clothes|shirt|fabric|wool|it|them)\b)'
+                . '(?!\s+(?:laughing|of\s+(?:laughter|embarrassment|boredom|cringe)))',
             $i . '\s+(?:end|ending)\s+it\s+all\b',
             self::I . '(?:\s+(?:really|just|still|sometimes|often|so|again))*\s+(?:want\s+to|wanna|am\s+going\s+to|'
                 . "going\\s+to|gonna|keep|keeps|have\\s+been|been|started|start|feel\\s+like|might|will|can't\\s+stop|"
-                . 'cant\s+stop|need\s+to)\s+' . self::SELF_HURT . '(?!\s+(?:a\s+|some\s+)?(?:slice|piece|break|slack)\b)',
-            "\\b(?:i'm|im|i\\s+am)\\s+(?:hurting|harming|cutting|burning)\\s+myself\\b",
+                . 'cant\s+stop|need\s+to|thinking\s+(?:about|of)|think\s+(?:about|of))\s+' . self::SELF_HURT . self::NOT_A_CUT,
+            "\\b(?:i'm|im|i\\s+am)\\s+(?:hurting|harming|cutting|burning)\\s+myself\\b" . self::NOT_A_CUT,
             '\bi\s+cut\s+myself\s+(?:again|last\s+night|tonight|today|yesterday|this\s+morning|on\s+purpose)\b',
             self::I . '(?:\s+(?:have|been|am|keep|still|started|again))*\s+self[\s-]?harm(?:ing|ed)?\b' . $coursework,
             '\bmy\s+self[\s-]?harm(?:ing)?\b' . $coursework,
@@ -217,6 +224,25 @@ class answer_rules {
                 . '(?=\s*(?:[.!?,;]|$))',
             "\\b(?:i\\s+have|i've\\s+got|ive\\s+got|there's)\\s+no(?:thing)?\\s+(?:reason|point)\\s+(?:for\\s+me\\s+)?"
                 . '(?:to\s+live|in\s+living)',
+            // "Better off dead", unless it is quoted (a learner asking what the phrase means in a text).
+            "(?<!['\"])\\bbetter\\s+off\\s+dead\\b(?!['\"])",
+            // Pills taken in a dangerous amount.
+            self::I . "(?:\\s+just|\\s+have|'ve)?\\s+(?:took|taken|swallowed)\\s+(?:too\\s+many|a\\s+bunch\\s+of|all\\s+(?:of\\s+)?"
+                . '(?:my|the)|a\s+lot\s+of|loads\s+of)\s+(?:[\w-]+\s+)?(?:pills|tablets|meds|medications?)\b',
+            // "Thinking about hurting myself" with no "I", at the start of a sentence.
+            '(?:^|[.!?]\s+)\s*(?:(?:been|keep|always|just)\s+)?(?:thinking|thought)\s+(?:about|of)\s+'
+                . '(?:hurting|cutting|killing|harming|burning)\s+myself' . self::NOT_A_CUT,
+            $i . '\s+end\s+it\b(?!\s+(?:with|by|on|in|at|there|here|after|before|early|well|now\s+with|all\b))',
+            '\bno\s+(?:point|reason)\s+(?:in\s+living|to\s+live|in\s+being\s+alive|in\s+going\s+on)\b',
+            '\b(?:nobody|no\s+one|no-one)\s+would\s+(?:miss\s+me|care\s+if\s+i\b|care\s+about\s+me)',
+            self::I . '(?:\s+(?:just|really|so))*\s+want\s+(?:it\s+all|it|everything|the\s+pain|this)\s+to\s+stop\b',
+            $i . '\s+(?:so\s+)?done\s+with\s+(?:life|living|everything|it\s+all|being\s+alive)\b',
+            $i . '\s+(?:so\s+)?tired\s+of\s+(?:living|life|being\s+alive)\b',
+            self::I . "\\s+(?:don't|dont|do\\s+not)\\s+want\\s+to\\s+wake\\s+up(?:\\s+(?:tomorrow|again|anymore|any\\s+more))?"
+                . '(?=\s*(?:[.!?,;]|$))',
+            self::I . '(?:\s+(?:just|really|sometimes))*\s+wish\s+i\s+(?:could|would)\s+(?:just\s+)?(?:disappear|vanish|'
+                . 'not\s+exist|stop\s+existing|die|fall\s+asleep\s+and\s+(?:never|not)\s+wake\s+up)\b',
+            self::I . "(?:\\s+just)?\\s+wish\\s+i\\s+(?:wasn't|weren't|was\\s+not|were\\s+not)\\s+(?:alive|born|here)\\b",
             // Chinese "I want to die", but not "我想死你了" ("I miss you so much").
             '我(?:真的|好|很|就|都)?想死(?!你|您|他|她|它)',
         ];
@@ -248,15 +274,18 @@ class answer_rules {
         . '(?:sept?|nov|dec)(?:ember)?|oct(?:ober)?)\\b';
 
     /**
-     * @var string[] A date as an answer would state it, captured for the support check: Month DD, DD Month, or a
+     * @var string[] A date as an answer would state it (captured for the support check): Month DD, DD (of) Month, or a
      *     numeric date WITH a year (a bare 3/4 is a fraction). The day ends at a word boundary, so "March 2020" is
      *     not "March 20".
      */
-    private const DATES = [
-        '(' . self::MONTH . '\.?\s+\d{1,2}(?:st|nd|rd|th)?)\b',
-        '(\d{1,2}(?:st|nd|rd|th)?\s+' . self::MONTH . ')\b',
-        '(\d{1,2}/\d{1,2}/\d{2,4})\b',
+    private const DATE_BODIES = [
+        self::MONTH . '\.?\s+\d{1,2}(?:st|nd|rd|th)?',
+        '\d\d?(?:st|nd|rd|th)?\s+(?:of\s)?' . self::MONTH,
+        '\d{1,2}/\d{1,2}/\d{2,4}',
     ];
+
+    /** @var string[] What introduces a due date: due (not "due to"), deadline, closes / close / closing. */
+    private const DATE_TRIGGERS = ['\b(?:due(?!\s+to\b)|deadline)\b', '\bclos(?:es|e|ing)\b'];
 
     /** @var string What a learner might try to get round: Turnitin, a proctor, or a plagiarism, AI or similarity
      *     checker or detector. */
@@ -267,17 +296,33 @@ class answer_rules {
         . self::EVADE_OBJECT;
 
     /**
-     * @var string A refusal, a negation or a condition in the same sentence ("I cannot grant you an extension",
-     *     "I'd give an extension only if your instructor agreed", "ask your instructor"): a rule with this as its
-     *     `except` does not fire on that sentence.
+     * @var string A condition that follows a grant in the same clause ("...an extension on the essay only if your
+     *     instructor agrees"). A rule's `except` is checked only on the rest of the clause after its match, so words
+     *     like "don't worry" or "you won't lose marks" around a real grant do not cancel it. Refusals ("I cannot
+     *     grant", "we don't give") are excluded inside the grant pattern itself, where the negation governs the verb.
      */
-    private const REFUSAL = "\\b(?:cannot|can't|cant|can\\s+not|won't|wont|will\\s+not|never|not|don't|dont|do\\s+not|"
-        . "wouldn't|would|unable|only\\s+if|if\\s+your|unless|ask\\s+your|check\\s+with|contact\\s+your|talk\\s+to\\s+your|"
-        . "you\\s+may\\s+want\\s+to\\s+ask)\\b|\\bi'd\\b";
+    private const CONDITION_AFTER = '\b(?:only\s+if|unless|provided\s+(?:that\s+)?your|as\s+long\s+as\s+your\s+instructor)\b';
 
     /** @var string The category the existing runtime validators' rules carry (validator.<name>). Not an admin choice,
      *     so not in CATEGORIES; consumers must accept it. safe_message() gives it the general text. */
     public const VALIDATOR_CATEGORY = 'general';
+
+    /**
+     * The invented-date patterns: each trigger with each date form, the date captured as group 1.
+     *
+     * @return string[]
+     */
+    private static function date_patterns(): array {
+        $out = [];
+        foreach (self::DATE_TRIGGERS as $trigger) {
+            foreach (self::DATE_BODIES as $body) {
+                // MONTH already ends at a word boundary; do not add a second one.
+                $end = substr($body, -2) === '\b' ? '' : '\b';
+                $out[] = $trigger . '[^.\n]{0,40}?\b(' . $body . ')' . $end;
+            }
+        }
+        return $out;
+    }
 
     /**
      * The default rule pack. Conservative: block only for wellbeing and for clearly harmful guidance (promising or
@@ -327,18 +372,17 @@ class answer_rules {
             // believes SOLA may miss the real deadline. Needs a granting frame AND a deadline or piece of work, so
             // "a file extension list" and "a field extension" do not match.
             ['id' => 'deadlines.extension_granted', 'category' => 'deadlines', 'kind' => 'pattern',
-                'applies_to' => 'reply', 'action' => 'block', 'except' => self::REFUSAL, 'values' => [
-                    "\\b(?:i|we)\\b(?:'\\w+|\\s+\\w+)?\\s+(?:grant|giv|approv)\\w*\\s+(?:\\S+\\s+){0,3}extension\\s+(?:on|for|to)\\s+"
-                        . '(?:\S+\s+){0,3}?(?:deadline|assignment|essay|exam|quiz|test|project|paper|due\s+date)',
+                'applies_to' => 'reply', 'action' => 'block', 'except' => self::CONDITION_AFTER, 'values' => [
+                    "\\b(?:i|we)(?:'ve|'ll|\\s+(?:have|will|just|can))?\\s+(?:grant|giv|approv)\\w*\\s+(?:\\S+\\s+){0,3}"
+                        . 'extension\s+(?:on|for|to)\s+'
+                        . '(?:\S+\s+){0,3}?(?:deadline|assignment|essay|exam|quiz|test|paper|due\s+date)',
                     '\byour\s+extension\s+(?:request\s+)?(?:is|has\s+been|was)\s+(?:approved|granted|confirmed)\b',
                     "\\b(?:i|we)(?:'ve|\\s+have)\\s+extended\\s+(?:your|the)\\s+(?:[\\w-]+\\s+){0,2}(?:deadline|due\\s+date)",
                 ]],
             // A due date the retrieved course text does not contain. Warn: it may be right, but an invented date
             // costs marks. "Due to" is not a due date.
             ['id' => 'deadlines.invented_date', 'category' => 'deadlines', 'kind' => 'pattern', 'applies_to' => 'reply',
-                'action' => 'warn', 'support' => 'date', 'values' => array_map(
-                    static fn(string $date): string => '\b(?:due(?!\s+to\b)|deadline)\b[^.\n]{0,40}?\b' . $date,
-                    self::DATES)],
+                'action' => 'warn', 'support' => 'date', 'values' => self::date_patterns()],
             // A stated institutional policy (refund, withdrawal, transfer...) of a kind the retrieved course text
             // has no policy for. Warn: policy questions belong to student support, and a made-up policy can cost
             // money. The kind is captured, so "the late policy" matches a course's "Late Work Policy".
@@ -814,21 +858,6 @@ class answer_rules {
             // Nothing retrieved: nothing to say the answer is unsupported by.
             return false;
         }
-        if (!empty($rule['except'])) {
-            // Judge each sentence on its own, so a refusal in one sentence does not hide a grant in another.
-            $sentences = preg_split('~(?<=[.;!?])\s+|\n+~u', $text) ?: [$text];
-            if (count($sentences) > 1) {
-                foreach ($sentences as $sentence) {
-                    if (self::rule_matches($rule, $sentence, $chunktext, $pcreerrors)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            if (is_array(self::pattern_match($rule['except'], $text))) {
-                return false;
-            }
-        }
         foreach ($rule['values'] as $pattern) {
             $m = self::pattern_match($pattern, $text);
             if ($m === false) {
@@ -837,6 +866,16 @@ class answer_rules {
             }
             if ($m === null) {
                 continue;
+            }
+            if (!empty($rule['except'])) {
+                // The rest of the clause after the match: a condition there ("only if your instructor agrees")
+                // cancels it; words before it or in another clause do not.
+                $pos = strpos($text, $m[0]);
+                $rest = $pos === false ? '' : substr($text, $pos + strlen($m[0]));
+                $clause = preg_match('~^[^.;!?\n]*~u', $rest, $cm) ? $cm[0] : '';
+                if (is_array(self::pattern_match($rule['except'], $clause))) {
+                    continue;
+                }
             }
             if ($support === null) {
                 return true;
@@ -863,8 +902,7 @@ class answer_rules {
         if (!$wanted) {
             return true;
         }
-        $pattern = self::DELIM . '(?:' . implode('|', array_map(static fn($d) => substr($d, 0, -2), self::DATES))
-            . ')\b' . self::DELIM . 'iu';
+        $pattern = self::DELIM . '(?:' . implode('|', self::DATE_BODIES) . ')\b' . self::DELIM . 'iu';
         $have = [];
         if (preg_match_all($pattern, $chunktext, $all)) {
             foreach ($all[0] as $one) {
