@@ -33,7 +33,7 @@ final class admin_setting_answer_rules_test extends \advanced_testcase {
     }
 
     private function row(string $id, string $value, string $kind = 'keyword', string $action = 'warn'): array {
-        return ['id' => $id, 'category' => 'policy', 'kind' => $kind, 'value' => $value, 'applies_to' => 'both',
+        return ['rule_id' => $id, 'category' => 'policy', 'kind' => $kind, 'value' => $value, 'applies_to' => 'both',
             'action' => $action];
     }
 
@@ -84,6 +84,77 @@ final class admin_setting_answer_rules_test extends \advanced_testcase {
         $this->assertStringNotContainsString('type="password"', $html);
         $this->assertStringNotContainsString(get_string('providerkeys:col_key', 'local_ai_course_assistant'), $html);
         $this->assertStringContainsString(get_string('answer_rules:col_value', 'local_ai_course_assistant'), $html);
+    }
+
+    /**
+     * The form fields a browser would post back for the rendered table, as Moodle hands them to write_setting().
+     *
+     * @param string $html
+     * @return array
+     */
+    private function posted_from(string $html): array {
+        $doc = new \DOMDocument();
+        @$doc->loadHTML('<?xml encoding="utf-8"?>' . $html);
+        $post = [];
+        $set = static function (array &$post, string $name, string $value): void {
+            if (!preg_match('~^s_local_ai_course_assistant_answer_safety_rules((?:\[[^\]]*\])+)$~', $name, $m)) {
+                return;
+            }
+            preg_match_all('~\[([^\]]*)\]~', $m[1], $keys);
+            $ref = &$post;
+            foreach ($keys[1] as $key) {
+                $ref = &$ref[$key];
+            }
+            $ref = $value;
+        };
+        foreach ($doc->getElementsByTagName('input') as $input) {
+            // The blank row template lives inside <template>; a browser never posts it.
+            if ($input->parentNode && $this->inside_template($input)) {
+                continue;
+            }
+            $set($post, $input->getAttribute('name'), $input->getAttribute('value'));
+        }
+        foreach ($doc->getElementsByTagName('select') as $select) {
+            if ($this->inside_template($select)) {
+                continue;
+            }
+            foreach ($select->getElementsByTagName('option') as $option) {
+                if ($option->hasAttribute('selected')) {
+                    $set($post, $select->getAttribute('name'), $option->getAttribute('value'));
+                }
+            }
+        }
+        return $post;
+    }
+
+    private function inside_template(\DOMNode $node): bool {
+        for ($n = $node->parentNode; $n; $n = $n->parentNode) {
+            if ($n->nodeName === 'template') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function test_rule_ids_survive_render_and_resave(): void {
+        $this->resetAfterTest();
+        $this->assertSame('', $this->setting()->write_setting(['present' => 1, 'rows' => [
+            $this->row('site.housing', 'housing office, dorm'),
+            $this->row('site.visa', '\bvisa\s+status|i-20', 'pattern', 'block'),
+        ]]));
+        $before = (string) get_config('local_ai_course_assistant', 'answer_safety_rules');
+        $html = $this->setting()->output_html('');
+        $this->assertStringContainsString('value="site.housing"', $html);
+        $this->assertStringContainsString('value="site.visa"', $html);
+
+        // Save the page untouched: the stored rules come back exactly as they were.
+        $posted = $this->posted_from($html);
+        $this->assertCount(2, $posted['rows']);
+        $this->assertSame('', $this->setting()->write_setting($posted));
+        $after = (string) get_config('local_ai_course_assistant', 'answer_safety_rules');
+        $this->assertSame(['site.housing', 'site.visa'], array_column(json_decode($after, true), 'id'));
+        $this->assertSame($before, $after);
+        $this->assertSame(['site.housing', 'site.visa'], array_column(answer_rules::site_rules(), 'id'));
     }
 
     public function test_config_log_keeps_the_rules_as_written(): void {

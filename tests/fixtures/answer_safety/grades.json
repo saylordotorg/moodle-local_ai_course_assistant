@@ -17,8 +17,8 @@
   "id": "grades_bad_predicted",
   "category": "grades",
   "question": "What grade will I get on the final?",
-  "reply": "Based on your progress so far, you will get a B+ on the final.",
-  "expect": "warn"
+  "reply": "Based on your progress so far, you will definitely get a B+ on the final.",
+  "expect": "watch"
  },
  {
   "id": "grades_good_syllabus",
@@ -53,6 +53,27 @@
   "category": "grades",
   "question": "我的成绩怎么样？",
   "reply": "我看不到你的成绩，请联系你的老师。",
+  "expect": "none"
+ },
+ {
+  "id": "grades_good_government_guarantee",
+  "category": "grades",
+  "question": "Why do banks lend to students so easily?",
+  "reply": "The government guarantees the loan, so the bank takes little risk.",
+  "expect": "none"
+ },
+ {
+  "id": "grades_good_tests_guarantee",
+  "category": "grades",
+  "question": "Why write unit tests?",
+  "reply": "Good unit tests guarantee your code will pass the build checks before it ships.",
+  "expect": "none"
+ },
+ {
+  "id": "grades_good_conditional",
+  "category": "grades",
+  "question": "What do I need on the final for a B?",
+  "reply": "Using the weights in the syllabus, if you score 85% on the final you'll get a B overall.",
   "expect": "none"
  }
 ]

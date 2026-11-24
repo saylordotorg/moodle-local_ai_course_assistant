@@ -43,13 +43,17 @@ use local_ai_course_assistant\validators\hallucination_validator;
  * one or more comma-separated phrases matched case-insensitively on word boundaries (CJK and Arabic phrases match as
  * substrings). A pattern is a PCRE body of at most PATTERN_MAX_LENGTH characters, with no recursion,
  * backreferences or subroutine calls, that must finish every sample in validate_rule() within $budgetms and without a
- * PCRE error. Site rules are re-validated when loaded, and an invalid one is skipped.
+ * PCRE error (the samples and the budget are checked when the rule is SAVED). When loaded, site rules are checked
+ * for structure, length and compiling only, never timed, so a saved rule cannot drop out because the server is busy;
+ * an invalid one is skipped. Every rule pattern runs under pcre.backtrack_limit BACKTRACK_LIMIT; a pattern that hits
+ * it fails open but visibly (listed in pcre_errors and fired as 'watch').
  *
  * Existing validators: ctx['validator_results'] (runtime_guard::last_results()) are folded in. A failing validator
  * fires 'validator.<name>' as 'block' when validators_runtime_mode is block and 'warn' when annotate, so the stricter
  * of the two systems wins; runtime_guard keeps doing exactly what it did before. The numeric hallucination warn maps
  * to 'numbers_unsupported' (warn; watch in watch mode). When no hallucination result was passed and ctx['chunks']
- * holds retrieved text, the same numeric check runs here.
+ * holds retrieved text, the same numeric check runs here. Validator rules carry the category VALIDATOR_CATEGORY
+ * ('general'), which is not one of CATEGORIES.
  *
  * Language: the question patterns and the default reply rules are English. Wellbeing also has a short list of
  * first-person crisis phrases in Spanish, French, German, Portuguese, Arabic and Chinese. Text that is not valid
@@ -57,7 +61,8 @@ use local_ai_course_assistant\validators\hallucination_validator;
  * reply rules.
  *
  * Fail safe: evaluate() never throws. Any error returns action 'none' with 'error' set, so the caller delivers the
- * answer unchanged and records check_failed.
+ * answer unchanged and records check_failed; the one exception is a wellbeing question, which is checked first and
+ * still gets its block (enforce) or watch when anything after that fails.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell & David Ta / Saylor University
@@ -108,36 +113,84 @@ class answer_rules {
     /** @var string The rule id that every wellbeing question fires. */
     public const WELLBEING_RULE = 'wellbeing.crisis';
 
+    /** @var \Closure|null Test seam: called inside evaluate() after the wellbeing check. Never set outside tests. */
+    public static ?\Closure $beforerules = null;
+
+    /** @var int pcre.backtrack_limit while a rule pattern runs (PHP's default is 1,000,000). */
+    public const BACKTRACK_LIMIT = 100000;
+
     /** @var array<string, array> Site rules by raw config value (per request). */
     private static array $sitecache = [];
 
     /**
-     * First-person crisis phrases. English plus Spanish, French, German, Portuguese, Arabic and Chinese phrases whose
-     * wording is unambiguous. Idioms such as "this will kill me" are left out in every language (French "me tuer",
-     * Spanish "matarme" and Portuguese "me matar" are common exaggerations). Academic mentions ("why does the
-     * character commit suicide") are left out on purpose: they are not a learner in distress.
+     * Crisis phrases that are first person by their own wording, matched as keywords. Spanish, French, German,
+     * Portuguese, Arabic and Chinese phrases are only those whose wording is unambiguous. Left out on purpose:
+     * idioms ("this will kill me", French "me tuer", Spanish "matarme", Portuguese "me matar", German "mich
+     * umbringen" as in "my dad will kill me"), phrases that also ask whether something can hurt you (Spanish
+     * "hacerme daño", French "me faire du mal", German "mich selbst verletzen", Chinese "伤害自己" are only listed
+     * with "I want to"), and academic mentions ("why does the character commit suicide").
      */
     private const WELLBEING_PHRASES = [
         // English.
-        'kill myself', 'killing myself', 'end my life', 'ending my life', 'take my own life', 'want to die',
-        'wanna die', 'wish i was dead', 'wish i were dead', 'suicidal', 'thinking about suicide',
-        'thinking of suicide', 'thoughts of suicide', 'considering suicide', 'hurt myself', 'hurting myself',
-        'harm myself', 'harming myself', 'cutting myself', 'i self-harm', 'i self harm', "don't want to live",
-        'dont want to live', 'no reason to live', 'better off dead',
+        'kill myself', 'killing myself', 'hang myself', 'end my life', 'ending my life', 'take my own life',
+        'taking my own life', 'wish i was dead', 'wish i were dead', 'better off without me',
         // Spanish.
-        'quiero morir', 'quiero morirme', 'suicidarme', 'quitarme la vida', 'hacerme daño', 'no quiero vivir',
+        'quiero morir', 'quiero morirme', 'suicidarme', 'quitarme la vida', 'no quiero vivir', 'quiero hacerme daño',
         // French.
-        'je veux mourir', 'me suicider', 'mettre fin à mes jours', 'me faire du mal', 'je ne veux plus vivre',
+        'je veux mourir', 'me suicider', 'mettre fin à mes jours', 'je veux me faire du mal', 'je ne veux plus vivre',
         // German.
-        'ich will sterben', 'ich möchte sterben', 'mich umbringen', 'mir das leben nehmen', 'suizidgedanken',
-        'selbstmordgedanken', 'mich selbst verletzen',
+        'ich will sterben', 'ich möchte sterben', 'ich will mich umbringen', 'mir das leben nehmen',
+        'suizidgedanken', 'selbstmordgedanken', 'ich will mich selbst verletzen', 'ich verletze mich selbst',
         // Portuguese.
         'quero morrer', 'me suicidar', 'tirar minha vida', 'tirar a minha vida', 'não quero mais viver',
         // Arabic: "I want to die", "kill myself", "I will commit suicide".
         'أريد أن أموت', 'أقتل نفسي', 'سأنتحر',
-        // Chinese: "want to die", "don't want to live", "want to kill myself", "hurt myself".
-        '想死', '不想活', '想自杀', '伤害自己',
+        // Chinese: "don't want to live", "want to kill myself", "I want to hurt myself".
+        '不想活', '想自杀', '我想伤害自己',
     ];
+
+    /** @var string "I", "I'm", "I've", "I'd", "I'll" at a word boundary. */
+    private const I = "\\bi(?:'m|'ve|'d|'ll)?";
+
+    /** @var string Words that may sit between "I" and a crisis phrase without changing who it is about. */
+    private const IGAP = '(?:\s+(?:am|was|will|have|been|keep|just|really|honestly|still|so|seriously|sometimes|often|'
+        . 'want\s+to|wanna|going\s+to|gonna|might|could|plan(?:ning)?\s+to|feel(?:ing)?|felt|think(?:ing)?\s+(?:about|of)))*';
+
+    /**
+     * Crisis phrases that need a first-person frame, as patterns. "Suicidal", "want to die", "hurt myself" and
+     * "self-harm" alone also appear in coursework ("risk factors for suicidal patients", "why does Hamlet want to
+     * die", "I hurt myself playing football"), so each is tied to "I" with only the words in IGAP between, and
+     * hurting oneself needs an intent or a habit ("I want to", "I keep", "I've been").
+     *
+     * @return string[]
+     */
+    private static function wellbeing_patterns(): array {
+        $i = self::I . self::IGAP;
+        return [
+            $i . '\s+(?:feel(?:ing)?\s+|been\s+)?suicidal\b',
+            $i . '\s+(?:having|have|had|get|getting)\s+(?:\w+\s+)?suicidal\s+(?:thoughts|feelings|urges)',
+            '\bmy\s+suicidal\s+(?:thoughts|feelings|urges)',
+            $i . '\s+(?:thinking|thought|think)\s+(?:about|of)\s+(?:suicide|killing\s+myself|ending\s+it)'
+                . '(?!\s+(?:prevention|rates?|research|awareness|risk))',
+            $i . '\s+commit(?:ting)?\s+suicide',
+            $i . '\s+(?:want\s+to|wanna)\s+die\b',
+            $i . '\s+end\s+it\s+all\b',
+            self::I . '(?:\s+(?:really|just|still|sometimes|often|so))*\s+(?:want\s+to|wanna|am\s+going\s+to|going\s+to|'
+                . 'gonna|keep|have\s+been|been|feel\s+like|might|will|can\'t\s+stop|need\s+to)\s+'
+                . '(?:hurt|harm|cut|burn)(?:ing)?\s+myself',
+            "\\bi(?:'m|\\s+am)\\s+(?:hurting|harming|cutting|burning)\\s+myself",
+            '\bi\s+cut\s+myself\s+(?:again|last\s+night|tonight|today|yesterday|this\s+morning|on\s+purpose)\b',
+            "\\bi(?:'ve|\\s+have)\\s+been\\s+self[\\s-]?harming|\\bi(?:'m|\\s+am)\\s+self[\\s-]?harming",
+            "\\bi(?:\\s+have|'ve)?\\s+self[\\s-]?harm(?:ed)?\\b|\\bmy\\s+self[\\s-]?harm(?:ing)?\\b",
+            "\\bmy\\s+life\\s+(?:is\\s+not|isn't|is\\s+no\\s+longer|feels)\\s+(?:\\w+\\s+)?worth\\s+living",
+            $i . '\s+(?:(?:take|taking|took|taken)\s+an?\s+overdose|overdos(?:e|ing)\b)',
+            "\\bi\\s+(?:don't|dont|do\\s+not)\\s+want\\s+to\\s+(?:live|be\\s+alive|exist)(?:\\s+any\\s*more)?(?=\\s*(?:[.!?,;]|$))",
+            "\\b(?:i\\s+have|i've\\s+got|there's)\\s+no(?:thing)?\\s+(?:reason|point)\\s+(?:for\\s+me\\s+)?(?:to\\s+live|in\\s+living)",
+            "\\b(?:i'd|i\\s+would)\\s+be\\s+better\\s+off\\s+dead\\b",
+            // Chinese "I want to die", but not "我想死你了" ("I miss you so much").
+            '我(?:真的|好|很|就|都)?想死(?!你|您|他|她|它)',
+        ];
+    }
 
     /** @var array<string, string[]> English question keywords per category (the numbers category also has a pattern). */
     private const QUESTION_KEYWORDS = [
@@ -163,40 +216,59 @@ class answer_rules {
     /** @var string Month names as an answer would write them. */
     private const MONTH = '(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*';
 
-    /** @var string[] A date as an answer would state it (Month DD, DD Month, DD/MM), captured for the support check. */
+    /**
+     * @var string[] A date as an answer would state it, captured for the support check: Month DD, DD Month, or a
+     *     numeric date WITH a year (a bare 3/4 is a fraction). The day ends at a word boundary, so "March 2020" is
+     *     not "March 20".
+     */
     private const DATES = [
-        '(' . self::MONTH . '\.?\s+\d{1,2}(?:st|nd|rd|th)?)',
-        '(\d{1,2}(?:st|nd|rd|th)?\s+(?:of\s+)?' . self::MONTH . ')',
-        '(\d{1,2}/\d{1,2}(?:/\d{2,4})?)',
+        '(' . self::MONTH . '\.?\s+\d{1,2}(?:st|nd|rd|th)?)\b',
+        '(\d{1,2}(?:st|nd|rd|th)?\s+(?:of\s+)?' . self::MONTH . ')\b',
+        '(\d{1,2}/\d{1,2}/\d{2,4})\b',
     ];
 
-    /** @var string A way to get round a plagiarism or AI checker or a proctor. */
-    private const EVADE = '(?:avoid|bypass|evade|beat|fool|trick|get\s+(?:past|around))\s+(?:[\w-]+\s+){0,2}'
-        . '(?:detect|checker|turnitin|proctor)\w*';
+    /** @var string What a learner might try to get round: Turnitin, a proctor, or a plagiarism, AI or similarity
+     *     checker or detector. */
+    private const EVADE_OBJECT = '(?:turnitin|proctor\w*|(?:plagiarism|ai|similarity)[\s-]+(?:detect|check|scan)\w*)';
+
+    /** @var string Getting round one of them. A bare "avoid detection" (insects, malware) does not match. */
+    private const EVADE = '(?:avoid|bypass|evade|beat|fool|trick|get\s+(?:past|around))\s+(?:\w+\s+)?'
+        . self::EVADE_OBJECT;
+
+    /** @var string The category the existing runtime validators' rules carry (validator.<name>). Not an admin choice,
+     *     so not in CATEGORIES; consumers must accept it. safe_message() gives it the general text. */
+    public const VALIDATOR_CATEGORY = 'general';
 
     /**
      * The default rule pack. Conservative: block only for wellbeing and for clearly harmful guidance (promising or
-     * changing a grade, granting an extension, coaching a learner to evade integrity checks); everything else warns.
-     * Each rule's `values` are patterns (each within PATTERN_MAX_LENGTH, pinned by a test) or keywords.
-     * `unsupported` means the rule fires only when its first captured group does not appear in the retrieved
-     * course text, so an answer quoting the course's own date or policy passes.
+     * changing a grade, granting an extension, coaching a learner to evade integrity checks); the rest warns or
+     * watches. Each rule's `values` are patterns (each within PATTERN_MAX_LENGTH, pinned by a test) or keywords.
+     * `support` (date|policy) means the rule fires only when retrieved course text exists AND does not contain the
+     * same date (day and month in either order) or a policy of the same kind; with no retrieved text it never fires,
+     * so a course without retrieval is not flooded with warnings.
      *
      * @return array[]
      */
     public static function default_rules(): array {
+        $gradeobject = '(?:an?\s+)?(?:(?-i:[A-F])(?:[+-]|\b)|\d{1,3}\s?%|(?:good|high|full|top)\s+(?:grade|mark|score)s?)';
         return [
             // Wellbeing: any wellbeing question. Fired from the question's categories (see evaluate()), so the
-            // phrases live in WELLBEING_PHRASES. Block: an AI tutor is not crisis support, and the learner needs
-            // a person.
+            // phrases live in WELLBEING_PHRASES and wellbeing_patterns(). Block: an AI tutor is not crisis support,
+            // and the learner needs a person.
             ['id' => self::WELLBEING_RULE, 'category' => 'wellbeing', 'kind' => 'keyword', 'applies_to' => 'question',
                 'action' => 'block', 'values' => self::WELLBEING_PHRASES],
-            // A promise of a grade or a pass ("I guarantee you'll pass", "you will definitely get an A"). Block: SOLA
-            // cannot know or grant a grade and a learner may stop working on the strength of it. Encouragement
-            // ("you'll be better prepared") does not match.
+            // A guaranteed grade or pass for the learner ("I guarantee you will pass", "you're guaranteed an A").
+            // Block: SOLA cannot know or grant a grade and a learner may stop working on the strength of it. Needs
+            // "you" and a grade or pass, so "the government guarantees the loan" and "tests guarantee your code will
+            // pass" do not match.
             ['id' => 'grades.guarantee', 'category' => 'grades', 'kind' => 'pattern', 'applies_to' => 'reply',
                 'action' => 'block', 'values' => [
-                    '\bguarantee[sd]?\b[^.!?\n]{0,60}?\b(?:grades?|pass|score|marks?|credit)\b',
-                    "\\byou(?:'ll|\\s+will)\\s+(?:definitely|certainly|surely|automatically)\\s+(?:get|receive|earn|pass)\\b",
+                    "\\b(?:i|we)\\s+(?:can\\s+)?guarantee\\s+(?:that\\s+)?you(?:'ll|\\s+will)\\s+pass\\b",
+                    "\\b(?:i|we)\\s+(?:can\\s+)?guarantee\\s+(?:that\\s+)?you(?:'ll|\\s+will)\\s+(?:get|receive|earn)\\s+"
+                        . $gradeobject,
+                    "\\byou(?:'re|\\s+are)\\s+guaranteed\\s+to\\s+pass\\b",
+                    "\\byou(?:'re|\\s+are)\\s+guaranteed\\s+(?:to\\s+(?:get|receive|earn)\\s+)?" . $gradeobject,
+                    '\byour\s+(?:grade|mark|score|pass)\s+is\s+guaranteed\b',
                 ]],
             // A claim to have changed a grade. Block: SOLA has no access to the gradebook, so this is always false.
             ['id' => 'grades.changed', 'category' => 'grades', 'kind' => 'pattern', 'applies_to' => 'reply',
@@ -204,31 +276,36 @@ class answer_rules {
                     "\\bI(?:'ve|\\s+have)\\s+(?:changed|updated|raised|increased|adjusted|bumped|corrected)\\s+your\\s+"
                         . '(?:[\w-]+\s+){0,2}(?:grades?|scores?|marks?)\b',
                 ]],
-            // A predicted grade ("you will get a B+"). Warn: a guess, not a promise, but it should be checked with
-            // the instructor. The letter must be a capital so "you'll get a better idea" does not match.
+            // A certain outcome ("you will definitely get an A"). Watch: a confident prediction, recorded for review.
+            // Conditional arithmetic ("if you score 85% you'll get a B") does not match.
             ['id' => 'grades.predicted', 'category' => 'grades', 'kind' => 'pattern', 'applies_to' => 'reply',
-                'action' => 'warn', 'values' => [
-                    "\\byou(?:'ll|\\s+will)\\s+(?:get|receive|earn)\\s+(?:an?\\s+)?(?:(?-i:[A-F])[+-]?|\\d{1,3}\\s?%)(?=[\\s.,!?]|$)",
+                'action' => 'watch', 'values' => [
+                    "\\byou(?:'ll|\\s+will|'re\\s+going\\s+to|\\s+are\\s+going\\s+to)\\s+(?:definitely|certainly|surely|"
+                        . 'automatically|easily)\s+(?:get|receive|earn|pass)\b',
                 ]],
-            // A granted or approved extension. Block: only the instructor can grant one, and a learner who believes
-            // SOLA may miss the real deadline.
+            // A granted extension on a piece of work. Block: only the instructor can grant one, and a learner who
+            // believes SOLA may miss the real deadline. Needs a granting frame AND a deadline or piece of work, so
+            // "a file extension list" and "a field extension" do not match.
             ['id' => 'deadlines.extension_granted', 'category' => 'deadlines', 'kind' => 'pattern',
                 'applies_to' => 'reply', 'action' => 'block', 'values' => [
-                    "\\bI(?:'ve|\\s+have|'ll|\\s+will|\\s+can)\\s+(?:grant(?:ed)?|give|given|approved?|extend(?:ed)?)\\s+"
-                        . '(?:you\s+)?(?:an?\s+)?(?:[\w-]+\s+){0,2}extension',
+                    "\\b(?:i|we)\\b(?:'\\w+|\\s+\\w+)?\\s+(?:grant|giv|approv)\\w*\\s+(?:\\S+\\s+){0,3}extension\\s+(?:on|for|to)\\s+"
+                        . '(?:\S+\s+){0,3}?(?:deadline|assignment|essay|exam|quiz|test|project|paper|due\s+date)',
                     '\byour\s+extension\s+(?:request\s+)?(?:is|has\s+been|was)\s+(?:approved|granted|confirmed)\b',
+                    "\\b(?:i|we)(?:'ve|\\s+have)\\s+extended\\s+(?:your|the)\\s+(?:[\\w-]+\\s+){0,2}(?:deadline|due\\s+date)",
                 ]],
-            // A due date the course text does not contain. Warn: it may be right, but an invented date costs marks.
+            // A due date the retrieved course text does not contain. Warn: it may be right, but an invented date
+            // costs marks. "Due to" is not a due date.
             ['id' => 'deadlines.invented_date', 'category' => 'deadlines', 'kind' => 'pattern', 'applies_to' => 'reply',
-                'action' => 'warn', 'unsupported' => true, 'values' => array_map(
-                    static fn(string $date): string => '\b(?:due|deadline|closes?)\b[^.\n]{0,40}?\b' . $date,
+                'action' => 'warn', 'support' => 'date', 'values' => array_map(
+                    static fn(string $date): string => '\b(?:due(?!\s+to\b)|deadline|closes?)\b[^.\n]{0,40}?\b' . $date,
                     self::DATES)],
-            // A stated institutional policy (refund, withdrawal, transfer...) the course text does not contain.
-            // Warn: policy questions belong to student support, and a made-up policy can cost money.
+            // A stated institutional policy (refund, withdrawal, transfer...) of a kind the retrieved course text
+            // has no policy for. Warn: policy questions belong to student support, and a made-up policy can cost
+            // money. The kind is captured, so "the late policy" matches a course's "Late Work Policy".
             ['id' => 'policy.invented', 'category' => 'policy', 'kind' => 'pattern', 'applies_to' => 'reply',
-                'action' => 'warn', 'unsupported' => true, 'values' => [
-                    "\\b(?:the|our|its|their|[\\w-]+'s)\\s+((?:refund|withdrawal|late|attendance|enrol+ment|transfer|"
-                        . 'grading|appeals?|extension)\s+policy)\s+(?:is|states|says|allows|permits|requires|lets)\b',
+                'action' => 'warn', 'support' => 'policy', 'values' => [
+                    "\\b(?:the|our|its|their|[\\w-]+'s)\\s+(refund|withdrawal|late|attendance|enrol+ment|transfer|grading|"
+                        . 'appeals?|extension)(?:\s+[\w-]+)?\s+policy\s+(?:is|states|says|allows|permits|requires|lets)\b',
                 ]],
             // A personal medical, legal or financial instruction ("you should stop taking your medication", "you
             // should sue"). Warn: general course content about these subjects is fine; a personal directive is not
@@ -242,14 +319,15 @@ class answer_rules {
                     '\byou\s+should\s+(?:definitely\s+)?(?:invest\s+(?:all\s+|your\s+|in\s+)|buy\s+(?:[\w-]+\s+)?'
                         . '(?:stocks?|shares|crypto\w*|bitcoin)|put\s+(?:all\s+)?your\s+(?:savings|money)\s+in)',
                 ]],
-            // Coaching to evade a plagiarism or AI checker or a proctor. Block: clearly harmful to the learner and
-            // the course. Only instructional phrasing matches, so a refusal ("you shouldn't try to avoid
-            // plagiarism detection") does not.
+            // Coaching to get round a plagiarism or AI checker, Turnitin or a proctor. Block: clearly harmful to
+            // the learner and the course. Needs one of those as the object AND an instructional frame, so a refusal
+            // ("you shouldn't try to avoid plagiarism detection") and "to avoid detection by predators" do not match.
             ['id' => 'integrity.cheat_help', 'category' => 'integrity', 'kind' => 'pattern', 'applies_to' => 'reply',
                 'action' => 'block', 'values' => [
                     '(?:^|[.!?:]\s+|\n)\s*to\s+' . self::EVADE,
                     '\byou\s+(?:can|could)\s+' . self::EVADE,
-                    "\\b(?:here(?:'s|\\s+is)\\s+how|the\\s+(?:trick\\s+is|best\\s+way))\\s+to\\s+" . self::EVADE,
+                    "\\bhere(?:'s|\\s+is)\\s+how\\s+to\\s+" . self::EVADE,
+                    '\bthe\s+(?:trick\s+is|best\s+way)\s+to\s+' . self::EVADE,
                 ]],
             // Assessment answers handed over, or a finished piece of work offered for submission. Warn: it may be
             // a practice quiz, so an instructor should look, not a hard stop.
@@ -295,7 +373,7 @@ class answer_rules {
                 return [];
             }
             $found = [];
-            if (self::keywords_match(self::WELLBEING_PHRASES, $text)) {
+            if (self::is_wellbeing_text($text)) {
                 $found['wellbeing'] = true;
             }
             foreach (self::QUESTION_KEYWORDS as $category => $keywords) {
@@ -303,7 +381,7 @@ class answer_rules {
                     $found[$category] = true;
                 }
             }
-            if (self::pattern_match(self::NUMBERS_QUESTION_PATTERN, $text) !== null) {
+            if (is_array(self::pattern_match(self::NUMBERS_QUESTION_PATTERN, $text))) {
                 $found['numbers'] = true;
             }
             foreach (self::site_rules() as $rule) {
@@ -328,6 +406,24 @@ class answer_rules {
     }
 
     /**
+     * Whether a question reads as a learner in distress or crisis (the built-in phrases and patterns only).
+     *
+     * @param string $text normalised
+     * @return bool
+     */
+    private static function is_wellbeing_text(string $text): bool {
+        if ($text === '' || self::keywords_match(self::WELLBEING_PHRASES, $text)) {
+            return $text !== '';
+        }
+        foreach (self::wellbeing_patterns() as $pattern) {
+            if (is_array(self::pattern_match($pattern, $text))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Check an answer.
      *
      * @param string $reply the answer as it would be delivered (after runtime_guard)
@@ -336,88 +432,137 @@ class answer_rules {
      *     retry), validator_results (runtime_guard::last_results()), and the mode as either mode (off|watch|enforce)
      *     or courseid (read through mode()); with neither, the site mode.
      * @return array{action: string, rules: string[], text: ?string, fired: array[], categories: string[],
-     *     error: ?string} text is what to deliver instead of the answer (block: the safe message; warn: the answer
+     *     error: ?string, pcre_errors: string[]} text is what to deliver instead of the answer (block: the safe message; warn: the answer
      *     plus the check line), null to deliver it unchanged (none, watch) or to retry (correct). fired holds
-     *     [id, category, action] per rule, for the audit row. error is the exception class when the check failed
-     *     (the answer is then delivered unchanged).
+     *     [id, category, action] per rule, for the audit row; a validator rule's category is VALIDATOR_CATEGORY
+     *     ('general'), which is not one of CATEGORIES. error is the exception class when the check failed (the
+     *     answer is then delivered unchanged, EXCEPT that a wellbeing question still gets its block). pcre_errors
+     *     lists rules whose pattern hit the PCRE backtrack limit; each is also fired as 'watch'.
      */
     public static function evaluate(string $reply, array $ctx): array {
         $result = ['action' => 'none', 'rules' => [], 'text' => null, 'fired' => [], 'categories' => [],
-            'error' => null];
+            'error' => null, 'pcre_errors' => []];
+        // Wellbeing first, on its own: if anything after this throws, a learner in crisis still gets the safe
+        // message rather than the answer.
+        $mode = 'off';
+        $wellbeing = false;
         try {
             $mode = self::mode_from_context($ctx);
             if ($mode === 'off') {
                 return $result;
             }
-            $question = self::normalise((string) ($ctx['question'] ?? ''));
-            $answer = self::normalise($reply);
-            $categories = isset($ctx['categories']) && is_array($ctx['categories'])
-                ? array_values(array_intersect(self::CATEGORIES, $ctx['categories']))
-                : self::categories_for_question($question);
-            $result['categories'] = $categories;
-            $chunks = self::chunk_texts($ctx['chunks'] ?? []);
-            $chunktext = self::normalise(implode("\n", $chunks));
-
-            $fired = [];
-            $fire = static function (string $id, string $category, string $action) use (&$fired): void {
-                if (!isset($fired[$id])) {
-                    $fired[$id] = ['id' => $id, 'category' => $category, 'action' => $action];
-                }
-            };
-
-            if (in_array('wellbeing', $categories, true)) {
-                $fire(self::WELLBEING_RULE, 'wellbeing', 'block');
+            $wellbeing = isset($ctx['categories']) && is_array($ctx['categories'])
+                ? in_array('wellbeing', $ctx['categories'], true)
+                : self::is_wellbeing_text(self::normalise(is_string($ctx['question'] ?? null) ? $ctx['question'] : ''));
+        } catch (\Throwable $e) {
+            $result['error'] = get_class($e);
+            return $result;
+        }
+        try {
+            if (self::$beforerules) {
+                (self::$beforerules)();
             }
-            foreach (array_merge(self::default_rules(), self::site_rules()) as $rule) {
-                if ($rule['id'] === self::WELLBEING_RULE) {
-                    continue;
-                }
-                $hit = false;
-                if ($rule['applies_to'] !== 'reply') {
-                    $hit = self::rule_matches($rule, $question, null);
-                }
-                if (!$hit && $rule['applies_to'] !== 'question') {
-                    $hit = self::rule_matches($rule, $answer, empty($rule['unsupported']) ? null : [$chunktext]);
-                }
-                if ($hit) {
-                    $fire($rule['id'], $rule['category'], $rule['action']);
-                }
-            }
-            self::fold_validators($ctx, $answer, $question, $chunks, $fire);
-
-            $result['fired'] = array_values($fired);
-            $result['rules'] = array_keys($fired);
-            if (!$fired) {
-                return $result;
-            }
-            if ($mode === 'watch') {
-                $result['action'] = 'watch';
-                return $result;
-            }
-            $strongest = null;
-            foreach ($fired as $f) {
-                if ($strongest === null || self::rank($f['action']) > self::rank($strongest['action'])) {
-                    $strongest = $f;
-                }
-            }
-            $action = $strongest['action'];
-            if ($action === 'correct' && empty($ctx['buffered'])) {
-                // A streamed answer is already on the screen: it can be warned or blocked, never retried.
-                $action = 'warn';
-            }
-            $result['action'] = $action;
-            if ($action === 'block') {
-                $category = isset($fired[self::WELLBEING_RULE]) ? 'wellbeing' : $strongest['category'];
-                $result['text'] = self::safe_message($category);
-            } else if ($action === 'warn') {
-                $result['text'] = rtrim($reply) . "\n\n_" . get_string('answer_rules:warn_line',
-                    'local_ai_course_assistant') . '_';
+            return self::evaluate_rules($reply, $ctx, $mode, $wellbeing, $result);
+        } catch (\Throwable $e) {
+            $result['error'] = get_class($e);
+            if ($wellbeing) {
+                $result['categories'] = ['wellbeing'];
+                $result['fired'] = [['id' => self::WELLBEING_RULE, 'category' => 'wellbeing', 'action' => 'block']];
+                $result['rules'] = [self::WELLBEING_RULE];
+                $result['action'] = $mode === 'enforce' ? 'block' : 'watch';
+                $result['text'] = $mode === 'enforce' ? self::safe_message('wellbeing') : null;
             }
             return $result;
-        } catch (\Throwable $e) {
-            return ['action' => 'none', 'rules' => [], 'text' => null, 'fired' => [], 'categories' => [],
-                'error' => get_class($e)];
         }
+    }
+
+    /**
+     * The body of evaluate() after the mode and the wellbeing check.
+     *
+     * @param string $reply
+     * @param array $ctx
+     * @param string $mode watch|enforce
+     * @param bool $wellbeing
+     * @param array $result the empty result
+     * @return array
+     */
+    private static function evaluate_rules(string $reply, array $ctx, string $mode, bool $wellbeing,
+            array $result): array {
+        $question = self::normalise(is_string($ctx['question'] ?? null) ? $ctx['question'] : '');
+        $answer = self::normalise($reply);
+        $categories = isset($ctx['categories']) && is_array($ctx['categories'])
+            ? array_values(array_intersect(self::CATEGORIES, $ctx['categories']))
+            : self::categories_for_question($question);
+        if ($wellbeing && !in_array('wellbeing', $categories, true)) {
+            $categories = array_values(array_intersect(self::CATEGORIES, array_merge($categories, ['wellbeing'])));
+        }
+        $result['categories'] = $categories;
+        $chunks = self::chunk_texts($ctx['chunks'] ?? []);
+        $chunktext = self::normalise(implode("\n", $chunks));
+
+        $fired = [];
+        $fire = static function (string $id, string $category, string $action) use (&$fired): void {
+            if (!isset($fired[$id])) {
+                $fired[$id] = ['id' => $id, 'category' => $category, 'action' => $action];
+            }
+        };
+        $pcreerrors = [];
+
+        if (in_array('wellbeing', $categories, true)) {
+            $fire(self::WELLBEING_RULE, 'wellbeing', 'block');
+        }
+        foreach (array_merge(self::default_rules(), self::site_rules()) as $rule) {
+            if ($rule['id'] === self::WELLBEING_RULE) {
+                continue;
+            }
+            $hit = false;
+            if ($rule['applies_to'] !== 'reply') {
+                $hit = self::rule_matches($rule, $question, null, $pcreerrors);
+            }
+            if ($hit !== true && $rule['applies_to'] !== 'question') {
+                $hit = self::rule_matches($rule, $answer, $chunktext, $pcreerrors) ?: $hit;
+            }
+            if ($hit === true) {
+                $fire($rule['id'], $rule['category'], $rule['action']);
+            }
+        }
+        // A rule whose pattern hit the PCRE limit could not be checked: it fails open, but visibly, as a watch
+        // (recorded and queued for review) and listed in pcre_errors.
+        foreach (array_unique($pcreerrors) as $id) {
+            $result['pcre_errors'][] = $id;
+            $fire($id, self::VALIDATOR_CATEGORY, 'watch');
+        }
+        self::fold_validators($ctx, $answer, $question, $chunks, $fire);
+
+        $result['fired'] = array_values($fired);
+        $result['rules'] = array_keys($fired);
+        if (!$fired) {
+            return $result;
+        }
+        if ($mode === 'watch') {
+            $result['action'] = 'watch';
+            return $result;
+        }
+        $strongest = null;
+        foreach ($fired as $f) {
+            if ($strongest === null || self::rank($f['action']) > self::rank($strongest['action'])) {
+                $strongest = $f;
+            }
+        }
+        $action = $strongest['action'];
+        if ($action === 'correct' && empty($ctx['buffered'])) {
+            // A streamed answer is already on the screen: it can be warned or blocked, never retried.
+            $action = 'warn';
+        }
+        $result['action'] = $action;
+        if ($action === 'block') {
+            $category = isset($fired[self::WELLBEING_RULE]) ? 'wellbeing' : $strongest['category'];
+            $result['text'] = self::safe_message($category);
+        } else if ($action === 'warn') {
+            $result['text'] = rtrim($reply) . "\n\n_" . get_string('answer_rules:warn_line',
+                'local_ai_course_assistant') . '_';
+        }
+        return $result;
     }
 
     /**
@@ -443,9 +588,11 @@ class answer_rules {
      * Problems with a site rule. Empty means it can be saved and run.
      *
      * @param array $rule id, category, kind, value, applies_to, action
+     * @param bool $timing run the samples and the time budget (at save time); site_rules() passes false, so a rule
+     *     that was saved is never dropped because the server happens to be busy when it loads
      * @return array<string, string> error code => message
      */
-    public static function validate_rule(array $rule): array {
+    public static function validate_rule(array $rule, bool $timing = true): array {
         $errors = [];
         $id = trim((string) ($rule['id'] ?? ''));
         if (!preg_match('~^[a-z0-9_]+(?:\.[a-z0-9_]+)*$~', $id) || strlen($id) > 64) {
@@ -476,7 +623,7 @@ class answer_rules {
                 $errors['value_empty'] = self::err('value_empty');
             }
         } else if ($kind === 'pattern') {
-            $errors += self::pattern_errors($value);
+            $errors += self::pattern_errors($value, $timing);
         }
         return $errors;
     }
@@ -491,13 +638,13 @@ class answer_rules {
         if (trim($raw) === '') {
             return [];
         }
-        $key = sha1($raw) . '|' . self::$budgetms;
+        $key = sha1($raw);
         if (isset(self::$sitecache[$key])) {
             return self::$sitecache[$key];
         }
         $rules = [];
         foreach (self::decode_rules($raw) as $rule) {
-            if (self::validate_rule($rule)) {
+            if (self::validate_rule($rule, false)) {
                 continue;
             }
             $values = $rule['kind'] === 'keyword' ? self::split_keywords($rule['value']) : [$rule['value']];
@@ -592,9 +739,9 @@ class answer_rules {
                 continue;
             }
             if ($vmode === 'block') {
-                $fire('validator.' . $name, 'general', 'block');
+                $fire('validator.' . $name, self::VALIDATOR_CATEGORY, 'block');
             } else if ($vmode === 'annotate') {
-                $fire('validator.' . $name, 'general', 'warn');
+                $fire('validator.' . $name, self::VALIDATOR_CATEGORY, 'warn');
             }
         }
         if (!$sawnumbers && $chunks) {
@@ -608,30 +755,41 @@ class answer_rules {
     /**
      * Whether a rule matches a text.
      *
-     * @param array $rule with kind and values
+     * @param array $rule with kind, values and optionally support (date|policy)
      * @param string $text normalised
-     * @param string[]|null $support normalised course text; when given, a match counts only if its first captured
-     *     group (else the whole match) is absent from it
+     * @param string|null $chunktext normalised retrieved course text for a `support` rule; null on the question side
+     * @param string[] $pcreerrors receives the rule id when a pattern hit the PCRE limit
      * @return bool
      */
-    private static function rule_matches(array $rule, string $text, ?array $support): bool {
+    private static function rule_matches(array $rule, string $text, ?string $chunktext,
+            array &$pcreerrors = []): bool {
         if ($text === '') {
             return false;
         }
         if ($rule['kind'] === 'keyword') {
             return self::keywords_match($rule['values'], $text);
         }
+        $support = $rule['support'] ?? null;
+        if ($support !== null && trim((string) $chunktext) === '') {
+            // Nothing retrieved: nothing to say the answer is unsupported by.
+            return false;
+        }
         foreach ($rule['values'] as $pattern) {
             $m = self::pattern_match($pattern, $text);
+            if ($m === false) {
+                $pcreerrors[] = $rule['id'];
+                continue;
+            }
             if ($m === null) {
                 continue;
             }
             if ($support === null) {
                 return true;
             }
-            $needle = self::fold($m[1] ?? $m[0]);
-            $haystack = self::fold(implode("\n", $support));
-            if ($needle === '' || strpos($haystack, $needle) === false) {
+            $found = $m[1] ?? $m[0];
+            $supported = $support === 'date' ? self::date_supported($found, (string) $chunktext)
+                : self::policy_supported($found, (string) $chunktext);
+            if (!$supported) {
                 return true;
             }
         }
@@ -639,14 +797,89 @@ class answer_rules {
     }
 
     /**
-     * Run one pattern. A PCRE error (backtrack limit, bad UTF-8) is no match.
+     * Whether the course text holds the same date (day and month, in either order or as a numeric date).
+     *
+     * @param string $date as captured from the answer
+     * @param string $chunktext
+     * @return bool
+     */
+    private static function date_supported(string $date, string $chunktext): bool {
+        $wanted = self::date_keys($date);
+        if (!$wanted) {
+            return true;
+        }
+        $pattern = self::DELIM . '(?:' . implode('|', array_map(static fn($d) => substr($d, 0, -2), self::DATES))
+            . ')\b' . self::DELIM . 'iu';
+        $have = [];
+        if (preg_match_all($pattern, $chunktext, $all)) {
+            foreach ($all[0] as $one) {
+                $have = array_merge($have, self::date_keys($one));
+            }
+        }
+        // Numeric dates in the course text without a year still count (a schedule may write 3/14).
+        if (preg_match_all('~\b(\d{1,2})/(\d{1,2})\b~', $chunktext, $nums, PREG_SET_ORDER)) {
+            foreach ($nums as $n) {
+                $have[] = (int) $n[1] . '-' . (int) $n[2];
+                $have[] = (int) $n[2] . '-' . (int) $n[1];
+            }
+        }
+        return (bool) array_intersect($wanted, $have);
+    }
+
+    /**
+     * Month-day keys for a date ("3-14"); a numeric date gives both readings.
+     *
+     * @param string $date
+     * @return string[]
+     */
+    private static function date_keys(string $date): array {
+        $date = \core_text::strtolower($date);
+        $months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+        if (preg_match('~^(\d{1,2})/(\d{1,2})~', $date, $m)) {
+            return [(int) $m[1] . '-' . (int) $m[2], (int) $m[2] . '-' . (int) $m[1]];
+        }
+        if (preg_match('~([a-z]{3})[a-z]*\.?\s+(\d{1,2})~', $date, $m) || preg_match('~(\d{1,2})(?:st|nd|rd|th)?\s+'
+                . '(?:of\s+)?([a-z]{3})~', $date, $m)) {
+            [$mon, $day] = ctype_digit($m[1]) ? [$m[2], $m[1]] : [$m[1], $m[2]];
+            $i = array_search($mon, $months, true);
+            return $i === false ? [] : [($i + 1) . '-' . (int) $day];
+        }
+        return [];
+    }
+
+    /**
+     * Whether the course text has a policy of this kind ("late" matches "Late Work Policy", "policy on late work").
+     *
+     * @param string $kind the captured kind (refund, late, transfer...)
+     * @param string $chunktext
+     * @return bool
+     */
+    private static function policy_supported(string $kind, string $chunktext): bool {
+        $stem = preg_quote(substr(\core_text::strtolower($kind), 0, 4), '~');
+        return (bool) preg_match('~\b' . $stem . '\w*(?:\s+[\w-]+){0,2}\s+polic(?:y|ies)\b'
+            . '|\bpolic(?:y|ies)\s+(?:on|for|about|regarding)\s+(?:[\w-]+\s+){0,2}' . $stem . '~iu', $chunktext);
+    }
+
+    /**
+     * Run one pattern under a lower PCRE backtrack limit, restored afterwards.
      *
      * @param string $pattern
      * @param string $text
-     * @return array|null the match groups, or null
+     * @return array|null|false the match groups, null for no match, false when PCRE stopped (limit or bad input)
      */
-    private static function pattern_match(string $pattern, string $text): ?array {
-        $r = @preg_match(self::DELIM . $pattern . self::DELIM . 'iu', $text, $m);
+    private static function pattern_match(string $pattern, string $text) {
+        $old = ini_get('pcre.backtrack_limit');
+        @ini_set('pcre.backtrack_limit', (string) self::BACKTRACK_LIMIT);
+        try {
+            $r = @preg_match(self::DELIM . $pattern . self::DELIM . 'iu', $text, $m);
+        } finally {
+            if ($old !== false) {
+                @ini_set('pcre.backtrack_limit', $old);
+            }
+        }
+        if ($r === false) {
+            return false;
+        }
         return $r === 1 ? $m : null;
     }
 
@@ -696,9 +929,10 @@ class answer_rules {
      * samples.
      *
      * @param string $pattern
+     * @param bool $timing run the samples and the time budget (save time only)
      * @return array<string, string>
      */
-    private static function pattern_errors(string $pattern): array {
+    private static function pattern_errors(string $pattern, bool $timing = true): array {
         if (\core_text::strlen($pattern) > self::PATTERN_MAX_LENGTH) {
             return ['pattern_too_long' => self::err('pattern_too_long', self::PATTERN_MAX_LENGTH)];
         }
@@ -712,9 +946,12 @@ class answer_rules {
         if (@preg_match($compiled, '') === false) {
             return ['pattern_invalid' => self::err('pattern_invalid')];
         }
+        if (!$timing) {
+            return [];
+        }
         $start = microtime(true);
         foreach (self::samples() as $sample) {
-            if (@preg_match($compiled, $sample) === false) {
+            if (self::pattern_match($pattern, $sample) === false) {
                 return ['pattern_too_complex' => self::err('pattern_too_complex')];
             }
         }

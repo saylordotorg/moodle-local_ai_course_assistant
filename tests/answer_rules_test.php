@@ -37,6 +37,7 @@ final class answer_rules_test extends \advanced_testcase {
 
     protected function tearDown(): void {
         answer_rules::$budgetms = answer_rules::DEFAULT_BUDGET_MS;
+        answer_rules::$beforerules = null;
         parent::tearDown();
     }
 
@@ -315,25 +316,68 @@ final class answer_rules_test extends \advanced_testcase {
             $this->assertNotEmpty(array_intersect(array_keys($errors), ['pattern_too_complex', 'pattern_too_slow']),
                 $pattern . ': ' . implode(',', array_keys($errors)));
         }
-        // Stored by hand anyway: skipped when loaded, and evaluation still finishes quickly with no error.
+        // Stored by hand anyway: loading does not time patterns (a saved rule must not drop out under load), so it
+        // loads, and the run-time backtrack limit stops it: quick, no exception, and visible as a watch.
         set_config('answer_safety_rules', json_encode([$base + ['value' => '(a+)+$']]), 'local_ai_course_assistant');
-        $this->assertSame([], answer_rules::site_rules());
+        $this->assertCount(1, answer_rules::site_rules());
         $start = microtime(true);
         $r = answer_rules::evaluate(str_repeat('a', 5000) . '!', ['question' => str_repeat('a', 40) . '!',
             'mode' => 'enforce', 'buffered' => true]);
         $this->assertLessThan(1.0, microtime(true) - $start);
         $this->assertNull($r['error']);
-        $this->assertNotContains('site.boom', $r['rules']);
+        $this->assertSame(['site.boom'], $r['pcre_errors']);
+        $this->assertSame('watch', $r['action']);
 
-        // A pattern that explodes only on input the samples lack passes validation, but PCRE's backtrack limit
-        // still stops it at run time: no match, no error, no stall.
+        // A pattern that explodes only on input the samples lack passes validation, but the lowered backtrack
+        // limit stops it at run time: no stall, no exception, and the rule that could not be checked is visible
+        // (pcre_errors, fired as watch) instead of silently failing open.
         $this->set_site_rules([$base + ['value' => '(x+x+)+y']]);
         $this->assertCount(1, answer_rules::site_rules());
+        $before = ini_get('pcre.backtrack_limit');
         $start = microtime(true);
         $r = answer_rules::evaluate(str_repeat('x', 5000) . '!y', ['question' => 'q', 'mode' => 'enforce']);
         $this->assertLessThan(1.0, microtime(true) - $start);
         $this->assertNull($r['error']);
-        $this->assertSame('none', $r['action']);
+        $this->assertSame(['site.boom'], $r['pcre_errors']);
+        $this->assertContains('site.boom', $r['rules']);
+        $this->assertSame('watch', $r['action'], 'a block rule that could not run does not block, but is watched');
+        $this->assertSame($before, ini_get('pcre.backtrack_limit'), 'the limit is restored');
+    }
+
+    public function test_a_saved_rule_is_never_dropped_at_load_because_of_timing(): void {
+        $rule = ['id' => 'site.slowish', 'category' => 'grades', 'kind' => 'pattern', 'applies_to' => 'reply',
+            'action' => 'block', 'value' => '\byour\s+grade\s+is\s+an?\s+[A-F]\b'];
+        $this->assertSame([], answer_rules::validate_rule($rule), 'valid when saved');
+        $this->set_site_rules([$rule]);
+        // The server is now "slow": every timed check would fail.
+        answer_rules::$budgetms = 0.0;
+        $this->assertArrayHasKey('pattern_too_slow', answer_rules::validate_rule($rule), 'the save-time check is timed');
+        $this->assertSame([], answer_rules::validate_rule($rule, false), 'the load-time check is not');
+        $this->assertSame(['site.slowish'], array_column(answer_rules::site_rules(), 'id'));
+        $r = answer_rules::evaluate('Your grade is an A.', ['question' => 'q', 'mode' => 'enforce']);
+        $this->assertSame('block', $r['action']);
+        $this->assertContains('site.slowish', $r['rules']);
+    }
+
+    public function test_wellbeing_still_blocks_when_the_rules_throw(): void {
+        answer_rules::$beforerules = static function (): void {
+            throw new \RuntimeException('rule engine broke');
+        };
+        $r = answer_rules::evaluate('Here is a study plan.', ['question' => 'I want to kill myself', 'mode' => 'enforce']);
+        $this->assertSame('block', $r['action']);
+        $this->assertSame(answer_rules::safe_message('wellbeing'), $r['text']);
+        $this->assertSame(['wellbeing.crisis'], $r['rules']);
+        $this->assertSame(\RuntimeException::class, $r['error']);
+
+        $r = answer_rules::evaluate('x', ['question' => 'q', 'categories' => ['wellbeing'], 'mode' => 'enforce']);
+        $this->assertSame('block', $r['action'], 'categories passed by the caller count too');
+
+        $r = answer_rules::evaluate('x', ['question' => 'I want to kill myself', 'mode' => 'watch']);
+        $this->assertSame(['watch', null], [$r['action'], $r['text']]);
+
+        $r = answer_rules::evaluate('I guarantee you will pass.', ['question' => 'Will I pass?', 'mode' => 'enforce']);
+        $this->assertSame(['none', null, \RuntimeException::class], [$r['action'], $r['text'], $r['error']],
+            'any other question: delivered unchanged, check_failed');
     }
 
     public function test_validate_rule_reports_each_problem(): void {
@@ -384,8 +428,8 @@ final class answer_rules_test extends \advanced_testcase {
     public function test_existing_block_mode_still_wins_when_stricter(): void {
         $failing = [['validator' => 'pii_echo', 'severity' => 'fail', 'messages' => ['x']],
             ['validator' => 'second_person', 'severity' => 'pass', 'messages' => []]];
-        // The rulebook alone would only warn (a predicted grade); the validator in block mode makes it a block.
-        $reply = 'You will get a B+ on the final.';
+        // The rulebook alone would only watch (a certain outcome); the validator in block mode makes it a block.
+        $reply = 'You will definitely get a B+ on the final.';
         $r = answer_rules::evaluate($reply, ['question' => 'q', 'mode' => 'enforce', 'buffered' => true,
             'validator_results' => $failing, 'validators_mode' => 'block']);
         $this->assertSame('block', $r['action']);
@@ -393,6 +437,10 @@ final class answer_rules_test extends \advanced_testcase {
         $this->assertContains('grades.predicted', $r['rules']);
         $this->assertNotContains('validator.second_person', $r['rules'], 'a passing validator fires nothing');
         $this->assertSame(answer_rules::safe_message('general'), $r['text']);
+        $byid = array_column($r['fired'], null, 'id');
+        $this->assertSame(answer_rules::VALIDATOR_CATEGORY, $byid['validator.pii_echo']['category']);
+        $this->assertNotContains(answer_rules::VALIDATOR_CATEGORY, answer_rules::CATEGORIES,
+            'validator rules use a category of their own');
 
         // Annotate mode maps to warn.
         $r = answer_rules::evaluate('Plain answer.', ['question' => 'q', 'mode' => 'enforce',
@@ -441,8 +489,8 @@ final class answer_rules_test extends \advanced_testcase {
                 'applies_to' => 'question', 'action' => 'watch'],
             ['id' => 'site.r', 'category' => 'advice', 'kind' => 'pattern', 'value' => '\bvisa\s+status\b',
                 'applies_to' => 'reply', 'action' => 'warn'],
-            ['id' => 'site.bad', 'category' => 'advice', 'kind' => 'pattern', 'value' => '(a+)+$',
-                'applies_to' => 'reply', 'action' => 'block'],
+            ['id' => 'site.bad', 'category' => 'advice', 'kind' => 'pattern', 'value' => 'visa',
+                'applies_to' => 'reply', 'action' => 'explode'],
         ]);
         $this->assertCount(2, answer_rules::site_rules(), 'the invalid row is skipped');
         $this->assertContains('policy', answer_rules::categories_for_question('Where is the Housing  Office?'));

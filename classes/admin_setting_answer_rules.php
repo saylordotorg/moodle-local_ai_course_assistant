@@ -48,7 +48,8 @@ class admin_setting_answer_rules extends admin_setting_keyed_rows {
             return $out;
         };
         return [
-            ['name' => 'id', 'label' => 'answer_rules:col_id', 'type' => 'text', 'placeholder' => 'e.g. site.housing'],
+            // Named rule_id, not id: the row editor keeps its own row key in 'id'.
+            ['name' => 'rule_id', 'label' => 'answer_rules:col_id', 'type' => 'text', 'placeholder' => 'e.g. site.housing'],
             ['name' => 'category', 'label' => 'answer_rules:col_category', 'type' => 'select',
                 'options' => $options(answer_rules::CATEGORIES, 'answer_rules:category_')],
             ['name' => 'kind', 'label' => 'answer_rules:col_kind', 'type' => 'select',
@@ -88,7 +89,10 @@ class admin_setting_answer_rules extends admin_setting_keyed_rows {
     protected function load_rows(): array {
         $rows = [];
         foreach (answer_rules::decode_rules((string) $this->get_setting()) as $i => $rule) {
-            $rows[] = ['id' => (string) $i, 'stored_key' => ''] + $rule;
+            // The editor's own row key ('id') is the position; the rule's id is its rule_id column.
+            $row = $rule;
+            unset($row['id']);
+            $rows[] = ['id' => (string) $i, 'stored_key' => '', 'rule_id' => $rule['id']] + $row;
         }
         return $rows;
     }
@@ -105,8 +109,8 @@ class admin_setting_answer_rules extends admin_setting_keyed_rows {
         }
         $list = [];
         foreach ($rows as $r) {
-            $list[] = ['id' => $r['id'], 'category' => $r['category'], 'kind' => $r['kind'], 'value' => $r['value'],
-                'applies_to' => $r['applies_to'], 'action' => $r['action']];
+            $list[] = ['id' => $r['rule_id'], 'category' => $r['category'], 'kind' => $r['kind'],
+                'value' => $r['value'], 'applies_to' => $r['applies_to'], 'action' => $r['action']];
         }
         return json_encode($list, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
@@ -121,14 +125,15 @@ class admin_setting_answer_rules extends admin_setting_keyed_rows {
         $errors = [];
         $seen = [];
         foreach ($rows as $r) {
-            $id = self::safe_name($r['id']);
-            foreach (answer_rules::validate_rule($r) as $message) {
+            $rule = ['id' => $r['rule_id']] + $r;
+            $id = self::safe_name($rule['id']);
+            foreach (answer_rules::validate_rule($rule) as $message) {
                 $errors[] = $id . ': ' . $message;
             }
-            if (isset($seen[$r['id']])) {
+            if (isset($seen[$rule['id']])) {
                 $errors[] = get_string('answer_rules:err_id_duplicate', 'local_ai_course_assistant', $id);
             }
-            $seen[$r['id']] = true;
+            $seen[$rule['id']] = true;
         }
         return $errors;
     }

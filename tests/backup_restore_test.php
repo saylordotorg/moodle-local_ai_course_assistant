@@ -277,6 +277,59 @@ final class backup_restore_test extends \advanced_testcase {
         );
     }
 
+    public function test_the_answer_safety_override_is_not_carried_by_a_duplicate(): void {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        set_config('answer_safety_mode', 'enforce', 'local_ai_course_assistant');
+        $course = $this->getDataGenerator()->create_course();
+        $cid = (int) $course->id;
+        course_config_manager::set_answer_safety_mode($cid, 'off');
+        set_config('socratic_mode_course_' . $cid, '1', 'local_ai_course_assistant');
+
+        $newid = $this->duplicate_course($cid, false);
+
+        $this->assertFalse(get_config('local_ai_course_assistant', 'answer_safety_mode_course_' . $newid),
+            'A copy follows the site mode until an admin sets its own (ruling R8).');
+        $this->assertSame('enforce', answer_rules::mode($newid));
+        $this->assertSame('1', get_config('local_ai_course_assistant', 'socratic_mode_course_' . $newid),
+            'other overrides still travel');
+    }
+
+    public function test_a_hand_edited_archive_cannot_set_the_answer_safety_override(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/local/ai_course_assistant/backup/moodle2/restore_local_ai_course_assistant_plugin.class.php');
+        $this->resetAfterTest(true);
+        set_config('answer_safety_mode', 'enforce', 'local_ai_course_assistant');
+        $task = new class {
+            /** @return int */
+            public function get_courseid() {
+                return 777;
+            }
+        };
+        $step = new class($task) {
+            /** @var object */
+            private $task;
+            /** @param object $task */
+            public function __construct($task) {
+                $this->task = $task;
+            }
+            /** @return object */
+            public function get_task() {
+                return $this->task;
+            }
+        };
+        $plugin = new \restore_local_ai_course_assistant_plugin('local', 'ai_course_assistant', $step);
+
+        // What an edited .mbz could carry: the override for the source course, set to off.
+        $plugin->process_aica_course_setting(['name' => 'answer_safety_mode_course_5', 'value' => 'off']);
+        $this->assertFalse(get_config('local_ai_course_assistant', 'answer_safety_mode_course_777'));
+        $this->assertSame('enforce', answer_rules::mode(777));
+
+        // The same path does write an allowed override, so the refusal above is the list, not a broken stub.
+        $plugin->process_aica_course_setting(['name' => 'socratic_mode_course_5', 'value' => '1']);
+        $this->assertSame('1', get_config('local_ai_course_assistant', 'socratic_mode_course_777'));
+    }
+
     public function test_course_configuration_survives_a_duplicate(): void {
         global $DB;
         $this->resetAfterTest(true);

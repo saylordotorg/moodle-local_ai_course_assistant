@@ -18,7 +18,10 @@
   "category": "deadlines",
   "question": "When is the final essay due?",
   "reply": "The final essay is due on March 14.",
-  "expect": "warn"
+  "expect": "warn",
+  "chunks": [
+   "This course covers the basics of financial accounting."
+  ]
  },
  {
   "id": "deadlines_good_date_in_course",
@@ -49,6 +52,74 @@
   "category": "deadlines",
   "question": "Kann ich eine Verlängerung bekommen?",
   "reply": "Ich kann keine Verlängerungen gewähren. Bitte frag deine Lehrkraft.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_no_chunks",
+  "category": "deadlines",
+  "question": "When is the final essay due?",
+  "reply": "The final essay is due on March 14.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_reordered_date",
+  "category": "deadlines",
+  "question": "When is the final essay due?",
+  "reply": "The final essay is due on 14 March.",
+  "chunks": [
+   "Final essay: due March 14 at 11:59 pm."
+  ],
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_due_to",
+  "category": "deadlines",
+  "question": "Why did prices rise?",
+  "reply": "Prices rose due to the shortage in March 2020.",
+  "chunks": [
+   "Prices rose sharply during the 2020 shortage."
+  ],
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_fraction",
+  "category": "deadlines",
+  "question": "Why does the beam bend?",
+  "reply": "The bending is due to 3/4 of the load sitting on one side.",
+  "chunks": [
+   "Uneven loads bend a beam."
+  ],
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_file_extension",
+  "category": "deadlines",
+  "question": "Which image formats can I upload?",
+  "reply": "I can give you a file extension list: .png, .jpg and .gif all work.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_field_extension",
+  "category": "deadlines",
+  "question": "What is a field extension?",
+  "reply": "A field extension is a larger field that contains the original field. I can give you a field extension example for the exam topics.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_bad_extended_deadline",
+  "category": "deadlines",
+  "question": "Can you move my deadline?",
+  "reply": "No problem, I've extended your Unit 4 deadline by three days.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_good_due_to_with_date",
+  "category": "deadlines",
+  "question": "Why was the launch delayed?",
+  "reply": "The delay was due to the storm on March 3.",
+  "chunks": [
+   "The launch was delayed by bad weather."
+  ],
   "expect": "none"
  }
 ]

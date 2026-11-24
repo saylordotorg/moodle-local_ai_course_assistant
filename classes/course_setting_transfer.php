@@ -85,8 +85,18 @@ class course_setting_transfer {
         // "not used" rather than to an error.
         'supplemental_courses_course_',
         'digest_email_enabled_course_',
-        // Answer safety (8.4.0): off, watch or enforce for this course. A copy keeps its source's checking, the
-        // same as the other per-course feature switches; it holds no learner data.
+    ];
+
+    /**
+     * Per-course setting prefixes that must NOT travel, each with its reason. Listed so that
+     * course_setting_transfer_test knows a decision was made; is_transferable() never reads this list (the
+     * allowlist alone decides), so a name here can only ever be refused.
+     */
+    public const NOT_TRANSFERABLE_PREFIXES = [
+        // Answer safety mode (8.4.0, ruling R8). It switches off the wellbeing block and the answer audit trail
+        // when set to 'off', and only a site admin may set it. A restore capability does not imply site:config,
+        // so a hand-edited .mbz must not be able to turn a site-wide 'enforce' off for one course, and a copied
+        // course follows the site setting until an admin sets its own.
         'answer_safety_mode_course_',
     ];
 
