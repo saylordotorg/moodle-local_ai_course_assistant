@@ -218,6 +218,26 @@ final class review_queue_answer_sources_test extends \advanced_testcase {
         $this->assertFalse($ctx['review_rows'][1]['priority_high']);
     }
 
+    public function test_a_rule_caught_wellbeing_answer_with_a_serious_claim_is_still_first_and_uncapped(): void {
+        // The wellbeing rule fired (so the judge's flag was suppressed) and the claim check found a serious
+        // contradicted claim: the claim item wins the answer, and must carry the wellbeing priority.
+        $wb = $this->answer((int) $this->course->id, [['id' => answer_rules::WELLBEING_RULE, 'action' => 'block']],
+            'I want to end it all');
+        $this->verdict($wb, 'needs_review', 'high', [$this->contradicted()]);
+        $this->waitForSecond();
+        for ($i = 0; $i < 51; $i++) {
+            $aid = $this->answer((int) $this->course->id);
+            $this->verdict($aid, 'needs_review', 'high', [$this->contradicted()]);
+        }
+        $rows = review_queue::pending_for_course((int) $this->course->id);
+        $this->assertCount(50, $rows);
+        $this->assertSame(['claim', $wb], [$rows[0]['source'], $rows[0]['sourceid']]);
+        $this->assertSame(1, $rows[0]['priority']);
+        $this->assertSame(0, $rows[1]['priority']);
+        $this->assertSame([], array_values(array_filter($rows, static fn(array $r): bool => $r['source'] === 'rule')),
+            'one item per answer');
+    }
+
     public function test_an_activity_name_is_escaped_once(): void {
         $page = $this->getDataGenerator()->create_module('page', ['course' => $this->course->id,
             'name' => 'Q&A week 2']);

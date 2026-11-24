@@ -563,6 +563,29 @@ class answer_rules {
     }
 
     /**
+     * Whether a recorded rules list holds a wellbeing rule that makes a review item: a rule id starting `wellbeing.`
+     * with action block, warn or correct, or watch while the course mode is watch. The one condition shared by the
+     * review queue (a wellbeing rule item, or a claim item treated as wellbeing) and the claim check (the judge's
+     * wellbeing flag is suppressed only when such a rule already makes an item).
+     *
+     * @param array $rules [{id, action}] as recorded
+     * @param string $mode the course's mode
+     * @return bool
+     */
+    public static function wellbeing_rule_fired(array $rules, string $mode): bool {
+        foreach ($rules as $r) {
+            if (!is_array($r) || !is_string($r['id'] ?? null) || !str_starts_with($r['id'], 'wellbeing.')) {
+                continue;
+            }
+            $action = $r['action'] ?? null;
+            if (in_array($action, ['block', 'warn', 'correct'], true) || ($action === 'watch' && $mode === 'watch')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * The mode for a course: the course's own override when it holds a valid mode, else the site setting, else off.
      *
      * @param int $courseid 0 or less for the site setting alone

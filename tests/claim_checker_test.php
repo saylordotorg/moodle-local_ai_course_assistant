@@ -420,6 +420,17 @@ final class claim_checker_test extends \advanced_testcase {
         claim_checker::check($turn['auditid']);
         $this->assertNotContains(claim_checker::WELLBEING_MODEL_RULE, $this->rule_ids($this->verdict($turn['auditid'])));
 
+        // In enforce a watch-action wellbeing rule makes no review item (review_queue's condition), so it must not
+        // suppress the flag either: the flag is then the only signal.
+        stub_provider::reset();
+        set_config('answer_safety_mode', 'enforce', 'local_ai_course_assistant');
+        $turn = $this->answer('I feel hopeless', 'Please reach out.', [],
+            ['categories' => [], 'rules' => [['id' => 'wellbeing.site_extra', 'action' => 'watch']]]);
+        $this->judge_says([], true);
+        claim_checker::check($turn['auditid']);
+        $this->assertContains(claim_checker::WELLBEING_MODEL_RULE, $this->rule_ids($this->verdict($turn['auditid'])));
+        set_config('answer_safety_mode', 'watch', 'local_ai_course_assistant');
+
         // The category matched but no wellbeing rule was recorded: the model flag is raised (the only signal a
         // person sees when nothing was blocked).
         stub_provider::reset();

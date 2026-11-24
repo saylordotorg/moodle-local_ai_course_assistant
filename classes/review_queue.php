@@ -205,9 +205,10 @@ class review_queue {
      * verdict is needs_review or blocked and carries a contradicted claim of high or medium severity, or the
      * wellbeing model flag (priority 1, listed first). `rule`: the answer row recorded a guidance rule with action
      * block, warn or correct, or (only while the course's mode is watch) watch; never when a claim item exists for
-     * that answer, resolved or not. A rule item for a wellbeing rule (id wellbeing.*) has priority 1 and is never
-     * capped, as the wellbeing model flag it stands in for. Failed checks (status check_failed, rule ids starting claim_check.) are not
-     * content findings and never make an item.
+     * that answer, resolved or not. An item whose answer recorded a wellbeing rule that makes an item
+     * (answer_rules::wellbeing_rule_fired()), rule or claim, has priority 1 and is not counted against the cap, as the
+     * wellbeing model flag it stands in for. Failed checks (status check_failed, rule ids starting claim_check.) are
+     * not content findings and never make an item.
      *
      * @param int $courseid
      * @param int $limit
@@ -225,7 +226,7 @@ class review_queue {
             // Latest verdict per answer, of this course, with an answer row of this course.
             [$statusin, $statusparams] = $DB->get_in_or_equal(self::CLAIM_STATUSES, SQL_PARAMS_NAMED, 'st');
             $vsql = "SELECT v.id AS vid, v.supersedes AS aid, v.status, v.severity, v.claims, v.rules AS vrules,
-                            v.timecreated AS vwhen
+                            v.timecreated AS vwhen, a.rules AS arules
                        FROM {" . answer_audit::TABLE . "} v
                        JOIN {" . answer_audit::TABLE . "} a ON a.id = v.supersedes AND a.kind = :akind
                                 AND a.courseid = v.courseid
@@ -236,14 +237,18 @@ class review_queue {
             $params = ['akind' => 'answer', 'vkind' => 'verdict', 'v2kind' => 'verdict', 'courseid' => $courseid]
                 + $statusparams;
             $verdicts = [];
-            // Wellbeing flags are never capped here: they sort first, so a busy course must not push them out
-            // before pending_for_course() applies priority. Only the other claim items count toward $limit.
+            // Wellbeing items are never capped here: they sort first, so a busy course must not push them out
+            // before pending_for_course() applies priority. Only the other claim items count toward $limit. A claim
+            // item is a wellbeing item when the judge flagged the question, or when the answer recorded a wellbeing
+            // rule that makes an item (the judge's flag is suppressed then, and this claim item takes the answer).
             $capped = 0;
             $rs = $DB->get_recordset_sql($vsql, $params);
             foreach ($rs as $v) {
                 $claims = self::json_list($v->claims);
                 $vrules = self::content_rules(self::json_list($v->vrules));
-                $wellbeing = in_array(claim_checker::WELLBEING_MODEL_RULE, array_column($vrules, 'id'), true);
+                $flag = in_array(claim_checker::WELLBEING_MODEL_RULE, array_column($vrules, 'id'), true);
+                $wellbeing = $flag || answer_rules::wellbeing_rule_fired(self::content_rules(self::json_list($v->arules)),
+                    $mode);
                 $serious = false;
                 foreach ($claims as $c) {
                     if (($c['status'] ?? '') === 'contradicted' && in_array($c['severity'] ?? '', ['high', 'medium'], true)) {
@@ -251,7 +256,8 @@ class review_queue {
                         break;
                     }
                 }
-                if (!$wellbeing && !$serious) {
+                if (!$flag && !$serious) {
+                    // A wellbeing rule alone is a rule item, below.
                     continue;
                 }
                 $claimanswers[(int) $v->aid] = true;
@@ -379,14 +385,7 @@ class review_queue {
         if (!$strong && !$watch) {
             return null;
         }
-        $wellbeing = false;
-        foreach ($rules as $r) {
-            if (str_starts_with($r['id'], 'wellbeing.')) {
-                $wellbeing = true;
-                break;
-            }
-        }
-        return ['rules' => $rules, 'wellbeing' => $wellbeing];
+        return ['rules' => $rules, 'wellbeing' => answer_rules::wellbeing_rule_fired($rules, $mode)];
     }
 
     /**
