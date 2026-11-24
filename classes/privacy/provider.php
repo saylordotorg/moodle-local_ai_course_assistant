@@ -328,6 +328,20 @@ class provider implements
             ],
             'privacy:metadata:model_switch'
         );
+        // 8.4.0: the answer audit. Discovery covers it now (COURSE_USER_TABLES); export and the redaction on
+        // erasure arrive with the privacy work of the same release.
+        $collection->add_database_table(
+            'local_ai_course_assistant_answer_audit',
+            [
+                'userid' => 'privacy:metadata:answer_audit:userid',
+                'courseid' => 'privacy:metadata:answer_audit:courseid',
+                'question' => 'privacy:metadata:answer_audit:question',
+                'answer' => 'privacy:metadata:answer_audit:answer',
+                'claims' => 'privacy:metadata:answer_audit:claims',
+                'timecreated' => 'privacy:metadata:answer_audit:timecreated',
+            ],
+            'privacy:metadata:answer_audit'
+        );
         // Same class of row, found by the guard below rather than by core:
         // which staff member last edited a Soapbox assignment. Course
         // configuration, not learner data, and erasing it would silently
@@ -584,6 +598,7 @@ class provider implements
         'local_ai_course_assistant_outreach_log',
         'local_ai_course_assistant_avatar_sess',
         'local_ai_course_assistant_email_optout',
+        'local_ai_course_assistant_answer_audit',
     ];
 
     /**

@@ -1,0 +1,591 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace local_ai_course_assistant;
+
+/**
+ * The answer audit store (8.4.0): one append-only row per assistant answer, one per background verdict.
+ *
+ * Rows are never edited except by redaction. A verdict is a NEW row of kind 'verdict' whose `supersedes` is the
+ * answer row's id, so the original stays exactly as written.
+ *
+ * Each course's rows form a hash chain: `rowhash` = sha256 of the canonical JSON of the row's fixed fields, which
+ * include `prevhash` (the rowhash of the course's previous row, '' for the first). The fixed fields include
+ * `texthash` (sha256 of the question, answer and claim text) but never the text itself, so redaction, which nulls
+ * the text and sets `redacted` = 1, leaves every hash intact and `verify_chain()` still passes. Reading the
+ * previous hash and inserting happen under a per-course \core\lock so two answers at the same moment cannot fork
+ * the chain.
+ *
+ * Nothing key-like is ever stored: every field is on an allowlist, and a row or verdict carrying a field named
+ * like a key, secret, token, password or prompt (at any depth) is refused with a coding_exception.
+ *
+ * Known limits: the chain proves rows were not edited, reordered or removed from the middle; it cannot prove the
+ * newest rows were not removed (no external anchor). Redaction is not itself tamper-evident (it is the permitted
+ * change). A caller inside an open delegated transaction holds the lock only until record() returns, not until
+ * its commit; call record() outside a transaction.
+ *
+ * @package    local_ai_course_assistant
+ * @copyright  2026 Tom Caswell & David Ta / Saylor University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class answer_audit {
+
+    /** @var string The table. */
+    public const TABLE = 'local_ai_course_assistant_answer_audit';
+
+    /** @var string The \core\lock factory type. */
+    public const LOCK_TYPE = 'local_ai_course_assistant_answer_audit';
+
+    /** @var int Seconds record() waits for the course lock by default. */
+    public const DEFAULT_LOCK_TIMEOUT = 10;
+
+    /** @var int Seconds record() waits for the course lock (tests lower it). */
+    public static int $locktimeout = self::DEFAULT_LOCK_TIMEOUT;
+
+    /** @var string[] Verdict statuses. */
+    public const STATUSES = ['ok', 'warn', 'blocked', 'needs_review', 'check_failed'];
+
+    /** @var string[] Keys an answer row may carry. */
+    private const ROW_KEYS = ['messageid', 'conversationid', 'userid', 'courseid', 'cmid', 'mode', 'question', 'answer',
+        'model', 'provider', 'chunks', 'citations', 'categories', 'rules', 'validators'];
+
+    /** @var string[] Keys a verdict may carry. */
+    private const VERDICT_KEYS = ['status', 'severity', 'claims', 'judge_model', 'judge_cost'];
+
+    /** @var string[] Keys of one retrieved chunk. */
+    private const CHUNK_KEYS = ['cmid', 'score', 'ref'];
+
+    /** @var string[] Keys of one rule fired. */
+    private const RULE_KEYS = ['id', 'action'];
+
+    /** @var string[] Keys of one claim. */
+    private const CLAIM_KEYS = ['text', 'type', 'status', 'evidence_ref', 'severity'];
+
+    /** @var string A field name that may carry a credential or prompt text. */
+    private const FORBIDDEN_NAME = '/key|secret|token|passw|prompt|credential|bearer|authori[sz]ation/i';
+
+    /** @var string[] Fields covered by rowhash, in a fixed order. Text is covered through texthash only. */
+    private const HASHED_FIELDS = ['kind', 'supersedes', 'messageid', 'conversationid', 'userid', 'courseid', 'cmid',
+        'mode', 'model', 'provider', 'chunks', 'citations', 'categories', 'rules', 'validators', 'status', 'severity',
+        'claims', 'judge_model', 'judge_cost', 'texthash', 'timecreated', 'prevhash'];
+
+    /** @var string[] Filters rows_for_export() accepts. */
+    private const EXPORT_FILTERS = ['userid', 'kind', 'status', 'since', 'until', 'limit'];
+
+    /**
+     * Record one assistant answer.
+     *
+     * @param array $row messageid, conversationid, userid, courseid, cmid, mode, question, answer, model, provider,
+     *     chunks [{cmid, score, ref}], citations, categories, rules [{id, action}], validators
+     * @return int the new row id
+     * @throws \coding_exception for an unknown or key-like field, or a missing user or course
+     * @throws \moodle_exception locktimeout when the course lock cannot be taken
+     */
+    public static function record(array $row): int {
+        self::assert_no_forbidden_names($row, 'row');
+        $unknown = array_diff(array_keys($row), self::ROW_KEYS);
+        if ($unknown) {
+            throw new \coding_exception('answer_audit: unknown row field(s): ' . implode(', ', $unknown));
+        }
+        if (empty($row['userid']) || empty($row['courseid'])) {
+            throw new \coding_exception('answer_audit: a row needs a userid and a courseid');
+        }
+
+        $rec = (object) [
+            'kind' => 'answer',
+            'supersedes' => null,
+            'messageid' => self::int_or_null($row['messageid'] ?? null),
+            'conversationid' => self::int_or_null($row['conversationid'] ?? null),
+            'userid' => (int) $row['userid'],
+            'courseid' => (int) $row['courseid'],
+            'cmid' => self::int_or_null($row['cmid'] ?? null),
+            'mode' => self::str_or_null($row['mode'] ?? null, 10),
+            'model' => self::str_or_null($row['model'] ?? null, 100),
+            'provider' => self::str_or_null($row['provider'] ?? null, 50),
+            'question' => isset($row['question']) ? (string) $row['question'] : null,
+            'answer' => isset($row['answer']) ? (string) $row['answer'] : null,
+            'chunks' => self::json_or_null(self::checked_list($row['chunks'] ?? null, self::CHUNK_KEYS, 'chunks')),
+            'citations' => self::json_or_null($row['citations'] ?? null),
+            'categories' => self::json_or_null($row['categories'] ?? null),
+            'rules' => self::json_or_null(self::checked_list($row['rules'] ?? null, self::RULE_KEYS, 'rules')),
+            'validators' => self::json_or_null($row['validators'] ?? null),
+            'status' => null,
+            'severity' => null,
+            'claims' => null,
+            'judge_model' => null,
+            'judge_cost' => null,
+        ];
+        return self::insert_chained($rec);
+    }
+
+    /**
+     * Append a background verdict for an answer row. The answer row is not changed.
+     *
+     * @param int $auditid the answer row
+     * @param array $verdict status (ok|warn|blocked|needs_review|check_failed), severity,
+     *     claims [{text, type, status, evidence_ref, severity}], judge_model, judge_cost
+     * @return int the new verdict row id
+     */
+    public static function append_verdict(int $auditid, array $verdict): int {
+        global $DB;
+        self::assert_no_forbidden_names($verdict, 'verdict');
+        $unknown = array_diff(array_keys($verdict), self::VERDICT_KEYS);
+        if ($unknown) {
+            throw new \coding_exception('answer_audit: unknown verdict field(s): ' . implode(', ', $unknown));
+        }
+        $status = (string) ($verdict['status'] ?? '');
+        if (!in_array($status, self::STATUSES, true)) {
+            throw new \coding_exception('answer_audit: verdict status must be one of ' . implode(', ', self::STATUSES));
+        }
+        $claims = self::checked_list($verdict['claims'] ?? null, self::CLAIM_KEYS, 'claims');
+
+        $original = $DB->get_record(self::TABLE, ['id' => $auditid], '*', MUST_EXIST);
+        if ($original->kind !== 'answer') {
+            throw new \coding_exception('answer_audit: a verdict must point at an answer row');
+        }
+
+        $rec = (object) [
+            'kind' => 'verdict',
+            'supersedes' => (int) $original->id,
+            'messageid' => self::int_or_null($original->messageid),
+            'conversationid' => self::int_or_null($original->conversationid),
+            'userid' => (int) $original->userid,
+            'courseid' => (int) $original->courseid,
+            'cmid' => self::int_or_null($original->cmid),
+            'mode' => $original->mode,
+            'model' => $original->model,
+            'provider' => $original->provider,
+            'question' => null,
+            'answer' => null,
+            'chunks' => null,
+            'citations' => null,
+            'categories' => null,
+            'rules' => null,
+            'validators' => null,
+            'status' => $status,
+            'severity' => self::str_or_null($verdict['severity'] ?? null, 20),
+            'claims' => self::json_or_null($claims),
+            'judge_model' => self::str_or_null($verdict['judge_model'] ?? null, 100),
+            'judge_cost' => isset($verdict['judge_cost']) ? round((float) $verdict['judge_cost'], 6) : null,
+        ];
+        // A redacted original stays redacted: its verdict is written with no claim text either.
+        if (!empty($original->redacted)) {
+            $rec->claims = self::strip_claim_text($rec->claims);
+            $rec->redacted = 1;
+            $rec->timeredacted = time();
+        }
+        return self::insert_chained($rec);
+    }
+
+    /**
+     * Redact the rows of these assistant messages.
+     *
+     * @param int[] $msgids
+     * @return int rows redacted
+     */
+    public static function redact_for_messages(array $msgids): int {
+        global $DB;
+        $msgids = array_values(array_unique(array_filter(array_map('intval', $msgids))));
+        if (!$msgids) {
+            return 0;
+        }
+        $total = 0;
+        foreach (array_chunk($msgids, 500) as $chunk) {
+            [$in, $params] = $DB->get_in_or_equal($chunk);
+            $total += self::redact_where("messageid $in", $params);
+        }
+        return $total;
+    }
+
+    /**
+     * Redact the rows of one conversation.
+     *
+     * @param int $conversationid
+     * @return int rows redacted
+     */
+    public static function redact_for_conversation(int $conversationid): int {
+        return self::redact_where('conversationid = ?', [$conversationid]);
+    }
+
+    /**
+     * Redact every row of one user, in every course.
+     *
+     * @param int $userid
+     * @return int rows redacted
+     */
+    public static function redact_for_user(int $userid): int {
+        return self::redact_where('userid = ?', [$userid]);
+    }
+
+    /**
+     * Redact a course's rows, or one user's rows in it.
+     *
+     * @param int $courseid
+     * @param int|null $userid
+     * @return int rows redacted
+     */
+    public static function redact_for_course(int $courseid, ?int $userid = null): int {
+        if ($userid === null) {
+            return self::redact_where('courseid = ?', [$courseid]);
+        }
+        return self::redact_where('courseid = ? AND userid = ?', [$courseid, $userid]);
+    }
+
+    /**
+     * Check a course's chain: every link, every row hash, and the text of every unredacted row.
+     *
+     * @param int $courseid
+     * @return array{ok: bool, brokenat: ?int} brokenat is the id of the first row that fails
+     */
+    public static function verify_chain(int $courseid): array {
+        global $DB;
+        $prev = '';
+        $rs = $DB->get_recordset(self::TABLE, ['courseid' => $courseid], 'id ASC');
+        try {
+            foreach ($rs as $rec) {
+                $ok = (string) $rec->prevhash === $prev
+                    && hash_equals((string) $rec->rowhash, self::compute_rowhash($rec));
+                if ($ok) {
+                    if (empty($rec->redacted)) {
+                        $ok = hash_equals((string) $rec->texthash,
+                            self::compute_texthash($rec->question, $rec->answer, $rec->claims));
+                    } else {
+                        // A redaction drops all the text; text left or put back is not a redaction.
+                        $ok = $rec->question === null && $rec->answer === null
+                            && self::strip_claim_text($rec->claims) === $rec->claims;
+                    }
+                }
+                if (!$ok) {
+                    return ['ok' => false, 'brokenat' => (int) $rec->id];
+                }
+                $prev = (string) $rec->rowhash;
+            }
+        } finally {
+            $rs->close();
+        }
+        return ['ok' => true, 'brokenat' => null];
+    }
+
+    /**
+     * A course's rows for export, oldest first, JSON columns decoded.
+     *
+     * @param int $courseid
+     * @param array $filters userid, kind, status, since, until (unix times), limit
+     * @return array[]
+     */
+    public static function rows_for_export(int $courseid, array $filters): array {
+        global $DB;
+        $unknown = array_diff(array_keys($filters), self::EXPORT_FILTERS);
+        if ($unknown) {
+            throw new \coding_exception('answer_audit: unknown export filter(s): ' . implode(', ', $unknown));
+        }
+        $where = ['courseid = :courseid'];
+        $params = ['courseid' => $courseid];
+        if (isset($filters['userid'])) {
+            $where[] = 'userid = :userid';
+            $params['userid'] = (int) $filters['userid'];
+        }
+        if (isset($filters['kind'])) {
+            $where[] = 'kind = :kind';
+            $params['kind'] = (string) $filters['kind'];
+        }
+        if (isset($filters['status'])) {
+            $where[] = 'status = :status';
+            $params['status'] = (string) $filters['status'];
+        }
+        if (isset($filters['since'])) {
+            $where[] = 'timecreated >= :since';
+            $params['since'] = (int) $filters['since'];
+        }
+        if (isset($filters['until'])) {
+            $where[] = 'timecreated <= :until';
+            $params['until'] = (int) $filters['until'];
+        }
+        $limit = isset($filters['limit']) ? max(0, (int) $filters['limit']) : 0;
+
+        $out = [];
+        $rs = $DB->get_recordset_select(self::TABLE, implode(' AND ', $where), $params, 'id ASC', '*', 0, $limit);
+        foreach ($rs as $rec) {
+            $row = [];
+            foreach ((array) $rec as $field => $value) {
+                if (in_array($field, ['chunks', 'citations', 'categories', 'rules', 'validators', 'claims'], true)) {
+                    $row[$field] = $value === null ? null : json_decode($value, true);
+                } else if (in_array($field, ['id', 'supersedes', 'messageid', 'conversationid', 'userid', 'courseid',
+                        'cmid', 'redacted', 'timeredacted', 'timecreated'], true)) {
+                    $row[$field] = $value === null ? null : (int) $value;
+                } else if ($field === 'judge_cost') {
+                    $row[$field] = $value === null ? null : (float) $value;
+                } else {
+                    $row[$field] = $value;
+                }
+            }
+            $out[] = $row;
+        }
+        $rs->close();
+        return $out;
+    }
+
+    /**
+     * The \core\lock resource for one course's chain.
+     *
+     * @param int $courseid
+     * @return string
+     */
+    public static function lock_resource(int $courseid): string {
+        return 'course_' . $courseid;
+    }
+
+    /**
+     * The rowhash a stored (or about to be stored) row should carry.
+     *
+     * @param \stdClass $rec a row as read from the database (all values may be strings)
+     * @return string sha256 hex
+     */
+    public static function compute_rowhash(\stdClass $rec): string {
+        $fixed = [];
+        foreach (self::HASHED_FIELDS as $field) {
+            $value = $rec->$field ?? null;
+            if ($field === 'claims') {
+                // Claims are hashed without their text, so redaction leaves the hash unchanged.
+                $value = self::strip_claim_text($value);
+            }
+            if ($field === 'prevhash') {
+                $value = (string) $value;
+            } else if ($field === 'judge_cost') {
+                $value = $value === null || $value === '' ? null : sprintf('%.6f', (float) $value);
+            } else if ($value !== null) {
+                $value = (string) $value;
+            }
+            $fixed[$field] = $value;
+        }
+        return hash('sha256', self::canonical_json($fixed));
+    }
+
+    /**
+     * sha256 of the question, answer and claim text.
+     *
+     * @param string|null $question
+     * @param string|null $answer
+     * @param string|null $claimsjson stored claims JSON
+     * @return string
+     */
+    public static function compute_texthash(?string $question, ?string $answer, ?string $claimsjson): string {
+        $claimtext = [];
+        $claims = $claimsjson === null ? null : json_decode($claimsjson, true);
+        if (is_array($claims)) {
+            foreach ($claims as $claim) {
+                $claimtext[] = is_array($claim) && array_key_exists('text', $claim) ? (string) $claim['text'] : null;
+            }
+        }
+        return hash('sha256', self::canonical_json([
+            'question' => $question,
+            'answer' => $answer,
+            'claims' => $claimtext,
+        ]));
+    }
+
+    /**
+     * Insert a row at the end of its course's chain, under the course lock.
+     *
+     * @param \stdClass $rec
+     * @return int
+     */
+    private static function insert_chained(\stdClass $rec): int {
+        global $DB;
+        $rec->texthash = self::compute_texthash($rec->question, $rec->answer, $rec->claims);
+        $rec->redacted = $rec->redacted ?? 0;
+        $rec->timeredacted = $rec->timeredacted ?? null;
+
+        $factory = \core\lock\lock_config::get_lock_factory(self::LOCK_TYPE);
+        $lock = $factory->get_lock(self::lock_resource($rec->courseid), self::$locktimeout);
+        if (!$lock) {
+            throw new \moodle_exception('locktimeout');
+        }
+        try {
+            $last = $DB->get_records(self::TABLE, ['courseid' => $rec->courseid], 'id DESC', 'id, rowhash', 0, 1);
+            $rec->prevhash = $last ? (string) reset($last)->rowhash : '';
+            $rec->timecreated = time();
+            $rec->rowhash = self::compute_rowhash($rec);
+            return (int) $DB->insert_record(self::TABLE, $rec);
+        } finally {
+            $lock->release();
+        }
+    }
+
+    /**
+     * Redact every unredacted row matching a condition.
+     *
+     * @param string $select
+     * @param array $params
+     * @return int
+     */
+    private static function redact_where(string $select, array $params): int {
+        global $DB;
+        $count = 0;
+        $now = time();
+        $rs = $DB->get_recordset_select(self::TABLE, "redacted = 0 AND $select", $params, 'id ASC', 'id, claims');
+        foreach ($rs as $rec) {
+            $DB->update_record(self::TABLE, (object) [
+                'id' => $rec->id,
+                'question' => null,
+                'answer' => null,
+                'claims' => self::strip_claim_text($rec->claims),
+                'redacted' => 1,
+                'timeredacted' => $now,
+            ]);
+            $count++;
+        }
+        $rs->close();
+        return $count;
+    }
+
+    /**
+     * Claims JSON with each claim's text removed (canonical form).
+     *
+     * @param string|null $claimsjson
+     * @return string|null
+     */
+    private static function strip_claim_text(?string $claimsjson): ?string {
+        if ($claimsjson === null) {
+            return null;
+        }
+        $claims = json_decode($claimsjson, true);
+        if (!is_array($claims)) {
+            return $claimsjson;
+        }
+        foreach ($claims as $i => $claim) {
+            if (is_array($claim)) {
+                unset($claim['text']);
+                $claims[$i] = $claim;
+            }
+        }
+        return self::canonical_json($claims);
+    }
+
+    /**
+     * Refuse a field named like a credential or prompt, at any depth.
+     *
+     * @param array $data
+     * @param string $where
+     */
+    private static function assert_no_forbidden_names(array $data, string $where): void {
+        foreach ($data as $name => $value) {
+            if (is_string($name) && preg_match(self::FORBIDDEN_NAME, $name)) {
+                throw new \coding_exception("answer_audit: {$where} field '{$name}' looks like a key or prompt; "
+                    . 'the audit never stores either');
+            }
+            if (is_array($value)) {
+                self::assert_no_forbidden_names($value, $where);
+            } else if (is_object($value)) {
+                self::assert_no_forbidden_names((array) $value, $where);
+            }
+        }
+    }
+
+    /**
+     * Check a list of items against an allowlist of keys.
+     *
+     * @param mixed $list
+     * @param string[] $allowed
+     * @param string $name
+     * @return array|null
+     */
+    private static function checked_list($list, array $allowed, string $name): ?array {
+        if ($list === null) {
+            return null;
+        }
+        if (!is_array($list)) {
+            throw new \coding_exception("answer_audit: {$name} must be a list");
+        }
+        foreach ($list as $item) {
+            if (!is_array($item)) {
+                throw new \coding_exception("answer_audit: each of {$name} must be an object");
+            }
+            $unknown = array_diff(array_keys($item), $allowed);
+            if ($unknown) {
+                throw new \coding_exception("answer_audit: unknown {$name} field(s): " . implode(', ', $unknown));
+            }
+        }
+        return array_values($list);
+    }
+
+    /**
+     * JSON with object keys sorted at every depth, no escaped slashes or unicode.
+     *
+     * @param mixed $value
+     * @return string
+     */
+    private static function canonical_json($value): string {
+        return json_encode(self::sort_keys($value), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            | JSON_PRESERVE_ZERO_FRACTION | JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * Sort associative keys recursively; lists keep their order.
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    private static function sort_keys($value) {
+        if (is_object($value)) {
+            $value = (array) $value;
+        }
+        if (!is_array($value)) {
+            return $value;
+        }
+        foreach ($value as $k => $v) {
+            $value[$k] = self::sort_keys($v);
+        }
+        if (!array_is_list($value)) {
+            ksort($value, SORT_STRING);
+        }
+        return $value;
+    }
+
+    /**
+     * Canonical JSON, or null for null.
+     *
+     * @param mixed $value
+     * @return string|null
+     */
+    private static function json_or_null($value): ?string {
+        return $value === null ? null : self::canonical_json($value);
+    }
+
+    /**
+     * An int, or null for empty.
+     *
+     * @param mixed $value
+     * @return int|null
+     */
+    private static function int_or_null($value): ?int {
+        return $value === null || $value === '' ? null : (int) $value;
+    }
+
+    /**
+     * A trimmed string cut to the column length, or null.
+     *
+     * @param mixed $value
+     * @param int $max
+     * @return string|null
+     */
+    private static function str_or_null($value, int $max): ?string {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        return \core_text::substr(trim((string) $value), 0, $max);
+    }
+}

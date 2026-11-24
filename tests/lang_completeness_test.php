@@ -435,6 +435,14 @@ final class lang_completeness_test extends \basic_testcase {
         // The settings-page truncation warning for an automatic budget (7.12.4). Admin-only copy about a setting whose
         // wrong move makes things worse; English like the other budget text until a translator can check it.
         'settings:prompt_truncated_warning_auto',
+        // 8.4.0: the answer audit's privacy metadata. English first, like the other privacy metadata above.
+        'privacy:metadata:answer_audit',
+        'privacy:metadata:answer_audit:userid',
+        'privacy:metadata:answer_audit:courseid',
+        'privacy:metadata:answer_audit:question',
+        'privacy:metadata:answer_audit:answer',
+        'privacy:metadata:answer_audit:claims',
+        'privacy:metadata:answer_audit:timecreated',
     ];
 
     /**

@@ -3676,6 +3676,13 @@ $string['privacy:metadata:model_eval:createdby'] = 'The site administrator who a
 $string['privacy:metadata:model_switch'] = 'Model switches and rollbacks: which model a role moved from and to, and why. The only personal data is the identifier of the administrator who made or reversed the switch. These rows are site configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure.';
 $string['privacy:metadata:model_switch:createdby'] = 'The site administrator who made this switch. Empty when it was automatic.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'The site administrator who rolled this switch back. Empty when the watcher did, or it was not rolled back.';
+$string['privacy:metadata:answer_audit'] = 'A record of each answer the assistant gave: the sources it used, the rules that fired and any later check of its claims, so that answers can be reviewed. The question, answer and claim text are removed when the conversation is cleared or erasure is requested; the record of what was checked stays.';
+$string['privacy:metadata:answer_audit:userid'] = 'The learner who asked the question.';
+$string['privacy:metadata:answer_audit:courseid'] = 'The course the question was asked in.';
+$string['privacy:metadata:answer_audit:question'] = 'The learner\'s question.';
+$string['privacy:metadata:answer_audit:answer'] = 'The answer the assistant gave.';
+$string['privacy:metadata:answer_audit:claims'] = 'The claims found in the answer and whether the course material supports them.';
+$string['privacy:metadata:answer_audit:timecreated'] = 'When the answer was recorded.';
 
 // Settings save report and primary provider status check (v7.8.1).
 $string['savereport:summary'] = '{$a} AI Course Assistant settings changed in this save:';

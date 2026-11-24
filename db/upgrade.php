@@ -2366,5 +2366,51 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026112200, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026112301) {
+        // 8.4.0: the answer audit. One append-only row per assistant answer, and one per background verdict
+        // (supersedes = the answer row), chained per course by rowhash. See \local_ai_course_assistant\answer_audit.
+        $table = new xmldb_table('local_ai_course_assistant_answer_audit');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('kind', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, 'answer');
+        $table->add_field('supersedes', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('messageid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('conversationid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('cmid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('mode', XMLDB_TYPE_CHAR, '10', null, null, null, null);
+        $table->add_field('model', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('provider', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+        $table->add_field('question', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('answer', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('chunks', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('citations', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('categories', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('rules', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('validators', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('severity', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('claims', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('judge_model', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('judge_cost', XMLDB_TYPE_NUMBER, '12, 6', null, null, null, null);
+        $table->add_field('texthash', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('redacted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timeredacted', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('prevhash', XMLDB_TYPE_CHAR, '64', null, null, null, null);
+        $table->add_field('rowhash', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('course_id', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'id']);
+        $table->add_index('messageid', XMLDB_INDEX_NOTUNIQUE, ['messageid']);
+        $table->add_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+        $table->add_index('conversationid', XMLDB_INDEX_NOTUNIQUE, ['conversationid']);
+        $table->add_index('supersedes', XMLDB_INDEX_NOTUNIQUE, ['supersedes']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026112301, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

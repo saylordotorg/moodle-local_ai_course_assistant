@@ -991,5 +991,48 @@
         <INDEX NAME="role_status" UNIQUE="false" FIELDS="role, status"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_ai_course_assistant_answer_audit" COMMENT="8.4.0 answer audit: one append-only row per assistant answer (kind answer) and one per background verdict (kind verdict, supersedes = the answer row). rowhash chains each course's rows; it covers texthash, never the text, so redaction (text nulled, redacted = 1) keeps the chain checkable. No key, system prompt or prompt text is ever stored.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="kind" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="answer" SEQUENCE="false" COMMENT="answer or verdict"/>
+        <FIELD NAME="supersedes" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="For a verdict row: the id of the answer row it judges"/>
+        <FIELD NAME="messageid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The assistant message (msgs.id)"/>
+        <FIELD NAME="conversationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="mode" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="text or voice"/>
+        <FIELD NAME="model" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="provider" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="question" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The learner's question; null once redacted"/>
+        <FIELD NAME="answer" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The answer as delivered; null once redacted"/>
+        <FIELD NAME="chunks" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: retrieved chunks [{cmid, score, ref}]"/>
+        <FIELD NAME="citations" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: cited source tags"/>
+        <FIELD NAME="categories" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: risk categories"/>
+        <FIELD NAME="rules" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: rules fired [{id, action}]"/>
+        <FIELD NAME="validators" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: runtime validator results"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="Verdict rows: ok, warn, blocked, needs_review or check_failed"/>
+        <FIELD NAME="severity" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="claims" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: [{text, type, status, evidence_ref, severity}]; text removed on redaction"/>
+        <FIELD NAME="judge_model" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="judge_cost" TYPE="number" LENGTH="12" NOTNULL="false" SEQUENCE="false" DECIMALS="6" COMMENT="USD"/>
+        <FIELD NAME="texthash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="sha256 of the question, answer and claim text"/>
+        <FIELD NAME="redacted" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timeredacted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="prevhash" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="rowhash of the previous row for the same course; empty for the first"/>
+        <FIELD NAME="rowhash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course_id" UNIQUE="false" FIELDS="courseid, id"/>
+        <INDEX NAME="messageid" UNIQUE="false" FIELDS="messageid"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="conversationid" UNIQUE="false" FIELDS="conversationid"/>
+        <INDEX NAME="supersedes" UNIQUE="false" FIELDS="supersedes"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>
