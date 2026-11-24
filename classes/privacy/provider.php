@@ -210,7 +210,11 @@ class provider implements
         );
         $collection->add_database_table(
             'local_ai_course_assistant_review_res',
-            ['resolved_by' => 'privacy:metadata:review_res:resolved_by'],
+            [
+                'resolved_by' => 'privacy:metadata:review_res:resolved_by',
+                'note' => 'privacy:metadata:review_res:note',
+                'outcome' => 'privacy:metadata:review_res:outcome',
+            ],
             'privacy:metadata:review_res'
         );
         $collection->add_database_table(
@@ -337,8 +341,14 @@ class provider implements
             [
                 'userid' => 'privacy:metadata:answer_audit:userid',
                 'courseid' => 'privacy:metadata:answer_audit:courseid',
+                'messageid' => 'privacy:metadata:answer_audit:messageid',
+                'conversationid' => 'privacy:metadata:answer_audit:conversationid',
+                'cmid' => 'privacy:metadata:answer_audit:cmid',
                 'question' => 'privacy:metadata:answer_audit:question',
                 'answer' => 'privacy:metadata:answer_audit:answer',
+                'categories' => 'privacy:metadata:answer_audit:categories',
+                'rules' => 'privacy:metadata:answer_audit:rules',
+                'status' => 'privacy:metadata:answer_audit:status',
                 'claims' => 'privacy:metadata:answer_audit:claims',
                 'timecreated' => 'privacy:metadata:answer_audit:timecreated',
             ],

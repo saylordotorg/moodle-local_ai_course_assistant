@@ -443,6 +443,14 @@ final class lang_completeness_test extends \basic_testcase {
         'privacy:metadata:answer_audit:answer',
         'privacy:metadata:answer_audit:claims',
         'privacy:metadata:answer_audit:timecreated',
+        'privacy:metadata:answer_audit:messageid',
+        'privacy:metadata:answer_audit:conversationid',
+        'privacy:metadata:answer_audit:cmid',
+        'privacy:metadata:answer_audit:categories',
+        'privacy:metadata:answer_audit:rules',
+        'privacy:metadata:answer_audit:status',
+        'privacy:metadata:review_res:note',
+        'privacy:metadata:review_res:outcome',
         // 8.4.0: answer safety settings and guidance rules. English first; the learner-facing safe messages and the
         // warn line need a translator who can check the wellbeing wording before they are translated.
         'settings:answer_safety_heading',
@@ -586,6 +594,7 @@ final class lang_completeness_test extends \basic_testcase {
         'answeraudit:detail_heading',
         'answeraudit:back',
         'answeraudit:model',
+        'answeraudit:flow',
         'answeraudit:categories',
         'answeraudit:validators',
         'answeraudit:citations',

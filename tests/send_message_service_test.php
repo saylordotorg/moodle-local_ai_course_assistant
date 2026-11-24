@@ -309,7 +309,8 @@ final class send_message_service_test extends \advanced_testcase {
         $this->assertSame(self::PLAIN_Q, $row->question);
         $this->assertSame($result['response'], $row->answer, 'the audit holds what the learner got');
         $this->assertSame('stub-model', $row->model);
-        $this->assertSame([], $this->audit_rules($row));
+        $this->assertSame([['id' => 'mode.watch', 'action' => 'none'], ['id' => 'outcome.delivered', 'action' => 'none']],
+            $this->audit_rules($row), 'no rule fired; the row still says the mode and what happened');
         $this->assertTrue(answer_audit::verify_chain((int) $this->course->id)['ok']);
     }
 
@@ -403,6 +404,8 @@ final class send_message_service_test extends \advanced_testcase {
             '*', MUST_EXIST);
         $this->assertSame(['courseid' => (int) $this->course->id, 'reason' => 'rules_error',
             'error_class' => 'RuntimeException'], json_decode($failed->details, true));
+        $this->assertSame(['mode.enforce', 'outcome.delivered', 'outcome.check_failed'],
+            array_column($this->audit_rules($this->audit_rows()[0]), 'id'), 'the row says the check failed');
     }
 
     public function test_send_message_correct_retries_once_and_blocks_when_retry_fails(): void {
@@ -505,6 +508,38 @@ final class send_message_service_test extends \advanced_testcase {
         $this->assertSame('fail', $byname['credential_leak'] ?? null, 'the credential_leak validator failed');
         $this->assertStringNotContainsString($awskey, (string) $rows[0]->answer);
         $this->assertContains(['id' => 'validator.credential_leak', 'action' => 'block'], $this->audit_rules($rows[0]));
+    }
+
+    public function test_send_message_audit_row_records_the_mode_and_what_happened(): void {
+        global $DB;
+        $q = 'I want to kill myself, I cannot do this anymore';
+        // Watch: the wellbeing rule is recorded as block, and the row says the answer was delivered unchanged.
+        $this->use_stub('watch', ['Here is a study plan for the week.']);
+        $result = send_message::execute((int) $this->course->id, $q, 0);
+        $this->assertSame('Here is a study plan for the week.', $result['response']);
+        $rules = $this->audit_rules($this->audit_rows()[0]);
+        $this->assertContains(['id' => answer_rules::WELLBEING_RULE, 'action' => 'block'], $rules);
+        $this->assertContains(['id' => 'mode.watch', 'action' => 'none'], $rules);
+        $this->assertContains(['id' => 'outcome.delivered', 'action' => 'none'], $rules);
+        $this->assertNotContains(['id' => 'outcome.blocked', 'action' => 'none'], $rules);
+
+        // Enforce: the same question is blocked, held and says so.
+        $DB->delete_records('local_ai_course_assistant_answer_audit');
+        $this->use_stub('enforce', ['Here is a study plan for the week.']);
+        send_message::execute((int) $this->course->id, $q, 0);
+        $ids = array_column($this->audit_rules($this->audit_rows()[0]), 'id');
+        $this->assertSame(['mode.enforce', 'outcome.blocked', 'outcome.held'],
+            array_values(array_filter($ids, static fn(string $id): bool => (bool) preg_match('/^(mode|outcome)\./', $id))));
+
+        // A corrected retry.
+        $DB->delete_records('local_ai_course_assistant_answer_audit');
+        $this->correct_rule();
+        $this->use_stub('enforce', ['You will get 500 zorkmid points.', 'Please ask your instructor about grades.']);
+        send_message::execute((int) $this->course->id, self::GRADE_Q, 0);
+        $rules = $this->audit_rules($this->audit_rows()[0]);
+        foreach (['mode.enforce', 'outcome.corrected', 'outcome.held', 'outcome.retried'] as $id) {
+            $this->assertContains(['id' => $id, 'action' => 'none'], $rules);
+        }
     }
 
     public function test_send_message_wellbeing_question_in_enforce_returns_the_safe_text(): void {

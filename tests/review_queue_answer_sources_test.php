@@ -199,6 +199,25 @@ final class review_queue_answer_sources_test extends \advanced_testcase {
         $this->assertSame(1, $rows[0]['priority']);
     }
 
+    public function test_a_rule_caught_wellbeing_question_is_listed_first_and_never_capped(): void {
+        // The judge's model flag is suppressed when a wellbeing rule already fired (claim_checker::wellbeing_caught()),
+        // so the rule item is the only signal: it must carry the same priority as the model flag.
+        $wb = $this->answer((int) $this->course->id, [['id' => answer_rules::WELLBEING_RULE, 'action' => 'block']],
+            'I want to end it all');
+        $this->waitForSecond();
+        for ($i = 0; $i < 51; $i++) {
+            $this->answer((int) $this->course->id, [['id' => 'deadlines.date', 'action' => 'block']]);
+        }
+        $rows = review_queue::pending_for_course((int) $this->course->id);
+        $this->assertCount(50, $rows);
+        $this->assertSame(['rule', $wb], [$rows[0]['source'], $rows[0]['sourceid']]);
+        $this->assertSame(1, $rows[0]['priority']);
+        $this->assertSame(0, $rows[1]['priority'], 'an ordinary rule item keeps priority 0');
+        $ctx = review_queue::template_context($rows, (int) $this->course->id, 7, 3);
+        $this->assertTrue($ctx['review_rows'][0]['priority_high'], 'the wellbeing rule item gets the badge');
+        $this->assertFalse($ctx['review_rows'][1]['priority_high']);
+    }
+
     public function test_an_activity_name_is_escaped_once(): void {
         $page = $this->getDataGenerator()->create_module('page', ['course' => $this->course->id,
             'name' => 'Q&A week 2']);

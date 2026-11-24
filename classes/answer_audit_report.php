@@ -229,6 +229,7 @@ class answer_audit_report {
             'answer' => $redacted ? '' : (string) ($a->answer ?? ''),
             'categories' => implode(', ', array_map('strval', self::json_scalars($a->categories))),
             'rules' => self::rule_text(self::content_rules(self::json_list($a->rules))),
+            'flow' => implode(', ', self::status_ids(self::json_list($a->rules))),
             'validators' => implode(', ', $validators),
             'citations' => count(self::json_list($a->citations)),
             'passages' => $passages,
@@ -677,6 +678,24 @@ class answer_audit_report {
      */
     private static function rule_text(array $rules, string $glue = ', '): string {
         return implode($glue, array_map(static fn(array $r): string => $r['id'] . ':' . $r['action'], $rules));
+    }
+
+    /**
+     * The status entries of a rules list (answer_flow::audit_rules(): ids mode.* and outcome.*, action none), as ids:
+     * the course mode and what happened to the answer. Shown in the detail view only.
+     *
+     * @param array $rules
+     * @return string[]
+     */
+    private static function status_ids(array $rules): array {
+        $out = [];
+        foreach ($rules as $r) {
+            if (is_array($r) && is_string($r['id'] ?? null) && ($r['action'] ?? null) === 'none'
+                    && (str_starts_with($r['id'], 'mode.') || str_starts_with($r['id'], 'outcome.'))) {
+                $out[] = $r['id'];
+            }
+        }
+        return $out;
     }
 
     /**

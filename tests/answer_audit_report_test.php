@@ -384,6 +384,39 @@ final class answer_audit_report_test extends \advanced_testcase {
         $this->assertStringContainsString('<code>' . $d1['rowhash'] . '</code>', $html);
     }
 
+    public function test_status_entries_show_in_the_detail_only(): void {
+        global $OUTPUT, $PAGE;
+        $cid = (int) $this->course->id;
+        $PAGE->set_url('/local/ai_course_assistant/answer_audit.php', ['courseid' => $cid]);
+        // What sse.php and send_message record for a watch-mode answer the wellbeing rule would have blocked.
+        $aid = $this->answer($cid, [['id' => 'wellbeing.crisis', 'action' => 'block'],
+            ['id' => 'mode.watch', 'action' => 'none'], ['id' => 'outcome.delivered', 'action' => 'none']]);
+        $plain = $this->answer($cid, [['id' => 'mode.enforce', 'action' => 'none'],
+            ['id' => 'outcome.delivered', 'action' => 'none']]);
+
+        $d = answer_audit_report::detail($cid, $aid);
+        $this->assertSame('wellbeing.crisis:block', $d['rules']);
+        $this->assertSame('mode.watch, outcome.delivered', $d['flow']);
+        $ctx = answer_audit_report::template_context($cid, answer_audit_report::parse_filters('', '', '', ''), $aid);
+        $html = $OUTPUT->render_from_template('local_ai_course_assistant/answer_audit', $ctx);
+        $this->assertStringContainsString(get_string('answeraudit:flow', 'local_ai_course_assistant'), $html);
+        $this->assertStringContainsString('mode.watch, outcome.delivered', $html);
+
+        // Never a rule choice, a counted rule, or a rule in the list and export.
+        $this->assertSame(['wellbeing.crisis'], answer_audit_report::rule_choices($cid));
+        $this->assertSame(['wellbeing.crisis'], array_column(answer_audit_report::report($cid)['rules'], 'rule'));
+        $this->assertSame([$aid], $this->ids(answer_audit_report::export_rows($cid, ['rule' => 'wellbeing.crisis'])));
+        $this->assertSame([], answer_audit_report::export_rows($cid, ['rule' => 'mode.watch']));
+        foreach (answer_audit_report::export_rows($cid, []) as $row) {
+            $this->assertStringNotContainsString('mode.', $row['rules']);
+            $this->assertStringNotContainsString('outcome.', $row['rules']);
+        }
+        $this->assertSame('', answer_audit_report::detail($cid, $plain)['rules']);
+        // And no review item for a row that recorded only status entries.
+        $this->assertSame([], array_values(array_filter(review_queue::pending_for_course($cid),
+            static fn(array $r): bool => $r['sourceid'] === $plain)));
+    }
+
     // Counts report.
 
     public function test_report_lists_unsupported_topics_by_activity_from_the_latest_verdict(): void {

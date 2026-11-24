@@ -455,7 +455,8 @@ class send_message extends external_api {
             ], $retry);
             // The decision is applied before anything else can throw, so the catch below never undoes a block.
             $decided = true;
-            $out['checked'] = ['categories' => $final['categories'], 'rules' => $final['rules']];
+            // The rules fired, then the mode and what happened (status entries, action none).
+            $out['checked'] = ['categories' => $final['categories'], 'rules' => answer_flow::audit_rules($plan, $final)];
             if ($final['replace']) {
                 // finalize() sets replace exactly when the text to deliver differs from the reply.
                 $out['text'] = (string) $final['text'];
@@ -470,6 +471,18 @@ class send_message extends external_api {
             if (!$decided) {
                 $out['text'] = $guarded;
                 $out['retryraw'] = null;
+                // The row still says the mode and that the check failed (the plan itself never throws).
+                $failedplan = $plan ?? null;
+                if ($failedplan === null) {
+                    try {
+                        $failedplan = ['mode' => \local_ai_course_assistant\answer_rules::mode($courseid),
+                            'categories' => [], 'hold' => false];
+                    } catch (\Throwable $ignore) {
+                        $failedplan = ['mode' => 'off', 'categories' => [], 'hold' => false];
+                    }
+                }
+                $out['checked'] = ['categories' => $failedplan['categories'],
+                    'rules' => answer_flow::audit_rules($failedplan, null)];
             }
             answer_audit::log_rules_error($userid, $courseid, get_class($e));
         }

@@ -415,6 +415,96 @@ final class answer_flow_test extends \advanced_testcase {
         $this->assertDebuggingNotCalled();
     }
 
+    // What the audit row records about the mode and what happened (status entries, action none).
+
+    /**
+     * The status entries (mode.*, outcome.*) of a rules list, as ids.
+     *
+     * @param array[] $rules
+     * @return string[]
+     */
+    private function status_ids(array $rules): array {
+        $ids = [];
+        foreach ($rules as $r) {
+            if (preg_match('/^(mode|outcome)\./', $r['id'])) {
+                $this->assertSame('none', $r['action'], 'a status entry is never a content finding');
+                $ids[] = $r['id'];
+            }
+        }
+        return $ids;
+    }
+
+    public function test_audit_rules_say_watch_delivered_the_answer_unchanged(): void {
+        $this->mode('watch');
+        $q = 'I want to kill myself';
+        $plan = answer_flow::plan($q, 0);
+        $final = answer_flow::finalize('Here is a study plan.', $plan, ['question' => $q]);
+        $rules = answer_flow::audit_rules($plan, $final);
+        $this->assertContains(['id' => answer_rules::WELLBEING_RULE, 'action' => 'block'], $rules,
+            'the rule that would have blocked is still recorded');
+        $this->assertSame(['mode.watch', 'outcome.delivered'], $this->status_ids($rules));
+    }
+
+    public function test_audit_rules_name_each_enforce_outcome(): void {
+        $this->mode('enforce');
+        $plan = answer_flow::plan(self::PLAIN_Q, 0);
+        $block = answer_flow::finalize(self::BLOCKED, $plan, ['question' => self::PLAIN_Q]);
+        $this->assertSame(['mode.enforce', 'outcome.blocked'], $this->status_ids(answer_flow::audit_rules($plan, $block)));
+        $warn = answer_flow::finalize(self::WARNED, $plan, ['question' => self::PLAIN_Q]);
+        $this->assertSame(['mode.enforce', 'outcome.warned'], $this->status_ids(answer_flow::audit_rules($plan, $warn)));
+        $clean = answer_flow::finalize('Photosynthesis turns light into sugar.', $plan, ['question' => self::PLAIN_Q]);
+        $this->assertSame(['mode.enforce', 'outcome.delivered'],
+            $this->status_ids(answer_flow::audit_rules($plan, $clean)));
+
+        $this->correct_rule();
+        $held = answer_flow::plan(self::GRADE_Q, 0);
+        $fixed = answer_flow::finalize('You get 500 zorkmid.', $held, ['question' => self::GRADE_Q, 'buffered' => true],
+            fn(): string => 'Ask your instructor.');
+        $this->assertSame(['mode.enforce', 'outcome.corrected', 'outcome.held', 'outcome.retried'],
+            $this->status_ids(answer_flow::audit_rules($held, $fixed)));
+        $failed = answer_flow::finalize('You get 500 zorkmid.', $held, ['question' => self::GRADE_Q, 'buffered' => true],
+            fn(): string => 'Still 500 zorkmid.');
+        $this->assertSame(['mode.enforce', 'outcome.blocked', 'outcome.held', 'outcome.retried'],
+            $this->status_ids(answer_flow::audit_rules($held, $failed)));
+        answer_flow::$spendcheck = fn(): string => spend_guard::CAP_BLOCKED;
+        $capped = answer_flow::finalize('You get 500 zorkmid.', $held,
+            ['question' => self::GRADE_Q, 'buffered' => true, 'courseid' => 1], fn(): string => 'x');
+        $this->assertSame(['mode.enforce', 'outcome.blocked', 'outcome.held', 'outcome.retry_skipped_spend'],
+            $this->status_ids(answer_flow::audit_rules($held, $capped)));
+    }
+
+    public function test_audit_rules_when_the_check_failed(): void {
+        $this->mode('enforce');
+        $plan = answer_flow::plan(self::GRADE_Q, 0);
+        // finalize() itself threw (sse.php and send_message's catch): delivered as it was.
+        $this->assertSame(['mode.enforce', 'outcome.delivered', 'outcome.held', 'outcome.check_failed'],
+            $this->status_ids(answer_flow::audit_rules($plan, null)));
+        answer_flow::$beforefinalize = function (): void {
+            throw new \RuntimeException('planted');
+        };
+        $out = answer_flow::finalize(self::BLOCKED, $plan, ['question' => self::GRADE_Q]);
+        $this->assertSame(['mode.enforce', 'outcome.delivered', 'outcome.held', 'outcome.check_failed'],
+            $this->status_ids(answer_flow::audit_rules($plan, $out)));
+    }
+
+    public function test_status_entries_are_not_content_rules_anywhere(): void {
+        // They have action none, which the review queue, the audit report counts and the rule filter all drop.
+        $this->mode('watch');
+        $plan = answer_flow::plan(self::PLAIN_Q, 0);
+        $rules = answer_flow::audit_rules($plan, answer_flow::finalize('Fine.', $plan, ['question' => self::PLAIN_Q]));
+        $this->assertSame(['mode.watch', 'outcome.delivered'], array_column($rules, 'id'));
+        $this->assertSame(['none'], array_values(array_unique(array_column($rules, 'action'))));
+    }
+
+    public function test_a_held_answer_leaves_no_unchecked_partial_on_a_failed_turn(): void {
+        $hold = new answer_hold(function (string $frame): void {
+        });
+        $this->assertSame('', answer_flow::failed_turn_partial($hold, 'I guarantee you an A'),
+            'held: the unchecked partial is never stored');
+        $this->assertSame('Half an answer', answer_flow::failed_turn_partial(null, 'Half an answer'),
+            'streamed: the learner saw it, so it is stored as before');
+    }
+
     // The audit row and the failure counter.
 
     public function test_record_answer_stores_the_categories_and_rules(): void {
@@ -509,5 +599,15 @@ final class answer_flow_test extends \advanced_testcase {
         $this->assertStringContainsString('answer_audit::log_rules_error(', $src);
         // A failure in the new code keeps today's answer.
         $this->assertMatchesRegularExpression('/\} catch \(\\\\Throwable \$e\) \{ \$answercheck = /', $src);
+        // The audit row records the mode and the outcome, on success and on failure.
+        $this->assertStringContainsString("\$answercheck = ['categories' => \$answerfinal['categories'], "
+            . "'rules' => \\local_ai_course_assistant\\answer_flow::audit_rules(\$answerplan, \$answerfinal)];", $src);
+        $this->assertStringContainsString("\$answercheck = ['categories' => \$answerplan['categories'], "
+            . "'rules' => \\local_ai_course_assistant\\answer_flow::audit_rules(\$answerplan, null)];", $src);
+        // A failed turn never stores the unchecked partial of a held answer (both catch blocks).
+        $this->assertSame(2, substr_count($src, 'local_ai_course_assistant_record_failed_turn( $conv ?? null, '
+            . '(int)($USER->id ?? 0), (int)($courseid ?? 0), \\local_ai_course_assistant\\answer_flow::failed_turn_partial('
+            . '$answerhold ?? null, $fullresponse ?? \'\'),'));
+        $this->assertStringNotContainsString("\$fullresponse ?? '', get_class(\$e)", $src);
     }
 }

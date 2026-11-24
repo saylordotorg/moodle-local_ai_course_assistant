@@ -146,6 +146,70 @@ class answer_flow {
     }
 
     /**
+     * The rules list for the answer audit row: the rules finalize() recorded, then status entries saying the course
+     * mode and what happened to the answer, so a watch row that recorded a block rule also says the answer was
+     * delivered unchanged. Status entries have action none, so the review queue, the audit report's rule counts and
+     * its rule filter (content_rules(), which drops action none) never treat them as findings; the audit detail view
+     * shows them. No schema change: they live in the existing rules column.
+     *
+     * Ids: mode.<off|watch|enforce>; one of outcome.delivered (the answer as it was), outcome.warned,
+     * outcome.blocked (the safe message), outcome.corrected (the retry was delivered), outcome.replaced (any other
+     * change); then outcome.held (a held answer: nothing streamed before the check), outcome.retried (the one
+     * correct retry ran), outcome.retry_skipped_spend (the course is at its chat spend cap) and outcome.check_failed
+     * (the rule check failed; the answer was delivered as it was, or blocked when a held correct's retry failed).
+     *
+     * @param array $plan plan()'s result
+     * @param array|null $final finalize()'s result, or null when the check threw before it returned
+     * @return array[] [{id, action}]
+     */
+    public static function audit_rules(array $plan, ?array $final): array {
+        $rules = is_array($final['rules'] ?? null) ? array_values($final['rules']) : [];
+        $mode = (string) ($plan['mode'] ?? 'off');
+        $mode = in_array($mode, ['off', 'watch', 'enforce'], true) ? $mode : 'off';
+        $status = ['mode.' . $mode];
+        if ($final === null) {
+            $status[] = 'outcome.delivered';
+        } else if (empty($final['replace'])) {
+            $status[] = 'outcome.delivered';
+        } else {
+            $status[] = match ((string) ($final['action'] ?? '')) {
+                'block' => 'outcome.blocked',
+                'warn' => 'outcome.warned',
+                'correct' => 'outcome.corrected',
+                default => 'outcome.replaced',
+            };
+        }
+        if (!empty($plan['hold'])) {
+            $status[] = 'outcome.held';
+        }
+        if (!empty($final['retried'])) {
+            $status[] = 'outcome.retried';
+        }
+        $error = $final === null ? 'thrown' : ($final['error'] ?? null);
+        if ($error === self::RETRY_SKIPPED_SPEND) {
+            $status[] = 'outcome.retry_skipped_spend';
+        } else if ($error !== null) {
+            $status[] = 'outcome.check_failed';
+        }
+        foreach ($status as $id) {
+            $rules[] = ['id' => $id, 'action' => 'none'];
+        }
+        return $rules;
+    }
+
+    /**
+     * The partial reply a failed chat turn may store: none while the answer is held (enforce mode, a risky
+     * question), because a held partial was never checked and never shown; otherwise what the learner saw stream.
+     *
+     * @param object|null $hold sse.php's answer_hold while it is holding, null once released or when not held
+     * @param string $partial what the provider streamed so far
+     * @return string
+     */
+    public static function failed_turn_partial(?object $hold, string $partial): string {
+        return $hold !== null ? '' : $partial;
+    }
+
+    /**
      * The one bounded retry of a held answer.
      *
      * @param array $first evaluate()'s result for the reply

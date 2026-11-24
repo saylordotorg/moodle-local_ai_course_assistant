@@ -205,7 +205,8 @@ class review_queue {
      * verdict is needs_review or blocked and carries a contradicted claim of high or medium severity, or the
      * wellbeing model flag (priority 1, listed first). `rule`: the answer row recorded a guidance rule with action
      * block, warn or correct, or (only while the course's mode is watch) watch; never when a claim item exists for
-     * that answer, resolved or not. Failed checks (status check_failed, rule ids starting claim_check.) are not
+     * that answer, resolved or not. A rule item for a wellbeing rule (id wellbeing.*) has priority 1 and is never
+     * capped, as the wellbeing model flag it stands in for. Failed checks (status check_failed, rule ids starting claim_check.) are not
      * content findings and never make an item.
      *
      * @param int $courseid
@@ -279,35 +280,50 @@ class review_queue {
                 }
             }
 
-            // Answer rows that recorded a guidance rule.
-            $rsql = "SELECT id, userid, question, answer, chunks, rules, redacted, timecreated
-                       FROM {" . answer_audit::TABLE . "}
-                      WHERE courseid = :courseid AND kind = :kind AND rules IS NOT NULL
-                            AND " . $DB->sql_like('rules', ':hasaction') . "
-                   ORDER BY id DESC";
-            $rs = $DB->get_recordset_sql($rsql, ['courseid' => $courseid, 'kind' => 'answer',
-                'hasaction' => '%"action"%']);
+            // Answer rows that recorded a guidance rule with an action that can make an item. Status entries
+            // (mode.*, outcome.*, action none) are on nearly every row, so the filter names the actions.
+            $actionlikes = [];
+            $ruleparams = ['courseid' => $courseid, 'kind' => 'answer'];
+            foreach (['block', 'warn', 'correct', 'watch'] as $i => $act) {
+                $actionlikes[] = $DB->sql_like('rules', ':act' . $i);
+                $ruleparams['act' . $i] = '%"action":"' . $act . '"%';
+            }
+            $rulebase = "SELECT id, userid, question, answer, chunks, rules, redacted, timecreated
+                           FROM {" . answer_audit::TABLE . "}
+                          WHERE courseid = :courseid AND kind = :kind AND rules IS NOT NULL
+                                AND (" . implode(' OR ', $actionlikes) . ")";
+            $seen = [];
+            // A rule item for a wellbeing rule (id wellbeing.*) is what the claim check's wellbeing model flag would
+            // have been (claim_checker::wellbeing_caught() suppresses the flag then): priority 1, listed first and,
+            // like the flag, never counted toward $limit. Taken first, with no cap, so a busy course can't hide it.
+            $rs = $DB->get_recordset_sql($rulebase . " AND " . $DB->sql_like('rules', ':wb') . " ORDER BY id DESC",
+                $ruleparams + ['wb' => '%"id":"wellbeing.%']);
+            foreach ($rs as $a) {
+                $item = self::rule_candidate($a, $mode, $claimanswers, $resolvedkeys);
+                if ($item !== null && $item['wellbeing']) {
+                    $seen[(int) $a->id] = true;
+                    $items[] = self::rule_item($a, $item['rules'], self::latest_verdict((int) $a->id), true);
+                }
+            }
+            $rs->close();
+
+            $rs = $DB->get_recordset_sql($rulebase . " ORDER BY id DESC", $ruleparams);
             $ruleitems = 0;
             foreach ($rs as $a) {
                 if ($ruleitems >= $limit) {
                     break;
                 }
-                $aid = (int) $a->id;
-                if (isset($claimanswers[$aid]) || isset($resolvedkeys['rule:' . $aid])) {
+                if (isset($seen[(int) $a->id])) {
                     continue;
                 }
-                $rules = self::content_rules(self::json_list($a->rules));
-                $actions = array_column($rules, 'action');
-                $strong = (bool) array_intersect($actions, ['block', 'warn', 'correct']);
-                $watch = in_array('watch', $actions, true) && $mode === 'watch';
-                if (!$strong && !$watch) {
+                $item = self::rule_candidate($a, $mode, $claimanswers, $resolvedkeys);
+                if ($item === null) {
                     continue;
                 }
-                $latest = $DB->get_records(answer_audit::TABLE, ['kind' => 'verdict', 'supersedes' => $aid],
-                    'id DESC', 'id, status, severity', 0, 1);
-                $latest = $latest ? reset($latest) : null;
-                $items[] = self::rule_item($a, $rules, $latest);
-                $ruleitems++;
+                $items[] = self::rule_item($a, $item['rules'], self::latest_verdict((int) $a->id), $item['wellbeing']);
+                if (!$item['wellbeing']) {
+                    $ruleitems++;
+                }
             }
             $rs->close();
         } catch (\Throwable $e) {
@@ -342,14 +358,60 @@ class review_queue {
     }
 
     /**
+     * Whether an answer row that recorded rules makes a rule item: not when a claim item exists for the answer or the
+     * item is resolved, and only for a block, warn or correct rule, or a watch rule while the course mode is watch.
+     *
+     * @param \stdClass $a the answer row
+     * @param string $mode the course's answer safety mode
+     * @param array $claimanswers answer id => true for answers with a claim item
+     * @param array $resolvedkeys "source:sourceid" => true
+     * @return array{rules: array[], wellbeing: bool}|null
+     */
+    private static function rule_candidate(\stdClass $a, string $mode, array $claimanswers, array $resolvedkeys): ?array {
+        $aid = (int) $a->id;
+        if (isset($claimanswers[$aid]) || isset($resolvedkeys['rule:' . $aid])) {
+            return null;
+        }
+        $rules = self::content_rules(self::json_list($a->rules));
+        $actions = array_column($rules, 'action');
+        $strong = (bool) array_intersect($actions, ['block', 'warn', 'correct']);
+        $watch = in_array('watch', $actions, true) && $mode === 'watch';
+        if (!$strong && !$watch) {
+            return null;
+        }
+        $wellbeing = false;
+        foreach ($rules as $r) {
+            if (str_starts_with($r['id'], 'wellbeing.')) {
+                $wellbeing = true;
+                break;
+            }
+        }
+        return ['rules' => $rules, 'wellbeing' => $wellbeing];
+    }
+
+    /**
+     * An answer's latest verdict (id, status, severity), or null.
+     *
+     * @param int $aid
+     * @return \stdClass|null
+     */
+    private static function latest_verdict(int $aid): ?\stdClass {
+        global $DB;
+        $latest = $DB->get_records(answer_audit::TABLE, ['kind' => 'verdict', 'supersedes' => $aid],
+            'id DESC', 'id, status, severity', 0, 1);
+        return $latest ? reset($latest) : null;
+    }
+
+    /**
      * A rule item.
      *
      * @param \stdClass $a the answer row
      * @param array $rules the content rules it recorded
      * @param \stdClass|null $latest its latest verdict, if any
+     * @param bool $wellbeing a wellbeing rule fired: priority 1 (listed first, with the badge)
      * @return array
      */
-    private static function rule_item(\stdClass $a, array $rules, ?\stdClass $latest): array {
+    private static function rule_item(\stdClass $a, array $rules, ?\stdClass $latest, bool $wellbeing = false): array {
         $status = $latest && $latest->status !== 'check_failed' ? (string) $latest->status : '';
         $severity = $latest && $latest->status !== 'check_failed' ? (string) ($latest->severity ?? '') : '';
         $detail = self::detail($a, $status, $severity, [], $rules, []);
@@ -359,7 +421,7 @@ class review_queue {
             'when' => (int) $a->timecreated,
             'summary' => self::summary(get_string('instructor_dashboard:review_kind_rule', self::COMPONENT), $detail),
             'who' => anonymizer::name((int) $a->userid),
-            'priority' => 0,
+            'priority' => $wellbeing ? 1 : 0,
             'detail' => $detail,
         ];
     }

@@ -1165,7 +1165,9 @@ try {
                 'chunks' => $answerchunks,
                 'courseid' => (int) $courseid,
             ], $answerretry);
-            $answercheck = ['categories' => $answerfinal['categories'], 'rules' => $answerfinal['rules']];
+            // The rules fired, then the mode and what happened (status entries, action none; answer_flow::audit_rules()).
+            $answercheck = ['categories' => $answerfinal['categories'],
+                'rules' => \local_ai_course_assistant\answer_flow::audit_rules($answerplan, $answerfinal)];
             if ($answerfinal['error'] !== null) {
                 \local_ai_course_assistant\answer_audit::log_rules_error((int) $userid, (int) $courseid,
                     (string) $answerfinal['error']);
@@ -1186,7 +1188,8 @@ try {
             }
         }
     } catch (\Throwable $e) {
-        $answercheck = ['categories' => $answerplan['categories'], 'rules' => []];
+        $answercheck = ['categories' => $answerplan['categories'],
+            'rules' => \local_ai_course_assistant\answer_flow::audit_rules($answerplan, null)];
         $answerreplace = null;
         \local_ai_course_assistant\answer_audit::log_rules_error((int) $userid, (int) $courseid, get_class($e));
     }
@@ -1503,9 +1506,11 @@ try {
     } catch (\Throwable $ignore) {
         /* never let audit logging mask the real error */
     }
+    // A held answer's partial was never checked or shown: store none (answer_flow::failed_turn_partial()).
     local_ai_course_assistant_record_failed_turn(
         $conv ?? null, (int)($USER->id ?? 0), (int)($courseid ?? 0),
-        $fullresponse ?? '', get_class($e), $pageid ?? null, $interactiontype ?? 'chat',
+        \local_ai_course_assistant\answer_flow::failed_turn_partial($answerhold ?? null, $fullresponse ?? ''),
+        get_class($e), $pageid ?? null, $interactiontype ?? 'chat',
         $learnernotice ?? '', $provider ?? null,
         $failedoutcome
     );
@@ -1524,9 +1529,11 @@ try {
         . ', pageid=' . (int)($pageid ?? 0) . ')',
         DEBUG_DEVELOPER
     );
+    // A held answer's partial was never checked or shown: store none (answer_flow::failed_turn_partial()).
     local_ai_course_assistant_record_failed_turn(
         $conv ?? null, (int)($USER->id ?? 0), (int)($courseid ?? 0),
-        $fullresponse ?? '', get_class($e), $pageid ?? null, $interactiontype ?? 'chat',
+        \local_ai_course_assistant\answer_flow::failed_turn_partial($answerhold ?? null, $fullresponse ?? ''),
+        get_class($e), $pageid ?? null, $interactiontype ?? 'chat',
         $learnernotice ?? '', $provider ?? null
     );
     try {

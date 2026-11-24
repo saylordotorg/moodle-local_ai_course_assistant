@@ -85,4 +85,34 @@ final class metadata_table_coverage_test extends \advanced_testcase {
                 . "model-registry tables do, rather than leaving it out."
         );
     }
+
+    /**
+     * 8.4.0: the answer audit and the review resolutions declare every field that holds or points at the learner's
+     * data (the teacher's note and outcome; the audit's message, conversation, activity, categories, rules and
+     * verdict status), each with a string that exists.
+     *
+     * @return void
+     */
+    public function test_the_8_4_0_tables_declare_their_personal_fields(): void {
+        $this->resetAfterTest();
+        $fields = [];
+        foreach (provider::get_metadata(new \core_privacy\local\metadata\collection('local_ai_course_assistant'))->get_collection() as $item) {
+            if ($item instanceof \core_privacy\local\metadata\types\database_table) {
+                $fields[$item->get_name()] = $item->get_privacy_fields();
+            }
+        }
+        $want = [
+            'local_ai_course_assistant_review_res' => ['resolved_by', 'note', 'outcome'],
+            'local_ai_course_assistant_answer_audit' => ['userid', 'courseid', 'messageid', 'conversationid', 'cmid',
+                'question', 'answer', 'categories', 'rules', 'status', 'claims', 'timecreated'],
+        ];
+        $sm = get_string_manager();
+        foreach ($want as $table => $names) {
+            foreach ($names as $name) {
+                $this->assertArrayHasKey($name, $fields[$table] ?? [], "$table.$name is not declared");
+                $this->assertTrue($sm->string_exists($fields[$table][$name], 'local_ai_course_assistant'),
+                    "$table.$name has no string");
+            }
+        }
+    }
 }
