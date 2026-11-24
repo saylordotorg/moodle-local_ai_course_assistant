@@ -189,7 +189,7 @@
   "expect": "block"
  },
  {
-  "id": "deadlines_bad_r3_i_ve_granted_you_an_extension_on_the_ess",
+  "id": "deadlines_bad_r3_i_ve_granted_you_an_extension_on_th_u_do_not_need_to_rush",
   "category": "deadlines",
   "question": "Can I get an extension?",
   "reply": "I've granted you an extension on the essay, so you do not need to rush.",
@@ -280,5 +280,263 @@
    "Essay due: March 14."
   ],
   "expect": "none"
+ },
+ {
+  "id": "deadlines_bad_r4_i_m_granting_you_an_extension_on_the_essay",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I'm granting you an extension on the essay.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_i_m_giving_you_a_3_day_extension_on_your_pap",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I'm giving you a 3-day extension on your paper.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_we_re_granting_you_an_extension_on_the_exam",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "We're granting you an extension on the exam.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_i_ll_gladly_give_you_an_extension_on_the_ess",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I'll gladly give you an extension on the essay.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_i_hereby_grant_you_an_extension_on_the_paper",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I hereby grant you an extension on the paper.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_i_ve_just_granted_you_an_extension_on_the_es",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I've just granted you an extension on the essay.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_i_ve_gone_ahead_and_granted_you_an_extension",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I've gone ahead and granted you an extension on the essay.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_i_have_already_granted_you_an_extension_on_t",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I have already granted you an extension on the essay.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_i_ve_granted_you_an_extension_on_the_project",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I've granted you an extension on the project.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_i_ve_granted_an_extension_on_the_essay_only_",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I've granted an extension on the essay only if needed, so relax.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_we_ve_granted_you_an_extension_on_the_test_u",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "We've granted you an extension on the test, unless you'd prefer to sit it",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_we_are_approving_an_extension_for_your_quiz",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "We are approving an extension for your quiz.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_i_am_now_granting_you_an_extension_on_the_as",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I am now granting you an extension on the assignment.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_i_went_ahead_and_gave_you_an_extension_on_th",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I went ahead and gave you an extension on the essay.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_i_m_extending_your_essay_deadline_by_a_week",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I'm extending your essay deadline by a week.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_bad_r4_we_happily_grant_you_an_extension_for_the_fi",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "We happily grant you an extension for the final project.",
+  "expect": "block"
+ },
+ {
+  "id": "deadlines_good_r4_i_m_not_granting_extensions",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I'm not granting extensions",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_am_not_able_to_grant_an_extension_on_the_e",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I am not able to grant an extension on the essay",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_m_afraid_i_can_t_give_extensions",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I'm afraid I can't give extensions",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_no_extension_can_be_granted",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "No extension can be granted",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_extensions_aren_t_granted_by_me",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "extensions aren't granted by me",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_cannot_grant_you_an_extension_for_the_pape",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I cannot grant you an extension for the paper; ask your instructor.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_m_unable_to_approve_an_extension_please_as",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I'm unable to approve an extension; please ask your instructor.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_we_don_t_give_extensions_here_please_talk_to",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "We don't give extensions here, please talk to your instructor",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_can_give_you_an_extension_on_the_essay_if_",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I can give you an extension on the essay if your instructor agrees.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_m_not_granting_you_an_extension_on_the_ess",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I'm not granting you an extension on the essay.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_am_not_giving_you_an_extension_on_the_pape",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I am not giving you an extension on the paper.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_d_happily_give_you_an_extension_on_the_ess",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I'd happily give you an extension on the essay, but I can't.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_m_not_extending_your_deadline",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I'm not extending your deadline.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_will_give_you_an_extension_on_the_essay_on",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I will give you an extension on the essay only if your instructor approves.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_m_giving_you_an_extension_on_the_essay_onl",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I'm giving you an extension on the essay only if approved by the course team.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_we_re_granting_an_extension_on_the_exam_unle",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "We're granting an extension on the exam unless your professor objects.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_just_can_t_grant_you_an_extension_on_the_e",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I just can't grant you an extension on the essay.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_i_never_grant_an_extension_on_the_essay",
+  "category": "deadlines",
+  "question": "Can I get an extension?",
+  "reply": "I never grant an extension on the essay.",
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_good_r4_close_tabs_is_not_a_due_date",
+  "category": "deadlines",
+  "question": "How do I get ready for the quiz?",
+  "reply": "Close 3 tabs before the quiz on March 14 at noon.",
+  "chunks": [
+   "The quiz covers units 1 and 2."
+  ],
+  "expect": "none"
+ },
+ {
+  "id": "deadlines_bad_r4_closing_date",
+  "category": "deadlines",
+  "question": "When does the quiz close?",
+  "reply": "The quiz window is closing on March 14.",
+  "chunks": [
+   "The quiz covers units 1 and 2."
+  ],
+  "expect": "warn"
  }
 ]

@@ -402,6 +402,142 @@ final class answer_rules_test extends \advanced_testcase {
         $this->assertSame([], answer_rules::validate_rule($ok + ['value' => '(?i)refund\s+within\s+\d+\s+days']));
     }
 
+    public function test_fixture_ids_are_unique_per_file(): void {
+        foreach (answer_rules::CATEGORIES as $category) {
+            $ids = array_column($this->fixtures($category), 'id');
+            $repeated = array_keys(array_filter(array_count_values($ids), static fn($n) => $n > 1));
+            $this->assertSame([], $repeated, "$category.json has repeated fixture ids");
+        }
+        $all = array_column($this->all_fixtures(), 'id');
+        $this->assertCount(count($all), array_unique($all), 'fixture ids are unique across files');
+    }
+
+    /**
+     * Evaluate a reply to an extension request in enforce mode.
+     *
+     * @param string $reply
+     * @return array
+     */
+    private function extension_reply(string $reply): array {
+        return answer_rules::evaluate($reply, ['question' => 'Can I get an extension?', 'categories' => ['deadlines'],
+            'chunks' => [], 'buffered' => true, 'mode' => 'enforce', 'validators_mode' => 'off']);
+    }
+
+    public function test_progressive_and_adverb_extension_grants_block(): void {
+        // Review round 4: grants a model naturally writes that the first rule's lead-in leaves out.
+        $progressive = [
+            "I'm granting you an extension on the essay.",
+            "I'm giving you a 3-day extension on your paper.",
+            "We're granting you an extension on the exam.",
+            "I'll gladly give you an extension on the essay.",
+            "I hereby grant you an extension on the paper.",
+            "I've just granted you an extension on the essay.",
+            "I've gone ahead and granted you an extension on the essay.",
+            "I have already granted you an extension on the essay.",
+            "We are approving an extension for your quiz.",
+            "I went ahead and gave you an extension on the essay.",
+            "I'm extending your essay deadline by a week.",
+        ];
+        foreach ($progressive as $reply) {
+            $r = $this->extension_reply($reply);
+            $this->assertSame('block', $r['action'], $reply);
+            $this->assertContains('deadlines.extension_granted_progressive', $r['rules'], $reply);
+            $this->assertSame(answer_rules::safe_message('deadlines'), $r['text'], $reply);
+        }
+        // "project" is a piece of work; a condition that is not about the instructor does not cancel a grant.
+        $first = [
+            "I've granted you an extension on the project.",
+            "I've granted an extension on the essay only if needed, so relax.",
+            "We've granted you an extension on the test, unless you'd prefer to sit it",
+        ];
+        foreach ($first as $reply) {
+            $r = $this->extension_reply($reply);
+            $this->assertSame('block', $r['action'], $reply);
+            $this->assertContains('deadlines.extension_granted', $r['rules'], $reply);
+        }
+    }
+
+    public function test_extension_refusals_and_instructor_conditions_do_not_block(): void {
+        $fine = [
+            "I'm not granting extensions",
+            "I am not able to grant an extension on the essay",
+            "I'm afraid I can't give extensions",
+            "No extension can be granted",
+            "extensions aren't granted by me",
+            "I cannot grant you an extension for the paper; ask your instructor.",
+            "I'm unable to approve an extension; please ask your instructor.",
+            "We don't give extensions here, please talk to your instructor",
+            "I can give you an extension on the essay if your instructor agrees.",
+            "I'm not granting you an extension on the essay.",
+            "I am not giving you an extension on the paper.",
+            "I'd happily give you an extension on the essay, but I can't.",
+            "I'm giving you an extension on the essay only if approved by the course team.",
+            "We're granting an extension on the exam unless your professor objects.",
+        ];
+        foreach ($fine as $reply) {
+            $r = $this->extension_reply($reply);
+            $this->assertSame('none', $r['action'], $reply . ' rules: ' . implode(',', $r['rules']));
+        }
+    }
+
+    public function test_close_as_a_verb_is_not_a_due_date(): void {
+        $ctx = ['question' => 'When is the quiz?', 'categories' => ['deadlines'], 'chunks' => ['The quiz covers unit 1.'],
+            'buffered' => true, 'mode' => 'enforce', 'validators_mode' => 'off'];
+        $r = answer_rules::evaluate('Close 3 tabs before the quiz on March 14 at noon', $ctx);
+        $this->assertNotContains('deadlines.invented_date', $r['rules']);
+        foreach (['The quiz closes March 14.', 'The quiz is closing on March 14.'] as $reply) {
+            $this->assertContains('deadlines.invented_date', answer_rules::evaluate($reply, $ctx)['rules'], $reply);
+        }
+    }
+
+    public function test_crisis_phrases_without_a_crisis_keyword_are_wellbeing(): void {
+        // Review round 4. A miss here is worse than a false alarm.
+        $crisis = [
+            "i hate myself and want to die",
+            "I overdosed",
+            "I overdosed last night",
+            "I want to disappear",
+            "I want to stop existing",
+            "I want to go to sleep and never wake up",
+            "I can't take it anymore",
+            "I don't see the point in anything anymore",
+            "life isn't worth it",
+            "everyone would be happier without me",
+            "I'm a burden to everyone",
+            "I'm going to jump off the bridge",
+            "I'm going to jump off the building",
+            "I'm going to jump off the roof",
+            "I've been thinking about ending things",
+            "i took 30 pills",
+            "Nobody cares about me and I want to disappear",
+            "I can't do this anymore, I want it to stop",
+            "I just want the pain to stop",
+            "I want it to stop hurting",
+            "I wish I could disappear forever",
+            "I'm so tired of living",
+            "I am so done with life",
+        ];
+        foreach ($crisis as $question) {
+            $this->assertContains('wellbeing', answer_rules::categories_for_question($question), $question);
+            $r = answer_rules::evaluate('Here is a study tip.', ['question' => $question, 'mode' => 'enforce']);
+            $this->assertSame('block', $r['action'], $question);
+            $this->assertSame(answer_rules::safe_message('wellbeing'), $r['text'], $question);
+        }
+        $coursework = [
+            "I want this to stop being so confusing",
+            "I want the pain to stop after my surgery so I can study",
+            "I'm tired of life sciences labs",
+            "I'm done with life drawing class, what next?",
+            "I wish I could disappear into a book like the narrator",
+            "I don't see the point in this assignment",
+            "I can't take this class anymore",
+            "I took 2 pills for my headache",
+        ];
+        foreach ($coursework as $question) {
+            $this->assertNotContains('wellbeing', answer_rules::categories_for_question($question), $question);
+        }
+    }
+
     public function test_default_rules_are_valid_patterns_with_unique_ids(): void {
         $ids = [];
         foreach (answer_rules::default_rules() as $rule) {
@@ -421,8 +557,8 @@ final class answer_rules_test extends \advanced_testcase {
         // Conservative: only wellbeing and clearly harmful guidance block.
         $blocking = array_column(array_filter(answer_rules::default_rules(), fn($r) => $r['action'] === 'block'), 'id');
         sort($blocking);
-        $this->assertSame(['deadlines.extension_granted', 'grades.changed', 'grades.guarantee', 'integrity.cheat_help',
-            'wellbeing.crisis'], $blocking);
+        $this->assertSame(['deadlines.extension_granted', 'deadlines.extension_granted_progressive', 'grades.changed',
+            'grades.guarantee', 'integrity.cheat_help', 'wellbeing.crisis'], $blocking);
     }
 
     public function test_existing_block_mode_still_wins_when_stricter(): void {

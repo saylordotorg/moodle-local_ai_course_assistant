@@ -36,7 +36,10 @@ use local_ai_course_assistant\validators\hallucination_validator;
  *
  * Wellbeing: a question in the wellbeing category ALWAYS gets 'block' with the wellbeing safe message in enforce
  * mode, whatever the answer says. The message points to the instructor or support and to local emergency services;
- * it carries no per-country list and no link.
+ * it carries no per-country list and no link. Detection is by phrase and pattern: a heuristic floor, NOT a guarantee.
+ * It catches the common first-person wordings and will miss others (indirect, misspelled, or in a language without a
+ * phrase list), so no caller may treat "no wellbeing category" as "the learner is fine". A model-based check is a
+ * later task and sits on top of this floor; it does not replace it.
  *
  * Rules: the default pack below (code) plus site rules written by site admins in the `answer_safety_rules` setting.
  * A rule is {id, category, kind keyword|pattern, value, applies_to question|reply|both, action}. A keyword value is
@@ -165,6 +168,18 @@ class answer_rules {
     /** @var string After "cut myself": a slice of cake, cutting myself off from social media, some slack. */
     private const NOT_A_CUT = '(?!\s+(?:a\s+|some\s+)?(?:slice|piece|break|slack|off|out|loose|short)\b)';
 
+    /** @var string After "life": life sciences, life drawing, life skills... are school subjects, not the speaker's life. */
+    private const NOT_A_SUBJECT = '(?!\s+(?:sciences?|drawing|skills|insurance|cycles?|histor(?:y|ies)|studies|expectancy|'
+        . 'span)\b)';
+
+    /** @var string After "disappear": into a book, a story, a role, a crowd. */
+    private const NOT_INTO_A_BOOK = '(?!\s+into\s+(?:an?|the|my|this|that)\s+(?:[\w-]+\s+)?(?:book|novel|story|stories|'
+        . 'character|role|crowd|game|movie|film|show|series)\b)';
+
+    /** @var string After "ending it / things": with a partner (a break-up) or with a conclusion (an essay). */
+    private const NOT_A_BREAKUP = '(?!\s+with\s+(?:my\s+|the\s+|an?\s+)?(?:boyfriend|girlfriend|partner|husband|wife|bf|gf|'
+        . 'ex|fiance\w*|conclusion|summary|quote|question|paragraph|sentence)\b)';
+
     /** @var string Hurting oneself, in the forms learners write (cutting, burning, hurting, harming). */
     private const SELF_HURT = '(?:hurt(?:ing)?|harm(?:ing)?|cut(?:ting)?|burn(?:ing|t)?)\s+myself';
 
@@ -181,7 +196,14 @@ class answer_rules {
      * "I don't want to be here anymore" said about a class, "My life is not worth living" quoted from a text, and
      * "I can't go on anymore" about a task, a quoted line such as "The poem says I want to die young" (a guard on
      * "says" or "young" could hide a learner's own words), "What does better off dead mean" without quotes, and "no
-     * point in living" said about a character.
+     * point in living" said about a character. Since review round 4 also: "I can't take it anymore" and "I don't see
+     * the point anymore" said about homework, "I overdosed on caffeine", "I want to disappear from the group chat",
+     * "I'm a burden to my project team", "life isn't worth it" as a line quoted from a text (compound nouns such as
+     * "student life" and "shelf life" are guarded), "I'm thinking about ending things" with a study group, "I took 30
+     * pills" in a pharmacy maths problem, and "I'm going to jump off the roof" in a game or a story.
+     *
+     * This list is a floor, not a guarantee: phrase matching misses indirect wording, misspellings and languages
+     * without a phrase list. A model-based check (a later task) is the second layer.
      *
      * @return string[]
      */
@@ -194,14 +216,15 @@ class answer_rules {
         // different subject ("I read that soldiers want to die") cannot come between.
         $clause = "(?:\\s+(?:i|i'm|im|am|and|but|so|just|really|honestly|literally|actually|seriously|still|always|often|"
             . "sometimes|kind|of|keep|hate|hated|my|life|feel|like|tired|sad|lonely|done|exhausted|hopeless|depressed|"
-            . "everything|all|this|have|been|now|anymore|want|wanting|to|be|alone)){0,6}?";
+            . "everything|all|this|have|been|now|anymore|want|wanting|to|be|alone|myself|me|everyone|hates|hate)){0,6}?";
         return [
             $i . '\s+(?:feel(?:ing)?\s+|been\s+)?suicidal\b(?!\s+(?:patients?|clients?|people|individuals|students))',
             $i . '\s+(?:having|have|had|get|getting)\s+(?:\w+\s+)?(?:suicidal\s+(?:thoughts|feelings|urges)|'
                 . 'thoughts\s+(?:of|about)\s+(?:suicide|killing\s+myself|dying|ending\s+it))',
             '\bmy\s+suicidal\s+(?:thoughts|feelings|urges)',
             $i . '\s+(?:thinking|thought|think|considering|considered|contemplating)\s+(?:about\s+|of\s+)?'
-                . '(?:suicide|killing\s+myself|ending\s+(?:it|my\s+life))\b' . $coursework,
+                . '(?:suicide|killing\s+myself|ending\s+(?:it|things|everything|my\s+life))\b' . $coursework
+                . self::NOT_A_BREAKUP,
             $i . '\s+commit(?:ting)?\s+suicide\b',
             self::I . $clause . "\\s+(?:want(?:ing)?\\s+to|wanna)\\s+die\\b"
                 . '(?!\s+(?:my\s+|your\s+|the\s+|her\s+|his\s+)?(?:hair|beard|clothes|shirt|fabric|wool|it|them)\b)'
@@ -217,7 +240,7 @@ class answer_rules {
             "\\bmy\\s+life\\s+(?:is\\s+not|isn't|isnt|is\\s+no\\s+longer|feels)\\s+(?:\\w+\\s+)?worth\\s+living\\b"
                 . '(?!\s+without\b)',
             $i . "\\s+(?:like\\s+)?(?:my\\s+)?life\\s+(?:is\\s+not|isn't|isnt)\\s+worth\\s+living\\b(?!\\s+without\\b)",
-            $i . '\s+(?:(?:take|taking|took|taken)\s+an?\s+overdose|overdos(?:e|ing)\b)',
+            $i . '\s+(?:(?:take|taking|took|taken)\s+an?\s+overdose|overdos(?:ed?|ing)\b)',
             self::I . "\\s+(?:don't|dont|do\\s+not)\\s+want\\s+to\\s+(?:live|be\\s+alive|exist|be\\s+here)"
                 . '(?:\s+any\s*more)?(?=\s*(?:[.!?,;]|$))',
             self::I . "\\s+(?:can't|cant|cannot|can\\s+not)\\s+go\\s+on(?:\\s+any\\s*more|\\s+like\\s+this|\\s+living)?"
@@ -228,21 +251,46 @@ class answer_rules {
             "(?<!['\"])\\bbetter\\s+off\\s+dead\\b(?!['\"])",
             // Pills taken in a dangerous amount.
             self::I . "(?:\\s+just|\\s+have|'ve)?\\s+(?:took|taken|swallowed)\\s+(?:too\\s+many|a\\s+bunch\\s+of|all\\s+(?:of\\s+)?"
-                . '(?:my|the)|a\s+lot\s+of|loads\s+of)\s+(?:[\w-]+\s+)?(?:pills|tablets|meds|medications?)\b',
+                . '(?:my|the)|a\s+lot\s+of|loads\s+of|\d{2,}|twenty|thirty|forty|fifty|a\s+hundred|dozens\s+of|a\s+handful\s+of|'
+                . 'a\s+(?:whole\s+|full\s+)?bottle\s+of)\s+(?:[\w-]+\s+)?(?:pills|tablets|meds|medications?)\b',
             // "Thinking about hurting myself" with no "I", at the start of a sentence.
             '(?:^|[.!?]\s+)\s*(?:(?:been|keep|always|just)\s+)?(?:thinking|thought)\s+(?:about|of)\s+'
                 . '(?:hurting|cutting|killing|harming|burning)\s+myself' . self::NOT_A_CUT,
             $i . '\s+end\s+it\b(?!\s+(?:with|by|on|in|at|there|here|after|before|early|well|now\s+with|all\b))',
             '\bno\s+(?:point|reason)\s+(?:in\s+living|to\s+live|in\s+being\s+alive|in\s+going\s+on)\b',
             '\b(?:nobody|no\s+one|no-one)\s+would\s+(?:miss\s+me|care\s+if\s+i\b|care\s+about\s+me)',
-            self::I . '(?:\s+(?:just|really|so))*\s+want\s+(?:it\s+all|it|everything|the\s+pain|this)\s+to\s+stop\b',
-            $i . '\s+(?:so\s+)?done\s+with\s+(?:life|living|everything|it\s+all|being\s+alive)\b',
-            $i . '\s+(?:so\s+)?tired\s+of\s+(?:living|life|being\s+alive)\b',
+            // "I want it to stop": not "to stop being so confusing" or a device that should stop beeping, and not a
+            // physical pain with a time or a place ("the pain to stop after my surgery").
+            self::I . '(?:\s+(?:just|really|so))*\s+want\s+(?:it\s+all|it|everything|the\s+pain|this)\s+to\s+stop\b'
+                . '(?!\s+(?:being|crashing|freezing|beeping|buzzing|looping|printing|after|before|during|from\s+my)\b)',
+            $i . '\s+(?:so\s+)?done\s+with\s+(?:life|living|everything|it\s+all|being\s+alive)\b' . self::NOT_A_SUBJECT,
+            $i . '\s+(?:so\s+)?tired\s+of\s+(?:living|life|being\s+alive)\b' . self::NOT_A_SUBJECT,
             self::I . "\\s+(?:don't|dont|do\\s+not)\\s+want\\s+to\\s+wake\\s+up(?:\\s+(?:tomorrow|again|anymore|any\\s+more))?"
                 . '(?=\s*(?:[.!?,;]|$))',
             self::I . '(?:\s+(?:just|really|sometimes))*\s+wish\s+i\s+(?:could|would)\s+(?:just\s+)?(?:disappear|vanish|'
-                . 'not\s+exist|stop\s+existing|die|fall\s+asleep\s+and\s+(?:never|not)\s+wake\s+up)\b',
+                . 'not\s+exist|stop\s+existing|die|fall\s+asleep\s+and\s+(?:never|not)\s+wake\s+up)\b'
+                . self::NOT_INTO_A_BOOK,
             self::I . "(?:\\s+just)?\\s+wish\\s+i\\s+(?:wasn't|weren't|was\\s+not|were\\s+not)\\s+(?:alive|born|here)\\b",
+            // Review round 4: wordings with no crisis keyword at all.
+            self::I . '(?:\s+(?:just|really|sometimes|only|so\s+badly))*\s+(?:want\s+to|wanna|need\s+to)\s+(?:just\s+)?'
+                . '(?:disappear|vanish|stop\s+existing|not\s+exist|cease\s+to\s+exist)\b' . self::NOT_INTO_A_BOOK,
+            $i . '\s+(?:just\s+)?(?:go\s+to\s+sleep|fall\s+asleep|sleep)\s+(?:forever|and\s+(?:never|not)\s+wake\s+up)\b',
+            self::I . "(?:\\s+(?:just|really|honestly|literally))*\\s+(?:can't|cant|cannot|can\\s+not)\\s+(?:take|bear|stand)"
+                . '\s+(?:it|this|life|living)\s+any\s*more\b',
+            self::I . "(?:\\s+(?:just|really|honestly))*\\s+(?:don't|dont|do\\s+not|can't|cant|cannot|no\\s+longer)\\s+see"
+                . '\s+(?:the|any|a)\s+point\s+(?:any\s*more|(?:in|of|to)\s+(?:anything|living|life|going\s+on|it\s+all|'
+                . 'any\s+of\s+(?:it|this)))\b',
+            // "Life isn't worth it", but not a compound noun (student life, shelf life).
+            '(?<!student\s|college\s|campus\s|school\s|university\s|greek\s|city\s|night\s|shelf\s|battery\s|dorm\s|'
+                . "plant\\s|animal\\s|marine\\s|wild\\s)\\blife\\s+(?:is\\s+not|isn't|isnt|is\\s+no\\s+longer|is\\s+just\\s+not)"
+                . '\s+(?:\w+\s+)?worth\s+it\b(?!\s+without\b)',
+            "\\b(?:everyone|everybody|they|people|my\\s+(?:family|parents|friends|kids|children))(?:\\s+would|\\s+will|'d|'ll)"
+                . '(?:\s+all)?(?:\s+just)?\s+be\s+(?:so\s+much\s+|much\s+)?(?:happier|better\s+off)\s+(?:without\s+me|'
+                . 'if\s+i\s+(?:was|were|am)\s+(?:gone|dead|not\s+(?:here|around)))\b',
+            $i . '\s+(?:such\s+|nothing\s+but\s+)?a\s+burden\b',
+            $i . '\s+jump(?:ing)?\s+(?:off|from|out\s+of)\s+(?:an?|the|my|this|that)\s+(?:[\w-]+\s+)?(?:bridge|building|'
+                . 'roof|rooftop|balcony|cliff|overpass|window)\b',
+            $i . '\s+jump(?:ing)?\s+in\s+front\s+of\s+(?:an?|the)\s+(?:train|bus|car|truck|subway)\b',
             // Chinese "I want to die", but not "我想死你了" ("I miss you so much").
             '我(?:真的|好|很|就|都)?想死(?!你|您|他|她|它)',
         ];
@@ -284,8 +332,9 @@ class answer_rules {
         '\d{1,2}/\d{1,2}/\d{2,4}',
     ];
 
-    /** @var string[] What introduces a due date: due (not "due to"), deadline, closes / close / closing. */
-    private const DATE_TRIGGERS = ['\b(?:due(?!\s+to\b)|deadline)\b', '\bclos(?:es|e|ing)\b'];
+    /** @var string[] What introduces a due date: due (not "due to"), deadline, closes / closing (not the
+     *     verb "close": "Close 3 tabs before the quiz on March 14" is not a due date). */
+    private const DATE_TRIGGERS = ['\b(?:due(?!\s+to\b)|deadline)\b', '\bclos(?:es|ing)\b'];
 
     /** @var string What a learner might try to get round: Turnitin, a proctor, or a plagiarism, AI or similarity
      *     checker or detector. */
@@ -297,11 +346,28 @@ class answer_rules {
 
     /**
      * @var string A condition that follows a grant in the same clause ("...an extension on the essay only if your
-     *     instructor agrees"). A rule's `except` is checked only on the rest of the clause after its match, so words
-     *     like "don't worry" or "you won't lose marks" around a real grant do not cancel it. Refusals ("I cannot
-     *     grant", "we don't give") are excluded inside the grant pattern itself, where the negation governs the verb.
+     *     instructor agrees"), tied to the instructor or to approval: "only if needed" and "unless you'd prefer to sit
+     *     it" are not conditions on the grant, so those still block. A rule's `except` is checked only on the rest of
+     *     the clause after its match, so words like "don't worry" or "you won't lose marks" around a real grant do not
+     *     cancel it. Refusals ("I cannot grant", "we don't give") are excluded inside the grant pattern itself, where
+     *     the negation governs the verb.
      */
-    private const CONDITION_AFTER = '\b(?:only\s+if|unless|provided\s+(?:that\s+)?your|as\s+long\s+as\s+your\s+instructor)\b';
+    private const CONDITION_AFTER = '\b(?:only\s+if\s+(?:your\s+|the\s+)?' . self::APPROVER
+        . '|(?:if|provided(?:\s+that)?|as\s+long\s+as)\s+(?:your|the)\s+' . self::TEACHER
+        . '\s+(?:agrees?|approves?|allows?|says|confirms?|is\s+ok|signs)|unless\s+(?:your\s+|the\s+)?' . self::TEACHER
+        . ')\b';
+
+    /** @var string Who can grant an extension. */
+    private const TEACHER = '(?:instructor|teacher|professor|tutor|course\s+team)';
+
+    /** @var string The same people, or the word "approved" ("only if approved"). */
+    private const APPROVER = '(?:instructor|teacher|professor|tutor|course\s+team|approved)';
+
+    /** @var string The rest of a granted extension after the verb: "... (you a 3-day) extension on (your) ...". */
+    private const EXTENSION_GAP = '\s+(?:\S+\s+){0,3}extension\s+(?:on|for|to)\s+(?:\S+\s+){0,3}?';
+
+    /** @var string[] What the extension is on, in four groups so that every pattern stays within PATTERN_MAX_LENGTH. */
+    private const EXTENSION_WORK = ['deadline|due\s+date', 'assignment|essay', 'exam|quiz|test', 'paper|project'];
 
     /** @var string The category the existing runtime validators' rules carry (validator.<name>). Not an admin choice,
      *     so not in CATEGORIES; consumers must accept it. safe_message() gives it the general text. */
@@ -322,6 +388,17 @@ class answer_rules {
             }
         }
         return $out;
+    }
+
+    /**
+     * A granting lead-in ("I've granted", "I'm giving") completed with the extension and each group of work nouns.
+     *
+     * @param string $lead the subject and verb
+     * @return string[] one pattern per EXTENSION_WORK group
+     */
+    private static function extension_patterns(string $lead): array {
+        return array_map(static fn(string $work): string => $lead . self::EXTENSION_GAP . '(?:' . $work . ')',
+            self::EXTENSION_WORK);
     }
 
     /**
@@ -370,15 +447,31 @@ class answer_rules {
                 ]],
             // A granted extension on a piece of work. Block: only the instructor can grant one, and a learner who
             // believes SOLA may miss the real deadline. Needs a granting frame AND a deadline or piece of work, so
-            // "a file extension list" and "a field extension" do not match.
+            // "a file extension list" and "a field extension" do not match. The first pattern is built once per group
+            // of work nouns (extension_patterns()) to stay within the length cap.
             ['id' => 'deadlines.extension_granted', 'category' => 'deadlines', 'kind' => 'pattern',
-                'applies_to' => 'reply', 'action' => 'block', 'except' => self::CONDITION_AFTER, 'values' => [
-                    "\\b(?:i|we)(?:'ve|'ll|\\s+(?:have|will|just|can))?\\s+(?:grant|giv|approv)\\w*\\s+(?:\\S+\\s+){0,3}"
-                        . 'extension\s+(?:on|for|to)\s+'
-                        . '(?:\S+\s+){0,3}?(?:deadline|assignment|essay|exam|quiz|test|paper|due\s+date)',
+                'applies_to' => 'reply', 'action' => 'block', 'except' => self::CONDITION_AFTER, 'values' => array_merge(
+                    self::extension_patterns("\\b(?:i|we)(?:'ve|'ll|\\s+(?:have|will|just|can))?\\s+(?:grant|giv|approv)\\w*"), [
                     '\byour\s+extension\s+(?:request\s+)?(?:is|has\s+been|was)\s+(?:approved|granted|confirmed)\b',
                     "\\b(?:i|we)(?:'ve|\\s+have)\\s+extended\\s+(?:your|the)\\s+(?:[\\w-]+\\s+){0,2}(?:deadline|due\\s+date)",
-                ]],
+                ])],
+            // The same grant in the wordings the rule above leaves out, as a second rule because each pattern is
+            // capped at PATTERN_MAX_LENGTH: the progressive ("I'm granting you...", "we are giving you...", "I'm
+            // extending your deadline") and an adverb between the subject and the verb ("I'll gladly give", "I hereby
+            // grant", "I've just granted", "I've gone ahead and granted", "I have already granted"). Block, for the
+            // same reason. A negation is not one of the listed words, so "I'm not granting...", "I am not able to
+            // grant..." and "I'd happily give you one, but I can't" do not match.
+            ['id' => 'deadlines.extension_granted_progressive', 'category' => 'deadlines', 'kind' => 'pattern',
+                'applies_to' => 'reply', 'action' => 'block', 'except' => self::CONDITION_AFTER, 'values' => array_merge(
+                    self::extension_patterns("\\b(?:i'm|we're|i\\s+am|we\\s+are)(?:\\s+(?:now|gladly|happily))?\\s+"
+                        . '(?:grant|giv|approv)ing'),
+                    self::extension_patterns("\\b(?:i|we)(?:'ve|'ll)?(?:\\s+(?:have|will|can|gladly|happily|hereby|now|already|"
+                        . 'just))+\s+(?:grant|giv|approv)\w*'),
+                    self::extension_patterns("\\b(?:i|we)(?:'ve|\\s+have)?\\s+(?:gone|went)\\s+ahead\\s+and\\s+"
+                        . '(?:grant|g[ai]v|approv)\w*'),
+                    ["\\b(?:i'm|we're|i\\s+am|we\\s+are)\\s+extending\\s+(?:your|the)\\s+(?:[\\w-]+\\s+){0,2}"
+                        . '(?:deadline|due\s+date)']
+                )],
             // A due date the retrieved course text does not contain. Warn: it may be right, but an invented date
             // costs marks. "Due to" is not a due date.
             ['id' => 'deadlines.invented_date', 'category' => 'deadlines', 'kind' => 'pattern', 'applies_to' => 'reply',
