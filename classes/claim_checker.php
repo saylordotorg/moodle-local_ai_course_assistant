@@ -30,9 +30,11 @@ use local_ai_course_assistant\provider\base_provider;
  * Claim statuses: supported (by the retrieved course text), not_in_course (true but not in the course text: a
  * content-gap signal only), contradicted (contradicted by the course text, or likely false), uncheckable (no course
  * text was readable, and the claim is not likely false). Verdict status: needs_review when a claim is contradicted
- * or the judge flags the question as possible distress or crisis (rule WELLBEING_MODEL_RULE, when the original row's
- * rules did not already catch it), ok otherwise, check_failed for any failure (provider error, malformed reply, spend
- * cap), with no claims.
+ * or the judge flags the question as possible distress or crisis (rule WELLBEING_MODEL_RULE, unless the original
+ * row recorded a `wellbeing.` rule firing, in any mode), ok otherwise, check_failed for any failure (provider error,
+ * malformed reply, the course at its chat spend cap), with no claims. A check_failed verdict carries one rule whose id
+ * starts with FAILED_RULE_PREFIX (`claim_check.`) saying why; it is a check outcome, not a content rule, so review
+ * queues and exports filter on that prefix (status check_failed also identifies these rows).
  *
  * No-op: an answer row that is redacted (the learner cleared the chat or was erased), or whose message or
  * conversation is gone, is skipped before the provider is called: no verdict, no text, no spend.
@@ -65,14 +67,17 @@ class claim_checker {
     /** @var string The rule id of a question the judge flags as possible distress or crisis. */
     public const WELLBEING_MODEL_RULE = 'wellbeing.model_flag';
 
+    /** @var string Prefix of every rule id a check_failed verdict carries (a failure reason, not a content rule). */
+    public const FAILED_RULE_PREFIX = 'claim_check.';
+
     /** @var string Rule id on a check_failed verdict: the course is at its chat spend cap. */
-    public const FAILED_SPEND = 'claim_check.spend';
+    public const FAILED_SPEND = self::FAILED_RULE_PREFIX . 'spend';
 
     /** @var string Rule id on a check_failed verdict: the provider failed. */
-    public const FAILED_ERROR = 'claim_check.error';
+    public const FAILED_ERROR = self::FAILED_RULE_PREFIX . 'error';
 
     /** @var string Rule id on a check_failed verdict: the judge's reply was not the schema. */
-    public const FAILED_MALFORMED = 'claim_check.malformed';
+    public const FAILED_MALFORMED = self::FAILED_RULE_PREFIX . 'malformed';
 
     /** @var string audit_logger action for a claim check that could not be queued. */
     public const QUEUE_FAILED_ACTION = 'answer_check_queue_failed';
@@ -317,6 +322,8 @@ class claim_checker {
             );
             // Logged right after the call, ahead of every early return: an unusable reply still cost money.
             // The type is a literal on purpose: spend_predicate_coverage_test reads it from the call.
+            // Accepted: if the learner cleared the chat during the call, this ledger row recreates an empty
+            // conversation holding only the marker (no learner text), as the mastery classifier's row does.
             conversation_manager::log_ancillary_usage($provider, $userid, $courseid, 'answer_check',
                 '[Answer check] claims judged');
             $usage = $provider->get_last_token_usage();
@@ -361,6 +368,9 @@ class claim_checker {
                 // No course text to check against: only "likely false" is a judgement the model can make.
                 $status = $status === 'contradicted' ? 'contradicted' : 'uncheckable';
                 $evidence = 0;
+            } else if ($status === 'uncheckable') {
+                // Passages were given, so the claim was checkable: not stated in them, and not likely false.
+                $status = 'not_in_course';
             } else if ($status === 'supported' && $evidence === 0) {
                 // Supported needs a passage; without one the claim is at best not in the course.
                 $status = 'not_in_course';
@@ -411,19 +421,17 @@ class claim_checker {
     }
 
     /**
-     * Whether the chat path already caught this question as wellbeing (its categories or its rules fired).
+     * Whether the chat path already recorded a wellbeing rule firing for this answer (any rule id starting
+     * `wellbeing.`, in any mode). A matched wellbeing CATEGORY alone does not count: in watch mode nothing is blocked,
+     * so the model flag is then the only signal a person sees.
      *
      * @param \stdClass $row the answer row
      * @return bool
      */
     private static function wellbeing_caught(\stdClass $row): bool {
-        $categories = json_decode((string) $row->categories, true);
-        if (is_array($categories) && in_array('wellbeing', $categories, true)) {
-            return true;
-        }
         $rules = json_decode((string) $row->rules, true);
         foreach (is_array($rules) ? $rules : [] as $rule) {
-            if (is_array($rule) && ($rule['id'] ?? null) === answer_rules::WELLBEING_RULE) {
+            if (is_array($rule) && is_string($rule['id'] ?? null) && str_starts_with($rule['id'], 'wellbeing.')) {
                 return true;
             }
         }
@@ -431,7 +439,8 @@ class claim_checker {
     }
 
     /**
-     * The chat spend check for the judge call: only at CAP_OK (Global Constraints: no check runs above it).
+     * The chat spend check for the judge call: skipped only at CAP_BLOCKED (R15, as answer_flow::retry_affordable();
+     * the 80% and 95% levels are warnings, still under cap, and the check keeps running while the tutor answers).
      *
      * @param int $courseid
      * @return bool
@@ -440,7 +449,7 @@ class claim_checker {
         try {
             $level = self::$spendcheck ? (string) (self::$spendcheck)($courseid)
                 : spend_guard::check($courseid, 'chat', false);
-            return $level === spend_guard::CAP_OK;
+            return $level !== spend_guard::CAP_BLOCKED;
         } catch (\Throwable $e) {
             return false;
         }
@@ -617,7 +626,8 @@ class claim_checker {
     }
 
     /**
-     * One data block. Marker characters inside the data are removed so it can't close its own block.
+     * One data block. Every run of two or more '<' or '>' characters (mixed too) is removed from the data, so no
+     * sequence of removals can leave a marker that closes its own block.
      *
      * @param string $label
      * @param string $text
@@ -625,7 +635,7 @@ class claim_checker {
      * @return string
      */
     private static function block(string $label, string $text, int $max): string {
-        $text = str_replace(['<<<', '>>>'], ['', ''], \core_text::substr($text, 0, $max));
+        $text = preg_replace('/[<>]{2,}/', '', \core_text::substr($text, 0, $max)) ?? '';
         return "<<<BEGIN {$label}>>>\n{$text}\n<<<END {$label}>>>\n\n";
     }
 
