@@ -87,13 +87,19 @@ class answer_safety_eval {
 
     /**
      * Why these options cannot run, or null when they can. A real provider (and anything that chooses one) needs
-     * the explicit 'real' flag.
+     * the explicit 'real' flag, and with it judge-provider and judge-model are given both or neither.
      *
      * @param array $options CLI options: real (bool), judge-provider, judge-model, courseid
      * @return string|null
      */
     public static function check_options(array $options): ?string {
         if (!empty($options['real'])) {
+            $provider = trim((string) ($options['judge-provider'] ?? ''));
+            $model = trim((string) ($options['judge-model'] ?? ''));
+            if (($provider === '') !== ($model === '')) {
+                return '--judge-provider and --judge-model go together: give both, or neither to use the site\'s '
+                    . 'claim check provider.';
+            }
             return null;
         }
         foreach (self::REAL_ONLY_OPTIONS as $name) {
@@ -148,7 +154,7 @@ class answer_safety_eval {
 
         $report = ['answers' => 0, 'good' => 0, 'bad' => 0, 'categories' => [],
             'rules' => ['mode' => 'enforce', 'false_alarms' => 0, 'false_alarm_ids' => [], 'good_blocked' => 0,
-                'misses' => 0, 'miss_ids' => [], 'mismatches' => 0, 'mismatch_ids' => [], 'errors' => 0,
+                'known_limit_ids' => [], 'misses' => 0, 'miss_ids' => [], 'mismatches' => 0, 'mismatch_ids' => [], 'errors' => 0,
                 'false_alarm_rate' => null, 'latency_ms' => null],
             'judge' => ['stub' => $stub, 'called' => $calljudge, 'calls' => 0, 'failed' => 0, 'model' => null,
                 'false_alarms' => 0, 'false_alarm_ids' => [], 'flagged_bad' => 0, 'false_alarm_rate' => null,
@@ -186,6 +192,9 @@ class answer_safety_eval {
             if ($good && $action !== 'none') {
                 $report['rules']['false_alarms']++;
                 $report['rules']['false_alarm_ids'][] = (string) $f['id'];
+                if (isset($f['known_limit'])) {
+                    $report['rules']['known_limit_ids'][] = (string) $f['id'];
+                }
                 if ($action === 'block') {
                     $report['rules']['good_blocked']++;
                 }
@@ -298,6 +307,10 @@ class answer_safety_eval {
         if ($r['false_alarm_ids']) {
             $lines[] = '    flagged: ' . implode(', ', $r['false_alarm_ids']);
         }
+        if ($r['known_limit_ids']) {
+            $lines[] = sprintf('    %d of these are a known limit (marked known_limit in the fixtures, not fixed yet)',
+                count($r['known_limit_ids']));
+        }
         $lines[] = sprintf('  Missed bad answers: %d of %d', $r['misses'], $report['bad']);
         if ($r['miss_ids']) {
             $lines[] = '    missed: ' . implode(', ', $r['miss_ids']);
@@ -335,6 +348,10 @@ class answer_safety_eval {
             $lines[] = sprintf('  Cost per 1,000 answers checked%s: $%.4f (total for this run $%.6f)',
                 $j['stub'] ? ' (estimate at ' . $j['model'] . ' list price)' : '', $j['cost_per_1000'],
                 $j['cost_total']);
+        }
+        if (!$j['stub']) {
+            $lines[] = '  Note: the cost excludes failed calls (check_failed). A judge false alarm is a known-good '
+                . 'fixture (expect none) that the judge marked needs_review.';
         }
         if ($j['stub']) {
             $lines[] = '  Note: fixture answers and passages are short; a real answer with up to 8 retrieved passages '

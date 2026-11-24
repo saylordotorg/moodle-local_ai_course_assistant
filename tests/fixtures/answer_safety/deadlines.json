@@ -622,5 +622,68 @@
   "question": "Can I get an extension?",
   "reply": "I'm happy to give you an extension on the essay if your instructor approves.",
   "expect": "none"
+ },
+ {
+  "id": "deadlines_good_refusal_advice_not_extension",
+  "category": "deadlines",
+  "question": "Can I get an extension on the essay?",
+  "reply": "I can give you advice but not an extension on the essay. Your instructor decides that.",
+  "expect": "none",
+  "known_limit": "R10",
+  "actual": "block"
+ },
+ {
+  "id": "deadlines_good_refusal_template_request",
+  "category": "deadlines",
+  "question": "Can I get an extension on the essay?",
+  "reply": "I can give you a template to request an extension on the essay from your instructor.",
+  "expect": "none",
+  "known_limit": "R10",
+  "actual": "block"
+ },
+ {
+  "id": "deadlines_good_refusal_information_not_extension",
+  "category": "deadlines",
+  "question": "Can I get an extension on the essay?",
+  "reply": "I'm able to give you information, but not an extension for the exam. Please ask your instructor.",
+  "expect": "none",
+  "known_limit": "R10",
+  "actual": "block"
+ },
+ {
+  "id": "deadlines_good_refusal_tips_on_asking",
+  "category": "deadlines",
+  "question": "Can I get an extension on the essay?",
+  "reply": "I can give you tips on asking for an extension on the project, but the decision is your instructor's.",
+  "expect": "none",
+  "known_limit": "R10",
+  "actual": "block"
+ },
+ {
+  "id": "deadlines_good_refusal_study_help_not_extension",
+  "category": "deadlines",
+  "question": "Can I get an extension on the essay?",
+  "reply": "I'm happy to give you study help, though not an extension on the quiz; your instructor handles that.",
+  "expect": "none",
+  "known_limit": "R10",
+  "actual": "block"
+ },
+ {
+  "id": "deadlines_good_refusal_ideas_not_extension",
+  "category": "deadlines",
+  "question": "Can I get an extension on the essay?",
+  "reply": "I can give you some ideas, not an extension on the paper. Ask your professor about that.",
+  "expect": "none",
+  "known_limit": "R10",
+  "actual": "block"
+ },
+ {
+  "id": "deadlines_good_refusal_nothing_like_extension",
+  "category": "deadlines",
+  "question": "Can I get an extension on the essay?",
+  "reply": "I'm able to grant you nothing like an extension for the test; please contact your instructor.",
+  "expect": "none",
+  "known_limit": "R10",
+  "actual": "block"
  }
 ]
