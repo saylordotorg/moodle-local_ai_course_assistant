@@ -29,6 +29,9 @@ class answer_audit_test_lock_factory extends \core\lock\db_record_lock_factory {
     /** @var array[] each get_lock call as [type, resource] */
     public static array $calls = [];
 
+    /** @var \Closure|null run once at the next get_lock call, before locking (a seam for race tests) */
+    public static ?\Closure $onlock = null;
+
     /** @var string the factory type */
     private string $locktype;
 
@@ -52,6 +55,11 @@ class answer_audit_test_lock_factory extends \core\lock\db_record_lock_factory {
      */
     public function get_lock($resource, $timeout, $maxlifetime = 86400) {
         self::$calls[] = [$this->locktype, $resource];
+        if (self::$onlock) {
+            $run = self::$onlock;
+            self::$onlock = null;
+            $run();
+        }
         return parent::get_lock($resource, $timeout, $maxlifetime);
     }
 }
@@ -75,6 +83,7 @@ final class answer_audit_test extends \advanced_testcase {
         parent::setUp();
         $this->resetAfterTest();
         answer_audit_test_lock_factory::$calls = [];
+        answer_audit_test_lock_factory::$onlock = null;
     }
 
     protected function tearDown(): void {
@@ -437,6 +446,93 @@ final class answer_audit_test extends \advanced_testcase {
         $this->assertEquals(1, $ra->redacted);
         $this->assertTrue(answer_audit::verify_chain((int) $course->id)['ok']);
         $this->assertNotNull($DB->get_field(self::TABLE, 'answer', ['id' => $b]), 'another course is untouched');
+    }
+
+    public function test_verdict_written_while_its_answer_is_redacted_keeps_no_text(): void {
+        global $CFG, $DB;
+        $CFG->lock_factory = '\\' . answer_audit_test_lock_factory::class;
+        $a = answer_audit::record($this->row(7, ['conversationid' => 11]));
+
+        // The judge has read the answer row (not redacted) and is about to insert its verdict when the learner
+        // clears the conversation: the seam runs the redaction between append_verdict's check and its insert.
+        answer_audit_test_lock_factory::$onlock = function() {
+            answer_audit::redact_for_conversation(11);
+        };
+        $vid = answer_audit::append_verdict($a, [
+            'status' => 'needs_review', 'severity' => 'high',
+            'claims' => [['text' => 'The exam is on 3 March.', 'type' => 'date', 'status' => 'contradicted',
+                'evidence_ref' => 'chunk:7', 'severity' => 'high']],
+            'judge_model' => 'gpt-4o-mini', 'judge_cost' => 0.001,
+        ]);
+        $this->assertNull(answer_audit_test_lock_factory::$onlock, 'the seam must have run');
+
+        $this->assertEquals(1, $DB->get_field(self::TABLE, 'redacted', ['id' => $a]));
+        $v = $DB->get_record(self::TABLE, ['id' => $vid]);
+        $this->assertEquals(1, $v->redacted, 'the verdict must end redacted');
+        $this->assertStringNotContainsString('3 March', $v->claims);
+        $claims = json_decode($v->claims, true);
+        $this->assertArrayNotHasKey('text', $claims[0]);
+        $this->assertSame('contradicted', $claims[0]['status']);
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain(7));
+    }
+
+    public function test_secret_names_are_refused_and_ordinary_names_are_not(): void {
+        global $DB;
+        // Names a validator, category or citation may well use.
+        $id = answer_audit::record($this->row(7, [
+            'validators' => ['prompt_injection' => 'pass', 'tokens_used' => 812, 'keywords' => ['exam'],
+                'key_terms' => ['deadline'], 'monkey' => 1, 'nested' => ['prompt_injection' => ['score' => 0.1]]],
+            'categories' => ['prompt_injection', ['keywords' => ['grade']]],
+            'citations' => [['tokens_used' => 3, 'ref' => 'activity:42']],
+        ]));
+        $rec = $DB->get_record(self::TABLE, ['id' => $id]);
+        $this->assertSame('pass', json_decode($rec->validators, true)['prompt_injection']);
+
+        foreach (['apikey', 'api_key', 'API-Key', 'secret', 'client_secret', 'password', 'system_prompt',
+                'systemprompt', 'access_token', 'token', 'private_key', 'authorization'] as $name) {
+            foreach ([
+                'validators' => ['grounding' => ['deep' => [$name => 'x']]],
+                'citations' => [[$name => 'x']],
+                'categories' => [['deep' => [$name => 'x']]],
+            ] as $field => $value) {
+                try {
+                    answer_audit::record($this->row(7, [$field => $value]));
+                    $this->fail("'$name' nested in $field must be refused");
+                } catch (\coding_exception $e) {
+                    $this->assertStringContainsString($name, $e->getMessage());
+                }
+            }
+        }
+        $this->assertSame(1, $DB->count_records(self::TABLE));
+    }
+
+    public function test_invalid_utf8_still_writes_a_row_with_a_verifiable_chain(): void {
+        global $DB;
+        $id = answer_audit::record($this->row(7, [
+            'question' => "Bad bytes \xFF\xFE here",
+            'answer' => "Half a character \xC3\x28 and a valid caf\u{00E9}",
+            'validators' => ["k\xFFey" => "v\xC3"],
+        ]));
+        $rec = $DB->get_record(self::TABLE, ['id' => $id]);
+        $this->assertTrue(mb_check_encoding($rec->question, 'UTF-8'));
+        $this->assertTrue(mb_check_encoding($rec->answer, 'UTF-8'));
+        $this->assertStringContainsString("\u{FFFD}", $rec->question);
+        $this->assertStringContainsString("caf\u{00E9}", $rec->answer);
+        $this->assertSame(answer_audit::compute_texthash($rec->question, $rec->answer, $rec->claims), $rec->texthash);
+
+        $vid = answer_audit::append_verdict($id, ['status' => 'ok',
+            'claims' => [['text' => "claim \xE2\x82", 'type' => 'fact', 'status' => 'supported']]]);
+        $v = $DB->get_record(self::TABLE, ['id' => $vid]);
+        $this->assertTrue(mb_check_encoding($v->claims, 'UTF-8'));
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain(7));
+
+        answer_audit::redact_for_course(7);
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain(7));
+    }
+
+    public function test_the_lock_wait_is_short(): void {
+        $this->assertLessThanOrEqual(5, answer_audit::LOCK_WAIT_SECONDS);
+        $this->assertSame(answer_audit::LOCK_WAIT_SECONDS, answer_audit::$locktimeout);
     }
 
     public function test_rows_for_export_filters_and_decodes(): void {

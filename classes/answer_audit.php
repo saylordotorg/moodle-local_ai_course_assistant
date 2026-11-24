@@ -32,6 +32,17 @@ namespace local_ai_course_assistant;
  * Nothing key-like is ever stored: every field is on an allowlist, and a row or verdict carrying a field named
  * like a key, secret, token, password or prompt (at any depth) is refused with a coding_exception.
  *
+ * Failure: record() and append_verdict() can throw (a refused field is a coding_exception, a busy course lock is
+ * moodle_exception 'locktimeout' after LOCK_WAIT_SECONDS, and the database can fail). The audit must never cost the
+ * learner an answer, so callers MUST wrap both in try/catch on \Throwable and carry on (Task 3: record the failure,
+ * deliver the answer). Text that is not valid UTF-8 is not a failure: it is scrubbed (invalid bytes become U+FFFD)
+ * before it is hashed and stored, so the row is still written and its chain still verifies.
+ *
+ * Erasure and verdicts: a verdict row carries its answer row's messageid, conversationid, userid and courseid, so
+ * every redact_for_*() path reaches it. append_verdict() re-reads the answer row AFTER inserting the verdict and
+ * redacts the verdict if the answer was redacted in the meantime; a redaction that runs after that re-read finds
+ * the verdict by those same identifiers. Either way no claim text outlives its answer.
+ *
  * Known limits: the chain proves rows were not edited, reordered or removed from the middle; it cannot prove the
  * newest rows were not removed (no external anchor). Redaction is not itself tamper-evident (it is the permitted
  * change). A caller inside an open delegated transaction holds the lock only until record() returns, not until
@@ -49,8 +60,11 @@ class answer_audit {
     /** @var string The \core\lock factory type. */
     public const LOCK_TYPE = 'local_ai_course_assistant_answer_audit';
 
-    /** @var int Seconds record() waits for the course lock by default. */
-    public const DEFAULT_LOCK_TIMEOUT = 10;
+    /** @var int Seconds record() waits for the course lock. Short: it runs in the learner's request path. */
+    public const LOCK_WAIT_SECONDS = 3;
+
+    /** @var int Kept for the tests' reset; the same as LOCK_WAIT_SECONDS. */
+    public const DEFAULT_LOCK_TIMEOUT = self::LOCK_WAIT_SECONDS;
 
     /** @var int Seconds record() waits for the course lock (tests lower it). */
     public static int $locktimeout = self::DEFAULT_LOCK_TIMEOUT;
@@ -75,7 +89,9 @@ class answer_audit {
     private const CLAIM_KEYS = ['text', 'type', 'status', 'evidence_ref', 'severity'];
 
     /** @var string A field name that may carry a credential or prompt text. */
-    private const FORBIDDEN_NAME = '/key|secret|token|passw|prompt|credential|bearer|authori[sz]ation/i';
+    private const FORBIDDEN_NAME = '/^(key|keys|token|tokens|prompt|auth|pass|pwd)$'
+        . '|api[_-]?key|private[_-]?key|secret|passw|(access|refresh|id|auth|bearer|session)[_-]?token'
+        . '|system[_-]?prompt|full[_-]?prompt|credential|bearer|authori[sz]ation/i';
 
     /** @var string[] Fields covered by rowhash, in a fixed order. Text is covered through texthash only. */
     private const HASHED_FIELDS = ['kind', 'supersedes', 'messageid', 'conversationid', 'userid', 'courseid', 'cmid',
@@ -104,6 +120,7 @@ class answer_audit {
             throw new \coding_exception('answer_audit: a row needs a userid and a courseid');
         }
 
+        $row = self::scrub_utf8($row);
         $rec = (object) [
             'kind' => 'answer',
             'supersedes' => null,
@@ -150,6 +167,7 @@ class answer_audit {
         if (!in_array($status, self::STATUSES, true)) {
             throw new \coding_exception('answer_audit: verdict status must be one of ' . implode(', ', self::STATUSES));
         }
+        $verdict = self::scrub_utf8($verdict);
         $claims = self::checked_list($verdict['claims'] ?? null, self::CLAIM_KEYS, 'claims');
 
         $original = $DB->get_record(self::TABLE, ['id' => $auditid], '*', MUST_EXIST);
@@ -187,7 +205,15 @@ class answer_audit {
             $rec->redacted = 1;
             $rec->timeredacted = time();
         }
-        return self::insert_chained($rec);
+        $id = self::insert_chained($rec);
+
+        // The answer may have been redacted between the read above and the insert (the learner cleared the
+        // conversation while the judge ran). Check again now that the verdict exists: any redaction from here on
+        // finds the verdict through the identifiers it shares with its answer.
+        if (empty($rec->redacted) && !empty($DB->get_field(self::TABLE, 'redacted', ['id' => $original->id]))) {
+            self::redact_where('id = ?', [$id]);
+        }
+        return $id;
     }
 
     /**
@@ -318,23 +344,26 @@ class answer_audit {
 
         $out = [];
         $rs = $DB->get_recordset_select(self::TABLE, implode(' AND ', $where), $params, 'id ASC', '*', 0, $limit);
-        foreach ($rs as $rec) {
-            $row = [];
-            foreach ((array) $rec as $field => $value) {
-                if (in_array($field, ['chunks', 'citations', 'categories', 'rules', 'validators', 'claims'], true)) {
-                    $row[$field] = $value === null ? null : json_decode($value, true);
-                } else if (in_array($field, ['id', 'supersedes', 'messageid', 'conversationid', 'userid', 'courseid',
-                        'cmid', 'redacted', 'timeredacted', 'timecreated'], true)) {
-                    $row[$field] = $value === null ? null : (int) $value;
-                } else if ($field === 'judge_cost') {
-                    $row[$field] = $value === null ? null : (float) $value;
-                } else {
-                    $row[$field] = $value;
+        try {
+            foreach ($rs as $rec) {
+                $row = [];
+                foreach ((array) $rec as $field => $value) {
+                    if (in_array($field, ['chunks', 'citations', 'categories', 'rules', 'validators', 'claims'], true)) {
+                        $row[$field] = $value === null ? null : json_decode($value, true);
+                    } else if (in_array($field, ['id', 'supersedes', 'messageid', 'conversationid', 'userid',
+                            'courseid', 'cmid', 'redacted', 'timeredacted', 'timecreated'], true)) {
+                        $row[$field] = $value === null ? null : (int) $value;
+                    } else if ($field === 'judge_cost') {
+                        $row[$field] = $value === null ? null : (float) $value;
+                    } else {
+                        $row[$field] = $value;
+                    }
                 }
+                $out[] = $row;
             }
-            $out[] = $row;
+        } finally {
+            $rs->close();
         }
-        $rs->close();
         return $out;
     }
 
@@ -410,6 +439,7 @@ class answer_audit {
         $rec->timeredacted = $rec->timeredacted ?? null;
 
         $factory = \core\lock\lock_config::get_lock_factory(self::LOCK_TYPE);
+        // The lock factory and resource are fixed; only the wait is adjustable (tests shorten it).
         $lock = $factory->get_lock(self::lock_resource($rec->courseid), self::$locktimeout);
         if (!$lock) {
             throw new \moodle_exception('locktimeout');
@@ -437,18 +467,21 @@ class answer_audit {
         $count = 0;
         $now = time();
         $rs = $DB->get_recordset_select(self::TABLE, "redacted = 0 AND $select", $params, 'id ASC', 'id, claims');
-        foreach ($rs as $rec) {
-            $DB->update_record(self::TABLE, (object) [
-                'id' => $rec->id,
-                'question' => null,
-                'answer' => null,
-                'claims' => self::strip_claim_text($rec->claims),
-                'redacted' => 1,
-                'timeredacted' => $now,
-            ]);
-            $count++;
+        try {
+            foreach ($rs as $rec) {
+                $DB->update_record(self::TABLE, (object) [
+                    'id' => $rec->id,
+                    'question' => null,
+                    'answer' => null,
+                    'claims' => self::strip_claim_text($rec->claims),
+                    'redacted' => 1,
+                    'timeredacted' => $now,
+                ]);
+                $count++;
+            }
+        } finally {
+            $rs->close();
         }
-        $rs->close();
         return $count;
     }
 
@@ -530,7 +563,48 @@ class answer_audit {
      */
     private static function canonical_json($value): string {
         return json_encode(self::sort_keys($value), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-            | JSON_PRESERVE_ZERO_FRACTION | JSON_THROW_ON_ERROR);
+            | JSON_PRESERVE_ZERO_FRACTION | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * Replace invalid UTF-8 in every string (values and keys, at any depth) with U+FFFD.
+     *
+     * Done before anything is hashed or stored, so the stored text is exactly the hashed text.
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    private static function scrub_utf8($value) {
+        if (is_string($value)) {
+            return mb_check_encoding($value, 'UTF-8') ? $value : self::utf8_substitute($value);
+        }
+        if (is_object($value)) {
+            $value = (array) $value;
+        }
+        if (!is_array($value)) {
+            return $value;
+        }
+        $out = [];
+        foreach ($value as $k => $v) {
+            $out[is_string($k) ? self::scrub_utf8($k) : $k] = self::scrub_utf8($v);
+        }
+        return $out;
+    }
+
+    /**
+     * A string's invalid UTF-8 bytes replaced with U+FFFD.
+     *
+     * @param string $value
+     * @return string
+     */
+    private static function utf8_substitute(string $value): string {
+        $prev = mb_substitute_character();
+        mb_substitute_character(0xFFFD);
+        try {
+            return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+        } finally {
+            mb_substitute_character($prev);
+        }
     }
 
     /**
