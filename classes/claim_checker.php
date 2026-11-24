@@ -25,7 +25,8 @@ use local_ai_course_assistant\provider\base_provider;
  * task\check_answer_claims per sampled answer (custom data is only the audit id). check() runs in that task:
  * it reads the answer row, re-reads the text of the retrieved chunks by id (`chunk:<id>` refs; `sha1:` refs are
  * merged parent passages with no single row and are skipped), asks a judge model through judge(), and appends ONE
- * verdict row with answer_audit::append_verdict(). Nothing the learner saw is ever changed here.
+ * verdict row with answer_audit::append_verdict(). Nothing the learner saw is ever changed here; in enforce mode a
+ * claim contradicted at high severity also gets the learner a NEW correction message (correction_notice).
  *
  * Claim statuses: supported (by the retrieved course text), not_in_course (true but not in the course text: a
  * content-gap signal only), contradicted (contradicted by the course text, or likely false), uncheckable (no course
@@ -292,6 +293,16 @@ class claim_checker {
             $verdict['rules'] = $rules;
         }
         $id = answer_audit::append_verdict($auditid, $verdict);
+        // 8.4.0 (Task 7): a claim contradicted at high severity gets the learner a correction message, in enforce
+        // mode only; correction_notice decides the rest. send_safely() never throws, and the try is a second guard:
+        // nothing about a correction may fail the check or make Moodle retry the task (a retry bills the judge).
+        if (correction_notice::wanted($verdict['claims'])) {
+            try {
+                correction_notice::send_safely($id, (int) $row->userid, $courseid);
+            } catch (\Throwable $e) {
+                debugging('claim_checker: correction not sent: ' . get_class($e), DEBUG_DEVELOPER);
+            }
+        }
         return ['done' => true, 'reason' => $judged['status'] === 'check_failed' ? (string) ($judged['reason'] ?? 'error')
             : 'checked', 'verdictid' => $id, 'status' => $verdict['status']];
     }

@@ -104,12 +104,26 @@ class history_selector {
 
         $scored = [];
         foreach ($candidates as $i => $p) {
-            $vec = $vecs[$i] ?? [];
-            $score = (!empty($vec) && !empty($p['user'])) ? self::cosine($queryvec, $vec) : 0.0;
-            $scored[] = ['pair' => $p, 'score' => $score];
+            $scored[] = ['pair' => $p, 'score' => self::pair_score($p, $queryvec, $vecs[$i] ?? [])];
         }
 
         return self::flatten(self::pick($scored, $maxpairs, $minscore));
+    }
+
+    /**
+     * How relevant one pair is to the query. A correction (8.4.0, correction_notice) has no user turn to score and
+     * always counts as fully relevant, so the tutor keeps knowing it corrected itself.
+     *
+     * @param array $pair from pair_messages()
+     * @param float[] $queryvec
+     * @param float[] $vec the pair's user-turn embedding
+     * @return float
+     */
+    public static function pair_score(array $pair, array $queryvec, array $vec): float {
+        if (!empty($pair['correction'])) {
+            return 1.0;
+        }
+        return (!empty($vec) && !empty($pair['user'])) ? self::cosine($queryvec, $vec) : 0.0;
     }
 
     /**
@@ -151,7 +165,7 @@ class history_selector {
      * Group a flat message list into user/assistant pairs.
      *
      * @param array $messages Message records (->role, ->message) in chronological order.
-     * @return array[] Pairs ['user'=>?array, 'assistant'=>?array].
+     * @return array[] Pairs ['user'=>?array, 'assistant'=>?array], plus 'correction'=>true on a correction's own entry.
      */
     public static function pair_messages(array $messages): array {
         $pairs = [];
@@ -171,7 +185,11 @@ class history_selector {
             } else {
                 // Stray assistant (or other) message; keep as its own entry so
                 // nothing is silently dropped before scoring.
-                $pairs[] = ['user' => null, 'assistant' => ['role' => $m->role, 'content' => $m->message]];
+                $pair = ['user' => null, 'assistant' => ['role' => $m->role, 'content' => $m->message]];
+                if (($m->interaction_type ?? null) === correction_notice::INTERACTION_TYPE) {
+                    $pair['correction'] = true;
+                }
+                $pairs[] = $pair;
                 $i += 1;
             }
         }

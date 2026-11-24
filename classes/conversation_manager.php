@@ -195,11 +195,17 @@ class conversation_manager {
         // bounding conversation HISTORY must not be able to destroy the cost
         // ledger; the ledger is append-only here and ages out on its own
         // retention schedule.
-        $rolesql = "conversationid = ? AND role IN ('user', 'assistant')";
+        //
+        // 8.4.0: a correction (correction_notice, interaction type 'correction') is neither counted nor trimmed
+        // here: it goes only when its conversation is cleared, deleted or aged out. It is rate limited per learner,
+        // so this cannot grow without bound, and sse.php never takes the type from a request.
+        $rolesql = "conversationid = ? AND role IN ('user', 'assistant')"
+            . " AND (interaction_type IS NULL OR interaction_type <> ?)";
+        $roleparams = [$conversationid, correction_notice::INTERACTION_TYPE];
         $totalcount = $DB->count_records_select(
             'local_ai_course_assistant_msgs',
             $rolesql,
-            [$conversationid]
+            $roleparams
         );
         // v7.4.4 NOTE ON GROWTH: the role filter above means telemetry rows
         // (mastery_signal, student_profile, speech_score, objective_extract,
@@ -218,7 +224,7 @@ class conversation_manager {
             $oldest  = $DB->get_records_select(
                 'local_ai_course_assistant_msgs',
                 $rolesql,
-                [$conversationid],
+                $roleparams,
                 'timecreated ASC, id ASC',
                 'id',
                 0,

@@ -3742,7 +3742,7 @@ $string['answer_rules:safe_advice'] = 'I can\'t give personal medical, legal or 
 $string['answer_rules:safe_integrity'] = 'I can\'t help with that, because it would break academic integrity rules. I\'m glad to help you learn the material instead.';
 $string['answer_rules:safe_general'] = 'I can\'t give a reliable answer to that here. Please check with your instructor or student support.';
 $string['settings:answer_check_sample_percent_retrieved'] = 'Claim check: answers with course passages (%)';
-$string['settings:answer_check_sample_percent_retrieved_desc'] = 'When answer safety (Safety and privacy page) is Watch or Enforce, a background check splits each answer into its factual claims and asks a judge model whether the course passages retrieved for it support them, and whether each is true. It never changes what the learner saw; claims that look false are recorded for review. This is the share of answers that had course passages that are checked (0 to 100). Default 100.';
+$string['settings:answer_check_sample_percent_retrieved_desc'] = 'When answer safety (Safety and privacy page) is Watch or Enforce, a background check splits each answer into its factual claims and asks a judge model whether the course passages retrieved for it support them, and whether each is true. It never changes what the learner saw; claims that look false are recorded for review. In Enforce mode a false claim about a date, deadline, grade or policy also gets a short correction message in the learner\'s chat (at most one every 10 minutes per learner). This is the share of answers that had course passages that are checked (0 to 100). Default 100.';
 $string['settings:answer_check_sample_percent_general'] = 'Claim check: answers without course passages (%)';
 $string['settings:answer_check_sample_percent_general_desc'] = 'The share of answers with no course passages that are checked (0 to 100). These can only be judged true or likely false. Default 10.';
 $string['settings:answer_check_daily_cap'] = 'Claim check: daily limit';
@@ -3754,6 +3754,9 @@ $string['settings:answer_check_model_desc'] = 'Model for the judge, for example 
 $string['layout:answercheck'] = 'Answer safety claim check';
 $string['task:check_answer_claims'] = 'Check the factual claims of a chat answer';
 $string['token_analytics:cat_answer_check'] = 'Answer checks';
+$string['correction:lead'] = 'Correction to an earlier answer:';
+$string['correction:claim'] = 'I said "{$a}", and that may not be right.';
+$string['correction:nextstep'] = 'Please check this with your course materials or instructor.';
 
 // Settings save report and primary provider status check (v7.8.1).
 $string['savereport:summary'] = '{$a} AI Course Assistant settings changed in this save:';

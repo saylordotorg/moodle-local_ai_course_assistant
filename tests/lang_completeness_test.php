@@ -517,6 +517,11 @@ final class lang_completeness_test extends \basic_testcase {
         'layout:answercheck',
         'task:check_answer_claims',
         'token_analytics:cat_answer_check',
+        // 8.4.0: the correction message a learner gets after a severe false claim. English first, like the safe
+        // messages above.
+        'correction:lead',
+        'correction:claim',
+        'correction:nextstep',
     ];
 
     /**
