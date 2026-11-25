@@ -10,14 +10,16 @@
  *   1. voice.js, src AND build, loaded whole with a fake stream, a fake text-to-speech endpoint and a fake audio
  *      context: on replace the audio that is playing stops, the sentences still queued are dropped, the transcript
  *      callback gets the replacement text, the replacement is spoken exactly once, and a token that arrives after
- *      the replace is neither shown nor spoken;
+ *      the replace is neither shown nor spoken. Also when the replace lands while the first sentence's audio is
+ *      still being fetched, whether that fetch is aborted in time or had already answered: audio fetched for the
+ *      old answer is never played and never cuts the replacement short;
  *   2. the REAL replaceVoiceTranscript() lifted from amd/src/ui.js, run on a minimal DOM: it swaps the last
  *      assistant line as text (never HTML) and never touches the learner's own line;
  *   3. the REAL practice-scoring onReplace handler lifted from amd/src/chat.js;
  *   4. chat.js wires Voice's onReplace to the transcript, in source and in the built bundle (Moodle serves
  *      amd/build).
  *
- * A planted-defect run at the end removes each handler from a copy of the source and requires the checks to fail.
+ * A planted-defect run at the end breaks a copy of the source seven ways and requires the checks to fail each time.
  *
  * What it can't check: real audio, a real microphone, a real provider. The realtime voice modes (Gemini Live,
  * OpenAI and xAI realtime) and the talking avatar never pass through sse.php at all, so no rule sees them; that is
@@ -51,7 +53,8 @@ const settle = async() => {
 };
 
 // ---- voice.js with everything around it faked ------------------------------------------------------------------
-const makeVoice = (src) => {
+const makeVoice = (src, opts) => {
+    opts = opts || {};
     const env = {spoken: [], sources: [], aborted: 0, stream: null, streams: 0, timers: [], maxPlaying: 0};
     class FakeSource {
         constructor() {
@@ -100,7 +103,8 @@ const makeVoice = (src) => {
             return new FakeSource();
         }
         decodeAudioData(buffer, ok) {
-            ok({duration: 1});
+            // The fake "audio" is the sentence itself, so a source knows which text it plays.
+            ok({duration: 1, text: Buffer.from(new Uint8Array(buffer)).toString('latin1')});
         }
     }
     class FakeRec {
@@ -122,7 +126,7 @@ const makeVoice = (src) => {
     }
     const fetch = (url, opts) => new Promise((resolve, reject) => {
         const text = opts.body.fields.text;
-        if (opts.signal) {
+        if (opts.signal && !env.ignoreAbort) {
             opts.signal.addEventListener('abort', () => {
                 env.aborted += 1;
                 const e = new Error('aborted');
@@ -131,7 +135,12 @@ const makeVoice = (src) => {
             });
         }
         env.spoken.push(text);
-        setImmediate(() => resolve({json: () => Promise.resolve({audio: 'AAAA'})}));
+        const answer = () => resolve({json: () => Promise.resolve({audio: Buffer.from(text, 'latin1').toString('base64')})});
+        if (env.manual) {
+            env.pending.push(answer);
+        } else {
+            setImmediate(answer);
+        }
     });
     const globals = {
         window: {SpeechRecognition: FakeRec, AudioContext: FakeCtx},
@@ -161,6 +170,10 @@ const makeVoice = (src) => {
             return {abort() {}};
         },
     };
+    env.ignoreAbort = !!opts.ignoreAbort;
+    env.manual = !!opts.manual;
+    env.pending = [];
+    env.flush = () => env.pending.splice(0).forEach((answer) => answer());
     env.V = loadAmd(src, globals, [SSE]);
     return env;
 };
@@ -232,6 +245,68 @@ const voiceChecks = async(label, src, check) => {
         env.maxPlaying === 1, 'max playing ' + env.maxPlaying);
     check(label + ': the turn ends idle, ready to listen', states[states.length - 1] === 'idle'
         || states[states.length - 1] === 'listening', states.join(','));
+
+    // The replace arrives while the first sentence's audio is still being fetched (a short answer: the stream ends
+    // before any audio plays). The aborted fetch still settles; it must not free the queue or cut the replacement.
+    const playOut = async(e) => {
+        for (let i = 0; i < 8; i++) {
+            e.sources.filter((x) => x.started && !x.stopped && !x.done).forEach((x) => {
+                x.done = true;
+                x.finish();
+            });
+            await settle();
+        }
+    };
+    for (const ignoreAbort of [false, true]) {
+        const how = ignoreAbort ? ' (the old audio had already been received)' : ' (the old fetch is aborted)';
+        const e = makeVoice(src, {ignoreAbort});
+        e.V.connect('', 'shimmer', {onTranscript() {}, onReplace() {}},
+            {courseId: 1, sessKey: 'k', sseUrl: 'https://x.example/local/ai_course_assistant/sse.php'});
+        await settle();
+        e.V.sendText('Will I pass?');
+        BLOCKED.match(/\S+\s*/g).forEach((t) => e.stream.onToken(t));
+        if (typeof e.stream.onReplace !== 'function') {
+            return;
+        }
+        e.stream.onReplace({replace: SAFE, messageid: 41});
+        e.stream.onDone({done: true});
+        await playOut(e);
+        const played = e.sources.filter((x) => x.started).map((x) => x.buffer.text);
+        check(label + ': replaced before any audio played' + how + ': only the replacement is played, whole, once',
+            played.join(' ') === SAFE, JSON.stringify(played));
+        check(label + ': and one sentence at a time' + how, e.maxPlaying === 1, 'max playing ' + e.maxPlaying);
+        e.V.disconnect();
+    }
+
+    // The replace arrives while the first sentence plays and the NEXT sentence of the old answer is being
+    // prefetched, and that prefetch answers afterwards: its audio must not be used for the replacement.
+    const p = makeVoice(src, {ignoreAbort: true, manual: true});
+    p.V.connect('', 'shimmer', {onTranscript() {}, onReplace() {}},
+        {courseId: 1, sessKey: 'k', sseUrl: 'https://x.example/local/ai_course_assistant/sse.php'});
+    await settle();
+    p.V.sendText('Will I pass?');
+    BLOCKED.match(/\S+\s*/g).forEach((t) => p.stream.onToken(t));
+    p.flush();
+    await settle();
+    check(label + ': prefetch case set up: one sentence playing, the next being fetched',
+        p.sources.filter((x) => x.started && !x.stopped).length === 1 && p.pending.length === 1,
+        p.sources.length + ' sources, ' + p.pending.length + ' pending');
+    const playedBefore = p.sources.length;
+    p.stream.onReplace({replace: SAFE, messageid: 41});
+    p.stream.onDone({done: true});
+    for (let i = 0; i < 10; i++) {
+        p.flush();
+        await settle();
+        p.sources.filter((x) => x.started && !x.stopped && !x.done).forEach((x) => {
+            x.done = true;
+            x.finish();
+        });
+        await settle();
+    }
+    const afterPrefetch = p.sources.slice(playedBefore).filter((x) => x.started).map((x) => x.buffer.text);
+    check(label + ': audio prefetched for the old answer is never played in place of the replacement',
+        afterPrefetch.join(' ') === SAFE, JSON.stringify(afterPrefetch));
+    p.V.disconnect();
 
     // A check line added to an answer (warn): the markdown underscores round the line are not read out or shown.
     env.V.sendText('When is it due?');
@@ -473,8 +548,13 @@ const sources = {
             sources.voiceSrc.replace(/(onReplace: function\(data\) \{[\s\S]*?)interruptTts\(\);/, '$1')],
         ['voice.js that keeps reading tokens after a replace', 'voiceSrc',
             sources.voiceSrc.replace(/if \(!connected \|\| streamReplaced\) \{/, 'if (!connected) {')],
-        ['voice.js whose stopped audio still drives the queue', 'voiceSrc',
-            sources.voiceSrc.replace(/currentSource\.onended = null;/, '')],
+        ['voice.js whose stopped or aborted audio still drives the queue', 'voiceSrc',
+            sources.voiceSrc.replace(/ttsGeneration\+\+;/, '')],
+        // Two guards cover this one (the prefetch callback checks the generation, and prefetched audio is used
+        // only for its own sentence), so both are removed.
+        ['voice.js that takes audio prefetched for the old answer', 'voiceSrc',
+            sources.voiceSrc.replace(/if \(gen !== ttsGeneration\) \{\n\s+return;\n\s+\}\n(\s+)prefetchInFlight = false;/,
+                '$1prefetchInFlight = false;').replace(/ready && ready\.text === sentence/, 'ready')],
         ['chat.js scoring stream without the onReplace handler', 'chatSrc',
             cut(sources.chatSrc, /\n( +)onReplace: function\(data\) \{\n\s+\/\/ 8\.4\.0 \(RT2\)[\s\S]*?\n\1\},\n/)],
         ['ui.js that appends instead of swapping', 'uiSrc',

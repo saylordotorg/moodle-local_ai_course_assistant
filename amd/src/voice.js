@@ -74,10 +74,12 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
     var currentSource = null;
     /** @type {AbortController|null} Controls in-flight TTS fetch */
     var ttsAbortCtrl = null;
-    /** @type {AudioBuffer|null} Pre-fetched and decoded audio for next sentence */
+    /** @type {{text: string, buf: AudioBuffer}|null} Pre-fetched and decoded audio for the next sentence, with that sentence */
     var prefetchedAudio = null;
     /** @type {boolean} Whether a prefetch is currently in flight */
     var prefetchInFlight = false;
+    /** @type {number} Raised by interruptTts(); callbacks of audio started under an older number do nothing */
+    var ttsGeneration = 0;
     /** @type {AbortController|null} Controls in-flight SSE stream */
     var sseController = null;
     /** @type {string} SSE token accumulation buffer for sentence extraction */
@@ -401,9 +403,6 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
      */
     var interruptTts = function() {
         if (currentSource) {
-            // A stopped source still fires "ended". Its handler would mark the queue free and start the next
-            // sentence (or reopen the mic) underneath whatever the caller does next, so it is detached first.
-            currentSource.onended = null;
             try { currentSource.stop(); } catch (e) { /**/ }
             currentSource = null;
         }
@@ -416,6 +415,11 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         isTtsBusy = false;
         prefetchedAudio = null;
         prefetchInFlight = false;
+        // Everything started before this point is stale: a stopped source still fires "ended", an aborted fetch
+        // still settles, and a fetch that had already answered still decodes. Each of those callbacks checks this
+        // number and does nothing when it has moved on, so none of them can free the queue, start the next
+        // sentence, reopen the mic or hand over old audio underneath whatever the caller does next.
+        ttsGeneration++;
     };
 
     /**
@@ -465,11 +469,16 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         }
         prefetchInFlight = true;
         var nextText = ttsQueue[0]; // peek, don't shift yet
+        var gen = ttsGeneration;
         fetchTtsAudio(nextText, (ttsAbortCtrl && ttsAbortCtrl.signal) || undefined)
             .then(function(buf) {
+                if (gen !== ttsGeneration) {
+                    return;
+                }
                 prefetchInFlight = false;
                 if (buf && connected) {
-                    prefetchedAudio = buf;
+                    // Kept with its sentence: it is used only for that sentence (see processTtsQueue).
+                    prefetchedAudio = {text: nextText, buf: buf};
                 }
             });
     };
@@ -510,14 +519,18 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         }
 
         var sentence = ttsQueue.shift();
+        var gen = ttsGeneration;
         isTtsBusy = true;
         setState('speaking');
 
         // Use prefetched audio if available (sentence was peeked by maybePrefetchNext).
         var audioBufPromise;
-        if (prefetchedAudio) {
-            audioBufPromise = Promise.resolve(prefetchedAudio);
-            prefetchedAudio = null;
+        // Only when it is this sentence's audio. A prefetch that answers late (after its sentence was fetched
+        // directly) would otherwise be played in place of the sentence after it.
+        var ready = prefetchedAudio;
+        prefetchedAudio = null;
+        if (ready && ready.text === sentence) {
+            audioBufPromise = Promise.resolve(ready.buf);
         } else {
             if (ttsAbortCtrl) {
                 ttsAbortCtrl.abort();
@@ -527,7 +540,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         }
 
         audioBufPromise.then(function(audioBuf) {
-            if (!connected) {
+            if (!connected || gen !== ttsGeneration) {
                 return;
             }
             if (!audioBuf) {
@@ -562,6 +575,9 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
             maybePrefetchNext();
 
             source.onended = function() {
+                if (gen !== ttsGeneration) {
+                    return;
+                }
                 if (currentSource === source) {
                     currentSource = null;
                 }
@@ -578,7 +594,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
                 }
             };
         }).catch(function(err) {
-            if (err && err.name === 'AbortError') {
+            if ((err && err.name === 'AbortError') || gen !== ttsGeneration) {
                 return;
             }
             isTtsBusy = false;
