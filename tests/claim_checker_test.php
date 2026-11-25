@@ -451,6 +451,39 @@ final class claim_checker_test extends \advanced_testcase {
         $this->assertSame('ok', $this->verdict($turn['auditid'])->status);
     }
 
+    public function test_wellbeing_flag_suppression_uses_the_mode_recorded_on_the_answer(): void {
+        // setUp leaves the site in watch. A watch-action wellbeing rule recorded in Watch makes a review item
+        // (review_queue reads the same recorded mode), so the flag is suppressed even when the course has moved to
+        // Enforce by the time the check runs.
+        $watchrules = [['id' => 'wellbeing.site_extra', 'action' => 'watch'], ['id' => 'mode.watch', 'action' => 'none']];
+        $turn = $this->answer('I feel hopeless', 'Please reach out.', [], ['categories' => [], 'rules' => $watchrules]);
+        set_config('answer_safety_mode', 'enforce', 'local_ai_course_assistant');
+        $this->judge_says([], true);
+        claim_checker::check($turn['auditid']);
+        $this->assertNotContains(claim_checker::WELLBEING_MODEL_RULE, $this->rule_ids($this->verdict($turn['auditid'])));
+
+        // Recorded in Enforce (no review item for a watch-action rule): the flag is raised even when the course has
+        // moved to Watch by the time the check runs.
+        stub_provider::reset();
+        $enforcerules = [['id' => 'wellbeing.site_extra', 'action' => 'watch'], ['id' => 'mode.enforce', 'action' => 'none']];
+        $turn = $this->answer('I feel hopeless', 'Please reach out.', [], ['categories' => [], 'rules' => $enforcerules]);
+        set_config('answer_safety_mode', 'watch', 'local_ai_course_assistant');
+        $this->judge_says([], true);
+        claim_checker::check($turn['auditid']);
+        $this->assertContains(claim_checker::WELLBEING_MODEL_RULE, $this->rule_ids($this->verdict($turn['auditid'])));
+    }
+
+    public function test_recorded_mode_reads_the_mode_entry_and_falls_back(): void {
+        $this->assertSame('watch', answer_rules::recorded_mode([['id' => 'x.y', 'action' => 'block'],
+            ['id' => 'mode.watch', 'action' => 'none']], 'enforce'));
+        $this->assertSame('enforce', answer_rules::recorded_mode([['id' => 'mode.enforce', 'action' => 'none']], 'watch'));
+        // No entry (a row from before the entry existed), an unknown mode, or an entry that is not a status entry.
+        $this->assertSame('enforce', answer_rules::recorded_mode([['id' => 'x.y', 'action' => 'block']], 'enforce'));
+        $this->assertSame('watch', answer_rules::recorded_mode([['id' => 'mode.loud', 'action' => 'none']], 'watch'));
+        $this->assertSame('watch', answer_rules::recorded_mode([['id' => 'mode.enforce', 'action' => 'block']], 'watch'));
+        $this->assertSame('off', answer_rules::recorded_mode(['junk', null], 'off'));
+    }
+
     public function test_sha1_refs_skipped_and_no_passages_marks_uncheckable(): void {
         $turn = $this->answer('When?', 'On 12 March. The sky is green.',
             [['content' => 'A merged parent passage with no id.', 'score' => 0.7, 'cmid' => null]]);

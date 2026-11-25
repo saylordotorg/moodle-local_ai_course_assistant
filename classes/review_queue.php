@@ -205,7 +205,9 @@ class review_queue {
      * verdict is needs_review or blocked and carries a contradicted claim of high or medium severity, or the
      * wellbeing model flag (priority 1, listed first). `rule`: the answer row recorded a guidance rule with action
      * block, warn or correct, or (only while the course's mode is watch) watch; never when a claim item exists for
-     * that answer, resolved or not. An item whose answer recorded a wellbeing rule that makes an item
+     * that answer, resolved or not. Whether a wellbeing rule makes an item is decided by the mode recorded on the
+     * answer row (answer_rules::recorded_mode(); the course's mode now for a row without one), so it stays when
+     * the course changes mode. An item whose answer recorded a wellbeing rule that makes an item
      * (answer_rules::wellbeing_rule_fired()), rule or claim, has priority 1 and is not counted against the cap, as the
      * wellbeing model flag it stands in for. Failed checks (status check_failed, rule ids starting claim_check.) are
      * not content findings and never make an item.
@@ -247,8 +249,9 @@ class review_queue {
                 $claims = self::json_list($v->claims);
                 $vrules = self::content_rules(self::json_list($v->vrules));
                 $flag = in_array(claim_checker::WELLBEING_MODEL_RULE, array_column($vrules, 'id'), true);
-                $wellbeing = $flag || answer_rules::wellbeing_rule_fired(self::content_rules(self::json_list($v->arules)),
-                    $mode);
+                $arules = self::json_list($v->arules);
+                $wellbeing = $flag || answer_rules::wellbeing_rule_fired(self::content_rules($arules),
+                    answer_rules::recorded_mode($arules, $mode));
                 $serious = false;
                 foreach ($claims as $c) {
                     if (($c['status'] ?? '') === 'contradicted' && in_array($c['severity'] ?? '', ['high', 'medium'], true)) {
@@ -365,7 +368,8 @@ class review_queue {
 
     /**
      * Whether an answer row that recorded rules makes a rule item: not when a claim item exists for the answer or the
-     * item is resolved, and only for a block, warn or correct rule, or a watch rule while the course mode is watch.
+     * item is resolved, and only for a block, warn or correct rule, a watch rule while the course mode is watch, or
+     * a wellbeing rule that made an item under the mode recorded on the row (answer_rules::recorded_mode()).
      *
      * @param \stdClass $a the answer row
      * @param string $mode the course's answer safety mode
@@ -378,14 +382,19 @@ class review_queue {
         if (isset($claimanswers[$aid]) || isset($resolvedkeys['rule:' . $aid])) {
             return null;
         }
-        $rules = self::content_rules(self::json_list($a->rules));
+        $recorded = self::json_list($a->rules);
+        $rules = self::content_rules($recorded);
         $actions = array_column($rules, 'action');
         $strong = (bool) array_intersect($actions, ['block', 'warn', 'correct']);
         $watch = in_array('watch', $actions, true) && $mode === 'watch';
-        if (!$strong && !$watch) {
+        // A wellbeing rule is judged by the mode the answer was recorded under, as claim_checker::wellbeing_caught()
+        // judged it when it suppressed the judge's flag: a watch-action wellbeing rule recorded in Watch stays an
+        // item (first, with the badge) after the course moves to Enforce.
+        $wellbeing = answer_rules::wellbeing_rule_fired($rules, answer_rules::recorded_mode($recorded, $mode));
+        if (!$strong && !$watch && !$wellbeing) {
             return null;
         }
-        return ['rules' => $rules, 'wellbeing' => answer_rules::wellbeing_rule_fired($rules, $mode)];
+        return ['rules' => $rules, 'wellbeing' => $wellbeing];
     }
 
     /**

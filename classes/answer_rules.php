@@ -564,12 +564,13 @@ class answer_rules {
 
     /**
      * Whether a recorded rules list holds a wellbeing rule that makes a review item: a rule id starting `wellbeing.`
-     * with action block, warn or correct, or watch while the course mode is watch. The one condition shared by the
+     * with action block, warn or correct, or watch while the mode is watch. Pass the mode the answer was recorded
+     * under (recorded_mode()), not the course's mode now. The one condition shared by the
      * review queue (a wellbeing rule item, or a claim item treated as wellbeing) and the claim check (the judge's
      * wellbeing flag is suppressed only when such a rule already makes an item).
      *
      * @param array $rules [{id, action}] as recorded
-     * @param string $mode the course's mode
+     * @param string $mode the mode the answer was recorded under (recorded_mode())
      * @return bool
      */
     public static function wellbeing_rule_fired(array $rules, string $mode): bool {
@@ -583,6 +584,31 @@ class answer_rules {
             }
         }
         return false;
+    }
+
+    /**
+     * The mode an answer was recorded under: the `mode.<off|watch|enforce>` status entry of its recorded rules list
+     * (answer_flow::audit_rules(), action none). Rows from before that entry existed have none: the fallback then.
+     *
+     * Whether a wellbeing rule makes a review item is decided with this mode by the claim check and by the review
+     * queue alike, so a course that changes mode later neither loses an item nor gains a second signal.
+     *
+     * @param array $rules the recorded rules list, status entries included
+     * @param string $fallback the mode to use when the row recorded none (the course's mode now)
+     * @return string off|watch|enforce
+     */
+    public static function recorded_mode(array $rules, string $fallback): string {
+        foreach ($rules as $r) {
+            if (!is_array($r) || !is_string($r['id'] ?? null) || ($r['action'] ?? null) !== 'none'
+                    || !str_starts_with($r['id'], 'mode.')) {
+                continue;
+            }
+            $mode = substr($r['id'], 5);
+            if (in_array($mode, self::MODES, true)) {
+                return $mode;
+            }
+        }
+        return $fallback;
     }
 
     /**

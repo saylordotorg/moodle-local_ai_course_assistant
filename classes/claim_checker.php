@@ -480,8 +480,8 @@ class claim_checker {
 
     /**
      * Whether the chat path already recorded a wellbeing rule that makes a review item for this answer
-     * (answer_rules::wellbeing_rule_fired(): a `wellbeing.` rule with action block, warn or correct, or watch while the
-     * course is in watch mode). Then the review queue already lists it first, so the judge's flag would be a second
+     * (answer_rules::wellbeing_rule_fired(): a `wellbeing.` rule with action block, warn or correct, or watch when the
+     * answer was recorded in watch mode: answer_rules::recorded_mode(), the course's mode now for a row without one). Then the review queue already lists it first, so the judge's flag would be a second
      * signal. A matched wellbeing CATEGORY alone does not count, nor does a watch-action wellbeing rule in enforce
      * (it makes no item): the model flag is then the only signal a person sees.
      *
@@ -490,7 +490,10 @@ class claim_checker {
      */
     private static function wellbeing_caught(\stdClass $row): bool {
         $rules = json_decode((string) $row->rules, true);
-        return answer_rules::wellbeing_rule_fired(is_array($rules) ? $rules : [], answer_rules::mode((int) $row->courseid));
+        $rules = is_array($rules) ? $rules : [];
+        // The mode recorded on the row, as review_queue reads it: the course may have changed mode since.
+        $mode = answer_rules::recorded_mode($rules, answer_rules::mode((int) $row->courseid));
+        return answer_rules::wellbeing_rule_fired($rules, $mode);
     }
 
     /**

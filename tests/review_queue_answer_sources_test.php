@@ -218,6 +218,60 @@ final class review_queue_answer_sources_test extends \advanced_testcase {
         $this->assertFalse($ctx['review_rows'][1]['priority_high']);
     }
 
+    public function test_a_watch_wellbeing_rule_recorded_in_watch_stays_first_after_the_course_moves_to_enforce(): void {
+        // A site wellbeing rule with the watch action fired while the course was in Watch. The claim check
+        // suppressed the judge's flag for it (claim_checker::wellbeing_caught()), so this rule item is the only
+        // signal. It is decided by the mode recorded on the answer row, not the course's mode when the teacher
+        // opens the queue: moving the course to Enforce must not make it leave.
+        $cid = (int) $this->course->id;
+        course_config_manager::set_answer_safety_mode($cid, 'watch');
+        $wb = $this->answer($cid, [['id' => 'wellbeing.site_extra', 'action' => 'watch'],
+            ['id' => 'mode.watch', 'action' => 'none'], ['id' => 'outcome.delivered', 'action' => 'none']],
+            'I feel hopeless');
+        $this->waitForSecond();
+        $newer = $this->answer($cid, [['id' => 'deadlines.date', 'action' => 'block'],
+            ['id' => 'mode.watch', 'action' => 'none'], ['id' => 'outcome.delivered', 'action' => 'none']]);
+        $plainwatch = $this->answer($cid, [['id' => 'grades.certain', 'action' => 'watch'],
+            ['id' => 'mode.watch', 'action' => 'none'], ['id' => 'outcome.delivered', 'action' => 'none']]);
+
+        $rows = review_queue::pending_for_course($cid);
+        $this->assertSame(['rule', $wb, 1], [$rows[0]['source'], $rows[0]['sourceid'], $rows[0]['priority']]);
+
+        course_config_manager::set_answer_safety_mode($cid, 'enforce');
+        $rows = review_queue::pending_for_course($cid);
+        $this->assertSame(['rule', $wb, 1], [$rows[0]['source'], $rows[0]['sourceid'], $rows[0]['priority']],
+            'the wellbeing item left the queue, or lost its place, when the course moved to Enforce');
+        $ids = array_column($rows, 'sourceid');
+        $this->assertContains($newer, $ids);
+        // An ordinary watch-action rule is still listed only while the course is in Watch.
+        $this->assertNotContains($plainwatch, $ids);
+        $html = $this->render($rows);
+        $first = substr($html, strpos($html, '<tbody>'), strpos($html, '</tr>', strpos($html, '<tbody>')));
+        $this->assertStringContainsString(get_string('instructor_dashboard:review_priority_high',
+            'local_ai_course_assistant'), $first);
+
+        // The other way round: recorded in Enforce (a watch-action wellbeing rule makes no item there, and the
+        // judge's flag was not suppressed), it does not become a wellbeing rule item when the course moves to Watch.
+        $enforced = $this->answer($cid, [['id' => 'wellbeing.site_extra', 'action' => 'watch'],
+            ['id' => 'mode.enforce', 'action' => 'none'], ['id' => 'outcome.delivered', 'action' => 'none']]);
+        course_config_manager::set_answer_safety_mode($cid, 'watch');
+        foreach (review_queue::pending_for_course($cid) as $row) {
+            if ($row['sourceid'] === $enforced) {
+                $this->assertSame(0, $row['priority'], 'not a wellbeing item: the flag covers it');
+            }
+        }
+    }
+
+    public function test_a_claim_item_takes_its_wellbeing_priority_from_the_recorded_mode(): void {
+        $cid = (int) $this->course->id;
+        $wb = $this->answer($cid, [['id' => 'wellbeing.site_extra', 'action' => 'watch'],
+            ['id' => 'mode.watch', 'action' => 'none']], 'I feel hopeless');
+        $this->verdict($wb, 'needs_review', 'high', [$this->contradicted()]);
+        // The course is in Enforce (setUp); the row says Watch.
+        $rows = $this->rows($cid, 'claim');
+        $this->assertSame([$wb, 1], [$rows[0]['sourceid'], $rows[0]['priority']]);
+    }
+
     public function test_a_rule_caught_wellbeing_answer_with_a_serious_claim_is_still_first_and_uncapped(): void {
         // The wellbeing rule fired (so the judge's flag was suppressed) and the claim check found a serious
         // contradicted claim: the claim item wins the answer, and must carry the wellbeing priority.
