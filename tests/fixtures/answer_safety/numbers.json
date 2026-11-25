@@ -58,5 +58,12 @@
    "约20%的公司在第一年失败。"
   ],
   "expect": "none"
+ },
+ {
+  "id": "numbers_good_rt1_code_and_multiplication",
+  "category": "numbers",
+  "question": "How do I name a variable?",
+  "reply": "Use `snake_case`, for example `unit_total = 2 * 3`.",
+  "expect": "none"
  }
 ]

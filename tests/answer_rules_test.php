@@ -39,6 +39,7 @@ final class answer_rules_test extends \advanced_testcase {
     protected function tearDown(): void {
         answer_rules::$budgetms = answer_rules::DEFAULT_BUDGET_MS;
         answer_rules::$beforerules = null;
+        answer_rules::$intl = null;
         parent::tearDown();
     }
 
@@ -780,6 +781,70 @@ final class answer_rules_test extends \advanced_testcase {
             'categories' => 'grades', 'chunks' => 'nope', 'validator_results' => ['junk', 5]]);
         $this->assertNull($r['text']);
         $this->assertContains($r['action'], answer_rules::ACTIONS);
+    }
+
+    public function test_rules_read_through_formatting_but_the_delivered_text_is_untouched(): void {
+        // RT1: the invented date is found through the bold markers, and the warning is added to the answer exactly
+        // as the model wrote it (markers, zero-width space and all).
+        $reply = "The final essay is due on **March 14**.\u{200B}";
+        $r = answer_rules::evaluate($reply, ['question' => 'When is the final essay due?', 'mode' => 'enforce',
+            'buffered' => true, 'validators_mode' => 'off', 'chunks' => ['Nothing about dates here.']]);
+        $this->assertSame('warn', $r['action']);
+        $this->assertStringStartsWith(rtrim($reply), $r['text']);
+        $this->assertStringContainsString('**March 14**', $r['text']);
+        // Watch mode and a clean answer hand back no text at all.
+        $r = answer_rules::evaluate("I've **granted** you an extension on the essay.", ['question' => 'q',
+            'mode' => 'watch', 'validators_mode' => 'off']);
+        $this->assertSame('watch', $r['action']);
+        $this->assertNull($r['text']);
+    }
+
+    public function test_formatting_tricks_work_without_the_intl_extension(): void {
+        answer_rules::$intl = false;
+        $ctx = ['question' => 'Can I get an extension?', 'mode' => 'enforce', 'buffered' => true,
+            'validators_mode' => 'off'];
+        foreach ([
+            "I've **granted** you an extension on the essay.",
+            "I've gran\u{200B}ted you an exten\u{00AD}sion on the essay.",
+            "I've ｇｒａｎｔｅｄ\u{3000}you\u{00A0}an extension on the essay.",
+            "I've gr\u{0430}nt\u{0435}d you an extension on the essay.",
+            "I've gran<!-- -->ted you an extension on the essay.",
+        ] as $reply) {
+            $this->assertSame('block', answer_rules::evaluate($reply, $ctx)['action'], $reply);
+        }
+    }
+
+    public function test_folding_lookalikes_only_adds_matches(): void {
+        // A Russian keyword still meets Russian text (which is full of letters that look Latin), a keyword that
+        // holds a zero-width non-joiner or an underscore meets itself, and a Latin keyword is found when the text
+        // spells it with Cyrillic letters.
+        $rule = ['category' => 'policy', 'kind' => 'keyword', 'applies_to' => 'both', 'action' => 'warn'];
+        $this->set_site_rules([
+            $rule + ['id' => 'ru', 'value' => 'отсрочка, пересдача'],
+            $rule + ['id' => 'fa', 'value' => "می\u{200C}خواهم"],
+            $rule + ['id' => 'snake', 'value' => 'final_exam'],
+            $rule + ['id' => 'visa', 'value' => 'visa'],
+        ]);
+        $this->assertCount(4, answer_rules::site_rules());
+        $ctx = ['question' => 'q', 'mode' => 'enforce', 'validators_mode' => 'off'];
+        $this->assertSame(['ru'], answer_rules::evaluate('Вам нужна отсрочка по курсу.', $ctx)['rules']);
+        $this->assertSame(['ru'], answer_rules::evaluate('Вам нужна **отсрочка** по курсу.', $ctx)['rules']);
+        $this->assertSame(['fa'], answer_rules::evaluate("من می\u{200C}خواهم بروم", $ctx)['rules']);
+        $this->assertSame(['snake'], answer_rules::evaluate('See the final_exam page.', $ctx)['rules']);
+        $this->assertSame(['visa'], answer_rules::evaluate("Your v\u{0456}s\u{0430} is fine.", $ctx)['rules']);
+        $this->assertContains('policy', answer_rules::categories_for_question("Is my v\u{0456}sa ok?"));
+        $this->assertSame([], answer_rules::evaluate('Привет, как дела? Всё хорошо.', $ctx)['rules']);
+    }
+
+    public function test_the_numeric_check_still_reads_the_answer_as_written(): void {
+        // "4 * 5%" as written holds one percentage, 5%, which the passage has. With the markers stripped it would
+        // read 45%, a figure no passage has. The numeric check gets the text as written.
+        $ctx = ['question' => 'What share is it?', 'mode' => 'enforce', 'buffered' => true,
+            'chunks' => ['Take a 5% share and multiply it by 4.']];
+        $r = answer_rules::evaluate('That is 4*5% in total.', $ctx);
+        $this->assertNotContains(answer_rules::NUMBERS_RULE, $r['rules']);
+        $r = answer_rules::evaluate('That is 45% in total.', $ctx);
+        $this->assertContains(answer_rules::NUMBERS_RULE, $r['rules'], 'the check itself works');
     }
 
     /**

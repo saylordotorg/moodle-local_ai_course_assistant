@@ -63,6 +63,13 @@ use local_ai_course_assistant\validators\hallucination_validator;
  * UTF-8 is scrubbed first, so no input makes a pattern error; a non-English answer simply does not match the English
  * reply rules.
  *
+ * What the rules read (8.4.0 red team, RT1): never the raw text. normalise() removes markdown emphasis, code and
+ * strike markers, HTML comments and invisible format characters and folds compatibility forms (NFKC), and each text
+ * is also tried with Cyrillic and Greek look-alike letters written as Latin (readings()), so "I've **granted** you an
+ * extension", a zero-width space inside a word or a Cyrillic "а" no longer slips past. This is for matching only: the
+ * text delivered and stored is the answer as the model wrote it. A site pattern that looks for one of * _ ` ~
+ * literally can no longer match, because the text it is given has none.
+ *
  * Fail safe: evaluate() never throws. Any error returns action 'none' with 'error' set, so the caller delivers the
  * answer unchanged and records check_failed; the one exception is a wellbeing question, which is checked first and
  * still gets its block (enforce) or watch when anything after that fails.
@@ -103,6 +110,38 @@ class answer_rules {
 
     /** @var float Default time budget (ms) for one pattern over all validation samples. */
     public const DEFAULT_BUDGET_MS = 50.0;
+
+    /** @var bool|null Whether to use the intl Normalizer; null means "when it is loaded". Tests set false to run the
+     *     fallback. */
+    public static ?bool $intl = null;
+
+    /** @var array<string, string> Cyrillic, Greek and IPA letters that are drawn like a Latin letter, to that letter.
+     *     Matching is case-insensitive, so a capital that looks like a Latin capital is enough. */
+    private const LOOKALIKES = [
+        // Cyrillic, lower case.
+        "\u{0430}" => 'a', "\u{0435}" => 'e', "\u{043E}" => 'o', "\u{0440}" => 'p', "\u{0441}" => 'c',
+        "\u{0443}" => 'y', "\u{0445}" => 'x', "\u{0456}" => 'i', "\u{0458}" => 'j', "\u{0455}" => 's',
+        "\u{043A}" => 'k', "\u{0501}" => 'd', "\u{04BB}" => 'h', "\u{051B}" => 'q', "\u{051D}" => 'w',
+        "\u{0475}" => 'v', "\u{04CF}" => 'l',
+        // Cyrillic, capitals.
+        "\u{0410}" => 'A', "\u{0412}" => 'B', "\u{0415}" => 'E', "\u{041A}" => 'K', "\u{041C}" => 'M',
+        "\u{041D}" => 'H', "\u{041E}" => 'O', "\u{0420}" => 'P', "\u{0421}" => 'C', "\u{0422}" => 'T',
+        "\u{0423}" => 'Y', "\u{0425}" => 'X', "\u{0406}" => 'I', "\u{0408}" => 'J', "\u{0405}" => 'S',
+        "\u{04C0}" => 'I', "\u{0500}" => 'D', "\u{051A}" => 'Q', "\u{051C}" => 'W',
+        // Greek, lower case.
+        "\u{03BF}" => 'o', "\u{03B1}" => 'a', "\u{03BD}" => 'v', "\u{03C1}" => 'p', "\u{03B9}" => 'i',
+        "\u{03BA}" => 'k', "\u{03C5}" => 'u', "\u{03B5}" => 'e', "\u{03C7}" => 'x', "\u{03F2}" => 'c',
+        "\u{03F3}" => 'j', "\u{03C4}" => 't',
+        // Greek, capitals.
+        "\u{0391}" => 'A', "\u{0392}" => 'B', "\u{0395}" => 'E', "\u{0396}" => 'Z', "\u{0397}" => 'H',
+        "\u{0399}" => 'I', "\u{039A}" => 'K', "\u{039C}" => 'M', "\u{039D}" => 'N', "\u{039F}" => 'O',
+        "\u{03A1}" => 'P', "\u{03A4}" => 'T', "\u{03A5}" => 'Y', "\u{03A7}" => 'X',
+        // Latin letters outside ASCII that are drawn like one inside it.
+        "\u{0131}" => 'i', "\u{0251}" => 'a', "\u{0261}" => 'g',
+    ];
+
+    /** @var array<string, string> Keywords already normalised, by keyword (per request). */
+    private static array $keywordforms = [];
 
     /** @var float Time budget (ms) used by validate_rule(); tests lower it. */
     public static float $budgetms = self::DEFAULT_BUDGET_MS;
@@ -645,17 +684,21 @@ class answer_rules {
             if (self::is_wellbeing_text($text)) {
                 $found['wellbeing'] = true;
             }
-            foreach (self::QUESTION_KEYWORDS as $category => $keywords) {
-                if (self::keywords_match($keywords, $text)) {
-                    $found[$category] = true;
+            $siterules = self::site_rules();
+            foreach (self::readings($text) as $reading) {
+                foreach (self::QUESTION_KEYWORDS as $category => $keywords) {
+                    if (!isset($found[$category]) && self::keywords_match($keywords, $reading)) {
+                        $found[$category] = true;
+                    }
                 }
-            }
-            if (is_array(self::pattern_match(self::NUMBERS_QUESTION_PATTERN, $text))) {
-                $found['numbers'] = true;
-            }
-            foreach (self::site_rules() as $rule) {
-                if ($rule['applies_to'] !== 'reply' && self::rule_matches($rule, $text, null)) {
-                    $found[$rule['category']] = true;
+                if (is_array(self::pattern_match(self::NUMBERS_QUESTION_PATTERN, $reading))) {
+                    $found['numbers'] = true;
+                }
+                foreach ($siterules as $rule) {
+                    if ($rule['applies_to'] !== 'reply' && !isset($found[$rule['category']])
+                            && self::rule_matches($rule, $reading, null)) {
+                        $found[$rule['category']] = true;
+                    }
                 }
             }
             return array_values(array_filter(self::CATEGORIES, static fn($c) => isset($found[$c])));
@@ -681,12 +724,18 @@ class answer_rules {
      * @return bool
      */
     private static function is_wellbeing_text(string $text): bool {
-        if ($text === '' || self::keywords_match(self::WELLBEING_PHRASES, $text)) {
-            return $text !== '';
+        if ($text === '') {
+            return false;
         }
-        foreach (self::wellbeing_patterns() as $pattern) {
-            if (is_array(self::pattern_match($pattern, $text))) {
+        $patterns = self::wellbeing_patterns();
+        foreach (self::readings($text) as $reading) {
+            if (self::keywords_match(self::WELLBEING_PHRASES, $reading)) {
                 return true;
+            }
+            foreach ($patterns as $pattern) {
+                if (is_array(self::pattern_match($pattern, $reading))) {
+                    return true;
+                }
             }
         }
         return false;
@@ -768,6 +817,14 @@ class answer_rules {
         $result['categories'] = $categories;
         $chunks = self::chunk_texts($ctx['chunks'] ?? []);
         $chunktext = self::normalise(implode("\n", $chunks));
+        // Each text as written and, when it holds look-alike letters, with those folded to Latin. A reply reading is
+        // checked against the course text read the same way.
+        $questions = self::readings($question);
+        $answers = [[$answer, $chunktext]];
+        $answerfolded = self::folded($answer);
+        if ($answerfolded !== null) {
+            $answers[] = [$answerfolded, self::folded($chunktext) ?? $chunktext];
+        }
 
         $fired = [];
         $fire = static function (string $id, string $category, string $action) use (&$fired): void {
@@ -786,10 +843,14 @@ class answer_rules {
             }
             $hit = false;
             if ($rule['applies_to'] !== 'reply') {
-                $hit = self::rule_matches($rule, $question, null, $pcreerrors);
+                foreach ($questions as $reading) {
+                    $hit = $hit || self::rule_matches($rule, $reading, null, $pcreerrors);
+                }
             }
             if ($hit !== true && $rule['applies_to'] !== 'question') {
-                $hit = self::rule_matches($rule, $answer, $chunktext, $pcreerrors) ?: $hit;
+                foreach ($answers as [$reading, $support]) {
+                    $hit = $hit || self::rule_matches($rule, $reading, $support, $pcreerrors);
+                }
             }
             if ($hit === true) {
                 $fire($rule['id'], $rule['category'], $rule['action']);
@@ -801,7 +862,9 @@ class answer_rules {
             $result['pcre_errors'][] = $id;
             $fire($id, self::VALIDATOR_CATEGORY, 'watch');
         }
-        self::fold_validators($ctx, $answer, $question, $chunks, $fire);
+        // The numeric check reads the answer and the passages as written (markdown kept), as it did before.
+        self::fold_validators($ctx, self::plain($reply), self::plain(is_string($ctx['question'] ?? null)
+            ? $ctx['question'] : ''), self::chunk_texts($ctx['chunks'] ?? [], false), $fire);
 
         $result['fired'] = array_values($fired);
         $result['rules'] = array_keys($fired);
@@ -980,8 +1043,8 @@ class answer_rules {
      * Fold runtime_guard's validator results in, and run the numeric check here when they carry none.
      *
      * @param array $ctx
-     * @param string $answer normalised answer
-     * @param string $question normalised question
+     * @param string $answer the answer, valid UTF-8, markdown kept
+     * @param string $question the question, valid UTF-8
      * @param string[] $chunks
      * @param callable $fire fn(id, category, action)
      * @return void
@@ -1177,6 +1240,9 @@ class answer_rules {
             if ($prefix) {
                 $keyword = rtrim(substr($keyword, 0, -1));
             }
+            // The keyword is read the way the text was (a phrase with a zero-width non-joiner, a fullwidth form or
+            // an underscore still meets itself).
+            $keyword = self::$keywordforms[$keyword] ??= self::normalise($keyword);
             if ($keyword === '') {
                 continue;
             }
@@ -1259,14 +1325,87 @@ class answer_rules {
     }
 
     /**
-     * Text ready for matching: valid UTF-8, curly apostrophes made straight.
+     * Text ready for matching. MATCHING ONLY: the answer that is delivered and stored is never this text.
+     *
+     * What an answer looks like on the screen is not what the model wrote: the chat renders markdown, hides
+     * zero-width characters and shows a fullwidth letter much like the plain one. So before a rule looks at a text:
+     * invalid UTF-8 is scrubbed, format characters (zero-width space and joiners, soft hyphen, bidi marks, variation
+     * selectors) are removed, compatibility forms are folded (NFKC: fullwidth letters, ligatures, no-break spaces),
+     * curly apostrophes are made straight, HTML comments are removed, and the markdown emphasis, code and strike
+     * markers (* _ ` ~) are removed. Look-alike letters from other scripts are handled separately by folded().
      *
      * @param string $text
      * @return string
      */
     private static function normalise(string $text): string {
+        $text = self::plain($text);
+        if (preg_match('~[^\x00-\x7F]~', $text)) {
+            $text = preg_replace('~[\p{Cf}\x{034F}\x{180B}-\x{180D}\x{FE00}-\x{FE0F}]+~u', '', $text) ?? $text;
+            $text = self::nfkc($text);
+            $text = self::plain($text);
+        }
+        if (strpos($text, '<!--') !== false) {
+            $text = preg_replace('~<!--.*?-->~su', '', $text) ?? $text;
+        }
+        return strpbrk($text, '*_`~') === false ? $text : str_replace(['*', '_', '`', '~'], '', $text);
+    }
+
+    /**
+     * Valid UTF-8 with curly apostrophes made straight, and nothing else changed (the numeric check reads this: it
+     * needs "2 * 3" to stay two numbers).
+     *
+     * @param string $text
+     * @return string
+     */
+    private static function plain(string $text): string {
         $text = mb_scrub($text, 'UTF-8');
         return str_replace(["\u{2019}", "\u{2018}", "\u{02BC}"], "'", $text);
+    }
+
+    /**
+     * Unicode compatibility folding (NFKC) with the intl extension; without it, the fullwidth ASCII block and the
+     * Unicode spaces only, which is the part an answer can use to dodge a rule.
+     *
+     * @param string $text valid UTF-8
+     * @return string
+     */
+    private static function nfkc(string $text): string {
+        if (self::$intl ?? class_exists(\Normalizer::class)) {
+            $out = \Normalizer::normalize($text, \Normalizer::FORM_KC);
+            if (is_string($out)) {
+                return $out;
+            }
+        }
+        $text = preg_replace_callback('~[\x{FF01}-\x{FF5E}]~u',
+            static fn(array $m): string => chr(mb_ord($m[0], 'UTF-8') - 0xFEE0), $text) ?? $text;
+        return preg_replace('~[\x{00A0}\x{2000}-\x{200A}\x{202F}\x{205F}\x{3000}]~u', ' ', $text) ?? $text;
+    }
+
+    /**
+     * The same text with Cyrillic and Greek letters that look like Latin ones written as the Latin letter, or null
+     * when it holds none. A rule is tried on the text as written AND on this, so folding can only add a match: real
+     * Russian or Greek text still meets its own keywords, and "grаnted" with a Cyrillic "а" meets the English rule.
+     *
+     * @param string $text normalised
+     * @return string|null
+     */
+    private static function folded(string $text): ?string {
+        if (!preg_match('~[\x{0370}-\x{03FF}\x{0400}-\x{052F}\x{0131}\x{0251}\x{0261}]~u', $text)) {
+            return null;
+        }
+        $out = strtr($text, self::LOOKALIKES);
+        return $out === $text ? null : $out;
+    }
+
+    /**
+     * A text as the rules read it: as written, then with look-alike letters folded when it has any.
+     *
+     * @param string $text normalised
+     * @return string[] one or two texts
+     */
+    private static function readings(string $text): array {
+        $folded = self::folded($text);
+        return $folded === null ? [$text] : [$text, $folded];
     }
 
     /**
@@ -1285,9 +1424,10 @@ class answer_rules {
      * Chunk texts from strings or retriever rows.
      *
      * @param mixed $chunks
+     * @param bool $normalise false keeps markdown (for the numeric check)
      * @return string[]
      */
-    private static function chunk_texts($chunks): array {
+    private static function chunk_texts($chunks, bool $normalise = true): array {
         if (!is_array($chunks)) {
             return [];
         }
@@ -1295,7 +1435,7 @@ class answer_rules {
         foreach ($chunks as $chunk) {
             $text = is_array($chunk) ? (string) ($chunk['content'] ?? '') : (is_scalar($chunk) ? (string) $chunk : '');
             if (trim($text) !== '') {
-                $texts[] = self::normalise($text);
+                $texts[] = $normalise ? self::normalise($text) : self::plain($text);
             }
         }
         return $texts;
