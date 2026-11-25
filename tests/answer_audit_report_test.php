@@ -400,7 +400,12 @@ final class answer_audit_report_test extends \advanced_testcase {
         $ctx = answer_audit_report::template_context($cid, answer_audit_report::parse_filters('', '', '', ''), $aid);
         $html = $OUTPUT->render_from_template('local_ai_course_assistant/answer_audit', $ctx);
         $this->assertStringContainsString(get_string('answeraudit:flow', 'local_ai_course_assistant'), $html);
-        $this->assertStringContainsString('mode.watch, outcome.delivered', $html);
+        // The page shows what the entries mean; the stored ids stay in detail() (above) and off the page.
+        $this->assertStringContainsString(get_string('answeraudit:flow_mode_watch', 'local_ai_course_assistant'), $html);
+        $this->assertStringContainsString(get_string('answeraudit:flow_outcome_delivered', 'local_ai_course_assistant'),
+            $html);
+        $this->assertStringNotContainsString('mode.watch', $html);
+        $this->assertStringNotContainsString('outcome.delivered', $html);
 
         // Never a rule choice, a counted rule, or a rule in the list and export.
         $this->assertSame(['wellbeing.crisis'], answer_audit_report::rule_choices($cid));
@@ -527,5 +532,137 @@ final class answer_audit_report_test extends \advanced_testcase {
         foreach (['TAMPEREDQUESTION', 'TAMPEREDCLAIM', 'due on Friday'] as $needle) {
             $this->assertStringNotContainsString($needle, $html, "{$needle} on the page");
         }
+    }
+
+    // Readable labels, empty states and links (8.4.0 polish).
+
+    /**
+     * Render the page for a course.
+     *
+     * @param int $courseid
+     * @param array $filters
+     * @param int $detailid
+     * @return string
+     */
+    private function page(int $courseid, array $filters, int $detailid = 0): string {
+        global $OUTPUT, $PAGE;
+        $PAGE->set_url('/local/ai_course_assistant/answer_audit.php', ['courseid' => $courseid]);
+        return $OUTPUT->render_from_template('local_ai_course_assistant/answer_audit',
+            answer_audit_report::template_context($courseid, $filters, $detailid));
+    }
+
+    public function test_the_page_shows_labels_and_never_a_stored_code(): void {
+        $cid = (int) $this->course->id;
+        $str = static fn(string $id, $a = null): string => get_string($id, 'local_ai_course_assistant', $a);
+        $aid = $this->answer($cid, [['id' => 'deadlines.date', 'action' => 'warn'],
+            ['id' => 'mode.enforce', 'action' => 'none'], ['id' => 'outcome.warned', 'action' => 'none']]);
+        $this->verdict($aid, 'needs_review', [$this->claim('contradicted', 'Visible claim'),
+            $this->claim('not_in_course', 'Other claim')]);
+
+        $html = $this->page($cid, answer_audit_report::parse_filters('', '', '', ''), $aid);
+        foreach (['answeraudit:claim_contradicted', 'answeraudit:claim_not_in_course', 'answeraudit:type_deadline',
+                'answeraudit:severity_high', 'answeraudit:flow_mode_enforce', 'answeraudit:flow_outcome_warned',
+                'answer_rules:category_deadlines'] as $id) {
+            $this->assertStringContainsString($str($id), $html, $id);
+        }
+        $this->assertStringContainsString('deadlines.date: ' . $str('answeraudit:action_warn'), $html);
+        $this->assertStringContainsString($str('instructor_dashboard:review_verdict', (object) [
+            'status' => $str('answeraudit:status_needs_review'), 'severity' => $str('answeraudit:severity_high')]), $html);
+        // What a reader sees (tags, and with them the filter's option values, removed) carries no stored code.
+        $text = strip_tags($html);
+        foreach (['needs_review', 'not_in_course', 'contradicted', 'deadlines.date:warn', 'mode.', 'outcome.',
+                ' deadline ', ' high', 'check_failed'] as $code) {
+            $this->assertStringNotContainsString($code, $text, "{$code} on the page");
+        }
+        // The exports and detail() keep the codes.
+        $row = answer_audit_report::export_rows($cid, [])[0];
+        $this->assertSame('needs_review', $row['verdict']);
+        $this->assertSame('deadlines.date:warn', $row['rules']);
+        $this->assertStringContainsString('contradicted/deadline/high', $row['claims']);
+        $this->assertSame('contradicted', answer_audit_report::detail($cid, $aid)['verdicts'][0]['claims'][0]['status']);
+    }
+
+    public function test_a_code_without_a_string_is_shown_as_it_is(): void {
+        $this->assertSame('brand_new', answer_labels::severity('brand_new'));
+        $this->assertSame('outcome.brand_new', answer_labels::flow('outcome.brand_new'));
+        $this->assertSame('<b>x</b>', answer_labels::claim_status('<b>x</b>'));
+        $this->assertSame('', answer_labels::claim_type(''));
+        $this->assertSame(get_string('answeraudit:status_ok', 'local_ai_course_assistant'),
+            answer_labels::verdict('ok', ''));
+    }
+
+    public function test_every_stored_code_has_a_label(): void {
+        $codes = [];
+        foreach (answer_audit_report::verdict_values() as $c) {
+            $codes[$c] = answer_labels::status($c);
+        }
+        foreach (['high', 'medium', 'low'] as $c) {
+            $codes[$c] = answer_labels::severity($c);
+        }
+        foreach (claim_checker::CLAIM_STATUSES as $c) {
+            $codes[$c] = answer_labels::claim_status($c);
+        }
+        foreach (claim_checker::CLAIM_TYPES as $c) {
+            $codes[$c] = answer_labels::claim_type($c);
+        }
+        foreach (answer_rules::RULE_ACTIONS as $c) {
+            $codes[$c] = answer_labels::action($c);
+        }
+        foreach (answer_rules::CATEGORIES as $c) {
+            $codes[$c] = answer_labels::category($c);
+        }
+        foreach (answer_rules::MODES as $c) {
+            $codes['mode.' . $c] = answer_labels::flow('mode.' . $c);
+        }
+        // Every outcome.* id answer_flow can record.
+        preg_match_all("/'(outcome\\.[a-z_]+)'/", file_get_contents(__DIR__ . '/../classes/answer_flow.php'), $m);
+        $this->assertGreaterThanOrEqual(9, count(array_unique($m[1])));
+        foreach (array_unique($m[1]) as $c) {
+            $codes[$c] = answer_labels::flow($c);
+        }
+        foreach ($codes as $code => $label) {
+            $this->assertNotSame($code, $label, "{$code} has no label");
+            $this->assertNotSame('', $label);
+        }
+    }
+
+    public function test_an_empty_course_says_so_and_a_filter_with_no_match_offers_the_reset(): void {
+        $cid = (int) $this->course->id;
+        $str = static fn(string $id): string => get_string($id, 'local_ai_course_assistant');
+        $html = $this->page($cid, answer_audit_report::parse_filters('', '', '', ''));
+        $this->assertStringContainsString($str('answeraudit:empty'), $html);
+        $this->assertStringNotContainsString($str('answeraudit:norows'), $html);
+        $this->assertStringNotContainsString('alert-link', $html);
+        $this->assertStringNotContainsString('<table', $html);
+        $this->assertStringContainsString($str('answeraudit:topics_none'), $html);
+        $this->assertStringContainsString($str('answeraudit:rules_none'), $html);
+
+        $this->answer($cid);
+        $html = $this->page($cid, answer_audit_report::parse_filters('blocked', '', '', ''));
+        $this->assertStringContainsString($str('answeraudit:norows'), $html);
+        $this->assertStringNotContainsString($str('answeraudit:empty'), $html);
+        $this->assertStringContainsString('class="alert-link"', $html);
+    }
+
+    public function test_the_page_links_to_the_dashboard_resets_filters_and_labels_the_exports(): void {
+        $cid = (int) $this->course->id;
+        $this->answer($cid);
+        $html = $this->page($cid, answer_audit_report::parse_filters('ok', '', '2026-01-01', ''));
+        $this->assertStringContainsString('/local/ai_course_assistant/instructor_dashboard.php?courseid=' . $cid . '"',
+            $html);
+        // The reset link is the page with the course only.
+        $this->assertStringContainsString('href="https://www.example.com/moodle/local/ai_course_assistant/'
+            . 'answer_audit.php?courseid=' . $cid . '" class="btn btn-secondary"', $html);
+        // Exports: visible CSV and JSON, a full accessible name, the filters and the sesskey kept.
+        $this->assertMatchesRegularExpression('~<a class="btn btn-sm btn-secondary" href="[^"]*verdict=ok[^"]*format=csv'
+            . '[^"]*sesskey=' . sesskey() . '" aria-label="Download CSV">CSV</a>~', $html);
+        $this->assertMatchesRegularExpression('~href="[^"]*format=json[^"]*" aria-label="Download JSON">JSON</a>~', $html);
+        // Every field has a label, every table header a scope.
+        foreach (['aica-aa-verdict', 'aica-aa-rule', 'aica-aa-from', 'aica-aa-to'] as $id) {
+            $this->assertStringContainsString('<label for="' . $id . '"', $html);
+            $this->assertStringContainsString('id="' . $id . '"', $html);
+        }
+        $this->assertSame(0, preg_match('~<th(?![^>]*scope=)[ >]~', $html), 'a table header has no scope');
+        $this->assertStringNotContainsString('{{{', file_get_contents(__DIR__ . '/../templates/answer_audit.mustache'));
     }
 }

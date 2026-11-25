@@ -497,14 +497,10 @@ class review_queue {
     private static function summary(string $kind, array $detail): string {
         $parts = [$kind];
         if ($detail['status'] !== '') {
-            $parts[] = get_string('instructor_dashboard:review_verdict', self::COMPONENT, (object) [
-                'status' => $detail['status'],
-                'severity' => $detail['severity'] !== '' ? $detail['severity'] : '-',
-            ]);
+            $parts[] = answer_labels::verdict($detail['status'], $detail['severity']);
         }
         if ($detail['rules']) {
-            $parts[] = implode(', ', array_map(static fn(array $r): string => $r['id'] . ' (' . $r['action'] . ')',
-                $detail['rules']));
+            $parts[] = answer_labels::rules($detail['rules']);
         }
         $parts[] = $detail['redacted'] ? get_string('instructor_dashboard:review_text_removed', self::COMPONENT)
             : trim(preg_replace('/\s+/u', ' ', $detail['question']));
@@ -670,13 +666,22 @@ class review_queue {
                     'question' => $d['question'],
                     'answer' => $d['answer'],
                     'has_verdict' => $d['status'] !== '',
-                    'verdict' => $d['status'] !== '' ? $str('review_verdict', (object) ['status' => $d['status'],
-                        'severity' => $d['severity'] !== '' ? $d['severity'] : '-']) : '',
+                    'verdict' => $d['status'] !== '' ? answer_labels::verdict($d['status'], $d['severity']) : '',
                     'has_claims' => !empty($d['claims']),
-                    'claims' => array_map(static fn(array $c): array => $c + ['has_text' => $c['text'] !== ''],
-                        $d['claims']),
+                    'claims' => array_map(static fn(array $c): array => [
+                        'text' => $c['text'],
+                        'has_text' => $c['text'] !== '',
+                        'meta' => $str('review_claim_meta', (object) [
+                            'status' => answer_labels::claim_status($c['status']),
+                            'severity' => $c['severity'] !== '' ? answer_labels::severity($c['severity']) : '-',
+                            'evidence' => $c['evidence'],
+                        ]),
+                    ], $d['claims']),
                     'has_rules' => !empty($d['rules']),
-                    'rules' => $d['rules'],
+                    'rules' => array_map(static fn(array $r): array => [
+                        'id' => $r['id'],
+                        'action' => answer_labels::action($r['action']),
+                    ], $d['rules']),
                     'passages' => $str('review_passages', $d['passages']),
                 ];
             }
@@ -701,6 +706,9 @@ class review_queue {
                 'rules' => $str('review_detail_rules'),
                 'text_removed' => $str('review_text_removed'),
                 'priority' => $str('review_priority_high'),
+                'col_resolve' => $str('review_col_resolve'),
+                'caption' => $str('review_caption'),
+                'audit_link' => $str('review_audit_link'),
             ],
         ];
     }

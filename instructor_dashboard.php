@@ -149,10 +149,11 @@ $nav = [
      'label' => get_string('instructor_dashboard:nav_analytics', $strman)],
 ];
 // 8.4.0: the answer audit, shown once the course has recorded answers (answer safety on now or before).
+$auditurl = '';
 if ($DB->record_exists(\local_ai_course_assistant\answer_audit::TABLE, ['courseid' => $courseid, 'kind' => 'answer'])
         || \local_ai_course_assistant\answer_audit::is_enabled($courseid)) {
-    $nav[] = ['url' => (new moodle_url('/local/ai_course_assistant/answer_audit.php', ['courseid' => $courseid]))->out(false),
-        'label' => get_string('answeraudit:dashboard_link', $strman)];
+    $auditurl = (new moodle_url('/local/ai_course_assistant/answer_audit.php', ['courseid' => $courseid]))->out(false);
+    $nav[] = ['url' => $auditurl, 'label' => get_string('answeraudit:dashboard_link', $strman)];
 }
 
 // Period selector options.
@@ -290,6 +291,7 @@ echo $OUTPUT->render_from_template('local_ai_course_assistant/instructor_dashboa
     'has_review' => !empty($reviewrows),
     'review_heading' => get_string('instructor_dashboard:review_heading', $strman),
     'review_intro' => get_string('instructor_dashboard:review_intro', $strman),
+    'review_auditurl' => $auditurl,
     'review_empty' => get_string('instructor_dashboard:review_empty', $strman),
     'review_cols' => [
         'when' => get_string('instructor_dashboard:review_col_when', $strman),

@@ -36,7 +36,7 @@
     {{#readonly}}<p class="sola-kr-forced-note text-muted">{{readonlynote}}</p>{{/readonly}}
     {{^readonly}}<input type="hidden" name="{{presentname}}" value="1">{{/readonly}}
     <table class="table table-sm table-bordered" style="max-width:960px">
-        <thead><tr>{{#heads}}<th>{{label}}</th>{{/heads}}{{^readonly}}<th style="width:50px"></th>{{/readonly}}</tr></thead>
+        <thead><tr>{{#heads}}<th scope="col">{{label}}</th>{{/heads}}{{^readonly}}<th style="width:50px"></th>{{/readonly}}</tr></thead>
         <tbody>
             {{#rows}}{{> local_ai_course_assistant/admin_keyed_row}}{{/rows}}
             {{^readonly}}<template class="sola-kr-blank">{{#blankrow}}{{> local_ai_course_assistant/admin_keyed_row}}{{/blankrow}}</template>{{/readonly}}

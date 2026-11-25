@@ -498,6 +498,59 @@ final class review_queue_answer_sources_test extends \advanced_testcase {
         $this->assertStringContainsString('review_queue::add_outcome_field()', $upgrade);
     }
 
+    public function test_the_queue_shows_labels_and_never_a_stored_code(): void {
+        $str = static fn(string $id, $a = null): string => get_string($id, 'local_ai_course_assistant', $a);
+        $aid = $this->answer((int) $this->course->id, [['id' => 'deadlines.date', 'action' => 'block']]);
+        $this->verdict($aid, 'needs_review', 'high', [$this->contradicted()]);
+        $this->answer((int) $this->course->id, [['id' => 'grades.promise', 'action' => 'warn']], 'Will I pass?');
+
+        $pending = review_queue::pending_for_course((int) $this->course->id);
+        $html = $this->render($pending);
+        $verdict = $str('instructor_dashboard:review_verdict', (object) [
+            'status' => $str('answeraudit:status_needs_review'), 'severity' => $str('answeraudit:severity_high')]);
+        $this->assertStringContainsString($verdict, $html);
+        $this->assertStringContainsString($str('answeraudit:claim_contradicted'), $html);
+        $this->assertStringContainsString('<code>deadlines.date</code>: ' . $str('answeraudit:action_block'), $html);
+        $this->assertStringContainsString('grades.promise: ' . $str('answeraudit:action_warn'), $html);
+        $text = strip_tags($html);
+        foreach (['needs_review', 'contradicted', '(block)', '(warn)', ', high', 'high severity'] as $code) {
+            $this->assertStringNotContainsString($code, $text, "{$code} in the queue");
+        }
+        // The rows keep the codes for callers: only what is shown is a label.
+        $claim = $this->rows((int) $this->course->id, 'claim')[0];
+        $this->assertSame('needs_review', $claim['detail']['status']);
+        $this->assertSame('contradicted', $claim['detail']['claims'][0]['status']);
+        $this->assertSame('block', $claim['detail']['rules'][0]['action']);
+        $this->assertLessThanOrEqual(200, \core_text::strlen($claim['summary']));
+    }
+
+    public function test_the_queue_table_is_labelled_and_links_to_the_audit_only_when_given_one(): void {
+        global $OUTPUT;
+        $this->answer((int) $this->course->id, [['id' => 'grades.promise', 'action' => 'warn']]);
+        $pending = review_queue::pending_for_course((int) $this->course->id);
+        $html = $this->render($pending);
+        $review = substr($html, strpos($html, 'id="aica-id-review"'));
+        $this->assertSame(0, preg_match('~<th(?![^>]*scope=)[ >]~', $review), 'a review table header has no scope');
+        $this->assertStringContainsString('<caption', $review);
+        $this->assertStringContainsString('<label for="aica-review-rule-', $review);
+        $this->assertStringNotContainsString('answer_audit.php', $review);
+
+        $ctx = review_queue::template_context($pending, (int) $this->course->id, 30, 7);
+        $ctx['has_review'] = true;
+        $ctx['review_auditurl'] = 'https://www.example.com/moodle/local/ai_course_assistant/answer_audit.php?courseid=5';
+        $html = $OUTPUT->render_from_template('local_ai_course_assistant/instructor_dashboard', $ctx);
+        $this->assertStringContainsString('answer_audit.php?courseid=5">'
+            . get_string('instructor_dashboard:review_audit_link', 'local_ai_course_assistant') . '</a>', $html);
+    }
+
+    public function test_the_intro_names_claim_and_rule_items(): void {
+        $intro = get_string('instructor_dashboard:review_intro', 'local_ai_course_assistant');
+        $this->assertStringContainsString('claim', $intro);
+        $this->assertStringContainsString('guidance rule', $intro);
+        $this->assertStringContainsString(get_string('instructor_dashboard:review_resolve', 'local_ai_course_assistant'),
+            $intro);
+    }
+
     public function test_a_row_written_without_an_outcome_reads_back_empty(): void {
         global $DB;
         $id = $DB->insert_record('local_ai_course_assistant_review_res', (object) ['source' => 'rating',

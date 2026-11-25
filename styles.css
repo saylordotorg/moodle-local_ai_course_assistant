@@ -5930,6 +5930,8 @@ button.local-ai-course-assistant__path-node-head[aria-expanded="true"] {
 .aica-id-narrow { max-width: 820px; }
 .aica-id-prewrap { white-space: pre-wrap; overflow-wrap: anywhere; }
 .aica-id-resolve { display: flex; flex-direction: column; gap: 4px; min-width: 160px; }
+.aica-aa-filters { gap: 0.75rem; }
+.aica-id-review td { vertical-align: top; }
 @media (max-width: 700px) { .aica-id-tiles { grid-template-columns: repeat(2, 1fr); } }
 
 /* Soapbox video recorder (v6.8.16) */

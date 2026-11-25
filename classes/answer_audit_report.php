@@ -199,6 +199,7 @@ class answer_audit_report {
                 'status' => (string) $v->status,
                 'severity' => (string) ($v->severity ?? ''),
                 'rules' => self::rule_text(self::content_rules(self::json_list($v->rules))),
+                'rule_items' => self::content_rules(self::json_list($v->rules)),
                 'judge_model' => (string) ($v->judge_model ?? ''),
                 'claims' => $claims,
                 'rowhash' => (string) $v->rowhash,
@@ -228,8 +229,11 @@ class answer_audit_report {
             'question' => $redacted ? '' : (string) ($a->question ?? ''),
             'answer' => $redacted ? '' : (string) ($a->answer ?? ''),
             'categories' => implode(', ', array_map('strval', self::json_scalars($a->categories))),
+            'category_ids' => array_map('strval', self::json_scalars($a->categories)),
             'rules' => self::rule_text(self::content_rules(self::json_list($a->rules))),
+            'rule_items' => self::content_rules(self::json_list($a->rules)),
             'flow' => implode(', ', self::status_ids(self::json_list($a->rules))),
+            'flow_ids' => self::status_ids(self::json_list($a->rules)),
             'validators' => implode(', ', $validators),
             'citations' => count(self::json_list($a->citations)),
             'passages' => $passages,
@@ -459,7 +463,7 @@ class answer_audit_report {
                 'learner' => anonymizer::name((int) $a->userid),
                 'activity' => self::activity($a, $cms),
                 'verdict' => self::status_label($v ? (string) $v->status : self::UNCHECKED),
-                'rules' => self::rule_text($rules),
+                'rules' => answer_labels::rules($rules),
                 'redacted' => $redacted,
                 'question' => $redacted ? '' : shorten_text((string) ($a->question ?? ''), 120),
                 'detailurl' => (new \moodle_url($base, $keep + ['id' => (int) $a->id]))->out(false),
@@ -469,17 +473,38 @@ class answer_audit_report {
         $detail = null;
         if ($detailid > 0) {
             $d = self::detail($courseid, $detailid);
+            // Readable labels for the page only: detail() and the exports keep the stored codes.
             $d['time'] = userdate($d['time']);
             $d['hasquestion'] = $d['question'] !== '';
             $d['hasanswer'] = $d['answer'] !== '';
             $d['haspassages'] = !empty($d['passages']);
             $d['hasverdicts'] = !empty($d['verdicts']);
+            $d['categories'] = implode(', ', array_map([answer_labels::class, 'category'], $d['category_ids']));
+            $d['rules'] = answer_labels::rules($d['rule_items']);
+            $d['flow'] = array_map(static fn(string $id): array => ['label' => answer_labels::flow($id)],
+                $d['flow_ids']);
+            $d['hasflow'] = !empty($d['flow']);
+            foreach ($d['passages'] as $i => $p) {
+                $d['passages'][$i]['label'] = $str('passage_score', (object) $p);
+            }
             foreach ($d['verdicts'] as $i => $v) {
-                $d['verdicts'][$i]['time'] = userdate($v['time']);
-                $d['verdicts'][$i]['status'] = self::status_label($v['status']);
+                $d['verdicts'][$i]['headingid'] = 'aica-aa-verdict-' . (int) $v['id'];
+                $d['verdicts'][$i]['status'] = answer_labels::verdict($v['status'], $v['severity']);
+                $d['verdicts'][$i]['checked'] = $str('verdict_checked', (object) [
+                    'time' => userdate($v['time']),
+                    'model' => $v['judge_model'] !== '' ? $v['judge_model'] : '-',
+                ]);
+                $d['verdicts'][$i]['rules'] = $v['rule_items'] ? $str('verdict_rules', answer_labels::rules($v['rule_items']))
+                    : '';
                 $d['verdicts'][$i]['hasclaims'] = !empty($v['claims']);
                 foreach ($v['claims'] as $j => $c) {
-                    $d['verdicts'][$i]['claims'][$j]['hastext'] = $c['text'] !== '';
+                    $d['verdicts'][$i]['claims'][$j] = [
+                        'text' => $c['text'],
+                        'hastext' => $c['text'] !== '',
+                        'status' => answer_labels::claim_status($c['status']),
+                        'type' => answer_labels::claim_type($c['type']),
+                        'severity' => answer_labels::severity($c['severity']),
+                    ];
                 }
             }
             $d['backurl'] = (new \moodle_url($base, $keep))->out(false);
@@ -504,8 +529,13 @@ class answer_audit_report {
         $exporturl = static fn(string $format): string =>
             (new \moodle_url($base, $keep + ['format' => $format, 'sesskey' => sesskey()]))->out(false);
 
+        $hasfilters = count($keep) > 1;
         return [
             'formaction' => $base->out(false),
+            'reseturl' => $base->out(false),
+            'hasfilters' => $hasfilters,
+            'dashboardurl' => (new \moodle_url('/local/ai_course_assistant/instructor_dashboard.php',
+                ['courseid' => $courseid]))->out(false),
             'courseid' => $courseid,
             'verdictoptions' => $verdictoptions,
             'ruleoptions' => $ruleoptions,
@@ -514,9 +544,11 @@ class answer_audit_report {
             'chainok' => !empty($chain['ok']),
             'chaintext' => !empty($chain['ok']) ? $str('chain_ok')
                 : $str('chain_broken', (int) $chain['brokenat']),
+            'chainlabel' => !empty($chain['ok']) ? $str('chain_ok_label') : $str('chain_broken_label'),
             'csvurl' => $exporturl('csv'),
             'jsonurl' => $exporturl('json'),
             'hasrows' => !empty($rows),
+            'emptytext' => $hasfilters ? $str('norows') : $str('empty'),
             'rows' => $rows,
             'rowcount' => $truncated ? $str('truncated', self::PAGE_LIMIT) : $str('rowcount', count($rows)),
             'hasdetail' => $detail !== null,
@@ -535,9 +567,7 @@ class answer_audit_report {
      * @return string
      */
     public static function status_label(string $status): string {
-        $sm = get_string_manager();
-        return $sm->string_exists('answeraudit:status_' . $status, self::COMPONENT)
-            ? get_string('answeraudit:status_' . $status, self::COMPONENT) : $status;
+        return answer_labels::status($status);
     }
 
     /**

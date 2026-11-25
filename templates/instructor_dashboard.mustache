@@ -31,7 +31,7 @@
     * has_confusion, confusion_heading, confusion_empty, confusion_cols, confusion_rows
     * ratings_heading, ratings_summary, has_low_rated, ratings_low_label, ratings_low_module, ratings_low_count, ratings_low_rows
     * gap_heading, gap_summary, has_gap_sample, gap_sample_label, gap_sample
-    * has_review, review_heading, review_intro, review_empty, review_cols, review_rows
+    * has_review, review_heading, review_intro, review_auditurl (empty for no link), review_empty, review_cols, review_rows
     * review_formaction, review_courseid, review_range, review_gapdays, review_sesskey, review_labels
       (review_queue::template_context(); each row has a resolve form and, for claim and rule items, a detail)
 
@@ -56,18 +56,18 @@
         "ratings_low_rows": [{"name": "Unit 2", "count": 3}],
         "gap_heading": "Engagement gap", "gap_summary": "3 of 12 not seen in 7 days.",
         "has_gap_sample": true, "gap_sample_label": "Show sample", "gap_sample": [{"name": "Learner 7"}],
-        "has_review": true, "review_heading": "Needs review", "review_intro": "Flagged exchanges.", "review_empty": "Nothing to review.",
+        "has_review": true, "review_heading": "Needs review", "review_intro": "Flagged exchanges.", "review_empty": "Nothing to review.", "review_auditurl": "#",
         "review_cols": {"when": "When", "source": "Source", "who": "Who", "summary": "Summary"},
         "review_formaction": "#", "review_courseid": 2, "review_range": 30, "review_gapdays": 7, "review_sesskey": "x",
-        "review_labels": {"resolve": "Mark resolved", "outcome": "Outcome", "outcome_none": "No outcome", "note": "Note", "detail": "Details", "question": "Question", "answer": "Answer", "claims": "Claims", "rules": "Rules fired", "text_removed": "Text removed", "priority": "High priority"},
+        "review_labels": {"resolve": "Mark resolved", "outcome": "Outcome", "outcome_none": "No outcome", "note": "Note", "detail": "Details", "question": "Question", "answer": "Answer", "claims": "Claims", "rules": "Rules fired", "text_removed": "Text removed", "priority": "High priority", "col_resolve": "Resolve", "caption": "Items waiting for review", "audit_link": "See every recorded answer in the answer audit"},
         "review_rows": [
             {"when": "2026-06-17 09:00", "sourcelabel": "Negative rating", "who": "Learner 7", "summary": "...", "priority_high": false, "source": "rating", "sourceid": 4, "formid": "aica-review-rating-4", "outcome_required": false, "has_detail": false,
              "outcomes": [{"value": "confirmed_bad", "label": "Confirmed bad"}, {"value": "false_alarm", "label": "False alarm"}]},
             {"when": "2026-06-17 09:05", "sourcelabel": "Answer claim", "who": "Learner 7", "summary": "Contradicted claim", "priority_high": true, "source": "claim", "sourceid": 9, "formid": "aica-review-claim-9", "outcome_required": true, "has_detail": true,
              "outcomes": [{"value": "content_gap", "label": "Content gap"}, {"value": "rule_too_strict", "label": "Rule too strict"}],
-             "detail": {"redacted": false, "question": "When is the final due?", "answer": "Friday.", "has_verdict": true, "verdict": "needs_review, high severity", "has_claims": true,
-                 "claims": [{"text": "The final is due Friday.", "has_text": true, "status": "contradicted", "severity": "high", "evidence": "Unit 2 schedule"}],
-                 "has_rules": true, "rules": [{"id": "deadlines.date", "action": "warn"}], "passages": "Course passages retrieved: 2"}}
+             "detail": {"redacted": false, "question": "When is the final due?", "answer": "Friday.", "has_verdict": true, "verdict": "Needs review, severity: High", "has_claims": true,
+                 "claims": [{"text": "The final is due Friday.", "has_text": true, "meta": "Contradicts the course, severity: High. Evidence: Unit 2 schedule."}],
+                 "has_rules": true, "rules": [{"id": "deadlines.date", "action": "Warning added"}], "passages": "Course passages retrieved: 2"}}
         ]
     }
 }}
@@ -187,49 +187,53 @@
     </details>
     {{/has_gap_sample}}
 
-    <h3 class="aica-id-h3-lg">{{review_heading}}</h3>
+    <h3 class="aica-id-h3-lg" id="aica-id-review">{{review_heading}}</h3>
     <p class="text-muted aica-id-narrow">{{review_intro}}</p>
-    {{^has_review}}<p class="text-success">{{review_empty}}</p>{{/has_review}}
+    {{#review_auditurl}}<p><a href="{{review_auditurl}}">{{review_labels.audit_link}}</a></p>{{/review_auditurl}}
+    {{^has_review}}<p class="alert alert-info aica-id-narrow" role="status">{{review_empty}}</p>{{/has_review}}
     {{#has_review}}
-    <table class="generaltable">
+    <div class="table-responsive">
+    <table class="generaltable aica-id-review">
+        <caption class="sr-only visually-hidden">{{review_labels.caption}}</caption>
         <thead><tr>
-            <th>{{review_cols.when}}</th><th>{{review_cols.source}}</th>
-            <th>{{review_cols.who}}</th><th>{{review_cols.summary}}</th><th></th>
+            <th scope="col">{{review_cols.when}}</th><th scope="col">{{review_cols.source}}</th>
+            <th scope="col">{{review_cols.who}}</th><th scope="col">{{review_cols.summary}}</th>
+            <th scope="col">{{review_labels.col_resolve}}</th>
         </tr></thead>
         <tbody>
         {{#review_rows}}
             <tr>
                 <td><small>{{when}}</small></td>
                 <td>
-                    <span class="badge badge-secondary">{{sourcelabel}}</span>
-                    {{#priority_high}}<span class="badge badge-danger">{{review_labels.priority}}</span>{{/priority_high}}
+                    <span class="badge badge-secondary bg-secondary text-white">{{sourcelabel}}</span>
+                    {{#priority_high}}<span class="badge badge-danger bg-danger text-white">{{review_labels.priority}}</span>{{/priority_high}}
                 </td>
                 <td>{{who}}</td>
                 <td>
-                    <small>{{summary}}</small>
+                    {{summary}}
                     {{#has_detail}}
                     <details class="aica-id-details">
                         <summary class="aica-id-summary">{{review_labels.detail}}</summary>
                         {{#detail}}
-                        {{#has_verdict}}<p><small>{{verdict}}</small></p>{{/has_verdict}}
-                        {{#redacted}}<p class="text-muted"><small>{{review_labels.text_removed}}</small></p>{{/redacted}}
+                        {{#has_verdict}}<p class="mb-2">{{verdict}}</p>{{/has_verdict}}
+                        {{#redacted}}<p class="text-muted"><em>{{review_labels.text_removed}}</em></p>{{/redacted}}
                         {{^redacted}}
-                        <p><strong>{{review_labels.question}}</strong><br><span class="aica-id-prewrap">{{question}}</span></p>
-                        <p><strong>{{review_labels.answer}}</strong><br><span class="aica-id-prewrap">{{answer}}</span></p>
+                        <p class="mb-2"><strong>{{review_labels.question}}</strong><br><span class="aica-id-prewrap">{{question}}</span></p>
+                        <p class="mb-2"><strong>{{review_labels.answer}}</strong><br><span class="aica-id-prewrap">{{answer}}</span></p>
                         {{/redacted}}
                         {{#has_claims}}
-                        <p><strong>{{review_labels.claims}}</strong></p>
+                        <p class="mb-1"><strong>{{review_labels.claims}}</strong></p>
                         <ul>
-                            {{#claims}}<li><small>{{#has_text}}{{text}} {{/has_text}}[{{status}}, {{severity}}] {{evidence}}</small></li>{{/claims}}
+                            {{#claims}}<li>{{#has_text}}{{text}}<br>{{/has_text}}<small class="text-muted">{{meta}}</small></li>{{/claims}}
                         </ul>
                         {{/has_claims}}
                         {{#has_rules}}
-                        <p><strong>{{review_labels.rules}}</strong></p>
+                        <p class="mb-1"><strong>{{review_labels.rules}}</strong></p>
                         <ul>
-                            {{#rules}}<li><small><code>{{id}}</code> ({{action}})</small></li>{{/rules}}
+                            {{#rules}}<li><code>{{id}}</code>: {{action}}</li>{{/rules}}
                         </ul>
                         {{/has_rules}}
-                        <p><small>{{passages}}</small></p>
+                        <p class="mb-0"><small class="text-muted">{{passages}}</small></p>
                         {{/detail}}
                     </details>
                     {{/has_detail}}
@@ -259,6 +263,7 @@
         {{/review_rows}}
         </tbody>
     </table>
+    </div>
     {{/has_review}}
 
 </div>
