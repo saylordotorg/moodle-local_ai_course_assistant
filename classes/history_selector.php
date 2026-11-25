@@ -175,25 +175,56 @@ class history_selector {
             $m = $messages[$i];
             if (($m->role ?? '') === 'user') {
                 $pair = ['user' => ['role' => 'user', 'content' => $m->message], 'assistant' => null];
-                if ($i + 1 < $n && ($messages[$i + 1]->role ?? '') === 'assistant') {
-                    $pair['assistant'] = ['role' => 'assistant', 'content' => $messages[$i + 1]->message];
-                    $i += 2;
+                // A correction of the previous answer can be stored between this question and its answer (the
+                // question is saved before streaming, the answer after): it is not the answer, so look past it.
+                $j = $i + 1;
+                while ($j < $n && self::is_correction($messages[$j])) {
+                    $j++;
+                }
+                if ($j < $n && ($messages[$j]->role ?? '') === 'assistant') {
+                    for ($k = $i + 1; $k < $j; $k++) {
+                        $pairs[] = self::single($messages[$k]);
+                    }
+                    $pair['assistant'] = ['role' => 'assistant', 'content' => $messages[$j]->message];
+                    $pairs[] = $pair;
+                    $i = $j + 1;
                 } else {
+                    $pairs[] = $pair;
                     $i += 1;
                 }
-                $pairs[] = $pair;
             } else {
                 // Stray assistant (or other) message; keep as its own entry so
                 // nothing is silently dropped before scoring.
-                $pair = ['user' => null, 'assistant' => ['role' => $m->role, 'content' => $m->message]];
-                if (($m->interaction_type ?? null) === correction_notice::INTERACTION_TYPE) {
-                    $pair['correction'] = true;
-                }
-                $pairs[] = $pair;
+                $pairs[] = self::single($m);
                 $i += 1;
             }
         }
         return $pairs;
+    }
+
+    /**
+     * Whether a row is a correction message (correction_notice).
+     *
+     * @param object $m
+     * @return bool
+     */
+    private static function is_correction($m): bool {
+        return ($m->role ?? '') === 'assistant'
+            && ($m->interaction_type ?? null) === correction_notice::INTERACTION_TYPE;
+    }
+
+    /**
+     * A message with no question of its own, as an entry; a correction keeps its flag.
+     *
+     * @param object $m
+     * @return array
+     */
+    private static function single($m): array {
+        $pair = ['user' => null, 'assistant' => ['role' => $m->role, 'content' => $m->message]];
+        if (($m->interaction_type ?? null) === correction_notice::INTERACTION_TYPE) {
+            $pair['correction'] = true;
+        }
+        return $pair;
     }
 
     /**

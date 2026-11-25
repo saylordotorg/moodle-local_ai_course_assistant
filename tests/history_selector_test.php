@@ -113,4 +113,35 @@ final class history_selector_test extends \advanced_testcase {
         $flat = history_selector::flatten($pairs);
         $this->assertSame(['q1', 'a1', 'q2'], array_column($flat, 'content'));
     }
+
+    public function test_a_correction_stored_between_a_question_and_its_answer_is_not_the_answer(): void {
+        // The question is stored before streaming, the answer after it; a correction of the previous answer can land
+        // between them (order q2, c, a2). q2 keeps a2 as its answer and the correction keeps its own entry and flag.
+        $c = correction_notice::INTERACTION_TYPE;
+        $messages = [
+            (object) ['role' => 'user', 'message' => 'q1'],
+            (object) ['role' => 'assistant', 'message' => 'a1'],
+            (object) ['role' => 'user', 'message' => 'q2'],
+            (object) ['role' => 'assistant', 'message' => 'c', 'interaction_type' => $c],
+            (object) ['role' => 'assistant', 'message' => 'a2'],
+        ];
+        $pairs = history_selector::pair_messages($messages);
+        $this->assertCount(3, $pairs);
+        $this->assertSame(['q1', 'a1'], [$pairs[0]['user']['content'], $pairs[0]['assistant']['content']]);
+        $this->assertNull($pairs[1]['user']);
+        $this->assertSame('c', $pairs[1]['assistant']['content']);
+        $this->assertTrue($pairs[1]['correction'] ?? false);
+        $this->assertSame(['q2', 'a2'], [$pairs[2]['user']['content'], $pairs[2]['assistant']['content']]);
+        $this->assertArrayNotHasKey('correction', $pairs[2]);
+        $this->assertSame(['q1', 'a1', 'c', 'q2', 'a2'], array_column(history_selector::flatten($pairs), 'content'));
+        // A correction after an unanswered question stays after it, as its own entry.
+        $pairs = history_selector::pair_messages(array_slice($messages, 0, 4));
+        $this->assertCount(3, $pairs);
+        $this->assertNull($pairs[1]['assistant']);
+        $this->assertTrue($pairs[2]['correction'] ?? false);
+        // A correction in its usual place (after the answer it corrects) is unchanged.
+        $pairs = history_selector::pair_messages([$messages[0], $messages[1], $messages[3]]);
+        $this->assertCount(2, $pairs);
+        $this->assertTrue($pairs[1]['correction'] ?? false);
+    }
 }
