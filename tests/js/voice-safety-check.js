@@ -18,10 +18,13 @@
  *   - when the session ends (closed, or stopped for silence) a waiting turn is sent, and words no answer followed
  *     are posted alone as the next turn, once; nothing is taken after that;
  *   - the safe message is spoken once through tts.php, or by the browser's own voice when that fails;
+ *   - each answer's transcript is handed over with its turn number (the greeting is 0), and chat.js tags the line
+ *     with it, so a block or warning changes that turn's line even when a later turn is on screen, and a verdict
+ *     that comes back after the session ended still replaces the line on screen (existing lines only, no audio);
  *   - chat.js and repository.js wiring, in source and build, including the Enforce refusal turning into the
  *     regular voice mode.
  *
- * A planted-defect run at the end breaks a copy of the source in nineteen ways and requires the checks to fail each time.
+ * A planted-defect run at the end breaks a copy of the source in twenty-seven ways and requires the checks to fail each time.
  *
  * What it can't check: a real provider, real audio, how much of an answer is heard before the verdict arrives,
  * and whether the provider's transcript is accurate. The talking avatar speaks inside the vendor's frame and is
@@ -217,7 +220,8 @@ const session = (kind, s, o) => {
     const env = makeEnv(clock);
     const engine = loadAmd(kind === 'gemini' ? s.gemini : s.realtime, env.globals);
     const VS = loadAmd(s.safety, env.globals);
-    const t = {clock, env, engine, VS, posts: [], blocks: [], warns: [], states: [], shown: [], verdicts: []};
+    const t = {clock, env, engine, VS, posts: [], blocks: [], warns: [], states: [], shown: [], shownTurns: [],
+        verdicts: []};
     // Each post gets a verdict the test resolves by hand.
     t.tracker = VS.create({
         ticket: o.ticket === undefined ? 'TICKET' : o.ticket,
@@ -235,7 +239,10 @@ const session = (kind, s, o) => {
         endpoint: 'wss://live.example/ws', provider: 'openai', model: 'gemini-3.8-live', sessionId: 9,
         maxSeconds: 600, idleSeconds: 600,
         onStateChange: (st) => t.states.push(st),
-        onTranscript: (r, x) => t.shown.push(r + ':' + x),
+        onTranscript: (r, x, n) => {
+            t.shown.push(r + ':' + x);
+            t.shownTurns.push([r, n]);
+        },
         onTurnText: t.tracker ? t.tracker.text : null,
         onTurnEnd: t.tracker ? t.tracker.turnEnd : null,
     };
@@ -337,6 +344,16 @@ const engineChecks = async(kind, label, s, check) => {
     await settle();
     check('the next turn is posted as turn 2 with its own question', t.posts.length === 2 && t.posts[1].turn === 2
         && t.posts[1].question === 'OK. What is osmosis?', JSON.stringify(t.posts[1]));
+    // Each answer's transcript is handed over with the turn it belongs to, the number its verdict will carry, so
+    // the verdict for turn 1 can find turn 1's line while turn 2 is on screen (the greeting is turn 0).
+    const said = t.shownTurns.filter((x) => x[0] === 'assistant' && x[1]).map((x) => x[1]);
+    check('assistant transcript carries its turn number (1 then 2)', said.length >= 2 && said[0] === 1
+        && said[said.length - 1] === 2 && said.every((n, i) => i === 0 || n >= said[i - 1]), JSON.stringify(said));
+    check('the turn number on the transcript matches the posted turn', t.posts.every((p) => said.includes(p.turn)));
+    if (kind === 'realtime') {
+        const greet = t.shownTurns.find((x) => x[0] === 'assistant');
+        check('the greeting is shown as turn 0, not turn 1', greet && greet[1] === 0, JSON.stringify(greet));
+    }
 
     // 5. Warn: the line is handed over without its markdown wrapper; the audio is left alone.
     t = session(kind, s);
@@ -578,10 +595,15 @@ const wiringChecks = (s, check) => {
     check('src: chat.js posts through Repo.checkVoiceTurn', /return Repo\.checkVoiceTurn\(courseId,/.test(c));
     check('src: the engine gets the tracker only when there is one',
         c.includes('onTurnText: safety ? safety.text : null') && c.includes('onTurnEnd: safety ? safety.turnEnd : null'));
-    check('src: a block swaps the transcript line and speaks the message',
-        /onBlock: function\(text\) \{[\s\S]{0,200}UI\.replaceVoiceTranscript\('assistant', text\);\s*VoiceSafety\.speak\(text,/.test(c));
-    check('src: a warning is added to the transcript',
-        /onWarn: function\(text\) \{[\s\S]{0,120}UI\.appendVoiceTranscript\('assistant', '\\n' \+ text\)/.test(c));
+    check('src: a block swaps THAT turn\'s transcript line and speaks the message',
+        /onBlock: function\(text, turn\) \{[\s\S]{0,500}\n\s+UI\.replaceVoiceTranscript\('assistant', text, turnTag\(turn\)\);\s*VoiceSafety\.speak\(text,/.test(c));
+    check('src: a block that comes back after the session ended still replaces the line on screen, existing lines only',
+        /onBlock: function\(text, turn\) \{\s*if \(!isThisConnection\(\)\) \{[\s\S]{0,300}UI\.replaceVoiceTranscript\('assistant', text, turnTag\(turn\), true\);\s*return;/.test(c));
+    check('src: a warning is added to THAT turn\'s line (only to an existing one after the session ended)',
+        /onWarn: function\(text, turn\) \{[\s\S]{0,200}UI\.appendToVoiceTurn\('\\n' \+ text, turnTag\(turn\), !isThisConnection\(\)\)/.test(c));
+    check('src: the answer\'s transcript line is tagged with its turn',
+        c.includes("UI.appendVoiceTranscript(role, text, role === 'assistant' ? turnTag(turn) : '');")
+        && /const turnTag = function\(turn\) \{\s*return turn \? sessionRequestId \+ '\.' \+ connection \+ '\.' \+ turn : '';/.test(c));
     check('src: the end of the session (closed, or stopped for silence) ends the tracker',
         /if \(state === 'disconnected' && safety\) \{[\s\S]{0,400}safety\.end\(\);/.test(c)
         && /onIdleStop: function\(\) \{\s*if \(safety\) \{[\s\S]{0,240}safety\.end\(\);/.test(c));
@@ -601,6 +623,8 @@ const wiringChecks = (s, check) => {
         s.repoBuild.includes('local_ai_course_assistant_check_voice_turn'));
     check('build: both engines export stopSpeaking', /stopSpeaking:/.test(s.realtimeBuild)
         && /stopSpeaking:/.test(s.geminiBuild));
+    check('build: chat.min.js tags transcript lines and uses appendToVoiceTurn', b.includes('appendToVoiceTurn(')
+        && /replaceVoiceTranscript\("assistant",\w+,\w+\(\w+\),!0\)/.test(b));
 };
 
 const run = async(s, check, srcOnly) => {
@@ -697,6 +721,27 @@ const sources = {
             swap(sources.chat, "err.errorcode === 'realtime:err_answer_safety' && canFallBack()", 'false')],
         ['chat.js that gives the engine no turn callbacks', 'chat',
             swap(sources.chat, 'onTurnEnd: safety ? safety.turnEnd : null,', '')],
+        ['realtime.js that shows the answer with no turn number', 'realtime',
+            swap(sources.realtime, "onTranscriptCb('assistant', shownText, awaitingGreeting ? 0 : turnSeq + 1);",
+                "onTranscriptCb('assistant', shownText);")],
+        ['realtime.js that numbers the greeting as turn 1', 'realtime',
+            swap(sources.realtime, 'awaitingGreeting ? 0 : turnSeq + 1);', 'turnSeq + 1);')],
+        ['gemini_live.js that shows the answer with no turn number', 'gemini',
+            swap(sources.gemini, "cb.onTranscript('assistant', shown, turnSeq + 1);", "cb.onTranscript('assistant', shown);")],
+        ['chat.js whose block replaces the last line, whichever turn', 'chat',
+            swap(sources.chat, "UI.replaceVoiceTranscript('assistant', text, turnTag(turn));",
+                "UI.replaceVoiceTranscript('assistant', text);")],
+        ['chat.js that drops the last turn\'s block after the session ended', 'chat',
+            swap(sources.chat, "UI.replaceVoiceTranscript('assistant', text, turnTag(turn), true);\n", '')],
+        ['chat.js that adds a new line for a verdict after the session ended', 'chat',
+            swap(sources.chat, "UI.replaceVoiceTranscript('assistant', text, turnTag(turn), true);",
+                "UI.replaceVoiceTranscript('assistant', text, turnTag(turn));")],
+        ['chat.js that adds the warning to the last line', 'chat',
+            swap(sources.chat, "UI.appendToVoiceTurn('\\n' + text, turnTag(turn), !isThisConnection());",
+                "UI.appendVoiceTranscript('assistant', '\\n' + text);")],
+        ['chat.js that does not tag the answer\'s line', 'chat',
+            swap(sources.chat, "UI.appendVoiceTranscript(role, text, role === 'assistant' ? turnTag(turn) : '');",
+                'UI.appendVoiceTranscript(role, text);')],
     ];
     console.log('planted defects (each must be caught)');
     for (const [name, key, mutated] of planted) {

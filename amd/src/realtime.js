@@ -568,7 +568,8 @@ define([], function() {
                         // 8.3.1: citation markers ([[c:1]]) never show either.
                         var shownText = markerFilter.push(assistantTranscript.slice(transcriptEmitted, cleanEnd));
                         if (shownText) {
-                            onTranscriptCb('assistant', shownText);
+                            // 8.4.0: with the turn it belongs to (0: the greeting), so a verdict finds its line.
+                            onTranscriptCb('assistant', shownText, awaitingGreeting ? 0 : turnSeq + 1);
                             // 8.4.0: the same text is what the answer check reads (never the greeting).
                             if (onTurnTextCb && !awaitingGreeting) {
                                 onTurnTextCb('assistant', shownText);

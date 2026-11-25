@@ -3648,6 +3648,12 @@ define([
                 const isThisConnection = function() {
                     return connection === liveConnection && isCurrentVoiceSessionRequest(sessionRequestId);
                 };
+                // Each answer's transcript line is tagged with its turn (data-voiceturn), unique across sessions and
+                // connections, so a verdict changes the line it is about even when later turns are on screen, and
+                // only lines of this connection.
+                const turnTag = function(turn) {
+                    return turn ? sessionRequestId + '.' + connection + '.' + turn : '';
+                };
                 const safety = VoiceSafety.create({
                     ticket: result.safetyticket || '',
                     post: function(turn) {
@@ -3658,11 +3664,14 @@ define([
                             engine.stopSpeaking(turn);
                         }
                     },
-                    onBlock: function(text) {
+                    onBlock: function(text, turn) {
                         if (!isThisConnection()) {
+                            // The session is over (the last turn's verdict comes back after end()): the blocked
+                            // text still on screen is replaced, but nothing is spoken or added.
+                            UI.replaceVoiceTranscript('assistant', text, turnTag(turn), true);
                             return;
                         }
-                        UI.replaceVoiceTranscript('assistant', text);
+                        UI.replaceVoiceTranscript('assistant', text, turnTag(turn));
                         VoiceSafety.speak(text, {
                             ttsUrl: root ? (root.dataset.ttsurl || '') : '',
                             courseId: courseId,
@@ -3671,10 +3680,9 @@ define([
                             audioCtx: audioCtx,
                         });
                     },
-                    onWarn: function(text) {
-                        if (isThisConnection()) {
-                            UI.appendVoiceTranscript('assistant', '\n' + text);
-                        }
+                    onWarn: function(text, turn) {
+                        // After the session is over the line is only added to, never created.
+                        UI.appendToVoiceTurn('\n' + text, turnTag(turn), !isThisConnection());
                     },
                 });
 
@@ -3737,11 +3745,11 @@ define([
                                 // Unreported sessions count in full against the daily allowance.
                             });
                         },
-                        onTranscript: function(role, text) {
+                        onTranscript: function(role, text, turn) {
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                                 return;
                             }
-                            UI.appendVoiceTranscript(role, text);
+                            UI.appendVoiceTranscript(role, text, role === 'assistant' ? turnTag(turn) : '');
                         },
                         onStateChange: function(state) {
                             if (state === 'disconnected' && safety) {

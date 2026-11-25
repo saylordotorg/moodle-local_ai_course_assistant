@@ -14,12 +14,14 @@
  *      still being fetched, whether that fetch is aborted in time or had already answered: audio fetched for the
  *      old answer is never played and never cuts the replacement short;
  *   2. the REAL replaceVoiceTranscript() lifted from amd/src/ui.js, run on a minimal DOM: it swaps the last
- *      assistant line as text (never HTML) and never touches the learner's own line;
+ *      assistant line as text (never HTML) and never touches the learner's own line; with a live voice turn tag
+ *      it swaps that turn's line even when a later turn is on screen, appendToVoiceTurn() adds a warning to that
+ *      line, and once the session has ended neither adds a line;
  *   3. the REAL practice-scoring onReplace handler lifted from amd/src/chat.js;
  *   4. chat.js wires Voice's onReplace to the transcript, in source and in the built bundle (Moodle serves
  *      amd/build).
  *
- * A planted-defect run at the end breaks a copy of the source seven ways and requires the checks to fail each time.
+ * A planted-defect run at the end breaks a copy of the source twelve ways and requires the checks to fail each time.
  *
  * What it can't check: real audio, a real microphone, a real provider. The live voice modes (Gemini Live, OpenAI
  * and xAI realtime) never pass through sse.php, so there is no replace event for them: their turns are posted and
@@ -392,14 +394,17 @@ class El {
 const liftUi = (uiSrc) => {
     const a = uiSrc.match(/\n( {4})const appendVoiceTranscript = function\([\s\S]*?\n\1\};\n/);
     const r = uiSrc.match(/\n( {4})const replaceVoiceTranscript = function\([\s\S]*?\n\1\};\n/);
+    const l = uiSrc.match(/\n( {4})const voiceTurnLines = function\([\s\S]*?\n\1\};\n/);
+    const w = uiSrc.match(/\n( {4})const appendToVoiceTurn = function\([\s\S]*?\n\1\};\n/);
     if (!a || !r) {
         return null;
     }
     return (container) => {
         // eslint-disable-next-line no-new-func
-        return new Function('messagesContainer', 'document', 'appendMessageNode', a[0] + r[0]
-            + '\nreturn {append: appendVoiceTranscript, replace: replaceVoiceTranscript};')(container,
-            {createElement: () => new El('')}, (n) => container.appendChild(n));
+        return new Function('messagesContainer', 'document', 'appendMessageNode', a[0] + (l ? l[0] : '') + r[0]
+            + (w ? w[0] : 'var appendToVoiceTurn = null;')
+            + '\nreturn {append: appendVoiceTranscript, replace: replaceVoiceTranscript, warn: appendToVoiceTurn};')(
+            container, {createElement: () => new El('')}, (n) => container.appendChild(n));
     };
 };
 
@@ -416,7 +421,7 @@ const uiChecks = (uiSrc, check) => {
     ui.append('assistant', 'you will pass.');
     ui.replace('assistant', 'Safe <b>text</b>.');
     const lines = box.querySelectorAll('aica-voice-msg');
-    const text = (el) => el.querySelector('.aica-voice-msg__text').textContent;
+    const text = (el) => (el ? el.querySelector('.aica-voice-msg__text').textContent : undefined);
     check('the last assistant line is swapped, not added to', lines.length === 2 && text(lines[1]) === 'Safe <b>text</b>.',
         lines.map(text).join(' | '));
     check('the text is set as text, never as HTML', lines.every((l) => l.htmlWrites === 0
@@ -431,6 +436,54 @@ const uiChecks = (uiSrc, check) => {
     check('with no assistant line yet, the replacement becomes one (the question is not overwritten)',
         l2.length === 2 && text(l2[0]) === 'Will I pass?' && text(l2[1]) === 'Safe.', l2.map(text).join(' | '));
     check('ui.js exports replaceVoiceTranscript', /replaceVoiceTranscript: replaceVoiceTranscript,/.test(uiSrc));
+
+    // 8.4.0 live voice: a verdict arrives after a round trip, by which time the next turn may be on screen. Each
+    // answer's line carries its turn tag; the verdict changes that line, never the newer one.
+    const box3 = new El('messages');
+    const ui3 = lift(box3);
+    check('ui.js defines appendToVoiceTurn', typeof ui3.warn === 'function');
+    ui3.append('user', 'Can I get an extension?');
+    ui3.append('assistant', 'Sure, I granted ', '7.1.1');
+    ui3.append('assistant', 'you one.', '7.1.1');
+    ui3.append('assistant', 'Osmosis is ', '7.1.2');
+    let l3 = box3.querySelectorAll('aica-voice-msg');
+    check('text of another turn starts its own line', l3.length === 3 && text(l3[1]) === 'Sure, I granted you one.'
+        && text(l3[2]) === 'Osmosis is ' && l3[1].dataset.voiceturn === '7.1.1' && l3[2].dataset.voiceturn === '7.1.2',
+        l3.map(text).join(' | '));
+    ui3.append('user', 'What is osmosis?');
+    ui3.append('assistant', 'the movement of water.', '7.1.2');
+    ui3.replace('assistant', 'Safe.', '7.1.1');
+    l3 = box3.querySelectorAll('aica-voice-msg');
+    check('a block for turn 1 replaces turn 1\'s line while turn 2 is on screen', text(l3[1]) === 'Safe.'
+        && l3[1].dataset.replaced === '1', l3.map(text).join(' | '));
+    check('and leaves turn 2\'s lines alone', l3.slice(2).map(text).join('|') === 'Osmosis is |What is osmosis?|'
+        + 'the movement of water.', l3.map(text).join(' | '));
+    if (typeof ui3.warn === 'function') {
+        ui3.warn('\nPlease check this.', '7.1.2');
+        l3 = box3.querySelectorAll('aica-voice-msg');
+        check('a warning goes on the end of its own turn\'s line', text(l3[4]) === 'the movement of water.\nPlease check this.'
+            && text(l3[2]) === 'Osmosis is ', l3.map(text).join(' | '));
+        const before = l3.length;
+        check('after the session ended a warning for a turn with no line adds nothing',
+            ui3.warn('\nCheck.', '7.1.9', true) === false && box3.querySelectorAll('aica-voice-msg').length === before);
+    }
+    // A turn split by a learner line that arrived late: every piece of the blocked answer goes.
+    const lines4 = box3.querySelectorAll('aica-voice-msg');
+    ui3.replace('assistant', 'Safe again.', '7.1.2');
+    const l4 = box3.querySelectorAll('aica-voice-msg');
+    check('a turn split over two lines is replaced whole (the first gets the text, the rest are emptied)',
+        text(l4[2]) === 'Safe again.' && text(l4[4]) === '' && l4[4].hidden === true && text(l4[3]) === 'What is osmosis?',
+        l4.map(text).join(' | '));
+    const n4 = lines4.length;
+    check('after the session ended a block for a turn with no line adds nothing',
+        ui3.replace('assistant', 'Safe.', '7.9.9', true) === false && box3.querySelectorAll('aica-voice-msg').length === n4);
+    check('while the session runs a block for a turn with no line adds one, tagged',
+        ui3.replace('assistant', 'Safe.', '7.1.3') === true
+        && (box3.querySelectorAll('aica-voice-msg')[n4] || {dataset: {}}).dataset.voiceturn === '7.1.3');
+    check('a session that ended can replace its own line still on screen',
+        ui3.replace('assistant', 'Late safe.', '7.1.1', true) === true && text(box3.querySelectorAll('aica-voice-msg')[1])
+        === 'Late safe.');
+    check('ui.js exports appendToVoiceTurn', /appendToVoiceTurn: appendToVoiceTurn,/.test(uiSrc));
 };
 
 // ---- chat.js: the practice-scoring stream and the Voice wiring -------------------------------------------------
@@ -506,6 +559,8 @@ const buildChecks = (s, check) => {
         (s.chatBuild.match(/onReplace:function/g) || []).length === 3,
         String((s.chatBuild.match(/onReplace:function/g) || []).length));
     check('build: ui.min.js exports replaceVoiceTranscript', /replaceVoiceTranscript:/.test(s.uiBuild));
+    check('build: ui.min.js exports appendToVoiceTurn and tags lines', /appendToVoiceTurn:/.test(s.uiBuild)
+        && s.uiBuild.includes('voiceturn'));
 };
 
 const run = async(s, check) => {
@@ -558,9 +613,22 @@ const sources = {
                 '$1prefetchInFlight = false;').replace(/ready && ready\.text === sentence/, 'ready')],
         ['chat.js scoring stream without the onReplace handler', 'chatSrc',
             cut(sources.chatSrc, /\n( +)onReplace: function\(data\) \{\n\s+\/\/ 8\.4\.0 \(RT2\)[\s\S]*?\n\1\},\n/)],
+        ['ui.js that runs a new turn on into the last line', 'uiSrc',
+            sources.uiSrc.replace('lastRole === role && (!turn || lastTurn === turn)', 'lastRole === role')],
+        ['ui.js that replaces the last line whatever turn the verdict is for', 'uiSrc',
+            sources.uiSrc.replace('lines = voiceTurnLines(role, turn);', 'lines = [].slice.call('
+                + 'messagesContainer.querySelectorAll(\'.aica-voice-msg--\' + role)).slice(-1);')],
+        ['ui.js that adds a line after the session ended', 'uiSrc',
+            sources.uiSrc.replace(/if \(existingOnly\) \{\n\s+return false;\n\s+\}\n(\s+)appendVoiceTranscript\(role, text, turn\);/,
+                '$1appendVoiceTranscript(role, text, turn);')],
+        ['ui.js that leaves the rest of a split turn showing', 'uiSrc',
+            sources.uiSrc.replace("                rest.textContent = '';\n", '')],
+        ['ui.js whose warning goes on the last line', 'uiSrc',
+            sources.uiSrc.replace("var lines = voiceTurnLines('assistant', turn);", 'var lines = [].slice.call('
+                + 'messagesContainer.querySelectorAll(\'.aica-voice-msg--assistant\')).slice(-1);')],
         ['ui.js that appends instead of swapping', 'uiSrc',
-            sources.uiSrc.replace(/content\.textContent = text;\n(\s+)lastMsg\.dataset\.replaced/,
-                'content.textContent += text;\n$1lastMsg.dataset.replaced')],
+            sources.uiSrc.replace(/content\.textContent = text;\n(\s+)lines\[0\]\.dataset\.replaced/,
+                'content.textContent += text;\n$1lines[0].dataset.replaced')],
     ];
     for (const [name, key, mutated] of planted) {
         if (!mutated || mutated === sources[key]) {

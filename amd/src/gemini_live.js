@@ -486,7 +486,8 @@ define([], function() {
             turnHasOutput = true;
             var shown = modelTextFilter.push(ev.modelText);
             if (shown && cb.onTranscript) {
-                cb.onTranscript('assistant', shown);
+                // 8.4.0: with the turn it belongs to, so a verdict finds its line.
+                cb.onTranscript('assistant', shown, turnSeq + 1);
             }
             // 8.4.0: the same text is what the answer check reads.
             if (shown && cb.onTurnText) {
