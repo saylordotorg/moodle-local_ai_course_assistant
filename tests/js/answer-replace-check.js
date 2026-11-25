@@ -204,9 +204,13 @@ const liftChatHandler = (chatSrc) => {
         return null;
     }
     const body = m[0].trim().replace(/^onReplace: /, '').replace(/,$/, '');
+    // A stand-in for chat.js's stripStreamingDecorators (decorator-strip-check.js pins the real one).
+    const strip = (t) => String(t).replace(/\n*\[SOLA_NEXT\][\s\S]*?(\[\/SOLA_NEXT\]|$)/g, '')
+        .replace(/\[{1,3}SOURCE:[^\]]*\]{1,3}/g, '');
     return (state, UI) => {
         // eslint-disable-next-line no-new-func
-        return new Function('state', 'UI', 'return ' + body.replace(/\bfullText\b/g, 'state.fullText') + ';')(state, UI);
+        return new Function('state', 'UI', 'stripStreamingDecorators',
+            'return ' + body.replace(/\bfullText\b/g, 'state.fullText') + ';')(state, UI, strip);
     };
 };
 
@@ -238,6 +242,13 @@ const chatChecks = (chatSrc, check, label) => {
     lift(state, UI)({replace: 'Other.', messageid: 99});
     check(label + ': an ignored replace leaves the text alone', state.fullText === 'kept');
     calls.length = 0;
+    state = {fullText: 'I guarantee you will pass.'};
+    const raw = 'Safe. [SOURCE:course]\n[SOLA_NEXT]Ask again||Quiz me[/SOLA_NEXT]';
+    lift(state, UI)({replace: raw, messageid: 41});
+    check(label + ': the replacement is shown without its markers, and kept whole for onDone',
+        calls.join('|') === 'replace:Safe. :41' && state.fullText === raw, calls.join('|'));
+    calls.length = 0;
+    state = {fullText: 'kept'};
     lift(state, UI)({messageid: 41});
     lift(state, UI)(null);
     check(label + ': a frame without replace text does nothing', calls.length === 0 && state.fullText === 'kept');
@@ -251,6 +262,8 @@ const run = async(sources, check) => {
     chatChecks(sources.chatSrc, check, 'src');
     check('build: chat.min.js wires onReplace', /onReplace:function/.test(sources.chatBuild));
     check('build: chat.min.js calls replaceStreamContent', sources.chatBuild.includes('replaceStreamContent'));
+    check('build: chat.min.js strips the replacement before it is shown',
+        /replaceStreamContent\(\w+\(\w+\.replace\),\w+\.messageid\)/.test(sources.chatBuild));
     check('build: ui.min.js exports replaceStreamContent', /replaceStreamContent:/.test(sources.uiBuild));
     check('build: ui.min.js marks data-replaced', /\.replaced="1"/.test(sources.uiBuild));
     check('ui.js exports replaceStreamContent', /replaceStreamContent: replaceStreamContent,/.test(sources.uiSrc));
@@ -284,6 +297,10 @@ const sources = {
         })],
         ['sse_client.js that never calls onReplace', Object.assign({}, sources, {
             sseSrc: sources.sseSrc.replace(/callbacks\.onReplace\(data\)/g, 'void 0'),
+        })],
+        ['chat.js that renders the replacement with its markers', Object.assign({}, sources, {
+            chatSrc: sources.chatSrc.replace('UI.replaceStreamContent(stripStreamingDecorators(data.replace), data.messageid)',
+                'UI.replaceStreamContent(data.replace, data.messageid)'),
         })],
         ['ui.js that does not mark the element', Object.assign({}, sources, {
             uiSrc: sources.uiSrc.replace(/streamingEl\.dataset\.replaced = '1';/, ''),

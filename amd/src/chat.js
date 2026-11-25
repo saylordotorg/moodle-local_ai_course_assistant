@@ -6283,7 +6283,9 @@ define([
                 if (!fullText) {
                     UI.startStreaming(null);
                 }
-                if (UI.replaceStreamContent(data.replace, data.messageid)) {
+                // Shown like every streamed frame, without [SOLA_NEXT] or [SOURCE:] markers; the raw text is kept so
+                // onDone still reads the chips and the source from it.
+                if (UI.replaceStreamContent(stripStreamingDecorators(data.replace), data.messageid)) {
                     fullText = data.replace;
                 }
             },
