@@ -32,7 +32,11 @@
  * Whose words a question is: the provider's transcript of the learner can arrive after the model has begun to
  * answer, or after it has finished. Learner text that arrives before the answer starts, or while this turn has no
  * question yet, belongs to this turn; learner text that arrives once an answer with a question is under way is a
- * barge-in and belongs to the next. A finished turn with no question waits up to waitMs for one.
+ * barge-in and belongs to the next. A finished turn with no question waits up to waitMs for one; learner text that
+ * comes later still goes with the next turn. When the session ends (end(): closed, or stopped for silence) a turn
+ * still waiting is sent, and so are words the learner said that no answer followed (and an answer cut off by the
+ * end), as one more turn, numbered after the last: the server checks a question alone on the question, so a
+ * distress statement at the end of a session is still recorded. After end() the tracker posts nothing more.
  *
  * @module     local_ai_course_assistant/voice_safety
  * @copyright  2026 Tom Caswell & David Ta / Saylor University
@@ -70,8 +74,8 @@ define([], function() {
      * @param {Function} opts.onBlock function(text, turn): show and speak the safe message
      * @param {Function} opts.onWarn function(text, turn): add the check line to the transcript
      * @param {number=} opts.waitMs
-     * @returns {{text: function(string, string), turnEnd: function(number), flush: function()}|null} null without
-     *     a ticket
+     * @returns {{text: function(string, string), turnEnd: function(number), flush: function(), end: function()}|null}
+     *     null without a ticket
      */
     var create = function(opts) {
         opts = opts || {};
@@ -85,6 +89,8 @@ define([], function() {
         var answering = false;
         var pending = null;
         var blocked = {};
+        var lastTurn = 0;
+        var ended = false;
 
         var send = function(turn) {
             var result;
@@ -165,6 +171,10 @@ define([], function() {
              * @param {number} n Turn number within the session, from 1
              */
             turnEnd: function(n) {
+                if (ended) {
+                    return;
+                }
+                lastTurn = Math.max(lastTurn, n || 0);
                 var turn = {turn: n, question: question, answer: answer, hadQuestion: !!question.trim(), timer: null};
                 question = nextQuestion;
                 nextQuestion = '';
@@ -186,8 +196,30 @@ define([], function() {
                     flush();
                 }, waitMs);
             },
-            /** Send a turn that is still waiting for its question (the session is ending). */
-            flush: flush
+            /** Send a turn that is still waiting for its question. */
+            flush: flush,
+            /**
+             * The session is over (closed, or stopped for silence). Send the turn still waiting, then whatever the
+             * learner said that no finished answer followed, with the part of an answer cut off by the end, as one
+             * more turn; then words spoken over that answer, alone. Posts nothing more afterwards. Safe to call twice.
+             */
+            end: function() {
+                if (ended) {
+                    return;
+                }
+                ended = true;
+                flush();
+                var left = [{question: question, answer: answer}, {question: nextQuestion, answer: ''}];
+                question = '';
+                nextQuestion = '';
+                answer = '';
+                left.forEach(function(t) {
+                    if (t.question.trim() || t.answer.trim()) {
+                        lastTurn += 1;
+                        send({turn: lastTurn, question: t.question, answer: t.answer});
+                    }
+                });
+            }
         };
     };
 

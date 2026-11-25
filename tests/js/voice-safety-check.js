@@ -15,11 +15,13 @@
  *   - a warning hands its line over and leaves the audio alone; a failed or empty reply changes nothing;
  *   - a learner transcript that arrives after the answer finished still goes with that turn (up to 1.5 s); words
  *     spoken over an answer go with the next turn; a Gemini turn cut off by the learner is posted once;
+ *   - when the session ends (closed, or stopped for silence) a waiting turn is sent, and words no answer followed
+ *     are posted alone as the next turn, once; nothing is taken after that;
  *   - the safe message is spoken once through tts.php, or by the browser's own voice when that fails;
  *   - chat.js and repository.js wiring, in source and build, including the Enforce refusal turning into the
  *     regular voice mode.
  *
- * A planted-defect run at the end breaks a copy of the source in fourteen ways and requires the checks to fail each time.
+ * A planted-defect run at the end breaks a copy of the source in nineteen ways and requires the checks to fail each time.
  *
  * What it can't check: a real provider, real audio, how much of an answer is heard before the verdict arrives,
  * and whether the provider's transcript is accurate. The talking avatar speaks inside the vendor's frame and is
@@ -399,6 +401,52 @@ const engineChecks = async(kind, label, s, check) => {
     await settle();
     check('flush sends a turn that was still waiting (the session is ending)', t.posts.length === 1);
 
+    // 7b. Words that come more than 1.5 s after the last answer, and then the session ends: they are posted alone
+    // when it ends (a distress statement at the end of a session must not go unrecorded).
+    t = session(kind, s);
+    t.user('Can I get an extension?');
+    t.answer('I cannot grant extensions.');
+    t.done();
+    await settle();
+    check('the answered turn is posted as turn 1', t.posts.length === 1 && t.posts[0].turn === 1);
+    t.clock.advance(3000);
+    t.user('I want to give up on everything');
+    t.clock.advance(5000);
+    await settle();
+    check('late words wait for the next turn while the session runs', t.posts.length === 1);
+    t.tracker.end();
+    await settle();
+    check('at the end they are posted alone, as the next turn', t.posts.length === 2 && t.posts[1].turn === 2
+        && t.posts[1].question === 'I want to give up on everything' && t.posts[1].answer === '',
+        JSON.stringify(t.posts));
+    t.tracker.end();
+    t.user('more words');
+    t.answer('More answer.');
+    t.done();
+    t.clock.advance(5000);
+    await settle();
+    check('end() twice posts once, and nothing is taken after it', t.posts.length === 2, JSON.stringify(t.posts));
+    t.verdicts[1].resolve({recorded: true, action: 'warn', text: '_Please reach out for support._', wellbeing: true});
+    await settle();
+    check('a warning for the question alone is handed over as a line', t.warns.length === 1
+        && t.warns[0][0] === 'Please reach out for support.' && t.warns[0][1] === 2, JSON.stringify(t.warns));
+    // A turn still waiting for its question, then the session ends: both go, each once.
+    t = session(kind, s);
+    t.answer('Your extension has been approved.');
+    t.done();
+    t.tracker.end();
+    await settle();
+    check('end() sends the waiting turn', t.posts.length === 1 && t.posts[0].turn === 1
+        && t.posts[0].answer === 'Your extension has been approved.', JSON.stringify(t.posts));
+    t.clock.advance(5000);
+    await settle();
+    check('and its timer does not send it again', t.posts.length === 1);
+    // Nothing left: nothing posted.
+    t = session(kind, s);
+    t.tracker.end();
+    await settle();
+    check('a session that ends with nothing said posts nothing', t.posts.length === 0);
+
     // 8. Words spoken over an answer belong to the next turn.
     t = session(kind, s);
     t.user('What is osmosis?');
@@ -534,6 +582,9 @@ const wiringChecks = (s, check) => {
         /onBlock: function\(text\) \{[\s\S]{0,200}UI\.replaceVoiceTranscript\('assistant', text\);\s*VoiceSafety\.speak\(text,/.test(c));
     check('src: a warning is added to the transcript',
         /onWarn: function\(text\) \{[\s\S]{0,120}UI\.appendVoiceTranscript\('assistant', '\\n' \+ text\)/.test(c));
+    check('src: the end of the session (closed, or stopped for silence) ends the tracker',
+        /if \(state === 'disconnected' && safety\) \{[\s\S]{0,400}safety\.end\(\);/.test(c)
+        && /onIdleStop: function\(\) \{\s*if \(safety\) \{[\s\S]{0,240}safety\.end\(\);/.test(c));
     check('src: a verdict from an earlier connection is ignored',
         /stop: function\(turn\) \{\s*if \(isThisConnection\(\) && engine\.stopSpeaking\)/.test(c));
     check('src: the Enforce refusal becomes the regular voice mode, with the server\'s message',
@@ -545,6 +596,7 @@ const wiringChecks = (s, check) => {
     check('build: chat.min.js reads the ticket, posts turns and handles the refusal', b.includes('safetyticket')
         && b.includes('checkVoiceTurn') && b.includes('realtime:err_answer_safety') && b.includes('onTurnEnd:')
         && b.includes('stopSpeaking'));
+    check('build: chat.min.js ends the tracker', /\.end\(\)/.test(b) && !/\.flush\(\)/.test(b));
     check('build: repository.min.js calls the check_voice_turn service',
         s.repoBuild.includes('local_ai_course_assistant_check_voice_turn'));
     check('build: both engines export stopSpeaking', /stopSpeaking:/.test(s.realtimeBuild)
@@ -622,6 +674,25 @@ const sources = {
             swap(sources.safety, "                    if (opts.stop) {\n                        opts.stop(turn.turn);\n                    }\n", '')],
         ['voice_safety.js that puts barge-in words in the turn being answered', 'safety',
             swap(sources.safety, 'nextQuestion += text;', 'question += text;')],
+        ['voice_safety.js whose end() drops the words no answer followed', 'safety',
+            swap(sources.safety, 'if (t.question.trim() || t.answer.trim()) {', 'if (t.answer.trim()) {')],
+        ['voice_safety.js whose end() reuses the last turn number', 'safety',
+            swap(sources.safety, '                        lastTurn += 1;\n', '')],
+        ['voice_safety.js that still posts turns after end()', 'safety',
+            swap(sources.safety, `            turnEnd: function(n) {
+                if (ended) {
+                    return;
+                }
+`, `            turnEnd: function(n) {
+`)],
+        ['chat.js that only flushes when the session ends', 'chat',
+            swap(sources.chat, 'safety.end();', 'safety.flush();')],
+        ['chat.js that does not end the tracker on an idle stop', 'chat',
+            swap(sources.chat, `                            if (safety) {
+                                // Stopped for silence ends this session's turns (a Resume starts a new tracker).
+                                safety.end();
+                            }
+`, '')],
         ['chat.js that does not fall back on the Enforce refusal', 'chat',
             swap(sources.chat, "err.errorcode === 'realtime:err_answer_safety' && canFallBack()", 'false')],
         ['chat.js that gives the engine no turn callbacks', 'chat',

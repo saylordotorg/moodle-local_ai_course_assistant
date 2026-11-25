@@ -3693,6 +3693,10 @@ define([
                         onTurnText: safety ? safety.text : null,
                         onTurnEnd: safety ? safety.turnEnd : null,
                         onIdleStop: function() {
+                            if (safety) {
+                                // Stopped for silence ends this session's turns (a Resume starts a new tracker).
+                                safety.end();
+                            }
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                                 return;
                             }
@@ -3741,8 +3745,9 @@ define([
                         },
                         onStateChange: function(state) {
                             if (state === 'disconnected' && safety) {
-                                // A last turn still waiting for the learner's transcript is sent as it is.
-                                safety.flush();
+                                // The session is over: a turn still waiting for the learner's transcript is sent,
+                                // and so are words the learner said that no answer followed.
+                                safety.end();
                             }
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                                 return;
