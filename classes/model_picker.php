@@ -56,7 +56,9 @@ final class model_picker {
 
     /**
      * The provider and model a chat request may override with: what the request named when the current user may
-     * use the pickers in this course, otherwise two empty strings (the configured model answers).
+     * use the pickers in this course AND the pair is one the picker offers (options()), otherwise two empty strings
+     * (the configured model answers). The second condition is the 8.4.0 red team fix: a crafted request used to be
+     * able to name any model id the provider's key can reach.
      *
      * @param string $provider the request's provider, already cleaned
      * @param string $model the request's model, already cleaned
@@ -64,10 +66,15 @@ final class model_picker {
      * @return string[] [provider, model]
      */
     public static function request_override(string $provider, string $model, int $courseid): array {
-        if ($provider === '' || !self::allowed($courseid)) {
+        if ($provider === '' || $model === '' || !self::allowed($courseid)) {
             return ['', ''];
         }
-        return [$provider, $model];
+        foreach (self::options()['providers'] as $offered) {
+            if ($offered['id'] === $provider && in_array($model, array_column($offered['models'], 'id'), true)) {
+                return [$provider, $model];
+            }
+        }
+        return ['', ''];
     }
 
     /**

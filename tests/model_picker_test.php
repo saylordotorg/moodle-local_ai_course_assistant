@@ -140,11 +140,45 @@ final class model_picker_test extends \advanced_testcase {
 
     public function test_an_admin_request_picks_the_model_when_the_setting_is_on(): void {
         set_config(model_picker::SETTING, '1', 'local_ai_course_assistant');
+        set_config('comparison_providers', "claude|sk-ant-test-key|claude-opus-5-5, claude-sonnet-5-5|0.3|",
+            'local_ai_course_assistant');
         $this->setAdminUser();
         $this->assertSame(['claude', 'claude-opus-5-5'],
             model_picker::request_override('claude', 'claude-opus-5-5', (int) $this->course->id));
+        // The primary provider's configured model is on the list too.
+        $this->assertSame(['openai', 'gpt-picker-sentinel'],
+            model_picker::request_override('openai', 'gpt-picker-sentinel', (int) $this->course->id));
         // No provider named: nothing to override, and a model alone is dropped.
         $this->assertSame(['', ''], model_picker::request_override('', 'claude-opus-5-5', (int) $this->course->id));
+    }
+
+    public function test_a_crafted_request_cannot_name_a_model_the_picker_does_not_offer(): void {
+        // Red team (picker on): the gate checked who was asking, not what they asked for, so a holder of the
+        // manage capability could send any model id the provider's key can reach (the most expensive one, a
+        // retired one, a string with a path in it). Only a provider and model pair the picker lists is taken;
+        // anything else is ignored and the configured model answers.
+        set_config(model_picker::SETTING, '1', 'local_ai_course_assistant');
+        set_config('comparison_providers', "claude|sk-ant-test-key|claude-opus-5-5, claude-sonnet-5-5|0.3|\n"
+            . "voyage|pa-test-key|voyage-3.5||", 'local_ai_course_assistant');
+        $this->setAdminUser();
+        $cid = (int) $this->course->id;
+        foreach ([
+            ['claude', 'claude-mythos-5-1'],                 // a real model of that provider, not offered
+            ['claude', 'claude-opus-5-5/../../v1/files'],    // a path
+            ['claude', 'CLAUDE-OPUS-5-5'],                   // not the id as listed
+            ['claude', ' claude-opus-5-5'],
+            ['claude', ''],                                  // a provider with no model
+            ['openai', 'claude-opus-5-5'],                   // another provider's model
+            ['openai', 'gpt-6-luna'],
+            ['gemini', 'gemini-2.5-flash'],                  // a provider with no row
+            ['voyage', 'voyage-3.5'],                        // a key-only row is not a chat provider
+            ['Claude', 'claude-opus-5-5'],
+        ] as [$provider, $model]) {
+            $this->assertSame(['', ''], model_picker::request_override($provider, $model, $cid),
+                $provider . ' / ' . $model);
+        }
+        $this->assertSame(['claude', 'claude-sonnet-5-5'],
+            model_picker::request_override('claude', 'claude-sonnet-5-5', $cid), 'a listed pair is still taken');
     }
 
     public function test_a_learner_request_never_picks_a_model(): void {
