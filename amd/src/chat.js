@@ -3321,9 +3321,19 @@ define([
         }
 
         var scoreFullText = '';
+        var scoreReplaced = false;
         SSE.startStream(sseUrl, postData, {
             onToken: function(token) {
                 scoreFullText += token;
+            },
+            onReplace: function(data) {
+                // 8.4.0 (RT2): a guidance rule replaced the scoring answer (blocked, or a check line added). The
+                // server stored the replacement, so the score is read from that text and never from what streamed.
+                if (!data || typeof data.replace !== 'string') {
+                    return;
+                }
+                scoreFullText = data.replace;
+                scoreReplaced = true;
             },
             onDone: function() {
                 var parsed = parseAssistantDecorators(scoreFullText);
@@ -3337,6 +3347,10 @@ define([
                     if (last && last.textContent.indexOf('Evaluating your practice') !== -1) {
                         last.remove();
                     }
+                }
+                if (scoreReplaced && !parsed.scoreData && parsed.text) {
+                    // The answer was blocked: there is no score, so show the learner what was stored instead.
+                    addAssistantMsg(parsed.text, null, {skipHistory: true});
                 }
                 practiceSessionType = null;
             },
@@ -3860,6 +3874,13 @@ define([
                             return;
                         }
                         UI.appendVoiceTranscript(role, text);
+                    },
+                    onReplace: function(text) {
+                        // 8.4.0 (RT2): a guidance rule replaced the answer being read; show the replacement.
+                        if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
+                            return;
+                        }
+                        UI.replaceVoiceTranscript('assistant', text);
                     },
                     onStateChange: function(state) {
                         if (!isCurrentVoiceSessionRequest(sessionRequestId)) {

@@ -195,9 +195,12 @@ const uiChecks = (uiSrc, check) => {
 };
 
 // ---- the chat.js handler ------------------------------------------------------------------------------------
+const CHAT_HANDLER = /\n( +)onReplace: function\(data\) \{[\s\S]*?\n\1\},\n/g;
 const liftChatHandler = (chatSrc) => {
-    const m = chatSrc.match(/\n( +)onReplace: function\(data\) \{[\s\S]*?\n\1\},\n/);
-    if (!m) {
+    // The chat stream's handler: the one that swaps the streamed message (the practice-scoring stream and the
+    // voice mode have their own, pinned by voice-replace-check.js).
+    const m = (chatSrc.match(CHAT_HANDLER) || []).filter((h) => h.includes('UI.replaceStreamContent'));
+    if (m.length !== 1) {
         return null;
     }
     const body = m[0].trim().replace(/^onReplace: /, '').replace(/,$/, '');
@@ -277,7 +280,7 @@ const sources = {
     // Planted defects: each must make the checks fail, or the checks prove nothing.
     const planted = [
         ['chat.js without the onReplace handler', Object.assign({}, sources, {
-            chatSrc: sources.chatSrc.replace(/\n( +)onReplace: function\(data\) \{[\s\S]*?\n\1\},\n/, '\n'),
+            chatSrc: sources.chatSrc.replace(CHAT_HANDLER, (h) => (h.includes('UI.replaceStreamContent') ? '\n' : h)),
         })],
         ['sse_client.js that never calls onReplace', Object.assign({}, sources, {
             sseSrc: sources.sseSrc.replace(/callbacks\.onReplace\(data\)/g, 'void 0'),

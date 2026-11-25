@@ -4465,6 +4465,36 @@ define([
     };
 
     /**
+     * Swap the assistant's current voice transcript line (8.4.0 replace event, RT2).
+     *
+     * A guidance rule blocked or warned on an answer the voice mode was already showing and reading. The last
+     * transcript line is replaced when it is the assistant's; when it is not (nothing of the answer had arrived),
+     * the replacement becomes a new line. Set as text, never as HTML.
+     *
+     * @param {string} role 'assistant'
+     * @param {string} text The text the learner should see.
+     */
+    const replaceVoiceTranscript = function(role, text) {
+        if (!messagesContainer || typeof text !== 'string') { return; }
+        var allVoiceMsgs = messagesContainer.querySelectorAll('.aica-voice-msg');
+        var lastMsg = allVoiceMsgs.length ? allVoiceMsgs[allVoiceMsgs.length - 1] : null;
+        var content = lastMsg && lastMsg.classList.contains('aica-voice-msg--' + role)
+            ? lastMsg.querySelector('.aica-voice-msg__text') : null;
+        if (!content) {
+            appendVoiceTranscript(role, text);
+            allVoiceMsgs = messagesContainer.querySelectorAll('.aica-voice-msg');
+            lastMsg = allVoiceMsgs.length ? allVoiceMsgs[allVoiceMsgs.length - 1] : null;
+            if (lastMsg && lastMsg.dataset) {
+                lastMsg.dataset.replaced = '1';
+            }
+            return;
+        }
+        content.textContent = text;
+        lastMsg.dataset.replaced = '1';
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    };
+
+    /**
      * Show the unified settings panel (language, avatar, voice).
      * Calling again while open closes it (toggle behaviour).
      *
@@ -6748,6 +6778,7 @@ define([
         hideVoiceOverlay: hideVoiceOverlay,
         setVoiceState: setVoiceState,
         appendVoiceTranscript: appendVoiceTranscript,
+        replaceVoiceTranscript: replaceVoiceTranscript,
         showLangPicker: showLangPicker,
         showSettingsPanel: showSettingsPanel,
         showBookmarksPanel: showBookmarksPanel,
