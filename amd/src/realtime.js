@@ -68,6 +68,14 @@ define([], function() {
      * model does not emit a usable [SOLA_NEXT] marker. Set per-session by
      * connect(); reset on disconnect. v5.3.5. */
     var fallbackChips = null;
+    /** @type {Function|null} 8.4.0 answer safety: the provider's transcript of either side, one piece at a time. */
+    var onTurnTextCb = null;
+    /** @type {Function|null} 8.4.0 answer safety: an assistant turn (not the greeting) is over; receives its number. */
+    var onTurnEndCb = null;
+    /** @type {number} Assistant turns finished in this session (the greeting is not one). */
+    var turnSeq = 0;
+    /** @type {number} The turn whose audio is playing, 0 for none or the greeting. */
+    var playingTurn = 0;
     /** @type {string} Accumulated assistant transcript for SOLA_NEXT parsing */
     var assistantTranscript = '';
     /** @type {number} How many chars of assistantTranscript have been emitted to display */
@@ -295,6 +303,7 @@ define([], function() {
             masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
         }
         currentSource = source;
+        playingTurn = awaitingGreeting ? 0 : turnSeq + 1;
         source.start();
         source.onended = function() {
             if (currentSource === source) {
@@ -559,7 +568,12 @@ define([], function() {
                         // 8.3.1: citation markers ([[c:1]]) never show either.
                         var shownText = markerFilter.push(assistantTranscript.slice(transcriptEmitted, cleanEnd));
                         if (shownText) {
-                            onTranscriptCb('assistant', shownText);
+                            // 8.4.0: with the turn it belongs to (0: the greeting), so a verdict finds its line.
+                            onTranscriptCb('assistant', shownText, awaitingGreeting ? 0 : turnSeq + 1);
+                            // 8.4.0: the same text is what the answer check reads (never the greeting).
+                            if (onTurnTextCb && !awaitingGreeting) {
+                                onTurnTextCb('assistant', shownText);
+                            }
                         }
                     }
                     transcriptEmitted = cleanEnd;
@@ -574,6 +588,9 @@ define([], function() {
                 lastActivityMs = Date.now();
                 if (msg.transcript && onTranscriptCb) {
                     onTranscriptCb('user', msg.transcript);
+                }
+                if (msg.transcript && onTurnTextCb) {
+                    onTurnTextCb('user', msg.transcript + ' ');
                 }
                 break;
 
@@ -630,6 +647,11 @@ define([], function() {
                 assistantTranscript = '';
                 transcriptEmitted = 0;
                 markerFilter = makeMarkerFilter();
+                // 8.4.0: the turn is over (finished or cancelled); its transcript can be checked now.
+                turnSeq += 1;
+                if (onTurnEndCb) {
+                    onTurnEndCb(turnSeq);
+                }
                 break;
 
             case 'error':
@@ -672,6 +694,10 @@ define([], function() {
         onErrorCb       = callbacks.onError        || null;
         onSuggestionsCb = callbacks.onSuggestions  || null;
         onIdleStopCb    = callbacks.onIdleStop     || null;
+        onTurnTextCb    = callbacks.onTurnText     || null;
+        onTurnEndCb     = callbacks.onTurnEnd      || null;
+        turnSeq = 0;
+        playingTurn = 0;
         idleSeconds     = Number(callbacks.idleSeconds) > 0 ? Number(callbacks.idleSeconds) : 10;
         fallbackChips = (callbacks.fallbackChips && callbacks.fallbackChips.length)
             ? callbacks.fallbackChips.slice() : null;
@@ -874,6 +900,9 @@ define([], function() {
         // asynchronously after ws.close() never surfaces a spurious error message
         // (e.g. code 1005 / 1000) for intentional disconnects.
         onErrorCb = null;
+        onTurnTextCb = null;
+        onTurnEndCb = null;
+        playingTurn = 0;
         if (idleTimer) { clearInterval(idleTimer); idleTimer = null; }
         responseActive = false;
         fallbackChips = null;
@@ -1004,6 +1033,9 @@ define([], function() {
         if (onTranscriptCb) {
             onTranscriptCb('user', text);
         }
+        if (onTurnTextCb) {
+            onTurnTextCb('user', text + ' ');
+        }
 
         // Create a text conversation item and request a response.
         ws.send(JSON.stringify({
@@ -1016,6 +1048,37 @@ define([], function() {
         }));
         responseActive = true;
         ws.send(JSON.stringify({type: 'response.create'}));
+    };
+
+    /**
+     * Stop the audio of one assistant turn at once (8.4.0: a guidance rule blocked it). Only that turn: if the
+     * learner has moved on and a later answer is playing, it is left alone. Nothing is sent to the provider: the
+     * check runs when the turn is complete, so there is no response in flight to cancel.
+     *
+     * @param {number} turn The turn number onTurnEnd reported
+     * @returns {boolean} Whether audio was stopped
+     */
+    var stopSpeaking = function(turn) {
+        if (!currentSource || playingTurn !== turn) {
+            return false;
+        }
+        if (masterGain && audioCtx) {
+            masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+        }
+        try { currentSource.stop(); } catch (e) { /**/ }
+        currentSource = null;
+        playingTurn = 0;
+        if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+        if (overlayRoot) {
+            overlayRoot.style.removeProperty('--aica-voice-level');
+        }
+        if (currentState === 'speaking') {
+            setState('idle');
+        }
+        return true;
     };
 
     /**
@@ -1033,6 +1096,7 @@ define([], function() {
         disconnect: disconnect,
         isConnected: isConnected,
         sendText: sendText,
+        stopSpeaking: stopSpeaking,
         ELL_INSTRUCTIONS: ELL_INSTRUCTIONS,
         ellInstructions: ellInstructions,
         _test: {makeMarkerFilter: makeMarkerFilter},

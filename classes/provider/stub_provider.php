@@ -49,6 +49,12 @@ class stub_provider extends base_provider implements batch_capable_interface {
     /** @var array<string, array> In-memory batches keyed by batch id: ['requests' => [...], 'status' => ..., 'results' => [...]]. */
     public static array $batches = [];
 
+    /**
+     * @var array<int, string|\Throwable> Replies consumed one per chat_completion call before $programmed: a string is
+     *     returned, a Throwable is thrown. Lets a test play a first answer and a different retry (8.4.0).
+     */
+    public static array $sequence = [];
+
     /** @var string|null What get_last_finish_reason() reports, so a test can play a truncated reply. */
     public static ?string $finish_reason = null;
 
@@ -65,6 +71,7 @@ class stub_provider extends base_provider implements batch_capable_interface {
         self::$programmed = [];
         self::$calls = [];
         self::$throw_next = null;
+        self::$sequence = [];
         self::$finish_reason = null;
         self::$batch_supported = false;
         self::$batches = [];
@@ -177,6 +184,14 @@ class stub_provider extends base_provider implements batch_capable_interface {
             $err = self::$throw_next;
             self::$throw_next = null;
             throw $err;
+        }
+
+        if (self::$sequence) {
+            $next = array_shift(self::$sequence);
+            if ($next instanceof \Throwable) {
+                throw $next;
+            }
+            return (string) $next;
         }
 
         if (isset(self::$programmed[$kind])) {

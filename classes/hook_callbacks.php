@@ -619,10 +619,15 @@ class hook_callbacks {
         $talkingavatardriver = \local_ai_course_assistant\talking_avatar\provider_factory::make();
         $talkingavatarenabled = \local_ai_course_assistant\feature_flags::resolve('talking_avatar', $courseid)
             && $talkingavatardriver !== null
-            && $talkingavatardriver->is_configured();
+            && $talkingavatardriver->is_configured()
+            // 8.4.0: not offered in Enforce mode unless the site allows it (start_avatar_session refuses too).
+            && \local_ai_course_assistant\voice_safety::realtime_allowed((int) $courseid);
 
         // Voice mode availability (global flags only; per-course control via starter toggles).
-        $realtimeenabled = (bool)get_config('local_ai_course_assistant', 'realtime_enabled');
+        // 8.4.0: live voice is not offered in Enforce mode unless the site allows it; the widget then uses the
+        // regular voice mode, whose answers the guidance rules can hold or block (get_realtime_token refuses too).
+        $realtimeenabled = (bool)get_config('local_ai_course_assistant', 'realtime_enabled')
+            && \local_ai_course_assistant\voice_safety::realtime_allowed((int) $courseid);
         // v6.2.x: gate the speaker button on whether ANY voice provider is
         // configured (a voice_providers row, or the legacy realtime/OpenAI key),
         // not the legacy key alone. tts.php resolves the actual provider through
@@ -719,48 +724,12 @@ class hook_callbacks {
         $serverpagetitle = $PAGE->title ?? '';
         $serverpageheading = $PAGE->heading ?? '';
 
-        // Build LLM options JSON for composer model switcher (admin-only feature).
-        // Primary provider is always first; comparison providers parsed from the
-        // comparison_providers admin setting (one line per provider, pipe-delimited).
-        $llmoptions = [];
-        if ($cansiteconfig) {
-            $configprovider = get_config('local_ai_course_assistant', 'provider') ?: 'openai';
-            $configmodel = get_config('local_ai_course_assistant', 'model') ?: '';
-            $providers = [
-                [
-                    'id' => $configprovider,
-                    'label' => ucfirst($configprovider) . ' (primary)',
-                    'models' => $configmodel
-                        ? [['id' => $configmodel, 'label' => $configmodel, 'status' => 'active']]
-                        : [],
-                ],
-            ];
-            $seen = [$configprovider => true];
-            foreach (\local_ai_course_assistant\provider_keys::rows() as $row) {
-                if ($row['columns'] < 2
-                        || in_array($row['provider'], \local_ai_course_assistant\provider_keys::KEY_ONLY_PROVIDERS, true)) {
-                    continue;
-                }
-                $pid = $row['provider'];
-                if (!empty($seen[$pid])) {
-                    continue;
-                }
-                $seen[$pid] = true;
-                $models = [];
-                foreach (array_filter(array_map('trim', explode(',', $row['models']))) as $m) {
-                    $models[] = ['id' => $m, 'label' => $m, 'status' => 'active'];
-                }
-                $providers[] = [
-                    'id' => $pid,
-                    'label' => ucfirst($pid),
-                    'models' => $models,
-                ];
-            }
-            $llmoptions = [
-                'enabled' => true,
-                'providers' => $providers,
-            ];
-        }
+        // The composer's LLM provider and model pickers: only while the chat_show_model_picker setting is on, and
+        // then only for holders of the manage capability (8.4.0: hidden by default). Hidden, the page carries no
+        // picker markup and no provider or model list, and sse.php ignores a provider or model in the request
+        // (model_picker::request_override()).
+        $showmodelpicker = $cansiteconfig && \local_ai_course_assistant\model_picker::enabled();
+        $llmoptions = $showmodelpicker ? \local_ai_course_assistant\model_picker::options() : [];
 
         // Whether admin-configured starters exist (controls fallback defaults in template).
         //
@@ -954,6 +923,7 @@ class hook_callbacks {
             'serverpagetitle'    => $serverpagetitle,
             'serverpageheading'  => $serverpageheading,
             'llmoptionsjson'     => json_encode($llmoptions),
+            'showmodelpicker'    => $showmodelpicker,
             'hasstarterdata'     => $hasstarterdata,
             'voicetabenabled'    => self::is_voice_tab_enabled($courseid),
             'voiceenabled'       => \local_ai_course_assistant\voice_registry::any_voice_enabled(),

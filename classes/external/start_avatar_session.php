@@ -26,6 +26,7 @@ use local_ai_course_assistant\feature_flags;
 use local_ai_course_assistant\rate_limiter;
 use local_ai_course_assistant\talking_avatar\provider_factory;
 use local_ai_course_assistant\talking_avatar_session_manager;
+use local_ai_course_assistant\voice_safety;
 
 /**
  * Open a real-time talking-avatar session for the configured provider.
@@ -93,6 +94,13 @@ class start_avatar_session extends external_api {
             return self::refusal('disabled', 'talking_avatar:disabled');
         }
 
+        // 8.4.0 (red team RT3): the avatar speaks inside the vendor's frame, so no rule can look at what it says and
+        // nothing can be recorded. In Enforce mode it is refused unless the site allows it (off by default). Refused
+        // here as well as hidden in the widget. Honors the course's own mode.
+        if (!voice_safety::realtime_allowed((int) $params['courseid'])) {
+            return self::refusal('answer_safety', 'talking_avatar:answer_safety');
+        }
+
         // F84: this was the one paid learner endpoint with neither a request
         // limit nor spend accounting -- every call opens a per-minute-billed
         // vendor session. Four opens per five minutes covers a flaky-connection
@@ -126,6 +134,9 @@ class start_avatar_session extends external_api {
                 'userid'   => $USER->id,
                 'lang'     => $params['lang'] ?: 'en',
                 'greeting' => $params['greeting'],
+                // 8.4.0: the guidance rules as instructions ('' when the course's mode is Off). Built server-side.
+                // Only a driver whose API takes session context can pass it on (Tavus today).
+                'guidance' => voice_safety::guidance_block((int) $params['courseid']),
             ]);
             $rowid = talking_avatar_session_manager::start(
                 $USER->id,
@@ -182,7 +193,7 @@ class start_avatar_session extends external_api {
         return new external_single_structure([
             'ok' => new external_value(PARAM_BOOL, 'Whether a session was opened'),
             'reason' => new external_value(PARAM_ALPHANUMEXT,
-                'disabled | ratelimited | session_open | unconfigured | upstream, empty on success'),
+                'disabled | answer_safety | ratelimited | session_open | unconfigured | upstream, empty on success'),
             'error' => new external_value(PARAM_TEXT, 'Message for the learner, empty on success'),
             'session_rowid' => new external_value(PARAM_INT, 'Session row id the heartbeat closes, 0 on refusal'),
             // PARAM_URL, not PARAM_RAW: this lands in an iframe src, and the

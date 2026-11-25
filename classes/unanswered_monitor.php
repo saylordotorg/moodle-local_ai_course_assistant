@@ -105,6 +105,7 @@ class unanswered_monitor {
                        COALESCE(c.shortname, '') AS shortname,
                        SUM(CASE WHEN m.role = 'user' THEN 1 ELSE 0 END) AS asked,
                        SUM(CASE WHEN m.role = 'assistant'
+                                 AND (m.interaction_type IS NULL OR m.interaction_type <> :correction)
                                  AND (m.stream_outcome IS NULL OR m.stream_outcome <> :failed1) THEN 1 ELSE 0 END) AS answered,
                        SUM(CASE WHEN m.role = 'assistant' AND m.stream_outcome = :failed2 THEN 1 ELSE 0 END) AS failed
                   FROM {local_ai_course_assistant_msgs} m
@@ -116,7 +117,9 @@ class unanswered_monitor {
               ORDER BY asked DESC";
 
         $out = [];
-        $params = ['since' => $since, 'failed1' => self::FAILED_OUTCOME, 'failed2' => self::FAILED_OUTCOME];
+        // 8.4.0: a correction message is not an answer to a question.
+        $params = ['since' => $since, 'failed1' => self::FAILED_OUTCOME, 'failed2' => self::FAILED_OUTCOME,
+            'correction' => correction_notice::INTERACTION_TYPE];
         foreach ($DB->get_records_sql($sql, $params) as $row) {
             $asked = (int) $row->asked;
             $answered = (int) $row->answered;

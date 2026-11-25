@@ -68,6 +68,53 @@ class conversation_manager {
         return $conv;
     }
 
+    /** @var bool Set only by add_correction_message() while it writes. */
+    private static bool $writingcorrection = false;
+
+    /**
+     * An interaction type with the reserved correction type taken out: 'correction' in any case, with or without
+     * surrounding spaces, becomes 'chat'. Every other value is returned unchanged.
+     *
+     * @param string $type
+     * @return string
+     */
+    public static function unreserved_interaction_type(string $type): string {
+        return strtolower(trim($type)) === correction_notice::INTERACTION_TYPE ? 'chat' : $type;
+    }
+
+    /**
+     * An interaction type taken from a request (sse.php): lowercased and trimmed, the reserved correction type
+     * mapped to 'chat', empty meaning 'chat'.
+     *
+     * @param string $type the PARAM_ALPHA value
+     * @return string
+     */
+    public static function request_interaction_type(string $type): string {
+        $type = strtolower(trim($type));
+        return $type === '' ? 'chat' : self::unreserved_interaction_type($type);
+    }
+
+    /**
+     * Store a correction message (8.4.0): the ONLY way a msgs row gets interaction type 'correction'. Role
+     * assistant, no tokens, provider, model, cmid or source. Used by correction_notice only.
+     *
+     * @param int $conversationid
+     * @param int $userid
+     * @param int $courseid
+     * @param string $message
+     * @return int the message id
+     */
+    public static function add_correction_message(int $conversationid, int $userid, int $courseid,
+            string $message): int {
+        self::$writingcorrection = true;
+        try {
+            return self::add_message($conversationid, $userid, $courseid, 'assistant', $message, 0, '', null, null,
+                null, correction_notice::INTERACTION_TYPE);
+        } finally {
+            self::$writingcorrection = false;
+        }
+    }
+
     /**
      * Add a message to a conversation.
      *
@@ -135,6 +182,10 @@ class conversation_manager {
         // analytics alike. role='user' rows still carry neither.
         $record->model_name        = ($role !== 'user' && $modelname !== null && $modelname !== '') ? $modelname : null;
         $record->provider          = ($role !== 'user' && $provider !== '') ? $provider : null;
+        // 8.4.0: 'correction' is reserved for add_correction_message(). Any other caller asking for it, in any
+        // case or with spaces (MySQL compares case-insensitively, so 'Correction' would match), gets 'chat'.
+        $interactiontype = self::$writingcorrection ? correction_notice::INTERACTION_TYPE
+            : self::unreserved_interaction_type($interactiontype);
         $record->interaction_type  = $interactiontype ?: 'chat';
         $record->cmid              = $cmid ?: null;
         // v7.8.4: the source pill, so a reloaded answer can show it again (#310).
@@ -195,11 +246,17 @@ class conversation_manager {
         // bounding conversation HISTORY must not be able to destroy the cost
         // ledger; the ledger is append-only here and ages out on its own
         // retention schedule.
-        $rolesql = "conversationid = ? AND role IN ('user', 'assistant')";
+        //
+        // 8.4.0: a correction (correction_notice, interaction type 'correction') is neither counted nor trimmed
+        // here: it goes only when its conversation is cleared, deleted or aged out. It is rate limited per learner,
+        // so this cannot grow without bound, and sse.php never takes the type from a request.
+        $rolesql = "conversationid = ? AND role IN ('user', 'assistant')"
+            . " AND (interaction_type IS NULL OR interaction_type <> ?)";
+        $roleparams = [$conversationid, correction_notice::INTERACTION_TYPE];
         $totalcount = $DB->count_records_select(
             'local_ai_course_assistant_msgs',
             $rolesql,
-            [$conversationid]
+            $roleparams
         );
         // v7.4.4 NOTE ON GROWTH: the role filter above means telemetry rows
         // (mastery_signal, student_profile, speech_score, objective_extract,
@@ -218,15 +275,25 @@ class conversation_manager {
             $oldest  = $DB->get_records_select(
                 'local_ai_course_assistant_msgs',
                 $rolesql,
-                [$conversationid],
+                $roleparams,
                 'timecreated ASC, id ASC',
                 'id',
                 0,
                 $excess
             );
             if (!empty($oldest)) {
-                [$insql, $inparams] = $DB->get_in_or_equal(array_keys($oldest));
-                $DB->delete_records_select('local_ai_course_assistant_msgs', "id {$insql}", $inparams);
+                // 8.4.0: the answer audit loses the text of a trimmed answer before the answer itself goes.
+                // The new message is already stored, so nothing here may throw out of add_message (callers
+                // need the id). If redaction fails the trim is skipped for this turn (never delete without
+                // redacting); the next message's trim covers the backlog, since it removes every row over 100.
+                try {
+                    answer_audit::redact_for_messages(array_keys($oldest));
+                    [$insql, $inparams] = $DB->get_in_or_equal(array_keys($oldest));
+                    $DB->delete_records_select('local_ai_course_assistant_msgs', "id {$insql}", $inparams);
+                } catch (\Throwable $e) {
+                    debugging('SOLA: conversation cap trim skipped for conversation ' . $conversationid
+                        . ' (answer audit redaction failed): ' . get_class($e), DEBUG_DEVELOPER);
+                }
             }
         }
 
@@ -652,8 +719,13 @@ class conversation_manager {
             'messageid IN (SELECT id FROM {local_ai_course_assistant_msgs} WHERE conversationid = :convid)',
             ['convid' => $conversationid]
         );
+        // 8.4.0: the answer audit keeps its rows (metadata, verdicts, hashes) and drops their text.
+        answer_audit::redact_for_conversation($conversationid);
         $DB->delete_records('local_ai_course_assistant_msgs', ['conversationid' => $conversationid]);
         $DB->delete_records('local_ai_course_assistant_convs', ['id' => $conversationid]);
+        // And once more now that the messages are gone (8.4.0 red team, RT6): an answer still being recorded when
+        // the first pass ran saw its message in place and kept its text; it is in the table by now.
+        answer_audit::redact_for_conversation($conversationid);
     }
 
     /**
@@ -682,6 +754,10 @@ class conversation_manager {
     public static function delete_user_data(int $userid): array {
         global $DB;
         $counts = [];
+
+        // 0. 8.4.0: the answer audit keeps the user's rows (metadata, verdicts, hashes) and drops their text,
+        // in every course, before the messages they describe go.
+        $counts['answer_audit_redacted'] = answer_audit::redact_for_user($userid);
 
         // 1. Messages (FK to conversations).
         $convids = $DB->get_fieldset_select('local_ai_course_assistant_convs', 'id', 'userid = ?', [$userid]);
@@ -779,6 +855,10 @@ class conversation_manager {
     public static function delete_course_data(int $courseid, ?int $userid = null): array {
         global $DB;
         $counts = [];
+
+        // 8.4.0: the answer audit keeps its rows (metadata, verdicts, hashes) and drops their text, for the
+        // course or for the one learner in it, before the messages they describe go.
+        $counts['answer_audit_redacted'] = answer_audit::redact_for_course($courseid, $userid ?: null);
 
         // Conversation messages first (FK to convs).
         $convparams = ['courseid' => $courseid];

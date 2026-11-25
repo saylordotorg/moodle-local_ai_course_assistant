@@ -55,6 +55,8 @@ interface provider_interface {
      * @type int    userid   Moodle user id (always set by the endpoint).
      * @type string lang     Two-letter ISO 639-1 language code.
      * @type string greeting Optional initial line for the avatar to speak.
+     * @type string guidance Optional guidance rules for the session (voice_safety::guidance_block()); a driver
+     *                       passes it on only when its API takes session context.
      * }
      * @return array {
      * @type string embed_url     URL the widget loads inside an iframe.

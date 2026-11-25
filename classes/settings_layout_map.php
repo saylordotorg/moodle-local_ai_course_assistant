@@ -270,7 +270,7 @@ final class settings_layout_map {
             'sections' => [
                 ['new', 'modelcalls', [
                     'apibaseurl', 'temperature', 'claude_temperature_allow_prefixes',
-                    'backend_context_tokens', 'enable_thinking', 'ssrf_trusted_endpoints',
+                    'backend_context_tokens', 'enable_thinking', 'chat_show_model_picker', 'ssrf_trusted_endpoints',
                     'xai_proxy_url', 'xai_proxy_jwt_secret'
                 ]],
                 ['new', 'promptbudget', [
@@ -302,6 +302,25 @@ final class settings_layout_map {
                 ['new', 'appearance', [
                     'display_mode', 'avatar_animation_enabled', 'position', 'avatar_color',
                     'avatar_fill'
+                ]],
+            ],
+        ],
+        // 8.4.0: one group for answer safety: the mode, rulebook and wellbeing wording, the claim check's tuning,
+        // and a link to the answer audit page. Off by default, so it sits under Advanced.
+        'adv_answer_safety' => [
+            'parent' => 'advanced',
+            'sections' => [
+                ['existing', 'answer_safety_heading', [
+                    'answer_safety_mode', 'answer_safety_realtime_in_enforce', 'answer_safety_rules',
+                    'answer_safety_wellbeing_message'
+                ]],
+                ['new', 'answercheck', [
+                    'answer_check_sample_percent_retrieved', 'answer_check_sample_percent_general',
+                    'answer_check_daily_cap', 'answer_check_user_daily_cap', 'answer_check_course_daily_cap',
+                    'answer_check_provider', 'answer_check_model'
+                ]],
+                ['new', 'answeraudit', [
+                    'answer_audit_link'
                 ]],
             ],
         ],

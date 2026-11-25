@@ -36,6 +36,8 @@ define([], function() {
      * @param {Function} callbacks.onDone Called when stream completes
      * @param {Function} callbacks.onError Called on error with error message string
      * @param {Function} [callbacks.onMeta] Called with metadata object (type, pageurl, courseurl, pagetitle)
+     * @param {Function} [callbacks.onReplace] 8.4.0: called with {replace, messageid, reason} when a guidance rule
+     *     changed the answer already streamed; it arrives before the done event
      * @returns {AbortController} Controller to cancel the stream
      */
     const startStream = function(url, body, callbacks) {
@@ -136,6 +138,13 @@ define([], function() {
                             if (data.type === 'meta') {
                                 if (callbacks.onMeta) {
                                     callbacks.onMeta(data);
+                                }
+                                continue;
+                            }
+
+                            if (typeof data.replace === 'string') {
+                                if (callbacks.onReplace) {
+                                    callbacks.onReplace(data);
                                 }
                                 continue;
                             }

@@ -32,7 +32,8 @@ define([
     'local_ai_course_assistant/path_map',
     'core/str',
     'local_ai_course_assistant/gemini_live',
-], function(UI, SSE, Repo, Speech, Realtime, Voice, I18nStrings, PathMap, Str, GeminiLive) {
+    'local_ai_course_assistant/voice_safety',
+], function(UI, SSE, Repo, Speech, Realtime, Voice, I18nStrings, PathMap, Str, GeminiLive, VoiceSafety) {
 
     /**
      * The live voice session, whichever engine runs it: OpenAI/xAI Realtime or Gemini Live (8.2.0).
@@ -3321,9 +3322,19 @@ define([
         }
 
         var scoreFullText = '';
+        var scoreReplaced = false;
         SSE.startStream(sseUrl, postData, {
             onToken: function(token) {
                 scoreFullText += token;
+            },
+            onReplace: function(data) {
+                // 8.4.0 (RT2): a guidance rule replaced the scoring answer (blocked, or a check line added). The
+                // server stored the replacement, so the score is read from that text and never from what streamed.
+                if (!data || typeof data.replace !== 'string') {
+                    return;
+                }
+                scoreFullText = data.replace;
+                scoreReplaced = true;
             },
             onDone: function() {
                 var parsed = parseAssistantDecorators(scoreFullText);
@@ -3337,6 +3348,10 @@ define([
                     if (last && last.textContent.indexOf('Evaluating your practice') !== -1) {
                         last.remove();
                     }
+                }
+                if (scoreReplaced && !parsed.scoreData && parsed.text) {
+                    // The answer was blocked: there is no score, so show the learner what was stored instead.
+                    addAssistantMsg(parsed.text, null, {skipHistory: true});
                 }
                 practiceSessionType = null;
             },
@@ -3573,6 +3588,9 @@ define([
         // closed (no more spend) but the overlay stays, with a Resume button.
         var stoppedForSilence = false;
         var resumingAfterSilence = false;
+        // 8.4.0 answer safety: one number per connection, so a verdict that comes back after the session ended or
+        // was resumed can't act on the new one (turn numbers start again with every connection).
+        var liveConnection = 0;
         var startSession = function(selection) {
             if (sessionStarted) { return; }
             sessionStarted = true;
@@ -3620,6 +3638,54 @@ define([
                 resumingAfterSilence = false;
                 let initialTextSent = false;
 
+                // 8.4.0 answer safety. The server sends a ticket only while the course's mode is Watch or Enforce;
+                // without one there is no tracker, nothing is collected and nothing is posted (as in 8.3.2). With
+                // one, every finished turn is posted and the guidance rules check it AFTER it was spoken: a block
+                // stops what is left of the audio, and the safe message is shown and spoken once; a warning adds
+                // its line to the transcript and leaves the audio alone.
+                liveConnection += 1;
+                const connection = liveConnection;
+                const isThisConnection = function() {
+                    return connection === liveConnection && isCurrentVoiceSessionRequest(sessionRequestId);
+                };
+                // Each answer's transcript line is tagged with its turn (data-voiceturn), unique across sessions and
+                // connections, so a verdict changes the line it is about even when later turns are on screen, and
+                // only lines of this connection.
+                const turnTag = function(turn) {
+                    return turn ? sessionRequestId + '.' + connection + '.' + turn : '';
+                };
+                const safety = VoiceSafety.create({
+                    ticket: result.safetyticket || '',
+                    post: function(turn) {
+                        return Repo.checkVoiceTurn(courseId, Object.assign({pageid: currentPageId || 0}, turn));
+                    },
+                    stop: function(turn) {
+                        if (isThisConnection() && engine.stopSpeaking) {
+                            engine.stopSpeaking(turn);
+                        }
+                    },
+                    onBlock: function(text, turn) {
+                        if (!isThisConnection()) {
+                            // The session is over (the last turn's verdict comes back after end()): the blocked
+                            // text still on screen is replaced, but nothing is spoken or added.
+                            UI.replaceVoiceTranscript('assistant', text, turnTag(turn), true);
+                            return;
+                        }
+                        UI.replaceVoiceTranscript('assistant', text, turnTag(turn));
+                        VoiceSafety.speak(text, {
+                            ttsUrl: root ? (root.dataset.ttsurl || '') : '',
+                            courseId: courseId,
+                            sessKey: root ? (root.dataset.sesskey || '') : '',
+                            voice: isGemini ? '' : voice,
+                            audioCtx: audioCtx,
+                        });
+                    },
+                    onWarn: function(text, turn) {
+                        // After the session is over the line is only added to, never created.
+                        UI.appendToVoiceTurn('\n' + text, turnTag(turn), !isThisConnection());
+                    },
+                });
+
                 engine.connect(
                     token,
                     instructions,
@@ -3632,7 +3698,13 @@ define([
                         sessionId: result.sessionid || 0,
                         maxSeconds: result.maxseconds || 0,
                         idleSeconds: result.idleseconds || 0,
+                        onTurnText: safety ? safety.text : null,
+                        onTurnEnd: safety ? safety.turnEnd : null,
                         onIdleStop: function() {
+                            if (safety) {
+                                // Stopped for silence ends this session's turns (a Resume starts a new tracker).
+                                safety.end();
+                            }
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                                 return;
                             }
@@ -3673,13 +3745,18 @@ define([
                                 // Unreported sessions count in full against the daily allowance.
                             });
                         },
-                        onTranscript: function(role, text) {
+                        onTranscript: function(role, text, turn) {
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                                 return;
                             }
-                            UI.appendVoiceTranscript(role, text);
+                            UI.appendVoiceTranscript(role, text, role === 'assistant' ? turnTag(turn) : '');
                         },
                         onStateChange: function(state) {
+                            if (state === 'disconnected' && safety) {
+                                // The session is over: a turn still waiting for the learner's transcript is sent,
+                                // and so are words the learner said that no answer followed.
+                                safety.end();
+                            }
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                                 return;
                             }
@@ -3750,6 +3827,12 @@ define([
                     fallBackToRegularVoice(selection);
                     return;
                 }
+                // 8.4.0: the course is in Enforce mode and the site does not offer live voice there. The regular
+                // voice mode goes through the guidance rules, so carry on in it, with the server's own words.
+                if (err && err.errorcode === 'realtime:err_answer_safety' && canFallBack()) {
+                    fallBackToRegularVoice(selection, err.message);
+                    return;
+                }
                 UI.setVoiceState('disconnected');
                 teardownVoiceSessionUi();
                 addAssistantMsg(formatRealtimeVoiceStartError(err));
@@ -3771,12 +3854,14 @@ define([
          * Switch to the regular voice mode, saying so.
          *
          * @param {string} selection The topic the learner picked
+         * @param {string=} message What to tell the learner (the server's message), else the built-in line
          */
-        var fallBackToRegularVoice = function(selection) {
+        var fallBackToRegularVoice = function(selection, message) {
             UI.stopMouthSync();
             UI.setVoiceState('disconnected');
             teardownVoiceSessionUi();
-            addAssistantMsg('Live voice isn\'t available right now, so this conversation uses the regular voice mode.');
+            addAssistantMsg(message ||
+                'Live voice isn\'t available right now, so this conversation uses the regular voice mode.');
             startLegacyPracticeSpeaking(root, selection);
         };
 
@@ -3860,6 +3945,13 @@ define([
                             return;
                         }
                         UI.appendVoiceTranscript(role, text);
+                    },
+                    onReplace: function(text) {
+                        // 8.4.0 (RT2): a guidance rule replaced the answer being read; show the replacement.
+                        if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
+                            return;
+                        }
+                        UI.replaceVoiceTranscript('assistant', text);
                     },
                     onStateChange: function(state) {
                         if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
@@ -6181,6 +6273,21 @@ define([
                 // Strip SOLA_NEXT / SOURCE / SOLA_SCORE tags, complete or partial,
                 // so they never appear in the typewriter.
                 UI.updateStreamContent(stripStreamingDecorators(fullText));
+            },
+            onReplace: function(data) {
+                // 8.4.0: a guidance rule changed the answer already streamed (blocked, or a check line added). The
+                // server saved the new text; show it in place of what streamed, and let onDone finish as usual.
+                if (!data || typeof data.replace !== 'string') {
+                    return;
+                }
+                if (!fullText) {
+                    UI.startStreaming(null);
+                }
+                // Shown like every streamed frame, without [SOLA_NEXT] or [SOURCE:] markers; the raw text is kept so
+                // onDone still reads the chips and the source from it.
+                if (UI.replaceStreamContent(stripStreamingDecorators(data.replace), data.messageid)) {
+                    fullText = data.replace;
+                }
             },
             onDone: function(doneData) {
                 UI.showTyping(false);

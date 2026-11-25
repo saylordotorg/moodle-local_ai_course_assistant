@@ -256,8 +256,8 @@ class analytics {
         // PHP-side text matching for a display, so an unbounded fetch would
         // load every message body in a large course into memory. The most
         // recent self::TEXT_SAMPLE_CAP messages are a representative sample.
-        $sql = "SELECT message FROM {local_ai_course_assistant_msgs}
-                 WHERE role = :role{$coursewhere}{$timewhere}
+        $sql = "SELECT message FROM {local_ai_course_assistant_msgs} m
+                 WHERE role = :role AND " . self::correction_rows_excluded('m') . "{$coursewhere}{$timewhere}
                  ORDER BY timecreated DESC";
         $messages = $DB->get_fieldset_sql($sql, $params, 0, self::TEXT_SAMPLE_CAP);
 
@@ -306,8 +306,8 @@ class analytics {
         // PHP-side text matching for a display, so an unbounded fetch would
         // load every message body in a large course into memory. The most
         // recent self::TEXT_SAMPLE_CAP messages are a representative sample.
-        $sql = "SELECT message FROM {local_ai_course_assistant_msgs}
-                 WHERE role = :role{$coursewhere}{$timewhere}
+        $sql = "SELECT message FROM {local_ai_course_assistant_msgs} m
+                 WHERE role = :role AND " . self::correction_rows_excluded('m') . "{$coursewhere}{$timewhere}
                  ORDER BY timecreated DESC";
         $messages = $DB->get_fieldset_sql($sql, $params, 0, self::TEXT_SAMPLE_CAP);
 
@@ -393,7 +393,7 @@ class analytics {
                        SUM(COALESCE(m.tokens_used, 0)) AS total_tokens,
                        AVG(COALESCE(m.tokens_used, 0)) AS avg_tokens
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.role = :role{$coursewhere}{$timewhere}
+                 WHERE m.role = :role AND " . self::correction_rows_excluded('m') . "{$coursewhere}{$timewhere}
                  GROUP BY COALESCE(m.provider, 'unknown')
                  ORDER BY response_count DESC";
 
@@ -444,12 +444,28 @@ class analytics {
      * NOT IN is NULL-propagating and rows written before v6 have a NULL
      * interaction_type, so the IS NULL branch is required or those rows vanish.
      *
+     * 8.4.0: correction messages (correction_notice) are excluded here too. They
+     * are written by the background claim check, not by a learner turn, so they
+     * are not activity, not a message count and not text to sample.
+     *
      * @param string $alias table alias used in the calling query.
      * @return string SQL boolean expression.
      */
     public static function meta_rows_excluded(string $alias = 'm'): string {
         return "({$alias}.interaction_type IS NULL"
-            . " OR {$alias}.interaction_type NOT IN ('meta', 'meta_scheduled'))";
+            . " OR {$alias}.interaction_type NOT IN ('meta', 'meta_scheduled', 'correction'))";
+    }
+
+    /**
+     * SQL predicate excluding correction messages (8.4.0, correction_notice) from model-answer metrics: a
+     * correction is not an answer from any provider.
+     *
+     * @param string $alias table alias used in the calling query.
+     * @return string SQL boolean expression.
+     */
+    public static function correction_rows_excluded(string $alias = 'm'): string {
+        return "({$alias}.interaction_type IS NULL OR {$alias}.interaction_type <> '"
+            . correction_notice::INTERACTION_TYPE . "')";
     }
 
         /**
@@ -551,6 +567,8 @@ class analytics {
         // slide_vision: one real provider round-trip per scored recording, on a
         // role='system' row, which the assistant arm can never match.
         //
+        // 8.4.0 adds answer_check, the background claim check's judge call (claim_checker::judge()).
+        //
         // Note every one of those names carries an underscore. sse.php:111 reads a
         // CLIENT-supplied interaction_type with PARAM_ALPHA, which strips
         // underscores, so a learner cannot forge one of these onto their own
@@ -563,7 +581,7 @@ class analytics {
                      'flashcards', 'essay', 'insights',
                      'mastery_signal', 'student_profile', 'speech_score',
                      'objective_extract', 'slide_vision', 'model_bench',
-                     'gesture_vision')))";
+                     'gesture_vision', 'answer_check')))";
     }
 
     /**

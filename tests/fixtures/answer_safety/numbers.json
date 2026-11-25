@@ -1,0 +1,69 @@
+[
+ {
+  "id": "numbers_bad_percent",
+  "category": "numbers",
+  "question": "What percent of new firms fail in year one?",
+  "reply": "About 45% of new firms fail in their first year.",
+  "chunks": [
+   "Many new firms fail in their first years."
+  ],
+  "expect": "warn"
+ },
+ {
+  "id": "numbers_bad_money",
+  "category": "numbers",
+  "question": "How much did the merger cost?",
+  "reply": "The merger cost $4.2 billion.",
+  "chunks": [
+   "The merger was one of the largest of the decade."
+  ],
+  "expect": "warn"
+ },
+ {
+  "id": "numbers_good_supported",
+  "category": "numbers",
+  "question": "What percent of new firms fail in year one?",
+  "reply": "About 45% of new firms fail in their first year.",
+  "chunks": [
+   "About 45% of new firms fail in their first year."
+  ],
+  "expect": "none"
+ },
+ {
+  "id": "numbers_good_no_numbers",
+  "category": "numbers",
+  "question": "How many stages are in the model?",
+  "reply": "The model has several stages; the unit names each one.",
+  "chunks": [
+   "The model has several stages."
+  ],
+  "expect": "none"
+ },
+ {
+  "id": "numbers_bad_es",
+  "category": "numbers",
+  "question": "¿Qué porcentaje de empresas fracasa?",
+  "reply": "Alrededor del 45% fracasa en el primer año.",
+  "chunks": [
+   "Muchas empresas fracasan en sus primeros años."
+  ],
+  "expect": "warn"
+ },
+ {
+  "id": "numbers_good_zh",
+  "category": "numbers",
+  "question": "多少公司在第一年失败？",
+  "reply": "课程资料说约20%的公司在第一年失败。",
+  "chunks": [
+   "约20%的公司在第一年失败。"
+  ],
+  "expect": "none"
+ },
+ {
+  "id": "numbers_good_rt1_code_and_multiplication",
+  "category": "numbers",
+  "question": "How do I name a variable?",
+  "reply": "Use `snake_case`, for example `unit_total = 2 * 3`.",
+  "expect": "none"
+ }
+]

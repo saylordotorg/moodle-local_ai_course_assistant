@@ -258,6 +258,8 @@ final class spend_predicate_coverage_test extends \advanced_testcase {
             'openai_stt'      => 'transcribe.php via voice_registry::interaction_type',
             'xai_stt'         => 'transcribe.php via voice_registry::interaction_type',
             'selfhosted_stt'  => 'transcribe.php via voice_registry::interaction_type',
+            // 8.4.0: the background claim check's judge call.
+            'answer_check'    => 'claim_checker::judge via log_ancillary_usage',
         ];
 
         $discovered = self::discover_written_types();

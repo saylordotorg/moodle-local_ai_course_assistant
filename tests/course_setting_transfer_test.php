@@ -24,7 +24,7 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_ai_course_assistant\course_setting_transfer
  */
-final class course_setting_transfer_test extends \basic_testcase {
+final class course_setting_transfer_test extends \advanced_testcase {
 
     public function test_ordinary_overrides_travel(): void {
         $this->assertTrue(course_setting_transfer::is_transferable('socratic_mode_course_42'));
@@ -81,16 +81,34 @@ final class course_setting_transfer_test extends \basic_testcase {
         // enumerated individually in the allowlist.
         unset($found['_enabled_course_']);
 
-        $allowed = array_flip(course_setting_transfer::TRANSFERABLE_PREFIXES);
-        $undecided = array_values(array_diff_key($found, $allowed));
+        $decided = array_flip(array_merge(course_setting_transfer::TRANSFERABLE_PREFIXES,
+            course_setting_transfer::NOT_TRANSFERABLE_PREFIXES));
+        $undecided = array_values(array_diff_key($found, $decided));
 
         $this->assertSame(
             [],
             $undecided,
             "Per-course setting prefixes are read in the plugin but are not listed in "
                 . "course_setting_transfer::TRANSFERABLE_PREFIXES. Add them if they should "
-                . "survive a course copy, or add a comment there saying why they must not: "
+                . "survive a course copy, or add them to NOT_TRANSFERABLE_PREFIXES with a comment saying why they must not: "
                 . implode(', ', $undecided)
         );
+    }
+
+    public function test_the_two_lists_do_not_overlap_and_refused_prefixes_never_transfer(): void {
+        $this->assertSame([], array_values(array_intersect(course_setting_transfer::TRANSFERABLE_PREFIXES,
+            course_setting_transfer::NOT_TRANSFERABLE_PREFIXES)));
+        foreach (course_setting_transfer::NOT_TRANSFERABLE_PREFIXES as $prefix) {
+            $this->assertFalse(course_setting_transfer::is_transferable($prefix . '42'), $prefix);
+        }
+    }
+
+    public function test_the_answer_safety_override_is_not_collected_for_a_backup(): void {
+        $this->resetAfterTest();
+        set_config('answer_safety_mode_course_42', 'off', 'local_ai_course_assistant');
+        set_config('socratic_mode_course_42', '1', 'local_ai_course_assistant');
+        $collected = course_setting_transfer::collect_for_course(42);
+        $this->assertArrayHasKey('socratic_mode_course_42', $collected);
+        $this->assertArrayNotHasKey('answer_safety_mode_course_42', $collected);
     }
 }

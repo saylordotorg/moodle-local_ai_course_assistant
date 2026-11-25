@@ -393,6 +393,15 @@ if ($hassiteconfig) {
         get_string('settings:prompt_debug_enabled_desc', 'local_ai_course_assistant'),
         '0'
     ));
+    // 8.4.0: the chat composer's LLM provider and model pickers are hidden unless this is on, and then shown only
+    // to holders of the manage capability. Off, sse.php also ignores a provider or model named in a request
+    // (model_picker::request_override()).
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/chat_show_model_picker',
+        get_string('settings:chat_show_model_picker', 'local_ai_course_assistant'),
+        get_string('settings:chat_show_model_picker_desc', 'local_ai_course_assistant'),
+        '0'
+    ));
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/socratic_verbose',
         get_string('settings:socratic_verbose', 'local_ai_course_assistant'),
@@ -1681,6 +1690,111 @@ if ($hassiteconfig) {
             'annotate' => get_string('settings:validators_runtime_annotate', 'local_ai_course_assistant'),
             'block'    => get_string('settings:validators_runtime_block', 'local_ai_course_assistant'),
         ]
+    ));
+
+    // 8.4.0: answer safety. Guidance rules checked against the question and the answer, and the answer audit
+    // trail. Off by default, so the upgrade changes nothing. A course can override the mode through
+    // course_config_manager::set_answer_safety_mode() (config key answer_safety_mode_course_<id>).
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/answer_safety_heading',
+        get_string('settings:answer_safety_heading', 'local_ai_course_assistant'),
+        get_string('settings:answer_safety_heading_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/answer_safety_mode',
+        get_string('settings:answer_safety_mode', 'local_ai_course_assistant'),
+        get_string('settings:answer_safety_mode_desc', 'local_ai_course_assistant'),
+        'off',
+        [
+            'off'     => get_string('settings:answer_safety_mode_off', 'local_ai_course_assistant'),
+            'watch'   => get_string('settings:answer_safety_mode_watch', 'local_ai_course_assistant'),
+            'enforce' => get_string('settings:answer_safety_mode_enforce', 'local_ai_course_assistant'),
+        ]
+    ));
+    $settings->add(new \local_ai_course_assistant\admin_setting_answer_rules(
+        'local_ai_course_assistant/answer_safety_rules',
+        get_string('settings:answer_safety_rules', 'local_ai_course_assistant'),
+        get_string('settings:answer_safety_rules_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/answer_safety_wellbeing_message',
+        get_string('settings:answer_safety_wellbeing_message', 'local_ai_course_assistant'),
+        get_string('settings:answer_safety_wellbeing_message_desc', 'local_ai_course_assistant',
+            get_string('answer_rules:safe_wellbeing', 'local_ai_course_assistant')),
+        '',
+        PARAM_TEXT
+    ));
+    // 8.4.0 (red team RT3): live voice and the avatar speak before any rule can look at the answer, so Enforce mode
+    // does not offer them unless this is on (voice_safety::realtime_allowed(); the endpoints refuse).
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/answer_safety_realtime_in_enforce',
+        get_string('settings:answer_safety_realtime_in_enforce', 'local_ai_course_assistant'),
+        get_string('settings:answer_safety_realtime_in_enforce_desc', 'local_ai_course_assistant'),
+        0
+    ));
+    // 8.4.0: the answer audit page (answer_audit.php): a course picker when opened without a course.
+    $answerauditurl = new moodle_url('/local/ai_course_assistant/answer_audit.php');
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/answer_audit_link',
+        s(get_string('settings:answer_audit_link', 'local_ai_course_assistant')),
+        '<a href="' . $answerauditurl->out() . '" class="btn btn-sm btn-outline-secondary">'
+        . s(get_string('answeraudit:dashboard_link', 'local_ai_course_assistant')) . ' &rarr;</a>'
+        . '<p class="text-muted mt-1 sola-admin-blurb">'
+        . s(get_string('settings:answer_audit_link_desc', 'local_ai_course_assistant')) . '</p>'
+    ));
+    // 8.4.0: the background claim check (claim_checker), for courses in Watch or Enforce. Deterministic sampling
+    // by audit row; a site-wide daily cap on queued checks; the judge's provider and model resolve as the mastery
+    // classifier's pair does (both set = that provider row, otherwise the course's chat provider).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_sample_percent_retrieved',
+        get_string('settings:answer_check_sample_percent_retrieved', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_sample_percent_retrieved_desc', 'local_ai_course_assistant'),
+        '100',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_sample_percent_general',
+        get_string('settings:answer_check_sample_percent_general', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_sample_percent_general_desc', 'local_ai_course_assistant'),
+        '10',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_daily_cap',
+        get_string('settings:answer_check_daily_cap', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_daily_cap_desc', 'local_ai_course_assistant'),
+        '2000',
+        PARAM_INT
+    ));
+    // 8.4.0 (red team RT5): one learner or one course cannot use up the site's daily checks.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_user_daily_cap',
+        get_string('settings:answer_check_user_daily_cap', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_user_daily_cap_desc', 'local_ai_course_assistant'),
+        '50',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_course_daily_cap',
+        get_string('settings:answer_check_course_daily_cap', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_course_daily_cap_desc', 'local_ai_course_assistant'),
+        '500',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_provider',
+        get_string('settings:answer_check_provider', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_provider_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_ALPHANUMEXT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_model',
+        get_string('settings:answer_check_model', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_model_desc', 'local_ai_course_assistant'),
+        '',
+        // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
+        PARAM_TEXT
     ));
 
     // v4.4.0: Optional Content-Security-Policy header on course pages where

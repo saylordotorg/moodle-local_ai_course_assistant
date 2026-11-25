@@ -36,6 +36,7 @@ const PAGES = [
   'objectives_admin.php?courseid=2',
   'outcomes_report.php?courseid=2',
   'instructor_dashboard.php?courseid=2',
+  'answer_audit.php?courseid=2',
   'rag_admin.php',
   'analytics.php?courseid=2',
   'starter_settings.php?courseid=2',

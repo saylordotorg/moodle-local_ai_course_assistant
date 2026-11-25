@@ -2775,6 +2775,36 @@ define([
     };
 
     /**
+     * Swap the text of the message being streamed (8.4.0 replace event).
+     *
+     * A guidance rule blocked or warned on an answer that was already streamed: the server saved the new text and
+     * sends it before the done event. The text goes through the same sanitising render path as every assistant
+     * answer, the typewriter is moved to its end so the old text is not replayed, and the element is marked
+     * data-replaced="1". A replace for a different message id than the element already knows is ignored.
+     *
+     * @param {string} text The text the learner should see.
+     * @param {number|string|null} messageid The saved message id from the server.
+     * @return {HTMLElement|null} The message element, or null when nothing was changed.
+     */
+    const replaceStreamContent = function(text, messageid) {
+        if (!streamingEl || typeof text !== 'string') {
+            return null;
+        }
+        const id = (messageid === undefined || messageid === null) ? '' : String(messageid);
+        if (id && streamingEl.dataset.messageid && streamingEl.dataset.messageid !== id) {
+            return null;
+        }
+        typewriterFull = text;
+        typewriterPos = text.length;
+        const content = streamingEl.querySelector('.local-ai-course-assistant__message-content');
+        if (content) {
+            content.innerHTML = renderAssistantHtml(text);
+        }
+        streamingEl.dataset.replaced = '1';
+        return streamingEl;
+    };
+
+    /**
      * Mark an assistant message as cut off by the output-token limit.
      *
      * v7.7.6. The server stores such a turn as 'truncated' and sends this note
@@ -4404,34 +4434,139 @@ define([
      * Append a voice transcript message to the main messages area.
      * Voice messages appear inline so the conversation is always visible.
      *
+     * 8.4.0: a live voice answer's line carries its turn (data-voiceturn, the tag chat.js makes from the session,
+     * the connection and the engine's turn number), so a verdict that arrives a turn or two later finds the line
+     * it is about. Text of another turn starts a new line rather than run on into this one.
+     *
      * @param {string} role  'user' | 'assistant'
      * @param {string} text  Text content
+     * @param {string=} turn The live voice turn tag of this text, if any
      */
-    const appendVoiceTranscript = function(role, text) {
+    const appendVoiceTranscript = function(role, text, turn) {
         if (!messagesContainer) { return; }
 
         // Find the last voice message in the container.
         var allVoiceMsgs = messagesContainer.querySelectorAll('.aica-voice-msg');
         var lastMsg = allVoiceMsgs.length ? allVoiceMsgs[allVoiceMsgs.length - 1] : null;
         var lastRole = lastMsg ? (lastMsg.classList.contains('aica-voice-msg--assistant') ? 'assistant' : 'user') : null;
+        var lastTurn = lastMsg && lastMsg.dataset ? (lastMsg.dataset.voiceturn || '') : '';
 
-        // Append to the last message only if it's the same role (streaming chunks).
-        if (lastMsg && lastRole === role) {
+        // Append to the last message only if it's the same role (streaming chunks) and, for tagged text, the same turn.
+        if (lastMsg && lastRole === role && (!turn || lastTurn === turn)) {
             var content = lastMsg.querySelector('.aica-voice-msg__text');
             if (content) { content.textContent += text; }
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             return;
         }
 
-        // Different role or no previous message: create a new message element.
+        // Different role or turn, or no previous message: create a new message element.
         var msg = document.createElement('div');
         msg.className = 'aica-voice-msg aica-voice-msg--' + role;
+        if (turn) {
+            msg.dataset.voiceturn = turn;
+        }
         var content = document.createElement('span');
         content.className = 'aica-voice-msg__text';
         content.textContent = text;
         msg.appendChild(content);
         appendMessageNode(msg);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    };
+
+    /**
+     * The transcript lines of one live voice turn, in order.
+     *
+     * @param {string} role
+     * @param {string} turn The turn tag
+     * @returns {Array<HTMLElement>}
+     */
+    const voiceTurnLines = function(role, turn) {
+        var lines = messagesContainer.querySelectorAll('.aica-voice-msg');
+        var out = [];
+        for (var i = 0; i < lines.length; i++) {
+            if (lines[i].classList.contains('aica-voice-msg--' + role) && lines[i].dataset
+                    && lines[i].dataset.voiceturn === turn) {
+                out.push(lines[i]);
+            }
+        }
+        return out;
+    };
+
+    /**
+     * Swap the assistant's voice transcript line (8.4.0 replace event, RT2, and live voice verdicts).
+     *
+     * A guidance rule blocked or warned on an answer the voice mode was already showing and reading. With a turn
+     * tag the lines of that turn are replaced (the first gets the text, any others, split by a learner line that
+     * arrived late, are emptied and hidden), whatever has been shown since. Without one the last transcript line
+     * is replaced when it is the assistant's. When there is no such line (nothing of the answer had arrived), the
+     * replacement becomes a new line, unless existingOnly is set (a verdict that came back after the session
+     * ended: it may correct what is on screen, never add to it). Set as text, never as HTML.
+     *
+     * @param {string} role 'assistant'
+     * @param {string} text The text the learner should see.
+     * @param {string=} turn The live voice turn tag
+     * @param {boolean=} existingOnly Change an existing line only
+     * @returns {boolean} whether a line was changed or added
+     */
+    const replaceVoiceTranscript = function(role, text, turn, existingOnly) {
+        if (!messagesContainer || typeof text !== 'string') { return false; }
+        var lines;
+        if (turn) {
+            lines = voiceTurnLines(role, turn);
+        } else {
+            var allVoiceMsgs = messagesContainer.querySelectorAll('.aica-voice-msg');
+            var lastMsg = allVoiceMsgs.length ? allVoiceMsgs[allVoiceMsgs.length - 1] : null;
+            lines = lastMsg && lastMsg.classList.contains('aica-voice-msg--' + role) ? [lastMsg] : [];
+        }
+        var content = lines.length ? lines[0].querySelector('.aica-voice-msg__text') : null;
+        if (!content) {
+            if (existingOnly) {
+                return false;
+            }
+            appendVoiceTranscript(role, text, turn);
+            var after = messagesContainer.querySelectorAll('.aica-voice-msg');
+            var added = after.length ? after[after.length - 1] : null;
+            if (added && added.dataset) {
+                added.dataset.replaced = '1';
+            }
+            return true;
+        }
+        content.textContent = text;
+        lines[0].dataset.replaced = '1';
+        for (var i = 1; i < lines.length; i++) {
+            var rest = lines[i].querySelector('.aica-voice-msg__text');
+            if (rest) {
+                rest.textContent = '';
+            }
+            lines[i].dataset.replaced = '1';
+            lines[i].hidden = true;
+        }
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        return true;
+    };
+
+    /**
+     * Add text to the end of one live voice turn's assistant line (8.4.0: a warning's check line), wherever that line
+     * now is. With no such line it becomes a new line, unless existingOnly is set.
+     *
+     * @param {string} text
+     * @param {string} turn The live voice turn tag
+     * @param {boolean=} existingOnly Change an existing line only
+     * @returns {boolean} whether a line was changed or added
+     */
+    const appendToVoiceTurn = function(text, turn, existingOnly) {
+        if (!messagesContainer || typeof text !== 'string' || !turn) { return false; }
+        var lines = voiceTurnLines('assistant', turn);
+        var content = lines.length ? lines[lines.length - 1].querySelector('.aica-voice-msg__text') : null;
+        if (!content) {
+            if (existingOnly) {
+                return false;
+            }
+            appendVoiceTranscript('assistant', text.replace(/^\n+/, ''), turn);
+            return true;
+        }
+        content.textContent += text;
+        return true;
     };
 
     /**
@@ -6665,6 +6800,7 @@ define([
         updateStreamContent: updateStreamContent,
         finishStreaming: finishStreaming,
         markMessageTruncated: markMessageTruncated,
+        replaceStreamContent: replaceStreamContent,
         setStreamCitations: setStreamCitations,
         renderMasteryChip: renderMasteryChip,
         hideMasteryChip: hideMasteryChip,
@@ -6717,6 +6853,8 @@ define([
         hideVoiceOverlay: hideVoiceOverlay,
         setVoiceState: setVoiceState,
         appendVoiceTranscript: appendVoiceTranscript,
+        replaceVoiceTranscript: replaceVoiceTranscript,
+        appendToVoiceTurn: appendToVoiceTurn,
         showLangPicker: showLangPicker,
         showSettingsPanel: showSettingsPanel,
         showBookmarksPanel: showBookmarksPanel,

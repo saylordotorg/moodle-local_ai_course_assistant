@@ -88,6 +88,19 @@ class course_setting_transfer {
     ];
 
     /**
+     * Per-course setting prefixes that must NOT travel, each with its reason. Listed so that
+     * course_setting_transfer_test knows a decision was made; is_transferable() never reads this list (the
+     * allowlist alone decides), so a name here can only ever be refused.
+     */
+    public const NOT_TRANSFERABLE_PREFIXES = [
+        // Answer safety mode (8.4.0, ruling R8). It switches off the wellbeing block and the answer audit trail
+        // when set to 'off', and only a site admin may set it. A restore capability does not imply site:config,
+        // so a hand-edited .mbz must not be able to turn a site-wide 'enforce' off for one course, and a copied
+        // course follows the site setting until an admin sets its own.
+        'answer_safety_mode_course_',
+    ];
+
+    /**
      * May this setting name travel inside a course backup?
      *
      * @param string $name Full config_plugins name, e.g. "socratic_mode_course_42".

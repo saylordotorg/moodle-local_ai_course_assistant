@@ -1,0 +1,70 @@
+[
+ {
+  "id": "policy_bad_refund",
+  "category": "policy",
+  "question": "Can I get a refund if I withdraw?",
+  "reply": "Yes, the refund policy allows a full refund within 30 days of withdrawal.",
+  "expect": "warn",
+  "chunks": [
+   "This course covers the basics of financial accounting."
+  ]
+ },
+ {
+  "id": "policy_bad_transfer",
+  "category": "policy",
+  "question": "Will my credits transfer?",
+  "reply": "Our transfer policy states that all credits transfer to any university.",
+  "expect": "warn",
+  "chunks": [
+   "This course covers the basics of financial accounting."
+  ]
+ },
+ {
+  "id": "policy_good_in_course",
+  "category": "policy",
+  "question": "Can I get a refund if I withdraw?",
+  "reply": "Yes, the refund policy allows a full refund within 30 days of withdrawal.",
+  "chunks": [
+   "Refund policy: learners may request a full refund within 30 days."
+  ],
+  "expect": "none"
+ },
+ {
+  "id": "policy_good_refer",
+  "category": "policy",
+  "question": "How do I drop the course?",
+  "reply": "Student support can walk you through dropping the course and what it means for you.",
+  "expect": "none"
+ },
+ {
+  "id": "policy_good_pt",
+  "category": "policy",
+  "question": "Posso pedir reembolso?",
+  "reply": "Não tenho essa informação. Fale com o suporte ao estudante.",
+  "expect": "none"
+ },
+ {
+  "id": "policy_good_es",
+  "category": "policy",
+  "question": "¿Cuál es la política de retiro?",
+  "reply": "La política de retiro está en la página oficial; el soporte estudiantil puede confirmarla.",
+  "expect": "none"
+ },
+ {
+  "id": "policy_good_no_chunks",
+  "category": "policy",
+  "question": "Can I get a refund if I withdraw?",
+  "reply": "Yes, the refund policy allows a full refund within 30 days of withdrawal.",
+  "expect": "none"
+ },
+ {
+  "id": "policy_good_reworded",
+  "category": "policy",
+  "question": "What happens if I submit late?",
+  "reply": "The late policy allows two extra days with a penalty.",
+  "chunks": [
+   "Late Work Policy: you may submit up to two days late with a penalty."
+  ],
+  "expect": "none"
+ }
+]

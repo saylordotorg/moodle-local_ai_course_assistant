@@ -244,4 +244,39 @@ class course_config_manager {
         $mode = get_config('local_ai_course_assistant', 'default_course_mode') ?: 'per_course';
         return $mode === 'all';
     }
+
+    /**
+     * The course's own answer safety mode (8.4.0), or null when it has none and the site setting applies.
+     *
+     * Stored like the other per-course overrides, as the plugin config key `answer_safety_mode_course_<id>`
+     * ('off', 'watch' or 'enforce'; anything else counts as unset). There is no course settings field for it yet: a
+     * site admin sets it with set_answer_safety_mode() or the config key. answer_rules::mode() reads it.
+     *
+     * @param int $courseid
+     * @return string|null
+     */
+    public static function get_answer_safety_mode(int $courseid): ?string {
+        $raw = get_config('local_ai_course_assistant', 'answer_safety_mode_course_' . $courseid);
+        return in_array($raw, answer_rules::MODES, true) ? $raw : null;
+    }
+
+    /**
+     * Set or clear (null) the course's own answer safety mode.
+     *
+     * @param int $courseid
+     * @param string|null $mode off|watch|enforce, or null to follow the site setting
+     * @return void
+     * @throws \coding_exception for an unknown mode
+     */
+    public static function set_answer_safety_mode(int $courseid, ?string $mode): void {
+        $name = 'answer_safety_mode_course_' . $courseid;
+        if ($mode === null) {
+            unset_config($name, 'local_ai_course_assistant');
+            return;
+        }
+        if (!in_array($mode, answer_rules::MODES, true)) {
+            throw new \coding_exception('Unknown answer safety mode');
+        }
+        set_config($name, $mode, 'local_ai_course_assistant');
+    }
 }

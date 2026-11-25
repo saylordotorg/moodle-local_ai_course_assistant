@@ -435,6 +435,10 @@ final class lang_completeness_test extends \basic_testcase {
         // The settings-page truncation warning for an automatic budget (7.12.4). Admin-only copy about a setting whose
         // wrong move makes things worse; English like the other budget text until a translator can check it.
         'settings:prompt_truncated_warning_auto',
+        // 8.4.0 (answer audit, guidance rules, claim check, review outcomes, model picker setting): all 236 keys were
+        // translated into the 45 other locales in the 8.4.0 batch, so none is listed. Machine-assisted, not reviewed
+        // by native speakers. Bambara (bm) and Wolof (wo) hold the English text for 44 long admin descriptions and
+        // the learner safety messages (the 7.8.9 ruling: an honest English value beats a translation nobody can check).
     ];
 
     /**
@@ -637,6 +641,9 @@ final class lang_completeness_test extends \basic_testcase {
         'settings:talking_avatar_provider_did',
         'settings:talking_avatar_provider_heygen',
         'settings:talking_avatar_provider_tavus',
+        // 8.4.0: the two export buttons are file-format acronyms.
+        'answeraudit:export_csv_short',
+        'answeraudit:export_json_short',
     ];
 
     /**

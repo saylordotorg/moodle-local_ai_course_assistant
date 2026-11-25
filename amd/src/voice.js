@@ -28,7 +28,10 @@
  * config = { courseId, sessKey, sseUrl, lang }
  * TTS URL is derived: sseUrl.replace(/\/sse\.php(\?.*)?$/, '/tts.php')
  *
- * callbacks = { onTranscript(role, text), onStateChange(state), onError(msg) }
+ * callbacks = { onTranscript(role, text), onStateChange(state), onError(msg), onReplace(text, data) }
+ *
+ * onReplace (8.4.0): a guidance rule replaced the answer being read. `text` is what the transcript should show in
+ * place of the assistant's current line; voice.js has already stopped the old audio and reads `text` once.
  *
  * @module     local_ai_course_assistant/voice
  * @copyright  2025 AI Course Assistant
@@ -71,10 +74,12 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
     var currentSource = null;
     /** @type {AbortController|null} Controls in-flight TTS fetch */
     var ttsAbortCtrl = null;
-    /** @type {AudioBuffer|null} Pre-fetched and decoded audio for next sentence */
+    /** @type {{text: string, buf: AudioBuffer}|null} Pre-fetched and decoded audio for the next sentence, with that sentence */
     var prefetchedAudio = null;
     /** @type {boolean} Whether a prefetch is currently in flight */
     var prefetchInFlight = false;
+    /** @type {number} Raised by interruptTts(); callbacks of audio started under an older number do nothing */
+    var ttsGeneration = 0;
     /** @type {AbortController|null} Controls in-flight SSE stream */
     var sseController = null;
     /** @type {string} SSE token accumulation buffer for sentence extraction */
@@ -120,6 +125,8 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
 
     /** @type {Function|null} */
     var onTranscriptCb = null;
+    /** @type {Function|null} 8.4.0: called with (text, data) when a guidance rule replaced the answer in progress */
+    var onReplaceCb = null;
     /** @type {Function|null} Suggestions callback — receives array of chip strings */
     var onSuggestionsCb = null;
     /** @type {Function|null} */
@@ -300,6 +307,19 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
     };
 
     /**
+     * A replacement answer as voice mode shows and reads it: no suggestion block or markers, and without the
+     * markdown underscores or asterisks that wrap a whole line (the check line a warning adds is written _so_).
+     * @param {string} text
+     * @returns {string}
+     */
+    var plainForVoice = function(text) {
+        return stripSolaTags(String(text || ''))
+            .replace(/(^|\n)[ \t]*([_*]{1,3})([^\n]*?)\2[ \t]*(?=\n|$)/g, '$1$3')
+            .replace(/\n{2,}/g, '\n')
+            .trim();
+    };
+
+    /**
      * What the transcript shows of a streamed reply: nothing from [SOLA_NEXT] on, no marker, no half marker,
      * and trailing spaces held until the next word arrives (a marker after them would otherwise leave a gap).
      * push() takes the next token and returns the new text to show, or ''.
@@ -395,6 +415,11 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         isTtsBusy = false;
         prefetchedAudio = null;
         prefetchInFlight = false;
+        // Everything started before this point is stale: a stopped source still fires "ended", an aborted fetch
+        // still settles, and a fetch that had already answered still decodes. Each of those callbacks checks this
+        // number and does nothing when it has moved on, so none of them can free the queue, start the next
+        // sentence, reopen the mic or hand over old audio underneath whatever the caller does next.
+        ttsGeneration++;
     };
 
     /**
@@ -444,11 +469,16 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         }
         prefetchInFlight = true;
         var nextText = ttsQueue[0]; // peek, don't shift yet
+        var gen = ttsGeneration;
         fetchTtsAudio(nextText, (ttsAbortCtrl && ttsAbortCtrl.signal) || undefined)
             .then(function(buf) {
+                if (gen !== ttsGeneration) {
+                    return;
+                }
                 prefetchInFlight = false;
                 if (buf && connected) {
-                    prefetchedAudio = buf;
+                    // Kept with its sentence: it is used only for that sentence (see processTtsQueue).
+                    prefetchedAudio = {text: nextText, buf: buf};
                 }
             });
     };
@@ -489,14 +519,18 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         }
 
         var sentence = ttsQueue.shift();
+        var gen = ttsGeneration;
         isTtsBusy = true;
         setState('speaking');
 
         // Use prefetched audio if available (sentence was peeked by maybePrefetchNext).
         var audioBufPromise;
-        if (prefetchedAudio) {
-            audioBufPromise = Promise.resolve(prefetchedAudio);
-            prefetchedAudio = null;
+        // Only when it is this sentence's audio. A prefetch that answers late (after its sentence was fetched
+        // directly) would otherwise be played in place of the sentence after it.
+        var ready = prefetchedAudio;
+        prefetchedAudio = null;
+        if (ready && ready.text === sentence) {
+            audioBufPromise = Promise.resolve(ready.buf);
         } else {
             if (ttsAbortCtrl) {
                 ttsAbortCtrl.abort();
@@ -506,7 +540,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         }
 
         audioBufPromise.then(function(audioBuf) {
-            if (!connected) {
+            if (!connected || gen !== ttsGeneration) {
                 return;
             }
             if (!audioBuf) {
@@ -541,6 +575,9 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
             maybePrefetchNext();
 
             source.onended = function() {
+                if (gen !== ttsGeneration) {
+                    return;
+                }
                 if (currentSource === source) {
                     currentSource = null;
                 }
@@ -557,7 +594,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
                 }
             };
         }).catch(function(err) {
-            if (err && err.name === 'AbortError') {
+            if ((err && err.name === 'AbortError') || gen !== ttsGeneration) {
                 return;
             }
             isTtsBusy = false;
@@ -600,6 +637,8 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         sentenceBuffer = '';
         displayBuffer = '';
         displayFilter = makeDisplayFilter();
+        // 8.4.0 (RT2): set when a guidance rule replaced this answer; later tokens of it are then ignored.
+        var streamReplaced = false;
 
         var postBody = {
             sesskey:  cfg.sessKey  || '',
@@ -625,7 +664,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
 
         sseController = SSE.startStream(cfg.sseUrl, postBody, {
             onToken: function(token) {
-                if (!connected) {
+                if (!connected || streamReplaced) {
                     return;
                 }
                 // Accumulate for display: nothing from [SOLA_NEXT] on, and no citation or source marker
@@ -636,6 +675,25 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
                     onTranscriptCb('assistant', shown);
                 }
                 sentenceBuffer += token;
+                maybeSendSentence();
+            },
+            onReplace: function(data) {
+                // 8.4.0 (RT2): a guidance rule blocked this answer, or added a check line to it, after it had
+                // started streaming. Stop reading the old text aloud at once, drop what is still queued, put the
+                // replacement in the transcript and read the replacement, once. onDone flushes its last sentence.
+                if (!connected || !data || typeof data.replace !== 'string') {
+                    return;
+                }
+                interruptTts();
+                streamReplaced = true;
+                var text = plainForVoice(data.replace);
+                displayBuffer = data.replace;
+                if (onReplaceCb) {
+                    onReplaceCb(text, data);
+                } else if (onTranscriptCb) {
+                    onTranscriptCb('assistant', '\n' + text);
+                }
+                sentenceBuffer = text;
                 maybeSendSentence();
             },
             onDone: function() {
@@ -947,6 +1005,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         }
 
         onTranscriptCb  = callbacks.onTranscript   || null;
+        onReplaceCb     = callbacks.onReplace      || null;
         onStateChangeCb = callbacks.onStateChange  || null;
         onErrorCb       = callbacks.onError        || null;
         onSuggestionsCb = callbacks.onSuggestions  || null;

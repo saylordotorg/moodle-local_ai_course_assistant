@@ -95,7 +95,10 @@ class observer {
      *
      * Deliberately not touched: the audit log, which is a record of what
      * happened on this site and should outlive the course it happened in, and
-     * email_optout, which is a site-wide contact preference.
+     * email_optout, which is a site-wide contact preference. The answer audit
+     * ('local_ai_course_assistant_answer_audit', 8.4.0) is redacted rather than
+     * deleted: its question, answer and claim text go, its metadata, verdicts and
+     * hashes stay so the course's hash chain can still be checked.
      *
      * @param \core\event\course_deleted $event
      * @return void
@@ -106,6 +109,18 @@ class observer {
         $courseid = (int) $event->objectid;
         if ($courseid <= 0) {
             return;
+        }
+
+        // The answer audit ('local_ai_course_assistant_answer_audit') keeps its rows and loses its text. FIRST,
+        // before anything below deletes messages or conversations: if the request dies part way (a timeout on a
+        // big course), the text must already be gone, because once the course is gone nothing reaches it again.
+        try {
+            answer_audit::redact_for_course($courseid);
+        } catch (\Throwable $e) {
+            debugging(
+                "SOLA: could not redact the answer audit for deleted course {$courseid}: " . $e->getMessage(),
+                DEBUG_DEVELOPER
+            );
         }
 
         // Media before rows. The generic sweep below deletes sbx_rec rows, and

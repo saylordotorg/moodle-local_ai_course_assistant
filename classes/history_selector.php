@@ -104,12 +104,26 @@ class history_selector {
 
         $scored = [];
         foreach ($candidates as $i => $p) {
-            $vec = $vecs[$i] ?? [];
-            $score = (!empty($vec) && !empty($p['user'])) ? self::cosine($queryvec, $vec) : 0.0;
-            $scored[] = ['pair' => $p, 'score' => $score];
+            $scored[] = ['pair' => $p, 'score' => self::pair_score($p, $queryvec, $vecs[$i] ?? [])];
         }
 
         return self::flatten(self::pick($scored, $maxpairs, $minscore));
+    }
+
+    /**
+     * How relevant one pair is to the query. A correction (8.4.0, correction_notice) has no user turn to score and
+     * always counts as fully relevant, so the tutor keeps knowing it corrected itself.
+     *
+     * @param array $pair from pair_messages()
+     * @param float[] $queryvec
+     * @param float[] $vec the pair's user-turn embedding
+     * @return float
+     */
+    public static function pair_score(array $pair, array $queryvec, array $vec): float {
+        if (!empty($pair['correction'])) {
+            return 1.0;
+        }
+        return (!empty($vec) && !empty($pair['user'])) ? self::cosine($queryvec, $vec) : 0.0;
     }
 
     /**
@@ -151,7 +165,7 @@ class history_selector {
      * Group a flat message list into user/assistant pairs.
      *
      * @param array $messages Message records (->role, ->message) in chronological order.
-     * @return array[] Pairs ['user'=>?array, 'assistant'=>?array].
+     * @return array[] Pairs ['user'=>?array, 'assistant'=>?array], plus 'correction'=>true on a correction's own entry.
      */
     public static function pair_messages(array $messages): array {
         $pairs = [];
@@ -161,21 +175,56 @@ class history_selector {
             $m = $messages[$i];
             if (($m->role ?? '') === 'user') {
                 $pair = ['user' => ['role' => 'user', 'content' => $m->message], 'assistant' => null];
-                if ($i + 1 < $n && ($messages[$i + 1]->role ?? '') === 'assistant') {
-                    $pair['assistant'] = ['role' => 'assistant', 'content' => $messages[$i + 1]->message];
-                    $i += 2;
+                // A correction of the previous answer can be stored between this question and its answer (the
+                // question is saved before streaming, the answer after): it is not the answer, so look past it.
+                $j = $i + 1;
+                while ($j < $n && self::is_correction($messages[$j])) {
+                    $j++;
+                }
+                if ($j < $n && ($messages[$j]->role ?? '') === 'assistant') {
+                    for ($k = $i + 1; $k < $j; $k++) {
+                        $pairs[] = self::single($messages[$k]);
+                    }
+                    $pair['assistant'] = ['role' => 'assistant', 'content' => $messages[$j]->message];
+                    $pairs[] = $pair;
+                    $i = $j + 1;
                 } else {
+                    $pairs[] = $pair;
                     $i += 1;
                 }
-                $pairs[] = $pair;
             } else {
                 // Stray assistant (or other) message; keep as its own entry so
                 // nothing is silently dropped before scoring.
-                $pairs[] = ['user' => null, 'assistant' => ['role' => $m->role, 'content' => $m->message]];
+                $pairs[] = self::single($m);
                 $i += 1;
             }
         }
         return $pairs;
+    }
+
+    /**
+     * Whether a row is a correction message (correction_notice).
+     *
+     * @param object $m
+     * @return bool
+     */
+    private static function is_correction($m): bool {
+        return ($m->role ?? '') === 'assistant'
+            && ($m->interaction_type ?? null) === correction_notice::INTERACTION_TYPE;
+    }
+
+    /**
+     * A message with no question of its own, as an entry; a correction keeps its flag.
+     *
+     * @param object $m
+     * @return array
+     */
+    private static function single($m): array {
+        $pair = ['user' => null, 'assistant' => ['role' => $m->role, 'content' => $m->message]];
+        if (($m->interaction_type ?? null) === correction_notice::INTERACTION_TYPE) {
+            $pair['correction'] = true;
+        }
+        return $pair;
     }
 
     /**

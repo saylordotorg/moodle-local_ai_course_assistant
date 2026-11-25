@@ -316,6 +316,29 @@ define(['core/ajax'], function(Ajax) {
     };
 
     /**
+     * Post one finished live voice turn for the guidance rules to check (8.4.0). Only called while the course's
+     * answer safety mode is Watch or Enforce (get_realtime_token then returns the ticket).
+     *
+     * @param {number} courseid
+     * @param {Object} turn {ticket, turn, question, answer, pageid}
+     * @returns {Promise} {recorded, action: none|warn|block, text, wellbeing, reason}
+     */
+    const checkVoiceTurn = function(courseid, turn) {
+        turn = turn || {};
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_check_voice_turn',
+            args: {
+                courseid: courseid,
+                ticket: String(turn.ticket || ''),
+                turn: parseInt(turn.turn, 10) || 0,
+                question: String(turn.question || ''),
+                answer: String(turn.answer || ''),
+                pageid: parseInt(turn.pageid, 10) || 0,
+            },
+        }])[0];
+    };
+
+    /**
      * Submit user feedback.
      *
      * @param {number} courseid
@@ -563,6 +586,7 @@ define(['core/ajax'], function(Ajax) {
         saveAvatarPreference: saveAvatarPreference,
         getRealtimeToken: getRealtimeToken,
         recordLiveUsage: recordLiveUsage,
+        checkVoiceTurn: checkVoiceTurn,
         submitFeedback: submitFeedback,
         getSurvey: getSurvey,
         submitSurveyResponse: submitSurveyResponse,

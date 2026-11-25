@@ -84,6 +84,7 @@
         "serverpagetitle": "Introduction",
         "serverpageheading": "Introduction",
         "llmoptionsjson": "{}",
+        "showmodelpicker": false,
         "startersjson": "[{\"key\":\"help-page\",\"name\":\"Help with this page\"}]",
         "hasstarterdata": true,
         "starters": [
@@ -829,6 +830,7 @@
                           rows="1"
                           aria-label="{{#str}}chat:placeholder, local_ai_course_assistant{{/str}}"></textarea>
                 <div class="local-ai-course-assistant__composer-bar">
+                    {{#showmodelpicker}}
                     <div class="local-ai-course-assistant__composer-left" hidden>
                         <label class="local-ai-course-assistant__composer-select-wrap" hidden>
                             <span class="local-ai-course-assistant__composer-select-label">{{#str}}chat:llm_label, local_ai_course_assistant{{/str}}</span>
@@ -851,6 +853,7 @@
                             </span>
                         </label>
                     </div>
+                    {{/showmodelpicker}}
                     <div class="local-ai-course-assistant__composer-right">
                         {{#voiceenabled}}
                         <button class="local-ai-course-assistant__btn-mic"

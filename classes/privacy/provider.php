@@ -23,6 +23,7 @@ use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
+use local_ai_course_assistant\answer_audit;
 use local_ai_course_assistant\conversation_manager;
 use local_ai_course_assistant\study_planner;
 use local_ai_course_assistant\reminder_manager;
@@ -209,7 +210,11 @@ class provider implements
         );
         $collection->add_database_table(
             'local_ai_course_assistant_review_res',
-            ['resolved_by' => 'privacy:metadata:review_res:resolved_by'],
+            [
+                'resolved_by' => 'privacy:metadata:review_res:resolved_by',
+                'note' => 'privacy:metadata:review_res:note',
+                'outcome' => 'privacy:metadata:review_res:outcome',
+            ],
             'privacy:metadata:review_res'
         );
         $collection->add_database_table(
@@ -327,6 +332,28 @@ class provider implements
                 'rolledbackby' => 'privacy:metadata:model_switch:rolledbackby',
             ],
             'privacy:metadata:model_switch'
+        );
+        // 8.4.0: the answer audit. Discovered through COURSE_USER_TABLES, exported by export_answer_audit(),
+        // and on erasure REDACTED rather than deleted: the question, answer and claim text go, the metadata,
+        // verdicts and hashes stay so the course's hash chain can still be checked.
+        $collection->add_database_table(
+            'local_ai_course_assistant_answer_audit',
+            [
+                'userid' => 'privacy:metadata:answer_audit:userid',
+                'courseid' => 'privacy:metadata:answer_audit:courseid',
+                'messageid' => 'privacy:metadata:answer_audit:messageid',
+                'conversationid' => 'privacy:metadata:answer_audit:conversationid',
+                'cmid' => 'privacy:metadata:answer_audit:cmid',
+                'mode' => 'privacy:metadata:answer_audit:mode',
+                'question' => 'privacy:metadata:answer_audit:question',
+                'answer' => 'privacy:metadata:answer_audit:answer',
+                'categories' => 'privacy:metadata:answer_audit:categories',
+                'rules' => 'privacy:metadata:answer_audit:rules',
+                'status' => 'privacy:metadata:answer_audit:status',
+                'claims' => 'privacy:metadata:answer_audit:claims',
+                'timecreated' => 'privacy:metadata:answer_audit:timecreated',
+            ],
+            'privacy:metadata:answer_audit'
         );
         // Same class of row, found by the guard below rather than by core:
         // which staff member last edited a Soapbox assignment. Course
@@ -584,6 +611,7 @@ class provider implements
         'local_ai_course_assistant_outreach_log',
         'local_ai_course_assistant_avatar_sess',
         'local_ai_course_assistant_email_optout',
+        'local_ai_course_assistant_answer_audit',
     ];
 
     /**
@@ -1127,6 +1155,39 @@ class provider implements
                     );
                 }
             }
+
+            self::export_answer_audit($userid, $context);
+        }
+    }
+
+    /**
+     * Export the learner's answer audit rows for one course (8.4.0).
+     *
+     * Every row is exported, answers and verdicts, live or redacted: the sources, rules fired, verdicts,
+     * hashes and timestamps are data about the learner's own questions. A live row also carries its question,
+     * answer and claim text, which are the learner's own; a redacted row has none left to export.
+     *
+     * @param int $userid
+     * @param \context $context A course context.
+     */
+    private static function export_answer_audit(int $userid, \context $context): void {
+        global $DB;
+        if (!$DB->get_manager()->table_exists(answer_audit::TABLE)) {
+            return;
+        }
+        $rows = answer_audit::rows_for_export((int) $context->instanceid, ['userid' => $userid]);
+        foreach ($rows as $row) {
+            $id = $row['id'];
+            unset($row['id'], $row['userid']);
+            foreach (['timecreated', 'timeredacted'] as $field) {
+                if (!empty($row[$field])) {
+                    $row[$field] = transform::datetime($row[$field]);
+                }
+            }
+            writer::with_context($context)->export_data(
+                [get_string('pluginname', 'local_ai_course_assistant'), 'answer_audit', $id],
+                (object) $row
+            );
         }
     }
 
@@ -1221,6 +1282,8 @@ class provider implements
         if ($context->contextlevel !== CONTEXT_COURSE) {
             return;
         }
+        // Also redacts the course's answer audit (8.4.0): delete_course_data() calls
+        // answer_audit::redact_for_course() before it deletes any message.
         conversation_manager::delete_course_data($context->instanceid);
         $DB->delete_records('local_ai_course_assistant_plans', ['courseid' => $context->instanceid]);
         $DB->delete_records('local_ai_course_assistant_reminders', ['courseid' => $context->instanceid]);
@@ -1311,6 +1374,10 @@ class provider implements
             if ($context->contextlevel !== CONTEXT_COURSE) {
                 continue;
             }
+
+            // 8.4.0: the answer audit is redacted, not deleted (see get_metadata), for this approved course
+            // only, and before the conversations go: rows whose conversation no longer exists are reached too.
+            answer_audit::redact_for_course((int) $context->instanceid, (int) $userid);
 
             $convs = $DB->get_records('local_ai_course_assistant_convs', [
                 'userid' => $userid,
@@ -1451,6 +1518,9 @@ class provider implements
 
         $userids = $userlist->get_userids();
         foreach ($userids as $userid) {
+            // 8.4.0: the answer audit is redacted, not deleted, in this course context only.
+            answer_audit::redact_for_course((int) $context->instanceid, (int) $userid);
+
             $convs = $DB->get_records('local_ai_course_assistant_convs', [
                 'userid' => $userid,
                 'courseid' => $context->instanceid,
