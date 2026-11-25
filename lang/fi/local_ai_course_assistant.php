@@ -3628,3 +3628,11 @@ $string['settings:answer_check_user_daily_cap'] = 'Väitetarkistus: yhden opiske
 $string['settings:answer_check_user_daily_cap_desc'] = 'Enimmäismäärä väitetarkistuksia, jotka asetetaan jonoon päivässä yhden opiskelijan vastauksista. Rajan ylittäviä vastauksia ei tarkisteta sinä päivänä. Näin yksi tili ei voi käyttää koko sivuston päivärajaa. 0 tarkoittaa, ettei yhdellä opiskelijalla ole rajaa; sivuston raja on silti voimassa. Oletus 50.';
 $string['settings:answer_check_course_daily_cap'] = 'Väitetarkistus: yhden kurssin päiväraja';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Enimmäismäärä väitetarkistuksia, jotka asetetaan jonoon päivässä yhdestä kurssista. Rajan ylittäviä vastauksia ei tarkisteta sinä päivänä. Näin yksi vilkas kurssi ei voi käyttää koko sivuston päivärajaa. 0 tarkoittaa, ettei yhdellä kurssilla ole rajaa; sivuston raja on silti voimassa. Oletus 500.';
+
+$string['settings:answer_safety_realtime_in_enforce'] = 'Salli reaaliaikainen ääni ja avatar Valvonta-tilassa (vastaukset tarkistetaan sen jälkeen, kun ne on puhuttu)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = 'Oletuksena pois: Valvonta-tilassa live-ääntä ja puhuvaa avataria ei tarjota, ja opiskelijat saavat tavallisen äänitilan, jonka vastaukset tarkistetaan ennen kuin ne kuullaan. Kun tämä on päällä, live-äänen vastaus tarkistetaan heti sen puhumisen jälkeen, joten osa vastauksesta tai koko vastaus voidaan kuulla ennen kuin se pysäytetään. Avatarin vastauksia ei tarkisteta eikä tallenneta. Kurssi, jolla on oma tilansa, noudattaa sitä.';
+$string['realtime:err_answer_safety'] = 'Live-ääni ei ole käytettävissä tällä kurssilla. Käytä sen sijaan tavallista äänitilaa tai chattia.';
+$string['talking_avatar:answer_safety'] = 'Puhuva avatar ei ole käytettävissä tällä kurssilla. Käytä sen sijaan chattia tai äänitilaa.';
+$string['answeraudit:flow_voice_transcript'] = 'Live-ääni: opiskelijan selaimen lähettämä litterointi, tarkistettu sen jälkeen, kun vastaus oli puhuttu';
+$string['answeraudit:flow_voice_truncated'] = 'Live-ääni: litterointi oli liian pitkä ja sitä lyhennettiin ennen tarkistusta';
+$string['privacy:metadata:answer_audit:mode'] = 'Onko vastaus kirjoitettu vai puhuttu live-äänellä. Live-äänestä tallennetaan litterointi. Ääntä ei tallenneta.';

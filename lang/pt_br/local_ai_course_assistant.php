@@ -3648,3 +3648,11 @@ $string['settings:answer_check_user_daily_cap'] = 'Verificação de afirmações
 $string['settings:answer_check_user_daily_cap_desc'] = 'Máximo de verificações de afirmações colocadas na fila por dia para as respostas de um mesmo estudante. As respostas além do limite não são verificadas naquele dia. Isso impede que uma única conta esgote o limite diário do site. 0 significa sem limite por estudante; o limite do site continua valendo. Padrão: 50.';
 $string['settings:answer_check_course_daily_cap'] = 'Verificação de afirmações: limite diário por curso';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Máximo de verificações de afirmações colocadas na fila por dia para um mesmo curso. As respostas além do limite não são verificadas naquele dia. Isso impede que um único curso muito ativo esgote o limite diário do site. 0 significa sem limite por curso; o limite do site continua valendo. Padrão: 500.';
+
+$string['settings:answer_safety_realtime_in_enforce'] = 'Permitir voz em tempo real e o avatar no modo Aplicar (as respostas são verificadas depois de faladas)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = 'Desativado por padrão: no modo Aplicar, a voz ao vivo e o avatar falante não são oferecidos, e os estudantes usam o modo de voz normal, cujas respostas são verificadas antes de serem ouvidas. Quando ativado, uma resposta de voz ao vivo é verificada logo depois de falada, então parte dela ou toda ela pode ser ouvida antes de ser interrompida. As respostas do avatar não são verificadas nem registradas. Um curso com modo próprio segue esse modo.';
+$string['realtime:err_answer_safety'] = 'A voz ao vivo não está disponível neste curso. Use o modo de voz normal ou o chat.';
+$string['talking_avatar:answer_safety'] = 'O avatar falante não está disponível neste curso. Use o chat ou o modo de voz.';
+$string['answeraudit:flow_voice_transcript'] = 'Voz ao vivo: transcrição enviada pelo navegador do estudante, verificada depois que a resposta foi falada';
+$string['answeraudit:flow_voice_truncated'] = 'Voz ao vivo: a transcrição era longa demais e foi cortada antes da verificação';
+$string['privacy:metadata:answer_audit:mode'] = 'Se a resposta foi escrita ou falada em voz ao vivo. Na voz ao vivo, a transcrição é registrada. Nenhum áudio é armazenado.';

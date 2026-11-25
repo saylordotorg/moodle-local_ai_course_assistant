@@ -3628,3 +3628,11 @@ $string['settings:answer_check_user_daily_cap'] = 'Påstandskontrol: daglig græ
 $string['settings:answer_check_user_daily_cap_desc'] = 'Det højeste antal påstandskontroller, der sættes i kø pr. dag for én kursists svar. Svar over grænsen kontrolleres ikke den dag. Det forhindrer, at én konto bruger hele webstedets daglige grænse. 0 betyder ingen grænse for én kursist; webstedets grænse gælder stadig. Standard 50.';
 $string['settings:answer_check_course_daily_cap'] = 'Påstandskontrol: daglig grænse for ét kursus';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Det højeste antal påstandskontroller, der sættes i kø pr. dag for ét kursus. Svar over grænsen kontrolleres ikke den dag. Det forhindrer, at ét travlt kursus bruger hele webstedets daglige grænse. 0 betyder ingen grænse for ét kursus; webstedets grænse gælder stadig. Standard 500.';
+
+$string['settings:answer_safety_realtime_in_enforce'] = 'Tillad realtidsstemme og avataren i tilstanden Håndhæv (svar kontrolleres, efter at de er sagt)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = 'Slået fra som standard: I tilstanden Håndhæv tilbydes livestemme og den talende avatar ikke, og kursister får den almindelige stemmetilstand, hvor svar kontrolleres, før de høres. Når dette er slået til, kontrolleres et livestemmesvar lige efter, at det er sagt, så en del af det eller hele svaret kan høres, før det stoppes. Avatarens svar kontrolleres og registreres ikke. Et kursus med sin egen tilstand følger den tilstand.';
+$string['realtime:err_answer_safety'] = 'Livestemme er ikke tilgængelig i dette kursus. Brug den almindelige stemmetilstand eller chatten i stedet.';
+$string['talking_avatar:answer_safety'] = 'Den talende avatar er ikke tilgængelig i dette kursus. Brug chatten eller stemmetilstanden i stedet.';
+$string['answeraudit:flow_voice_transcript'] = 'Livestemme: udskrift sendt af kursistens browser, kontrolleret efter at svaret var sagt';
+$string['answeraudit:flow_voice_truncated'] = 'Livestemme: udskriften var for lang og blev afkortet før kontrollen';
+$string['privacy:metadata:answer_audit:mode'] = 'Om svaret blev skrevet eller sagt med livestemme. For livestemme gemmes udskriften. Der gemmes ingen lyd.';

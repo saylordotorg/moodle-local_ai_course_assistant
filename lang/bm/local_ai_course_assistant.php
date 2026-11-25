@@ -3656,3 +3656,11 @@ $string['settings:answer_check_user_daily_cap'] = 'Fɔtaw lajɛli: don kelen dan
 $string['settings:answer_check_user_daily_cap_desc'] = 'Most claim checks queued per day for one learner\'s answers. Answers past the limit are not checked that day. It stops one account using up the site\'s daily limit. 0 means no limit for one learner; the site limit still applies. Default 50.';
 $string['settings:answer_check_course_daily_cap'] = 'Fɔtaw lajɛli: don kelen dan kalanso kelen ye';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Most claim checks queued per day for one course. Answers past the limit are not checked that day. It stops one busy course using up the site\'s daily limit. 0 means no limit for one course; the site limit still applies. Default 500.';
+
+$string['settings:answer_safety_realtime_in_enforce'] = 'Kumakan teliman ni avatar yamaruya Sariya waleya cogo la (jaabiw bɛ lajɛ u fɔlen kɔfɛ)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = 'Off by default: in Enforce mode live voice and the talking avatar are not offered, and learners get the regular voice mode, whose answers are checked before they are heard. When this is on, a live voice answer is checked right after it is spoken, so part or all of it can be heard before it is stopped. Avatar answers are not checked or recorded. A course with its own mode follows that mode.';
+$string['realtime:err_answer_safety'] = 'Live voice is not available in this course. Use the regular voice mode or chat instead.';
+$string['talking_avatar:answer_safety'] = 'The talking avatar is not available in this course. Use chat or voice mode instead.';
+$string['answeraudit:flow_voice_transcript'] = 'Kumakan teliman: kuma sɛbɛnnen min cira kalanden ka navigatɛri fɛ, a lajɛra jaabi fɔlen kɔfɛ';
+$string['answeraudit:flow_voice_truncated'] = 'Kumakan teliman: kuma sɛbɛnnen tun ka jan kojugu, a tigɛra sani lajɛli cɛ';
+$string['privacy:metadata:answer_audit:mode'] = 'Whether the answer was written or spoken in live voice. For live voice the transcript is recorded. No audio is stored.';

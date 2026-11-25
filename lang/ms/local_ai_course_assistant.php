@@ -3671,3 +3671,11 @@ $string['settings:answer_check_user_daily_cap'] = 'Semakan dakwaan: had harian u
 $string['settings:answer_check_user_daily_cap_desc'] = 'Bilangan terbanyak semakan dakwaan yang dibariskan sehari untuk jawapan seorang pelajar. Jawapan yang melebihi had tidak disemak pada hari itu. Ini menghalang satu akaun menghabiskan had harian laman. 0 bermaksud tiada had untuk seorang pelajar; had laman masih terpakai. Lalai 50.';
 $string['settings:answer_check_course_daily_cap'] = 'Semakan dakwaan: had harian untuk satu kursus';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Bilangan terbanyak semakan dakwaan yang dibariskan sehari untuk satu kursus. Jawapan yang melebihi had tidak disemak pada hari itu. Ini menghalang satu kursus yang sibuk menghabiskan had harian laman. 0 bermaksud tiada had untuk satu kursus; had laman masih terpakai. Lalai 500.';
+
+$string['settings:answer_safety_realtime_in_enforce'] = 'Benarkan suara masa nyata dan avatar dalam mod Kuat kuasa (jawapan disemak selepas diucapkan)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = 'Dimatikan secara lalai: dalam mod Kuat kuasa, suara langsung dan avatar bercakap tidak ditawarkan, dan pelajar mendapat mod suara biasa, yang jawapannya disemak sebelum didengar. Apabila dihidupkan, jawapan suara langsung disemak sejurus selepas diucapkan, jadi sebahagian atau keseluruhan jawapan boleh didengar sebelum dihentikan. Jawapan avatar tidak disemak dan tidak direkodkan. Kursus yang mempunyai mod sendiri mengikut mod itu.';
+$string['realtime:err_answer_safety'] = 'Suara langsung tidak tersedia dalam kursus ini. Gunakan mod suara biasa atau sembang.';
+$string['talking_avatar:answer_safety'] = 'Avatar bercakap tidak tersedia dalam kursus ini. Gunakan sembang atau mod suara.';
+$string['answeraudit:flow_voice_transcript'] = 'Suara langsung: transkrip dihantar oleh pelayar pelajar, disemak selepas jawapan diucapkan';
+$string['answeraudit:flow_voice_truncated'] = 'Suara langsung: transkrip terlalu panjang dan dipotong sebelum semakan';
+$string['privacy:metadata:answer_audit:mode'] = 'Sama ada jawapan ditulis atau diucapkan dengan suara langsung. Bagi suara langsung, transkrip direkodkan. Tiada audio disimpan.';

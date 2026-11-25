@@ -3643,3 +3643,11 @@ $string['settings:answer_check_user_daily_cap'] = 'Nyocha nkwupụta: oke kwa �
 $string['settings:answer_check_user_daily_cap_desc'] = 'Ọnụọgụ kacha elu nke nyocha nkwupụta a na-etinye n\'ahịrị kwa ụbọchị maka azịza otu onye mmụta. A naghị enyocha azịza gafere oke ahụ n\'ụbọchị ahụ. Ọ na-egbochi otu akaụntụ iji oke kwa ụbọchị nke saịtị niile. 0 pụtara na enweghị oke maka otu onye mmụta; oke saịtị ka na-adị. Nke mbụ 50.';
 $string['settings:answer_check_course_daily_cap'] = 'Nyocha nkwupụta: oke kwa ụbọchị maka otu usoro ọmụmụ';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Ọnụọgụ kacha elu nke nyocha nkwupụta a na-etinye n\'ahịrị kwa ụbọchị maka otu usoro ọmụmụ. A naghị enyocha azịza gafere oke ahụ n\'ụbọchị ahụ. Ọ na-egbochi otu usoro ọmụmụ nwere ọtụtụ ọrụ iji oke kwa ụbọchị nke saịtị niile. 0 pụtara na enweghị oke maka otu usoro ọmụmụ; oke saịtị ka na-adị. Nke mbụ 500.';
+
+$string['settings:answer_safety_realtime_in_enforce'] = 'Kwe ka olu ozugbo na avatar rụọ ọrụ n\'ọnọdụ Mee ka ọ dị irè (a na-enyocha azịza mgbe ekwuchara ha)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = 'Agbanyụrụ ya na ndabara: n\'ọnọdụ Mee ka ọ dị irè, a naghị enye olu ndụ na avatar na-ekwu okwu, ndị mmụta na-enwetakwa ọnọdụ olu nkịtị, nke a na-enyocha azịza ya tupu a nụ ha. Mgbe agbanyere ya, a na-enyocha azịza olu ndụ ozugbo ekwuchara ya, ya mere enwere ike ịnụ akụkụ ya ma ọ bụ ya niile tupu akwụsị ya. A naghị enyocha azịza avatar, a naghịkwa edekọ ha. Kọọsị nwere ọnọdụ nke ya na-eso ọnọdụ ahụ.';
+$string['realtime:err_answer_safety'] = 'Olu ndụ adịghị na kọọsị a. Jiri ọnọdụ olu nkịtị ma ọ bụ mkparịta ụka kama.';
+$string['talking_avatar:answer_safety'] = 'Avatar na-ekwu okwu adịghị na kọọsị a. Jiri mkparịta ụka ma ọ bụ ọnọdụ olu kama.';
+$string['answeraudit:flow_voice_transcript'] = 'Olu ndụ: ederede okwu nke ihe nchọgharị onye mmụta zitere, enyochara ya mgbe ekwuchara azịza ahụ';
+$string['answeraudit:flow_voice_truncated'] = 'Olu ndụ: ederede okwu ahụ toro ogologo nke ukwuu, e bepụrụ ya tupu nyocha';
+$string['privacy:metadata:answer_audit:mode'] = 'Ma e dere azịza ahụ ede ka ọ bụ ekwuru ya n\'olu ndụ. Maka olu ndụ, a na-edekọ ederede okwu ahụ. Ọ dịghị ụda a na-echekwa.';

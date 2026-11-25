@@ -3626,3 +3626,11 @@ $string['settings:answer_check_user_daily_cap'] = '主張チェック: 学習者
 $string['settings:answer_check_user_daily_cap_desc'] = '学習者 1 人の回答について 1 日にキューに入れる主張チェックの最大数です。上限を超えた回答はその日はチェックされません。1 つのアカウントがサイトの 1 日の上限を使い切るのを防ぎます。0 は学習者 1 人あたりの上限なしを意味し、サイトの上限は引き続き適用されます。デフォルトは 50。';
 $string['settings:answer_check_course_daily_cap'] = '主張チェック: コース 1 つあたりの 1 日の上限';
 $string['settings:answer_check_course_daily_cap_desc'] = '1 つのコースについて 1 日にキューに入れる主張チェックの最大数です。上限を超えた回答はその日はチェックされません。利用の多い 1 つのコースがサイトの 1 日の上限を使い切るのを防ぎます。0 はコース 1 つあたりの上限なしを意味し、サイトの上限は引き続き適用されます。デフォルトは 500。';
+
+$string['settings:answer_safety_realtime_in_enforce'] = '適用モードでリアルタイム音声とアバターを許可する(回答は話された後にチェックされます)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = '既定ではオフです。適用モードではライブ音声とトーキングアバターは提供されず、学習者は通常の音声モードを使います。通常の音声モードでは、回答は聞こえる前にチェックされます。オンにすると、ライブ音声の回答は話された直後にチェックされるため、停止される前に回答の一部またはすべてが聞こえることがあります。アバターの回答はチェックも記録もされません。独自のモードを持つコースはそのモードに従います。';
+$string['realtime:err_answer_safety'] = 'このコースではライブ音声は利用できません。通常の音声モードまたはチャットを使ってください。';
+$string['talking_avatar:answer_safety'] = 'このコースではトーキングアバターは利用できません。チャットまたは音声モードを使ってください。';
+$string['answeraudit:flow_voice_transcript'] = 'ライブ音声: 学習者のブラウザから送られた文字起こし。回答が話された後にチェックした';
+$string['answeraudit:flow_voice_truncated'] = 'ライブ音声: 文字起こしが長すぎたため、チェックの前に切り詰めた';
+$string['privacy:metadata:answer_audit:mode'] = '回答が文字で書かれたか、ライブ音声で話されたか。ライブ音声では文字起こしが記録されます。音声は保存されません。';

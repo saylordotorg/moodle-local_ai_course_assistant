@@ -3628,3 +3628,11 @@ $string['settings:answer_check_user_daily_cap'] = 'Kontrola tvrdení: denný lim
 $string['settings:answer_check_user_daily_cap_desc'] = 'Najvyšší počet kontrol tvrdení zaradených do frontu za deň pre odpovede jedného študenta. Odpovede nad limit sa v ten deň nekontrolujú. Jeden účet tak nemôže vyčerpať denný limit celej stránky. 0 znamená žiadny limit pre jedného študenta; limit stránky platí ďalej. Predvolená hodnota 50.';
 $string['settings:answer_check_course_daily_cap'] = 'Kontrola tvrdení: denný limit pre jeden kurz';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Najvyšší počet kontrol tvrdení zaradených do frontu za deň pre jeden kurz. Odpovede nad limit sa v ten deň nekontrolujú. Jeden vyťažený kurz tak nemôže vyčerpať denný limit celej stránky. 0 znamená žiadny limit pre jeden kurz; limit stránky platí ďalej. Predvolená hodnota 500.';
+
+$string['settings:answer_safety_realtime_in_enforce'] = 'Povoliť hlas v reálnom čase a avatara v režime Vynucovanie (odpovede sa kontrolujú po tom, čo zaznejú)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = 'Predvolene vypnuté: v režime Vynucovanie sa živý hlas a hovoriaci avatar neponúkajú a študenti používajú bežný hlasový režim, ktorého odpovede sa kontrolujú skôr, než zaznejú. Ak je zapnuté, odpoveď živého hlasu sa kontroluje hneď po tom, čo zaznie, takže časť alebo celú odpoveď možno počuť skôr, než sa zastaví. Odpovede avatara sa nekontrolujú ani nezaznamenávajú. Kurz s vlastným režimom sa riadi týmto režimom.';
+$string['realtime:err_answer_safety'] = 'Živý hlas nie je v tomto kurze k dispozícii. Použite bežný hlasový režim alebo chat.';
+$string['talking_avatar:answer_safety'] = 'Hovoriaci avatar nie je v tomto kurze k dispozícii. Použite chat alebo hlasový režim.';
+$string['answeraudit:flow_voice_transcript'] = 'Živý hlas: prepis odoslaný prehliadačom študenta, skontrolovaný po tom, čo odpoveď zaznela';
+$string['answeraudit:flow_voice_truncated'] = 'Živý hlas: prepis bol príliš dlhý a pred kontrolou bol skrátený';
+$string['privacy:metadata:answer_audit:mode'] = 'Či bola odpoveď napísaná, alebo vyslovená živým hlasom. Pri živom hlase sa zaznamenáva prepis. Zvuk sa neukladá.';

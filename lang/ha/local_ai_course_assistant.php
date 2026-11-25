@@ -3655,3 +3655,11 @@ $string['settings:answer_check_user_daily_cap'] = 'Binciken iƙirari: iyakar yin
 $string['settings:answer_check_user_daily_cap_desc'] = 'Mafi yawan binciken iƙirari da ake sanyawa a layi a rana don amsoshin ɗalibi ɗaya. Amsoshin da suka wuce iyakar ba a bincika su a wannan ranar. Yana hana asusu ɗaya cinye iyakar yini ta shafin. 0 na nufin babu iyaka ga ɗalibi ɗaya; iyakar shafin tana nan tana aiki. Na asali 50.';
 $string['settings:answer_check_course_daily_cap'] = 'Binciken iƙirari: iyakar yini ga kwas ɗaya';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Mafi yawan binciken iƙirari da ake sanyawa a layi a rana don kwas ɗaya. Amsoshin da suka wuce iyakar ba a bincika su a wannan ranar. Yana hana kwas ɗaya mai yawan aiki cinye iyakar yini ta shafin. 0 na nufin babu iyaka ga kwas ɗaya; iyakar shafin tana nan tana aiki. Na asali 500.';
+
+$string['settings:answer_safety_realtime_in_enforce'] = 'Bari muryar kai-tsaye da avatar a yanayin Tilasta (ana duba amsoshi bayan an faɗe su)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = 'A kashe yake tun farko: a yanayin Tilasta ba a bayar da muryar kai-tsaye da avatar mai magana, kuma ɗalibai suna samun yanayin murya na yau da kullum, wanda ake duba amsoshinsa kafin a ji su. Idan an kunna, ana duba amsar muryar kai-tsaye nan da nan bayan an faɗe ta, don haka ana iya jin wani ɓangare nata ko duka kafin a dakatar da ita. Ba a duba amsoshin avatar kuma ba a adana su. Kwas da ke da nasa yanayin yana bin wannan yanayin.';
+$string['realtime:err_answer_safety'] = 'Babu muryar kai-tsaye a wannan kwas. Yi amfani da yanayin murya na yau da kullum ko hira a maimakon haka.';
+$string['talking_avatar:answer_safety'] = 'Babu avatar mai magana a wannan kwas. Yi amfani da hira ko yanayin murya a maimakon haka.';
+$string['answeraudit:flow_voice_transcript'] = 'Muryar kai-tsaye: rubutun magana da burauzar ɗalibi ta aika, an duba shi bayan an faɗi amsar';
+$string['answeraudit:flow_voice_truncated'] = 'Muryar kai-tsaye: rubutun maganar ya yi tsayi sosai, an yanke shi kafin dubawa';
+$string['privacy:metadata:answer_audit:mode'] = 'Ko an rubuta amsar ne ko an faɗe ta da muryar kai-tsaye. Ga muryar kai-tsaye ana adana rubutun maganar. Ba a adana sauti.';

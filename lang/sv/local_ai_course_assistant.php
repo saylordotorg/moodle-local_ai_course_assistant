@@ -3627,3 +3627,11 @@ $string['settings:answer_check_user_daily_cap'] = 'Påståendekontroll: daglig g
 $string['settings:answer_check_user_daily_cap_desc'] = 'Högsta antal påståendekontroller som köas per dag för en deltagares svar. Svar över gränsen kontrolleras inte den dagen. Det hindrar att ett enda konto gör slut på webbplatsens dagliga gräns. 0 betyder ingen gräns för en deltagare; webbplatsens gräns gäller fortfarande. Standard 50.';
 $string['settings:answer_check_course_daily_cap'] = 'Påståendekontroll: daglig gräns för en kurs';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Högsta antal påståendekontroller som köas per dag för en kurs. Svar över gränsen kontrolleras inte den dagen. Det hindrar att en enda livligt använd kurs gör slut på webbplatsens dagliga gräns. 0 betyder ingen gräns för en kurs; webbplatsens gräns gäller fortfarande. Standard 500.';
+
+$string['settings:answer_safety_realtime_in_enforce'] = 'Tillåt realtidsröst och avataren i läget Tillämpa (svar kontrolleras efter att de har sagts)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = 'Av som standard: i läget Tillämpa erbjuds inte liveröst och den talande avataren, och deltagarna får det vanliga röstläget, där svar kontrolleras innan de hörs. När detta är på kontrolleras ett liveröstsvar direkt efter att det har sagts, så en del av det eller hela svaret kan höras innan det stoppas. Avatarens svar kontrolleras inte och sparas inte. En kurs med eget läge följer det läget.';
+$string['realtime:err_answer_safety'] = 'Liveröst är inte tillgängligt i den här kursen. Använd det vanliga röstläget eller chatten i stället.';
+$string['talking_avatar:answer_safety'] = 'Den talande avataren är inte tillgänglig i den här kursen. Använd chatten eller röstläget i stället.';
+$string['answeraudit:flow_voice_transcript'] = 'Liveröst: transkription skickad av deltagarens webbläsare, kontrollerad efter att svaret hade sagts';
+$string['answeraudit:flow_voice_truncated'] = 'Liveröst: transkriptionen var för lång och kortades före kontrollen';
+$string['privacy:metadata:answer_audit:mode'] = 'Om svaret skrevs eller sades med liveröst. För liveröst sparas transkriptionen. Inget ljud sparas.';

@@ -3649,3 +3649,11 @@ $string['settings:answer_check_user_daily_cap'] = 'Àyẹ̀wò ọ̀rọ̀: àà
 $string['settings:answer_check_user_daily_cap_desc'] = 'Iye àyẹ̀wò ọ̀rọ̀ tó pọ̀ jù tí a ń tò sórí ìlà lójúmọ́ fún àwọn ìdáhùn akẹ́kọ̀ọ́ kan. A kì í ṣàyẹ̀wò àwọn ìdáhùn tó kọjá ààlà náà lọ́jọ́ yẹn. Ó ń dènà àkáǹtì kan láti lo gbogbo ààlà ojoojúmọ́ sáìtì náà tán. 0 túmọ̀ sí pé kò sí ààlà fún akẹ́kọ̀ọ́ kan; ààlà sáìtì náà ṣì ń ṣiṣẹ́. Àìyípadà 50.';
 $string['settings:answer_check_course_daily_cap'] = 'Àyẹ̀wò ọ̀rọ̀: ààlà ojoojúmọ́ fún ẹ̀kọ́ kan';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Iye àyẹ̀wò ọ̀rọ̀ tó pọ̀ jù tí a ń tò sórí ìlà lójúmọ́ fún ẹ̀kọ́ kan. A kì í ṣàyẹ̀wò àwọn ìdáhùn tó kọjá ààlà náà lọ́jọ́ yẹn. Ó ń dènà ẹ̀kọ́ kan tí iṣẹ́ pọ̀ nínú rẹ̀ láti lo gbogbo ààlà ojoojúmọ́ sáìtì náà tán. 0 túmọ̀ sí pé kò sí ààlà fún ẹ̀kọ́ kan; ààlà sáìtì náà ṣì ń ṣiṣẹ́. Àìyípadà 500.';
+
+$string['settings:answer_safety_realtime_in_enforce'] = 'Gba ohùn àkókò gidi àti avatar láàyè nínú ipò Fipá mú ṣẹ (a máa ń ṣàyẹ̀wò àwọn ìdáhùn lẹ́yìn tí a bá ti sọ wọ́n)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = 'Ó wà ní pípa ní ìbẹ̀rẹ̀: nínú ipò Fipá mú ṣẹ, a kì í pèsè ohùn ààyè àti avatar tó ń sọ̀rọ̀, àwọn akẹ́kọ̀ọ́ sì máa ń gba ipò ohùn déédéé, èyí tí a máa ń ṣàyẹ̀wò àwọn ìdáhùn rẹ̀ kí a tó gbọ́ wọn. Tí a bá tan-án, a máa ń ṣàyẹ̀wò ìdáhùn ohùn ààyè ní kété lẹ́yìn tí a bá sọ ọ́, nítorí náà a lè gbọ́ apá kan rẹ̀ tàbí gbogbo rẹ̀ kí a tó dá a dúró. A kì í ṣàyẹ̀wò àwọn ìdáhùn avatar, a kì í sì í ṣe àkọsílẹ̀ wọn. Ẹ̀kọ́ tó ní ipò tirẹ̀ máa ń tẹ̀lé ipò yẹn.';
+$string['realtime:err_answer_safety'] = 'Ohùn ààyè kò sí nínú ẹ̀kọ́ yìí. Lo ipò ohùn déédéé tàbí ìtàkùrọ̀sọ dípò rẹ̀.';
+$string['talking_avatar:answer_safety'] = 'Avatar tó ń sọ̀rọ̀ kò sí nínú ẹ̀kọ́ yìí. Lo ìtàkùrọ̀sọ tàbí ipò ohùn dípò rẹ̀.';
+$string['answeraudit:flow_voice_transcript'] = 'Ohùn ààyè: àkọsílẹ̀ ọ̀rọ̀ tí aṣàwákiri akẹ́kọ̀ọ́ fi ránṣẹ́, a ṣàyẹ̀wò rẹ̀ lẹ́yìn tí a sọ ìdáhùn náà';
+$string['answeraudit:flow_voice_truncated'] = 'Ohùn ààyè: àkọsílẹ̀ ọ̀rọ̀ náà gùn jù, a sì gé e kúrú ṣáájú àyẹ̀wò';
+$string['privacy:metadata:answer_audit:mode'] = 'Bóyá a kọ ìdáhùn náà tàbí a sọ ọ́ pẹ̀lú ohùn ààyè. Fún ohùn ààyè, a máa ń ṣe àkọsílẹ̀ ọ̀rọ̀ náà. A kì í tọ́jú ohùn kankan.';

@@ -3664,3 +3664,11 @@ $string['settings:answer_check_user_daily_cap'] = '说法核查：单个学习�
 $string['settings:answer_check_user_daily_cap_desc'] = '针对单个学习者的回答，每天排入队列的说法核查的最大数量。超出上限的回答当天不再核查。这可以防止一个账号用完全站的每日上限。0 表示不对单个学习者设上限；全站上限仍然适用。默认 50。';
 $string['settings:answer_check_course_daily_cap'] = '说法核查：单门课程的每日上限';
 $string['settings:answer_check_course_daily_cap_desc'] = '针对单门课程，每天排入队列的说法核查的最大数量。超出上限的回答当天不再核查。这可以防止一门使用量大的课程用完全站的每日上限。0 表示不对单门课程设上限；全站上限仍然适用。默认 500。';
+
+$string['settings:answer_safety_realtime_in_enforce'] = '在执行模式下允许实时语音和头像(回答在说出之后才检查)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = '默认关闭:在执行模式下不提供实时语音和会说话头像,学习者使用普通语音模式,其回答在被听到之前就会检查。开启后,实时语音的回答在说出之后立即检查,因此在被停止之前,回答的一部分或全部可能已被听到。头像的回答不会被检查,也不会被记录。设有自己模式的课程遵循该模式。';
+$string['realtime:err_answer_safety'] = '本课程不提供实时语音。请改用普通语音模式或聊天。';
+$string['talking_avatar:answer_safety'] = '本课程不提供会说话头像。请改用聊天或语音模式。';
+$string['answeraudit:flow_voice_transcript'] = '实时语音:由学习者浏览器发送的转写文本,在回答说出之后检查';
+$string['answeraudit:flow_voice_truncated'] = '实时语音:转写文本过长,已在检查前截断';
+$string['privacy:metadata:answer_audit:mode'] = '回答是书面的还是用实时语音说出的。实时语音会记录转写文本。不存储任何音频。';

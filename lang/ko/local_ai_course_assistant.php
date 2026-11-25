@@ -3626,3 +3626,11 @@ $string['settings:answer_check_user_daily_cap'] = '주장 확인: 학습자 한 
 $string['settings:answer_check_user_daily_cap_desc'] = '학습자 한 명의 답변에 대해 하루에 대기열에 넣는 주장 확인의 최대 수입니다. 한도를 넘은 답변은 그날 확인하지 않습니다. 한 계정이 사이트의 일일 한도를 다 써 버리는 것을 막습니다. 0은 학습자 한 명에 대한 한도가 없다는 뜻이며, 사이트 한도는 계속 적용됩니다. 기본값 50.';
 $string['settings:answer_check_course_daily_cap'] = '주장 확인: 강좌 하나의 일일 한도';
 $string['settings:answer_check_course_daily_cap_desc'] = '강좌 하나에 대해 하루에 대기열에 넣는 주장 확인의 최대 수입니다. 한도를 넘은 답변은 그날 확인하지 않습니다. 이용이 많은 강좌 하나가 사이트의 일일 한도를 다 써 버리는 것을 막습니다. 0은 강좌 하나에 대한 한도가 없다는 뜻이며, 사이트 한도는 계속 적용됩니다. 기본값 500.';
+
+$string['settings:answer_safety_realtime_in_enforce'] = '적용 모드에서 실시간 음성과 아바타 허용(답변은 말한 뒤에 검사됩니다)';
+$string['settings:answer_safety_realtime_in_enforce_desc'] = '기본값은 꺼짐입니다. 적용 모드에서는 라이브 음성과 말하는 아바타가 제공되지 않으며, 학습자는 답변이 들리기 전에 검사되는 일반 음성 모드를 사용합니다. 이 설정을 켜면 라이브 음성 답변은 말한 직후에 검사되므로, 중단되기 전에 답변의 일부 또는 전체가 들릴 수 있습니다. 아바타의 답변은 검사되지 않고 기록되지도 않습니다. 자체 모드가 있는 강좌는 그 모드를 따릅니다.';
+$string['realtime:err_answer_safety'] = '이 강좌에서는 라이브 음성을 사용할 수 없습니다. 일반 음성 모드나 채팅을 사용하세요.';
+$string['talking_avatar:answer_safety'] = '이 강좌에서는 말하는 아바타를 사용할 수 없습니다. 채팅이나 음성 모드를 사용하세요.';
+$string['answeraudit:flow_voice_transcript'] = '라이브 음성: 학습자의 브라우저가 보낸 전사문, 답변을 말한 뒤에 검사함';
+$string['answeraudit:flow_voice_truncated'] = '라이브 음성: 전사문이 너무 길어 검사 전에 잘랐음';
+$string['privacy:metadata:answer_audit:mode'] = '답변이 글로 작성되었는지 라이브 음성으로 말해졌는지를 나타냅니다. 라이브 음성은 전사문이 기록됩니다. 오디오는 저장되지 않습니다.';
