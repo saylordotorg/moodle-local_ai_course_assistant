@@ -988,6 +988,60 @@ final class answer_audit_test extends \advanced_testcase {
         return ['conv' => $conv, 'msgid' => $msgid, 'row' => $row, 'user' => $user, 'course' => $course];
     }
 
+    public function test_an_answer_recorded_after_its_conversation_was_cleared_keeps_no_text(): void {
+        // RT6: sse.php records the answer after the done event, so the learner can clear the conversation first.
+        // The clear redacts the audit rows it finds; this row did not exist yet, so it used to keep its text for
+        // good. record_answer() now looks again after its insert, as append_verdict() does.
+        global $CFG, $DB;
+        set_config('answer_safety_mode', 'watch', 'local_ai_course_assistant');
+
+        $turn = $this->sse_turn();
+        conversation_manager::clear_conversation((int) $turn['conv']->id, (int) $turn['user']->id);
+        $id = answer_audit::record_answer($turn['row'], $this->retrieved(), [], []);
+        $this->assertNotNull($id, 'the row is still written (metadata, hashes)');
+        $this->assert_redacted((int) $id, 'cleared before the answer was recorded');
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain((int) $turn['course']->id));
+
+        // Cleared while record() waits for the course lock: same result.
+        $CFG->lock_factory = '\\' . answer_audit_test_lock_factory::class;
+        $turn = $this->sse_turn();
+        answer_audit_test_lock_factory::$onlock = function() use ($turn) {
+            conversation_manager::clear_conversation((int) $turn['conv']->id, (int) $turn['user']->id);
+        };
+        $id = answer_audit::record_answer($turn['row'], $this->retrieved(), [], []);
+        $this->assertNull(answer_audit_test_lock_factory::$onlock, 'the seam must have run');
+        $this->assert_redacted((int) $id, 'cleared while the answer was being recorded');
+
+        // Recorded in the middle of the clear, after its redaction pass and before its deletes (so the message was
+        // still there when record_answer() looked): the clear redacts once more after it has deleted the messages.
+        $CFG->lock_factory = null;
+        $turn = $this->sse_turn();
+        $passes = [];
+        answer_audit::$beforeredact = function() use ($turn, &$passes, $DB) {
+            $passes[] = $DB->record_exists('local_ai_course_assistant_msgs', ['conversationid' => $turn['conv']->id]);
+        };
+        conversation_manager::clear_conversation((int) $turn['conv']->id, (int) $turn['user']->id);
+        answer_audit::$beforeredact = null;
+        $this->assertSame([true, false], $passes, 'one redaction pass before the messages are deleted, one after');
+
+        // Only the conversation row is gone: same result.
+        $turn = $this->sse_turn();
+        $DB->delete_records('local_ai_course_assistant_convs', ['id' => $turn['conv']->id]);
+        $id = answer_audit::record_answer($turn['row'], $this->retrieved(), [], []);
+        $this->assert_redacted((int) $id, 'the conversation no longer exists');
+
+        // Only the message is gone (the conversation cap trimmed it): same result.
+        $turn = $this->sse_turn();
+        $DB->delete_records('local_ai_course_assistant_msgs', ['id' => $turn['msgid']]);
+        $id = answer_audit::record_answer($turn['row'], $this->retrieved(), [], []);
+        $this->assert_redacted((int) $id, 'the message no longer exists');
+
+        // A turn that is still there keeps its text.
+        $turn = $this->sse_turn();
+        $id = answer_audit::record_answer($turn['row'], $this->retrieved(), [], []);
+        $this->assert_live((int) $id, 'an ordinary turn');
+    }
+
     public function test_is_enabled_reads_answer_safety_mode(): void {
         unset_config('answer_safety_mode', 'local_ai_course_assistant');
         $this->assertFalse(answer_audit::is_enabled(7), 'off by default');

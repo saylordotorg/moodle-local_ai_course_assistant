@@ -723,6 +723,9 @@ class conversation_manager {
         answer_audit::redact_for_conversation($conversationid);
         $DB->delete_records('local_ai_course_assistant_msgs', ['conversationid' => $conversationid]);
         $DB->delete_records('local_ai_course_assistant_convs', ['id' => $conversationid]);
+        // And once more now that the messages are gone (8.4.0 red team, RT6): an answer still being recorded when
+        // the first pass ran saw its message in place and kept its text; it is in the table by now.
+        answer_audit::redact_for_conversation($conversationid);
     }
 
     /**

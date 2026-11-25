@@ -393,11 +393,47 @@ class answer_audit {
                 }
             }
             $row['validators'] = self::validator_entries($validatorresults);
-            return self::record($row);
+            $id = self::record($row);
+            self::redact_if_turn_is_gone($id, (int) $row['messageid'], (int) $row['conversationid']);
+            return $id;
         } catch (\Throwable $e) {
             debugging('answer_audit: answer not recorded: ' . get_class($e) . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
             self::log_dropped($row, ['reason' => 'error', 'error_class' => get_class($e)]);
             return null;
+        }
+    }
+
+    /**
+     * Redact an answer row just written when its message or conversation no longer exists (8.4.0 red team, RT6).
+     *
+     * The chat path records the answer after the done event, so the learner can clear the conversation (or the
+     * conversation cap can trim the message) first. Those deletions redact the audit rows they find, and this row
+     * did not exist yet: without this check it would keep the question and answer for good. Looked up after the
+     * insert, as append_verdict() looks again at its answer row. If the lookup itself fails the row is redacted
+     * too: text that can't be shown to belong to a live message is not kept. Never throws.
+     *
+     * @param int $id the new audit row
+     * @param int $messageid
+     * @param int $conversationid
+     * @return void
+     */
+    private static function redact_if_turn_is_gone(int $id, int $messageid, int $conversationid): void {
+        global $DB;
+        try {
+            $gone = !$DB->record_exists('local_ai_course_assistant_msgs', ['id' => $messageid,
+                    'conversationid' => $conversationid])
+                || !$DB->record_exists('local_ai_course_assistant_convs', ['id' => $conversationid]);
+        } catch (\Throwable $e) {
+            debugging('answer_audit: could not confirm the turn still exists: ' . get_class($e), DEBUG_DEVELOPER);
+            $gone = true;
+        }
+        if (!$gone) {
+            return;
+        }
+        try {
+            self::redact_where('id = ?', [$id]);
+        } catch (\Throwable $e) {
+            debugging('answer_audit: could not redact a row whose turn is gone: ' . get_class($e), DEBUG_DEVELOPER);
         }
     }
 
