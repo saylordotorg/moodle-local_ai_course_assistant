@@ -21,7 +21,7 @@
  *   4. chat.js wires Voice's onReplace to the transcript, in source and in the built bundle (Moodle serves
  *      amd/build).
  *
- * A planted-defect run at the end breaks a copy of the source twelve ways and requires the checks to fail each time.
+ * A planted-defect run at the end breaks a copy of the source thirteen ways and requires the checks to fail each time.
  *
  * What it can't check: real audio, a real microphone, a real provider. The live voice modes (Gemini Live, OpenAI
  * and xAI realtime) never pass through sse.php, so there is no replace event for them: their turns are posted and
@@ -563,7 +563,19 @@ const buildChecks = (s, check) => {
         && s.uiBuild.includes('voiceturn'));
 };
 
+// A docblock with another docblock straight after it belongs to nothing (the #238 defect: a declaration inserted
+// between a function's docblock and the function). voice.js had one in 8.4.0 (plainForVoice above
+// makeDisplayFilter's docblock).
+const docblockChecks = (s, check) => {
+    const orphan = /\*\/\n[ \t]*\/\*\*/.exec(s.voiceSrc);
+    check('voice.js: every docblock is followed by what it documents', !orphan,
+        orphan ? s.voiceSrc.slice(Math.max(0, orphan.index - 120), orphan.index + 20) : '');
+    const fn = /\/\*\*\n((?:\s+\*.*\n)+?)\s+\*\/\n\s+var makeDisplayFilter = function/.exec(s.voiceSrc);
+    check('voice.js: makeDisplayFilter keeps its own docblock', !!fn && fn[1].includes('What the transcript shows'));
+};
+
 const run = async(s, check) => {
+    docblockChecks(s, check);
     await voiceChecks('voice.js (src)', s.voiceSrc, check);
     await voiceChecks('voice.min.js (build)', s.voiceBuild, check);
     uiChecks(s.uiSrc, check);
@@ -626,6 +638,16 @@ const sources = {
         ['ui.js whose warning goes on the last line', 'uiSrc',
             sources.uiSrc.replace("var lines = voiceTurnLines('assistant', turn);", 'var lines = [].slice.call('
                 + 'messagesContainer.querySelectorAll(\'.aica-voice-msg--assistant\')).slice(-1);')],
+        ['voice.js with plainForVoice between makeDisplayFilter\'s docblock and the function', 'voiceSrc',
+            (() => {
+                const p = sources.voiceSrc.match(/\n( {4})\/\*\*\n\s+\* A replacement answer as voice mode[\s\S]*?\n\1\};\n/);
+                if (!p) {
+                    return null;
+                }
+                const without = sources.voiceSrc.replace(p[0], '\n');
+                return without.replace('\n    var makeDisplayFilter = function', p[0].replace(/^\n/, '\n').replace(/\n$/, '')
+                    + '\n\n    var makeDisplayFilter = function');
+            })()],
         ['ui.js that appends instead of swapping', 'uiSrc',
             sources.uiSrc.replace(/content\.textContent = text;\n(\s+)lines\[0\]\.dataset\.replaced/,
                 'content.textContent += text;\n$1lines[0].dataset.replaced')],

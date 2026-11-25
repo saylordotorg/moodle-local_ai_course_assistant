@@ -307,12 +307,6 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
     };
 
     /**
-     * What the transcript shows of a streamed reply: nothing from [SOLA_NEXT] on, no marker, no half marker,
-     * and trailing spaces held until the next word arrives (a marker after them would otherwise leave a gap).
-     * push() takes the next token and returns the new text to show, or ''.
-     * @returns {{push: function(string): string}}
-     */
-    /**
      * A replacement answer as voice mode shows and reads it: no suggestion block or markers, and without the
      * markdown underscores or asterisks that wrap a whole line (the check line a warning adds is written _so_).
      * @param {string} text
@@ -325,6 +319,12 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
             .trim();
     };
 
+    /**
+     * What the transcript shows of a streamed reply: nothing from [SOLA_NEXT] on, no marker, no half marker,
+     * and trailing spaces held until the next word arrives (a marker after them would otherwise leave a gap).
+     * push() takes the next token and returns the new text to show, or ''.
+     * @returns {{push: function(string): string}}
+     */
     var makeDisplayFilter = function() {
         var raw = '';
         var emitted = 0;
