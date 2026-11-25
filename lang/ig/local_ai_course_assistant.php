@@ -3638,3 +3638,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, ịdị njọ
 $string['instructor_dashboard:review_col_resolve'] = 'Dozie';
 $string['instructor_dashboard:review_audit_link'] = 'Lee azịza ọ bụla e dekọrọ na nyocha ndekọ azịza';
 $string['instructor_dashboard:review_caption'] = 'Ihe ndị na-eche nyocha, nke kacha dị ngwa na mbụ';
+
+$string['settings:answer_check_user_daily_cap'] = 'Nyocha nkwupụta: oke kwa ụbọchị maka otu onye mmụta';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Ọnụọgụ kacha elu nke nyocha nkwupụta a na-etinye n\'ahịrị kwa ụbọchị maka azịza otu onye mmụta. A naghị enyocha azịza gafere oke ahụ n\'ụbọchị ahụ. Ọ na-egbochi otu akaụntụ iji oke kwa ụbọchị nke saịtị niile. 0 pụtara na enweghị oke maka otu onye mmụta; oke saịtị ka na-adị. Nke mbụ 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Nyocha nkwupụta: oke kwa ụbọchị maka otu usoro ọmụmụ';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Ọnụọgụ kacha elu nke nyocha nkwupụta a na-etinye n\'ahịrị kwa ụbọchị maka otu usoro ọmụmụ. A naghị enyocha azịza gafere oke ahụ n\'ụbọchị ahụ. Ọ na-egbochi otu usoro ọmụmụ nwere ọtụtụ ọrụ iji oke kwa ụbọchị nke saịtị niile. 0 pụtara na enweghị oke maka otu usoro ọmụmụ; oke saịtị ka na-adị. Nke mbụ 500.';

@@ -3651,3 +3651,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, gɛlɛya hak�
 $string['instructor_dashboard:review_col_resolve'] = 'A ɲɛnabɔ';
 $string['instructor_dashboard:review_audit_link'] = 'Jaabi sɛbɛnnen bɛɛ lajɛ jaabiw sɛgɛsɛgɛli kɔnɔ';
 $string['instructor_dashboard:review_caption'] = 'Fɛn minnu bɛ lajɛli makɔnɔ, kɔrɔtɔlenw fɔlɔ';
+
+$string['settings:answer_check_user_daily_cap'] = 'Fɔtaw lajɛli: don kelen dan kalanden kelen ye';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Most claim checks queued per day for one learner\'s answers. Answers past the limit are not checked that day. It stops one account using up the site\'s daily limit. 0 means no limit for one learner; the site limit still applies. Default 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Fɔtaw lajɛli: don kelen dan kalanso kelen ye';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Most claim checks queued per day for one course. Answers past the limit are not checked that day. It stops one busy course using up the site\'s daily limit. 0 means no limit for one course; the site limit still applies. Default 500.';

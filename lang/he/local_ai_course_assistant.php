@@ -3662,3 +3662,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, חומרה: {
 $string['instructor_dashboard:review_col_resolve'] = 'טיפול';
 $string['instructor_dashboard:review_audit_link'] = 'הצגת כל התשובות שנרשמו בביקורת התשובות';
 $string['instructor_dashboard:review_caption'] = 'פריטים שממתינים לבדיקה, הדחופים ביותר קודם';
+
+$string['settings:answer_check_user_daily_cap'] = 'בדיקת טענות: מגבלה יומית ללומד אחד';
+$string['settings:answer_check_user_daily_cap_desc'] = 'המספר המרבי של בדיקות טענות שנכנסות לתור ביום עבור התשובות של לומד אחד. תשובות שמעבר למגבלה אינן נבדקות באותו יום. כך חשבון אחד אינו יכול לנצל את כל המגבלה היומית של האתר. 0 פירושו ללא מגבלה ללומד אחד; מגבלת האתר עדיין חלה. ברירת מחדל 50.';
+$string['settings:answer_check_course_daily_cap'] = 'בדיקת טענות: מגבלה יומית לקורס אחד';
+$string['settings:answer_check_course_daily_cap_desc'] = 'המספר המרבי של בדיקות טענות שנכנסות לתור ביום עבור קורס אחד. תשובות שמעבר למגבלה אינן נבדקות באותו יום. כך קורס עמוס אחד אינו יכול לנצל את כל המגבלה היומית של האתר. 0 פירושו ללא מגבלה לקורס אחד; מגבלת האתר עדיין חלה. ברירת מחדל 500.';

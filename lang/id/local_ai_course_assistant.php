@@ -3675,3 +3675,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, tingkat kepar
 $string['instructor_dashboard:review_col_resolve'] = 'Selesaikan';
 $string['instructor_dashboard:review_audit_link'] = 'Lihat semua jawaban tercatat di audit jawaban';
 $string['instructor_dashboard:review_caption'] = 'Butir yang menunggu tinjauan, paling mendesak lebih dulu';
+
+$string['settings:answer_check_user_daily_cap'] = 'Pemeriksaan klaim: batas harian untuk satu peserta';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Jumlah terbanyak pemeriksaan klaim yang diantrekan per hari untuk jawaban satu peserta. Jawaban yang melewati batas tidak diperiksa hari itu. Ini mencegah satu akun menghabiskan batas harian situs. 0 berarti tanpa batas untuk satu peserta; batas situs tetap berlaku. Bawaan 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Pemeriksaan klaim: batas harian untuk satu kursus';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Jumlah terbanyak pemeriksaan klaim yang diantrekan per hari untuk satu kursus. Jawaban yang melewati batas tidak diperiksa hari itu. Ini mencegah satu kursus yang ramai menghabiskan batas harian situs. 0 berarti tanpa batas untuk satu kursus; batas situs tetap berlaku. Bawaan 500.';

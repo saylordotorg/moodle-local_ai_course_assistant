@@ -3651,3 +3651,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, गंभी�
 $string['instructor_dashboard:review_col_resolve'] = 'हल करें';
 $string['instructor_dashboard:review_audit_link'] = 'उत्तर ऑडिट में हर रिकॉर्ड किया गया उत्तर देखें';
 $string['instructor_dashboard:review_caption'] = 'समीक्षा की प्रतीक्षा वाले आइटम, सबसे ज़रूरी पहले';
+
+$string['settings:answer_check_user_daily_cap'] = 'दावा जाँच: एक शिक्षार्थी की दैनिक सीमा';
+$string['settings:answer_check_user_daily_cap_desc'] = 'एक शिक्षार्थी के उत्तरों के लिए प्रतिदिन कतार में लगने वाली दावा जाँचों की अधिकतम संख्या। सीमा के बाद के उत्तर उस दिन नहीं जाँचे जाते। इससे कोई एक खाता साइट की दैनिक सीमा खत्म नहीं कर सकता। 0 का अर्थ है एक शिक्षार्थी के लिए कोई सीमा नहीं; साइट की सीमा फिर भी लागू रहती है। डिफ़ॉल्ट 50।';
+$string['settings:answer_check_course_daily_cap'] = 'दावा जाँच: एक कोर्स की दैनिक सीमा';
+$string['settings:answer_check_course_daily_cap_desc'] = 'एक कोर्स के लिए प्रतिदिन कतार में लगने वाली दावा जाँचों की अधिकतम संख्या। सीमा के बाद के उत्तर उस दिन नहीं जाँचे जाते। इससे कोई एक व्यस्त कोर्स साइट की दैनिक सीमा खत्म नहीं कर सकता। 0 का अर्थ है एक कोर्स के लिए कोई सीमा नहीं; साइट की सीमा फिर भी लागू रहती है। डिफ़ॉल्ट 500।';

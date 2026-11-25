@@ -3623,3 +3623,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, závažnosť:
 $string['instructor_dashboard:review_col_resolve'] = 'Vyriešiť';
 $string['instructor_dashboard:review_audit_link'] = 'Zobraziť všetky zaznamenané odpovede v audite odpovedí';
 $string['instructor_dashboard:review_caption'] = 'Položky čakajúce na kontrolu, od najnaliehavejších';
+
+$string['settings:answer_check_user_daily_cap'] = 'Kontrola tvrdení: denný limit pre jedného študenta';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Najvyšší počet kontrol tvrdení zaradených do frontu za deň pre odpovede jedného študenta. Odpovede nad limit sa v ten deň nekontrolujú. Jeden účet tak nemôže vyčerpať denný limit celej stránky. 0 znamená žiadny limit pre jedného študenta; limit stránky platí ďalej. Predvolená hodnota 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Kontrola tvrdení: denný limit pre jeden kurz';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Najvyšší počet kontrol tvrdení zaradených do frontu za deň pre jeden kurz. Odpovede nad limit sa v ten deň nekontrolujú. Jeden vyťažený kurz tak nemôže vyčerpať denný limit celej stránky. 0 znamená žiadny limit pre jeden kurz; limit stránky platí ďalej. Predvolená hodnota 500.';

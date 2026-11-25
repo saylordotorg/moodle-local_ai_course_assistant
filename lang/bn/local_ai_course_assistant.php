@@ -3621,3 +3621,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, গুরু�
 $string['instructor_dashboard:review_col_resolve'] = 'সমাধান';
 $string['instructor_dashboard:review_audit_link'] = 'উত্তর অডিটে রেকর্ড করা প্রতিটি উত্তর দেখুন';
 $string['instructor_dashboard:review_caption'] = 'পর্যালোচনার অপেক্ষায় থাকা আইটেম, সবচেয়ে জরুরিগুলো আগে';
+
+$string['settings:answer_check_user_daily_cap'] = 'দাবি যাচাই: একজন শিক্ষার্থীর দৈনিক সীমা';
+$string['settings:answer_check_user_daily_cap_desc'] = 'একজন শিক্ষার্থীর উত্তরের জন্য প্রতিদিন সারিতে রাখা দাবি যাচাইয়ের সর্বোচ্চ সংখ্যা। সীমার বাইরের উত্তর সেদিন যাচাই করা হয় না। এতে একটি অ্যাকাউন্ট সাইটের দৈনিক সীমা শেষ করে ফেলতে পারে না। 0 মানে একজন শিক্ষার্থীর জন্য কোনো সীমা নেই; সাইটের সীমা তবুও প্রযোজ্য। ডিফল্ট 50।';
+$string['settings:answer_check_course_daily_cap'] = 'দাবি যাচাই: একটি কোর্সের দৈনিক সীমা';
+$string['settings:answer_check_course_daily_cap_desc'] = 'একটি কোর্সের জন্য প্রতিদিন সারিতে রাখা দাবি যাচাইয়ের সর্বোচ্চ সংখ্যা। সীমার বাইরের উত্তর সেদিন যাচাই করা হয় না। এতে একটি ব্যস্ত কোর্স সাইটের দৈনিক সীমা শেষ করে ফেলতে পারে না। 0 মানে একটি কোর্সের জন্য কোনো সীমা নেই; সাইটের সীমা তবুও প্রযোজ্য। ডিফল্ট 500।';

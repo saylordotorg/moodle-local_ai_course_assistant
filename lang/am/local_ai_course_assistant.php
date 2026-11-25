@@ -3650,3 +3650,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}፣ ክብደ�
 $string['instructor_dashboard:review_col_resolve'] = 'ፍታ';
 $string['instructor_dashboard:review_audit_link'] = 'የተመዘገበውን እያንዳንዱን መልስ በመልስ ኦዲት ውስጥ ይመልከቱ';
 $string['instructor_dashboard:review_caption'] = 'ግምገማ የሚጠብቁ ንጥሎች፣ በጣም አስቸኳዮቹ በመጀመሪያ';
+
+$string['settings:answer_check_user_daily_cap'] = 'የሐሳብ ፍተሻ፦ ለአንድ ተማሪ ዕለታዊ ገደብ';
+$string['settings:answer_check_user_daily_cap_desc'] = 'ለአንድ ተማሪ መልሶች በቀን ወረፋ የሚገቡ የሐሳብ ፍተሻዎች ከፍተኛ ቁጥር። ከገደቡ በላይ የሆኑ መልሶች በዚያ ቀን አይፈተሹም። አንድ መለያ የጣቢያውን ዕለታዊ ገደብ እንዳይጨርስ ይከላከላል። 0 ማለት ለአንድ ተማሪ ገደብ የለም ማለት ነው፤ የጣቢያው ገደብ አሁንም ይሠራል። ነባሪ 50።';
+$string['settings:answer_check_course_daily_cap'] = 'የሐሳብ ፍተሻ፦ ለአንድ ኮርስ ዕለታዊ ገደብ';
+$string['settings:answer_check_course_daily_cap_desc'] = 'ለአንድ ኮርስ በቀን ወረፋ የሚገቡ የሐሳብ ፍተሻዎች ከፍተኛ ቁጥር። ከገደቡ በላይ የሆኑ መልሶች በዚያ ቀን አይፈተሹም። ብዙ እንቅስቃሴ ያለበት አንድ ኮርስ የጣቢያውን ዕለታዊ ገደብ እንዳይጨርስ ይከላከላል። 0 ማለት ለአንድ ኮርስ ገደብ የለም ማለት ነው፤ የጣቢያው ገደብ አሁንም ይሠራል። ነባሪ 500።';

@@ -3644,3 +3644,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, bí ó ṣe l
 $string['instructor_dashboard:review_col_resolve'] = 'Yanjú';
 $string['instructor_dashboard:review_audit_link'] = 'Wo gbogbo ìdáhùn tí a kọ sílẹ̀ nínú àyẹ̀wò àkọsílẹ̀ ìdáhùn';
 $string['instructor_dashboard:review_caption'] = 'Àwọn ohun tó ń dúró de àyẹ̀wò, èyí tó jẹ́ kánjúkánjú jù ṣáájú';
+
+$string['settings:answer_check_user_daily_cap'] = 'Àyẹ̀wò ọ̀rọ̀: ààlà ojoojúmọ́ fún akẹ́kọ̀ọ́ kan';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Iye àyẹ̀wò ọ̀rọ̀ tó pọ̀ jù tí a ń tò sórí ìlà lójúmọ́ fún àwọn ìdáhùn akẹ́kọ̀ọ́ kan. A kì í ṣàyẹ̀wò àwọn ìdáhùn tó kọjá ààlà náà lọ́jọ́ yẹn. Ó ń dènà àkáǹtì kan láti lo gbogbo ààlà ojoojúmọ́ sáìtì náà tán. 0 túmọ̀ sí pé kò sí ààlà fún akẹ́kọ̀ọ́ kan; ààlà sáìtì náà ṣì ń ṣiṣẹ́. Àìyípadà 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Àyẹ̀wò ọ̀rọ̀: ààlà ojoojúmọ́ fún ẹ̀kọ́ kan';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Iye àyẹ̀wò ọ̀rọ̀ tó pọ̀ jù tí a ń tò sórí ìlà lójúmọ́ fún ẹ̀kọ́ kan. A kì í ṣàyẹ̀wò àwọn ìdáhùn tó kọjá ààlà náà lọ́jọ́ yẹn. Ó ń dènà ẹ̀kọ́ kan tí iṣẹ́ pọ̀ nínú rẹ̀ láti lo gbogbo ààlà ojoojúmọ́ sáìtì náà tán. 0 túmọ̀ sí pé kò sí ààlà fún ẹ̀kọ́ kan; ààlà sáìtì náà ṣì ń ṣiṣẹ́. Àìyípadà 500.';

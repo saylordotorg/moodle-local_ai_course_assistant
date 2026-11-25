@@ -3621,3 +3621,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, 심각도: {$
 $string['instructor_dashboard:review_col_resolve'] = '해결';
 $string['instructor_dashboard:review_audit_link'] = '답변 감사에서 기록된 모든 답변 보기';
 $string['instructor_dashboard:review_caption'] = '검토를 기다리는 항목, 가장 급한 순';
+
+$string['settings:answer_check_user_daily_cap'] = '주장 확인: 학습자 한 명의 일일 한도';
+$string['settings:answer_check_user_daily_cap_desc'] = '학습자 한 명의 답변에 대해 하루에 대기열에 넣는 주장 확인의 최대 수입니다. 한도를 넘은 답변은 그날 확인하지 않습니다. 한 계정이 사이트의 일일 한도를 다 써 버리는 것을 막습니다. 0은 학습자 한 명에 대한 한도가 없다는 뜻이며, 사이트 한도는 계속 적용됩니다. 기본값 50.';
+$string['settings:answer_check_course_daily_cap'] = '주장 확인: 강좌 하나의 일일 한도';
+$string['settings:answer_check_course_daily_cap_desc'] = '강좌 하나에 대해 하루에 대기열에 넣는 주장 확인의 최대 수입니다. 한도를 넘은 답변은 그날 확인하지 않습니다. 이용이 많은 강좌 하나가 사이트의 일일 한도를 다 써 버리는 것을 막습니다. 0은 강좌 하나에 대한 한도가 없다는 뜻이며, 사이트 한도는 계속 적용됩니다. 기본값 500.';

@@ -3642,3 +3642,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, गम्भ�
 $string['instructor_dashboard:review_col_resolve'] = 'समाधान गर्नुहोस्';
 $string['instructor_dashboard:review_audit_link'] = 'उत्तर अडिटमा अभिलेख गरिएको हरेक उत्तर हेर्नुहोस्';
 $string['instructor_dashboard:review_caption'] = 'समीक्षा पर्खिरहेका वस्तुहरू, सबैभन्दा जरुरी पहिले';
+
+$string['settings:answer_check_user_daily_cap'] = 'दाबी जाँच: एक जना सिकारुको दैनिक सीमा';
+$string['settings:answer_check_user_daily_cap_desc'] = 'एक जना सिकारुका उत्तरका लागि दिनमा लाइनमा राखिने दाबी जाँचको अधिकतम सङ्ख्या। सीमा नाघेका उत्तर त्यो दिन जाँचिँदैनन्। यसले एउटै खाताले साइटको दैनिक सीमा सक्न पाउँदैन। 0 को अर्थ एक जना सिकारुका लागि कुनै सीमा छैन; साइटको सीमा भने लागू नै रहन्छ। पूर्वनिर्धारित 50।';
+$string['settings:answer_check_course_daily_cap'] = 'दाबी जाँच: एउटा कोर्सको दैनिक सीमा';
+$string['settings:answer_check_course_daily_cap_desc'] = 'एउटा कोर्सका लागि दिनमा लाइनमा राखिने दाबी जाँचको अधिकतम सङ्ख्या। सीमा नाघेका उत्तर त्यो दिन जाँचिँदैनन्। यसले एउटै व्यस्त कोर्सले साइटको दैनिक सीमा सक्न पाउँदैन। 0 को अर्थ एउटा कोर्सका लागि कुनै सीमा छैन; साइटको सीमा भने लागू नै रहन्छ। पूर्वनिर्धारित 500।';

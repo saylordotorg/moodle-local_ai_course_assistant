@@ -3650,3 +3650,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, tsanani: {$a-
 $string['instructor_dashboard:review_col_resolve'] = 'Warware';
 $string['instructor_dashboard:review_audit_link'] = 'Duba kowace amsa da aka yi rikodi a binciken rikodin amsoshi';
 $string['instructor_dashboard:review_caption'] = 'Abubuwan da ke jiran bita, mafi gaggawa a farko';
+
+$string['settings:answer_check_user_daily_cap'] = 'Binciken iƙirari: iyakar yini ga ɗalibi ɗaya';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Mafi yawan binciken iƙirari da ake sanyawa a layi a rana don amsoshin ɗalibi ɗaya. Amsoshin da suka wuce iyakar ba a bincika su a wannan ranar. Yana hana asusu ɗaya cinye iyakar yini ta shafin. 0 na nufin babu iyaka ga ɗalibi ɗaya; iyakar shafin tana nan tana aiki. Na asali 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Binciken iƙirari: iyakar yini ga kwas ɗaya';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Mafi yawan binciken iƙirari da ake sanyawa a layi a rana don kwas ɗaya. Amsoshin da suka wuce iyakar ba a bincika su a wannan ranar. Yana hana kwas ɗaya mai yawan aiki cinye iyakar yini ta shafin. 0 na nufin babu iyaka ga kwas ɗaya; iyakar shafin tana nan tana aiki. Na asali 500.';

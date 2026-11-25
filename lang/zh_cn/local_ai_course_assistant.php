@@ -3659,3 +3659,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}，严重程度
 $string['instructor_dashboard:review_col_resolve'] = '处理';
 $string['instructor_dashboard:review_audit_link'] = '在回答审计中查看所有已记录的回答';
 $string['instructor_dashboard:review_caption'] = '等待审阅的条目，最紧急的在前';
+
+$string['settings:answer_check_user_daily_cap'] = '说法核查：单个学习者的每日上限';
+$string['settings:answer_check_user_daily_cap_desc'] = '针对单个学习者的回答，每天排入队列的说法核查的最大数量。超出上限的回答当天不再核查。这可以防止一个账号用完全站的每日上限。0 表示不对单个学习者设上限；全站上限仍然适用。默认 50。';
+$string['settings:answer_check_course_daily_cap'] = '说法核查：单门课程的每日上限';
+$string['settings:answer_check_course_daily_cap_desc'] = '针对单门课程，每天排入队列的说法核查的最大数量。超出上限的回答当天不再核查。这可以防止一门使用量大的课程用完全站的每日上限。0 表示不对单门课程设上限；全站上限仍然适用。默认 500。';

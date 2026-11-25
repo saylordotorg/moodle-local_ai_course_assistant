@@ -3622,3 +3622,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, allvarlighets
 $string['instructor_dashboard:review_col_resolve'] = 'Åtgärda';
 $string['instructor_dashboard:review_audit_link'] = 'Se alla registrerade svar i svarsgranskningen';
 $string['instructor_dashboard:review_caption'] = 'Poster som väntar på granskning, mest brådskande först';
+
+$string['settings:answer_check_user_daily_cap'] = 'Påståendekontroll: daglig gräns för en deltagare';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Högsta antal påståendekontroller som köas per dag för en deltagares svar. Svar över gränsen kontrolleras inte den dagen. Det hindrar att ett enda konto gör slut på webbplatsens dagliga gräns. 0 betyder ingen gräns för en deltagare; webbplatsens gräns gäller fortfarande. Standard 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Påståendekontroll: daglig gräns för en kurs';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Högsta antal påståendekontroller som köas per dag för en kurs. Svar över gränsen kontrolleras inte den dagen. Det hindrar att en enda livligt använd kurs gör slut på webbplatsens dagliga gräns. 0 betyder ingen gräns för en kurs; webbplatsens gräns gäller fortfarande. Standard 500.';

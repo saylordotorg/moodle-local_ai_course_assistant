@@ -3666,3 +3666,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, tahap keteruk
 $string['instructor_dashboard:review_col_resolve'] = 'Selesaikan';
 $string['instructor_dashboard:review_audit_link'] = 'Lihat setiap jawapan yang direkodkan dalam audit jawapan';
 $string['instructor_dashboard:review_caption'] = 'Item yang menunggu semakan, paling mendesak dahulu';
+
+$string['settings:answer_check_user_daily_cap'] = 'Semakan dakwaan: had harian untuk seorang pelajar';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Bilangan terbanyak semakan dakwaan yang dibariskan sehari untuk jawapan seorang pelajar. Jawapan yang melebihi had tidak disemak pada hari itu. Ini menghalang satu akaun menghabiskan had harian laman. 0 bermaksud tiada had untuk seorang pelajar; had laman masih terpakai. Lalai 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Semakan dakwaan: had harian untuk satu kursus';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Bilangan terbanyak semakan dakwaan yang dibariskan sehari untuk satu kursus. Jawapan yang melebihi had tidak disemak pada hari itu. Ini menghalang satu kursus yang sibuk menghabiskan had harian laman. 0 bermaksud tiada had untuk satu kursus; had laman masih terpakai. Lalai 500.';

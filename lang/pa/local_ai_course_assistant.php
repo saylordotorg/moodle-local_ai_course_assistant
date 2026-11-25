@@ -3643,3 +3643,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, ਗੰਭੀ�
 $string['instructor_dashboard:review_col_resolve'] = 'ਹੱਲ ਕਰੋ';
 $string['instructor_dashboard:review_audit_link'] = 'ਜਵਾਬ ਆਡਿਟ ਵਿੱਚ ਹਰ ਰਿਕਾਰਡ ਕੀਤਾ ਜਵਾਬ ਦੇਖੋ';
 $string['instructor_dashboard:review_caption'] = 'ਸਮੀਖਿਆ ਦੀ ਉਡੀਕ ਵਾਲੀਆਂ ਆਈਟਮਾਂ, ਸਭ ਤੋਂ ਜ਼ਰੂਰੀ ਪਹਿਲਾਂ';
+
+$string['settings:answer_check_user_daily_cap'] = 'ਦਾਅਵਾ ਜਾਂਚ: ਇੱਕ ਸਿੱਖਿਆਰਥੀ ਲਈ ਰੋਜ਼ਾਨਾ ਸੀਮਾ';
+$string['settings:answer_check_user_daily_cap_desc'] = 'ਇੱਕ ਸਿੱਖਿਆਰਥੀ ਦੇ ਜਵਾਬਾਂ ਲਈ ਪ੍ਰਤੀ ਦਿਨ ਕਤਾਰ ਵਿੱਚ ਲੱਗਣ ਵਾਲੀਆਂ ਦਾਅਵਾ ਜਾਂਚਾਂ ਦੀ ਵੱਧ ਤੋਂ ਵੱਧ ਗਿਣਤੀ। ਸੀਮਾ ਤੋਂ ਬਾਅਦ ਦੇ ਜਵਾਬ ਉਸ ਦਿਨ ਨਹੀਂ ਜਾਂਚੇ ਜਾਂਦੇ। ਇਸ ਨਾਲ ਕੋਈ ਇੱਕ ਖਾਤਾ ਸਾਈਟ ਦੀ ਰੋਜ਼ਾਨਾ ਸੀਮਾ ਖਤਮ ਨਹੀਂ ਕਰ ਸਕਦਾ। 0 ਦਾ ਮਤਲਬ ਹੈ ਇੱਕ ਸਿੱਖਿਆਰਥੀ ਲਈ ਕੋਈ ਸੀਮਾ ਨਹੀਂ; ਸਾਈਟ ਦੀ ਸੀਮਾ ਫਿਰ ਵੀ ਲਾਗੂ ਰਹਿੰਦੀ ਹੈ। ਡਿਫੌਲਟ 50।';
+$string['settings:answer_check_course_daily_cap'] = 'ਦਾਅਵਾ ਜਾਂਚ: ਇੱਕ ਕੋਰਸ ਲਈ ਰੋਜ਼ਾਨਾ ਸੀਮਾ';
+$string['settings:answer_check_course_daily_cap_desc'] = 'ਇੱਕ ਕੋਰਸ ਲਈ ਪ੍ਰਤੀ ਦਿਨ ਕਤਾਰ ਵਿੱਚ ਲੱਗਣ ਵਾਲੀਆਂ ਦਾਅਵਾ ਜਾਂਚਾਂ ਦੀ ਵੱਧ ਤੋਂ ਵੱਧ ਗਿਣਤੀ। ਸੀਮਾ ਤੋਂ ਬਾਅਦ ਦੇ ਜਵਾਬ ਉਸ ਦਿਨ ਨਹੀਂ ਜਾਂਚੇ ਜਾਂਦੇ। ਇਸ ਨਾਲ ਕੋਈ ਇੱਕ ਰੁੱਝਿਆ ਕੋਰਸ ਸਾਈਟ ਦੀ ਰੋਜ਼ਾਨਾ ਸੀਮਾ ਖਤਮ ਨਹੀਂ ਕਰ ਸਕਦਾ। 0 ਦਾ ਮਤਲਬ ਹੈ ਇੱਕ ਕੋਰਸ ਲਈ ਕੋਈ ਸੀਮਾ ਨਹੀਂ; ਸਾਈਟ ਦੀ ਸੀਮਾ ਫਿਰ ਵੀ ਲਾਗੂ ਰਹਿੰਦੀ ਹੈ। ਡਿਫੌਲਟ 500।';

@@ -3643,3 +3643,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, mức độ n
 $string['instructor_dashboard:review_col_resolve'] = 'Xử lý';
 $string['instructor_dashboard:review_audit_link'] = 'Xem mọi câu trả lời đã ghi trong kiểm toán câu trả lời';
 $string['instructor_dashboard:review_caption'] = 'Các mục đang chờ xem xét, khẩn cấp nhất trước';
+
+$string['settings:answer_check_user_daily_cap'] = 'Kiểm tra nhận định: giới hạn hằng ngày cho một người học';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Số lần kiểm tra nhận định tối đa được xếp hàng mỗi ngày cho các câu trả lời của một người học. Câu trả lời vượt giới hạn sẽ không được kiểm tra trong ngày đó. Việc này ngăn một tài khoản dùng hết giới hạn hằng ngày của trang. 0 nghĩa là không giới hạn cho một người học; giới hạn của trang vẫn áp dụng. Mặc định 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Kiểm tra nhận định: giới hạn hằng ngày cho một khóa học';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Số lần kiểm tra nhận định tối đa được xếp hàng mỗi ngày cho một khóa học. Câu trả lời vượt giới hạn sẽ không được kiểm tra trong ngày đó. Việc này ngăn một khóa học nhiều hoạt động dùng hết giới hạn hằng ngày của trang. 0 nghĩa là không giới hạn cho một khóa học; giới hạn của trang vẫn áp dụng. Mặc định 500.';

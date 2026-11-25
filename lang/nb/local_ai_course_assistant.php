@@ -3621,3 +3621,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, alvorlighetsg
 $string['instructor_dashboard:review_col_resolve'] = 'Løs';
 $string['instructor_dashboard:review_audit_link'] = 'Se alle registrerte svar i svarrevisjonen';
 $string['instructor_dashboard:review_caption'] = 'Elementer som venter på gjennomgang, de mest presserende først';
+
+$string['settings:answer_check_user_daily_cap'] = 'Påstandskontroll: daglig grense for én deltaker';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Høyeste antall påstandskontroller som legges i kø per dag for svarene til én deltaker. Svar over grensen kontrolleres ikke den dagen. Det hindrer at én konto bruker opp nettstedets daglige grense. 0 betyr ingen grense for én deltaker; nettstedets grense gjelder fortsatt. Standard 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Påstandskontroll: daglig grense for ett kurs';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Høyeste antall påstandskontroller som legges i kø per dag for ett kurs. Svar over grensen kontrolleres ikke den dagen. Det hindrer at ett travelt kurs bruker opp nettstedets daglige grense. 0 betyr ingen grense for ett kurs; nettstedets grense gjelder fortsatt. Standard 500.';

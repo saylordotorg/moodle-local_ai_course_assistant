@@ -3663,3 +3663,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, súlyosság: 
 $string['instructor_dashboard:review_col_resolve'] = 'Megoldás';
 $string['instructor_dashboard:review_audit_link'] = 'Az összes rögzített válasz megtekintése a válaszauditban';
 $string['instructor_dashboard:review_caption'] = 'Áttekintésre váró elemek, a legsürgősebb elöl';
+
+$string['settings:answer_check_user_daily_cap'] = 'Állításellenőrzés: napi korlát egy tanulóra';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Az egy tanuló válaszaira naponta sorba állított állításellenőrzések legnagyobb száma. A korláton túli válaszokat aznap nem ellenőrzi. Így egyetlen fiók nem használhatja el a portál napi korlátját. A 0 azt jelenti, hogy egy tanulóra nincs korlát; a portál korlátja ekkor is érvényes. Alapértelmezés: 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Állításellenőrzés: napi korlát egy kurzusra';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Az egy kurzusra naponta sorba állított állításellenőrzések legnagyobb száma. A korláton túli válaszokat aznap nem ellenőrzi. Így egyetlen forgalmas kurzus nem használhatja el a portál napi korlátját. A 0 azt jelenti, hogy egy kurzusra nincs korlát; a portál korlátja ekkor is érvényes. Alapértelmezés: 500.';

@@ -3668,3 +3668,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, ubucayi: {$a-
 $string['instructor_dashboard:review_col_resolve'] = 'Xazulula';
 $string['instructor_dashboard:review_audit_link'] = 'Bona zonke izimpendulo eziqoshiwe ekucwaningweni kwezimpendulo';
 $string['instructor_dashboard:review_caption'] = 'Izinto ezilinde ukubuyekezwa, eziphuthuma kakhulu kuqala';
+
+$string['settings:answer_check_user_daily_cap'] = 'Ukuhlolwa kwezitatimende: umkhawulo wosuku womfundi oyedwa';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Inani eliphezulu lokuhlolwa kwezitatimende okufakwa kulayini ngosuku kwezimpendulo zomfundi oyedwa. Izimpendulo ezidlula umkhawulo azihlolwa ngalolo suku. Kuvimbela i-akhawunti eyodwa ukuthi isebenzise wonke umkhawulo wosuku wesayithi. U-0 usho ukuthi awukho umkhawulo womfundi oyedwa; umkhawulo wesayithi usasebenza. Okuzenzakalelayo 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Ukuhlolwa kwezitatimende: umkhawulo wosuku wesifundo esisodwa';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Inani eliphezulu lokuhlolwa kwezitatimende okufakwa kulayini ngosuku kwesifundo esisodwa. Izimpendulo ezidlula umkhawulo azihlolwa ngalolo suku. Kuvimbela isifundo esisodwa esimatasa ukuthi sisebenzise wonke umkhawulo wosuku wesayithi. U-0 usho ukuthi awukho umkhawulo wesifundo esisodwa; umkhawulo wesayithi usasebenza. Okuzenzakalelayo 500.';

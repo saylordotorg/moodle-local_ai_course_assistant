@@ -3667,3 +3667,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, uzito: {$a->s
 $string['instructor_dashboard:review_col_resolve'] = 'Tatua';
 $string['instructor_dashboard:review_audit_link'] = 'Tazama kila jibu lililorekodiwa katika ukaguzi wa kumbukumbu za majibu';
 $string['instructor_dashboard:review_caption'] = 'Vipengele vinavyosubiri ukaguzi, vya dharura zaidi kwanza';
+
+$string['settings:answer_check_user_daily_cap'] = 'Ukaguzi wa madai: kikomo cha kila siku kwa mwanafunzi mmoja';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Idadi ya juu ya ukaguzi wa madai unaowekwa kwenye foleni kwa siku kwa majibu ya mwanafunzi mmoja. Majibu yanayozidi kikomo hayakaguliwi siku hiyo. Huzuia akaunti moja kumaliza kikomo cha kila siku cha tovuti. 0 inamaanisha hakuna kikomo kwa mwanafunzi mmoja; kikomo cha tovuti bado kinatumika. Chaguo-msingi 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Ukaguzi wa madai: kikomo cha kila siku kwa kozi moja';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Idadi ya juu ya ukaguzi wa madai unaowekwa kwenye foleni kwa siku kwa kozi moja. Majibu yanayozidi kikomo hayakaguliwi siku hiyo. Huzuia kozi moja yenye shughuli nyingi kumaliza kikomo cha kila siku cha tovuti. 0 inamaanisha hakuna kikomo kwa kozi moja; kikomo cha tovuti bado kinatumika. Chaguo-msingi 500.';

@@ -3624,3 +3624,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, gravité : {$
 $string['instructor_dashboard:review_col_resolve'] = 'Résoudre';
 $string['instructor_dashboard:review_audit_link'] = 'Voir toutes les réponses enregistrées dans l\'audit des réponses';
 $string['instructor_dashboard:review_caption'] = 'Éléments en attente d\'examen, les plus urgents d\'abord';
+
+$string['settings:answer_check_user_daily_cap'] = 'Vérification des affirmations : limite quotidienne par apprenant';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Nombre maximal de vérifications d\'affirmations mises en file par jour pour les réponses d\'un même apprenant. Les réponses au-delà de la limite ne sont pas vérifiées ce jour-là. Cela empêche un seul compte d\'épuiser la limite quotidienne du site. 0 signifie aucune limite par apprenant ; la limite du site s\'applique toujours. Par défaut 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Vérification des affirmations : limite quotidienne par cours';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Nombre maximal de vérifications d\'affirmations mises en file par jour pour un même cours. Les réponses au-delà de la limite ne sont pas vérifiées ce jour-là. Cela empêche un seul cours très actif d\'épuiser la limite quotidienne du site. 0 signifie aucune limite par cours ; la limite du site s\'applique toujours. Par défaut 500.';

@@ -3655,3 +3655,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, cimina: {$a->
 $string['instructor_dashboard:review_col_resolve'] = 'Furi';
 $string['instructor_dashboard:review_audit_link'] = 'Deebii galmaa\'e hunda odiitii deebii keessatti ilaali';
 $string['instructor_dashboard:review_caption'] = 'Wantoota gamaaggama eegaa jiran, kan baay\'ee ariifachiisaa ta\'e dura';
+
+$string['settings:answer_check_user_daily_cap'] = 'Sakatta\'iinsa himannaa: daangaa guyyaa barataa tokkoof';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Lakkoofsa sakatta\'iinsa himannaa isa ol\'aanaa guyyaatti deebiiwwan barataa tokkoof tarree galu. Deebiiwwan daangaa darban guyyaa sana hin sakatta\'aman. Akkaawuntiin tokko daangaa guyyaa saayitichaa akka hin fixne dhorka. 0 jechuun barataa tokkoof daangaan hin jiru jechuudha; daangaan saayitichaa ammas ni hojjeta. Durtii 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Sakatta\'iinsa himannaa: daangaa guyyaa koorsii tokkoof';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Lakkoofsa sakatta\'iinsa himannaa isa ol\'aanaa guyyaatti koorsii tokkoof tarree galu. Deebiiwwan daangaa darban guyyaa sana hin sakatta\'aman. Koorsiin tokko kan hojiin itti baay\'atu daangaa guyyaa saayitichaa akka hin fixne dhorka. 0 jechuun koorsii tokkoof daangaan hin jiru jechuudha; daangaan saayitichaa ammas ni hojjeta. Durtii 500.';

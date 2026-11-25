@@ -3623,3 +3623,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, Schweregrad: 
 $string['instructor_dashboard:review_col_resolve'] = 'Erledigen';
 $string['instructor_dashboard:review_audit_link'] = 'Alle protokollierten Antworten im Antwort-Audit ansehen';
 $string['instructor_dashboard:review_caption'] = 'Einträge, die auf Prüfung warten, die dringendsten zuerst';
+
+$string['settings:answer_check_user_daily_cap'] = 'Aussagenprüfung: Tageslimit für eine lernende Person';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Höchstzahl der Aussagenprüfungen, die pro Tag für die Antworten einer lernenden Person eingereiht werden. Antworten über dem Limit werden an dem Tag nicht geprüft. So kann ein einzelnes Konto das Tageslimit der Website nicht aufbrauchen. 0 bedeutet kein Limit für eine lernende Person; das Limit der Website gilt weiterhin. Standard 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Aussagenprüfung: Tageslimit für einen Kurs';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Höchstzahl der Aussagenprüfungen, die pro Tag für einen Kurs eingereiht werden. Antworten über dem Limit werden an dem Tag nicht geprüft. So kann ein einzelner stark genutzter Kurs das Tageslimit der Website nicht aufbrauchen. 0 bedeutet kein Limit für einen Kurs; das Limit der Website gilt weiterhin. Standard 500.';

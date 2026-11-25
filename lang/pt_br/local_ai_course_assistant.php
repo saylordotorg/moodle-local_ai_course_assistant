@@ -3643,3 +3643,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, gravidade: {$
 $string['instructor_dashboard:review_col_resolve'] = 'Resolver';
 $string['instructor_dashboard:review_audit_link'] = 'Ver todas as respostas registradas na auditoria de respostas';
 $string['instructor_dashboard:review_caption'] = 'Itens aguardando revisão, os mais urgentes primeiro';
+
+$string['settings:answer_check_user_daily_cap'] = 'Verificação de afirmações: limite diário por estudante';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Máximo de verificações de afirmações colocadas na fila por dia para as respostas de um mesmo estudante. As respostas além do limite não são verificadas naquele dia. Isso impede que uma única conta esgote o limite diário do site. 0 significa sem limite por estudante; o limite do site continua valendo. Padrão: 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Verificação de afirmações: limite diário por curso';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Máximo de verificações de afirmações colocadas na fila por dia para um mesmo curso. As respostas além do limite não são verificadas naquele dia. Isso impede que um único curso muito ativo esgote o limite diário do site. 0 significa sem limite por curso; o limite do site continua valendo. Padrão: 500.';

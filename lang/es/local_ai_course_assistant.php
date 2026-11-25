@@ -3650,3 +3650,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, gravedad: {$a
 $string['instructor_dashboard:review_col_resolve'] = 'Resolver';
 $string['instructor_dashboard:review_audit_link'] = 'Ver todas las respuestas registradas en la auditoría de respuestas';
 $string['instructor_dashboard:review_caption'] = 'Elementos en espera de revisión, los más urgentes primero';
+
+$string['settings:answer_check_user_daily_cap'] = 'Comprobación de afirmaciones: límite diario por estudiante';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Máximo de comprobaciones de afirmaciones en cola por día para las respuestas de un estudiante. Las respuestas que pasan del límite no se comprueban ese día. Evita que una sola cuenta agote el límite diario del sitio. 0 significa sin límite por estudiante; el límite del sitio se sigue aplicando. Predeterminado: 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Comprobación de afirmaciones: límite diario por curso';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Máximo de comprobaciones de afirmaciones en cola por día para un curso. Las respuestas que pasan del límite no se comprueban ese día. Evita que un solo curso con mucha actividad agote el límite diario del sitio. 0 significa sin límite por curso; el límite del sitio se sigue aplicando. Predeterminado: 500.';

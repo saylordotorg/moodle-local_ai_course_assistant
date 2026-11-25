@@ -3667,3 +3667,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, darnaanta: {$
 $string['instructor_dashboard:review_col_resolve'] = 'Xalli';
 $string['instructor_dashboard:review_audit_link'] = 'Ka eeg jawaab kasta oo la diiwaangeliyay hanti-dhawrka jawaabaha';
 $string['instructor_dashboard:review_caption'] = 'Waxyaabaha sugaya dib-u-eegis, kuwa ugu degdegsan marka hore';
+
+$string['settings:answer_check_user_daily_cap'] = 'Hubinta sheegashada: xadka maalinlaha ah ee hal arday';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Tirada ugu badan ee hubinta sheegashada ee safka la geliyo maalintii ee jawaabaha hal arday. Jawaabaha xadka dhaafa lama hubiyo maalintaas. Waxay ka hortagtaa in hal akoon uu dhammeeyo xadka maalinlaha ah ee bogga. 0 waxay ka dhigan tahay inaan xad lahayn hal arday; xadka boggu weli wuu shaqeynayaa. Asalka 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Hubinta sheegashada: xadka maalinlaha ah ee hal koorso';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Tirada ugu badan ee hubinta sheegashada ee safka la geliyo maalintii ee hal koorso. Jawaabaha xadka dhaafa lama hubiyo maalintaas. Waxay ka hortagtaa in hal koorso oo mashquul ah ay dhammeyso xadka maalinlaha ah ee bogga. 0 waxay ka dhigan tahay inaan xad lahayn hal koorso; xadka boggu weli wuu shaqeynayaa. Asalka 500.';

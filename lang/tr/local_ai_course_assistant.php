@@ -3624,3 +3624,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, önem dereces
 $string['instructor_dashboard:review_col_resolve'] = 'Çöz';
 $string['instructor_dashboard:review_audit_link'] = 'Kaydedilen tüm yanıtları yanıt denetim kaydında görün';
 $string['instructor_dashboard:review_caption'] = 'İnceleme bekleyen öğeler, en acil en üstte';
+
+$string['settings:answer_check_user_daily_cap'] = 'İddia denetimi: bir öğrenci için günlük sınır';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Bir öğrencinin yanıtları için günde kuyruğa alınan en fazla iddia denetimi sayısı. Sınırı aşan yanıtlar o gün denetlenmez. Tek bir hesabın sitenin günlük sınırını tüketmesini önler. 0, bir öğrenci için sınır olmadığı anlamına gelir; site sınırı yine de geçerlidir. Varsayılan 50.';
+$string['settings:answer_check_course_daily_cap'] = 'İddia denetimi: bir ders için günlük sınır';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Bir ders için günde kuyruğa alınan en fazla iddia denetimi sayısı. Sınırı aşan yanıtlar o gün denetlenmez. Yoğun kullanılan tek bir dersin sitenin günlük sınırını tüketmesini önler. 0, bir ders için sınır olmadığı anlamına gelir; site sınırı yine de geçerlidir. Varsayılan 500.';

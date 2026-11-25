@@ -3646,3 +3646,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, ernst: {$a->s
 $string['instructor_dashboard:review_col_resolve'] = 'Afhandelen';
 $string['instructor_dashboard:review_audit_link'] = 'Bekijk elk vastgelegd antwoord in de antwoordaudit';
 $string['instructor_dashboard:review_caption'] = 'Items die op beoordeling wachten, de dringendste eerst';
+
+$string['settings:answer_check_user_daily_cap'] = 'Beweringscontrole: daglimiet voor één cursist';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Het maximale aantal beweringscontroles dat per dag in de wachtrij komt voor de antwoorden van één cursist. Antwoorden boven de limiet worden die dag niet gecontroleerd. Zo kan één account de daglimiet van de site niet opmaken. 0 betekent geen limiet voor één cursist; de limiet van de site blijft gelden. Standaard 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Beweringscontrole: daglimiet voor één cursus';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Het maximale aantal beweringscontroles dat per dag in de wachtrij komt voor één cursus. Antwoorden boven de limiet worden die dag niet gecontroleerd. Zo kan één drukke cursus de daglimiet van de site niet opmaken. 0 betekent geen limiet voor één cursus; de limiet van de site blijft gelden. Standaard 500.';

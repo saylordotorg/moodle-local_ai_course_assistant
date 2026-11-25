@@ -3623,3 +3623,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, vakavuus: {$a
 $string['instructor_dashboard:review_col_resolve'] = 'Ratkaise';
 $string['instructor_dashboard:review_audit_link'] = 'Katso kaikki tallennetut vastaukset vastausten tarkastuksessa';
 $string['instructor_dashboard:review_caption'] = 'Tarkistusta odottavat kohteet, kiireellisin ensin';
+
+$string['settings:answer_check_user_daily_cap'] = 'Väitetarkistus: yhden opiskelijan päiväraja';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Enimmäismäärä väitetarkistuksia, jotka asetetaan jonoon päivässä yhden opiskelijan vastauksista. Rajan ylittäviä vastauksia ei tarkisteta sinä päivänä. Näin yksi tili ei voi käyttää koko sivuston päivärajaa. 0 tarkoittaa, ettei yhdellä opiskelijalla ole rajaa; sivuston raja on silti voimassa. Oletus 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Väitetarkistus: yhden kurssin päiväraja';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Enimmäismäärä väitetarkistuksia, jotka asetetaan jonoon päivässä yhdestä kurssista. Rajan ylittäviä vastauksia ei tarkisteta sinä päivänä. Näin yksi vilkas kurssi ei voi käyttää koko sivuston päivärajaa. 0 tarkoittaa, ettei yhdellä kurssilla ole rajaa; sivuston raja on silti voimassa. Oletus 500.';

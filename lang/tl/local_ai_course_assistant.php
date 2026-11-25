@@ -3667,3 +3667,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, bigat: {$a->s
 $string['instructor_dashboard:review_col_resolve'] = 'Lutasin';
 $string['instructor_dashboard:review_audit_link'] = 'Tingnan ang bawat naitalang sagot sa audit ng sagot';
 $string['instructor_dashboard:review_caption'] = 'Mga item na naghihintay ng pagsusuri, pinakaapurahan muna';
+
+$string['settings:answer_check_user_daily_cap'] = 'Pagsusuri ng pahayag: limitasyon bawat araw para sa isang mag-aaral';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Pinakamaraming pagsusuri ng pahayag na ipinipila bawat araw para sa mga sagot ng isang mag-aaral. Ang mga sagot na lampas sa limitasyon ay hindi sinusuri sa araw na iyon. Pinipigilan nito ang isang account na maubos ang limitasyon bawat araw ng site. Ang 0 ay nangangahulugang walang limitasyon para sa isang mag-aaral; umiiral pa rin ang limitasyon ng site. Default 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Pagsusuri ng pahayag: limitasyon bawat araw para sa isang kurso';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Pinakamaraming pagsusuri ng pahayag na ipinipila bawat araw para sa isang kurso. Ang mga sagot na lampas sa limitasyon ay hindi sinusuri sa araw na iyon. Pinipigilan nito ang isang abalang kurso na maubos ang limitasyon bawat araw ng site. Ang 0 ay nangangahulugang walang limitasyon para sa isang kurso; umiiral pa rin ang limitasyon ng site. Default 500.';

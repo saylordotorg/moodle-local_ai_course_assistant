@@ -3623,3 +3623,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, waga: {$a->se
 $string['instructor_dashboard:review_col_resolve'] = 'Rozwiąż';
 $string['instructor_dashboard:review_audit_link'] = 'Zobacz wszystkie zapisane odpowiedzi w audycie odpowiedzi';
 $string['instructor_dashboard:review_caption'] = 'Pozycje czekające na przegląd, od najpilniejszych';
+
+$string['settings:answer_check_user_daily_cap'] = 'Sprawdzanie twierdzeń: limit dzienny dla jednego uczestnika';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Największa liczba sprawdzeń twierdzeń dodawanych do kolejki w ciągu dnia dla odpowiedzi jednego uczestnika. Odpowiedzi ponad limit nie są tego dnia sprawdzane. Dzięki temu jedno konto nie wyczerpie dziennego limitu witryny. 0 oznacza brak limitu dla jednego uczestnika; limit witryny nadal obowiązuje. Domyślnie 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Sprawdzanie twierdzeń: limit dzienny dla jednego kursu';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Największa liczba sprawdzeń twierdzeń dodawanych do kolejki w ciągu dnia dla jednego kursu. Odpowiedzi ponad limit nie są tego dnia sprawdzane. Dzięki temu jeden intensywnie używany kurs nie wyczerpie dziennego limitu witryny. 0 oznacza brak limitu dla jednego kursu; limit witryny nadal obowiązuje. Domyślnie 500.';

@@ -3623,3 +3623,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, alvorsgrad: {
 $string['instructor_dashboard:review_col_resolve'] = 'Løs';
 $string['instructor_dashboard:review_audit_link'] = 'Se alle registrerede svar i svarrevisionen';
 $string['instructor_dashboard:review_caption'] = 'Punkter, der venter på gennemgang, de mest presserende først';
+
+$string['settings:answer_check_user_daily_cap'] = 'Påstandskontrol: daglig grænse for én kursist';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Det højeste antal påstandskontroller, der sættes i kø pr. dag for én kursists svar. Svar over grænsen kontrolleres ikke den dag. Det forhindrer, at én konto bruger hele webstedets daglige grænse. 0 betyder ingen grænse for én kursist; webstedets grænse gælder stadig. Standard 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Påstandskontrol: daglig grænse for ét kursus';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Det højeste antal påstandskontroller, der sættes i kø pr. dag for ét kursus. Svar over grænsen kontrolleres ikke den dag. Det forhindrer, at ét travlt kursus bruger hele webstedets daglige grænse. 0 betyder ingen grænse for ét kursus; webstedets grænse gælder stadig. Standard 500.';

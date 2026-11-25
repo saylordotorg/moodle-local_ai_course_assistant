@@ -3623,3 +3623,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, gravitate: {$
 $string['instructor_dashboard:review_col_resolve'] = 'Rezolvă';
 $string['instructor_dashboard:review_audit_link'] = 'Vezi toate răspunsurile înregistrate în auditul răspunsurilor';
 $string['instructor_dashboard:review_caption'] = 'Elemente care așteaptă examinarea, cele mai urgente primele';
+
+$string['settings:answer_check_user_daily_cap'] = 'Verificarea afirmațiilor: limită zilnică pentru un cursant';
+$string['settings:answer_check_user_daily_cap_desc'] = 'Numărul maxim de verificări de afirmații puse în coadă pe zi pentru răspunsurile unui singur cursant. Răspunsurile peste limită nu sunt verificate în ziua respectivă. Astfel, un singur cont nu poate epuiza limita zilnică a site-ului. 0 înseamnă fără limită pentru un cursant; limita site-ului se aplică în continuare. Implicit 50.';
+$string['settings:answer_check_course_daily_cap'] = 'Verificarea afirmațiilor: limită zilnică pentru un curs';
+$string['settings:answer_check_course_daily_cap_desc'] = 'Numărul maxim de verificări de afirmații puse în coadă pe zi pentru un singur curs. Răspunsurile peste limită nu sunt verificate în ziua respectivă. Astfel, un singur curs foarte activ nu poate epuiza limita zilnică a site-ului. 0 înseamnă fără limită pentru un curs; limita site-ului se aplică în continuare. Implicit 500.';

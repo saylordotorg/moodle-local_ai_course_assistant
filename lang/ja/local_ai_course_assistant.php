@@ -3621,3 +3621,8 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}、重大度: {
 $string['instructor_dashboard:review_col_resolve'] = '解決';
 $string['instructor_dashboard:review_audit_link'] = '記録されたすべての回答を回答の監査で見る';
 $string['instructor_dashboard:review_caption'] = 'レビュー待ちの項目（緊急度の高い順）';
+
+$string['settings:answer_check_user_daily_cap'] = '主張チェック: 学習者 1 人あたりの 1 日の上限';
+$string['settings:answer_check_user_daily_cap_desc'] = '学習者 1 人の回答について 1 日にキューに入れる主張チェックの最大数です。上限を超えた回答はその日はチェックされません。1 つのアカウントがサイトの 1 日の上限を使い切るのを防ぎます。0 は学習者 1 人あたりの上限なしを意味し、サイトの上限は引き続き適用されます。デフォルトは 50。';
+$string['settings:answer_check_course_daily_cap'] = '主張チェック: コース 1 つあたりの 1 日の上限';
+$string['settings:answer_check_course_daily_cap_desc'] = '1 つのコースについて 1 日にキューに入れる主張チェックの最大数です。上限を超えた回答はその日はチェックされません。利用の多い 1 つのコースがサイトの 1 日の上限を使い切るのを防ぎます。0 はコース 1 つあたりの上限なしを意味し、サイトの上限は引き続き適用されます。デフォルトは 500。';
