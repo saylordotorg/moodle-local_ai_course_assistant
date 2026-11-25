@@ -315,7 +315,8 @@ final class settings_layout_map {
                 ]],
                 ['new', 'answercheck', [
                     'answer_check_sample_percent_retrieved', 'answer_check_sample_percent_general',
-                    'answer_check_daily_cap', 'answer_check_provider', 'answer_check_model'
+                    'answer_check_daily_cap', 'answer_check_user_daily_cap', 'answer_check_course_daily_cap',
+                    'answer_check_provider', 'answer_check_model'
                 ]],
                 ['new', 'answeraudit', [
                     'answer_audit_link'

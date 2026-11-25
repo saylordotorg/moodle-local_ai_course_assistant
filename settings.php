@@ -1758,6 +1758,21 @@ if ($hassiteconfig) {
         '2000',
         PARAM_INT
     ));
+    // 8.4.0 (red team RT5): one learner or one course cannot use up the site's daily checks.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_user_daily_cap',
+        get_string('settings:answer_check_user_daily_cap', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_user_daily_cap_desc', 'local_ai_course_assistant'),
+        '50',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/answer_check_course_daily_cap',
+        get_string('settings:answer_check_course_daily_cap', 'local_ai_course_assistant'),
+        get_string('settings:answer_check_course_daily_cap_desc', 'local_ai_course_assistant'),
+        '500',
+        PARAM_INT
+    ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/answer_check_provider',
         get_string('settings:answer_check_provider', 'local_ai_course_assistant'),

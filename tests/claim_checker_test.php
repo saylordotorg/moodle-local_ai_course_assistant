@@ -642,6 +642,87 @@ final class claim_checker_test extends \advanced_testcase {
         $this->assertSame(claim_checker::DEFAULT_DAILY_CAP, claim_checker::daily_cap());
     }
 
+    public function test_one_learner_cannot_use_up_the_site_claim_check_cap(): void {
+        // RT5: there was only a site-wide daily cap, so one learner (or a script holding one account) could spend
+        // all of it and leave every other learner's answers unchecked that day. A per-learner cap comes first.
+        set_config('answer_check_sample_percent_general', '100', 'local_ai_course_assistant');
+        set_config('answer_check_daily_cap', '100', 'local_ai_course_assistant');
+        set_config('answer_check_user_daily_cap', '2', 'local_ai_course_assistant');
+        $mine = $this->user;
+        $one = $this->answer('Q1', 'A1.');
+        $two = $this->answer('Q2', 'A2.');
+        $three = $this->answer('Q3', 'A3.');
+        $this->assertTrue(claim_checker::queue_for($one['auditid']), 'a queued check counts');
+        answer_audit::append_verdict($two['auditid'], ['status' => 'ok', 'claims' => []]);
+        $this->assertSame(['user' => 2, 'course' => 2], claim_checker::queued_today_for((int) $mine->id,
+            (int) $this->course->id), 'one queued, one verdict written today');
+        $this->assertFalse(claim_checker::queue_for($three['auditid']), 'the learner is at their cap');
+        $this->assertCount(1, \core\task\manager::get_adhoc_tasks(check_answer_claims::class), 'nothing more queued');
+
+        // Another learner in the same course is still checked.
+        $this->user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id, 'student');
+        $theirs = $this->answer('Q4', 'A4.');
+        $this->assertTrue(claim_checker::queue_for($theirs['auditid']), 'another learner has their own count');
+        $this->assertSame(['user' => 1, 'course' => 3], claim_checker::queued_today_for((int) $this->user->id,
+            (int) $this->course->id));
+
+        // 0 turns the per-learner cap off; the site cap still applies.
+        $this->user = $mine;
+        set_config('answer_check_user_daily_cap', '0', 'local_ai_course_assistant');
+        $this->assertTrue(claim_checker::queue_for($three['auditid']), '0 = no per-learner limit');
+        set_config('answer_check_daily_cap', '4', 'local_ai_course_assistant');
+        $five = $this->answer('Q5', 'A5.');
+        $this->assertFalse(claim_checker::queue_for($five['auditid']), 'the site cap still applies');
+    }
+
+    public function test_one_course_cannot_use_up_the_site_claim_check_cap(): void {
+        set_config('answer_check_sample_percent_general', '100', 'local_ai_course_assistant');
+        set_config('answer_check_daily_cap', '100', 'local_ai_course_assistant');
+        set_config('answer_check_user_daily_cap', '0', 'local_ai_course_assistant');
+        set_config('answer_check_course_daily_cap', '2', 'local_ai_course_assistant');
+        $first = $this->course;
+        $one = $this->answer('Q1', 'A1.');
+        $two = $this->answer('Q2', 'A2.');
+        $three = $this->answer('Q3', 'A3.');
+        $this->assertTrue(claim_checker::queue_for($one['auditid']));
+        $this->assertTrue(claim_checker::queue_for($two['auditid']));
+        $this->assertFalse(claim_checker::queue_for($three['auditid']), 'the course is at its cap');
+
+        // The same learner in another course is still checked.
+        $this->course = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id, 'student');
+        $other = $this->answer('Q4', 'A4.');
+        $this->assertTrue(claim_checker::queue_for($other['auditid']), 'another course has its own count');
+        $this->assertSame(['user' => 3, 'course' => 1], claim_checker::queued_today_for((int) $this->user->id,
+            (int) $this->course->id));
+        $this->assertSame(['user' => 3, 'course' => 2], claim_checker::queued_today_for((int) $this->user->id,
+            (int) $first->id));
+
+        // Yesterday's checks do not count.
+        global $DB;
+        answer_audit::append_verdict($one['auditid'], ['status' => 'ok', 'claims' => []]);
+        foreach (\core\task\manager::get_adhoc_tasks(check_answer_claims::class) as $task) {
+            $DB->delete_records('task_adhoc', ['id' => $task->get_id()]);
+        }
+        $this->assertSame(['user' => 1, 'course' => 1], claim_checker::queued_today_for((int) $this->user->id,
+            (int) $first->id));
+        $DB->set_field(answer_audit::TABLE, 'timecreated', time() - 3 * DAYSECS, []);
+        $this->assertSame(['user' => 0, 'course' => 0], claim_checker::queued_today_for((int) $this->user->id,
+            (int) $first->id));
+    }
+
+    public function test_the_claim_check_sub_cap_defaults(): void {
+        $this->assertSame(50, claim_checker::DEFAULT_USER_DAILY_CAP);
+        $this->assertSame(500, claim_checker::DEFAULT_COURSE_DAILY_CAP);
+        $this->assertSame(50, claim_checker::user_daily_cap());
+        $this->assertSame(500, claim_checker::course_daily_cap());
+        set_config('answer_check_user_daily_cap', 'lots', 'local_ai_course_assistant');
+        set_config('answer_check_course_daily_cap', '-4', 'local_ai_course_assistant');
+        $this->assertSame(50, claim_checker::user_daily_cap(), 'not a number: the default');
+        $this->assertSame(0, claim_checker::course_daily_cap(), 'below zero: no limit');
+    }
+
     public function test_queue_for_never_throws(): void {
         global $DB;
         $turn = $this->answer('When?', 'On 12 March.');

@@ -92,6 +92,12 @@ class claim_checker {
     /** @var int Default checks queued per site per day. */
     public const DEFAULT_DAILY_CAP = 2000;
 
+    /** @var int Default daily cap on queued checks for one learner (0 = no per-learner limit). */
+    public const DEFAULT_USER_DAILY_CAP = 50;
+
+    /** @var int Default daily cap on queued checks for one course (0 = no per-course limit). */
+    public const DEFAULT_COURSE_DAILY_CAP = 500;
+
     /** @var int Most claims kept from one reply. */
     public const MAX_CLAIMS = 12;
 
@@ -114,7 +120,8 @@ class claim_checker {
     public static ?\Closure $spendcheck = null;
 
     /**
-     * Queue a claim check for one recorded answer, when the course's mode, the sampling and the daily cap allow it.
+     * Queue a claim check for one recorded answer, when the course's mode, the sampling and the daily caps (one
+     * learner, one course, the site) allow it.
      * Never throws: a failure is written to the developer debug log and counted as QUEUE_FAILED_ACTION.
      *
      * @param int $auditid the answer row (answer_audit::record_answer()'s return; 0 or less is ignored)
@@ -127,7 +134,7 @@ class claim_checker {
                 return false;
             }
             global $DB;
-            $row = $DB->get_record(answer_audit::TABLE, ['id' => $auditid], 'id, kind, courseid, chunks, redacted');
+            $row = $DB->get_record(answer_audit::TABLE, ['id' => $auditid], 'id, kind, userid, courseid, chunks, redacted');
             if (!$row || $row->kind !== 'answer' || !empty($row->redacted)) {
                 return false;
             }
@@ -137,6 +144,18 @@ class claim_checker {
             }
             if (!self::sampled($auditid, self::chunk_refs($row->chunks) !== [])) {
                 return false;
+            }
+            // One learner, then one course, then the site (8.4.0 red team, RT5): with only the site cap, one account
+            // or one busy course could use the whole day's checks and leave everyone else's answers unchecked. An
+            // answer past any of the three is not checked, exactly as before: nothing is queued and nothing is
+            // written (the answer row itself is already in the audit).
+            $usercap = self::user_daily_cap();
+            $coursecap = self::course_daily_cap();
+            if ($usercap > 0 || $coursecap > 0) {
+                $mine = self::queued_today_for((int) $row->userid, $courseid);
+                if (($usercap > 0 && $mine['user'] >= $usercap) || ($coursecap > 0 && $mine['course'] >= $coursecap)) {
+                    return false;
+                }
             }
             if (self::queued_today() >= self::daily_cap()) {
                 return false;
@@ -190,6 +209,80 @@ class claim_checker {
     }
 
     /**
+     * The daily cap on queued checks for one learner. 0 means no per-learner limit (the site cap still applies).
+     *
+     * @return int
+     */
+    public static function user_daily_cap(): int {
+        $raw = get_config('local_ai_course_assistant', 'answer_check_user_daily_cap');
+        return ($raw === false || $raw === '' || !is_numeric($raw)) ? self::DEFAULT_USER_DAILY_CAP : max(0, (int) $raw);
+    }
+
+    /**
+     * The daily cap on queued checks for one course. 0 means no per-course limit (the site cap still applies).
+     *
+     * @return int
+     */
+    public static function course_daily_cap(): int {
+        $raw = get_config('local_ai_course_assistant', 'answer_check_course_daily_cap');
+        return ($raw === false || $raw === '' || !is_numeric($raw)) ? self::DEFAULT_COURSE_DAILY_CAP
+            : max(0, (int) $raw);
+    }
+
+    /**
+     * The first audit row id of today (server time) minus one: rows above it were written today.
+     *
+     * @return int
+     */
+    private static function today_floor(): int {
+        global $DB;
+        $midnight = usergetmidnight(time(), \core_date::get_server_timezone());
+        $before = $DB->get_records_select(answer_audit::TABLE, 'timecreated < ?', [$midnight], 'id DESC', 'id', 0, 1);
+        return $before ? (int) reset($before)->id : 0;
+    }
+
+    /**
+     * Checks counted against today's per-learner and per-course caps: verdicts written today for that learner and
+     * for that course, plus the checks still queued for answers of theirs. A queued task holds the audit id only, so
+     * the queued ones are looked up in the audit table (the queue is short: it can't pass the site cap).
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @return array{user: int, course: int}
+     */
+    public static function queued_today_for(int $userid, int $courseid): array {
+        global $DB;
+        $floor = self::today_floor();
+        $counts = [
+            'user' => $DB->count_records_select(answer_audit::TABLE, "id > ? AND kind = 'verdict' AND userid = ?",
+                [$floor, $userid]),
+            'course' => $DB->count_records_select(answer_audit::TABLE, "id > ? AND kind = 'verdict' AND courseid = ?",
+                [$floor, $courseid]),
+        ];
+        $ids = [];
+        $rs = $DB->get_recordset('task_adhoc', ['classname' => '\\' . task\check_answer_claims::class], '',
+            'id, customdata');
+        foreach ($rs as $task) {
+            $data = json_decode((string) $task->customdata, true);
+            $id = is_array($data) ? (int) ($data['auditid'] ?? 0) : 0;
+            if ($id > 0) {
+                $ids[] = $id;
+            }
+        }
+        $rs->close();
+        foreach (array_chunk($ids, 500) as $chunk) {
+            [$in, $params] = $DB->get_in_or_equal($chunk);
+            foreach ($DB->get_records_select(answer_audit::TABLE, "id $in", $params, '', 'id, userid, courseid') as $a) {
+                // One id per queued task: an answer queued twice counts twice, as it does against the site cap.
+                $n = count(array_keys($chunk, (int) $a->id));
+                $counts['user'] += (int) $a->userid === $userid ? $n : 0;
+                $counts['course'] += (int) $a->courseid === $courseid ? $n : 0;
+            }
+        }
+        return $counts;
+    }
+
+    /**
      * Checks counted against today's cap: verdicts written since midnight (server time) plus checks still queued.
      *
      * Reads only today's audit rows: the newest row from before midnight is found walking the primary key down from
@@ -199,9 +292,7 @@ class claim_checker {
      */
     public static function queued_today(): int {
         global $DB;
-        $midnight = usergetmidnight(time(), \core_date::get_server_timezone());
-        $before = $DB->get_records_select(answer_audit::TABLE, 'timecreated < ?', [$midnight], 'id DESC', 'id', 0, 1);
-        $floor = $before ? (int) reset($before)->id : 0;
+        $floor = self::today_floor();
         $verdicts = $DB->count_records_select(answer_audit::TABLE, "id > ? AND kind = 'verdict'", [$floor]);
         $pending = $DB->count_records('task_adhoc', ['classname' => '\\' . task\check_answer_claims::class]);
         return $verdicts + $pending;
