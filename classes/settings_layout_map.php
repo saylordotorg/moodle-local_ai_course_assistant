@@ -311,7 +311,8 @@ final class settings_layout_map {
             'parent' => 'advanced',
             'sections' => [
                 ['existing', 'answer_safety_heading', [
-                    'answer_safety_mode', 'answer_safety_rules', 'answer_safety_wellbeing_message'
+                    'answer_safety_mode', 'answer_safety_realtime_in_enforce', 'answer_safety_rules',
+                    'answer_safety_wellbeing_message'
                 ]],
                 ['new', 'answercheck', [
                     'answer_check_sample_percent_retrieved', 'answer_check_sample_percent_general',

@@ -1724,6 +1724,14 @@ if ($hassiteconfig) {
         '',
         PARAM_TEXT
     ));
+    // 8.4.0 (red team RT3): live voice and the avatar speak before any rule can look at the answer, so Enforce mode
+    // does not offer them unless this is on (voice_safety::realtime_allowed(); the endpoints refuse).
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/answer_safety_realtime_in_enforce',
+        get_string('settings:answer_safety_realtime_in_enforce', 'local_ai_course_assistant'),
+        get_string('settings:answer_safety_realtime_in_enforce_desc', 'local_ai_course_assistant'),
+        0
+    ));
     // 8.4.0: the answer audit page (answer_audit.php): a course picker when opened without a course.
     $answerauditurl = new moodle_url('/local/ai_course_assistant/answer_audit.php');
     $settings->add(new admin_setting_description(

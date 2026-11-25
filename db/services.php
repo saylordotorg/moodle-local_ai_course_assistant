@@ -213,6 +213,15 @@ $functions = [
         'ajax'         => true,
         'capabilities' => 'local/ai_course_assistant:use',
     ],
+    // 8.4.0: the browser posts each finished live voice turn (the provider's transcripts) while the course's answer
+    // safety mode is Watch or Enforce; the guidance rules check it and it is recorded in the answer audit.
+    'local_ai_course_assistant_check_voice_turn' => [
+        'classname'    => \local_ai_course_assistant\external\check_voice_turn::class,
+        'description'  => 'Check one finished live voice turn against the guidance rules and record it.',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
     'local_ai_course_assistant_submit_feedback' => [
         'classname'    => \local_ai_course_assistant\external\submit_feedback::class,
         'description'  => 'Submit user feedback about SOLA.',

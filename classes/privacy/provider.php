@@ -344,6 +344,7 @@ class provider implements
                 'messageid' => 'privacy:metadata:answer_audit:messageid',
                 'conversationid' => 'privacy:metadata:answer_audit:conversationid',
                 'cmid' => 'privacy:metadata:answer_audit:cmid',
+                'mode' => 'privacy:metadata:answer_audit:mode',
                 'question' => 'privacy:metadata:answer_audit:question',
                 'answer' => 'privacy:metadata:answer_audit:answer',
                 'categories' => 'privacy:metadata:answer_audit:categories',

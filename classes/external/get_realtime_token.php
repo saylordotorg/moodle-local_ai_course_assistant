@@ -42,6 +42,9 @@ class get_realtime_token extends external_api {
      */
     public static ?array $test_http_response = null;
 
+    /** @var string|null Test seam: the instructions the last OpenAI mint attached to the session. */
+    public static ?string $last_instructions = null;
+
     /**
      * Returns description of method parameters.
      *
@@ -122,6 +125,15 @@ class get_realtime_token extends external_api {
         // gets the authorisation error rather than learning the feature state.
         if (!get_config('local_ai_course_assistant', 'realtime_enabled')) {
             throw new \moodle_exception('realtime:err_disabled', 'local_ai_course_assistant');
+        }
+
+        // 8.4.0 (red team RT3): in Enforce mode live voice is refused unless the site allows it, because a live
+        // answer is spoken before any rule can look at it. The learner gets the regular voice mode, whose answers
+        // go through sse.php and can be held or blocked. Refused HERE, not only by hiding the button; the browser
+        // turns this error code into the regular mode. Honors the course's own mode.
+        if (!\local_ai_course_assistant\voice_safety::realtime_allowed((int) $params['courseid'])) {
+            throw new \moodle_exception(\local_ai_course_assistant\voice_safety::REFUSAL_STRING,
+                'local_ai_course_assistant');
         }
 
         // The emergency kill switch is enforced inside voice_registry::resolve(),
@@ -205,7 +217,11 @@ class get_realtime_token extends external_api {
             );
             $audioonlytail = $voicetail . $nochipsblock . $voicetailrest;
             $voicetail .= $chipsblock . $voicetailrest;
-            $fullinstructions = $systemprompt . $voicetail;
+            // 8.4.0: the guidance rules as instructions, when the course's mode is Watch or Enforce ('' when Off).
+            // Built server-side from the rule categories and the site's wellbeing message, never from the request,
+            // and kept out of the copy the browser gets. Advice to the model, not a control.
+            $guidance = \local_ai_course_assistant\voice_safety::guidance_block((int) $params['courseid']);
+            $fullinstructions = $systemprompt . $voicetail . $guidance;
             // OpenAI Realtime rejects session.instructions that contain a
             // reserved special token and fails the whole session with
             // "instructions contain a reserved special token". The chat
@@ -217,7 +233,7 @@ class get_realtime_token extends external_api {
             $clientinstructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $voicetail);
             // The same hygiene for the audio-only (Gemini Live) variant.
             $audioonlyinstructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]',
-                $systemprompt . $audioonlytail);
+                $systemprompt . $audioonlytail . $guidance);
             $audioonlyclient = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $audioonlytail);
         } catch (\Throwable $e) {
             // Fail CLOSED. The old handler blanked the instructions and minted
@@ -236,6 +252,14 @@ class get_realtime_token extends external_api {
         if ($cfg === null) {
             throw new \moodle_exception('realtime:err_no_provider', 'local_ai_course_assistant');
         }
+
+        // 8.4.0: while the course's mode is Watch or Enforce the browser posts each finished turn to
+        // check_voice_turn, and needs this ticket to do it (signed for this learner, course and provider). With the
+        // mode Off there is no ticket, the browser posts nothing and the reply is what it was in 8.3.2.
+        $safety = \local_ai_course_assistant\voice_safety::posts_turns((int) $params['courseid'])
+            ? ['safetyticket' => \local_ai_course_assistant\voice_safety::mint_ticket((int) $USER->id,
+                (int) $params['courseid'], (string) $cfg['provider'])]
+            : [];
 
         // xAI Realtime: the master API key must never leave the server, so
         // we mint a short-lived HS256 JWT scoped to this learner + course +
@@ -287,13 +311,13 @@ class get_realtime_token extends external_api {
                 'instructions' => $clientinstructions,
                 // 8.3.1: the browser stops listening after this many seconds of silence (the learner taps Resume).
                 'idleseconds' => \local_ai_course_assistant\voice\voice_idle::seconds(),
-            ];
+            ] + $safety;
         }
 
         // Gemini Live (8.2.0): a single-use token locked to the model, the grounded instruction and audio output.
         if ($cfg['provider'] === 'gemini') {
             return self::mint_gemini($cfg, $audioonlyinstructions, $audioonlyclient, (int) $USER->id,
-                (int) $params['courseid']);
+                (int) $params['courseid']) + $safety;
         }
 
         // OpenAI: mint an ephemeral client secret so the key never reaches the browser.
@@ -327,7 +351,7 @@ class get_realtime_token extends external_api {
             'instructions' => $clientinstructions,
             // 8.3.1: the browser stops listening after this many seconds of silence (the learner taps Resume).
             'idleseconds' => \local_ai_course_assistant\voice\voice_idle::seconds(),
-        ];
+        ] + $safety;
     }
 
     /**
@@ -484,6 +508,7 @@ class get_realtime_token extends external_api {
      * @return array{0:string,1:int} [response body, HTTP status]
      */
     private static function call_openai_realtime(string $apikey, string $instructions = ''): array {
+        self::$last_instructions = $instructions;
         if (self::$test_http_response !== null) {
             return [
                 (string) (self::$test_http_response['body'] ?? ''),
@@ -547,6 +572,9 @@ class get_realtime_token extends external_api {
             'sessionid' => new external_value(PARAM_INT, 'Spend row to report usage against', VALUE_OPTIONAL),
             'maxseconds' => new external_value(PARAM_INT, 'Session cap in seconds', VALUE_OPTIONAL),
             'idleseconds' => new external_value(PARAM_INT, 'Idle timeout in seconds', VALUE_OPTIONAL),
+            // 8.4.0: present only while the course's answer safety mode is Watch or Enforce.
+            'safetyticket' => new external_value(PARAM_RAW, 'Ticket for posting finished turns to check_voice_turn',
+                VALUE_OPTIONAL),
         ]);
     }
 }

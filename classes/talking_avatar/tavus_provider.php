@@ -56,7 +56,10 @@ class tavus_provider extends base_provider {
         $payload = [
             'replica_id' => $this->cfg('persona_id'),
             'conversation_name' => 'SOLA course ' . (int) ($context['courseid'] ?? 0),
-            'conversational_context' => $context['greeting'] ?? '',
+            // 8.4.0: the guidance rules ride along as conversation context when the course's answer safety mode is
+            // Watch or Enforce ('' otherwise, so the payload is what it was).
+            'conversational_context' => ($context['guidance'] ?? '') === '' ? ($context['greeting'] ?? '')
+                : trim(($context['greeting'] ?? '') . $context['guidance']),
             'properties' => [
                 'language' => $context['lang'] ?? 'en',
                 'max_call_duration' => 1800,
