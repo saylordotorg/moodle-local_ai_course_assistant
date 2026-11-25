@@ -214,6 +214,28 @@ while (ob_get_level() > 0) {
 ob_implicit_flush(true);
 
 /**
+ * Send the replace event a failed turn still owes the browser (8.4.0 red team, RT8).
+ *
+ * A guidance rule replaced an answer the learner had already seen streamed, and the turn failed before the replace
+ * event went out (it is sent after the message is saved). Without it the blocked text would stay on the screen next
+ * to the error. There is no saved message, so the id is 0. Never throws.
+ *
+ * @param array|null $replace ['text' => ..., 'reason' => ...] or null when nothing was replaced
+ * @param bool $sent whether the replace event was already sent
+ * @return void
+ */
+function local_ai_course_assistant_send_pending_replace($replace, bool $sent): void {
+    try {
+        if (!$sent && is_array($replace) && isset($replace['text'])) {
+            local_ai_course_assistant_sse_send(['replace' => (string) $replace['text'], 'messageid' => 0,
+                'reason' => (string) ($replace['reason'] ?? '')]);
+        }
+    } catch (\Throwable $ignore) {
+        debugging('could not send the pending replace: ' . get_class($ignore), DEBUG_DEVELOPER);
+    }
+}
+
+/**
  * Record a turn that failed, so it is not silently missing.
  *
  * v7.1.1. Before this, a provider error wrote nothing at all: the learner's
@@ -1183,6 +1205,7 @@ try {
                     $answerreleaseclean = $answerretryclean;
                 }
                 $cleanresponse = $answerfinal['text'];
+                $answerdelivered = $cleanresponse;
                 if ($answerhold === null) {
                     $answerreplace = ['text' => $cleanresponse,
                         'reason' => $answerfinal['reason'] !== '' ? $answerfinal['reason'] : $answerfinal['action']];
@@ -1193,6 +1216,7 @@ try {
         $answercheck = ['categories' => $answerplan['categories'],
             'rules' => \local_ai_course_assistant\answer_flow::audit_rules($answerplan, null)];
         $answerreplace = null;
+        $answerdelivered = null;
         \local_ai_course_assistant\answer_audit::log_rules_error((int) $userid, (int) $courseid, get_class($e));
     }
     if ($answerhold !== null) {
@@ -1269,6 +1293,7 @@ try {
     if ($answerreplace !== null) {
         local_ai_course_assistant_sse_send(['replace' => $answerreplace['text'],
             'messageid' => (int) $assistantmsgid, 'reason' => $answerreplace['reason']]);
+        $answerreplacesent = true;
     }
 
     // 8.4.0: what the answer audit row needs, taken now (last_results() belongs to the
@@ -1508,10 +1533,14 @@ try {
     } catch (\Throwable $ignore) {
         /* never let audit logging mask the real error */
     }
-    // A held answer's partial was never checked or shown: store none (answer_flow::failed_turn_partial()).
+    // A held answer's partial was never checked or shown: store none. Once the rules replaced the answer, only the
+    // delivered text is stored, never the raw reply they refused (answer_flow::failed_turn_partial()); and a
+    // streamed answer whose replace event had not gone out yet gets it now, before the error.
+    local_ai_course_assistant_send_pending_replace($answerreplace ?? null, $answerreplacesent ?? false);
     local_ai_course_assistant_record_failed_turn(
         $conv ?? null, (int)($USER->id ?? 0), (int)($courseid ?? 0),
-        \local_ai_course_assistant\answer_flow::failed_turn_partial($answerhold ?? null, $fullresponse ?? ''),
+        \local_ai_course_assistant\answer_flow::failed_turn_partial($answerhold ?? null, $fullresponse ?? '',
+            $answerdelivered ?? null),
         get_class($e), $pageid ?? null, $interactiontype ?? 'chat',
         $learnernotice ?? '', $provider ?? null,
         $failedoutcome
@@ -1531,10 +1560,14 @@ try {
         . ', pageid=' . (int)($pageid ?? 0) . ')',
         DEBUG_DEVELOPER
     );
-    // A held answer's partial was never checked or shown: store none (answer_flow::failed_turn_partial()).
+    // A held answer's partial was never checked or shown: store none. Once the rules replaced the answer, only the
+    // delivered text is stored, never the raw reply they refused (answer_flow::failed_turn_partial()); and a
+    // streamed answer whose replace event had not gone out yet gets it now, before the error.
+    local_ai_course_assistant_send_pending_replace($answerreplace ?? null, $answerreplacesent ?? false);
     local_ai_course_assistant_record_failed_turn(
         $conv ?? null, (int)($USER->id ?? 0), (int)($courseid ?? 0),
-        \local_ai_course_assistant\answer_flow::failed_turn_partial($answerhold ?? null, $fullresponse ?? ''),
+        \local_ai_course_assistant\answer_flow::failed_turn_partial($answerhold ?? null, $fullresponse ?? '',
+            $answerdelivered ?? null),
         get_class($e), $pageid ?? null, $interactiontype ?? 'chat',
         $learnernotice ?? '', $provider ?? null
     );

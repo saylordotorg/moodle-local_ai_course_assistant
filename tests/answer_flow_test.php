@@ -505,6 +505,48 @@ final class answer_flow_test extends \advanced_testcase {
             'streamed: the learner saw it, so it is stored as before');
     }
 
+    public function test_a_failed_save_after_the_rules_replaced_the_answer_stores_the_delivered_text(): void {
+        // RT8: finalize() blocked the answer and the safe message was released, then saving the message failed. The
+        // failed turn used to be stored with the raw answer the rules had just blocked. Once the rules have replaced
+        // the text, the delivered text is the only one a failure may store.
+        $raw = 'I guarantee you will pass.';
+        $safe = 'I can\'t promise a grade.';
+        $this->assertSame($safe, answer_flow::failed_turn_partial(null, $raw, $safe),
+            'released and replaced: the delivered text, never the raw answer');
+        $hold = new answer_hold(function (string $frame): void {
+        });
+        $this->assertSame($safe, answer_flow::failed_turn_partial($hold, $raw, $safe), 'the delivered text wins');
+        $this->assertSame($raw, answer_flow::failed_turn_partial(null, $raw, null), 'nothing replaced: as before');
+        $this->assertSame('', answer_flow::failed_turn_partial($hold, $raw, null), 'still held: nothing, as before');
+
+        // End to end through the same calls sse.php makes: a streamed guarantee, blocked in enforce mode.
+        $this->mode('enforce');
+        $plan = answer_flow::plan(self::PLAIN_Q, 0);
+        $final = answer_flow::finalize($raw, $plan, ['question' => self::PLAIN_Q, 'buffered' => false]);
+        $this->assertTrue($final['replace']);
+        $delivered = $final['replace'] ? $final['text'] : null;
+        $stored = conversation_manager::failed_turn_text(answer_flow::failed_turn_partial(null, $raw, $delivered), '');
+        $this->assertSame($final['text'], $stored);
+        $this->assertStringNotContainsString('guarantee', $stored);
+    }
+
+    public function test_sse_hands_the_delivered_text_to_both_failure_paths(): void {
+        $src = $this->sse_source();
+        // Set where the rules replace the text, for a held answer and a streamed one alike...
+        $this->assertStringContainsString('$cleanresponse = $answerfinal[\'text\']; $answerdelivered = $cleanresponse;', $src);
+        // ...and dropped again if the rules block itself failed (the answer then goes out as it was).
+        $this->assertMatchesRegularExpression('/\} catch \(\\\\Throwable \$e\) \{ \$answercheck = .{0,260}?'
+            . '\$answerreplace = null; \$answerdelivered = null;/', $src);
+        // Both catch blocks pass it on.
+        $this->assertSame(2, substr_count($src, 'answer_flow::failed_turn_partial($answerhold ?? null, '
+            . '$fullresponse ?? \'\', $answerdelivered ?? null),'));
+        // A streamed answer whose replace event was not sent yet gets it before the error, so the blocked text does
+        // not stay on the screen.
+        $this->assertSame(2, substr_count($src, 'local_ai_course_assistant_send_pending_replace('
+            . '$answerreplace ?? null, $answerreplacesent ?? false);'));
+        $this->assertStringContainsString('$answerreplacesent = true;', $src);
+    }
+
     // The audit row and the failure counter.
 
     public function test_record_answer_stores_the_categories_and_rules(): void {
@@ -607,7 +649,7 @@ final class answer_flow_test extends \advanced_testcase {
         // A failed turn never stores the unchecked partial of a held answer (both catch blocks).
         $this->assertSame(2, substr_count($src, 'local_ai_course_assistant_record_failed_turn( $conv ?? null, '
             . '(int)($USER->id ?? 0), (int)($courseid ?? 0), \\local_ai_course_assistant\\answer_flow::failed_turn_partial('
-            . '$answerhold ?? null, $fullresponse ?? \'\'),'));
+            . '$answerhold ?? null, $fullresponse ?? \'\', $answerdelivered ?? null),'));
         $this->assertStringNotContainsString("\$fullresponse ?? '', get_class(\$e)", $src);
     }
 }

@@ -198,14 +198,21 @@ class answer_flow {
     }
 
     /**
-     * The partial reply a failed chat turn may store: none while the answer is held (enforce mode, a risky
-     * question), because a held partial was never checked and never shown; otherwise what the learner saw stream.
+     * The partial reply a failed chat turn may store. Once the rules have replaced the answer (blocked it, added a
+     * check line or delivered a retry), only the delivered text: the raw reply is what the rules just refused, and a
+     * save that fails after that point must not put it in the learner's history (8.4.0 red team, RT8). Before that:
+     * none while the answer is held (enforce mode, a risky question), because a held partial was never checked and
+     * never shown; otherwise what the learner saw stream.
      *
      * @param object|null $hold sse.php's answer_hold while it is holding, null once released or when not held
      * @param string $partial what the provider streamed so far
+     * @param string|null $delivered the text finalize() put in place of the reply, null when it replaced nothing
      * @return string
      */
-    public static function failed_turn_partial(?object $hold, string $partial): string {
+    public static function failed_turn_partial(?object $hold, string $partial, ?string $delivered = null): string {
+        if ($delivered !== null) {
+            return $delivered;
+        }
         return $hold !== null ? '' : $partial;
     }
 
