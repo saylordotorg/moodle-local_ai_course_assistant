@@ -672,14 +672,16 @@ try {
         $history[] = ['role' => 'user', 'content' => $message];
     }
 
-    // Create provider. Admin LLM picker can override the provider/model for
-    // side-by-side comparison. Requires the manage capability; students always
-    // get the course/global default.
-    $isadmin = has_capability(
-        'local/ai_course_assistant:manage',
-        context_course::instance($courseid)
+    // Create provider. The admin LLM picker can override the provider and model for side-by-side comparison,
+    // but only while the chat_show_model_picker setting is on and the user holds the manage capability in this
+    // course. In every other case request_override() empties both values, so a crafted request cannot pick a
+    // model, and learners always get the course or site default.
+    [$clientprovider, $clientmodel] = \local_ai_course_assistant\model_picker::request_override(
+        $clientprovider,
+        $clientmodel,
+        $courseid
     );
-    if ($isadmin && !empty($clientprovider)) {
+    if ($clientprovider !== '') {
         $provider = base_provider::create_for_comparison($clientprovider, $clientmodel, $courseid);
         $effectiveprovidername = $clientprovider;
     } else {

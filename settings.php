@@ -393,6 +393,15 @@ if ($hassiteconfig) {
         get_string('settings:prompt_debug_enabled_desc', 'local_ai_course_assistant'),
         '0'
     ));
+    // 8.4.0: the chat composer's LLM provider and model pickers are hidden unless this is on, and then shown only
+    // to holders of the manage capability. Off, sse.php also ignores a provider or model named in a request
+    // (model_picker::request_override()).
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/chat_show_model_picker',
+        get_string('settings:chat_show_model_picker', 'local_ai_course_assistant'),
+        get_string('settings:chat_show_model_picker_desc', 'local_ai_course_assistant'),
+        '0'
+    ));
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/socratic_verbose',
         get_string('settings:socratic_verbose', 'local_ai_course_assistant'),

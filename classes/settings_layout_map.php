@@ -270,7 +270,7 @@ final class settings_layout_map {
             'sections' => [
                 ['new', 'modelcalls', [
                     'apibaseurl', 'temperature', 'claude_temperature_allow_prefixes',
-                    'backend_context_tokens', 'enable_thinking', 'ssrf_trusted_endpoints',
+                    'backend_context_tokens', 'enable_thinking', 'chat_show_model_picker', 'ssrf_trusted_endpoints',
                     'xai_proxy_url', 'xai_proxy_jwt_secret'
                 ]],
                 ['new', 'promptbudget', [

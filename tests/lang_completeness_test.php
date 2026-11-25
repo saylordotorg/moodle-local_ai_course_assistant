@@ -625,6 +625,9 @@ final class lang_completeness_test extends \basic_testcase {
         'layout:answeraudit',
         'settings:answer_audit_link',
         'settings:answer_audit_link_desc',
+        // 8.4.0: the chat model picker setting. English first.
+        'settings:chat_show_model_picker',
+        'settings:chat_show_model_picker_desc',
     ];
 
     /**
