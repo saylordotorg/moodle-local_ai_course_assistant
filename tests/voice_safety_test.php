@@ -585,6 +585,61 @@ final class voice_safety_test extends \advanced_testcase {
         $this->assertStringNotContainsString('<b>extension</b>', $html, 'escaped');
     }
 
+    public function test_a_question_with_no_answer_is_checked_on_the_question_and_recorded(): void {
+        global $DB;
+        // A learner's words can arrive after the session's last answer (or the session ends before one comes):
+        // the browser posts them alone when the session ends, and a distress statement must not go unrecorded.
+        [$course] = $this->student();
+        $cid = (int) $course->id;
+        set_config('answer_safety_mode', 'enforce', self::C);
+        set_config(voice_safety::ALLOW_SETTING, 1, self::C);
+        set_config('answer_check_sample_percent_general', 100, self::C);
+        $ticket = $this->ticket($cid);
+        $tasks = static fn(): int => $DB->count_records('task_adhoc',
+            ['classname' => '\\' . task\check_answer_claims::class]);
+
+        $result = check_voice_turn::execute($cid, $ticket, 4, 'I want to kill myself, nothing matters anymore', '');
+        $this->assertTrue($result['recorded']);
+        $this->assertTrue($result['wellbeing']);
+        $this->assertSame('warn', $result['action'], 'no audio to stop: the message is added to the transcript');
+        $this->assertSame(get_string('answer_rules:safe_wellbeing', self::C), $result['text']);
+        $row = $this->last_row($cid);
+        $this->assertSame('', (string) $row->answer);
+        $this->assertSame('I want to kill myself, nothing matters anymore', $row->question);
+        $rules = $this->rule_ids($row);
+        $this->assertSame('block', $rules['wellbeing.crisis'] ?? null);
+        $this->assertSame('none', $rules[voice_safety::QUESTION_ONLY_RULE] ?? null, 'the row says there was no answer');
+        $this->assertSame('none', $rules[voice_safety::MARKER_RULE] ?? null);
+        $this->assertSame('none', $rules['mode.enforce'] ?? null);
+        $this->assertSame([], array_filter(array_keys($rules), static fn(string $id): bool =>
+            str_starts_with($id, 'outcome.')), 'no outcome: no answer was delivered or replaced');
+        $this->assertContains('wellbeing', json_decode((string) $row->categories, true));
+        $this->assertSame(0, $tasks(), 'no claim check for a turn with no answer');
+        $pending = review_queue::pending_for_course($cid);
+        $this->assertSame((int) $row->id, (int) $pending[0]['sourceid']);
+        $this->assertSame(1, $pending[0]['priority'], 'the wellbeing item leads the queue');
+        $this->assertTrue($pending[0]['detail']['voice']);
+        $this->assertSame(get_string('answeraudit:flow_voice_question_only', self::C),
+            answer_labels::flow(voice_safety::QUESTION_ONLY_RULE));
+
+        // An ordinary question alone is recorded, changes nothing and makes no review item.
+        $result = check_voice_turn::execute($cid, $ticket, 5, 'What is unit 3 about?', '');
+        $this->assertSame(['recorded' => true, 'action' => 'none', 'text' => '', 'wellbeing' => false,
+            'reason' => 'ok'], $result);
+        $ordinary = $this->last_row($cid);
+        $this->assertNotContains((int) $ordinary->id, array_column(review_queue::pending_for_course($cid), 'sourceid'));
+
+        // Watch: recorded and flagged, nothing for the browser to do.
+        set_config('answer_safety_mode', 'watch', self::C);
+        $result = check_voice_turn::execute($cid, $ticket, 6, 'I want to kill myself', '');
+        $this->assertSame('none', $result['action']);
+        $this->assertTrue($result['wellbeing']);
+        $this->assertTrue($result['recorded']);
+
+        // Nothing on either side is still nothing.
+        $this->assertSame('empty', check_voice_turn::execute($cid, $ticket, 7, " \n", '')['reason']);
+    }
+
     // ---------- the endpoint against a hostile caller ----------
 
     public function test_a_turn_cannot_be_posted_with_someone_elses_ticket_or_for_another_course(): void {
@@ -676,7 +731,7 @@ final class voice_safety_test extends \advanced_testcase {
             str_repeat('a', voice_safety::MAX_ANSWER_BYTES + 1))['reason']);
         $this->assertSame('toolarge', check_voice_turn::execute($cid, $ticket, 1,
             str_repeat('a', voice_safety::MAX_QUESTION_BYTES + 1), self::BAD)['reason']);
-        $this->assertSame('empty', check_voice_turn::execute($cid, $ticket, 1, 'q', "  \n ")['reason']);
+        $this->assertSame('empty', check_voice_turn::execute($cid, $ticket, 1, ' ', "  \n ")['reason']);
         $this->assertSame(0, $DB->count_records(self::AUDIT));
     }
 
@@ -764,6 +819,18 @@ final class voice_safety_test extends \advanced_testcase {
         $this->assertSame('none', $this->rule_ids($this->last_row((int) $course->id))['outcome.check_failed'] ?? null);
         $this->assertTrue($DB->record_exists('local_ai_course_assistant_audit',
             ['action' => answer_audit::RULES_FAILED_ACTION, 'userid' => $user->id]));
+    }
+
+    public function test_a_failure_in_the_turn_is_logged_by_its_class_only(): void {
+        [$course, $user] = $this->student();
+        set_config('answer_safety_mode', 'enforce', self::C);
+        // A session id that is not a string makes building the marker throw, after the transcript was read.
+        $result = voice_safety::check_turn((int) $user->id, (int) $course->id, ['provider' => 'openai',
+            'session' => new \stdClass(), 'issued' => time()], 1, 'Can I get an extension?', self::BAD);
+        $this->assertSame(['recorded' => false, 'action' => 'none', 'text' => '', 'wellbeing' => false,
+            'reason' => 'error'], $result);
+        // The message of an exception can quote what it was given; the log line names the class only.
+        $this->assertDebuggingCalled('voice_safety: turn not checked: Error', DEBUG_DEVELOPER);
     }
 
     // ---------- the transcript goes when a text row's text goes ----------

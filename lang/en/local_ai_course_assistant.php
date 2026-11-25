@@ -4096,6 +4096,7 @@ $string['answeraudit:flow_outcome_retry_skipped_spend'] = 'Not written again: th
 $string['answeraudit:flow_outcome_check_failed'] = 'The rule check failed';
 $string['answeraudit:flow_voice_transcript'] = 'Live voice: transcript sent by the learner\'s browser, checked after the answer was spoken';
 $string['answeraudit:flow_voice_truncated'] = 'Live voice: the transcript was too long and was cut before the check';
+$string['answeraudit:flow_voice_question_only'] = 'Live voice: the learner\'s words came after the last answer of the session; only they were checked';
 $string['answeraudit:source'] = 'Source';
 $string['answeraudit:source_text'] = 'Text chat';
 $string['answeraudit:source_voice'] = 'Live voice';

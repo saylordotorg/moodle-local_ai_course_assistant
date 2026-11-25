@@ -63,7 +63,8 @@ class check_voice_turn extends external_api {
             'ticket' => new external_value(PARAM_RAW, 'The safety ticket get_realtime_token returned'),
             'turn' => new external_value(PARAM_INT, 'Turn number within the session, from 1'),
             'question' => new external_value(PARAM_RAW, 'Transcript of what the learner said', VALUE_DEFAULT, ''),
-            'answer' => new external_value(PARAM_RAW, 'Transcript of what the assistant said'),
+            'answer' => new external_value(PARAM_RAW,
+                'Transcript of what the assistant said; empty for the learner\'s words alone when the session ended'),
             'pageid' => new external_value(PARAM_INT, 'Course module id of the current page', VALUE_DEFAULT, 0),
         ]);
     }

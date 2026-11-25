@@ -75,6 +75,9 @@ class voice_safety {
     /** @var string Status entry (action none): a transcript was cut to the size cap before it was checked. */
     public const TRUNCATED_RULE = 'voice.truncated';
 
+    /** @var string Status entry of a turn with the learner's words and no answer (posted when the session ended). */
+    public const QUESTION_ONLY_RULE = 'voice.question_only';
+
     /** @var string The error code get_realtime_token refuses with; the browser turns it into the regular mode. */
     public const REFUSAL_STRING = 'realtime:err_answer_safety';
 
@@ -262,7 +265,11 @@ class voice_safety {
      * @param array $ticket verify_ticket()'s result
      * @param int $turn the turn number within the session, from 1
      * @param string $question the provider's transcript of what the learner said (untrusted)
-     * @param string $answer the provider's transcript of what the assistant said (untrusted)
+     * @param string $answer the provider's transcript of what the assistant said (untrusted); empty for a question
+     *     the browser posted on its own when the session ended (words that came after the last answer): the rules
+     *     read the question (a wellbeing rule fires on it as for a text turn), the row has no outcome entry and
+     *     says QUESTION_ONLY_RULE, no claim check is queued, and a replacement comes back as warn (there is no
+     *     audio to stop, so the browser adds the message to the transcript)
      * @param int $cmid the activity the learner is on, 0 for none
      * @return array{recorded: bool, action: string, text: string, wellbeing: bool, reason: string} action is
      *     none (do nothing), warn (add text to the transcript) or block (stop the audio; show and say text);
@@ -275,10 +282,11 @@ class voice_safety {
             $truncated = false;
             $question = self::clean($question, self::MAX_QUESTION_CHARS, $truncated);
             $answer = self::clean($answer, self::MAX_ANSWER_CHARS, $truncated);
-            if ($answer === '') {
+            if ($answer === '' && $question === '') {
                 $out['reason'] = 'empty';
                 return $out;
             }
+            $questiononly = $answer === '';
             $plan = answer_flow::plan($question, $courseid);
             if ($plan['mode'] === 'off') {
                 $out['reason'] = 'off';
@@ -298,12 +306,24 @@ class voice_safety {
                 answer_audit::log_rules_error($userid, $courseid, (string) $final['error']);
             }
             $rules = answer_flow::audit_rules($plan, $final);
+            if ($questiononly) {
+                // Nothing was answered, so nothing was delivered, warned or blocked: no outcome entry.
+                $rules = array_values(array_filter($rules, static fn(array $r): bool =>
+                    !str_starts_with((string) ($r['id'] ?? ''), 'outcome.')));
+                $rules[] = ['id' => self::QUESTION_ONLY_RULE, 'action' => 'none'];
+            }
             $rules[] = ['id' => self::MARKER_RULE, 'action' => 'none'];
             if ($truncated) {
                 $rules[] = ['id' => self::TRUNCATED_RULE, 'action' => 'none'];
             }
             $out['wellbeing'] = answer_rules::wellbeing_rule_fired($rules, (string) $plan['mode']);
-            if ($final['replace']) {
+            if ($final['replace'] && $questiononly) {
+                $text = trim((string) $final['text']);
+                if ($text !== '') {
+                    $out['action'] = 'warn';
+                    $out['text'] = $text;
+                }
+            } else if ($final['replace']) {
                 if ($final['action'] === 'block') {
                     $out['action'] = 'block';
                     $out['text'] = (string) $final['text'];
@@ -335,13 +355,16 @@ class voice_safety {
             if ($auditid) {
                 $out['recorded'] = true;
                 $out['reason'] = 'ok';
-                claim_checker::queue_for($auditid);
+                if (!$questiononly) {
+                    claim_checker::queue_for($auditid);
+                }
                 self::trim_conversation((int) $conv->id);
             }
             return $out;
         } catch (\Throwable $e) {
             // Fail safe, as the text path: nothing is done to the session, and the failure is counted.
-            debugging('voice_safety: turn not checked: ' . get_class($e) . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+            // The class only: the message can quote the transcript.
+            debugging('voice_safety: turn not checked: ' . get_class($e), DEBUG_DEVELOPER);
             answer_audit::log_rules_error($userid, $courseid, get_class($e));
             return ['recorded' => false, 'action' => 'none', 'text' => '', 'wellbeing' => false, 'reason' => 'error'];
         }
