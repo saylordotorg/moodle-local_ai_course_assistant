@@ -1655,7 +1655,7 @@ $string['instructor_dashboard:review_detail_question'] = 'Question';
 $string['instructor_dashboard:review_detail_answer'] = 'Answer';
 $string['instructor_dashboard:review_detail_claims'] = 'Claims';
 $string['instructor_dashboard:review_detail_rules'] = 'Rules fired';
-$string['instructor_dashboard:review_bad_outcome'] = 'That review outcome is not one SOLA knows.';
+$string['instructor_dashboard:review_bad_outcome'] = 'That review outcome is not one of the choices.';
 $string['instructor_dashboard:review_outcome_required'] = 'Choose an outcome before you resolve this item.';
 $string['instructor_dashboard:review_not_in_course'] = 'That review item is not in this course.';
 
@@ -4053,7 +4053,7 @@ $string['settingspage:adv_answer_safety_intro'] = 'Guidance rules, the backgroun
 $string['layout:answeraudit'] = 'Answer audit';
 $string['settings:answer_audit_link'] = 'Answer audit';
 $string['settings:answer_audit_link_desc'] = 'Each course\'s recorded answers, verdicts and counts are on its answer audit page, also linked from the AI Tutor Dashboard. Teachers see their own courses; administrators any course.';
-$string['settings:chat_show_model_picker'] = 'Show the LLM provider and model pickers in the chat (admins only)';
+$string['settings:chat_show_model_picker'] = 'Show the LLM provider and model pickers in the chat to people who can manage the assistant in a course';
 $string['settings:chat_show_model_picker_desc'] = 'When on, people who can manage the assistant in a course see two menus under the chat box and can answer a message with another provider or model from Providers and keys, for side-by-side comparison. Learners never see them. Default off: the menus are hidden and a chat request that names a provider or model is answered by the configured model.';
 $string['answeraudit:severity_high'] = 'High';
 $string['answeraudit:severity_medium'] = 'Medium';
