@@ -620,6 +620,10 @@ final class answer_audit_report_test extends \advanced_testcase {
         foreach (array_unique($m[1]) as $c) {
             $codes[$c] = answer_labels::flow($c);
         }
+        // The live voice entries voice_safety::check_turn() records.
+        foreach ([voice_safety::MARKER_RULE, voice_safety::TRUNCATED_RULE] as $c) {
+            $codes[$c] = answer_labels::flow($c);
+        }
         foreach ($codes as $code => $label) {
             $this->assertNotSame($code, $label, "{$code} has no label");
             $this->assertNotSame('', $label);

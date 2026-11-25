@@ -303,7 +303,7 @@ class review_queue {
                 $actionlikes[] = $DB->sql_like('rules', ':act' . $i);
                 $ruleparams['act' . $i] = '%"action":"' . $act . '"%';
             }
-            $rulebase = "SELECT id, userid, question, answer, chunks, rules, redacted, timecreated
+            $rulebase = "SELECT id, userid, mode, question, answer, chunks, rules, redacted, timecreated
                            FROM {" . answer_audit::TABLE . "}
                           WHERE courseid = :courseid AND kind = :kind AND rules IS NOT NULL
                                 AND (" . implode(' OR ', $actionlikes) . ")";
@@ -467,8 +467,9 @@ class review_queue {
      * @param array $claims verdict claims
      * @param array $rules [{id, action}]
      * @param array $cms cmid => activity name
-     * @return array{redacted: bool, question: string, answer: string, status: string, severity: string,
-     *     claims: array, rules: array, passages: int}
+     * @return array{redacted: bool, voice: bool, question: string, answer: string, status: string, severity: string,
+     *     claims: array, rules: array, passages: int} voice: a live voice turn, whose transcript the learner's browser
+     *     reported
      */
     private static function detail(\stdClass $a, string $status, string $severity, array $claims, array $rules,
             array $cms): array {
@@ -510,6 +511,7 @@ class review_queue {
         }
         return [
             'redacted' => $redacted,
+            'voice' => answer_audit_report::source($a) === answer_audit_report::SOURCE_VOICE,
             'question' => $redacted ? '' : (string) $a->question,
             'answer' => $redacted ? '' : \core_text::substr((string) $a->answer, 0, self::ANSWER_CHARS),
             'status' => $status,
@@ -690,6 +692,7 @@ class review_queue {
                 'outcome_required' => $answeritem,
                 'outcomes' => $outcomes,
                 'has_detail' => false,
+                'voice' => $answeritem && !empty($row['detail']['voice']),
             ];
             if ($answeritem && isset($row['detail'])) {
                 $d = $row['detail'];
@@ -742,6 +745,8 @@ class review_queue {
                 'col_resolve' => $str('review_col_resolve'),
                 'caption' => $str('review_caption'),
                 'audit_link' => $str('review_audit_link'),
+                'voice' => get_string('answeraudit:source_voice', self::COMPONENT),
+                'voice_note' => get_string('answeraudit:source_voice_note', self::COMPONENT),
             ],
         ];
     }

@@ -59,11 +59,11 @@
         "has_review": true, "review_heading": "Needs review", "review_intro": "Flagged exchanges.", "review_empty": "Nothing to review.", "review_auditurl": "#",
         "review_cols": {"when": "When", "source": "Source", "who": "Who", "summary": "Summary"},
         "review_formaction": "#", "review_courseid": 2, "review_range": 30, "review_gapdays": 7, "review_sesskey": "x",
-        "review_labels": {"resolve": "Mark resolved", "outcome": "Outcome", "outcome_none": "No outcome", "note": "Note", "detail": "Details", "question": "Question", "answer": "Answer", "claims": "Claims", "rules": "Rules fired", "text_removed": "Text removed", "priority": "High priority", "col_resolve": "Resolve", "caption": "Items waiting for review", "audit_link": "See every recorded answer in the answer audit"},
+        "review_labels": {"resolve": "Mark resolved", "outcome": "Outcome", "outcome_none": "No outcome", "note": "Note", "detail": "Details", "question": "Question", "answer": "Answer", "claims": "Claims", "rules": "Rules fired", "text_removed": "Text removed", "priority": "High priority", "col_resolve": "Resolve", "caption": "Items waiting for review", "audit_link": "See every recorded answer in the answer audit", "voice": "Live voice", "voice_note": "Live voice: this transcript was reported by the learner's browser and is not verified by the server"},
         "review_rows": [
             {"when": "2026-06-17 09:00", "sourcelabel": "Negative rating", "who": "Learner 7", "summary": "...", "priority_high": false, "source": "rating", "sourceid": 4, "formid": "aica-review-rating-4", "outcome_required": false, "has_detail": false,
              "outcomes": [{"value": "confirmed_bad", "label": "Confirmed bad"}, {"value": "false_alarm", "label": "False alarm"}]},
-            {"when": "2026-06-17 09:05", "sourcelabel": "Answer claim", "who": "Learner 7", "summary": "Contradicted claim", "priority_high": true, "source": "claim", "sourceid": 9, "formid": "aica-review-claim-9", "outcome_required": true, "has_detail": true,
+            {"when": "2026-06-17 09:05", "sourcelabel": "Answer claim", "who": "Learner 7", "summary": "Contradicted claim", "priority_high": true, "voice": true, "source": "claim", "sourceid": 9, "formid": "aica-review-claim-9", "outcome_required": true, "has_detail": true,
              "outcomes": [{"value": "content_gap", "label": "Content gap"}, {"value": "rule_too_strict", "label": "Rule too strict"}],
              "detail": {"redacted": false, "question": "When is the final due?", "answer": "Friday.", "has_verdict": true, "verdict": "Needs review, severity: High", "has_claims": true,
                  "claims": [{"text": "The final is due Friday.", "has_text": true, "meta": "Contradicts the course, severity: High. Evidence: Unit 2 schedule."}],
@@ -207,10 +207,12 @@
                 <td>
                     <span class="badge badge-secondary bg-secondary text-white">{{sourcelabel}}</span>
                     {{#priority_high}}<span class="badge badge-danger bg-danger text-white">{{review_labels.priority}}</span>{{/priority_high}}
+                    {{#voice}}<span class="badge badge-warning bg-warning text-dark aica-voice-badge">{{review_labels.voice}}</span>{{/voice}}
                 </td>
                 <td>{{who}}</td>
                 <td>
                     {{summary}}
+                    {{#voice}}<p class="mb-1 aica-voice-note"><small>{{review_labels.voice_note}}</small></p>{{/voice}}
                     {{#has_detail}}
                     <details class="aica-id-details">
                         <summary class="aica-id-summary">{{review_labels.detail}}</summary>

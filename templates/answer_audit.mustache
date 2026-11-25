@@ -39,10 +39,12 @@
     * jsonurl string - JSON export URL (with sesskey).
     * hasrows bool
     * emptytext string - Shown when there are no rows.
-    * rows array - id, time, learner, activity, verdict, rules, redacted, question, detailurl.
+    * rows array - id, time, learner, activity, verdict, voice, rules, redacted, question, detailurl. voice: a live
+      voice turn, labelled as reported by the learner's browser.
     * rowcount string
     * hasdetail bool
-    * detail object - answer_audit_report::detail() with labels: flow is a list of {label}, each passage has a
+    * detail object - answer_audit_report::detail() with labels (voice: a live voice turn, shown with a note that the
+      learner's browser reported it): flow is a list of {label}, each passage has a
       label, each verdict has headingid, status, checked, rules and claims of text, hastext, status, type, severity.
     * hastopics bool
     * topics array - topic, not_in_course, contradicted, total.
@@ -72,12 +74,12 @@
         "hasrows": true,
         "emptytext": "No answers match these filters.",
         "rows": [{"id": 7, "time": "24/11/26, 10:00", "learner": "Student 12", "activity": "Unit 1",
-            "verdict": "Needs review", "rules": "deadlines.date: Warning added", "redacted": false,
+            "verdict": "Needs review", "voice": false, "rules": "deadlines.date: Warning added", "redacted": false,
             "question": "When is the final due?", "detailurl": "#"}],
         "rowcount": "Answers shown: 1.",
         "hasdetail": true,
         "detail": {"id": 7, "backurl": "#", "time": "24 November 2026, 10:00", "learner": "Student 12",
-            "activity": "Unit 1", "provider": "openai", "model": "gpt-4o-mini", "mode": "text",
+            "activity": "Unit 1", "provider": "openai", "model": "gpt-4o-mini", "mode": "text", "voice": false,
             "hasquestion": true, "question": "When is the final due?", "hasanswer": true, "answer": "Friday.",
             "categories": "Deadlines and dates", "rules": "deadlines.date: Warning added",
             "hasflow": true, "flow": [{"label": "Mode: Enforce"}, {"label": "Warning added to the answer"}],
@@ -115,6 +117,8 @@
             <dd class="col-sm-9">{{learner}}</dd>
             <dt class="col-sm-3">{{#str}}answeraudit:col_activity, local_ai_course_assistant{{/str}}</dt>
             <dd class="col-sm-9">{{activity}}</dd>
+            <dt class="col-sm-3">{{#str}}answeraudit:source, local_ai_course_assistant{{/str}}</dt>
+            <dd class="col-sm-9">{{#voice}}<span class="badge badge-warning bg-warning text-dark">{{#str}}answeraudit:source_voice, local_ai_course_assistant{{/str}}</span> <span class="aica-voice-note">{{#str}}answeraudit:source_voice_note, local_ai_course_assistant{{/str}}</span>{{/voice}}{{^voice}}{{#str}}answeraudit:source_text, local_ai_course_assistant{{/str}}{{/voice}}</dd>
             <dt class="col-sm-3">{{#str}}answeraudit:question, local_ai_course_assistant{{/str}}</dt>
             <dd class="col-sm-9 aica-id-prewrap">{{#hasquestion}}{{question}}{{/hasquestion}}{{^hasquestion}}<em>{{#str}}answeraudit:text_removed, local_ai_course_assistant{{/str}}</em>{{/hasquestion}}</dd>
             <dt class="col-sm-3">{{#str}}answeraudit:answer, local_ai_course_assistant{{/str}}</dt>
@@ -255,7 +259,7 @@
                 <td>{{activity}}</td>
                 <td>{{verdict}}</td>
                 <td>{{rules}}</td>
-                <td>{{#redacted}}<em>{{#str}}answeraudit:text_removed, local_ai_course_assistant{{/str}}</em>{{/redacted}}{{^redacted}}{{question}}{{/redacted}}</td>
+                <td>{{#voice}}<span class="badge badge-warning bg-warning text-dark aica-voice-badge">{{#str}}answeraudit:source_voice, local_ai_course_assistant{{/str}}</span> {{/voice}}{{#redacted}}<em>{{#str}}answeraudit:text_removed, local_ai_course_assistant{{/str}}</em>{{/redacted}}{{^redacted}}{{question}}{{/redacted}}</td>
                 <td><a href="{{detailurl}}" aria-label="{{#str}}answeraudit:detail_heading, local_ai_course_assistant, {{id}}{{/str}}">{{#str}}answeraudit:open, local_ai_course_assistant{{/str}}</a></td>
             </tr>
             {{/rows}}

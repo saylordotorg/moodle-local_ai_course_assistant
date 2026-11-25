@@ -62,8 +62,14 @@ class answer_audit_report {
     public const FALSE_ALARM_OUTCOMES = ['false_alarm', 'rule_too_strict'];
 
     /** @var string[] Export columns, in order. */
-    public const COLUMNS = ['id', 'time', 'learner', 'activity', 'mode', 'model', 'provider', 'categories', 'rules',
-        'verdict', 'severity', 'claims', 'passages', 'redacted', 'question', 'answer', 'rowhash'];
+    public const COLUMNS = ['id', 'time', 'learner', 'activity', 'mode', 'source', 'model', 'provider', 'categories',
+        'rules', 'verdict', 'severity', 'claims', 'passages', 'redacted', 'question', 'answer', 'rowhash'];
+
+    /** @var string Export source of an answer the server streamed and stored itself. */
+    public const SOURCE_TEXT = 'text';
+
+    /** @var string Export source of a live voice turn: the transcript was posted by the learner's browser. */
+    public const SOURCE_VOICE = 'voice_transcript';
 
     /**
      * Stop the request unless the current user may read this course's audit.
@@ -223,6 +229,8 @@ class answer_audit_report {
             'learner' => anonymizer::name((int) $a->userid),
             'activity' => self::activity($a, $cms),
             'mode' => (string) ($a->mode ?? ''),
+            'source' => self::source($a),
+            'voice' => self::source($a) === self::SOURCE_VOICE,
             'model' => (string) ($a->model ?? ''),
             'provider' => (string) ($a->provider ?? ''),
             'redacted' => $redacted,
@@ -463,6 +471,7 @@ class answer_audit_report {
                 'learner' => anonymizer::name((int) $a->userid),
                 'activity' => self::activity($a, $cms),
                 'verdict' => self::status_label($v ? (string) $v->status : self::UNCHECKED),
+                'voice' => self::source($a) === self::SOURCE_VOICE,
                 'rules' => answer_labels::rules($rules),
                 'redacted' => $redacted,
                 'question' => $redacted ? '' : shorten_text((string) ($a->question ?? ''), 120),
@@ -684,6 +693,7 @@ class answer_audit_report {
             'learner' => anonymizer::name((int) $a->userid),
             'activity' => self::activity($a, $cms),
             'mode' => (string) ($a->mode ?? ''),
+            'source' => self::source($a),
             'model' => (string) ($a->model ?? ''),
             'provider' => (string) ($a->provider ?? ''),
             'categories' => implode(';', array_map('strval', self::json_scalars($a->categories))),
@@ -700,6 +710,17 @@ class answer_audit_report {
     }
 
     /**
+     * Where an answer row's text came from: SOURCE_VOICE for a live voice turn (mode voice: the learner's browser
+     * posted the transcript and the server cannot verify it), else SOURCE_TEXT.
+     *
+     * @param \stdClass $a answer row
+     * @return string
+     */
+    public static function source(\stdClass $a): string {
+        return (string) ($a->mode ?? '') === 'voice' ? self::SOURCE_VOICE : self::SOURCE_TEXT;
+    }
+
+    /**
      * Rules as "id:action" joined.
      *
      * @param array $rules
@@ -711,8 +732,9 @@ class answer_audit_report {
     }
 
     /**
-     * The status entries of a rules list (answer_flow::audit_rules(): ids mode.* and outcome.*, action none), as ids:
-     * the course mode and what happened to the answer. Shown in the detail view only.
+     * The status entries of a rules list (answer_flow::audit_rules(): ids mode.* and outcome.*, action none; and for
+     * a live voice turn voice.transcript and voice.truncated, voice_safety::check_turn()), as ids: the course mode,
+     * what happened to the answer and where its text came from. Shown in the detail view only.
      *
      * @param array $rules
      * @return string[]
@@ -721,7 +743,8 @@ class answer_audit_report {
         $out = [];
         foreach ($rules as $r) {
             if (is_array($r) && is_string($r['id'] ?? null) && ($r['action'] ?? null) === 'none'
-                    && (str_starts_with($r['id'], 'mode.') || str_starts_with($r['id'], 'outcome.'))) {
+                    && (str_starts_with($r['id'], 'mode.') || str_starts_with($r['id'], 'outcome.')
+                        || str_starts_with($r['id'], 'voice.'))) {
                 $out[] = $r['id'];
             }
         }

@@ -507,6 +507,76 @@ final class voice_safety_test extends \advanced_testcase {
         $this->assertTrue($watch['wellbeing']);
     }
 
+    public function test_a_live_voice_row_is_labelled_as_browser_reported_wherever_it_is_read(): void {
+        global $OUTPUT, $PAGE;
+        [$course] = $this->student();
+        $cid = (int) $course->id;
+        set_config('answer_safety_mode', 'enforce', self::C);
+        set_config(voice_safety::ALLOW_SETTING, 1, self::C);
+        $ticket = $this->ticket($cid);
+        check_voice_turn::execute($cid, $ticket, 1, 'Can I get an <b>extension</b>?', self::BAD);
+        $voice = $this->last_row($cid);
+        $this->assertSame('voice', $voice->mode);
+        // A text row with the same rule, recorded as sse.php records one.
+        $text = answer_audit::record(['messageid' => 999001, 'conversationid' => 999001,
+            'userid' => (int) $voice->userid, 'courseid' => $cid, 'mode' => 'text', 'question' => 'Typed question',
+            'answer' => self::BAD, 'categories' => ['deadlines'],
+            'rules' => [['id' => 'deadlines.extension_granted', 'action' => 'block']]]);
+        $note = get_string('answeraudit:source_voice_note', self::C);
+        $badge = get_string('answeraudit:source_voice', self::C);
+        $read = static fn(string $html): string => html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5);
+        $this->setAdminUser();
+
+        // The audit list: a badge on the voice row only.
+        $PAGE->set_url('/local/ai_course_assistant/answer_audit.php', ['courseid' => $cid]);
+        $filters = answer_audit_report::parse_filters('', '', '', '');
+        $ctx = answer_audit_report::template_context($cid, $filters);
+        $byid = array_column($ctx['rows'], 'voice', 'id');
+        $this->assertSame([(int) $voice->id => true, $text => false], [(int) $voice->id => $byid[(int) $voice->id],
+            $text => $byid[$text]]);
+        $html = $OUTPUT->render_from_template('local_ai_course_assistant/answer_audit', $ctx);
+        $this->assertSame(1, substr_count($html, 'aica-voice-badge'), 'one badge, on the voice row');
+        $this->assertStringContainsString($badge, $read($html));
+        $this->assertStringNotContainsString('<b>extension</b>', $html, 'escaped');
+
+        // The detail of the voice row: the note and the live voice status entry; of the text row: neither.
+        $html = $OUTPUT->render_from_template('local_ai_course_assistant/answer_audit',
+            answer_audit_report::template_context($cid, $filters, (int) $voice->id));
+        $this->assertStringContainsString($note, $read($html));
+        $this->assertStringContainsString(get_string('answeraudit:flow_voice_transcript', self::C), $read($html));
+        $this->assertStringNotContainsString(voice_safety::MARKER_RULE, $read($html), 'a label, never the code');
+        $html = $OUTPUT->render_from_template('local_ai_course_assistant/answer_audit',
+            answer_audit_report::template_context($cid, $filters, $text));
+        $this->assertStringNotContainsString($note, $read($html));
+        $this->assertStringContainsString(get_string('answeraudit:source_text', self::C), $read($html));
+        $this->assertSame('voice_transcript', answer_audit_report::detail($cid, (int) $voice->id)['source']);
+
+        // The exports: a source column and field.
+        $rows = array_column(answer_audit_report::export_rows($cid, []), null, 'id');
+        $this->assertSame('voice_transcript', $rows[(int) $voice->id]['source']);
+        $this->assertSame('text', $rows[$text]['source']);
+        $chain = answer_audit::verify_chain($cid);
+        $csv = answer_audit_report::to_csv(array_values($rows), $chain);
+        $this->assertContains('source', str_getcsv(explode("\n", $csv)[1]));
+        $json = json_decode(answer_audit_report::to_json(array_values($rows), $chain, []), true);
+        $this->assertEqualsCanonicalizing(['voice_transcript', 'text'], array_column($json['rows'], 'source'));
+
+        // The review queue: badge and the one line on the voice item only.
+        $pending = review_queue::pending_for_course($cid);
+        $items = array_column($pending, null, 'sourceid');
+        $this->assertTrue($items[(int) $voice->id]['detail']['voice']);
+        $this->assertFalse($items[$text]['detail']['voice']);
+        $PAGE->set_url(new \moodle_url('/local/ai_course_assistant/instructor_dashboard.php'));
+        $PAGE->set_context(\context_course::instance($cid));
+        $rctx = review_queue::template_context($pending, $cid, 30, 7);
+        $rctx['has_review'] = true;
+        $html = $OUTPUT->render_from_template('local_ai_course_assistant/instructor_dashboard', $rctx);
+        $this->assertSame(1, substr_count($html, 'aica-voice-badge'));
+        $this->assertSame(1, substr_count($html, 'aica-voice-note'));
+        $this->assertStringContainsString($note, $read($html));
+        $this->assertStringNotContainsString('<b>extension</b>', $html, 'escaped');
+    }
+
     // ---------- the endpoint against a hostile caller ----------
 
     public function test_a_turn_cannot_be_posted_with_someone_elses_ticket_or_for_another_course(): void {
