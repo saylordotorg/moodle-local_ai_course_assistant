@@ -153,6 +153,14 @@ final class voice_safety_test extends \advanced_testcase {
         $this->assertTrue(voice_safety::realtime_allowed($id), 'enforce, setting on');
     }
 
+    public function test_the_setting_label_does_not_say_avatar_answers_are_checked(): void {
+        // Final review I3: the avatar is never checked or recorded, so the label must not claim that it is.
+        $label = get_string('settings:' . voice_safety::ALLOW_SETTING, self::C);
+        $this->assertStringContainsString('voice answers are checked after they are spoken', $label);
+        $this->assertStringContainsString('avatar answers are not checked', $label);
+        $this->assertStringNotContainsString('(answers are checked', $label);
+    }
+
     public function test_the_course_mode_decides_not_the_site_mode(): void {
         $strict = $this->getDataGenerator()->create_course();
         $loose = $this->getDataGenerator()->create_course();
