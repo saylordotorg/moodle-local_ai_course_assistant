@@ -54,6 +54,11 @@ final class review_queue_answer_sources_test extends \advanced_testcase {
         set_config('answer_safety_mode', 'enforce', 'local_ai_course_assistant');
     }
 
+    protected function tearDown(): void {
+        review_queue::$wellbeingmax = review_queue::WELLBEING_MAX;
+        parent::tearDown();
+    }
+
     /**
      * Record an answer row.
      *
@@ -216,6 +221,57 @@ final class review_queue_answer_sources_test extends \advanced_testcase {
         $ctx = review_queue::template_context($rows, (int) $this->course->id, 7, 3);
         $this->assertTrue($ctx['review_rows'][0]['priority_high'], 'the wellbeing rule item gets the badge');
         $this->assertFalse($ctx['review_rows'][1]['priority_high']);
+    }
+
+    public function test_a_flood_of_wellbeing_rule_items_is_capped_newest_first_and_still_listed_first(): void {
+        // RT4: one learner (or a script) can trip the wellbeing rule as often as they like. The list used to load
+        // every one of those rows, text and all. Now: the newest WELLBEING_MAX, still ahead of everything else.
+        review_queue::$wellbeingmax = 5;
+        $cid = (int) $this->course->id;
+        $wb = [];
+        for ($i = 0; $i < 12; $i++) {
+            $wb[] = $this->answer($cid, [['id' => answer_rules::WELLBEING_RULE, 'action' => 'block']],
+                'I want to end it all ' . $i);
+        }
+        $other = $this->answer($cid, [['id' => 'deadlines.date', 'action' => 'block']]);
+        $rows = review_queue::pending_for_course($cid);
+        $first = array_slice($rows, 0, 5);
+        $this->assertSame(array_reverse(array_slice($wb, -5)), array_column($first, 'sourceid'), 'the newest five');
+        $this->assertSame([1, 1, 1, 1, 1], array_column($first, 'priority'));
+        $this->assertCount(6, $rows, 'the cap, plus the ordinary item: the second pass adds no more wellbeing items');
+        $this->assertSame($other, $rows[5]['sourceid']);
+
+        // Resolving the newest two makes room for the next two: resolved rows do not use up the cap.
+        foreach (array_slice($wb, -2) as $aid) {
+            review_queue::mark_resolved('rule', $aid, $cid, (int) $this->teacher->id, '', 'confirmed_bad');
+        }
+        $rows = review_queue::pending_for_course($cid);
+        $this->assertSame(array_reverse(array_slice($wb, -7, 5)), array_column(array_slice($rows, 0, 5), 'sourceid'));
+
+        // With the newest eight resolved, the four oldest are what is left, and they are listed.
+        foreach (array_slice($wb, -8, 6) as $aid) {
+            review_queue::mark_resolved('rule', $aid, $cid, (int) $this->teacher->id, '', 'confirmed_bad');
+        }
+        $rows = review_queue::pending_for_course($cid);
+        $this->assertSame(array_merge(array_reverse(array_slice($wb, 0, 4)), [$other]), array_column($rows, 'sourceid'));
+
+        // Rows that match the wellbeing filter but make no wellbeing item (a watch-action wellbeing rule recorded
+        // in Enforce) cannot push a real one out: they take places in the capped wellbeing pass, and the ordinary
+        // pass still finds what it skipped, up to the cap.
+        for ($i = 0; $i < 9; $i++) {
+            $this->answer($cid, [['id' => 'wellbeing.site_note', 'action' => 'watch']], 'note ' . $i);
+        }
+        $rows = review_queue::pending_for_course($cid);
+        $this->assertSame(array_merge(array_reverse(array_slice($wb, 0, 4)), [$other]), array_column($rows, 'sourceid'));
+        // And the ordinary pass keeps to the cap as well.
+        review_queue::$wellbeingmax = 3;
+        $rows = review_queue::pending_for_course($cid);
+        $this->assertSame(array_merge(array_reverse(array_slice($wb, 1, 3)), [$other]), array_column($rows, 'sourceid'));
+    }
+
+    public function test_the_wellbeing_cap_defaults(): void {
+        $this->assertSame(200, review_queue::WELLBEING_MAX);
+        $this->assertSame(review_queue::WELLBEING_MAX, review_queue::$wellbeingmax);
     }
 
     public function test_a_watch_wellbeing_rule_recorded_in_watch_stays_first_after_the_course_moves_to_enforce(): void {

@@ -61,6 +61,12 @@ class review_queue {
     /** @var int the answer is cut to this many characters in the detail */
     public const ANSWER_CHARS = 1500;
 
+    /** @var int Most wellbeing rule items one course's list shows (the newest; the rest appear as these are resolved). */
+    public const WELLBEING_MAX = 200;
+
+    /** @var int WELLBEING_MAX; tests lower it. */
+    public static int $wellbeingmax = self::WELLBEING_MAX;
+
     /**
      * Pending (unresolved) queue rows for a course, newest first.
      *
@@ -304,19 +310,35 @@ class review_queue {
             $seen = [];
             // A rule item for a wellbeing rule (id wellbeing.*) is what the claim check's wellbeing model flag would
             // have been (claim_checker::wellbeing_caught() suppresses the flag then): priority 1, listed first and,
-            // like the flag, never counted toward $limit. Taken first, with no cap, so a busy course can't hide it.
-            $rs = $DB->get_recordset_sql($rulebase . " AND " . $DB->sql_like('rules', ':wb') . " ORDER BY id DESC",
-                $ruleparams + ['wb' => '%"id":"wellbeing.%']);
+            // like the flag, never counted toward $limit, so a busy course can't hide it. Taken first, newest first,
+            // and bounded in SQL (8.4.0 red team, RT4): the newest $wellbeingmax unresolved rows, so a learner or a
+            // script that trips the rule thousands of times cannot make this page load every one of those
+            // questions and answers. Resolved rows are left out in SQL, so resolving the ones shown brings up the
+            // next ones.
+            $wblike = $DB->sql_like('rules', ':wb');
+            $notresolved = "NOT EXISTS (SELECT 1 FROM {local_ai_course_assistant_review_res} rr
+                                         WHERE rr.source = :rsource AND rr.sourceid = {" . answer_audit::TABLE . "}.id)";
+            $wbparams = ['wb' => '%"id":"wellbeing.%'];
+            $wellbeingitems = 0;
+            $max = max(1, self::$wellbeingmax);
+            $rs = $DB->get_recordset_sql($rulebase . " AND $wblike AND $notresolved ORDER BY id DESC",
+                $ruleparams + $wbparams + ['rsource' => 'rule'], 0, $max);
             foreach ($rs as $a) {
                 $item = self::rule_candidate($a, $mode, $claimanswers, $resolvedkeys);
                 if ($item !== null && $item['wellbeing']) {
                     $seen[(int) $a->id] = true;
                     $items[] = self::rule_item($a, $item['rules'], self::latest_verdict((int) $a->id), true);
+                    $wellbeingitems++;
                 }
             }
             $rs->close();
 
-            $rs = $DB->get_recordset_sql($rulebase . " ORDER BY id DESC", $ruleparams);
+            // Every other rule item. Once the wellbeing cap is full this pass leaves the wellbeing rows out in SQL,
+            // so a flood is not read a second time; below the cap it still picks up a wellbeing item the first pass
+            // did not reach (rows that matched its filter without making an item took its places), up to the cap.
+            $full = $wellbeingitems >= $max;
+            $rs = $DB->get_recordset_sql($rulebase . ($full ? ' AND NOT (' . $wblike . ')' : '') . " ORDER BY id DESC",
+                $ruleparams + ($full ? $wbparams : []));
             $ruleitems = 0;
             foreach ($rs as $a) {
                 if ($ruleitems >= $limit) {
@@ -326,11 +348,13 @@ class review_queue {
                     continue;
                 }
                 $item = self::rule_candidate($a, $mode, $claimanswers, $resolvedkeys);
-                if ($item === null) {
+                if ($item === null || ($item['wellbeing'] && $wellbeingitems >= $max)) {
                     continue;
                 }
                 $items[] = self::rule_item($a, $item['rules'], self::latest_verdict((int) $a->id), $item['wellbeing']);
-                if (!$item['wellbeing']) {
+                if ($item['wellbeing']) {
+                    $wellbeingitems++;
+                } else {
                     $ruleitems++;
                 }
             }
