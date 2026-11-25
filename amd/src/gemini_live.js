@@ -344,6 +344,10 @@ define([], function() {
     var started = false;
     /** @type {boolean} */
     var modelTurnOpen = false;
+    /** @type {number} 8.4.0 answer safety: assistant turns finished in this session. */
+    var turnSeq = 0;
+    /** @type {boolean} 8.4.0: the model has said something in the turn that is under way. */
+    var turnHasOutput = false;
     /** @type {number} */
     var sessionStartMs = 0;
     /** @type {number} */
@@ -445,6 +449,8 @@ define([], function() {
         var startAt = Math.max(audioCtx.currentTime + 0.01, playHead);
         src.start(startAt);
         playHead = startAt + buf.duration;
+        // 8.4.0: which turn this audio belongs to, so a blocked turn can be silenced without touching a later one.
+        src.turnNo = turnSeq + 1;
         playing.push(src);
         src.onended = function() {
             playing = playing.filter(function(p) {
@@ -472,12 +478,34 @@ define([], function() {
             replyPendingSince = Date.now();
             cb.onTranscript('user', ev.userText);
         }
+        if (ev.userText && cb.onTurnText) {
+            cb.onTurnText('user', ev.userText);
+        }
         if (ev.modelText) {
             replyPendingSince = 0;
+            turnHasOutput = true;
             var shown = modelTextFilter.push(ev.modelText);
             if (shown && cb.onTranscript) {
                 cb.onTranscript('assistant', shown);
             }
+            // 8.4.0: the same text is what the answer check reads.
+            if (shown && cb.onTurnText) {
+                cb.onTurnText('assistant', shown);
+            }
+        }
+    };
+
+    /**
+     * 8.4.0 answer safety: the assistant's turn is over (finished, or cut off by the learner). Counted once.
+     */
+    var endTurn = function() {
+        if (!turnHasOutput) {
+            return;
+        }
+        turnHasOutput = false;
+        turnSeq += 1;
+        if (cb.onTurnEnd) {
+            cb.onTurnEnd(turnSeq);
         }
     };
 
@@ -504,10 +532,13 @@ define([], function() {
             modelTurnOpen = false;
             modelTextFilter = makeMarkerFilter();
             setState('listening');
+            // What was said before the interruption is still an answer to check.
+            endTurn();
         }
         if (ev.audio.length) {
             replyPendingSince = 0;
             modelTurnOpen = true;
+            turnHasOutput = true;
             ev.audio.forEach(function(a) {
                 enqueueAudio(a.data, a.mime);
             });
@@ -525,6 +556,7 @@ define([], function() {
             if (!playing.length && currentState === 'speaking') {
                 setState('idle');
             }
+            endTurn();
             // Audio only: no chip marker can ride along, so offer the caller's chips.
             if (cb.onSuggestions && cb.fallbackChips && cb.fallbackChips.length) {
                 cb.onSuggestions(cb.fallbackChips.slice());
@@ -659,6 +691,8 @@ define([], function() {
         micStreamIn = micStreamParam || null;
         started = false;
         modelTurnOpen = false;
+        turnSeq = 0;
+        turnHasOutput = false;
         replyPendingSince = 0;
         modelTextFilter = makeMarkerFilter();
         usageTotal = {prompt: 0, response: 0};
@@ -829,7 +863,39 @@ define([], function() {
         if (cb.onTranscript) {
             cb.onTranscript('user', text);
         }
+        if (cb.onTurnText) {
+            cb.onTurnText('user', text + ' ');
+        }
         send({clientContent: {turns: [{role: 'user', parts: [{text: text}]}], turnComplete: true}});
+    };
+
+    /**
+     * Stop the audio of one assistant turn at once (8.4.0: a guidance rule blocked it). Only that turn: audio of
+     * a later answer is left alone. The Live API has no message that cancels a finished turn, so nothing is sent.
+     *
+     * @param {number} turn The turn number onTurnEnd reported
+     * @returns {boolean} Whether audio was stopped
+     */
+    var stopSpeaking = function(turn) {
+        var stopped = false;
+        playing = playing.filter(function(src) {
+            if (src.turnNo !== turn) {
+                return true;
+            }
+            try {
+                src.onended = null;
+                src.stop();
+            } catch (e) { /* Already stopped. */ }
+            stopped = true;
+            return false;
+        });
+        if (!playing.length) {
+            playHead = 0;
+            if (!modelTurnOpen && currentState === 'speaking') {
+                setState('idle');
+            }
+        }
+        return stopped;
     };
 
     var ellInstructions = function(name) {
@@ -841,6 +907,7 @@ define([], function() {
         disconnect: disconnect,
         isConnected: isConnected,
         sendText: sendText,
+        stopSpeaking: stopSpeaking,
         ELL_INSTRUCTIONS: ELL_INSTRUCTIONS,
         ellInstructions: ellInstructions,
         // Pure helpers, exported for tests/js/gemini-live-check.js.

@@ -32,7 +32,8 @@ define([
     'local_ai_course_assistant/path_map',
     'core/str',
     'local_ai_course_assistant/gemini_live',
-], function(UI, SSE, Repo, Speech, Realtime, Voice, I18nStrings, PathMap, Str, GeminiLive) {
+    'local_ai_course_assistant/voice_safety',
+], function(UI, SSE, Repo, Speech, Realtime, Voice, I18nStrings, PathMap, Str, GeminiLive, VoiceSafety) {
 
     /**
      * The live voice session, whichever engine runs it: OpenAI/xAI Realtime or Gemini Live (8.2.0).
@@ -3587,6 +3588,9 @@ define([
         // closed (no more spend) but the overlay stays, with a Resume button.
         var stoppedForSilence = false;
         var resumingAfterSilence = false;
+        // 8.4.0 answer safety: one number per connection, so a verdict that comes back after the session ended or
+        // was resumed can't act on the new one (turn numbers start again with every connection).
+        var liveConnection = 0;
         var startSession = function(selection) {
             if (sessionStarted) { return; }
             sessionStarted = true;
@@ -3634,6 +3638,46 @@ define([
                 resumingAfterSilence = false;
                 let initialTextSent = false;
 
+                // 8.4.0 answer safety. The server sends a ticket only while the course's mode is Watch or Enforce;
+                // without one there is no tracker, nothing is collected and nothing is posted (as in 8.3.2). With
+                // one, every finished turn is posted and the guidance rules check it AFTER it was spoken: a block
+                // stops what is left of the audio, and the safe message is shown and spoken once; a warning adds
+                // its line to the transcript and leaves the audio alone.
+                liveConnection += 1;
+                const connection = liveConnection;
+                const isThisConnection = function() {
+                    return connection === liveConnection && isCurrentVoiceSessionRequest(sessionRequestId);
+                };
+                const safety = VoiceSafety.create({
+                    ticket: result.safetyticket || '',
+                    post: function(turn) {
+                        return Repo.checkVoiceTurn(courseId, Object.assign({pageid: currentPageId || 0}, turn));
+                    },
+                    stop: function(turn) {
+                        if (isThisConnection() && engine.stopSpeaking) {
+                            engine.stopSpeaking(turn);
+                        }
+                    },
+                    onBlock: function(text) {
+                        if (!isThisConnection()) {
+                            return;
+                        }
+                        UI.replaceVoiceTranscript('assistant', text);
+                        VoiceSafety.speak(text, {
+                            ttsUrl: root ? (root.dataset.ttsurl || '') : '',
+                            courseId: courseId,
+                            sessKey: root ? (root.dataset.sesskey || '') : '',
+                            voice: isGemini ? '' : voice,
+                            audioCtx: audioCtx,
+                        });
+                    },
+                    onWarn: function(text) {
+                        if (isThisConnection()) {
+                            UI.appendVoiceTranscript('assistant', '\n' + text);
+                        }
+                    },
+                });
+
                 engine.connect(
                     token,
                     instructions,
@@ -3646,6 +3690,8 @@ define([
                         sessionId: result.sessionid || 0,
                         maxSeconds: result.maxseconds || 0,
                         idleSeconds: result.idleseconds || 0,
+                        onTurnText: safety ? safety.text : null,
+                        onTurnEnd: safety ? safety.turnEnd : null,
                         onIdleStop: function() {
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                                 return;
@@ -3694,6 +3740,10 @@ define([
                             UI.appendVoiceTranscript(role, text);
                         },
                         onStateChange: function(state) {
+                            if (state === 'disconnected' && safety) {
+                                // A last turn still waiting for the learner's transcript is sent as it is.
+                                safety.flush();
+                            }
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                                 return;
                             }
@@ -3764,6 +3814,12 @@ define([
                     fallBackToRegularVoice(selection);
                     return;
                 }
+                // 8.4.0: the course is in Enforce mode and the site does not offer live voice there. The regular
+                // voice mode goes through the guidance rules, so carry on in it, with the server's own words.
+                if (err && err.errorcode === 'realtime:err_answer_safety' && canFallBack()) {
+                    fallBackToRegularVoice(selection, err.message);
+                    return;
+                }
                 UI.setVoiceState('disconnected');
                 teardownVoiceSessionUi();
                 addAssistantMsg(formatRealtimeVoiceStartError(err));
@@ -3785,12 +3841,14 @@ define([
          * Switch to the regular voice mode, saying so.
          *
          * @param {string} selection The topic the learner picked
+         * @param {string=} message What to tell the learner (the server's message), else the built-in line
          */
-        var fallBackToRegularVoice = function(selection) {
+        var fallBackToRegularVoice = function(selection, message) {
             UI.stopMouthSync();
             UI.setVoiceState('disconnected');
             teardownVoiceSessionUi();
-            addAssistantMsg('Live voice isn\'t available right now, so this conversation uses the regular voice mode.');
+            addAssistantMsg(message ||
+                'Live voice isn\'t available right now, so this conversation uses the regular voice mode.');
             startLegacyPracticeSpeaking(root, selection);
         };
 

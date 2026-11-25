@@ -21,9 +21,10 @@
  *
  * A planted-defect run at the end breaks a copy of the source seven ways and requires the checks to fail each time.
  *
- * What it can't check: real audio, a real microphone, a real provider. The realtime voice modes (Gemini Live,
- * OpenAI and xAI realtime) and the talking avatar never pass through sse.php at all, so no rule sees them; that is
- * a known limit of 8.4.0, not something this check covers.
+ * What it can't check: real audio, a real microphone, a real provider. The live voice modes (Gemini Live, OpenAI
+ * and xAI realtime) never pass through sse.php, so there is no replace event for them: their turns are posted and
+ * checked after they are spoken, which tests/js/voice-safety-check.js covers. The talking avatar speaks inside the
+ * vendor's frame and is not checked at all (in Enforce mode it is off unless the site allows it).
  *
  * Run: node tests/js/voice-replace-check.js
  */
