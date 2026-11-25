@@ -302,7 +302,8 @@ class claim_checker {
      * Check one recorded answer and append its verdict.
      *
      * @param int $auditid the answer row
-     * @return array{done: bool, reason: string, verdictid: ?int, status: ?string} done is false for a no-op
+     * @return array{done: bool, reason: string, verdictid: ?int, status: ?string} done is false for a no-op ('checked':
+     *     the answer already has a verdict, which is returned)
      */
     public static function check(int $auditid): array {
         global $DB;
@@ -325,6 +326,14 @@ class claim_checker {
         $courseid = (int) $row->courseid;
         if (!answer_audit::is_enabled($courseid)) {
             return $noop('off');
+        }
+        // A task run again (a worker that died after writing the verdict) must not bill the judge again, add a
+        // second verdict or post a second correction.
+        $existing = $DB->get_records(answer_audit::TABLE, ['kind' => 'verdict', 'supersedes' => $auditid], 'id ASC',
+            'id, status', 0, 1);
+        if ($existing) {
+            $v = reset($existing);
+            return ['done' => false, 'reason' => 'checked', 'verdictid' => (int) $v->id, 'status' => (string) $v->status];
         }
 
         if (!self::spend_allows($courseid)) {

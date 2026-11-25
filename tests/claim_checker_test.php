@@ -388,6 +388,33 @@ final class claim_checker_test extends \advanced_testcase {
         $this->assertSame('high', $verdict->severity);
     }
 
+    public function test_a_re_run_check_of_an_answer_already_checked_is_a_noop(): void {
+        global $DB;
+        // A worker that died after writing the verdict makes Moodle run the task again: no second judge call (it
+        // is billed), no second verdict, no second correction.
+        set_config('answer_safety_mode', 'enforce', 'local_ai_course_assistant');
+        $turn = $this->answer('When is the exam?', 'The exam is on 3 May.');
+        $this->judge_says([['text' => 'The exam is on 3 May.', 'type' => 'date', 'status' => 'contradicted',
+            'evidence' => 0]]);
+        $first = claim_checker::check($turn['auditid']);
+        $this->assertTrue($first['done']);
+        $calls = count(stub_provider::$calls);
+        $corrections = $DB->count_records('local_ai_course_assistant_msgs',
+            ['interaction_type' => correction_notice::INTERACTION_TYPE]);
+        $msgs = $DB->count_records('local_ai_course_assistant_msgs');
+        $this->judge_says([['text' => 'The exam is on 3 May.', 'type' => 'date', 'status' => 'contradicted',
+            'evidence' => 0]]);
+        $again = claim_checker::check($turn['auditid']);
+        $this->assertFalse($again['done']);
+        $this->assertSame('checked', $again['reason']);
+        $this->assertSame($first['verdictid'], $again['verdictid'], 'the existing verdict is reported');
+        $this->assertCount($calls, stub_provider::$calls, 'the judge is not called again');
+        $this->assertCount(1, $this->verdicts($turn['auditid']));
+        $this->assertSame($corrections, $DB->count_records('local_ai_course_assistant_msgs',
+            ['interaction_type' => correction_notice::INTERACTION_TYPE]));
+        $this->assertSame($msgs, $DB->count_records('local_ai_course_assistant_msgs'), 'no spend row either');
+    }
+
     public function test_wellbeing_model_flag(): void {
         // The regex floor missed it (no wellbeing category on the row); the judge flags the question.
         $turn = $this->answer('honestly what is even the point of going on', 'Let us look at your goals.');
