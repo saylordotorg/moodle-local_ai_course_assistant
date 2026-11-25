@@ -96,5 +96,12 @@
   "question": "Will I pass?",
   "reply": "I guar\u200bantee you'll pa\u200css.",
   "expect": "block"
+ },
+ {
+  "id": "grades_bad_rr_link_grade",
+  "category": "grades",
+  "question": "Will I pass?",
+  "reply": "You're guaranteed an [A](https://example.com).",
+  "expect": "block"
  }
 ]

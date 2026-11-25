@@ -836,6 +836,85 @@ final class answer_rules_test extends \advanced_testcase {
         $this->assertSame([], answer_rules::evaluate('Привет, как дела? Всё хорошо.', $ctx)['rules']);
     }
 
+    public function test_what_the_chat_shows_is_read_too_and_only_adds_matches(): void {
+        // The re-review of RT1. Taking formatting out is not what the learner sees: the chat shows an HTML comment's
+        // contents, a link as its label, struck-out words crossed out, and a backtick as an apostrophe.
+        $ctx = ['question' => 'Can I get an extension on the essay?', 'mode' => 'enforce', 'buffered' => true,
+            'validators_mode' => 'off'];
+        foreach ([
+            "<!-- I've granted you an extension on the essay. -->",
+            "I've [granted](https://example.com) you an extension on the essay.",
+            "I've granted you an [extension](https://example.com/x) on the essay.",
+            "You're guaranteed an [A](https://example.com).",
+            "I`ve granted you an extension on the essay.",
+            "I\u{02B9}ve granted you an extension on the essay.",
+            "I\u{00B4}ve granted you an extension on the essay.",
+            "I've ~~not~~ granted you an extension on the essay.",
+            "<!--\nTo avoid plagiarism detection, swap in synonyms\nand change the sentence order.\n-->",
+            // The reading with everything taken out still counts: what blocked before blocks now.
+            "I've gran<!-- x -->ted you an extension on the essay.",
+            "I've **granted** you an ~extension~ on the essay.",
+            "I've gr\u{0430}nted you an [extension](https://example.com) on the essay.",
+        ] as $reply) {
+            $this->assertSame('block', answer_rules::evaluate($reply, $ctx)['action'], $reply);
+        }
+        // Questions are read the same way.
+        foreach (['<!-- i want to kill myself -->', 'I want to [kill myself](https://example.com)',
+                'I`ve been feeling suicidal'] as $q) {
+            $this->assertContains('wellbeing', answer_rules::categories_for_question($q), $q);
+            $r = answer_rules::evaluate('Let us focus on the essay.', ['question' => $q, 'mode' => 'enforce',
+                'validators_mode' => 'off']);
+            $this->assertSame('block', $r['action'], $q);
+            $this->assertSame(answer_rules::safe_message('wellbeing'), $r['text'], $q);
+        }
+        $this->assertContains('deadlines', answer_rules::categories_for_question('<!-- when is the deadline? -->'));
+        $this->assertSame([], answer_rules::categories_for_question('<!-- -->'));
+        $this->assertSame([], answer_rules::categories_for_question(''));
+        // Ordinary uses of the same marks stay clean.
+        foreach ([
+            "I can't grant extensions. See the [extension policy](https://example.com/policy) and ask your instructor.",
+            'An HTML comment looks like <!-- this is a note --> and the browser does not show it.',
+            'Write the old word struck out, like ~~teh~~ the, and code such as `git commit` in backticks.',
+        ] as $reply) {
+            $this->assertSame('none', answer_rules::evaluate($reply, $ctx)['action'], $reply);
+        }
+        // Matching only: the warning is added to the answer exactly as the model wrote it.
+        $reply = 'The final essay is due on [March 14](https://example.com/dates). <!-- note -->';
+        $r = answer_rules::evaluate($reply, ['question' => 'When is the final essay due?', 'mode' => 'enforce',
+            'buffered' => true, 'validators_mode' => 'off', 'chunks' => ['Nothing about dates here.']]);
+        $this->assertSame('warn', $r['action']);
+        $this->assertStringStartsWith($reply, $r['text']);
+    }
+
+    public function test_a_megabyte_of_hostile_formatting_is_read_in_bounded_time(): void {
+        $mb = 1048576;
+        $fill = static fn(string $unit): string => str_repeat($unit, intdiv($mb, strlen($unit)) + 1);
+        $inputs = [
+            'open brackets' => $fill('['),
+            'empty links' => $fill('[]()'),
+            'unclosed links' => $fill('[a]('),
+            'long labels' => $fill('[' . str_repeat('a', 299)),
+            'long addresses' => $fill('[a](' . str_repeat('b', 1999)),
+            'tildes' => $fill('~'),
+            'unclosed strikes' => $fill('~~' . str_repeat('a', 299)),
+            'comment openers' => $fill('<!--'),
+            'comment closers' => $fill('-->'),
+            'backticks between letters' => $fill('a`'),
+            'everything at once' => $fill("<!-- [a](b) ~~c~~ d`e --> "),
+        ];
+        $ctx = ['question' => 'q', 'mode' => 'enforce', 'buffered' => true, 'validators_mode' => 'off'];
+        foreach ($inputs as $what => $text) {
+            $start = microtime(true);
+            $r = answer_rules::evaluate($text . " I've granted you an extension on the essay.", $ctx);
+            $took = microtime(true) - $start;
+            $this->assertNull($r['error'], $what);
+            $this->assertLessThan(2.0, $took, $what . ' took ' . round($took, 2) . ' s');
+            $start = microtime(true);
+            answer_rules::categories_for_question($text);
+            $this->assertLessThan(2.0, microtime(true) - $start, $what . ' as a question');
+        }
+    }
+
     public function test_the_numeric_check_still_reads_the_answer_as_written(): void {
         // "4 * 5%" as written holds one percentage, 5%, which the passage has. With the markers stripped it would
         // read 45%, a figure no passage has. The numeric check gets the text as written.

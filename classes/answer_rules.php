@@ -70,6 +70,12 @@ use local_ai_course_assistant\validators\hallucination_validator;
  * text delivered and stored is the answer as the model wrote it. A site pattern that looks for one of * _ ` ~
  * literally can no longer match, because the text it is given has none.
  *
+ * More than one reading (the re-review of RT1): taking formatting out is not always what the learner sees. The chat
+ * shows an HTML comment's contents as text, a markdown link as its label and ~~struck~~ words crossed out, and a
+ * backtick between letters reads as an apostrophe. shown() adds those readings and a rule fires when ANY reading
+ * matches, so a reading can only add a match. Still not read: letters spaced or hyphenated apart ("g r a n t e d",
+ * "gran-ted"), combining marks stacked on letters, and scripts outside the look-alike list.
+ *
  * Fail safe: evaluate() never throws. Any error returns action 'none' with 'error' set, so the caller delivers the
  * answer unchanged and records check_failed; the one exception is a wellbeing question, which is checked first and
  * still gets its block (enforce) or watch when anything after that fails.
@@ -676,16 +682,16 @@ class answer_rules {
      */
     public static function categories_for_question(string $q): array {
         try {
-            $text = self::normalise($q);
-            if ($text === '') {
+            $readings = self::readings($q);
+            if (!$readings) {
                 return [];
             }
             $found = [];
-            if (self::is_wellbeing_text($text)) {
+            if (self::is_wellbeing_text($q)) {
                 $found['wellbeing'] = true;
             }
             $siterules = self::site_rules();
-            foreach (self::readings($text) as $reading) {
+            foreach ($readings as $reading) {
                 foreach (self::QUESTION_KEYWORDS as $category => $keywords) {
                     if (!isset($found[$category]) && self::keywords_match($keywords, $reading)) {
                         $found[$category] = true;
@@ -718,15 +724,13 @@ class answer_rules {
     }
 
     /**
-     * Whether a question reads as a learner in distress or crisis (the built-in phrases and patterns only).
+     * Whether a question reads as a learner in distress or crisis (the built-in phrases and patterns only), in any
+     * of its readings().
      *
-     * @param string $text normalised
+     * @param string $text as the learner wrote it
      * @return bool
      */
     private static function is_wellbeing_text(string $text): bool {
-        if ($text === '') {
-            return false;
-        }
         $patterns = self::wellbeing_patterns();
         foreach (self::readings($text) as $reading) {
             if (self::keywords_match(self::WELLBEING_PHRASES, $reading)) {
@@ -771,7 +775,7 @@ class answer_rules {
             }
             $wellbeing = isset($ctx['categories']) && is_array($ctx['categories'])
                 ? in_array('wellbeing', $ctx['categories'], true)
-                : self::is_wellbeing_text(self::normalise(is_string($ctx['question'] ?? null) ? $ctx['question'] : ''));
+                : self::is_wellbeing_text(is_string($ctx['question'] ?? null) ? $ctx['question'] : '');
         } catch (\Throwable $e) {
             $result['error'] = get_class($e);
             return $result;
@@ -806,8 +810,7 @@ class answer_rules {
      */
     private static function evaluate_rules(string $reply, array $ctx, string $mode, bool $wellbeing,
             array $result): array {
-        $question = self::normalise(is_string($ctx['question'] ?? null) ? $ctx['question'] : '');
-        $answer = self::normalise($reply);
+        $question = is_string($ctx['question'] ?? null) ? $ctx['question'] : '';
         $categories = isset($ctx['categories']) && is_array($ctx['categories'])
             ? array_values(array_intersect(self::CATEGORIES, $ctx['categories']))
             : self::categories_for_question($question);
@@ -817,13 +820,17 @@ class answer_rules {
         $result['categories'] = $categories;
         $chunks = self::chunk_texts($ctx['chunks'] ?? []);
         $chunktext = self::normalise(implode("\n", $chunks));
-        // Each text as written and, when it holds look-alike letters, with those folded to Latin. A reply reading is
-        // checked against the course text read the same way.
+        // Every reading of each text (readings()): with the formatting removed, as the chat shows it, and each of
+        // those with look-alike letters folded to Latin. A rule fires when ANY reading matches, so a reading can
+        // only add a match. A folded reply reading is checked against the course text folded the same way.
         $questions = self::readings($question);
-        $answers = [[$answer, $chunktext]];
-        $answerfolded = self::folded($answer);
-        if ($answerfolded !== null) {
-            $answers[] = [$answerfolded, self::folded($chunktext) ?? $chunktext];
+        $answers = [];
+        foreach (self::shown($reply) as $reading) {
+            $answers[] = [$reading, $chunktext];
+            $folded = self::folded($reading);
+            if ($folded !== null) {
+                $answers[] = [$folded, self::folded($chunktext) ?? $chunktext];
+            }
         }
 
         $fired = [];
@@ -1331,23 +1338,99 @@ class answer_rules {
      * zero-width characters and shows a fullwidth letter much like the plain one. So before a rule looks at a text:
      * invalid UTF-8 is scrubbed, format characters (zero-width space and joiners, soft hyphen, bidi marks, variation
      * selectors) are removed, compatibility forms are folded (NFKC: fullwidth letters, ligatures, no-break spaces),
-     * curly apostrophes are made straight, HTML comments are removed, and the markdown emphasis, code and strike
-     * markers (* _ ` ~) are removed. Look-alike letters from other scripts are handled separately by folded().
+     * curly apostrophes and apostrophe look-alikes are made straight, HTML comments are removed, and the markdown
+     * emphasis, code and strike markers (* _ ` ~) are removed. This is ONE reading of the text, the one with all
+     * formatting taken out. It is not always what the learner sees (the chat shows an HTML comment as text, a link
+     * as its label, struck-out words as struck out): shown() adds those readings, and folded() the look-alike
+     * letters of other scripts.
      *
      * @param string $text
      * @return string
      */
     private static function normalise(string $text): string {
+        $text = self::unformatted($text);
+        if (strpos($text, '<!--') !== false) {
+            $text = preg_replace('~<!--.*?-->~su', '', $text) ?? $text;
+        }
+        return self::without_markers($text);
+    }
+
+    /**
+     * The first steps of normalise(): valid UTF-8, no format characters, compatibility forms folded, apostrophes
+     * straight. Markdown and HTML comments are still in it.
+     *
+     * @param string $text
+     * @return string
+     */
+    private static function unformatted(string $text): string {
         $text = self::plain($text);
         if (preg_match('~[^\x00-\x7F]~', $text)) {
             $text = preg_replace('~[\p{Cf}\x{034F}\x{180B}-\x{180D}\x{FE00}-\x{FE0F}]+~u', '', $text) ?? $text;
             $text = self::nfkc($text);
             $text = self::plain($text);
         }
-        if (strpos($text, '<!--') !== false) {
-            $text = preg_replace('~<!--.*?-->~su', '', $text) ?? $text;
-        }
+        return $text;
+    }
+
+    /**
+     * The text without the markdown emphasis, code and strike markers.
+     *
+     * @param string $text
+     * @return string
+     */
+    private static function without_markers(string $text): string {
         return strpbrk($text, '*_`~') === false ? $text : str_replace(['*', '_', '`', '~'], '', $text);
+    }
+
+    /**
+     * The ways a text can be read, each ready for matching: normalise() first (all formatting taken out), then,
+     * only when they differ, the text as the chat shows it. MATCHING ONLY, and a rule fires when ANY reading
+     * matches, so a reading can only ADD a match; nothing here can hide text from a rule.
+     *
+     * What the chat shows differs from normalise() in four ways, and each one hid a phrase from the rules:
+     *  - an HTML comment is NOT hidden by the chat (markdown.js escapes "<"), so its contents are on the screen:
+     *    here the comment marks go and the contents stay;
+     *  - a markdown link or image shows as its label: [label](address) and ![label](address) become label;
+     *  - a backtick between two letters is an apostrophe to the eye ("I`ve"): it becomes one;
+     *  - struck-out words (~~not~~) are shown crossed out: one more reading leaves them out, so crossed-out text
+     *    can't cancel a rule ("I've ~~not~~ granted you an extension"). The reading that keeps them stays too.
+     *
+     * Every step is one linear pass with bounded repeats (a label up to 300 characters, an address up to 2,000,
+     * struck text up to 300), so a megabyte of brackets or tildes costs milliseconds.
+     *
+     * @param string $text as written
+     * @return string[] one to three texts, the normalise() reading first; never empty
+     */
+    private static function shown(string $text): array {
+        $base = self::unformatted($text);
+        $out = [self::normalise($text)];
+        $comment = strpos($base, '<!--') !== false || strpos($base, '-->') !== false;
+        $link = strpos($base, '](') !== false;
+        $tick = strpos($base, '`') !== false && preg_match('~\pL`\pL~u', $base) === 1;
+        $strike = strpos($base, '~~') !== false;
+        if (!$comment && !$link && !$tick && !$strike) {
+            return $out;
+        }
+        foreach ($strike ? [false, true] : [false] as $dropstruck) {
+            $t = $base;
+            if ($comment) {
+                $t = str_replace(['<!--', '-->'], ' ', $t);
+            }
+            if ($link) {
+                $t = preg_replace('~!?\[([^\[\]\n]{0,300})\]\([^()\s]{0,2000}\)~u', '$1', $t) ?? $t;
+            }
+            if ($tick) {
+                $t = preg_replace('~(?<=\pL)`(?=\pL)~u', "'", $t) ?? $t;
+            }
+            if ($dropstruck) {
+                $t = preg_replace('#~~[^~\n]{1,300}~~#u', ' ', $t) ?? $t;
+            }
+            $t = self::without_markers($t);
+            if (!in_array($t, $out, true)) {
+                $out[] = $t;
+            }
+        }
+        return $out;
     }
 
     /**
@@ -1359,7 +1442,10 @@ class answer_rules {
      */
     private static function plain(string $text): string {
         $text = mb_scrub($text, 'UTF-8');
-        return str_replace(["\u{2019}", "\u{2018}", "\u{02BC}"], "'", $text);
+        // Curly quotes, the modifier apostrophe, and the marks typed in place of one: prime, acute accent, reversed
+        // quote. (A backtick used as an apostrophe is markdown too, so shown() handles it as one more reading.)
+        return str_replace(["\u{2019}", "\u{2018}", "\u{02BC}", "\u{02B9}", "\u{00B4}", "\u{2032}", "\u{201B}"],
+            "'", $text);
     }
 
     /**
@@ -1398,14 +1484,25 @@ class answer_rules {
     }
 
     /**
-     * A text as the rules read it: as written, then with look-alike letters folded when it has any.
+     * Every reading of a text: each shown() reading, and each of those with look-alike letters folded when it has
+     * any. Empty readings are left out.
      *
-     * @param string $text normalised
-     * @return string[] one or two texts
+     * @param string $text as written
+     * @return string[] no texts for an empty text, otherwise one to six
      */
     private static function readings(string $text): array {
-        $folded = self::folded($text);
-        return $folded === null ? [$text] : [$text, $folded];
+        $out = [];
+        foreach (self::shown($text) as $reading) {
+            if (trim($reading) === '') {
+                continue;
+            }
+            $out[] = $reading;
+            $folded = self::folded($reading);
+            if ($folded !== null) {
+                $out[] = $folded;
+            }
+        }
+        return $out;
     }
 
     /**
