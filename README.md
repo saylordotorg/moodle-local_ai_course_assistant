@@ -11,7 +11,7 @@ A 2:38 tour, recorded on version 8.0.0 on a Saylor test site in a demo course wi
 ## Version 8.4.0
 
 **Release Date:** November 2026
-**Plugin build:** 2026112304
+**Plugin build:** 2026112305
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0, 5.1 and 5.3. `version.php` declares support through 5.3.
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+
