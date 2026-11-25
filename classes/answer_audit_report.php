@@ -101,11 +101,13 @@ class answer_audit_report {
         }
         $since = self::day_start($from);
         $until = self::day_start($to);
+        // The end of the "to" day is the next day's start minus a second: a daylight-saving day has 23 or 25 hours.
+        $untilend = $until ? self::day_start($to, 1) - 1 : 0;
         return [
             'verdict' => $verdict,
             'rule' => $rule,
             'since' => $since,
-            'until' => $until ? $until + DAYSECS - 1 : 0,
+            'until' => $untilend,
             'from' => $since ? $from : '',
             'to' => $until ? $to : '',
         ];
@@ -309,15 +311,32 @@ class answer_audit_report {
             }
         }
         $rs->close();
-        $outcomes = $DB->get_records_select_menu('local_ai_course_assistant_review_res',
-            "courseid = :courseid AND source = :source AND outcome <> ''",
-            ['courseid' => $courseid, 'source' => 'rule'], '', 'sourceid, outcome');
+        // A teacher's outcome is recorded per answer, not per rule, so it counts toward a rule only on an answer where
+        // that rule was the one content rule that fired. The rule item's own outcome first; else the claim item's,
+        // which hid the rule item when both existed (review_queue::rule_candidate()).
+        $outcomes = [];
+        $rs = $DB->get_recordset_select('local_ai_course_assistant_review_res',
+            "courseid = :courseid AND source IN ('rule', 'claim') AND outcome <> ''",
+            ['courseid' => $courseid], '', 'id, source, sourceid, outcome');
+        foreach ($rs as $res) {
+            $sid = (int) $res->sourceid;
+            if ($res->source === 'rule' || !isset($outcomes[$sid])) {
+                $outcomes[$sid] = (string) $res->outcome;
+            }
+        }
+        $rs->close();
+        $rulecount = [];
+        foreach ($fired as $aids) {
+            foreach ($aids as $aid) {
+                $rulecount[$aid] = ($rulecount[$aid] ?? 0) + 1;
+            }
+        }
         $rules = [];
         foreach ($fired as $id => $aids) {
             $reviewed = 0;
             $falsealarms = 0;
             foreach ($aids as $aid) {
-                if (!isset($outcomes[$aid])) {
+                if (!isset($outcomes[$aid]) || $rulecount[$aid] !== 1) {
                     continue;
                 }
                 $reviewed++;
@@ -833,15 +852,17 @@ class answer_audit_report {
     }
 
     /**
-     * The start of a YYYY-MM-DD day in the user's timezone, or 0.
+     * The start of a YYYY-MM-DD day (or of the day $plusdays after it) in the user's timezone, or 0.
      *
      * @param string $day
+     * @param int $plusdays
      * @return int
      */
-    private static function day_start(string $day): int {
+    private static function day_start(string $day, int $plusdays = 0): int {
         if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', trim($day), $m) || !checkdate((int) $m[2], (int) $m[3], (int) $m[1])) {
             return 0;
         }
-        return (int) make_timestamp((int) $m[1], (int) $m[2], (int) $m[3]);
+        // make_timestamp() normalises day 32 to the next month's first.
+        return (int) make_timestamp((int) $m[1], (int) $m[2], (int) $m[3] + $plusdays);
     }
 }

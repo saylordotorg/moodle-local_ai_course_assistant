@@ -481,6 +481,62 @@ final class answer_audit_report_test extends \advanced_testcase {
         $this->assertEqualsWithDelta(1.0, $rules[1]['falsealarmrate'], 0.0001);
     }
 
+    public function test_an_outcome_counts_only_for_an_answer_where_one_content_rule_fired(): void {
+        $cid = (int) $this->course->id;
+        $tid = (int) $this->teacher->id;
+        $a = ['id' => 'deadlines.date', 'action' => 'warn'];
+        $b = ['id' => 'grades.promise', 'action' => 'block'];
+        // Both rules fired; the teacher's "too strict" was about one of them, and the report cannot tell which.
+        $both = $this->answer($cid, [$a, $b]);
+        review_queue::mark_resolved('rule', $both, $cid, $tid, '', 'rule_too_strict');
+        // One rule fired (plus a status entry, which is not a content rule): counted.
+        $one = $this->answer($cid, [$b, ['id' => 'claim_check.spend', 'action' => 'none']]);
+        review_queue::mark_resolved('rule', $one, $cid, $tid, '', 'confirmed_bad');
+        // The same rule twice on one answer is still one rule.
+        $twice = $this->answer($cid, [$a, $a]);
+        review_queue::mark_resolved('rule', $twice, $cid, $tid, '', 'false_alarm');
+
+        $rules = array_column(answer_audit_report::report($cid)['rules'], null, 'rule');
+        $this->assertSame(2, $rules['deadlines.date']['hits']);
+        $this->assertSame(1, $rules['deadlines.date']['reviewed'], 'the two-rule answer is not counted');
+        $this->assertSame(1, $rules['deadlines.date']['falsealarms']);
+        $this->assertSame(2, $rules['grades.promise']['hits']);
+        $this->assertSame(1, $rules['grades.promise']['reviewed']);
+        $this->assertSame(0, $rules['grades.promise']['falsealarms'], 'the other rule gets no false alarm from it');
+    }
+
+    public function test_an_outcome_on_the_claim_item_counts_for_the_single_rule_it_hid(): void {
+        $cid = (int) $this->course->id;
+        $tid = (int) $this->teacher->id;
+        $rule = [['id' => 'deadlines.date', 'action' => 'warn']];
+        // A claim item exists for the answer, so its rule item is hidden; the teacher resolved the claim item.
+        $hidden = $this->answer($cid, $rule);
+        $this->verdict($hidden, 'needs_review', [$this->claim('contradicted')]);
+        review_queue::mark_resolved('claim', $hidden, $cid, $tid, '', 'rule_too_strict');
+        // Both items resolved: the rule item's own outcome wins.
+        $own = $this->answer($cid, $rule);
+        review_queue::mark_resolved('rule', $own, $cid, $tid, '', 'confirmed_bad');
+        review_queue::mark_resolved('claim', $own, $cid, $tid, '', 'false_alarm');
+        // A claim outcome on an answer where two rules fired is not counted either.
+        $two = $this->answer($cid, array_merge($rule, [['id' => 'grades.promise', 'action' => 'block']]));
+        review_queue::mark_resolved('claim', $two, $cid, $tid, '', 'false_alarm');
+
+        $rules = array_column(answer_audit_report::report($cid)['rules'], null, 'rule');
+        $this->assertSame(3, $rules['deadlines.date']['hits']);
+        $this->assertSame(2, $rules['deadlines.date']['reviewed']);
+        $this->assertSame(1, $rules['deadlines.date']['falsealarms']);
+        $this->assertSame(0, $rules['grades.promise']['reviewed']);
+    }
+
+    public function test_the_to_date_ends_at_the_next_days_start_on_a_daylight_saving_day(): void {
+        $this->setTimezone('America/New_York');
+        // 2026-03-08 is 23 hours long in New York, 2026-11-01 25 hours.
+        foreach (['2026-03-08' => [2026, 3, 9], '2026-11-01' => [2026, 11, 2], '2026-02-10' => [2026, 2, 11]] as $day => $next) {
+            $f = answer_audit_report::parse_filters('', '', '', $day);
+            $this->assertSame(make_timestamp($next[0], $next[1], $next[2]) - 1, $f['until'], $day);
+        }
+    }
+
     public function test_report_rule_with_no_review_has_no_false_alarm_rate(): void {
         $cid = (int) $this->course->id;
         $this->answer($cid, [['id' => 'deadlines.date', 'action' => 'warn']]);
