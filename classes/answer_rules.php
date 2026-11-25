@@ -1390,13 +1390,14 @@ class answer_rules {
      * What the chat shows differs from normalise() in four ways, and each one hid a phrase from the rules:
      *  - an HTML comment is NOT hidden by the chat (markdown.js escapes "<"), so its contents are on the screen:
      *    here the comment marks go and the contents stay;
-     *  - a markdown link or image shows as its label: [label](address) and ![label](address) become label;
+     *  - a markdown link or image shows as its label: [label](address) and ![label](address) become label, read
+     *    exactly as markdown.js reads one (link_labels());
      *  - a backtick between two letters is an apostrophe to the eye ("I`ve"): it becomes one;
      *  - struck-out words (~~not~~) are shown crossed out: one more reading leaves them out, so crossed-out text
      *    can't cancel a rule ("I've ~~not~~ granted you an extension"). The reading that keeps them stays too.
      *
-     * Every step is one linear pass with bounded repeats (a label up to 300 characters, an address up to 2,000,
-     * struck text up to 300), so a megabyte of brackets or tildes costs milliseconds.
+     * Every step is one linear pass (links by link_labels(), struck text up to 300 characters), so a megabyte of
+     * brackets or tildes costs milliseconds.
      *
      * @param string $text as written
      * @return string[] one to three texts, the normalise() reading first; never empty
@@ -1417,7 +1418,7 @@ class answer_rules {
                 $t = str_replace(['<!--', '-->'], ' ', $t);
             }
             if ($link) {
-                $t = preg_replace('~!?\[([^\[\]\n]{0,300})\]\([^()\s]{0,2000}\)~u', '$1', $t) ?? $t;
+                $t = self::link_labels($t);
             }
             if ($tick) {
                 $t = preg_replace('~(?<=\pL)`(?=\pL)~u', "'", $t) ?? $t;
@@ -1431,6 +1432,64 @@ class answer_rules {
             }
         }
         return $out;
+    }
+
+    /**
+     * The text with every markdown link and image written as its label, matched exactly as the chat's renderer
+     * matches one (amd/src/markdown.js processInline(), one line at a time): "[", a label of one or more
+     * characters up to the first "]", then "(", an address of one or more characters up to the first ")", then ")".
+     * Neither part crosses a line break, the address may hold spaces, quotes and "(", and there is no length limit,
+     * so "[granted](https://example.com "t")" and "[granted](x y)" read as "granted", as the learner sees them. A
+     * "!" just before the link (an image) goes too.
+     *
+     * Written as a scan, not a regular expression: each candidate's match is decided by the next "]", ")" and line
+     * break after it, which are remembered until the scan passes them, so the whole text costs one pass however
+     * many unclosed brackets it holds (a regular expression would rescan to the line's end from every "[").
+     *
+     * @param string $text valid UTF-8 (every mark looked for is ASCII, so byte offsets are safe)
+     * @return string
+     */
+    private static function link_labels(string $text): string {
+        $len = strlen($text);
+        $out = '';
+        $copied = 0;
+        $close = -1;
+        $paren = -1;
+        $nl = -1;
+        $s = 0;
+        while ($s < $len && ($s = strpos($text, '[', $s)) !== false) {
+            if ($close <= $s) {
+                $close = strpos($text, ']', $s + 1);
+                if ($close === false) {
+                    break;
+                }
+            }
+            if ($nl <= $s) {
+                $found = strpos($text, "\n", $s + 1);
+                $nl = $found === false ? $len : $found;
+            }
+            $j = $close;
+            if ($j === $s + 1 || $j + 1 >= $len || $text[$j + 1] !== '(') {
+                $s++;
+                continue;
+            }
+            if ($paren <= $j + 1) {
+                $paren = strpos($text, ')', $j + 2);
+                if ($paren === false) {
+                    break;
+                }
+            }
+            $k = $paren;
+            // The ")" must come before the line ends (and so must the "]", which is before it).
+            if ($k > $nl || $k === $j + 2) {
+                $s++;
+                continue;
+            }
+            $start = ($s > $copied && $text[$s - 1] === '!') ? $s - 1 : $s;
+            $out .= substr($text, $copied, $start - $copied) . substr($text, $s + 1, $j - $s - 1);
+            $copied = $s = $k + 1;
+        }
+        return $copied === 0 ? $text : $out . substr($text, $copied);
     }
 
     /**

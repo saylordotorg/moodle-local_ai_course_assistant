@@ -855,12 +855,19 @@ final class answer_rules_test extends \advanced_testcase {
             "I've gran<!-- x -->ted you an extension on the essay.",
             "I've **granted** you an ~extension~ on the essay.",
             "I've gr\u{0430}nted you an [extension](https://example.com) on the essay.",
+            // The chat takes everything up to the first ")" on the line as the address (markdown.js), so these
+            // show as "I've granted you an extension on the essay." too: a title, a space, a "(", a long address.
+            "I've [granted](https://example.com \"t\") you an extension on the essay.",
+            "I've [granted](x y) you an extension on the essay.",
+            "I've [granted](https://example.com/a(b) you an extension on the essay.",
+            "I've [granted](https://example.com/" . str_repeat('a', 2100) . ") you an extension on the essay.",
+            "I've ![granted](x y) you an extension on the essay.",
         ] as $reply) {
             $this->assertSame('block', answer_rules::evaluate($reply, $ctx)['action'], $reply);
         }
         // Questions are read the same way.
         foreach (['<!-- i want to kill myself -->', 'I want to [kill myself](https://example.com)',
-                'I`ve been feeling suicidal'] as $q) {
+                'I`ve been feeling suicidal', 'i want to [kill](a b) myself'] as $q) {
             $this->assertContains('wellbeing', answer_rules::categories_for_question($q), $q);
             $r = answer_rules::evaluate('Let us focus on the essay.', ['question' => $q, 'mode' => 'enforce',
                 'validators_mode' => 'off']);
@@ -886,6 +893,32 @@ final class answer_rules_test extends \advanced_testcase {
         $this->assertStringStartsWith($reply, $r['text']);
     }
 
+    public function test_links_are_read_exactly_as_the_chat_renderer_reads_them(): void {
+        // markdown.js, one line at a time: /\[([^\]]+)\]\(([^)]+)\)/g shows the label. Expected values were checked
+        // against that expression in node (and 20,000 random strings of "[]()!\n ab" agreed with it).
+        $method = new \ReflectionMethod(answer_rules::class, 'link_labels');
+        $method->setAccessible(true);
+        $cases = [
+            '[granted](https://example.com "t") you' => 'granted you',
+            '[granted](x y) you' => 'granted you',
+            '[granted](https://e.com/a(b) you' => 'granted you',
+            '![granted](g.png) you' => 'granted you',
+            '[a [b](u)' => 'a [b',
+            '[a](x[b](y) z' => 'a z',
+            '[a](b) [c](d)' => 'a c',
+            "[kill\nmyself](x)" => "[kill\nmyself](x)",
+            "[a](b\n)" => "[a](b\n)",
+            "[a](b\n[c](d)" => "[a](b\nc",
+            '[](x) []() [a]()' => '[](x) []() [a]()',
+            '[a] (b)' => '[a] (b)',
+            '[a](b' => '[a](b',
+            'no links here' => 'no links here',
+        ];
+        foreach ($cases as $in => $want) {
+            $this->assertSame($want, $method->invoke(null, $in), json_encode($in));
+        }
+    }
+
     public function test_a_megabyte_of_hostile_formatting_is_read_in_bounded_time(): void {
         $mb = 1048576;
         $fill = static fn(string $unit): string => str_repeat($unit, intdiv($mb, strlen($unit)) + 1);
@@ -895,6 +928,11 @@ final class answer_rules_test extends \advanced_testcase {
             'unclosed links' => $fill('[a]('),
             'long labels' => $fill('[' . str_repeat('a', 299)),
             'long addresses' => $fill('[a](' . str_repeat('b', 1999)),
+            'unclosed spaced addresses' => $fill('[a](b c '),
+            'nested openers' => $fill('[[a]('),
+            'link starts' => $fill(']('),
+            'labels with no address' => $fill('[a] '),
+            'openers then one close' => $fill('[') . '](x',
             'tildes' => $fill('~'),
             'unclosed strikes' => $fill('~~' . str_repeat('a', 299)),
             'comment openers' => $fill('<!--'),

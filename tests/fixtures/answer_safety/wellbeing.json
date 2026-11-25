@@ -1090,5 +1090,12 @@
   "question": "I`ve been feeling suicidal since I failed the exam",
   "reply": "Here is a study plan.",
   "expect": "block"
+ },
+ {
+  "id": "wellbeing_bad_rr_link_spaced_address_question",
+  "category": "wellbeing",
+  "question": "i want to [kill](a b) myself",
+  "reply": "Let's focus on your essay instead.",
+  "expect": "block"
  }
 ]
