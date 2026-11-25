@@ -3673,10 +3673,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Tirada ugu badan ee hubi
 $string['settings:answer_check_course_daily_cap'] = 'Hubinta sheegashada: xadka maalinlaha ah ee hal koorso';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Tirada ugu badan ee hubinta sheegashada ee safka la geliyo maalintii ee hal koorso. Jawaabaha xadka dhaafa lama hubiyo maalintaas. Waxay ka hortagtaa in hal koorso oo mashquul ah ay dhammeyso xadka maalinlaha ah ee bogga. 0 waxay ka dhigan tahay inaan xad lahayn hal koorso; xadka boggu weli wuu shaqeynayaa. Asalka 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Oggolow codka waqtiga-dhabta ah iyo avatar-ka habka Fulin (jawaabaha waxaa la hubiyaa ka dib marka la dhaho)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Oggolow codka waqtiga-dhabta ah iyo avatar-ka habka Fulin (jawaabaha codka waxaa la hubiyaa ka dib marka la dhaho; jawaabaha avatar-ka lama hubiyo)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Asal ahaan waa damsan yahay: habka Fulin, codka tooska ah iyo avatar-ka hadlaya lama bixiyo, ardayduna waxay helaan habka codka caadiga ah, kaas oo jawaabihiisa la hubiyo ka hor inta aan la maqlin. Marka la shido, jawaabta codka tooska ah waxaa la hubiyaa isla marka la dhaho ka dib, sidaa darteed qayb ka mid ah ama dhammaanteed waa la maqli karaa ka hor inta aan la joojin. Jawaabaha avatar-ka lama hubiyo lamana duubo. Koorso leh hab u gaar ah waxay raacdaa habkaas.';
 $string['realtime:err_answer_safety'] = 'Codka tooska ah lagama heli karo koorsadan. Beddelkeeda isticmaal habka codka caadiga ah ama sheekaysiga.';
 $string['talking_avatar:answer_safety'] = 'Avatar-ka hadlaya lagama heli karo koorsadan. Beddelkeeda isticmaal sheekaysiga ama habka codka.';
 $string['answeraudit:flow_voice_transcript'] = 'Codka tooska ah: qoraalka hadalka ee uu soo diray biraawsarka ardaygu, waxaa la hubiyay ka dib markii jawaabta la yidhi';
 $string['answeraudit:flow_voice_truncated'] = 'Codka tooska ah: qoraalka hadalku aad buu u dheeraa waana la gooyay hubinta ka hor';
+$string['answeraudit:source'] = 'Isha';
+$string['answeraudit:source_text'] = 'Sheekaysi qoraal ah';
+$string['answeraudit:source_voice'] = 'Codka tooska ah';
+$string['answeraudit:source_voice_note'] = 'Codka tooska ah: qoraalkan hadalka waxaa soo sheegay biraawsarka ardayga, mana xaqiijin seerfarku';
 $string['privacy:metadata:answer_audit:mode'] = 'In jawaabta la qoray ama lagu yidhi codka tooska ah. Codka tooska ah waxaa la kaydiyaa qoraalka hadalka. Wax cod ah lama kaydiyo.';

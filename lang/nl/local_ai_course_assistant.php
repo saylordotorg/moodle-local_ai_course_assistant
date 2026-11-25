@@ -3652,10 +3652,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Het maximale aantal bewe
 $string['settings:answer_check_course_daily_cap'] = 'Beweringscontrole: daglimiet voor één cursus';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Het maximale aantal beweringscontroles dat per dag in de wachtrij komt voor één cursus. Antwoorden boven de limiet worden die dag niet gecontroleerd. Zo kan één drukke cursus de daglimiet van de site niet opmaken. 0 betekent geen limiet voor één cursus; de limiet van de site blijft gelden. Standaard 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Realtime spraak en de avatar toestaan in de modus Afdwingen (antwoorden worden gecontroleerd nadat ze zijn uitgesproken)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Realtime spraak en de avatar toestaan in de modus Afdwingen (spraakantwoorden worden gecontroleerd nadat ze zijn uitgesproken; antwoorden van de avatar worden niet gecontroleerd)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Standaard uit: in de modus Afdwingen worden live spraak en de pratende avatar niet aangeboden en krijgen cursisten de gewone spraakmodus, waarvan de antwoorden worden gecontroleerd voordat ze te horen zijn. Staat dit aan, dan wordt een live gesproken antwoord direct na het uitspreken gecontroleerd, zodat een deel of het hele antwoord te horen kan zijn voordat het wordt gestopt. Antwoorden van de avatar worden niet gecontroleerd of vastgelegd. Een cursus met een eigen modus volgt die modus.';
 $string['realtime:err_answer_safety'] = 'Live spraak is niet beschikbaar in deze cursus. Gebruik de gewone spraakmodus of de chat.';
 $string['talking_avatar:answer_safety'] = 'De pratende avatar is niet beschikbaar in deze cursus. Gebruik de chat of de spraakmodus.';
 $string['answeraudit:flow_voice_transcript'] = 'Live spraak: transcript verzonden door de browser van de cursist, gecontroleerd nadat het antwoord was uitgesproken';
 $string['answeraudit:flow_voice_truncated'] = 'Live spraak: het transcript was te lang en is voor de controle ingekort';
+$string['answeraudit:source'] = 'Bron';
+$string['answeraudit:source_text'] = 'Tekstchat';
+$string['answeraudit:source_voice'] = 'Live spraak';
+$string['answeraudit:source_voice_note'] = 'Live spraak: dit transcript is gemeld door de browser van de cursist en niet geverifieerd door de server';
 $string['privacy:metadata:answer_audit:mode'] = 'Of het antwoord is geschreven of live is uitgesproken. Bij live spraak wordt het transcript vastgelegd. Er wordt geen audio opgeslagen.';

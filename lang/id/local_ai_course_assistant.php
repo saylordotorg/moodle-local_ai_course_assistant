@@ -3681,10 +3681,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Jumlah terbanyak pemerik
 $string['settings:answer_check_course_daily_cap'] = 'Pemeriksaan klaim: batas harian untuk satu kursus';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Jumlah terbanyak pemeriksaan klaim yang diantrekan per hari untuk satu kursus. Jawaban yang melewati batas tidak diperiksa hari itu. Ini mencegah satu kursus yang ramai menghabiskan batas harian situs. 0 berarti tanpa batas untuk satu kursus; batas situs tetap berlaku. Bawaan 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Izinkan suara waktu nyata dan avatar dalam mode Terapkan (jawaban diperiksa setelah diucapkan)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Izinkan suara waktu nyata dan avatar dalam mode Terapkan (jawaban suara diperiksa setelah diucapkan; jawaban avatar tidak diperiksa)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Nonaktif secara default: dalam mode Terapkan, suara langsung dan avatar bicara tidak ditawarkan, dan peserta mendapat mode suara biasa, yang jawabannya diperiksa sebelum terdengar. Jika diaktifkan, jawaban suara langsung diperiksa segera setelah diucapkan, sehingga sebagian atau seluruh jawaban dapat terdengar sebelum dihentikan. Jawaban avatar tidak diperiksa dan tidak dicatat. Kursus yang memiliki mode sendiri mengikuti mode tersebut.';
 $string['realtime:err_answer_safety'] = 'Suara langsung tidak tersedia di kursus ini. Gunakan mode suara biasa atau obrolan.';
 $string['talking_avatar:answer_safety'] = 'Avatar bicara tidak tersedia di kursus ini. Gunakan obrolan atau mode suara.';
 $string['answeraudit:flow_voice_transcript'] = 'Suara langsung: transkrip dikirim oleh peramban peserta, diperiksa setelah jawaban diucapkan';
 $string['answeraudit:flow_voice_truncated'] = 'Suara langsung: transkrip terlalu panjang dan dipotong sebelum pemeriksaan';
+$string['answeraudit:source'] = 'Sumber';
+$string['answeraudit:source_text'] = 'Obrolan teks';
+$string['answeraudit:source_voice'] = 'Suara langsung';
+$string['answeraudit:source_voice_note'] = 'Suara langsung: transkrip ini dilaporkan oleh peramban peserta dan tidak diverifikasi oleh server';
 $string['privacy:metadata:answer_audit:mode'] = 'Apakah jawaban ditulis atau diucapkan dengan suara langsung. Untuk suara langsung, transkripnya dicatat. Tidak ada audio yang disimpan.';

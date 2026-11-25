@@ -3669,10 +3669,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Az egy tanuló válaszai
 $string['settings:answer_check_course_daily_cap'] = 'Állításellenőrzés: napi korlát egy kurzusra';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Az egy kurzusra naponta sorba állított állításellenőrzések legnagyobb száma. A korláton túli válaszokat aznap nem ellenőrzi. Így egyetlen forgalmas kurzus nem használhatja el a portál napi korlátját. A 0 azt jelenti, hogy egy kurzusra nincs korlát; a portál korlátja ekkor is érvényes. Alapértelmezés: 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Valós idejű hang és az avatár engedélyezése Érvényesítés módban (a válaszokat az elhangzásuk után ellenőrzi a rendszer)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Valós idejű hang és az avatár engedélyezése Érvényesítés módban (a hangalapú válaszokat az elhangzásuk után ellenőrzi a rendszer; az avatár válaszait nem ellenőrzi)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Alapértelmezés szerint kikapcsolva: Érvényesítés módban az élő hang és a beszélő avatár nem érhető el, a tanulók a szokásos hangmódot kapják, amelynek válaszait a rendszer még az elhangzásuk előtt ellenőrzi. Ha be van kapcsolva, az élő hangos választ a rendszer közvetlenül az elhangzása után ellenőrzi, így a válasz egy része vagy egésze hallható lehet, mielőtt leállna. Az avatár válaszait a rendszer nem ellenőrzi és nem rögzíti. A saját móddal rendelkező kurzus azt a módot követi.';
 $string['realtime:err_answer_safety'] = 'Az élő hang nem érhető el ebben a kurzusban. Használd helyette a szokásos hangmódot vagy a csevegést.';
 $string['talking_avatar:answer_safety'] = 'A beszélő avatár nem érhető el ebben a kurzusban. Használd helyette a csevegést vagy a hangmódot.';
 $string['answeraudit:flow_voice_transcript'] = 'Élő hang: a tanuló böngészője által küldött átirat, a válasz elhangzása után ellenőrizve';
 $string['answeraudit:flow_voice_truncated'] = 'Élő hang: az átirat túl hosszú volt, ezért az ellenőrzés előtt le lett vágva';
+$string['answeraudit:source'] = 'Forrás';
+$string['answeraudit:source_text'] = 'Szöveges csevegés';
+$string['answeraudit:source_voice'] = 'Élő hang';
+$string['answeraudit:source_voice_note'] = 'Élő hang: ezt az átiratot a tanuló böngészője küldte, a szerver nem ellenőrizte';
 $string['privacy:metadata:answer_audit:mode'] = 'Azt jelzi, hogy a válasz írásban vagy élő hangon hangzott-e el. Élő hang esetén az átirat kerül rögzítésre. Hangfelvétel nem tárolódik.';

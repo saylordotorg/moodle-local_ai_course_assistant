@@ -3674,10 +3674,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Inani eliphezulu lokuhlo
 $string['settings:answer_check_course_daily_cap'] = 'Ukuhlolwa kwezitatimende: umkhawulo wosuku wesifundo esisodwa';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Inani eliphezulu lokuhlolwa kwezitatimende okufakwa kulayini ngosuku kwesifundo esisodwa. Izimpendulo ezidlula umkhawulo azihlolwa ngalolo suku. Kuvimbela isifundo esisodwa esimatasa ukuthi sisebenzise wonke umkhawulo wosuku wesayithi. U-0 usho ukuthi awukho umkhawulo wesifundo esisodwa; umkhawulo wesayithi usasebenza. Okuzenzakalelayo 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Vumela izwi lesikhathi sangempela ne-avatar kumodi Ukuphoqelela (izimpendulo zihlolwa ngemva kokuba zishiwo)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Vumela izwi lesikhathi sangempela ne-avatar kumodi Ukuphoqelela (izimpendulo zezwi zihlolwa ngemva kokuba zishiwo; izimpendulo ze-avatar azihlolwa)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Kuvaliwe ngokuzenzakalelayo: kumodi Ukuphoqelela, izwi elibukhoma ne-avatar ekhulumayo akunikezwa, futhi abafundi bathola imodi yezwi ejwayelekile, lapho izimpendulo zihlolwa ngaphambi kokuba zizwakale. Uma kuvuliwe, impendulo yezwi elibukhoma ihlolwa ngokushesha ngemva kokuba ishiwo, ngakho ingxenye yayo noma yonke ingezwakala ngaphambi kokuba imiswe. Izimpendulo ze-avatar azihlolwa futhi aziqoshwa. Isifundo esinemodi yaso silandela leyo modi.';
 $string['realtime:err_answer_safety'] = 'Izwi elibukhoma alitholakali kulesi sifundo. Sebenzisa imodi yezwi ejwayelekile noma ingxoxo esikhundleni salo.';
 $string['talking_avatar:answer_safety'] = 'I-avatar ekhulumayo ayitholakali kulesi sifundo. Sebenzisa ingxoxo noma imodi yezwi esikhundleni sayo.';
 $string['answeraudit:flow_voice_transcript'] = 'Izwi elibukhoma: umbhalo wenkulumo othunyelwe yisiphequluli somfundi, uhlolwe ngemva kokuba impendulo ishiwo';
 $string['answeraudit:flow_voice_truncated'] = 'Izwi elibukhoma: umbhalo wenkulumo ubumude kakhulu futhi unqunyiwe ngaphambi kokuhlolwa';
+$string['answeraudit:source'] = 'Umthombo';
+$string['answeraudit:source_text'] = 'Ingxoxo yombhalo';
+$string['answeraudit:source_voice'] = 'Izwi elibukhoma';
+$string['answeraudit:source_voice_note'] = 'Izwi elibukhoma: lo mbhalo wenkulumo ubikwe yisiphequluli somfundi futhi awuqinisekiswanga yiseva';
 $string['privacy:metadata:answer_audit:mode'] = 'Ukuthi impendulo ibhaliwe noma ishiwo ngezwi elibukhoma. Ngezwi elibukhoma, kuqoshwa umbhalo wenkulumo. Awukho umsindo ogcinwayo.';

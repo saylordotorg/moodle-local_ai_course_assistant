@@ -3673,10 +3673,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Pinakamaraming pagsusuri
 $string['settings:answer_check_course_daily_cap'] = 'Pagsusuri ng pahayag: limitasyon bawat araw para sa isang kurso';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Pinakamaraming pagsusuri ng pahayag na ipinipila bawat araw para sa isang kurso. Ang mga sagot na lampas sa limitasyon ay hindi sinusuri sa araw na iyon. Pinipigilan nito ang isang abalang kurso na maubos ang limitasyon bawat araw ng site. Ang 0 ay nangangahulugang walang limitasyon para sa isang kurso; umiiral pa rin ang limitasyon ng site. Default 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Payagan ang realtime na boses at ang avatar sa mode na Ipatupad (sinusuri ang mga sagot pagkatapos bigkasin)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Payagan ang realtime na boses at ang avatar sa mode na Ipatupad (sinusuri ang mga sagot sa boses pagkatapos bigkasin; hindi sinusuri ang mga sagot ng avatar)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Naka-off bilang default: sa mode na Ipatupad, hindi iniaalok ang live na boses at ang talking avatar, at ang karaniwang voice mode ang nakukuha ng mga mag-aaral, kung saan sinusuri ang mga sagot bago marinig. Kapag naka-on ito, sinusuri ang sagot ng live na boses pagkatapos mismo nitong bigkasin, kaya maaaring marinig ang bahagi o ang kabuuan nito bago ito ihinto. Hindi sinusuri o itinatala ang mga sagot ng avatar. Ang kursong may sariling mode ay sumusunod sa mode na iyon.';
 $string['realtime:err_answer_safety'] = 'Hindi available ang live na boses sa kursong ito. Gamitin ang karaniwang voice mode o ang chat.';
 $string['talking_avatar:answer_safety'] = 'Hindi available ang talking avatar sa kursong ito. Gamitin ang chat o ang voice mode.';
 $string['answeraudit:flow_voice_transcript'] = 'Live na boses: transcript na ipinadala ng browser ng mag-aaral, sinuri pagkatapos bigkasin ang sagot';
 $string['answeraudit:flow_voice_truncated'] = 'Live na boses: masyadong mahaba ang transcript at pinutol ito bago ang pagsusuri';
+$string['answeraudit:source'] = 'Pinagmulan';
+$string['answeraudit:source_text'] = 'Chat na teksto';
+$string['answeraudit:source_voice'] = 'Live na boses';
+$string['answeraudit:source_voice_note'] = 'Live na boses: ang transcript na ito ay iniulat ng browser ng mag-aaral at hindi pinatunayan ng server';
 $string['privacy:metadata:answer_audit:mode'] = 'Kung ang sagot ay isinulat o binigkas sa live na boses. Para sa live na boses, itinatala ang transcript. Walang audio na iniimbak.';

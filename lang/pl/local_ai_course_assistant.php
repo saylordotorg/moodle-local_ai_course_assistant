@@ -3629,10 +3629,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Największa liczba spraw
 $string['settings:answer_check_course_daily_cap'] = 'Sprawdzanie twierdzeń: limit dzienny dla jednego kursu';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Największa liczba sprawdzeń twierdzeń dodawanych do kolejki w ciągu dnia dla jednego kursu. Odpowiedzi ponad limit nie są tego dnia sprawdzane. Dzięki temu jeden intensywnie używany kurs nie wyczerpie dziennego limitu witryny. 0 oznacza brak limitu dla jednego kursu; limit witryny nadal obowiązuje. Domyślnie 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Zezwól na głos w czasie rzeczywistym i awatara w trybie Egzekwowanie (odpowiedzi są sprawdzane po ich wypowiedzeniu)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Zezwól na głos w czasie rzeczywistym i awatara w trybie Egzekwowanie (odpowiedzi głosowe są sprawdzane po ich wypowiedzeniu; odpowiedzi awatara nie są sprawdzane)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Domyślnie wyłączone: w trybie Egzekwowanie głos na żywo i mówiący awatar nie są oferowane, a uczestnicy korzystają ze zwykłego trybu głosowego, w którym odpowiedzi są sprawdzane, zanim zostaną usłyszane. Po włączeniu odpowiedź głosu na żywo jest sprawdzana zaraz po jej wypowiedzeniu, więc część lub całość może zostać usłyszana, zanim zostanie zatrzymana. Odpowiedzi awatara nie są sprawdzane ani zapisywane. Kurs z własnym trybem stosuje ten tryb.';
 $string['realtime:err_answer_safety'] = 'Głos na żywo nie jest dostępny w tym kursie. Użyj zwykłego trybu głosowego lub czatu.';
 $string['talking_avatar:answer_safety'] = 'Mówiący awatar nie jest dostępny w tym kursie. Użyj czatu lub trybu głosowego.';
 $string['answeraudit:flow_voice_transcript'] = 'Głos na żywo: transkrypcja wysłana przez przeglądarkę uczestnika, sprawdzona po wypowiedzeniu odpowiedzi';
 $string['answeraudit:flow_voice_truncated'] = 'Głos na żywo: transkrypcja była za długa i została skrócona przed sprawdzeniem';
+$string['answeraudit:source'] = 'Źródło';
+$string['answeraudit:source_text'] = 'Czat tekstowy';
+$string['answeraudit:source_voice'] = 'Głos na żywo';
+$string['answeraudit:source_voice_note'] = 'Głos na żywo: tę transkrypcję przesłała przeglądarka uczestnika i serwer jej nie zweryfikował';
 $string['privacy:metadata:answer_audit:mode'] = 'Czy odpowiedź została napisana, czy wypowiedziana głosem na żywo. W przypadku głosu na żywo zapisywana jest transkrypcja. Dźwięk nie jest przechowywany.';

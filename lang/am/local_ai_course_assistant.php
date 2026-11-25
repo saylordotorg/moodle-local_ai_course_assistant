@@ -3656,10 +3656,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'ለአንድ ተማሪ �
 $string['settings:answer_check_course_daily_cap'] = 'የሐሳብ ፍተሻ፦ ለአንድ ኮርስ ዕለታዊ ገደብ';
 $string['settings:answer_check_course_daily_cap_desc'] = 'ለአንድ ኮርስ በቀን ወረፋ የሚገቡ የሐሳብ ፍተሻዎች ከፍተኛ ቁጥር። ከገደቡ በላይ የሆኑ መልሶች በዚያ ቀን አይፈተሹም። ብዙ እንቅስቃሴ ያለበት አንድ ኮርስ የጣቢያውን ዕለታዊ ገደብ እንዳይጨርስ ይከላከላል። 0 ማለት ለአንድ ኮርስ ገደብ የለም ማለት ነው፤ የጣቢያው ገደብ አሁንም ይሠራል። ነባሪ 500።';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'በማስፈጸም ሁነታ የቅጽበታዊ ድምፅን እና አቫታሩን ፍቀድ (መልሶች ከተነገሩ በኋላ ይፈተሻሉ)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'በማስፈጸም ሁነታ የቅጽበታዊ ድምፅን እና አቫታሩን ፍቀድ (የድምፅ መልሶች ከተነገሩ በኋላ ይፈተሻሉ፤ የአቫታር መልሶች አይፈተሹም)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'በነባሪ ጠፍቷል፦ በማስፈጸም ሁነታ የቀጥታ ድምፅ እና ተናጋሪ አቫታር አይቀርቡም፣ ተማሪዎችም መልሶቹ ከመሰማታቸው በፊት የሚፈተሹበትን መደበኛ የድምፅ ሁነታ ያገኛሉ። ሲበራ የቀጥታ ድምፅ መልስ ከተነገረ በኋላ ወዲያውኑ ይፈተሻል፣ ስለዚህ ከመቆሙ በፊት የመልሱ ከፊል ወይም ሙሉው ሊሰማ ይችላል። የአቫታሩ መልሶች አይፈተሹም፣ አይመዘገቡምም። የራሱ ሁነታ ያለው ኮርስ ያንን ሁነታ ይከተላል።';
 $string['realtime:err_answer_safety'] = 'የቀጥታ ድምፅ በዚህ ኮርስ አይገኝም። በምትኩ መደበኛውን የድምፅ ሁነታ ወይም ቻት ይጠቀሙ።';
 $string['talking_avatar:answer_safety'] = 'ተናጋሪ አቫታር በዚህ ኮርስ አይገኝም። በምትኩ ቻት ወይም የድምፅ ሁነታ ይጠቀሙ።';
 $string['answeraudit:flow_voice_transcript'] = 'የቀጥታ ድምፅ፦ ከተማሪው አሳሽ የተላከ የጽሑፍ ግልባጭ፣ መልሱ ከተነገረ በኋላ የተፈተሸ';
 $string['answeraudit:flow_voice_truncated'] = 'የቀጥታ ድምፅ፦ የጽሑፍ ግልባጩ በጣም ረጅም ስለነበር ከፍተሻው በፊት ተቆርጧል';
+$string['answeraudit:source'] = 'ምንጭ';
+$string['answeraudit:source_text'] = 'የጽሑፍ ውይይት';
+$string['answeraudit:source_voice'] = 'የቀጥታ ድምፅ';
+$string['answeraudit:source_voice_note'] = 'የቀጥታ ድምፅ፦ ይህ የጽሑፍ ግልባጭ በተማሪው አሳሽ የተላከ ሲሆን በአገልጋዩ አልተረጋገጠም';
 $string['privacy:metadata:answer_audit:mode'] = 'መልሱ የተጻፈ ወይም በቀጥታ ድምፅ የተነገረ መሆኑ። ለቀጥታ ድምፅ የጽሑፍ ግልባጩ ይመዘገባል። ምንም ድምፅ አይቀመጥም።';

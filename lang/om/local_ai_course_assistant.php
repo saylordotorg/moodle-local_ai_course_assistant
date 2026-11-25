@@ -3661,10 +3661,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Lakkoofsa sakatta\'iinsa
 $string['settings:answer_check_course_daily_cap'] = 'Sakatta\'iinsa himannaa: daangaa guyyaa koorsii tokkoof';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Lakkoofsa sakatta\'iinsa himannaa isa ol\'aanaa guyyaatti koorsii tokkoof tarree galu. Deebiiwwan daangaa darban guyyaa sana hin sakatta\'aman. Koorsiin tokko kan hojiin itti baay\'atu daangaa guyyaa saayitichaa akka hin fixne dhorka. 0 jechuun koorsii tokkoof daangaan hin jiru jechuudha; daangaan saayitichaa ammas ni hojjeta. Durtii 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Sagalee yeroo-dhugaa fi fakkii dubbatu haala Raawwachiisi keessatti hayyami (deebiiwwan erga dubbatamanii booda sakatta\'amu)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Sagalee yeroo-dhugaa fi fakkii dubbatu haala Raawwachiisi keessatti hayyami (deebiiwwan sagalee erga dubbatamanii booda sakatta\'amu; deebiiwwan fakkii dubbatuu hin sakatta\'aman)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Durtiidhaan cufaadha: haala Raawwachiisi keessatti sagaleen kallattii fi fakkiin dubbatu hin dhiyaatan, barattoonnis haala sagalee idilee argatu, kan deebiiwwan isaa osoo hin dhaga\'amin dura sakatta\'aman. Yoo banamu, deebiin sagalee kallattii erga dubbatamee booda battalumatti sakatta\'ama, kanaaf osoo hin dhaabbatin dura kutaan isaa yookaan guutuun isaa dhaga\'amuu danda\'a. Deebiiwwan fakkii dubbatuu hin sakatta\'aman, hin galmeeffamanis. Koorsiin haala mataa isaa qabu haala sana hordofa.';
 $string['realtime:err_answer_safety'] = 'Sagaleen kallattii koorsii kana keessatti hin argamu. Bakka isaa haala sagalee idilee yookaan marii fayyadami.';
 $string['talking_avatar:answer_safety'] = 'Fakkiin dubbatu koorsii kana keessatti hin argamu. Bakka isaa marii yookaan haala sagalee fayyadami.';
 $string['answeraudit:flow_voice_transcript'] = 'Sagalee kallattii: barreeffama dubbii kan sakatta\'aan barataa erge, erga deebiin dubbatamee booda sakatta\'ame';
 $string['answeraudit:flow_voice_truncated'] = 'Sagalee kallattii: barreeffamni dubbii baay\'ee dheeraa ture, sakatta\'iinsa dura ni murame';
+$string['answeraudit:source'] = 'Madda';
+$string['answeraudit:source_text'] = 'Haasaa barreeffamaa';
+$string['answeraudit:source_voice'] = 'Sagalee kallattii';
+$string['answeraudit:source_voice_note'] = 'Sagalee kallattii: barreeffamni dubbii kun sakatta\'aa barataatiin gabaafame, sarvariin hin mirkaneessine';
 $string['privacy:metadata:answer_audit:mode'] = 'Deebiin barreeffamee yookaan sagalee kallattiin dubbatamee ta\'uu isaa. Sagalee kallattiif barreeffamni dubbii ni galmeeffama. Sagaleen tokkollee hin kuufamu.';

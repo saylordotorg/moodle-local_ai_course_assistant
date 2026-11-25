@@ -3673,10 +3673,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Idadi ya juu ya ukaguzi 
 $string['settings:answer_check_course_daily_cap'] = 'Ukaguzi wa madai: kikomo cha kila siku kwa kozi moja';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Idadi ya juu ya ukaguzi wa madai unaowekwa kwenye foleni kwa siku kwa kozi moja. Majibu yanayozidi kikomo hayakaguliwi siku hiyo. Huzuia kozi moja yenye shughuli nyingi kumaliza kikomo cha kila siku cha tovuti. 0 inamaanisha hakuna kikomo kwa kozi moja; kikomo cha tovuti bado kinatumika. Chaguo-msingi 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Ruhusu sauti ya wakati halisi na avatar katika hali ya Tekeleza (majibu hukaguliwa baada ya kutamkwa)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Ruhusu sauti ya wakati halisi na avatar katika hali ya Tekeleza (majibu ya sauti hukaguliwa baada ya kutamkwa; majibu ya avatar hayakaguliwi)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Imezimwa kwa chaguo-msingi: katika hali ya Tekeleza, sauti ya moja kwa moja na avatar inayoongea hazitolewi, na wanafunzi hupata hali ya kawaida ya sauti, ambayo majibu yake hukaguliwa kabla ya kusikika. Ikiwashwa, jibu la sauti ya moja kwa moja hukaguliwa mara tu baada ya kutamkwa, kwa hiyo sehemu yake au jibu lote linaweza kusikika kabla ya kusimamishwa. Majibu ya avatar hayakaguliwi wala hayarekodiwi. Kozi yenye hali yake yenyewe hufuata hali hiyo.';
 $string['realtime:err_answer_safety'] = 'Sauti ya moja kwa moja haipatikani katika kozi hii. Tumia hali ya kawaida ya sauti au gumzo badala yake.';
 $string['talking_avatar:answer_safety'] = 'Avatar inayoongea haipatikani katika kozi hii. Tumia gumzo au hali ya sauti badala yake.';
 $string['answeraudit:flow_voice_transcript'] = 'Sauti ya moja kwa moja: nakala ya maandishi iliyotumwa na kivinjari cha mwanafunzi, imekaguliwa baada ya jibu kutamkwa';
 $string['answeraudit:flow_voice_truncated'] = 'Sauti ya moja kwa moja: nakala ya maandishi ilikuwa ndefu mno na ilikatwa kabla ya ukaguzi';
+$string['answeraudit:source'] = 'Chanzo';
+$string['answeraudit:source_text'] = 'Gumzo la maandishi';
+$string['answeraudit:source_voice'] = 'Sauti ya moja kwa moja';
+$string['answeraudit:source_voice_note'] = 'Sauti ya moja kwa moja: nakala hii iliripotiwa na kivinjari cha mwanafunzi na haijathibitishwa na seva';
 $string['privacy:metadata:answer_audit:mode'] = 'Kama jibu liliandikwa au lilitamkwa kwa sauti ya moja kwa moja. Kwa sauti ya moja kwa moja, nakala ya maandishi hurekodiwa. Hakuna sauti inayohifadhiwa.';

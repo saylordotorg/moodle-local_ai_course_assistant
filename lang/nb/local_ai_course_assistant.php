@@ -3627,10 +3627,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Høyeste antall påstand
 $string['settings:answer_check_course_daily_cap'] = 'Påstandskontroll: daglig grense for ett kurs';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Høyeste antall påstandskontroller som legges i kø per dag for ett kurs. Svar over grensen kontrolleres ikke den dagen. Det hindrer at ett travelt kurs bruker opp nettstedets daglige grense. 0 betyr ingen grense for ett kurs; nettstedets grense gjelder fortsatt. Standard 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Tillat sanntidsstemme og avataren i modusen Håndhev (svar kontrolleres etter at de er sagt)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Tillat sanntidsstemme og avataren i modusen Håndhev (stemmesvar kontrolleres etter at de er sagt; avatarens svar kontrolleres ikke)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Av som standard: I modusen Håndhev tilbys ikke direktestemme og den snakkende avataren, og deltakerne får den vanlige stemmemodusen, der svar kontrolleres før de høres. Når dette er på, kontrolleres et direktestemmesvar rett etter at det er sagt, så deler av det eller hele svaret kan høres før det stoppes. Avatarens svar kontrolleres ikke og lagres ikke. Et kurs med egen modus følger den modusen.';
 $string['realtime:err_answer_safety'] = 'Direktestemme er ikke tilgjengelig i dette kurset. Bruk den vanlige stemmemodusen eller chatten i stedet.';
 $string['talking_avatar:answer_safety'] = 'Den snakkende avataren er ikke tilgjengelig i dette kurset. Bruk chatten eller stemmemodusen i stedet.';
 $string['answeraudit:flow_voice_transcript'] = 'Direktestemme: transkripsjon sendt av deltakerens nettleser, kontrollert etter at svaret var sagt';
 $string['answeraudit:flow_voice_truncated'] = 'Direktestemme: transkripsjonen var for lang og ble kuttet før kontrollen';
+$string['answeraudit:source'] = 'Kilde';
+$string['answeraudit:source_text'] = 'Tekstchat';
+$string['answeraudit:source_voice'] = 'Direktestemme';
+$string['answeraudit:source_voice_note'] = 'Direktestemme: denne transkripsjonen ble rapportert av deltakerens nettleser og er ikke bekreftet av serveren';
 $string['privacy:metadata:answer_audit:mode'] = 'Om svaret ble skrevet eller sagt med direktestemme. For direktestemme lagres transkripsjonen. Ingen lyd lagres.';

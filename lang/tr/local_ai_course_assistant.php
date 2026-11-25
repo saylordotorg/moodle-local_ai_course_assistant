@@ -3630,10 +3630,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Bir öğrencinin yanıtl
 $string['settings:answer_check_course_daily_cap'] = 'İddia denetimi: bir ders için günlük sınır';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Bir ders için günde kuyruğa alınan en fazla iddia denetimi sayısı. Sınırı aşan yanıtlar o gün denetlenmez. Yoğun kullanılan tek bir dersin sitenin günlük sınırını tüketmesini önler. 0, bir ders için sınır olmadığı anlamına gelir; site sınırı yine de geçerlidir. Varsayılan 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Uygula modunda gerçek zamanlı sese ve avatara izin ver (yanıtlar söylendikten sonra denetlenir)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Uygula modunda gerçek zamanlı sese ve avatara izin ver (sesli yanıtlar söylendikten sonra denetlenir; avatar yanıtları denetlenmez)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Varsayılan olarak kapalıdır: Uygula modunda canlı ses ve konuşan avatar sunulmaz; öğrenciler, yanıtları duyulmadan önce denetlenen normal ses modunu kullanır. Açıldığında canlı ses yanıtı söylendikten hemen sonra denetlenir, bu yüzden yanıtın bir kısmı veya tamamı durdurulmadan önce duyulabilir. Avatarın yanıtları denetlenmez ve kaydedilmez. Kendi modu olan bir ders o modu izler.';
 $string['realtime:err_answer_safety'] = 'Canlı ses bu derste kullanılamıyor. Bunun yerine normal ses modunu veya sohbeti kullanın.';
 $string['talking_avatar:answer_safety'] = 'Konuşan avatar bu derste kullanılamıyor. Bunun yerine sohbeti veya ses modunu kullanın.';
 $string['answeraudit:flow_voice_transcript'] = 'Canlı ses: öğrencinin tarayıcısının gönderdiği döküm, yanıt söylendikten sonra denetlendi';
 $string['answeraudit:flow_voice_truncated'] = 'Canlı ses: döküm çok uzundu ve denetimden önce kısaltıldı';
+$string['answeraudit:source'] = 'Kaynak';
+$string['answeraudit:source_text'] = 'Metin sohbeti';
+$string['answeraudit:source_voice'] = 'Canlı ses';
+$string['answeraudit:source_voice_note'] = 'Canlı ses: bu döküm öğrencinin tarayıcısı tarafından bildirildi ve sunucu tarafından doğrulanmadı';
 $string['privacy:metadata:answer_audit:mode'] = 'Yanıtın yazılı mı yoksa canlı sesle mi verildiği. Canlı seste döküm kaydedilir. Ses saklanmaz.';

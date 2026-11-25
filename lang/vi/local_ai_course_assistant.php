@@ -3649,10 +3649,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Số lần kiểm tra nh
 $string['settings:answer_check_course_daily_cap'] = 'Kiểm tra nhận định: giới hạn hằng ngày cho một khóa học';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Số lần kiểm tra nhận định tối đa được xếp hàng mỗi ngày cho một khóa học. Câu trả lời vượt giới hạn sẽ không được kiểm tra trong ngày đó. Việc này ngăn một khóa học nhiều hoạt động dùng hết giới hạn hằng ngày của trang. 0 nghĩa là không giới hạn cho một khóa học; giới hạn của trang vẫn áp dụng. Mặc định 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Cho phép giọng nói thời gian thực và hình đại diện ở chế độ Thực thi (câu trả lời được kiểm tra sau khi đã nói)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Cho phép giọng nói thời gian thực và hình đại diện ở chế độ Thực thi (câu trả lời bằng giọng nói được kiểm tra sau khi đã nói; câu trả lời của hình đại diện không được kiểm tra)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Tắt theo mặc định: ở chế độ Thực thi, giọng nói trực tiếp và hình đại diện biết nói không được cung cấp, và người học dùng chế độ giọng nói thông thường, trong đó câu trả lời được kiểm tra trước khi được nghe. Khi bật, câu trả lời bằng giọng nói trực tiếp được kiểm tra ngay sau khi nói, nên một phần hoặc toàn bộ câu trả lời có thể được nghe trước khi bị dừng. Câu trả lời của hình đại diện không được kiểm tra hay ghi lại. Khóa học có chế độ riêng sẽ theo chế độ đó.';
 $string['realtime:err_answer_safety'] = 'Giọng nói trực tiếp không khả dụng trong khóa học này. Hãy dùng chế độ giọng nói thông thường hoặc trò chuyện.';
 $string['talking_avatar:answer_safety'] = 'Hình đại diện biết nói không khả dụng trong khóa học này. Hãy dùng trò chuyện hoặc chế độ giọng nói.';
 $string['answeraudit:flow_voice_transcript'] = 'Giọng nói trực tiếp: bản ghi lời do trình duyệt của người học gửi, được kiểm tra sau khi câu trả lời đã được nói';
 $string['answeraudit:flow_voice_truncated'] = 'Giọng nói trực tiếp: bản ghi lời quá dài và đã bị cắt trước khi kiểm tra';
+$string['answeraudit:source'] = 'Nguồn';
+$string['answeraudit:source_text'] = 'Trò chuyện văn bản';
+$string['answeraudit:source_voice'] = 'Giọng nói trực tiếp';
+$string['answeraudit:source_voice_note'] = 'Giọng nói trực tiếp: bản ghi lời này do trình duyệt của người học báo cáo và chưa được máy chủ xác minh';
 $string['privacy:metadata:answer_audit:mode'] = 'Câu trả lời được viết hay được nói bằng giọng nói trực tiếp. Với giọng nói trực tiếp, bản ghi lời được lưu. Không lưu âm thanh.';

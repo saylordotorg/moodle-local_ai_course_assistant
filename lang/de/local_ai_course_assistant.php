@@ -3629,10 +3629,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Höchstzahl der Aussagen
 $string['settings:answer_check_course_daily_cap'] = 'Aussagenprüfung: Tageslimit für einen Kurs';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Höchstzahl der Aussagenprüfungen, die pro Tag für einen Kurs eingereiht werden. Antworten über dem Limit werden an dem Tag nicht geprüft. So kann ein einzelner stark genutzter Kurs das Tageslimit der Website nicht aufbrauchen. 0 bedeutet kein Limit für einen Kurs; das Limit der Website gilt weiterhin. Standard 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Echtzeit-Sprache und den Avatar im Modus „Durchsetzen“ zulassen (Antworten werden geprüft, nachdem sie gesprochen wurden)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Echtzeit-Sprache und den Avatar im Modus „Durchsetzen“ zulassen (Sprachantworten werden geprüft, nachdem sie gesprochen wurden; Antworten des Avatars werden nicht geprüft)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Standardmäßig aus: Im Modus „Durchsetzen“ werden Live-Sprache und der sprechende Avatar nicht angeboten, und Lernende erhalten den normalen Sprachmodus, dessen Antworten geprüft werden, bevor sie zu hören sind. Ist dies eingeschaltet, wird eine Live-Sprachantwort direkt nach dem Sprechen geprüft, sodass ein Teil oder die ganze Antwort zu hören sein kann, bevor sie gestoppt wird. Antworten des Avatars werden weder geprüft noch protokolliert. Ein Kurs mit eigenem Modus folgt diesem Modus.';
 $string['realtime:err_answer_safety'] = 'Live-Sprache ist in diesem Kurs nicht verfügbar. Nutze stattdessen den normalen Sprachmodus oder den Chat.';
 $string['talking_avatar:answer_safety'] = 'Der sprechende Avatar ist in diesem Kurs nicht verfügbar. Nutze stattdessen den Chat oder den Sprachmodus.';
 $string['answeraudit:flow_voice_transcript'] = 'Live-Sprache: Transkript vom Browser der lernenden Person gesendet, geprüft, nachdem die Antwort gesprochen wurde';
 $string['answeraudit:flow_voice_truncated'] = 'Live-Sprache: Das Transkript war zu lang und wurde vor der Prüfung gekürzt';
+$string['answeraudit:source'] = 'Quelle';
+$string['answeraudit:source_text'] = 'Text-Chat';
+$string['answeraudit:source_voice'] = 'Live-Sprache';
+$string['answeraudit:source_voice_note'] = 'Live-Sprache: Dieses Transkript wurde vom Browser der lernenden Person gemeldet und vom Server nicht überprüft';
 $string['privacy:metadata:answer_audit:mode'] = 'Ob die Antwort geschrieben oder in Live-Sprache gesprochen wurde. Bei Live-Sprache wird das Transkript gespeichert. Es wird kein Audio gespeichert.';

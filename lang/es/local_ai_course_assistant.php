@@ -3656,10 +3656,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Máximo de comprobacione
 $string['settings:answer_check_course_daily_cap'] = 'Comprobación de afirmaciones: límite diario por curso';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Máximo de comprobaciones de afirmaciones en cola por día para un curso. Las respuestas que pasan del límite no se comprueban ese día. Evita que un solo curso con mucha actividad agote el límite diario del sitio. 0 significa sin límite por curso; el límite del sitio se sigue aplicando. Predeterminado: 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Permitir la voz en tiempo real y el avatar en el modo Aplicar (las respuestas se comprueban después de pronunciarse)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Permitir la voz en tiempo real y el avatar en el modo Aplicar (las respuestas de voz se comprueban después de pronunciarse; las respuestas del avatar no se comprueban)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Desactivado de forma predeterminada: en el modo Aplicar no se ofrecen la voz en directo ni el avatar parlante, y los estudiantes usan el modo de voz normal, cuyas respuestas se comprueban antes de oírse. Si se activa, una respuesta de voz en directo se comprueba justo después de pronunciarse, por lo que puede oírse una parte o toda antes de que se detenga. Las respuestas del avatar no se comprueban ni se registran. Un curso con su propio modo sigue ese modo.';
 $string['realtime:err_answer_safety'] = 'La voz en directo no está disponible en este curso. Usa el modo de voz normal o el chat.';
 $string['talking_avatar:answer_safety'] = 'El avatar parlante no está disponible en este curso. Usa el chat o el modo de voz.';
 $string['answeraudit:flow_voice_transcript'] = 'Voz en directo: transcripción enviada por el navegador del estudiante, comprobada después de pronunciarse la respuesta';
 $string['answeraudit:flow_voice_truncated'] = 'Voz en directo: la transcripción era demasiado larga y se recortó antes de la comprobación';
+$string['answeraudit:source'] = 'Origen';
+$string['answeraudit:source_text'] = 'Chat de texto';
+$string['answeraudit:source_voice'] = 'Voz en directo';
+$string['answeraudit:source_voice_note'] = 'Voz en directo: esta transcripción la envió el navegador del estudiante y el servidor no la ha verificado';
 $string['privacy:metadata:answer_audit:mode'] = 'Si la respuesta fue escrita o pronunciada en voz en directo. En la voz en directo se registra la transcripción. No se guarda ningún audio.';

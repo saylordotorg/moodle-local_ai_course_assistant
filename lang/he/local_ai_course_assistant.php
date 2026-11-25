@@ -3668,10 +3668,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'המספר המרבי ש
 $string['settings:answer_check_course_daily_cap'] = 'בדיקת טענות: מגבלה יומית לקורס אחד';
 $string['settings:answer_check_course_daily_cap_desc'] = 'המספר המרבי של בדיקות טענות שנכנסות לתור ביום עבור קורס אחד. תשובות שמעבר למגבלה אינן נבדקות באותו יום. כך קורס עמוס אחד אינו יכול לנצל את כל המגבלה היומית של האתר. 0 פירושו ללא מגבלה לקורס אחד; מגבלת האתר עדיין חלה. ברירת מחדל 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'לאפשר קול בזמן אמת ואת האווטאר במצב אכיפה (התשובות נבדקות לאחר שנאמרו)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'לאפשר קול בזמן אמת ואת האווטאר במצב אכיפה (תשובות קוליות נבדקות לאחר שנאמרו; תשובות האווטאר אינן נבדקות)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'כבוי כברירת מחדל: במצב אכיפה קול חי והאווטאר המדבר אינם מוצעים, והלומדים מקבלים את מצב הקול הרגיל, שתשובותיו נבדקות לפני שהן נשמעות. כאשר ההגדרה פועלת, תשובה בקול חי נבדקת מיד לאחר שנאמרה, ולכן ייתכן שחלק ממנה או כולה יישמעו לפני שתיעצר. תשובות האווטאר אינן נבדקות ואינן נרשמות. קורס שיש לו מצב משלו פועל לפי אותו מצב.';
 $string['realtime:err_answer_safety'] = 'קול חי אינו זמין בקורס זה. השתמשו במצב הקול הרגיל או בצ\'אט.';
 $string['talking_avatar:answer_safety'] = 'האווטאר המדבר אינו זמין בקורס זה. השתמשו בצ\'אט או במצב הקול.';
 $string['answeraudit:flow_voice_transcript'] = 'קול חי: תמליל שנשלח מהדפדפן של הלומד, נבדק לאחר שהתשובה נאמרה';
 $string['answeraudit:flow_voice_truncated'] = 'קול חי: התמליל היה ארוך מדי וקוצר לפני הבדיקה';
+$string['answeraudit:source'] = 'מקור';
+$string['answeraudit:source_text'] = 'צ\'אט טקסט';
+$string['answeraudit:source_voice'] = 'קול חי';
+$string['answeraudit:source_voice_note'] = 'קול חי: התמליל הזה דווח על ידי הדפדפן של הלומד ולא אומת על ידי השרת';
 $string['privacy:metadata:answer_audit:mode'] = 'האם התשובה נכתבה או נאמרה בקול חי. בקול חי נשמר התמליל. לא נשמר שמע.';

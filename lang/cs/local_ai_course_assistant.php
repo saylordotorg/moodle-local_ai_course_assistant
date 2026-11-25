@@ -3630,10 +3630,14 @@ $string['settings:answer_check_user_daily_cap_desc'] = 'Nejvyšší počet kontr
 $string['settings:answer_check_course_daily_cap'] = 'Kontrola tvrzení: denní limit pro jeden kurz';
 $string['settings:answer_check_course_daily_cap_desc'] = 'Nejvyšší počet kontrol tvrzení zařazených do fronty za den pro jeden kurz. Odpovědi nad limit se ten den nekontrolují. Jeden vytížený kurz tak nemůže vyčerpat denní limit celého webu. 0 znamená žádný limit pro jeden kurz; limit webu platí dál. Výchozí hodnota 500.';
 
-$string['settings:answer_safety_realtime_in_enforce'] = 'Povolit hlas v reálném čase a avatara v režimu Vynucování (odpovědi se kontrolují poté, co zazní)';
+$string['settings:answer_safety_realtime_in_enforce'] = 'Povolit hlas v reálném čase a avatara v režimu Vynucování (hlasové odpovědi se kontrolují poté, co zazní; odpovědi avatara se nekontrolují)';
 $string['settings:answer_safety_realtime_in_enforce_desc'] = 'Ve výchozím nastavení vypnuto: v režimu Vynucování se živý hlas a mluvící avatar nenabízejí a studenti používají běžný hlasový režim, jehož odpovědi se kontrolují dříve, než zazní. Je-li zapnuto, odpověď živého hlasu se kontroluje hned poté, co zazní, takže část nebo celou odpověď lze slyšet dříve, než je zastavena. Odpovědi avatara se nekontrolují ani nezaznamenávají. Kurz s vlastním režimem se řídí tímto režimem.';
 $string['realtime:err_answer_safety'] = 'Živý hlas není v tomto kurzu k dispozici. Použijte běžný hlasový režim nebo chat.';
 $string['talking_avatar:answer_safety'] = 'Mluvící avatar není v tomto kurzu k dispozici. Použijte chat nebo hlasový režim.';
 $string['answeraudit:flow_voice_transcript'] = 'Živý hlas: přepis odeslaný prohlížečem studenta, zkontrolovaný poté, co odpověď zazněla';
 $string['answeraudit:flow_voice_truncated'] = 'Živý hlas: přepis byl příliš dlouhý a před kontrolou byl zkrácen';
+$string['answeraudit:source'] = 'Zdroj';
+$string['answeraudit:source_text'] = 'Textový chat';
+$string['answeraudit:source_voice'] = 'Živý hlas';
+$string['answeraudit:source_voice_note'] = 'Živý hlas: tento přepis nahlásil prohlížeč studenta a server ho neověřil';
 $string['privacy:metadata:answer_audit:mode'] = 'Zda byla odpověď napsána, nebo vyslovena živým hlasem. U živého hlasu se zaznamenává přepis. Zvuk se neukládá.';
