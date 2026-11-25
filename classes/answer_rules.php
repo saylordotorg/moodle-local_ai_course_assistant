@@ -164,6 +164,12 @@ class answer_rules {
     /** @var \Closure|null Test seam: called inside evaluate() after the wellbeing check. Never set outside tests. */
     public static ?\Closure $beforerules = null;
 
+    /** @var int matches of one pattern examined in a reply; past this the rule fires rather than skip the rest. */
+    private const MAX_MATCHES = 64;
+
+    /** @var int bytes after a match read for its except clause (a clause runs to the next . ; ! ? or newline). */
+    private const CLAUSE_BYTES = 2000;
+
     /** @var int pcre.backtrack_limit while a rule pattern runs (PHP's default is 1,000,000). */
     public const BACKTRACK_LIMIT = 100000;
 
@@ -1114,32 +1120,42 @@ class answer_rules {
             return false;
         }
         foreach ($rule['values'] as $pattern) {
-            $m = self::pattern_match($pattern, $text);
-            if ($m === false) {
-                $pcreerrors[] = $rule['id'];
-                continue;
-            }
-            if ($m === null) {
-                continue;
-            }
-            if (!empty($rule['except'])) {
-                // The rest of the clause after the match: a condition there ("only if your instructor agrees")
-                // cancels it; words before it or in another clause do not.
-                $pos = strpos($text, $m[0]);
-                $rest = $pos === false ? '' : substr($text, $pos + strlen($m[0]));
-                $clause = preg_match('~^[^.;!?\n]*~u', $rest, $cm) ? $cm[0] : '';
-                if (is_array(self::pattern_match($rule['except'], $clause))) {
-                    continue;
+            // Every match counts, not only the first: an excused match ("only if your instructor agrees", a date the
+            // course text has) must not hide a later unexcused one of the same pattern.
+            $offset = 0;
+            for ($seen = 0; ; $seen++) {
+                $m = self::pattern_match($pattern, $text, $offset);
+                if ($m === false) {
+                    $pcreerrors[] = $rule['id'];
+                    break;
                 }
-            }
-            if ($support === null) {
-                return true;
-            }
-            $found = $m[1] ?? $m[0];
-            $supported = $support === 'date' ? self::date_supported($found, (string) $chunktext)
-                : self::policy_supported($found, (string) $chunktext);
-            if (!$supported) {
-                return true;
+                if ($m === null) {
+                    break;
+                }
+                if ($seen >= self::MAX_MATCHES) {
+                    // Still matching past the bound: fire rather than leave the rest unchecked.
+                    return true;
+                }
+                [$whole, $at] = $m[0];
+                $offset = $at + max(1, strlen($whole));
+                if (!empty($rule['except'])) {
+                    // The rest of the clause after this match: a condition there ("only if your instructor agrees")
+                    // cancels it; words before it or in another clause do not.
+                    $rest = (string) mb_strcut($text, $at + strlen($whole), self::CLAUSE_BYTES, 'UTF-8');
+                    $clause = preg_match('~^[^.;!?\n]*~u', $rest, $cm) ? $cm[0] : '';
+                    if (is_array(self::pattern_match($rule['except'], $clause))) {
+                        continue;
+                    }
+                }
+                if ($support === null) {
+                    return true;
+                }
+                $found = isset($m[1]) ? $m[1][0] : $whole;
+                $supported = $support === 'date' ? self::date_supported($found, (string) $chunktext)
+                    : self::policy_supported($found, (string) $chunktext);
+                if (!$supported) {
+                    return true;
+                }
             }
         }
         return false;
@@ -1213,13 +1229,15 @@ class answer_rules {
      *
      * @param string $pattern
      * @param string $text
+     * @param int|null $offset byte offset to search from; when given, each group is [text, byte offset] (PREG_OFFSET_CAPTURE)
      * @return array|null|false the match groups, null for no match, false when PCRE stopped (limit or bad input)
      */
-    private static function pattern_match(string $pattern, string $text) {
+    private static function pattern_match(string $pattern, string $text, ?int $offset = null) {
         $old = ini_get('pcre.backtrack_limit');
         @ini_set('pcre.backtrack_limit', (string) self::BACKTRACK_LIMIT);
         try {
-            $r = @preg_match(self::DELIM . $pattern . self::DELIM . 'iu', $text, $m);
+            $re = self::DELIM . $pattern . self::DELIM . 'iu';
+            $r = $offset === null ? @preg_match($re, $text, $m) : @preg_match($re, $text, $m, PREG_OFFSET_CAPTURE, $offset);
         } finally {
             if ($old !== false) {
                 @ini_set('pcre.backtrack_limit', $old);

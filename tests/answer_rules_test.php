@@ -501,6 +501,46 @@ final class answer_rules_test extends \advanced_testcase {
         }
     }
 
+    public function test_every_match_of_a_pattern_is_checked_not_only_the_first(): void {
+        // An excused first match (a condition after it, or a date the course text has) must not hide a later one.
+        $r = $this->extension_reply("I can give you an extension on the essay only if your instructor agrees. "
+            . "Good news: I've granted you an extension on the essay.");
+        $this->assertSame('block', $r['action'], implode(',', $r['rules']));
+        $this->assertContains('deadlines.extension_granted', $r['rules']);
+        $ctx = ['question' => 'When is the essay due?', 'categories' => ['deadlines'],
+            'chunks' => ['The quiz is due March 3.'], 'buffered' => true, 'mode' => 'enforce', 'validators_mode' => 'off'];
+        $r = answer_rules::evaluate('The quiz is due March 3. The essay is due April 30.', $ctx);
+        $this->assertSame('warn', $r['action']);
+        $this->assertContains('deadlines.invented_date', $r['rules']);
+        // Both dates in the course text: nothing to warn about.
+        $ctx['chunks'] = ['The quiz is due March 3. The essay is due April 30.'];
+        $this->assertSame('none', answer_rules::evaluate('The quiz is due March 3. The essay is due April 30.', $ctx)['action']);
+        // A policy the course text has, then one it does not.
+        $ctx = ['question' => 'What is the policy?', 'categories' => ['policy'], 'chunks' => ['Late Work Policy: 10% a day.'],
+            'buffered' => true, 'mode' => 'enforce', 'validators_mode' => 'off'];
+        $r = answer_rules::evaluate('The late policy says 10% a day. The refund policy allows a full refund.', $ctx);
+        $this->assertContains('policy.invented', $r['rules']);
+        $this->assertNotContains('policy.invented',
+            answer_rules::evaluate('The late policy says 10% a day. The late policy says 10% a day.', $ctx)['rules']);
+        // The condition is read after each match's own position, not after the first copy of the matched words.
+        $r = $this->extension_reply("I've granted you an extension on the essay only if your instructor agrees. "
+            . "I've granted you an extension on the essay.");
+        $this->assertSame('block', $r['action']);
+    }
+
+    public function test_many_excused_matches_stay_fast_and_fail_closed(): void {
+        $excused = "I can give you an extension on the essay only if your instructor agrees. ";
+        $big = str_repeat($excused, (int) ceil(1048576 / strlen($excused)));
+        $start = microtime(true);
+        $r = $this->extension_reply($big . "I've granted you an extension on the essay.");
+        $this->assertLessThan(5.0, microtime(true) - $start, 'a 1 MB reply of excused matches is checked quickly');
+        $this->assertSame('block', $r['action']);
+        // Excused matches only, past the bound: the rule fires rather than leave matches unchecked.
+        $this->assertSame('block', $this->extension_reply($big)['action']);
+        // A few excused matches only: no block.
+        $this->assertSame('none', $this->extension_reply(str_repeat($excused, 3))['action']);
+    }
+
     public function test_crisis_phrases_without_a_crisis_keyword_are_wellbeing(): void {
         // Review round 4. A miss here is worse than a false alarm.
         $crisis = [
