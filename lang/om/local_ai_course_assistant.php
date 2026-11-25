@@ -3667,6 +3667,7 @@ $string['realtime:err_answer_safety'] = 'Sagaleen kallattii koorsii kana keessat
 $string['talking_avatar:answer_safety'] = 'Fakkiin dubbatu koorsii kana keessatti hin argamu. Bakka isaa marii yookaan haala sagalee fayyadami.';
 $string['answeraudit:flow_voice_transcript'] = 'Sagalee kallattii: barreeffama dubbii kan sakatta\'aan barataa erge, erga deebiin dubbatamee booda sakatta\'ame';
 $string['answeraudit:flow_voice_truncated'] = 'Sagalee kallattii: barreeffamni dubbii baay\'ee dheeraa ture, sakatta\'iinsa dura ni murame';
+$string['answeraudit:flow_voice_question_only'] = 'Sagalee kallattii: jechoonni barataa deebii dhumaa marii booda dhufan; isaan qofatu sakatta\'ame';
 $string['answeraudit:source'] = 'Madda';
 $string['answeraudit:source_text'] = 'Haasaa barreeffamaa';
 $string['answeraudit:source_voice'] = 'Sagalee kallattii';

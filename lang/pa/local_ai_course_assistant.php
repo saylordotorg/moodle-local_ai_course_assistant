@@ -3655,6 +3655,7 @@ $string['realtime:err_answer_safety'] = 'ਇਸ ਕੋਰਸ ਵਿੱਚ ਲਾ
 $string['talking_avatar:answer_safety'] = 'ਇਸ ਕੋਰਸ ਵਿੱਚ ਬੋਲਣ ਵਾਲਾ ਅਵਤਾਰ ਉਪਲਬਧ ਨਹੀਂ ਹੈ। ਇਸ ਦੀ ਥਾਂ ਚੈਟ ਜਾਂ ਵੌਇਸ ਮੋਡ ਵਰਤੋ।';
 $string['answeraudit:flow_voice_transcript'] = 'ਲਾਈਵ ਆਵਾਜ਼: ਸਿਖਿਆਰਥੀ ਦੇ ਬ੍ਰਾਊਜ਼ਰ ਵੱਲੋਂ ਭੇਜੀ ਗਈ ਲਿਖਤੀ ਨਕਲ, ਜਵਾਬ ਬੋਲੇ ਜਾਣ ਤੋਂ ਬਾਅਦ ਜਾਂਚੀ ਗਈ';
 $string['answeraudit:flow_voice_truncated'] = 'ਲਾਈਵ ਆਵਾਜ਼: ਲਿਖਤੀ ਨਕਲ ਬਹੁਤ ਲੰਬੀ ਸੀ ਅਤੇ ਜਾਂਚ ਤੋਂ ਪਹਿਲਾਂ ਕੱਟ ਦਿੱਤੀ ਗਈ';
+$string['answeraudit:flow_voice_question_only'] = 'ਲਾਈਵ ਆਵਾਜ਼: ਸਿਖਿਆਰਥੀ ਦੇ ਸ਼ਬਦ ਸੈਸ਼ਨ ਦੇ ਆਖਰੀ ਜਵਾਬ ਤੋਂ ਬਾਅਦ ਆਏ; ਸਿਰਫ਼ ਉਨ੍ਹਾਂ ਦੀ ਜਾਂਚ ਹੋਈ';
 $string['answeraudit:source'] = 'ਸਰੋਤ';
 $string['answeraudit:source_text'] = 'ਟੈਕਸਟ ਚੈਟ';
 $string['answeraudit:source_voice'] = 'ਲਾਈਵ ਆਵਾਜ਼';

@@ -3650,6 +3650,7 @@ $string['realtime:err_answer_safety'] = 'Olu ndụ adịghị na kọọsị a. 
 $string['talking_avatar:answer_safety'] = 'Avatar na-ekwu okwu adịghị na kọọsị a. Jiri mkparịta ụka ma ọ bụ ọnọdụ olu kama.';
 $string['answeraudit:flow_voice_transcript'] = 'Olu ndụ: ederede okwu nke ihe nchọgharị onye mmụta zitere, enyochara ya mgbe ekwuchara azịza ahụ';
 $string['answeraudit:flow_voice_truncated'] = 'Olu ndụ: ederede okwu ahụ toro ogologo nke ukwuu, e bepụrụ ya tupu nyocha';
+$string['answeraudit:flow_voice_question_only'] = 'Olu ndụ: okwu onye mmụta bịara mgbe azịza ikpeazụ nke nnọkọ ahụ gasịrị; ọ bụ naanị ha ka enyochara';
 $string['answeraudit:source'] = 'Isi mmalite';
 $string['answeraudit:source_text'] = 'Mkparịta ụka ederede';
 $string['answeraudit:source_voice'] = 'Olu ndụ';

@@ -3679,6 +3679,7 @@ $string['realtime:err_answer_safety'] = 'Sauti ya moja kwa moja haipatikani kati
 $string['talking_avatar:answer_safety'] = 'Avatar inayoongea haipatikani katika kozi hii. Tumia gumzo au hali ya sauti badala yake.';
 $string['answeraudit:flow_voice_transcript'] = 'Sauti ya moja kwa moja: nakala ya maandishi iliyotumwa na kivinjari cha mwanafunzi, imekaguliwa baada ya jibu kutamkwa';
 $string['answeraudit:flow_voice_truncated'] = 'Sauti ya moja kwa moja: nakala ya maandishi ilikuwa ndefu mno na ilikatwa kabla ya ukaguzi';
+$string['answeraudit:flow_voice_question_only'] = 'Sauti ya moja kwa moja: maneno ya mwanafunzi yalikuja baada ya jibu la mwisho la kipindi; ni hayo tu yaliyokaguliwa';
 $string['answeraudit:source'] = 'Chanzo';
 $string['answeraudit:source_text'] = 'Gumzo la maandishi';
 $string['answeraudit:source_voice'] = 'Sauti ya moja kwa moja';

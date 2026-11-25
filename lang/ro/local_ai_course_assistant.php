@@ -3635,6 +3635,7 @@ $string['realtime:err_answer_safety'] = 'Vocea live nu este disponibilă în ace
 $string['talking_avatar:answer_safety'] = 'Avatarul vorbitor nu este disponibil în acest curs. Folosește chatul sau modul vocal.';
 $string['answeraudit:flow_voice_transcript'] = 'Voce live: transcriere trimisă de browserul cursantului, verificată după ce răspunsul a fost rostit';
 $string['answeraudit:flow_voice_truncated'] = 'Voce live: transcrierea era prea lungă și a fost scurtată înainte de verificare';
+$string['answeraudit:flow_voice_question_only'] = 'Voce live: cuvintele cursantului au venit după ultimul răspuns al sesiunii; doar ele au fost verificate';
 $string['answeraudit:source'] = 'Sursă';
 $string['answeraudit:source_text'] = 'Chat text';
 $string['answeraudit:source_voice'] = 'Voce live';

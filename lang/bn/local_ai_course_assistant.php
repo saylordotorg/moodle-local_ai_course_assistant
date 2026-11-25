@@ -3633,6 +3633,7 @@ $string['realtime:err_answer_safety'] = 'এই কোর্সে লাইভ 
 $string['talking_avatar:answer_safety'] = 'এই কোর্সে কথা-বলা অবতার পাওয়া যায় না। এর বদলে চ্যাট বা ভয়েস মোড ব্যবহার করুন।';
 $string['answeraudit:flow_voice_transcript'] = 'লাইভ ভয়েস: শিক্ষার্থীর ব্রাউজার থেকে পাঠানো প্রতিলিপি, উত্তর বলা হওয়ার পরে যাচাই করা হয়েছে';
 $string['answeraudit:flow_voice_truncated'] = 'লাইভ ভয়েস: প্রতিলিপিটি খুব দীর্ঘ ছিল এবং যাচাইয়ের আগে ছেঁটে ফেলা হয়েছে';
+$string['answeraudit:flow_voice_question_only'] = 'লাইভ ভয়েস: শিক্ষার্থীর কথাগুলো সেশনের শেষ উত্তরের পরে এসেছে; শুধু সেগুলোই যাচাই করা হয়েছে';
 $string['answeraudit:source'] = 'উৎস';
 $string['answeraudit:source_text'] = 'টেক্সট চ্যাট';
 $string['answeraudit:source_voice'] = 'লাইভ ভয়েস';

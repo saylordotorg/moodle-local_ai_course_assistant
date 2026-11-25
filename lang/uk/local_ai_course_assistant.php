@@ -3675,6 +3675,7 @@ $string['realtime:err_answer_safety'] = 'Живий голос недоступ�
 $string['talking_avatar:answer_safety'] = 'Розмовний аватар недоступний у цьому курсі. Скористайтеся чатом або голосовим режимом.';
 $string['answeraudit:flow_voice_transcript'] = 'Живий голос: розшифровку надіслано браузером учня, перевірено після того, як відповідь було вимовлено';
 $string['answeraudit:flow_voice_truncated'] = 'Живий голос: розшифровка була надто довгою, і її обрізано перед перевіркою';
+$string['answeraudit:flow_voice_question_only'] = 'Живий голос: слова учня надійшли після останньої відповіді сеансу; перевірено лише їх';
 $string['answeraudit:source'] = 'Джерело';
 $string['answeraudit:source_text'] = 'Текстовий чат';
 $string['answeraudit:source_voice'] = 'Живий голос';

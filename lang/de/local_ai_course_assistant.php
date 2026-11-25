@@ -3635,6 +3635,7 @@ $string['realtime:err_answer_safety'] = 'Live-Sprache ist in diesem Kurs nicht v
 $string['talking_avatar:answer_safety'] = 'Der sprechende Avatar ist in diesem Kurs nicht verfügbar. Nutze stattdessen den Chat oder den Sprachmodus.';
 $string['answeraudit:flow_voice_transcript'] = 'Live-Sprache: Transkript vom Browser der lernenden Person gesendet, geprüft, nachdem die Antwort gesprochen wurde';
 $string['answeraudit:flow_voice_truncated'] = 'Live-Sprache: Das Transkript war zu lang und wurde vor der Prüfung gekürzt';
+$string['answeraudit:flow_voice_question_only'] = 'Live-Sprache: die Worte der lernenden Person kamen nach der letzten Antwort der Sitzung; nur sie wurden geprüft';
 $string['answeraudit:source'] = 'Quelle';
 $string['answeraudit:source_text'] = 'Text-Chat';
 $string['answeraudit:source_voice'] = 'Live-Sprache';

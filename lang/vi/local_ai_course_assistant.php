@@ -3655,6 +3655,7 @@ $string['realtime:err_answer_safety'] = 'Giọng nói trực tiếp không khả
 $string['talking_avatar:answer_safety'] = 'Hình đại diện biết nói không khả dụng trong khóa học này. Hãy dùng trò chuyện hoặc chế độ giọng nói.';
 $string['answeraudit:flow_voice_transcript'] = 'Giọng nói trực tiếp: bản ghi lời do trình duyệt của người học gửi, được kiểm tra sau khi câu trả lời đã được nói';
 $string['answeraudit:flow_voice_truncated'] = 'Giọng nói trực tiếp: bản ghi lời quá dài và đã bị cắt trước khi kiểm tra';
+$string['answeraudit:flow_voice_question_only'] = 'Giọng nói trực tiếp: lời của người học đến sau câu trả lời cuối cùng của phiên; chỉ những lời đó được kiểm tra';
 $string['answeraudit:source'] = 'Nguồn';
 $string['answeraudit:source_text'] = 'Trò chuyện văn bản';
 $string['answeraudit:source_voice'] = 'Giọng nói trực tiếp';

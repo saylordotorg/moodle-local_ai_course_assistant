@@ -3680,6 +3680,7 @@ $string['realtime:err_answer_safety'] = 'Izwi elibukhoma alitholakali kulesi sif
 $string['talking_avatar:answer_safety'] = 'I-avatar ekhulumayo ayitholakali kulesi sifundo. Sebenzisa ingxoxo noma imodi yezwi esikhundleni sayo.';
 $string['answeraudit:flow_voice_transcript'] = 'Izwi elibukhoma: umbhalo wenkulumo othunyelwe yisiphequluli somfundi, uhlolwe ngemva kokuba impendulo ishiwo';
 $string['answeraudit:flow_voice_truncated'] = 'Izwi elibukhoma: umbhalo wenkulumo ubumude kakhulu futhi unqunyiwe ngaphambi kokuhlolwa';
+$string['answeraudit:flow_voice_question_only'] = 'Izwi elibukhoma: amazwi omfundi afike ngemva kwempendulo yokugcina yeseshini; yiwona kuphela ahloliwe';
 $string['answeraudit:source'] = 'Umthombo';
 $string['answeraudit:source_text'] = 'Ingxoxo yombhalo';
 $string['answeraudit:source_voice'] = 'Izwi elibukhoma';

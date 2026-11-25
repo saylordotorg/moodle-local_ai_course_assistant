@@ -3663,6 +3663,7 @@ $string['realtime:err_answer_safety'] = 'Live voice is not available in this cou
 $string['talking_avatar:answer_safety'] = 'The talking avatar is not available in this course. Use chat or voice mode instead.';
 $string['answeraudit:flow_voice_transcript'] = 'Kumakan teliman: kuma sɛbɛnnen min cira kalanden ka navigatɛri fɛ, a lajɛra jaabi fɔlen kɔfɛ';
 $string['answeraudit:flow_voice_truncated'] = 'Kumakan teliman: kuma sɛbɛnnen tun ka jan kojugu, a tigɛra sani lajɛli cɛ';
+$string['answeraudit:flow_voice_question_only'] = 'Live voice: the learner\'s words came after the last answer of the session; only they were checked';
 $string['answeraudit:source'] = 'Sɔrɔyɔrɔ';
 $string['answeraudit:source_text'] = 'Sɛbɛnni baro';
 $string['answeraudit:source_voice'] = 'Kumakan teliman';

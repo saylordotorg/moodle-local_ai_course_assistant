@@ -3633,6 +3633,7 @@ $string['realtime:err_answer_safety'] = '이 강좌에서는 라이브 음성을
 $string['talking_avatar:answer_safety'] = '이 강좌에서는 말하는 아바타를 사용할 수 없습니다. 채팅이나 음성 모드를 사용하세요.';
 $string['answeraudit:flow_voice_transcript'] = '라이브 음성: 학습자의 브라우저가 보낸 전사문, 답변을 말한 뒤에 검사함';
 $string['answeraudit:flow_voice_truncated'] = '라이브 음성: 전사문이 너무 길어 검사 전에 잘랐음';
+$string['answeraudit:flow_voice_question_only'] = '라이브 음성: 학습자의 말이 세션의 마지막 답변 뒤에 도착하여 그 말만 검사함';
 $string['answeraudit:source'] = '출처';
 $string['answeraudit:source_text'] = '텍스트 채팅';
 $string['answeraudit:source_voice'] = '라이브 음성';

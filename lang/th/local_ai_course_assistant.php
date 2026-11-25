@@ -3634,6 +3634,7 @@ $string['realtime:err_answer_safety'] = 'เสียงสดไม่พร้
 $string['talking_avatar:answer_safety'] = 'อวาตาร์พูดได้ไม่พร้อมใช้งานในรายวิชานี้ โปรดใช้แชตหรือโหมดเสียงแทน';
 $string['answeraudit:flow_voice_transcript'] = 'เสียงสด: บทถอดเสียงที่เบราว์เซอร์ของผู้เรียนส่งมา ตรวจหลังจากพูดคำตอบแล้ว';
 $string['answeraudit:flow_voice_truncated'] = 'เสียงสด: บทถอดเสียงยาวเกินไปและถูกตัดก่อนการตรวจ';
+$string['answeraudit:flow_voice_question_only'] = 'เสียงสด: คำพูดของผู้เรียนมาหลังคำตอบสุดท้ายของเซสชัน จึงตรวจเฉพาะคำพูดนั้น';
 $string['answeraudit:source'] = 'แหล่งที่มา';
 $string['answeraudit:source_text'] = 'แชตข้อความ';
 $string['answeraudit:source_voice'] = 'เสียงสด';

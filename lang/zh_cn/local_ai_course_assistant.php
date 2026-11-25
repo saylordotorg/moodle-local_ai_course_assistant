@@ -3671,6 +3671,7 @@ $string['realtime:err_answer_safety'] = '本课程不提供实时语音。请改
 $string['talking_avatar:answer_safety'] = '本课程不提供会说话头像。请改用聊天或语音模式。';
 $string['answeraudit:flow_voice_transcript'] = '实时语音:由学习者浏览器发送的转写文本,在回答说出之后检查';
 $string['answeraudit:flow_voice_truncated'] = '实时语音:转写文本过长,已在检查前截断';
+$string['answeraudit:flow_voice_question_only'] = '实时语音:学习者的话在本次会话最后一个回答之后才到达;只检查了这些话';
 $string['answeraudit:source'] = '来源';
 $string['answeraudit:source_text'] = '文字聊天';
 $string['answeraudit:source_voice'] = '实时语音';

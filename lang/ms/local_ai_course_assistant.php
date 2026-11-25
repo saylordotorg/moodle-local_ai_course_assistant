@@ -3678,6 +3678,7 @@ $string['realtime:err_answer_safety'] = 'Suara langsung tidak tersedia dalam kur
 $string['talking_avatar:answer_safety'] = 'Avatar bercakap tidak tersedia dalam kursus ini. Gunakan sembang atau mod suara.';
 $string['answeraudit:flow_voice_transcript'] = 'Suara langsung: transkrip dihantar oleh pelayar pelajar, disemak selepas jawapan diucapkan';
 $string['answeraudit:flow_voice_truncated'] = 'Suara langsung: transkrip terlalu panjang dan dipotong sebelum semakan';
+$string['answeraudit:flow_voice_question_only'] = 'Suara langsung: kata-kata pelajar tiba selepas jawapan terakhir sesi; hanya kata-kata itu disemak';
 $string['answeraudit:source'] = 'Sumber';
 $string['answeraudit:source_text'] = 'Sembang teks';
 $string['answeraudit:source_voice'] = 'Suara langsung';

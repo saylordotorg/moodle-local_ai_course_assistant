@@ -3679,6 +3679,7 @@ $string['realtime:err_answer_safety'] = 'Codka tooska ah lagama heli karo koorsa
 $string['talking_avatar:answer_safety'] = 'Avatar-ka hadlaya lagama heli karo koorsadan. Beddelkeeda isticmaal sheekaysiga ama habka codka.';
 $string['answeraudit:flow_voice_transcript'] = 'Codka tooska ah: qoraalka hadalka ee uu soo diray biraawsarka ardaygu, waxaa la hubiyay ka dib markii jawaabta la yidhi';
 $string['answeraudit:flow_voice_truncated'] = 'Codka tooska ah: qoraalka hadalku aad buu u dheeraa waana la gooyay hubinta ka hor';
+$string['answeraudit:flow_voice_question_only'] = 'Codka tooska ah: erayada ardaygu waxay yimaadeen jawaabtii ugu dambaysay ee fadhiga kadib; iyaga oo keliya ayaa la hubiyay';
 $string['answeraudit:source'] = 'Isha';
 $string['answeraudit:source_text'] = 'Sheekaysi qoraal ah';
 $string['answeraudit:source_voice'] = 'Codka tooska ah';

@@ -3675,6 +3675,7 @@ $string['realtime:err_answer_safety'] = 'Az élő hang nem érhető el ebben a k
 $string['talking_avatar:answer_safety'] = 'A beszélő avatár nem érhető el ebben a kurzusban. Használd helyette a csevegést vagy a hangmódot.';
 $string['answeraudit:flow_voice_transcript'] = 'Élő hang: a tanuló böngészője által küldött átirat, a válasz elhangzása után ellenőrizve';
 $string['answeraudit:flow_voice_truncated'] = 'Élő hang: az átirat túl hosszú volt, ezért az ellenőrzés előtt le lett vágva';
+$string['answeraudit:flow_voice_question_only'] = 'Élő hang: a tanuló szavai a munkamenet utolsó válasza után érkeztek; csak azokat ellenőrizte a rendszer';
 $string['answeraudit:source'] = 'Forrás';
 $string['answeraudit:source_text'] = 'Szöveges csevegés';
 $string['answeraudit:source_voice'] = 'Élő hang';

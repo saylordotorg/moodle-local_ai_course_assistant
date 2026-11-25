@@ -3662,6 +3662,7 @@ $string['realtime:err_answer_safety'] = 'Babu muryar kai-tsaye a wannan kwas. Yi
 $string['talking_avatar:answer_safety'] = 'Babu avatar mai magana a wannan kwas. Yi amfani da hira ko yanayin murya a maimakon haka.';
 $string['answeraudit:flow_voice_transcript'] = 'Muryar kai-tsaye: rubutun magana da burauzar ɗalibi ta aika, an duba shi bayan an faɗi amsar';
 $string['answeraudit:flow_voice_truncated'] = 'Muryar kai-tsaye: rubutun maganar ya yi tsayi sosai, an yanke shi kafin dubawa';
+$string['answeraudit:flow_voice_question_only'] = 'Muryar kai-tsaye: kalmomin ɗalibi sun zo bayan amsar ƙarshe ta zaman; su kaɗai aka duba';
 $string['answeraudit:source'] = 'Tushe';
 $string['answeraudit:source_text'] = 'Hira ta rubutu';
 $string['answeraudit:source_voice'] = 'Muryar kai-tsaye';

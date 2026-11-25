@@ -3636,6 +3636,7 @@ $string['realtime:err_answer_safety'] = 'Živý hlas není v tomto kurzu k dispo
 $string['talking_avatar:answer_safety'] = 'Mluvící avatar není v tomto kurzu k dispozici. Použijte chat nebo hlasový režim.';
 $string['answeraudit:flow_voice_transcript'] = 'Živý hlas: přepis odeslaný prohlížečem studenta, zkontrolovaný poté, co odpověď zazněla';
 $string['answeraudit:flow_voice_truncated'] = 'Živý hlas: přepis byl příliš dlouhý a před kontrolou byl zkrácen';
+$string['answeraudit:flow_voice_question_only'] = 'Živý hlas: slova studenta přišla po poslední odpovědi relace; zkontrolována byla jen ona';
 $string['answeraudit:source'] = 'Zdroj';
 $string['answeraudit:source_text'] = 'Textový chat';
 $string['answeraudit:source_voice'] = 'Živý hlas';

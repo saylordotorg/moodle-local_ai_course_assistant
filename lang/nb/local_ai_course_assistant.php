@@ -3633,6 +3633,7 @@ $string['realtime:err_answer_safety'] = 'Direktestemme er ikke tilgjengelig i de
 $string['talking_avatar:answer_safety'] = 'Den snakkende avataren er ikke tilgjengelig i dette kurset. Bruk chatten eller stemmemodusen i stedet.';
 $string['answeraudit:flow_voice_transcript'] = 'Direktestemme: transkripsjon sendt av deltakerens nettleser, kontrollert etter at svaret var sagt';
 $string['answeraudit:flow_voice_truncated'] = 'Direktestemme: transkripsjonen var for lang og ble kuttet før kontrollen';
+$string['answeraudit:flow_voice_question_only'] = 'Direktestemme: deltakerens ord kom etter øktens siste svar; bare de ble kontrollert';
 $string['answeraudit:source'] = 'Kilde';
 $string['answeraudit:source_text'] = 'Tekstchat';
 $string['answeraudit:source_voice'] = 'Direktestemme';

@@ -3633,6 +3633,7 @@ $string['realtime:err_answer_safety'] = 'このコースではライブ音声は
 $string['talking_avatar:answer_safety'] = 'このコースではトーキングアバターは利用できません。チャットまたは音声モードを使ってください。';
 $string['answeraudit:flow_voice_transcript'] = 'ライブ音声: 学習者のブラウザから送られた文字起こし。回答が話された後にチェックした';
 $string['answeraudit:flow_voice_truncated'] = 'ライブ音声: 文字起こしが長すぎたため、チェックの前に切り詰めた';
+$string['answeraudit:flow_voice_question_only'] = 'ライブ音声: 学習者の発言がセッションの最後の回答の後に届いたため、その発言だけをチェックした';
 $string['answeraudit:source'] = 'ソース';
 $string['answeraudit:source_text'] = 'テキストチャット';
 $string['answeraudit:source_voice'] = 'ライブ音声';

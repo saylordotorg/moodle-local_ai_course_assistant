@@ -3655,6 +3655,7 @@ $string['realtime:err_answer_safety'] = 'A voz ao vivo não está disponível ne
 $string['talking_avatar:answer_safety'] = 'O avatar falante não está disponível neste curso. Use o chat ou o modo de voz.';
 $string['answeraudit:flow_voice_transcript'] = 'Voz ao vivo: transcrição enviada pelo navegador do estudante, verificada depois que a resposta foi falada';
 $string['answeraudit:flow_voice_truncated'] = 'Voz ao vivo: a transcrição era longa demais e foi cortada antes da verificação';
+$string['answeraudit:flow_voice_question_only'] = 'Voz ao vivo: as palavras do estudante chegaram depois da última resposta da sessão; só elas foram verificadas';
 $string['answeraudit:source'] = 'Origem';
 $string['answeraudit:source_text'] = 'Chat de texto';
 $string['answeraudit:source_voice'] = 'Voz ao vivo';

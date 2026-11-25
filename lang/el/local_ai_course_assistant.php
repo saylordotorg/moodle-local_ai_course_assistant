@@ -3676,6 +3676,7 @@ $string['realtime:err_answer_safety'] = 'Η ζωντανή φωνή δεν εί�
 $string['talking_avatar:answer_safety'] = 'Το ομιλούν avatar δεν είναι διαθέσιμο σε αυτό το μάθημα. Χρησιμοποιήστε τη συνομιλία ή τη λειτουργία φωνής.';
 $string['answeraudit:flow_voice_transcript'] = 'Ζωντανή φωνή: απομαγνητοφώνηση που έστειλε ο περιηγητής του εκπαιδευόμενου, ελεγμένη αφού ειπώθηκε η απάντηση';
 $string['answeraudit:flow_voice_truncated'] = 'Ζωντανή φωνή: η απομαγνητοφώνηση ήταν πολύ μεγάλη και κόπηκε πριν από τον έλεγχο';
+$string['answeraudit:flow_voice_question_only'] = 'Ζωντανή φωνή: τα λόγια του εκπαιδευόμενου ήρθαν μετά την τελευταία απάντηση της συνεδρίας· ελέγχθηκαν μόνο αυτά';
 $string['answeraudit:source'] = 'Πηγή';
 $string['answeraudit:source_text'] = 'Συνομιλία κειμένου';
 $string['answeraudit:source_voice'] = 'Ζωντανή φωνή';

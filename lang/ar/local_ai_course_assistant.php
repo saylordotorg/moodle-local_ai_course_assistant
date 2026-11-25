@@ -3633,6 +3633,7 @@ $string['realtime:err_answer_safety'] = 'الصوت المباشر غير متا
 $string['talking_avatar:answer_safety'] = 'الصورة الرمزية المتحدثة غير متاحة في هذا المقرر. استخدم المحادثة أو وضع الصوت بدلًا منها.';
 $string['answeraudit:flow_voice_transcript'] = 'الصوت المباشر: نص مفرّغ أرسله متصفح المتعلم، وفُحص بعد نطق الإجابة';
 $string['answeraudit:flow_voice_truncated'] = 'الصوت المباشر: كان النص المفرّغ طويلًا جدًا فاقتُطع قبل الفحص';
+$string['answeraudit:flow_voice_question_only'] = 'الصوت المباشر: وصلت كلمات المتعلم بعد آخر إجابة في الجلسة؛ ولم يُفحص سواها';
 $string['answeraudit:source'] = 'المصدر';
 $string['answeraudit:source_text'] = 'محادثة نصية';
 $string['answeraudit:source_voice'] = 'الصوت المباشر';

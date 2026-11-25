@@ -3674,6 +3674,7 @@ $string['realtime:err_answer_safety'] = 'קול חי אינו זמין בקור�
 $string['talking_avatar:answer_safety'] = 'האווטאר המדבר אינו זמין בקורס זה. השתמשו בצ\'אט או במצב הקול.';
 $string['answeraudit:flow_voice_transcript'] = 'קול חי: תמליל שנשלח מהדפדפן של הלומד, נבדק לאחר שהתשובה נאמרה';
 $string['answeraudit:flow_voice_truncated'] = 'קול חי: התמליל היה ארוך מדי וקוצר לפני הבדיקה';
+$string['answeraudit:flow_voice_question_only'] = 'קול חי: דברי הלומד הגיעו אחרי התשובה האחרונה של הפעלה; רק הם נבדקו';
 $string['answeraudit:source'] = 'מקור';
 $string['answeraudit:source_text'] = 'צ\'אט טקסט';
 $string['answeraudit:source_voice'] = 'קול חי';

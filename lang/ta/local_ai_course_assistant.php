@@ -3656,6 +3656,7 @@ $string['realtime:err_answer_safety'] = 'இந்தப் பாடநெற�
 $string['talking_avatar:answer_safety'] = 'இந்தப் பாடநெறியில் பேசும் அவதாரம் கிடைக்காது. அதற்குப் பதிலாக அரட்டையையோ குரல் பயன்முறையையோ பயன்படுத்துங்கள்.';
 $string['answeraudit:flow_voice_transcript'] = 'நேரலைக் குரல்: கற்பவரின் உலாவி அனுப்பிய எழுத்துப்படி, பதில் பேசப்பட்ட பிறகு சரிபார்க்கப்பட்டது';
 $string['answeraudit:flow_voice_truncated'] = 'நேரலைக் குரல்: எழுத்துப்படி மிக நீளமாக இருந்ததால் சரிபார்ப்புக்கு முன் வெட்டப்பட்டது';
+$string['answeraudit:flow_voice_question_only'] = 'நேரலைக் குரல்: கற்பவரின் சொற்கள் அமர்வின் கடைசி பதிலுக்குப் பிறகு வந்தன; அவை மட்டுமே சரிபார்க்கப்பட்டன';
 $string['answeraudit:source'] = 'மூலம்';
 $string['answeraudit:source_text'] = 'உரை அரட்டை';
 $string['answeraudit:source_voice'] = 'நேரலைக் குரல்';

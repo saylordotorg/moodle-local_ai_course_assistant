@@ -3687,6 +3687,7 @@ $string['realtime:err_answer_safety'] = 'Suara langsung tidak tersedia di kursus
 $string['talking_avatar:answer_safety'] = 'Avatar bicara tidak tersedia di kursus ini. Gunakan obrolan atau mode suara.';
 $string['answeraudit:flow_voice_transcript'] = 'Suara langsung: transkrip dikirim oleh peramban peserta, diperiksa setelah jawaban diucapkan';
 $string['answeraudit:flow_voice_truncated'] = 'Suara langsung: transkrip terlalu panjang dan dipotong sebelum pemeriksaan';
+$string['answeraudit:flow_voice_question_only'] = 'Suara langsung: kata-kata peserta datang setelah jawaban terakhir sesi; hanya kata-kata itu yang diperiksa';
 $string['answeraudit:source'] = 'Sumber';
 $string['answeraudit:source_text'] = 'Obrolan teks';
 $string['answeraudit:source_voice'] = 'Suara langsung';

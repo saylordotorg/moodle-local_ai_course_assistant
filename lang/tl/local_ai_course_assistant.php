@@ -3679,6 +3679,7 @@ $string['realtime:err_answer_safety'] = 'Hindi available ang live na boses sa ku
 $string['talking_avatar:answer_safety'] = 'Hindi available ang talking avatar sa kursong ito. Gamitin ang chat o ang voice mode.';
 $string['answeraudit:flow_voice_transcript'] = 'Live na boses: transcript na ipinadala ng browser ng mag-aaral, sinuri pagkatapos bigkasin ang sagot';
 $string['answeraudit:flow_voice_truncated'] = 'Live na boses: masyadong mahaba ang transcript at pinutol ito bago ang pagsusuri';
+$string['answeraudit:flow_voice_question_only'] = 'Live na boses: dumating ang mga salita ng mag-aaral pagkatapos ng huling sagot ng session; ang mga iyon lang ang sinuri';
 $string['answeraudit:source'] = 'Pinagmulan';
 $string['answeraudit:source_text'] = 'Chat na teksto';
 $string['answeraudit:source_voice'] = 'Live na boses';

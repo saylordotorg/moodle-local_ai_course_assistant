@@ -3636,6 +3636,7 @@ $string['realtime:err_answer_safety'] = 'La voix en direct n\'est pas disponible
 $string['talking_avatar:answer_safety'] = 'L\'avatar parlant n\'est pas disponible dans ce cours. Utilisez plutôt le chat ou le mode vocal.';
 $string['answeraudit:flow_voice_transcript'] = 'Voix en direct : transcription envoyée par le navigateur de l\'apprenant, vérifiée après que la réponse a été prononcée';
 $string['answeraudit:flow_voice_truncated'] = 'Voix en direct : la transcription était trop longue et a été coupée avant la vérification';
+$string['answeraudit:flow_voice_question_only'] = 'Voix en direct : les paroles de l\'apprenant sont arrivées après la dernière réponse de la session ; seules elles ont été vérifiées';
 $string['answeraudit:source'] = 'Source';
 $string['answeraudit:source_text'] = 'Chat textuel';
 $string['answeraudit:source_voice'] = 'Voix en direct';

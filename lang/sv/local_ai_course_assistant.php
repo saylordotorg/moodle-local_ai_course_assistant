@@ -3634,6 +3634,7 @@ $string['realtime:err_answer_safety'] = 'Liveröst är inte tillgängligt i den 
 $string['talking_avatar:answer_safety'] = 'Den talande avataren är inte tillgänglig i den här kursen. Använd chatten eller röstläget i stället.';
 $string['answeraudit:flow_voice_transcript'] = 'Liveröst: transkription skickad av deltagarens webbläsare, kontrollerad efter att svaret hade sagts';
 $string['answeraudit:flow_voice_truncated'] = 'Liveröst: transkriptionen var för lång och kortades före kontrollen';
+$string['answeraudit:flow_voice_question_only'] = 'Liveröst: deltagarens ord kom efter sessionens sista svar; bara de kontrollerades';
 $string['answeraudit:source'] = 'Källa';
 $string['answeraudit:source_text'] = 'Textchatt';
 $string['answeraudit:source_voice'] = 'Liveröst';

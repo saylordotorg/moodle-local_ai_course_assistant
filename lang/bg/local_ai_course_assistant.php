@@ -3636,6 +3636,7 @@ $string['realtime:err_answer_safety'] = 'Гласът на живо не е на
 $string['talking_avatar:answer_safety'] = 'Говорещият аватар не е наличен в този курс. Използвайте чата или гласовия режим.';
 $string['answeraudit:flow_voice_transcript'] = 'Глас на живо: транскрипция, изпратена от браузъра на учащия, проверена след изговарянето на отговора';
 $string['answeraudit:flow_voice_truncated'] = 'Глас на живо: транскрипцията беше твърде дълга и беше съкратена преди проверката';
+$string['answeraudit:flow_voice_question_only'] = 'Глас на живо: думите на учащия дойдоха след последния отговор в сесията; проверени бяха само те';
 $string['answeraudit:source'] = 'Източник';
 $string['answeraudit:source_text'] = 'Текстов чат';
 $string['answeraudit:source_voice'] = 'Глас на живо';

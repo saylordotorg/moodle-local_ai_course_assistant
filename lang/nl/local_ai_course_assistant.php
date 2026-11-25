@@ -3658,6 +3658,7 @@ $string['realtime:err_answer_safety'] = 'Live spraak is niet beschikbaar in deze
 $string['talking_avatar:answer_safety'] = 'De pratende avatar is niet beschikbaar in deze cursus. Gebruik de chat of de spraakmodus.';
 $string['answeraudit:flow_voice_transcript'] = 'Live spraak: transcript verzonden door de browser van de cursist, gecontroleerd nadat het antwoord was uitgesproken';
 $string['answeraudit:flow_voice_truncated'] = 'Live spraak: het transcript was te lang en is voor de controle ingekort';
+$string['answeraudit:flow_voice_question_only'] = 'Live spraak: de woorden van de cursist kwamen na het laatste antwoord van de sessie; alleen die zijn gecontroleerd';
 $string['answeraudit:source'] = 'Bron';
 $string['answeraudit:source_text'] = 'Tekstchat';
 $string['answeraudit:source_voice'] = 'Live spraak';

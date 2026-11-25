@@ -3656,6 +3656,7 @@ $string['realtime:err_answer_safety'] = 'Ohùn ààyè kò sí nínú ẹ̀kọ�
 $string['talking_avatar:answer_safety'] = 'Avatar tó ń sọ̀rọ̀ kò sí nínú ẹ̀kọ́ yìí. Lo ìtàkùrọ̀sọ tàbí ipò ohùn dípò rẹ̀.';
 $string['answeraudit:flow_voice_transcript'] = 'Ohùn ààyè: àkọsílẹ̀ ọ̀rọ̀ tí aṣàwákiri akẹ́kọ̀ọ́ fi ránṣẹ́, a ṣàyẹ̀wò rẹ̀ lẹ́yìn tí a sọ ìdáhùn náà';
 $string['answeraudit:flow_voice_truncated'] = 'Ohùn ààyè: àkọsílẹ̀ ọ̀rọ̀ náà gùn jù, a sì gé e kúrú ṣáájú àyẹ̀wò';
+$string['answeraudit:flow_voice_question_only'] = 'Ohùn ààyè: ọ̀rọ̀ akẹ́kọ̀ọ́ dé lẹ́yìn ìdáhùn tó gbẹ̀yìn nínú ìpàdé náà; àwọn nìkan ni a ṣàyẹ̀wò';
 $string['answeraudit:source'] = 'Orísun';
 $string['answeraudit:source_text'] = 'Ìfọ̀rọ̀wérọ̀ ọ̀rọ̀ kíkọ';
 $string['answeraudit:source_voice'] = 'Ohùn ààyè';

@@ -3673,6 +3673,7 @@ $string['realtime:err_answer_safety'] = 'La voce dal vivo non è disponibile in 
 $string['talking_avatar:answer_safety'] = 'L\'avatar parlante non è disponibile in questo corso. Usa la chat o la modalità vocale.';
 $string['answeraudit:flow_voice_transcript'] = 'Voce dal vivo: trascrizione inviata dal browser dello studente, controllata dopo che la risposta è stata pronunciata';
 $string['answeraudit:flow_voice_truncated'] = 'Voce dal vivo: la trascrizione era troppo lunga ed è stata tagliata prima del controllo';
+$string['answeraudit:flow_voice_question_only'] = 'Voce dal vivo: le parole dello studente sono arrivate dopo l\'ultima risposta della sessione; sono state controllate solo quelle';
 $string['answeraudit:source'] = 'Origine';
 $string['answeraudit:source_text'] = 'Chat testuale';
 $string['answeraudit:source_voice'] = 'Voce dal vivo';

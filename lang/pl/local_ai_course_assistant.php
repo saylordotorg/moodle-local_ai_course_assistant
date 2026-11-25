@@ -3635,6 +3635,7 @@ $string['realtime:err_answer_safety'] = 'Głos na żywo nie jest dostępny w tym
 $string['talking_avatar:answer_safety'] = 'Mówiący awatar nie jest dostępny w tym kursie. Użyj czatu lub trybu głosowego.';
 $string['answeraudit:flow_voice_transcript'] = 'Głos na żywo: transkrypcja wysłana przez przeglądarkę uczestnika, sprawdzona po wypowiedzeniu odpowiedzi';
 $string['answeraudit:flow_voice_truncated'] = 'Głos na żywo: transkrypcja była za długa i została skrócona przed sprawdzeniem';
+$string['answeraudit:flow_voice_question_only'] = 'Głos na żywo: słowa uczestnika przyszły po ostatniej odpowiedzi sesji; sprawdzono tylko je';
 $string['answeraudit:source'] = 'Źródło';
 $string['answeraudit:source_text'] = 'Czat tekstowy';
 $string['answeraudit:source_voice'] = 'Głos na żywo';

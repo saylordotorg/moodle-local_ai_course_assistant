@@ -3662,6 +3662,7 @@ $string['realtime:err_answer_safety'] = 'የቀጥታ ድምፅ በዚህ ኮር
 $string['talking_avatar:answer_safety'] = 'ተናጋሪ አቫታር በዚህ ኮርስ አይገኝም። በምትኩ ቻት ወይም የድምፅ ሁነታ ይጠቀሙ።';
 $string['answeraudit:flow_voice_transcript'] = 'የቀጥታ ድምፅ፦ ከተማሪው አሳሽ የተላከ የጽሑፍ ግልባጭ፣ መልሱ ከተነገረ በኋላ የተፈተሸ';
 $string['answeraudit:flow_voice_truncated'] = 'የቀጥታ ድምፅ፦ የጽሑፍ ግልባጩ በጣም ረጅም ስለነበር ከፍተሻው በፊት ተቆርጧል';
+$string['answeraudit:flow_voice_question_only'] = 'የቀጥታ ድምፅ፦ የተማሪው ቃላት ከክፍለ ጊዜው የመጨረሻ መልስ በኋላ መጥተዋል፤ የተፈተሹት እነሱ ብቻ ናቸው';
 $string['answeraudit:source'] = 'ምንጭ';
 $string['answeraudit:source_text'] = 'የጽሑፍ ውይይት';
 $string['answeraudit:source_voice'] = 'የቀጥታ ድምፅ';

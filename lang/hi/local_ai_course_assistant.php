@@ -3663,6 +3663,7 @@ $string['realtime:err_answer_safety'] = 'इस पाठ्यक्रम म�
 $string['talking_avatar:answer_safety'] = 'इस पाठ्यक्रम में बोलने वाला अवतार उपलब्ध नहीं है। इसके बजाय चैट या वॉइस मोड का उपयोग करें।';
 $string['answeraudit:flow_voice_transcript'] = 'लाइव आवाज़: शिक्षार्थी के ब्राउज़र द्वारा भेजी गई प्रतिलिपि, उत्तर बोले जाने के बाद जाँची गई';
 $string['answeraudit:flow_voice_truncated'] = 'लाइव आवाज़: प्रतिलिपि बहुत लंबी थी और जाँच से पहले काट दी गई';
+$string['answeraudit:flow_voice_question_only'] = 'लाइव आवाज़: शिक्षार्थी के शब्द सत्र के अंतिम उत्तर के बाद आए; केवल उन्हीं की जाँच हुई';
 $string['answeraudit:source'] = 'स्रोत';
 $string['answeraudit:source_text'] = 'टेक्स्ट चैट';
 $string['answeraudit:source_voice'] = 'लाइव आवाज़';

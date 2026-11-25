@@ -3636,6 +3636,7 @@ $string['realtime:err_answer_safety'] = 'Canlı ses bu derste kullanılamıyor. 
 $string['talking_avatar:answer_safety'] = 'Konuşan avatar bu derste kullanılamıyor. Bunun yerine sohbeti veya ses modunu kullanın.';
 $string['answeraudit:flow_voice_transcript'] = 'Canlı ses: öğrencinin tarayıcısının gönderdiği döküm, yanıt söylendikten sonra denetlendi';
 $string['answeraudit:flow_voice_truncated'] = 'Canlı ses: döküm çok uzundu ve denetimden önce kısaltıldı';
+$string['answeraudit:flow_voice_question_only'] = 'Canlı ses: öğrencinin sözleri oturumun son yanıtından sonra geldi; yalnızca onlar denetlendi';
 $string['answeraudit:source'] = 'Kaynak';
 $string['answeraudit:source_text'] = 'Metin sohbeti';
 $string['answeraudit:source_voice'] = 'Canlı ses';

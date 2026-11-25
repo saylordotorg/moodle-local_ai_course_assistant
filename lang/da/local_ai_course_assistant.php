@@ -3635,6 +3635,7 @@ $string['realtime:err_answer_safety'] = 'Livestemme er ikke tilgængelig i dette
 $string['talking_avatar:answer_safety'] = 'Den talende avatar er ikke tilgængelig i dette kursus. Brug chatten eller stemmetilstanden i stedet.';
 $string['answeraudit:flow_voice_transcript'] = 'Livestemme: udskrift sendt af kursistens browser, kontrolleret efter at svaret var sagt';
 $string['answeraudit:flow_voice_truncated'] = 'Livestemme: udskriften var for lang og blev afkortet før kontrollen';
+$string['answeraudit:flow_voice_question_only'] = 'Livestemme: kursistens ord kom efter sessionens sidste svar; kun de blev kontrolleret';
 $string['answeraudit:source'] = 'Kilde';
 $string['answeraudit:source_text'] = 'Tekstchat';
 $string['answeraudit:source_voice'] = 'Livestemme';

@@ -3635,6 +3635,7 @@ $string['realtime:err_answer_safety'] = 'Live-ääni ei ole käytettävissä tä
 $string['talking_avatar:answer_safety'] = 'Puhuva avatar ei ole käytettävissä tällä kurssilla. Käytä sen sijaan chattia tai äänitilaa.';
 $string['answeraudit:flow_voice_transcript'] = 'Live-ääni: opiskelijan selaimen lähettämä litterointi, tarkistettu sen jälkeen, kun vastaus oli puhuttu';
 $string['answeraudit:flow_voice_truncated'] = 'Live-ääni: litterointi oli liian pitkä ja sitä lyhennettiin ennen tarkistusta';
+$string['answeraudit:flow_voice_question_only'] = 'Live-ääni: opiskelijan sanat tulivat istunnon viimeisen vastauksen jälkeen; vain ne tarkistettiin';
 $string['answeraudit:source'] = 'Lähde';
 $string['answeraudit:source_text'] = 'Tekstikeskustelu';
 $string['answeraudit:source_voice'] = 'Live-ääni';
