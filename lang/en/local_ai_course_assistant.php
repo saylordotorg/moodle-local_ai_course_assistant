@@ -3722,7 +3722,7 @@ $string['privacy:metadata:answer_audit:rules'] = 'The guidance rules that fired 
 $string['privacy:metadata:answer_audit:status'] = 'The claim check\'s verdict on the answer.';
 $string['privacy:metadata:answer_audit:claims'] = 'The claims found in the answer and whether the course material supports them.';
 $string['privacy:metadata:answer_audit:timecreated'] = 'When the answer was recorded.';
-$string['privacy:metadata:answer_audit:linkkey'] = 'A one-way key made from the learner, message and conversation and a random salt. When the text is removed the learner, message and conversation are cleared and the salt is deleted, so the key no longer leads back to the learner.';
+$string['privacy:metadata:answer_audit:linkhash'] = 'A one-way key made from the learner, message and conversation and a random salt. When the text is removed the learner, message and conversation are cleared and the salt is deleted, so the key no longer leads back to the learner.';
 // 8.4.0: answer safety settings and guidance rules.
 $string['settings:answer_safety_heading'] = 'Answer safety';
 $string['settings:answer_safety_heading_desc'] = 'Checks each answer for risky guidance (grades, deadlines, policy, wellbeing, personal medical, legal or financial advice, academic integrity and numbers the course material does not support) and keeps an audit record of every chat answer: in the course page chat and in the Moodle app. Meta AI answers are not covered. Questions on these topics are held and checked before the learner sees the answer.';

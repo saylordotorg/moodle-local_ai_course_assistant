@@ -30,10 +30,10 @@ namespace local_ai_course_assistant;
  * the chain.
  *
  * Learner link (8.4.1): the chain never covers the raw userid, messageid or conversationid. Each row gets a random
- * `linksalt` and `linkkey` = sha256(linksalt:userid:messageid:conversationid), and `linkkey` is what rowhash covers.
- * While the row is live, verify_chain() recomputes linkkey from the salt and the three ids, so changing any of them
+ * `linksalt` and `linkhash` = sha256(linksalt:userid:messageid:conversationid), and `linkhash` is what rowhash covers.
+ * While the row is live, verify_chain() recomputes linkhash from the salt and the three ids, so changing any of them
  * is still detected. Redaction also UNLINKS the row: userid = 0, messageid and conversationid = null, linksalt =
- * null, linkkey kept. With the salt gone the key cannot be tied back to anyone, the chain still verifies, and a
+ * null, linkhash kept. With the salt gone the key cannot be tied back to anyone, the chain still verifies, and a
  * redacted row that has any id put back fails verification. A redaction for any reason (clear, trim, retention,
  * course deletion, privacy erasure) unlinks, so a redacted row is never linked to a learner. Teacher notes on review
  * queue items for an unlinked answer are cleared too (the outcome stays), since a note can quote or name the
@@ -120,9 +120,9 @@ class answer_audit {
 
     /**
      * @var string[] Fields covered by rowhash, in a fixed order. Text is covered through texthash only, and the
-     *     learner, message and conversation ids through linkkey only (8.4.1), so unlinking leaves the hash intact.
+     *     learner, message and conversation ids through linkhash only (8.4.1), so unlinking leaves the hash intact.
      */
-    private const HASHED_FIELDS = ['kind', 'supersedes', 'linkkey', 'courseid', 'cmid',
+    private const HASHED_FIELDS = ['kind', 'supersedes', 'linkhash', 'courseid', 'cmid',
         'mode', 'model', 'provider', 'chunks', 'citations', 'categories', 'rules', 'validators', 'status', 'severity',
         'claims', 'judge_model', 'judge_cost', 'texthash', 'timecreated', 'prevhash'];
 
@@ -250,7 +250,7 @@ class answer_audit {
             $rec->messageid = null;
             $rec->conversationid = null;
             $rec->linksalt = null;
-            $rec->linkkey = self::new_link_key(0, null, null)[1];
+            $rec->linkhash = self::new_link(0, null, null)[1];
         } else {
             self::link($rec);
         }
@@ -352,15 +352,15 @@ class answer_audit {
         try {
             foreach ($rs as $rec) {
                 $ok = (string) $rec->prevhash === $prev
-                    && (string) $rec->linkkey !== ''
+                    && (string) $rec->linkhash !== ''
                     && hash_equals((string) $rec->rowhash, self::compute_rowhash($rec));
                 if ($ok) {
                     if (empty($rec->redacted)) {
-                        // A live row: its ids must be the ones its link key was made from.
+                        // A live row: its ids must be the ones its link hash was made from.
                         $ok = hash_equals((string) $rec->texthash,
                             self::compute_texthash($rec->question, $rec->answer, $rec->claims))
                             && (string) $rec->linksalt !== ''
-                            && hash_equals((string) $rec->linkkey, self::link_key((string) $rec->linksalt,
+                            && hash_equals((string) $rec->linkhash, self::link_hash((string) $rec->linksalt,
                                 (int) $rec->userid, $rec->messageid, $rec->conversationid));
                     } else {
                         // A redaction drops all the text and every link; text or an id left or put back is not a
@@ -824,10 +824,10 @@ class answer_audit {
      * Re-seal one course's chain under the 8.4.1 scheme (upgrade step 2026112610).
      *
      * First checks the chain as 8.4.0 wrote it, so the result says whether it verified BEFORE the re-seal (a
-     * re-seal cannot hide that). Then, in id order, gives every row without a link key a salt and a key (a
+     * re-seal cannot hide that). Then, in id order, gives every row without a link hash a salt and a key (a
      * redacted row is unlinked at once: its key is made from a salt that is thrown away), and rewrites every
      * prevhash and rowhash. Runs under the course lock. Writes one RESEALED_ACTION audit_logger row with the counts
-     * and the legacy result (no text, no ids of learners). A course with no row lacking a link key is left exactly
+     * and the legacy result (no text, no ids of learners). A course with no row lacking a link hash is left exactly
      * as it is and logs nothing, so running it again never rewrites a chain.
      *
      * @param int $courseid
@@ -841,7 +841,7 @@ class answer_audit {
             throw new \moodle_exception('locktimeout');
         }
         $result = ['rows' => 0, 'linked' => 0, 'unlinked' => 0, 'legacy_ok' => true, 'legacy_brokenat' => null];
-        $legacy = $DB->count_records_select(self::TABLE, "courseid = ? AND (linkkey IS NULL OR linkkey = '')",
+        $legacy = $DB->count_records_select(self::TABLE, "courseid = ? AND (linkhash IS NULL OR linkhash = '')",
             [$courseid]);
         if ($legacy === 0) {
             // Nothing written before 8.4.1: nothing to re-seal, and a chain is never rewritten without a reason
@@ -854,7 +854,7 @@ class answer_audit {
             $rs = $DB->get_recordset(self::TABLE, ['courseid' => $courseid], 'id ASC');
             try {
                 foreach ($rs as $rec) {
-                    if ((string) $rec->linkkey !== '') {
+                    if ((string) $rec->linkhash !== '') {
                         $prev = (string) $rec->rowhash;
                         continue;
                     }
@@ -875,9 +875,9 @@ class answer_audit {
             try {
                 foreach ($rs as $rec) {
                     $update = (object) ['id' => $rec->id];
-                    if ((string) $rec->linkkey === '') {
+                    if ((string) $rec->linkhash === '') {
                         if (!empty($rec->redacted)) {
-                            $update->linkkey = self::new_link_key((int) $rec->userid, $rec->messageid,
+                            $update->linkhash = self::new_link((int) $rec->userid, $rec->messageid,
                                 $rec->conversationid)[1];
                             $update->linksalt = null;
                             $update->userid = 0;
@@ -886,7 +886,7 @@ class answer_audit {
                             $unlinked[] = $rec->kind === 'answer' ? (int) $rec->id : (int) $rec->supersedes;
                             $result['unlinked']++;
                         } else {
-                            [$update->linksalt, $update->linkkey] = self::new_link_key((int) $rec->userid,
+                            [$update->linksalt, $update->linkhash] = self::new_link((int) $rec->userid,
                                 $rec->messageid, $rec->conversationid);
                             $result['linked']++;
                         }
@@ -920,25 +920,25 @@ class answer_audit {
      * @return void
      */
     private static function link(\stdClass $rec): void {
-        [$rec->linksalt, $rec->linkkey] = self::new_link_key((int) $rec->userid, $rec->messageid,
+        [$rec->linksalt, $rec->linkhash] = self::new_link((int) $rec->userid, $rec->messageid,
             $rec->conversationid);
     }
 
     /**
-     * A fresh random salt and the link key made from it.
+     * A fresh random salt and the link hash made from it.
      *
      * @param int $userid
      * @param int|string|null $messageid
      * @param int|string|null $conversationid
      * @return array{0: string, 1: string} [salt, key]
      */
-    private static function new_link_key(int $userid, $messageid, $conversationid): array {
+    private static function new_link(int $userid, $messageid, $conversationid): array {
         $salt = bin2hex(random_bytes(32));
-        return [$salt, self::link_key($salt, $userid, $messageid, $conversationid)];
+        return [$salt, self::link_hash($salt, $userid, $messageid, $conversationid)];
     }
 
     /**
-     * The link key: sha256 of salt, userid, messageid and conversationid. Without the salt it identifies no one.
+     * The link hash: sha256 of salt, userid, messageid and conversationid. Without the salt it identifies no one.
      *
      * @param string $salt
      * @param int $userid
@@ -946,7 +946,7 @@ class answer_audit {
      * @param int|string|null $conversationid
      * @return string
      */
-    public static function link_key(string $salt, int $userid, $messageid, $conversationid): string {
+    public static function link_hash(string $salt, int $userid, $messageid, $conversationid): string {
         $id = static fn($v): string => $v === null || $v === '' ? '' : (string) (int) $v;
         return hash('sha256', $salt . ':' . $userid . ':' . $id($messageid) . ':' . $id($conversationid));
     }

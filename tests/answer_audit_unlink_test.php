@@ -137,7 +137,7 @@ final class answer_audit_unlink_test extends \advanced_testcase {
             $this->assertNull($rec->question);
             $this->assertNull($rec->answer);
             $this->assertNull($rec->linksalt, 'the salt must go, or the key could be recomputed');
-            $this->assertNotEmpty($rec->linkkey);
+            $this->assertNotEmpty($rec->linkhash);
             $this->assertTrue(answer_audit::is_unlinked($rec));
         }
         $this->assertNull($DB->get_field('local_ai_course_assistant_review_res', 'note', ['id' => $ra]));
@@ -157,7 +157,7 @@ final class answer_audit_unlink_test extends \advanced_testcase {
         $rows = answer_audit::rows_for_export($c1, ['userid' => $kept]);
         $this->assertCount(3, $rows);
         $this->assertArrayNotHasKey('linksalt', $rows[0]);
-        $this->assertArrayHasKey('linkkey', $rows[0]);
+        $this->assertArrayHasKey('linkhash', $rows[0]);
         $this->assertSame([], answer_audit::rows_for_export($c1, ['userid' => $erased]));
     }
 
@@ -211,7 +211,7 @@ final class answer_audit_unlink_test extends \advanced_testcase {
         $rb = $DB->get_record(self::TABLE, ['id' => $b]);
         $rb->userid = 8;
         $rb->linksalt = str_repeat('a', 64);
-        $rb->linkkey = answer_audit::link_key($rb->linksalt, 8, $rb->messageid, $rb->conversationid);
+        $rb->linkhash = answer_audit::link_hash($rb->linksalt, 8, $rb->messageid, $rb->conversationid);
         $DB->update_record(self::TABLE, $rb);
         $this->assertSame(['ok' => false, 'brokenat' => (int) $b], answer_audit::verify_chain(7));
         // ... and recomputing that hash breaks the link to the next row.
@@ -248,7 +248,7 @@ final class answer_audit_unlink_test extends \advanced_testcase {
                 'categories' => null, 'rules' => null, 'validators' => null, 'status' => null, 'severity' => null,
                 'claims' => null, 'judge_model' => null, 'judge_cost' => null,
                 'redacted' => $redacted ? 1 : 0, 'timeredacted' => $redacted ? time() : null,
-                'timecreated' => time(), 'prevhash' => $prev, 'linksalt' => null, 'linkkey' => null,
+                'timecreated' => time(), 'prevhash' => $prev, 'linksalt' => null, 'linkhash' => null,
             ];
             $rec->texthash = answer_audit::compute_texthash('Q' . $messageid, 'A' . $messageid, null);
             $rec->rowhash = answer_audit::compute_legacy_rowhash($rec);
@@ -275,7 +275,7 @@ final class answer_audit_unlink_test extends \advanced_testcase {
         // Live rows keep their learner, now behind a salted key.
         $rec = $DB->get_record(self::TABLE, ['id' => $live]);
         $this->assertEquals(5, $rec->userid);
-        $this->assertSame(answer_audit::link_key($rec->linksalt, 5, 9501, 9051), $rec->linkkey);
+        $this->assertSame(answer_audit::link_hash($rec->linksalt, 5, 9501, 9051), $rec->linkhash);
         $this->assertNotEmpty($live2);
 
         // One audit log line says the chain was re-sealed.

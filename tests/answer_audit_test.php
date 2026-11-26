@@ -296,7 +296,7 @@ final class answer_audit_test extends \advanced_testcase {
         $this->assertGreaterThan(0, (int) $ra->timeredacted);
         // Metadata, sources, rules and hashes are kept.
         foreach (['courseid', 'cmid', 'mode', 'model', 'provider', 'chunks', 'citations', 'categories', 'rules',
-                'validators', 'texthash', 'linkkey', 'prevhash', 'rowhash'] as $f) {
+                'validators', 'texthash', 'linkhash', 'prevhash', 'rowhash'] as $f) {
             $this->assertEquals($beforea->$f, $ra->$f, "field $f must survive redaction");
         }
         // 8.4.1: the link to the learner, message and conversation does not.
@@ -761,6 +761,7 @@ final class answer_audit_test extends \advanced_testcase {
     }
 
     public function test_privacy_export_contains_audit_metadata_for_user(): void {
+        global $DB;
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         $other = $this->getDataGenerator()->create_user();
@@ -797,14 +798,10 @@ final class answer_audit_test extends \advanced_testcase {
         $this->assertSame('needs_review', $verdict->status);
         $this->assertSame('contradicted', $verdict->claims[0]['status']);
 
-        $tomb = $writer->get_data([$plugin, 'answer_audit', $gone]);
-        $this->assertNotEmpty($tomb, 'a redacted row is still exported as metadata');
-        $this->assertSame(1, $tomb->redacted);
-        $this->assertNull($tomb->question);
-        $this->assertNull($tomb->answer);
-        $this->assertNotEmpty($tomb->timeredacted);
-        $this->assertEquals([['id' => 'r1', 'action' => 'warn']], $tomb->rules);
-        $this->assertStringNotContainsString('Gone', json_encode($tomb));
+        // 8.4.1: a redacted row is unlinked from the learner, so it is no longer their data and is not exported.
+        $this->assertEmpty($writer->get_data([$plugin, 'answer_audit', $gone]),
+            'a redacted (unlinked) row is not in the learner\'s export');
+        $this->assertTrue(answer_audit::is_unlinked($DB->get_record(self::TABLE, ['id' => $gone])));
 
         $this->assertEmpty($writer->get_data([$plugin, 'answer_audit', $theirs['auditid']]),
             'another learner\'s row is not in this export');
