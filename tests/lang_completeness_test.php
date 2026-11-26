@@ -439,6 +439,33 @@ final class lang_completeness_test extends \basic_testcase {
         // translated into the 45 other locales in the 8.4.0 batch, so none is listed. Machine-assisted, not reviewed
         // by native speakers. Bambara (bm) and Wolof (wo) hold the English text for 44 long admin descriptions and
         // the learner safety messages (the 7.8.9 ruling: an honest English value beats a translation nobody can check).
+        // 8.4.1: the five branding and contact descriptions now say what a blank value falls back to (the site's own
+        // name, support email or policy page) instead of Saylor's values; their 45 old translations described the
+        // old behaviour and were removed, so they fall back to English, as the 7.12.2 corrected descriptions did.
+        'settings:contact_email_desc',
+        'settings:display_name_desc',
+        'settings:institution_name_desc',
+        'settings:institution_short_name_desc',
+        'settings:privacy_external_url_desc',
+        // 8.4.1: the Learning Radar admin page's alerts, prompts and confirms, moved out of the JS (Marketplace review).
+        // Admin-only, English first like the other admin-only additions.
+        'radar:js_error_prefix',
+        'radar:js_network_error',
+        'radar:js_redash_created_confirm',
+        'radar:js_redash_push_error',
+        'radar:js_unknown_error',
+        'radar:js_email_prompt',
+        'radar:js_slack_prompt',
+        'radar:js_teams_prompt',
+        'radar:js_sent',
+        'radar:js_send_error',
+        'radar:js_type_query_first',
+        'radar:js_share_copied',
+        'radar:js_delete_schedule_confirm',
+        'radar:js_schedule_edit',
+        'radar:js_schedule_new',
+        'radar:js_placeholder_courseids',
+        'radar:js_placeholder_provider',
     ];
 
     /**
