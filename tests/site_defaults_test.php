@@ -160,6 +160,33 @@ final class site_defaults_test extends \advanced_testcase {
         $this->assertSame([], site_defaults::migrate('https://dev.sylr.org'));
     }
 
+    public function test_no_support_email_means_no_contact_line(): void {
+        global $CFG, $OUTPUT;
+        $this->resetAfterTest();
+        $CFG->supportemail = '';
+        $CFG->noreplyaddress = 'noreply@example.com';
+        foreach (['contact_email', 'dpo_email'] as $name) {
+            set_config($name, '', self::C);
+        }
+        // Never the no-reply address: nobody reads it.
+        $this->assertSame('', branding::contact_email());
+        $this->assertSame('', branding::dpo_email());
+
+        // privacy.php gates its contact line on the raw value; render the notice the same way.
+        $contact = branding::contact_email();
+        $html = $OUTPUT->render_from_template('local_ai_course_assistant/privacy_notice', [
+            'contactemail' => $contact,
+            'contactemailline' => branding::str('privacynotice:contact_email',
+                \html_writer::link('mailto:' . $contact, s($contact))),
+        ]);
+        $this->assertStringNotContainsString('mailto:', $html);
+        $this->assertStringNotContainsString('noreply@example.com', $html);
+
+        $CFG->supportemail = ' help@example.edu ';
+        $this->assertSame('help@example.edu', branding::contact_email());
+        $this->assertSame('help@example.edu', branding::dpo_email());
+    }
+
     public function test_a_blank_transcript_pattern_pairs_nothing(): void {
         $this->resetAfterTest();
         set_config('rag_transcript_url_pattern', '', self::C);

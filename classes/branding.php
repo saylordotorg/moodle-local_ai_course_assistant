@@ -134,16 +134,15 @@ class branding {
     }
 
     /**
-     * This site's support email (Moodle's support contact; Moodle itself falls back to the no-reply address).
+     * This site's support email ($CFG->supportemail), or '' when none is set. Deliberately not
+     * \core_user::get_support_user(), which falls back to the no-reply address: a learner must never be told
+     * to write to an address nobody reads. Blank hides the contact line on the privacy notice.
      *
      * @return string
      */
     private static function site_support_email(): string {
-        try {
-            return (string) (\core_user::get_support_user()->email ?? '');
-        } catch (\Throwable $e) {
-            return '';
-        }
+        global $CFG;
+        return trim((string) ($CFG->supportemail ?? ''));
     }
 
     /**
