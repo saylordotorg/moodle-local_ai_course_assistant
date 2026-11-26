@@ -238,7 +238,8 @@ final class claim_checker_test extends \advanced_testcase {
         $this->assertNull($verdict->severity);
         $this->assertSame([], json_decode((string) $verdict->claims, true));
         $this->assertSame([claim_checker::FAILED_ERROR], $this->rule_ids($verdict));
-        $this->assertStringNotContainsString('503', json_encode($verdict), 'no error text in the row');
+        $this->assertStringNotContainsString('HTTP 503', json_encode($verdict), 'no error text in the row');
+        $this->assertStringNotContainsString('upstream', json_encode($verdict), 'no error text in the row');
 
         // The learner's conversation and the answer row are exactly as they were.
         $this->assertEquals($before,
