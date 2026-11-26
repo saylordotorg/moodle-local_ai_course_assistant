@@ -5741,9 +5741,10 @@ define([
         }
         var rootEl = document.getElementById('local-ai-course-assistant');
         var shortName = (rootEl && rootEl.dataset.shortname) || 'SOLA';
-        var displayName = (rootEl && rootEl.dataset.displayname) || 'Saylor Online Learning Assistant';
-        var institutionName = (rootEl && rootEl.dataset.institution) || 'Saylor University';
-        // Build identity string: "SOLA (Saylor Online Learning Assistant)" or just the short name if they match.
+        // The server always sends the configured (or this site's neutral) names; these are last-resort fallbacks.
+        var displayName = (rootEl && rootEl.dataset.displayname) || shortName;
+        var institutionName = (rootEl && rootEl.dataset.institution) || '';
+        // Build identity string: "SOLA (Online Learning Assistant)" or just the short name if they match.
         var identity = shortName;
         if (displayName && displayName !== shortName) {
             identity = shortName + ' (' + displayName + ')';

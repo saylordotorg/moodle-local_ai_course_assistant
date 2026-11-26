@@ -798,12 +798,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/external_resources_allowlist',
         get_string('settings:external_resources_allowlist', 'local_ai_course_assistant'),
         \local_ai_course_assistant\branding::apply(get_string('settings:external_resources_allowlist_desc', 'local_ai_course_assistant')),
-        "Wikipedia (en.wikipedia.org)\n"
-        . "Khan Academy (khanacademy.org)\n"
-        . "OER Commons (oercommons.org)\n"
-        . "OpenStax (openstax.org)\n"
-        . "MIT OpenCourseWare (ocw.mit.edu)\n"
-        . "Saylor Academy (learn.saylor.org)"
+        \local_ai_course_assistant\site_defaults::NEUTRAL_RESOURCES_ALLOWLIST
     ));
 
     $embeddingproviders = [
@@ -2284,7 +2279,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/footer_courses_text',
         get_string('settings:footer_courses_text', 'local_ai_course_assistant'),
         get_string('settings:footer_courses_text_desc', 'local_ai_course_assistant'),
-        'Explore open online courses at saylor.org',
+        '',
         PARAM_TEXT
     ));
 
@@ -2292,7 +2287,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/footer_courses_url',
         get_string('settings:footer_courses_url', 'local_ai_course_assistant'),
         get_string('settings:footer_courses_url_desc', 'local_ai_course_assistant'),
-        'https://www.saylor.org',
+        '',
         PARAM_URL
     ));
 
@@ -2794,21 +2789,21 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/institution_name',
         get_string('settings:institution_name', 'local_ai_course_assistant'),
         get_string('settings:institution_name_desc', 'local_ai_course_assistant'),
-        'Saylor University'
+        ''
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/institution_short_name',
         get_string('settings:institution_short_name', 'local_ai_course_assistant'),
         get_string('settings:institution_short_name_desc', 'local_ai_course_assistant'),
-        'Saylor'
+        ''
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/display_name',
         get_string('settings:display_name', 'local_ai_course_assistant'),
         get_string('settings:display_name_desc', 'local_ai_course_assistant'),
-        'Saylor Online Learning Assistant'
+        ''
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -2869,7 +2864,7 @@ if ($hassiteconfig) {
         'avatar_01' => get_string(
             'settings:avatar_saylor',
             'local_ai_course_assistant',
-            get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University'
+            \local_ai_course_assistant\branding::institution_name()
         ),
     ];
     for ($i = 2; $i <= 10; $i++) {
@@ -2955,7 +2950,7 @@ if ($hassiteconfig) {
 
     // v3.9.16: admin-editable privacy notice override. If populated, this HTML
     // replaces the default branded notice rendered by privacy.php. Lets
-    // Saylor (or any rebranded install) finalize the legal-reviewed notice
+    // any install finalize the legal-reviewed notice
     // text in the admin UI without touching code.
     $settings->add(new admin_setting_confightmleditor(
         'local_ai_course_assistant/privacy_notice_override',

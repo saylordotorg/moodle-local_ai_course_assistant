@@ -773,17 +773,11 @@ class hook_callbacks {
         }
         $avataranim = ($avataranim === false || $avataranim === '') ? 1 : (int)(bool)$avataranim;
 
-        // Footer "explore courses" link + customizable feedback text. The courses
-        // link ships with a default; get_config() === false means "never saved"
-        // (use default), while '' means an admin cleared it (hide the link).
-        $coursestextcfg = get_config('local_ai_course_assistant', 'footer_courses_text');
-        $footercoursestext = $coursestextcfg === false
-            ? 'Explore open online courses at saylor.org'
-            : trim((string) $coursestextcfg);
-        $coursesurlcfg = get_config('local_ai_course_assistant', 'footer_courses_url');
-        $footercoursesurl = $coursesurlcfg === false
-            ? 'https://www.saylor.org'
-            : trim((string) $coursesurlcfg);
+        // Footer "explore courses" link + customizable feedback text. Since 8.4.1
+        // the link ships empty (hidden) on every site; an admin sets both pieces
+        // to show it. Saylor's own sites carry their link as a saved value.
+        $footercoursestext = trim((string) get_config('local_ai_course_assistant', 'footer_courses_text'));
+        $footercoursesurl = trim((string) get_config('local_ai_course_assistant', 'footer_courses_url'));
         // Hide the link if either piece is missing.
         if ($footercoursesurl === '') {
             $footercoursestext = '';

@@ -181,7 +181,7 @@ class milestone_check extends \core\task\scheduled_task {
             'firstname' => $user->firstname ?: '',
             'days' => $days,
             'coursename' => $course->fullname,
-            'institution' => get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University',
+            'institution' => \local_ai_course_assistant\branding::institution_name(),
         ];
         $subject = get_string('milestone:streak_subject', 'local_ai_course_assistant', $a);
         $text = \local_ai_course_assistant\branding::apply(get_string('milestone:streak_body_text', 'local_ai_course_assistant', $a));
@@ -206,7 +206,7 @@ class milestone_check extends \core\task\scheduled_task {
         $a = (object)[
             'firstname' => $user->firstname ?: '',
             'coursename' => $course->fullname,
-            'institution' => get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University',
+            'institution' => \local_ai_course_assistant\branding::institution_name(),
         ];
         $subject = get_string('milestone:completion_subject', 'local_ai_course_assistant', $a);
         $text = \local_ai_course_assistant\branding::apply(get_string('milestone:completion_body_text', 'local_ai_course_assistant', $a));

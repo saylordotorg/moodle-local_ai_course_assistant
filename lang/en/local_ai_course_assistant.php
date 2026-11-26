@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'AI Course Assistant';
+$string['branding:default_display_name'] = 'AI Learning Assistant';
 $string['error'] = '{$a}';
 // Cache definitions (db/caches.php). Required so the cache admin UI has a label per store.
 $string['cachedef_ratelimit'] = 'Per-user request rate limiting';
@@ -147,7 +148,7 @@ $string['settings:history_candidates_desc'] = 'In semantic history mode, only th
 $string['settings:avatar'] = 'Chat Avatar';
 $string['settings:avatar_desc'] = 'Select the avatar icon for the chat widget button.';
 $string['settings:institution_name'] = 'Institution Name';
-$string['settings:institution_name_desc'] = 'The name of the institution displayed in the system prompt, avatar labels, and demo content. Change this when rebranding.';
+$string['settings:institution_name_desc'] = 'The name of the institution displayed in the system prompt, avatar labels, and demo content. Leave empty to use the site name.';
 $string['settings:avatar_saylor'] = '{$a} Logo (Default)';
 $string['settings:avatar_numbered'] = 'Avatar {$a}';
 $string['settings:avatar_custom'] = 'Custom: {$a}';
@@ -984,11 +985,11 @@ $string['admin:vendor_dpa:dpa_unknown'] = 'Unknown';
 
 // White-label contact points (v3.9.15, contact_email added v4.1.9).
 $string['settings:contact_email'] = 'Contact email';
-$string['settings:contact_email_desc'] = 'General contact email shown on the learner facing privacy notice under "Contact". Defaults to contact@saylor.org. Leave empty to hide the line. Rebranded installs should point this at their own support address.';
+$string['settings:contact_email_desc'] = 'General contact email shown on the learner facing privacy notice under "Contact". Leave empty to use the site support email.';
 $string['settings:dpo_email'] = 'Data Protection Officer email';
 $string['settings:dpo_email_desc'] = 'Optional Data Protection Officer email. Retained for installs that want a dedicated DPO line in addition to the general contact email; the bundled privacy notice surfaces the contact email by default.';
 $string['settings:privacy_external_url'] = 'Institution privacy page URL';
-$string['settings:privacy_external_url_desc'] = 'Link to the institution level privacy page, shown on the learner facing privacy notice under "Contact". Leave empty to hide the line.';
+$string['settings:privacy_external_url_desc'] = 'Link to the institution level privacy page, shown on the learner facing privacy notice under "Contact". Leave empty to use the site policy page when the site has one, or to hide the line.';
 
 // Privacy notice admin override (v3.9.16).
 $string['settings:privacy_notice_override'] = 'Privacy notice override (HTML)';
@@ -2281,9 +2282,9 @@ $string['settings:quiz_model_desc'] = 'Model name for quiz generation, e.g. <cod
 $string['settings:branding_heading'] = 'Branding';
 $string['settings:branding_heading_desc'] = 'Customize the assistant name and appearance.';
 $string['settings:institution_short_name'] = 'Institution Short Name';
-$string['settings:institution_short_name_desc'] = 'Abbreviated institution name for compact UI elements (e.g. "State U").';
+$string['settings:institution_short_name_desc'] = 'Abbreviated institution name for compact UI elements (e.g. "State U"). Leave empty to use the site short name.';
 $string['settings:display_name'] = 'Assistant Display Name';
-$string['settings:display_name_desc'] = 'Full name of the AI assistant shown in greetings and the welcome screen (e.g. "Online Learning Assistant").';
+$string['settings:display_name_desc'] = 'Full name of the AI assistant shown in greetings and the welcome screen (e.g. "Online Learning Assistant"). Leave empty for a generic name.';
 $string['settings:short_name'] = 'Assistant Short Name';
 $string['settings:short_name_desc'] = 'Short name shown in the header bar and compact UI elements (e.g. "Assistant").';
 $string['settings:welcome_message'] = 'Welcome Screen Message';

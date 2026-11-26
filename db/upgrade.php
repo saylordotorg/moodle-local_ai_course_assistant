@@ -2445,6 +2445,17 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             }
         }
 
+        // 8.4.1: Saylor's values are no longer anyone's defaults. On Saylor's own sites (saylor.org, sylr.org) a
+        // setting never set, or blank where blank used to mean the Saylor value, gets the old value written so
+        // nothing visibly changes; on other sites a setting still holding exactly the old Saylor default is
+        // replaced with the neutral one. See site_defaults::migrate().
+        $moved = \local_ai_course_assistant\site_defaults::migrate();
+        if ($moved) {
+            mtrace('SOLA: Saylor defaults ' . (\local_ai_course_assistant\site_defaults::is_saylor_host()
+                ? 'kept as saved values on this Saylor site' : 'replaced with neutral defaults')
+                . ': ' . implode(', ', array_keys($moved)) . '.');
+        }
+
         upgrade_plugin_savepoint(true, 2026112610, 'local', 'ai_course_assistant');
     }
 

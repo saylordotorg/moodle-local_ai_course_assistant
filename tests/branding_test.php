@@ -178,19 +178,19 @@ final class branding_test extends \advanced_testcase {
     }
 
     public function test_apply_uses_fallback_when_config_empty(): void {
-        // With config blank, apply() resolves to branding.php's built-in
-        // fallback chain (the Saylor/SOLA values). NOTE: a fresh install
-        // actually writes the generic settings.php defaults ("Assistant" etc.)
-        // to config, so this asserts the fallback in isolation by clearing the
-        // four keys first.
+        // With config blank, apply() resolves to branding.php's neutral
+        // fallback chain (8.4.1): the product short name, a generic assistant
+        // name, and this site's own full and short names. Never Saylor's.
+        global $SITE;
         $this->resetAfterTest();
         foreach (['short_name', 'display_name', 'institution_name', 'institution_short_name'] as $k) {
             set_config($k, '', 'local_ai_course_assistant');
         }
         $this->assertEquals('SOLA', branding::apply('[[tutorshort]]'));
-        $this->assertEquals('Saylor Online Learning Assistant', branding::apply('[[tutorname]]'));
-        $this->assertEquals('Saylor University', branding::apply('[[uniname]]'));
-        $this->assertEquals('Saylor', branding::apply('[[unishort]]'));
+        $this->assertEquals(get_string('branding:default_display_name', 'local_ai_course_assistant'),
+            branding::apply('[[tutorname]]'));
+        $this->assertEquals(format_string($SITE->fullname), branding::apply('[[uniname]]'));
+        $this->assertEquals(format_string($SITE->shortname), branding::apply('[[unishort]]'));
     }
 
     public function test_apply_is_noop_and_null_safe(): void {

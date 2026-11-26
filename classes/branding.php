@@ -27,15 +27,17 @@ defined('MOODLE_INTERNAL') || die();
  * handful of admin config values — no code changes, no string file edits.
  *
  * Admin config keys consulted:
- *   display_name              → full product name, e.g. "Saylor Online Learning Assistant"
+ *   display_name              → full product name, e.g. "Online Learning Assistant"
  *   short_name                → short product name, e.g. "SOLA"
  *   institution_name          → full institution name
  *   institution_short_name    → short institution name
  *   dpo_email                 → Data Protection Officer contact email
  *   privacy_external_url      → institution-level privacy page URL
  *
- * Defaults are the original Saylor values so existing installations keep
- * the current behavior without any config flip required.
+ * Defaults are neutral (8.4.1): a blank setting falls back to this site's own
+ * name, support email and site policy page, never to Saylor's. Saylor's own
+ * sites keep their values because the 8.4.1 upgrade writes them explicitly
+ * (see site_defaults).
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell & David Ta / Saylor University
@@ -47,7 +49,8 @@ class branding {
      */
     public static function display_name(): string {
         $v = get_config('local_ai_course_assistant', 'display_name');
-        return $v !== false && $v !== '' ? $v : 'Saylor Online Learning Assistant';
+        return $v !== false && $v !== '' ? $v
+            : get_string('branding:default_display_name', 'local_ai_course_assistant');
     }
 
     /**
@@ -65,7 +68,7 @@ class branding {
      */
     public static function institution_name(): string {
         $v = get_config('local_ai_course_assistant', 'institution_name');
-        return $v !== false && $v !== '' ? $v : 'Saylor University';
+        return $v !== false && $v !== '' ? $v : self::site_name(false);
     }
 
     /**
@@ -73,7 +76,7 @@ class branding {
      */
     public static function institution_short_name(): string {
         $v = get_config('local_ai_course_assistant', 'institution_short_name');
-        return $v !== false && $v !== '' ? $v : 'Saylor';
+        return $v !== false && $v !== '' ? $v : self::site_name(true);
     }
 
     /**
@@ -83,7 +86,7 @@ class branding {
      */
     public static function contact_email(): string {
         $v = get_config('local_ai_course_assistant', 'contact_email');
-        return $v !== false && $v !== '' ? $v : 'contact@saylor.org';
+        return $v !== false && $v !== '' ? $v : self::site_support_email();
     }
 
     /**
@@ -95,7 +98,7 @@ class branding {
      */
     public static function dpo_email(): string {
         $v = get_config('local_ai_course_assistant', 'dpo_email');
-        return $v !== false && $v !== '' ? $v : 'dpo@saylor.org';
+        return $v !== false && $v !== '' ? $v : self::site_support_email();
     }
 
     /**
@@ -103,14 +106,65 @@ class branding {
      */
     public static function privacy_external_url(): string {
         $v = get_config('local_ai_course_assistant', 'privacy_external_url');
-        return $v !== false && $v !== '' ? $v : 'https://www.saylor.org/privacypolicy/';
+        return $v !== false && $v !== '' ? $v : self::site_policy_url();
+    }
+
+    /**
+     * This site's own name (8.4.1 neutral default for the institution names).
+     *
+     * @param bool $short the short name rather than the full name
+     * @return string plain text
+     */
+    private static function site_name(bool $short): string {
+        global $SITE;
+        $site = $SITE ?? null;
+        if (!$site || empty($site->fullname)) {
+            try {
+                $site = get_site();
+            } catch (\Throwable $e) {
+                $site = null;
+            }
+        }
+        $name = $site ? (string) ($short ? ($site->shortname ?: $site->fullname) : ($site->fullname ?: $site->shortname))
+            : '';
+        if ($name === '') {
+            return get_string('pluginname', 'local_ai_course_assistant');
+        }
+        return format_string($name, true, ['context' => \context_system::instance(), 'escape' => false]);
+    }
+
+    /**
+     * This site's support email (Moodle's support contact; Moodle itself falls back to the no-reply address).
+     *
+     * @return string
+     */
+    private static function site_support_email(): string {
+        try {
+            return (string) (\core_user::get_support_user()->email ?? '');
+        } catch (\Throwable $e) {
+            return '';
+        }
+    }
+
+    /**
+     * This site's policy page, when one is configured, else ''.
+     *
+     * @return string
+     */
+    private static function site_policy_url(): string {
+        try {
+            $url = (new \core_privacy\local\sitepolicy\manager())->get_redirect_url(false);
+            return $url ? $url->out(false) : '';
+        } catch (\Throwable $e) {
+            return '';
+        }
     }
 
     /**
      * Lowercase dash-safe slug derived from the short product name. Used
      * for filenames and identifiers that must be filesystem-friendly.
      *
-     * Example: "Saylor AI Assistant" → "saylor-ai-assistant"
+     * Example: "State U Tutor" → "state-u-tutor"
      */
     public static function filename_slug(): string {
         $short = self::short_name();
@@ -127,10 +181,10 @@ class branding {
     // whole product (and the operator-facing copy) rebrands from the four
     // admin settings with no code or string-file edits:
     //
-    // [[tutorname]]  → display_name()            (e.g. "Saylor Online Learning Assistant")
+    // [[tutorname]]  → display_name()            (e.g. "Online Learning Assistant")
     // [[tutorshort]] → short_name()              (e.g. "SOLA")
-    // [[uniname]]    → institution_name()        (e.g. "Saylor University")
-    // [[unishort]]   → institution_short_name()  (e.g. "Saylor")
+    // [[uniname]]    → institution_name()        (e.g. "State University")
+    // [[unishort]]   → institution_short_name()  (e.g. "State U")
     //
     // Substitution happens at output boundaries (the JS string bundle, the
     // mustache template data, the system prompt builder, admin settings copy,
