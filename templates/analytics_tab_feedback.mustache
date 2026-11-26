@@ -67,26 +67,26 @@
 <div class="row mt-4">
     {{#hasratings}}
         <div class="col-md-4">
-            <h5>Message Ratings</h5>
+            <h5>{{#str}}analytics:msg_ratings, local_ai_course_assistant{{/str}}</h5>
             <canvas id="sola-chart-msgratings" height="200"></canvas>
         </div>
     {{/hasratings}}
     {{#hasstars}}
         <div class="col-md-4">
-            <h5>Star Rating Distribution</h5>
+            <h5>{{#str}}analytics:star_distribution, local_ai_course_assistant{{/str}}</h5>
             <canvas id="sola-chart-stars" height="200"></canvas>
         </div>
     {{/hasstars}}
 </div>
 {{#hasnegatives}}
-    <h5 class="mt-4">Recent Negative Feedback</h5>
+    <h5 class="mt-4">{{#str}}analytics:recent_negative, local_ai_course_assistant{{/str}}</h5>
     <table class="table table-sm table-striped">
         <thead>
             <tr>
-                <th>Message Excerpt</th>
-                <th>Comment</th>
-                <th>Hallucination?</th>
-                <th>Date</th>
+                <th>{{#str}}analytics:msg_excerpt, local_ai_course_assistant{{/str}}</th>
+                <th>{{#str}}analytics:comment, local_ai_course_assistant{{/str}}</th>
+                <th>{{#str}}analytics:hallucination_q, local_ai_course_assistant{{/str}}</th>
+                <th>{{#str}}analytics:date, local_ai_course_assistant{{/str}}</th>
             </tr>
         </thead>
         <tbody>

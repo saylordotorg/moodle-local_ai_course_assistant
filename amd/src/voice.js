@@ -37,7 +37,7 @@
  * @copyright  2025 AI Course Assistant
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['local_ai_course_assistant/sse_client'], function(SSE) {
+define(['local_ai_course_assistant/sse_client', 'core/str'], function(SSE, Str) {
     'use strict';
 
     /**
@@ -133,6 +133,30 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
     var onStateChangeCb = null;
     /** @type {Function|null} */
     var onErrorCb = null;
+
+    /**
+     * Report a learner-facing error through the onError callback, in the learner's language.
+     * The callback is captured now because disconnect() may clear it before the string arrives.
+     * @param {string} key Lang string identifier (component local_ai_course_assistant).
+     * @param {string} [param] Optional value for the {$a} placeholder.
+     */
+    var reportError = function(key, param) {
+        var cb = onErrorCb;
+        if (!cb) {
+            return;
+        }
+        if (!Str || typeof Str.get_string !== 'function') {
+            cb(key);
+            return;
+        }
+        Str.get_string(key, 'local_ai_course_assistant').then(function(text) {
+            // Moodle's string cache returns the raw {$a}; substitute here.
+            cb(param === undefined ? text : String(text).replace('{$a}', param));
+            return null;
+        }).catch(function() {
+            cb(key);
+        });
+    };
     /** @type {Object} Session config: courseId, sessKey, sseUrl, lang, voice */
     var cfg = {};
 
@@ -842,7 +866,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
                 ? new MediaRecorder(mediaStream, {mimeType: mimeType})
                 : new MediaRecorder(mediaStream);
         } catch (e) {
-            if (onErrorCb) { onErrorCb('Audio recording is not supported in this browser.'); }
+            if (onErrorCb) { reportError('chat:voice_err_record_unsupported'); }
             return;
         }
 
@@ -892,7 +916,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
                     // the console, not the learner.
                     if (data && data.error) {
                         window.console && console.warn('[SOLA voice STT]', data.error);
-                        if (onErrorCb) { onErrorCb('Transcription failed. Please try again in a moment.'); }
+                        if (onErrorCb) { reportError('chat:voice_err_transcribe_failed'); }
                         return;
                     }
                     if (!data || !data.text || !data.text.trim()) {
@@ -905,7 +929,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
                 })
                 .catch(function() {
                     if (!connected) { return; }
-                    if (onErrorCb) { onErrorCb('Transcription is unavailable right now.'); }
+                    if (onErrorCb) { reportError('chat:voice_err_transcribe_unavailable'); }
                 });
         };
 
@@ -925,7 +949,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SR) {
             if (onErrorCb) {
-                onErrorCb('Speech recognition is not supported in this browser. Please try Chrome or Edge.');
+                reportError('chat:voice_err_recognition_unsupported');
             }
             return;
         }
@@ -967,13 +991,13 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
             }
             if (event.error === 'not-allowed') {
                 if (onErrorCb) {
-                    onErrorCb('Microphone access denied. Please allow microphone access in your browser settings and try again.');
+                    reportError('chat:voice_err_mic_denied_settings');
                 }
                 disconnect();
                 return;
             }
             if (onErrorCb) {
-                onErrorCb('Speech recognition error: ' + event.error);
+                reportError('chat:voice_err_recognition', String(event.error));
             }
         };
 
@@ -981,7 +1005,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
             recognition.start();
         } catch (e) {
             if (onErrorCb) {
-                onErrorCb('Could not start speech recognition. Please check microphone permissions.');
+                reportError('chat:voice_err_recognition_start');
             }
         }
     };
@@ -1042,7 +1066,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
 
         if (!audioCtx) {
             if (onErrorCb) {
-                onErrorCb('Audio playback is not available in this browser.');
+                reportError('chat:voice_err_playback_unavailable');
             }
             return;
         }
@@ -1057,7 +1081,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
             audioCtx.close().catch(function() {/**/});
             audioCtx = null;
             if (onErrorCb) {
-                onErrorCb('Speech input is not supported in this browser.');
+                reportError('chat:mic_unsupported');
             }
             return;
         }
@@ -1087,7 +1111,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
                 .catch(function() {
                     disconnect();
                     if (onErrorCb) {
-                        onErrorCb('Microphone access denied. Please allow microphone access to use voice chat.');
+                        reportError('chat:voice_err_mic_denied_chat');
                     }
                 });
         } else {
@@ -1114,7 +1138,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
             }).catch(function() {
                 disconnect();
                 if (onErrorCb) {
-                    onErrorCb('Microphone access denied. Please allow microphone access to use voice chat.');
+                    reportError('chat:voice_err_mic_denied_chat');
                 }
             });
         }

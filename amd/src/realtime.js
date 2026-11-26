@@ -655,7 +655,8 @@ define([], function() {
                 break;
 
             case 'error':
-                var errMsg = msg.error ? msg.error.message : 'Unknown error';
+                // No message from the server: leave it empty so chat.js shows its own localized line.
+                var errMsg = msg.error && msg.error.message ? msg.error.message : '';
                 // Suppress harmless cancellation race condition — this occurs when
                 // response.cancel is sent after the response has already finished.
                 if (errMsg && errMsg.indexOf('Cancellation failed') !== -1) {

@@ -88,10 +88,15 @@ define(['core/str', 'local_ai_course_assistant/ui'], function(Str, UI) {
             {key: 'chat:quiz_topic_modules',      component: 'local_ai_course_assistant'},
             {key: 'chat:quiz_subtopic_select',    component: 'local_ai_course_assistant'},
             {key: 'chat:quiz_topic_adaptive',     component: 'local_ai_course_assistant'},
+            {key: 'chat:quiz_difficulty',         component: 'local_ai_course_assistant'},
+            {key: 'chat:quiz_difficulty_easy',    component: 'local_ai_course_assistant'},
+            {key: 'chat:quiz_difficulty_medium',  component: 'local_ai_course_assistant'},
+            {key: 'chat:quiz_difficulty_hard',    component: 'local_ai_course_assistant'},
         ]).then(function(strings) {
             const [titleStr, questionsStr, topicStr, guidedStr, defaultStr, customStr,
                    customPlaceholder, startStr, cancelStr,
-                   objectivesStr, modulesStr, subTopicStr, adaptiveStr] = strings;
+                   objectivesStr, modulesStr, subTopicStr, adaptiveStr,
+                   difficultyStr, easyStr, mediumStr, hardStr] = strings;
 
             const panel = document.createElement('div');
             panel.className = 'aica-quiz-setup';
@@ -228,15 +233,15 @@ define(['core/str', 'local_ai_course_assistant/ui'], function(Str, UI) {
             // parameter and then into the quiz generation system prompt.
             const diffLabel = document.createElement('p');
             diffLabel.className = 'aica-quiz-setup__label';
-            diffLabel.textContent = 'Difficulty';
+            diffLabel.textContent = difficultyStr;
             panel.appendChild(diffLabel);
 
             const diffRow = document.createElement('div');
             diffRow.className = 'aica-quiz-setup__count-row';
             const diffs = [
-                {value: 'easy',   label: 'Easy'},
-                {value: 'medium', label: 'Medium'},
-                {value: 'hard',   label: 'Hard'},
+                {value: 'easy',   label: easyStr},
+                {value: 'medium', label: mediumStr},
+                {value: 'hard',   label: hardStr},
             ];
             let selectedDifficulty = 'medium';
             diffs.forEach(function(d) {
@@ -361,13 +366,17 @@ define(['core/str', 'local_ai_course_assistant/ui'], function(Str, UI) {
             {key: 'chat:quiz_wrong',    component: 'local_ai_course_assistant'},
             {key: 'chat:quiz_next',     component: 'local_ai_course_assistant'},
             {key: 'chat:quiz_finish',   component: 'local_ai_course_assistant'},
+            {key: 'chat:quiz_progress', component: 'local_ai_course_assistant'},
         ]).then(function(strings) {
-            const [correctStr, wrongStr, nextStr, finishStr] = strings;
+            const [correctStr, wrongStr, nextStr, finishStr, progressStr] = strings;
 
             // Progress.
             const progress = document.createElement('p');
             progress.className = 'aica-quiz__progress';
-            progress.textContent = 'Question ' + (index + 1) + ' of ' + total;
+            // Moodle's string cache returns the raw placeholders, so substitute here.
+            progress.textContent = progressStr
+                .split('{$a->current}').join(String(index + 1))
+                .split('{$a->total}').join(String(total));
             quizEl.appendChild(progress);
 
             // Question text.

@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define([], function() {
+define(['core/str'], function(Str) {
 
     /** @type {SpeechSynthesisUtterance|null} Current utterance */
     let currentUtterance = null;
@@ -36,6 +36,18 @@ define([], function() {
     const isSupported = function() {
         return 'speechSynthesis' in window;
     };
+
+    /** @type {?{play: string, pause: string}} Button labels, once the strings have loaded. */
+    let labels = null;
+    const labelsReady = Str.get_strings([
+        {key: 'chat:audio_play', component: 'local_ai_course_assistant'},
+        {key: 'chat:audio_pause', component: 'local_ai_course_assistant'},
+    ]).then(function(strs) {
+        labels = {play: strs[0], pause: strs[1]};
+        return null;
+    }).catch(function() {
+        return null;
+    });
 
     /**
      * Update button icon based on state.
@@ -88,7 +100,17 @@ define([], function() {
             button.removeChild(button.firstChild);
         }
         button.appendChild(svg);
-        button.setAttribute('aria-label', playing ? 'Pause audio' : 'Play audio');
+        button.dataset.audioState = state;
+        if (labels) {
+            button.setAttribute('aria-label', playing ? labels.pause : labels.play);
+        } else {
+            labelsReady.then(function() {
+                if (labels && button.dataset.audioState === state) {
+                    button.setAttribute('aria-label', playing ? labels.pause : labels.play);
+                }
+                return null;
+            });
+        }
     };
 
     /**
@@ -186,7 +208,6 @@ define([], function() {
         // Create audio button.
         const button = document.createElement('button');
         button.className = 'local-ai-course-assistant__audio-btn';
-        button.setAttribute('aria-label', 'Play audio');
         // Build the initial play glyph via the DOM (CONTRIB-10574 #94).
         updateButtonIcon(button, 'play');
 

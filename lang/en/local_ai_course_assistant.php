@@ -4129,3 +4129,104 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, severity: {$a
 $string['instructor_dashboard:review_col_resolve'] = 'Resolve';
 $string['instructor_dashboard:review_audit_link'] = 'See every recorded answer in the answer audit';
 $string['instructor_dashboard:review_caption'] = 'Items waiting for review, most urgent first';
+
+// --- v8.4.1: learner and admin text moved out of JS, templates and PHP literals ---
+// instructor dashboard review queue summaries.
+$string['instructor_dashboard:review_summary_offtopic'] = 'Off-topic count: {$a}';
+$string['instructor_dashboard:review_summary_integrity'] = 'Integrity: {$a}';
+// inactivity reminder email.
+$string['reminder:inactivity_subject'] = 'We miss you in {$a}!';
+$string['reminder:inactivity_since_days'] = '{$a} days';
+$string['reminder:inactivity_since_awhile'] = 'a while';
+$string['reminder:inactivity_body'] = 'Hi {$a->firstname},
+
+It\'s been {$a->since} since you last visited {$a->coursename}. [[tutorname]] is ready to help you pick up where you left off.
+
+Even 10 minutes of review can make a difference. Log in and let\'s keep your momentum going!
+
+— [[tutorname]]';
+// voice.js and chat.js voice errors.
+$string['chat:voice_err_record_unsupported'] = 'Audio recording is not supported in this browser.';
+$string['chat:voice_err_transcribe_failed'] = 'Transcription failed. Please try again in a moment.';
+$string['chat:voice_err_transcribe_unavailable'] = 'Transcription is unavailable right now.';
+$string['chat:voice_err_recognition_unsupported'] = 'Speech recognition is not supported in this browser. Please try Chrome or Edge.';
+$string['chat:voice_err_mic_denied_settings'] = 'Microphone access denied. Please allow microphone access in your browser settings and try again.';
+$string['chat:voice_err_recognition'] = 'Speech recognition error: {$a}';
+$string['chat:voice_err_recognition_start'] = 'Could not start speech recognition. Please check microphone permissions.';
+$string['chat:voice_err_playback_unavailable'] = 'Audio playback is not available in this browser.';
+$string['chat:voice_err_mic_denied_chat'] = 'Microphone access denied. Please allow microphone access to use voice chat.';
+$string['chat:voice_err_mic_blocked'] = 'Microphone access was blocked. Please allow microphone access and try again.';
+$string['chat:voice_err_mic_missing'] = 'No microphone was found on this device.';
+$string['chat:voice_err_mic_busy'] = 'Your microphone is busy in another app. Close the other app and try again.';
+$string['chat:voice_err_mic_unavailable'] = 'Microphone access is not available in this browser.';
+$string['chat:voice_err_start_failed'] = 'Could not start live voice chat.';
+$string['chat:voice_err_connection_failed'] = 'Voice connection failed.';
+$string['chat:voice_err_mode_failed'] = 'Voice mode failed.';
+$string['chat:voice_live_fallback'] = 'Live voice isn\'t available right now, so this conversation uses the regular voice mode.';
+$string['chat:voice_err_speech_input'] = 'This browser does not support speech input.';
+$string['chat:voice_err_wait_response'] = 'Please wait for the current response to finish before starting voice chat.';
+$string['chat:voice_err_not_enabled'] = 'Voice chat is not enabled for this course yet.';
+$string['chat:voice_err_secure_context'] = 'Voice chat needs a secure context (HTTPS or localhost) and microphone access. This page is served over plain HTTP from a LAN address, so the browser blocks the microphone.';
+$string['chat:voice_err_pron_not_enabled'] = 'Pronunciation Practice is not enabled for this course yet.';
+$string['chat:voice_err_pron_secure_context'] = 'Pronunciation Practice needs a secure context (HTTPS or localhost) and microphone access. This page is served over plain HTTP from a LAN address, so the browser blocks the microphone.';
+// voice panel status text.
+$string['chat:voicepanel_open_page'] = 'Voice chat is open for "{$a}". Keep speaking, type a follow-up, or end the session when you are done.';
+$string['chat:voicepanel_open_generic'] = 'Voice chat is open for this page or another course topic. Keep speaking, type a follow-up, or end the session when you are done.';
+$string['chat:voicepanel_start_page'] = 'Start a voice conversation about "{$a}" or another course topic. Your transcript will still show up in chat.';
+$string['chat:voicepanel_start_generic'] = 'Start a voice conversation about this page or another course topic. Your transcript will still show up in chat.';
+$string['chat:voicepanel_status_ready'] = 'Ready when you are.';
+$string['chat:voicepanel_status_starting'] = 'Voice chat is starting. You can end the session at any time.';
+$string['chat:voicepanel_status_live'] = 'Voice chat is live. Speak or type to continue.';
+$string['chat:voicepanel_status_https'] = 'Voice chat needs HTTPS and microphone access.';
+// chat.js notifications.
+$string['chat:history_refresh_failed'] = 'Could not refresh history right now.';
+$string['chat:language_set'] = 'Language set to {$a->language}. New messages will be in {$a->language}.';
+$string['chat:language_locked'] = 'Language is locked to English for this course.';
+$string['chat:survey_already_done'] = 'You have already completed this survey. Thank you!';
+$string['chat:usertesting_none'] = 'No testing tasks are available right now.';
+$string['chat:usertesting_done'] = 'You have completed all testing tasks. Thank you!';
+$string['chat:usertesting_load_failed'] = 'Could not load testing tasks.';
+$string['chat:avatar_save_failed'] = 'Could not save the avatar choice.';
+$string['chat:error_stream_cap'] = 'The response was too large to display. Please try again.';
+$string['chat:error_stream_connection'] = 'The connection was interrupted. Please try again.';
+// audio player labels.
+$string['chat:audio_play'] = 'Play audio';
+$string['chat:audio_pause'] = 'Pause audio';
+// quiz setup and progress.
+$string['chat:quiz_difficulty'] = 'Difficulty';
+$string['chat:quiz_difficulty_easy'] = 'Easy';
+$string['chat:quiz_difficulty_medium'] = 'Medium';
+$string['chat:quiz_difficulty_hard'] = 'Hard';
+$string['chat:quiz_progress'] = 'Question {$a->current} of {$a->total}';
+// analytics tab templates.
+$string['analytics:msg_ratings'] = 'Message Ratings';
+$string['analytics:star_distribution'] = 'Star Rating Distribution';
+$string['analytics:recent_negative'] = 'Recent Negative Feedback';
+$string['analytics:msg_excerpt'] = 'Message Excerpt';
+$string['analytics:hallucination_q'] = 'Hallucination?';
+$string['analytics:daily_usage_trend'] = 'Daily Usage Trend';
+$string['analytics:hour_of_day'] = 'Hour of Day';
+$string['analytics:day_of_week'] = 'Day of Week';
+$string['analytics:keyword'] = 'Keyword';
+$string['analytics:category'] = 'Category';
+$string['analytics:usage_type'] = 'Type';
+$string['analytics:insights_failed'] = 'Failed to generate insights: {$a}';
+$string['analytics:unknown_error'] = 'Unknown error';
+// Learning Radar alerts and prompts.
+$string['radar:js_error_prefix'] = 'Error: {$a}';
+$string['radar:js_network_error'] = 'Network error';
+$string['radar:js_redash_created_confirm'] = 'Redash query created. Open in a new tab?';
+$string['radar:js_redash_push_error'] = 'Redash push error: {$a}';
+$string['radar:js_unknown_error'] = 'unknown error';
+$string['radar:js_email_prompt'] = 'Recipient email address:';
+$string['radar:js_slack_prompt'] = 'Slack incoming webhook URL:';
+$string['radar:js_teams_prompt'] = 'Teams incoming webhook URL:';
+$string['radar:js_sent'] = 'Sent.';
+$string['radar:js_send_error'] = 'Send error: {$a}';
+$string['radar:js_type_query_first'] = 'Type or run a query first.';
+$string['radar:js_share_copied'] = 'Share link copied to clipboard.';
+$string['radar:js_delete_schedule_confirm'] = 'Delete this schedule?';
+$string['radar:js_schedule_edit'] = 'Edit schedule';
+$string['radar:js_schedule_new'] = 'Schedule a Learning Radar query';
+$string['radar:js_placeholder_courseids'] = 'Course IDs (e.g. 2,5,12)';
+$string['radar:js_placeholder_provider'] = 'Provider (e.g. openai)';
