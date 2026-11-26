@@ -34,8 +34,6 @@ class content_extractor {
     /** @var int Minimum characters required to keep a module's content. */
     private const MIN_CHARS = 80;
 
-    /** @var string Default transcript URL regex. */
-
     /** @var string Default iframe host patterns (one per line; # comments supported). */
     private const DEFAULT_IFRAME_HOST_PATTERNS = <<<'TXT'
 share\.synthesia\.io/embeds/videos/
