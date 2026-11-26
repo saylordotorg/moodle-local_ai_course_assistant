@@ -117,15 +117,15 @@ define([
     };
 
     /**
-     * Synchronous read of a preloaded string. Returns the key itself only while the map is not ready;
-     * init re-draws the voice panel as soon as it is.
+     * Synchronous read of a preloaded string. Returns '' while the map is not ready (never the raw key, which
+     * a learner would see); init re-draws the voice panel as soon as it is.
      *
      * @param {string} key
      * @param {string|number|Object} [param]
      * @returns {string}
      */
     const uiTextNow = function(key, param) {
-        return UI_STRINGS[key] === undefined ? key : fillPlaceholders(UI_STRINGS[key], param);
+        return UI_STRINGS[key] === undefined ? '' : fillPlaceholders(UI_STRINGS[key], param);
     };
 
     /**
