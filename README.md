@@ -8,16 +8,26 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 
 A 2:38 tour, recorded on version 8.0.0 on a Saylor test site in a demo course with no student data. It shows what SOLA does for learners (in student view): answers from the course, Quiz Me, Study Plan and 46 languages. Then it shows how an institution brands SOLA as its own with settings instead of a fork, the settings hub, and the Providers and keys table. Branding needs version 8.0.0 or later. Narration is AI-generated.
 
-## Version 8.4.0
+## Version 8.4.1
 
 **Release Date:** November 2026
-**Plugin build:** 2026112310
+**Plugin build:** 2026112610
 **Requires:** Moodle 4.5+ (2024100700). `version.php` declares support for Moodle 4.5 to 5.3; CI covers 4.5, 5.0, 5.1 and 5.3 (5.2 is declared but not tested).
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+
 **Maturity:** Stable. In production on Saylor's Learn and Degrees sites.
 
 See the [Changelog](https://github.com/saylordotorg/moodle-local_ai_course_assistant/wiki/Changelog) for what's new and the [GitHub Releases](https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases) page for the canonical version list.
+
+### What's new in 8.4.1
+
+Fixes the five items the Moodle plugin directory reviewer listed for 8.4.0.
+
+- **Erasure unlinks the answer audit.** After a learner's data is erased (or a conversation is cleared, trimmed or aged out), no answer audit row, verdict or review note points back to them: the user, message and conversation ids are cleared and the row keeps only a one-way `linkhash` whose salt is deleted. The course's hash chain still verifies. On upgrade, each course's 8.4.0 chain is checked and then re-sealed once under the new scheme, and the result is written to the audit log (`answer_audit_resealed`).
+- **No Saylor defaults on other sites.** The assistant name, institution names, contact and DPO email, privacy link, transcript URL pattern, footer courses link and one allowlist line no longer default to Saylor's values. A blank setting now means this site's own name, support email or site policy page. Saylor's own sites (saylor.org, sylr.org) keep their current values, written explicitly by the upgrade.
+- **More interface text in language strings.** About 100 hard-coded English messages (voice and microphone errors, chat notices, quiz labels, the analytics tables, the Learning Radar alerts, the inactivity email, two review queue summaries) moved into language strings and translated into the 45 other languages (admin-only Learning Radar text is English only for now).
+- **No stray files in the package.** `README.md-E` is gone, and the zip script refuses editor and tool artifacts.
+- **One stated Moodle range.** Every statement now reads: version.php declares support for Moodle 4.5 to 5.3; CI covers 4.5, 5.0, 5.1 and 5.3 (5.2 is declared but not tested).
 
 ## Moodle Workplace
 

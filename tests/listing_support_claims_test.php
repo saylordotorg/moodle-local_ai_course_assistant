@@ -56,7 +56,8 @@ final class listing_support_claims_test extends \basic_testcase {
         $latest = end($drafts);
         $copy = file_get_contents($latest);
 
-        preg_match_all('/Moodle\s+(\d+)\.(\d+)/', $copy, $all, PREG_SET_ORDER);
+        // "Moodle 5.3" and the upper end of "Moodle 4.5 to 5.3" both count as a claim.
+        preg_match_all('/Moodle\s+(?:\d+\.\d+\s+to\s+)?(\d+)\.(\d+)/', $copy, $all, PREG_SET_ORDER);
         $this->assertNotEmpty($all, 'sanity: the description should name a Moodle version');
 
         $over = [];
@@ -69,7 +70,7 @@ final class listing_support_claims_test extends \basic_testcase {
             basename($latest) . " claims Moodle versions beyond version.php's declared "
             . "{$maxmajor}.{$maxminor}. Claim a newer Moodle only once version.php declares it.");
 
-        $this->assertStringContainsString("Moodle {$maxmajor}.{$maxminor}", $copy,
+        $this->assertMatchesRegularExpression("/Moodle (\\d+\\.\\d+ to )?{$maxmajor}\\.{$maxminor}\\b/", $copy,
             basename($latest) . " should state the declared ceiling, Moodle {$maxmajor}.{$maxminor}.");
     }
 
