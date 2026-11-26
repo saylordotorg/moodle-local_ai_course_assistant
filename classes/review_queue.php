@@ -384,7 +384,7 @@ class review_queue {
             'sourceid' => (int) $a->id,
             'when' => (int) $v->vwhen,
             'summary' => self::summary($kind, $detail),
-            'who' => anonymizer::name((int) $a->userid),
+            'who' => answer_audit_report::learner($a),
             'priority' => $found['wellbeing'] ? 1 : 0,
             'detail' => $detail,
         ];
@@ -452,7 +452,7 @@ class review_queue {
             'sourceid' => (int) $a->id,
             'when' => (int) $a->timecreated,
             'summary' => self::summary(get_string('instructor_dashboard:review_kind_rule', self::COMPONENT), $detail),
-            'who' => anonymizer::name((int) $a->userid),
+            'who' => answer_audit_report::learner($a),
             'priority' => $wellbeing ? 1 : 0,
             'detail' => $detail,
         ];

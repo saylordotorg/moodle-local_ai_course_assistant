@@ -295,10 +295,17 @@ final class answer_audit_test extends \advanced_testcase {
         $this->assertEquals(1, $ra->redacted);
         $this->assertGreaterThan(0, (int) $ra->timeredacted);
         // Metadata, sources, rules and hashes are kept.
-        foreach (['messageid', 'conversationid', 'userid', 'courseid', 'cmid', 'mode', 'model', 'provider',
-                'chunks', 'citations', 'categories', 'rules', 'validators', 'texthash', 'prevhash', 'rowhash'] as $f) {
+        foreach (['courseid', 'cmid', 'mode', 'model', 'provider', 'chunks', 'citations', 'categories', 'rules',
+                'validators', 'texthash', 'linkkey', 'prevhash', 'rowhash'] as $f) {
             $this->assertEquals($beforea->$f, $ra->$f, "field $f must survive redaction");
         }
+        // 8.4.1: the link to the learner, message and conversation does not.
+        $this->assertEquals(0, $ra->userid);
+        $this->assertNull($ra->messageid);
+        $this->assertNull($ra->conversationid);
+        $this->assertNull($ra->linksalt);
+        $this->assertEquals(0, $rva->userid);
+        $this->assertNull($rva->linksalt);
         // Claim text is dropped, the claim's verdict stays.
         $claims = json_decode($rva->claims, true);
         $this->assertArrayNotHasKey('text', $claims[0]);

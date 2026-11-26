@@ -29,6 +29,16 @@ namespace local_ai_course_assistant;
  * previous hash and inserting happen under a per-course \core\lock so two answers at the same moment cannot fork
  * the chain.
  *
+ * Learner link (8.4.1): the chain never covers the raw userid, messageid or conversationid. Each row gets a random
+ * `linksalt` and `linkkey` = sha256(linksalt:userid:messageid:conversationid), and `linkkey` is what rowhash covers.
+ * While the row is live, verify_chain() recomputes linkkey from the salt and the three ids, so changing any of them
+ * is still detected. Redaction also UNLINKS the row: userid = 0, messageid and conversationid = null, linksalt =
+ * null, linkkey kept. With the salt gone the key cannot be tied back to anyone, the chain still verifies, and a
+ * redacted row that has any id put back fails verification. A redaction for any reason (clear, trim, retention,
+ * course deletion, privacy erasure) unlinks, so a redacted row is never linked to a learner. Teacher notes on review
+ * queue items for an unlinked answer are cleared too (the outcome stays), since a note can quote or name the
+ * learner. Rows written by 8.4.0 are re-sealed once under this scheme by reseal_course() (upgrade step 2026112610).
+ *
  * Nothing key-like is ever stored: every field is on an allowlist, and a row or verdict carrying a field named
  * like a key, secret, token, password or prompt (at any depth) is refused with a coding_exception.
  *
@@ -45,7 +55,9 @@ namespace local_ai_course_assistant;
  *
  * Known limits: the chain proves rows were not edited, reordered or removed from the middle; it cannot prove the
  * newest rows were not removed (no external anchor). Redaction is not itself tamper-evident (it is the permitted
- * change). A caller inside an open delegated transaction holds the lock only until record() returns, not until
+ * change). An unlinked row still has its course, activity, mode, model and time, which say nothing about who asked
+ * on their own but could be matched against other logs of the same moment by someone who also holds those logs.
+ * A caller inside an open delegated transaction holds the lock only until record() returns, not until
  * its commit; call record() outside a transaction.
  *
  * @package    local_ai_course_assistant
@@ -106,10 +118,24 @@ class answer_audit {
         . '|api[_-]?key|private[_-]?key|secret|passw|(access|refresh|id|auth|bearer|session)[_-]?token'
         . '|system[_-]?prompt|full[_-]?prompt|credential|bearer|authori[sz]ation/i';
 
-    /** @var string[] Fields covered by rowhash, in a fixed order. Text is covered through texthash only. */
-    private const HASHED_FIELDS = ['kind', 'supersedes', 'messageid', 'conversationid', 'userid', 'courseid', 'cmid',
+    /**
+     * @var string[] Fields covered by rowhash, in a fixed order. Text is covered through texthash only, and the
+     *     learner, message and conversation ids through linkkey only (8.4.1), so unlinking leaves the hash intact.
+     */
+    private const HASHED_FIELDS = ['kind', 'supersedes', 'linkkey', 'courseid', 'cmid',
         'mode', 'model', 'provider', 'chunks', 'citations', 'categories', 'rules', 'validators', 'status', 'severity',
         'claims', 'judge_model', 'judge_cost', 'texthash', 'timecreated', 'prevhash'];
+
+    /** @var string[] The 8.4.0 rowhash fields (raw ids), read only by reseal_course() to check a legacy chain. */
+    private const LEGACY_HASHED_FIELDS = ['kind', 'supersedes', 'messageid', 'conversationid', 'userid', 'courseid',
+        'cmid', 'mode', 'model', 'provider', 'chunks', 'citations', 'categories', 'rules', 'validators', 'status',
+        'severity', 'claims', 'judge_model', 'judge_cost', 'texthash', 'timecreated', 'prevhash'];
+
+    /** @var string audit_logger action written once per course when reseal_course() re-seals its chain. */
+    public const RESEALED_ACTION = 'answer_audit_resealed';
+
+    /** @var string[] Fields never returned by rows_for_export(): the salt is only there to check a live link. */
+    private const NOT_EXPORTED = ['linksalt'];
 
     /** @var string[] Filters rows_for_export() accepts. */
     private const EXPORT_FILTERS = ['userid', 'kind', 'status', 'since', 'until', 'limit'];
@@ -158,6 +184,7 @@ class answer_audit {
             'judge_model' => null,
             'judge_cost' => null,
         ];
+        self::link($rec);
         return self::insert_chained($rec);
     }
 
@@ -214,11 +241,18 @@ class answer_audit {
             'judge_model' => self::str_or_null($verdict['judge_model'] ?? null, 100),
             'judge_cost' => isset($verdict['judge_cost']) ? round((float) $verdict['judge_cost'], 6) : null,
         ];
-        // A redacted original stays redacted: its verdict is written with no claim text either.
+        // A redacted original stays redacted: its verdict is written with no claim text either, and unlinked like it.
         if (!empty($original->redacted)) {
             $rec->claims = self::strip_claim_text($rec->claims);
             $rec->redacted = 1;
             $rec->timeredacted = time();
+            $rec->userid = 0;
+            $rec->messageid = null;
+            $rec->conversationid = null;
+            $rec->linksalt = null;
+            $rec->linkkey = self::new_link_key(0, null, null)[1];
+        } else {
+            self::link($rec);
         }
         $id = self::insert_chained($rec);
 
@@ -318,15 +352,22 @@ class answer_audit {
         try {
             foreach ($rs as $rec) {
                 $ok = (string) $rec->prevhash === $prev
+                    && (string) $rec->linkkey !== ''
                     && hash_equals((string) $rec->rowhash, self::compute_rowhash($rec));
                 if ($ok) {
                     if (empty($rec->redacted)) {
+                        // A live row: its ids must be the ones its link key was made from.
                         $ok = hash_equals((string) $rec->texthash,
-                            self::compute_texthash($rec->question, $rec->answer, $rec->claims));
+                            self::compute_texthash($rec->question, $rec->answer, $rec->claims))
+                            && (string) $rec->linksalt !== ''
+                            && hash_equals((string) $rec->linkkey, self::link_key((string) $rec->linksalt,
+                                (int) $rec->userid, $rec->messageid, $rec->conversationid));
                     } else {
-                        // A redaction drops all the text; text left or put back is not a redaction.
+                        // A redaction drops all the text and every link; text or an id left or put back is not a
+                        // redaction.
                         $ok = $rec->question === null && $rec->answer === null
-                            && self::strip_claim_text($rec->claims) === $rec->claims;
+                            && self::strip_claim_text($rec->claims) === $rec->claims
+                            && self::is_unlinked($rec);
                     }
                 }
                 if (!$ok) {
@@ -580,6 +621,9 @@ class answer_audit {
             foreach ($rs as $rec) {
                 $row = [];
                 foreach ((array) $rec as $field => $value) {
+                    if (in_array($field, self::NOT_EXPORTED, true)) {
+                        continue;
+                    }
                     if (in_array($field, ['chunks', 'citations', 'categories', 'rules', 'validators', 'claims'], true)) {
                         $row[$field] = $value === null ? null : json_decode($value, true);
                     } else if (in_array($field, ['id', 'supersedes', 'messageid', 'conversationid', 'userid',
@@ -616,8 +660,30 @@ class answer_audit {
      * @return string sha256 hex
      */
     public static function compute_rowhash(\stdClass $rec): string {
+        return self::hash_fields($rec, self::HASHED_FIELDS);
+    }
+
+    /**
+     * The rowhash an 8.4.0 row carried (raw userid, messageid and conversationid in the hash). Only reseal_course()
+     * and the tests that build a legacy row use it.
+     *
+     * @param \stdClass $rec
+     * @return string sha256 hex
+     */
+    public static function compute_legacy_rowhash(\stdClass $rec): string {
+        return self::hash_fields($rec, self::LEGACY_HASHED_FIELDS);
+    }
+
+    /**
+     * sha256 of the canonical JSON of the given fields of a row.
+     *
+     * @param \stdClass $rec
+     * @param string[] $fields
+     * @return string
+     */
+    private static function hash_fields(\stdClass $rec, array $fields): string {
         $fixed = [];
-        foreach (self::HASHED_FIELDS as $field) {
+        foreach ($fields as $field) {
             $value = $rec->$field ?? null;
             if ($field === 'claims') {
                 // Claims are hashed without their text, so redaction leaves the hash unchanged.
@@ -701,7 +767,12 @@ class answer_audit {
         }
         $count = 0;
         $now = time();
-        $rs = $DB->get_recordset_select(self::TABLE, "redacted = 0 AND $select", $params, 'id ASC', 'id, claims');
+        $unlinked = [];
+        // A redacted row that still carries a link (only possible for a row written before 8.4.1 and not yet
+        // re-sealed) is unlinked too, so an erasure never leaves the learner's id behind.
+        $rs = $DB->get_recordset_select(self::TABLE,
+            "(redacted = 0 OR userid <> 0 OR messageid IS NOT NULL OR conversationid IS NOT NULL) AND ($select)",
+            $params, 'id ASC', 'id, kind, supersedes, claims, redacted, timeredacted');
         try {
             foreach ($rs as $rec) {
                 $DB->update_record(self::TABLE, (object) [
@@ -710,14 +781,185 @@ class answer_audit {
                     'answer' => null,
                     'claims' => self::strip_claim_text($rec->claims),
                     'redacted' => 1,
-                    'timeredacted' => $now,
+                    'timeredacted' => empty($rec->redacted) ? $now : $rec->timeredacted,
+                    'userid' => 0,
+                    'messageid' => null,
+                    'conversationid' => null,
+                    'linksalt' => null,
                 ]);
-                $count++;
+                $unlinked[] = $rec->kind === 'answer' ? (int) $rec->id : (int) $rec->supersedes;
+                if (empty($rec->redacted)) {
+                    $count++;
+                }
             }
         } finally {
             $rs->close();
         }
+        self::clear_review_notes($unlinked);
         return $count;
+    }
+
+    /**
+     * Clear the teacher's note on review queue items (sources claim and rule) for these answer rows. The outcome
+     * and who resolved it stay; only free text, which can quote or name the learner, goes.
+     *
+     * @param int[] $answerids
+     * @return void
+     */
+    private static function clear_review_notes(array $answerids): void {
+        global $DB;
+        $answerids = array_values(array_unique(array_filter($answerids)));
+        if (!$answerids || !$DB->get_manager()->table_exists('local_ai_course_assistant_review_res')) {
+            return;
+        }
+        foreach (array_chunk($answerids, 500) as $chunk) {
+            [$in, $params] = $DB->get_in_or_equal($chunk, SQL_PARAMS_NAMED, 'aid');
+            [$srcin, $srcparams] = $DB->get_in_or_equal(['claim', 'rule'], SQL_PARAMS_NAMED, 'src');
+            $DB->set_field_select('local_ai_course_assistant_review_res', 'note', null,
+                "source $srcin AND sourceid $in", $params + $srcparams);
+        }
+    }
+
+    /**
+     * Re-seal one course's chain under the 8.4.1 scheme (upgrade step 2026112610).
+     *
+     * First checks the chain as 8.4.0 wrote it, so the result says whether it verified BEFORE the re-seal (a
+     * re-seal cannot hide that). Then, in id order, gives every row without a link key a salt and a key (a
+     * redacted row is unlinked at once: its key is made from a salt that is thrown away), and rewrites every
+     * prevhash and rowhash. Runs under the course lock. Writes one RESEALED_ACTION audit_logger row with the counts
+     * and the legacy result (no text, no ids of learners). A course with no row lacking a link key is left exactly
+     * as it is and logs nothing, so running it again never rewrites a chain.
+     *
+     * @param int $courseid
+     * @return array{rows: int, linked: int, unlinked: int, legacy_ok: bool, legacy_brokenat: ?int}
+     */
+    public static function reseal_course(int $courseid): array {
+        global $DB;
+        $factory = \core\lock\lock_config::get_lock_factory(self::LOCK_TYPE);
+        $lock = $factory->get_lock(self::lock_resource($courseid), 60);
+        if (!$lock) {
+            throw new \moodle_exception('locktimeout');
+        }
+        $result = ['rows' => 0, 'linked' => 0, 'unlinked' => 0, 'legacy_ok' => true, 'legacy_brokenat' => null];
+        $legacy = $DB->count_records_select(self::TABLE, "courseid = ? AND (linkkey IS NULL OR linkkey = '')",
+            [$courseid]);
+        if ($legacy === 0) {
+            // Nothing written before 8.4.1: nothing to re-seal, and a chain is never rewritten without a reason
+            // (re-sealing a verified chain again would hide any change made since).
+            $lock->release();
+            return $result;
+        }
+        try {
+            $prev = '';
+            $rs = $DB->get_recordset(self::TABLE, ['courseid' => $courseid], 'id ASC');
+            try {
+                foreach ($rs as $rec) {
+                    if ((string) $rec->linkkey !== '') {
+                        $prev = (string) $rec->rowhash;
+                        continue;
+                    }
+                    if ($result['legacy_ok'] && ((string) $rec->prevhash !== $prev
+                            || !hash_equals((string) $rec->rowhash, self::compute_legacy_rowhash($rec)))) {
+                        $result['legacy_ok'] = false;
+                        $result['legacy_brokenat'] = (int) $rec->id;
+                    }
+                    $prev = (string) $rec->rowhash;
+                }
+            } finally {
+                $rs->close();
+            }
+
+            $prev = '';
+            $unlinked = [];
+            $rs = $DB->get_recordset(self::TABLE, ['courseid' => $courseid], 'id ASC');
+            try {
+                foreach ($rs as $rec) {
+                    $update = (object) ['id' => $rec->id];
+                    if ((string) $rec->linkkey === '') {
+                        if (!empty($rec->redacted)) {
+                            $update->linkkey = self::new_link_key((int) $rec->userid, $rec->messageid,
+                                $rec->conversationid)[1];
+                            $update->linksalt = null;
+                            $update->userid = 0;
+                            $update->messageid = null;
+                            $update->conversationid = null;
+                            $unlinked[] = $rec->kind === 'answer' ? (int) $rec->id : (int) $rec->supersedes;
+                            $result['unlinked']++;
+                        } else {
+                            [$update->linksalt, $update->linkkey] = self::new_link_key((int) $rec->userid,
+                                $rec->messageid, $rec->conversationid);
+                            $result['linked']++;
+                        }
+                        foreach ((array) $update as $field => $value) {
+                            $rec->$field = $value;
+                        }
+                    }
+                    $update->prevhash = $prev;
+                    $rec->prevhash = $prev;
+                    $update->rowhash = self::compute_rowhash($rec);
+                    $DB->update_record(self::TABLE, $update);
+                    $prev = $update->rowhash;
+                    $result['rows']++;
+                }
+            } finally {
+                $rs->close();
+            }
+            self::clear_review_notes($unlinked);
+        } finally {
+            $lock->release();
+        }
+        audit_logger::log(self::RESEALED_ACTION, 0, $courseid, ['courseid' => $courseid, 'scheme' => '8.4.1']
+            + $result);
+        return $result;
+    }
+
+    /**
+     * Give a row about to be written its link: a fresh salt and the key made from it and the row's ids.
+     *
+     * @param \stdClass $rec with userid, messageid, conversationid
+     * @return void
+     */
+    private static function link(\stdClass $rec): void {
+        [$rec->linksalt, $rec->linkkey] = self::new_link_key((int) $rec->userid, $rec->messageid,
+            $rec->conversationid);
+    }
+
+    /**
+     * A fresh random salt and the link key made from it.
+     *
+     * @param int $userid
+     * @param int|string|null $messageid
+     * @param int|string|null $conversationid
+     * @return array{0: string, 1: string} [salt, key]
+     */
+    private static function new_link_key(int $userid, $messageid, $conversationid): array {
+        $salt = bin2hex(random_bytes(32));
+        return [$salt, self::link_key($salt, $userid, $messageid, $conversationid)];
+    }
+
+    /**
+     * The link key: sha256 of salt, userid, messageid and conversationid. Without the salt it identifies no one.
+     *
+     * @param string $salt
+     * @param int $userid
+     * @param int|string|null $messageid
+     * @param int|string|null $conversationid
+     * @return string
+     */
+    public static function link_key(string $salt, int $userid, $messageid, $conversationid): string {
+        $id = static fn($v): string => $v === null || $v === '' ? '' : (string) (int) $v;
+        return hash('sha256', $salt . ':' . $userid . ':' . $id($messageid) . ':' . $id($conversationid));
+    }
+
+    /**
+     * Whether a row carries no link to a learner: no userid, message, conversation or salt.
+     *
+     * @param \stdClass $rec
+     * @return bool
+     */
+    public static function is_unlinked(\stdClass $rec): bool {
+        return (int) $rec->userid === 0 && $rec->messageid === null && $rec->conversationid === null
+            && ($rec->linksalt ?? null) === null;
     }
 
     /**
