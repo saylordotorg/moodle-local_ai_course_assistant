@@ -16,6 +16,9 @@
 # Backup files
 *.bak
 *.orig
+*.rej
+*-E
+*~
 
 # CDN build output
 cdn/dist/
