@@ -12,7 +12,7 @@ A 2:38 tour, recorded on version 8.0.0 on a Saylor test site in a demo course wi
 
 **Release Date:** November 2026
 **Plugin build:** 2026112310
-**Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0, 5.1 and 5.3. `version.php` declares support through 5.3.
+**Requires:** Moodle 4.5+ (2024100700). `version.php` declares support for Moodle 4.5 to 5.3; CI covers 4.5, 5.0, 5.1 and 5.3 (5.2 is declared but not tested).
 **Moodle Workplace:** not tested, and not recommended on a multi-tenant site. See [Moodle Workplace](#moodle-workplace) below.
 **License:** GPL v3+
 **Maturity:** Stable. In production on Saylor's Learn and Degrees sites.
@@ -26,7 +26,7 @@ See the [Changelog](https://github.com/saylordotorg/moodle-local_ai_course_assis
 This is stated explicitly because silence reads as tacit support. Asked in
 [#246](https://github.com/saylordotorg/moodle-local_ai_course_assistant/issues/246).
 
-CI covers Moodle LMS only: 4.5, 5.0 and 5.1, on PHP 8.1 to 8.3, with PostgreSQL
+CI covers Moodle LMS only: 4.5, 5.0, 5.1 and 5.3, on PHP 8.1 to 8.3, with PostgreSQL
 and MariaDB. There is no Workplace instance in our infrastructure, so there is no
 evidence either way, which is not the same as believing it works.
 

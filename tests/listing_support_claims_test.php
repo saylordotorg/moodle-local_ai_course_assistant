@@ -74,6 +74,81 @@ final class listing_support_claims_test extends \basic_testcase {
     }
 
     /**
+     * Every place that states the Moodle range or the CI range says the same thing (8.4.1, Marketplace review).
+     *
+     * The reviewer of 8.4.0 found the README's Moodle Workplace section still saying CI covers 4.5, 5.0 and 5.1
+     * after 5.3 joined the matrix. The CI list is read from .github/workflows/ci.yml and the declared range from
+     * version.php; the README's Requires line, its Workplace section, the version.php comment and the newest
+     * Marketplace description must each state both, in the one sentence shape
+     * "declares support for Moodle 4.5 to 5.3; CI covers 4.5, 5.0, 5.1 and 5.3 (5.2 is declared but not tested)".
+     */
+    public function test_every_range_statement_matches_version_php_and_ci(): void {
+        $root = realpath(__DIR__ . '/..');
+        $ci = $root . '/.github/workflows/ci.yml';
+        if (!is_readable($ci)) {
+            $this->markTestSkipped('No .github/workflows/ci.yml in this checkout.');
+        }
+        preg_match_all('/MOODLE_(\d)(\d\d)_STABLE/', file_get_contents($ci), $m, PREG_SET_ORDER);
+        $tested = [];
+        foreach ($m as [, $major, $minor]) {
+            $tested[(int) $major * 100 + (int) $minor] = $major . '.' . (int) $minor;
+        }
+        ksort($tested);
+        $this->assertNotEmpty($tested, 'sanity: ci.yml should name Moodle branches');
+
+        $version = file_get_contents($root . '/version.php');
+        $this->assertSame(1, preg_match('/\$plugin->supported\s*=\s*\[\s*(\d)(\d\d)\s*,\s*(\d)(\d\d)\s*\]/',
+            $version, $s));
+        $min = $s[1] . '.' . (int) $s[2];
+        $max = $s[3] . '.' . (int) $s[4];
+        $lo = (int) $s[1] * 100 + (int) $s[2];
+        $hi = (int) $s[3] * 100 + (int) $s[4];
+        // Moodle 4 ended at 4.5; Moodle 5 numbers from 5.0 up.
+        $declared = [];
+        for ($v = $lo; $v <= $hi; $v++) {
+            $minor = $v % 100;
+            if (($v >= 400 && $v < 500 && $minor <= 5) || ($v >= 500 && $minor <= 9)) {
+                $declared[$v] = intdiv($v, 100) . '.' . $minor;
+            }
+        }
+        $this->assertSame([], array_values(array_diff_key($tested, $declared)), 'CI tests a Moodle that version.php '
+            . 'does not declare');
+        $untested = array_values(array_diff_key($declared, $tested));
+
+        $list = static function(array $items): string {
+            $items = array_values($items);
+            return count($items) < 2 ? implode('', $items)
+                : implode(', ', array_slice($items, 0, -1)) . ' and ' . end($items);
+        };
+        $ciphrase = 'CI covers ' . $list($tested);
+        $statement = "declares support for Moodle {$min} to {$max}; {$ciphrase}"
+            . ($untested ? ' (' . $list($untested) . (count($untested) > 1 ? ' are' : ' is')
+                . ' declared but not tested)' : '');
+
+        $readme = file_get_contents($root . '/README.md');
+        $this->assertSame(1, preg_match('/^\*\*Requires:\*\*.*$/m', $readme, $requires));
+        $this->assertStringContainsString($statement, $requires[0], 'README Requires line');
+
+        $this->assertSame(1, preg_match('/^## Moodle Workplace$(.*?)^## /ms', $readme, $workplace),
+            'README must keep its Moodle Workplace section');
+        $this->assertStringContainsString('CI covers Moodle LMS only: ' . $list($tested) . ',', $workplace[1],
+            'README Moodle Workplace section');
+
+        $this->assertSame(1, preg_match('/\$plugin->supported\s*=.*$/m', $version, $line));
+        $this->assertStringContainsString("Moodle {$min} to {$max}. {$ciphrase}", $line[0], 'version.php comment');
+
+        $drafts = glob($root . '/.drafts/marketplace-description-v*.txt') ?: [];
+        if ($drafts) {
+            usort($drafts, fn($a, $b) => version_compare(self::ver($a), self::ver($b)));
+            $copy = file_get_contents(end($drafts));
+            $this->assertStringContainsString($statement, $copy, basename(end($drafts)));
+            // No older wording of the range may survive beside it.
+            $this->assertDoesNotMatchRegularExpression('/(declared|support) through Moodle|CI covers (?!'
+                . preg_quote($list($tested), '/') . ')/', $copy, basename(end($drafts)));
+        }
+    }
+
+    /**
      * Pull the release number out of a draft's filename.
      *
      * @param string $path
