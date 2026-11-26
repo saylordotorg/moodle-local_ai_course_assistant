@@ -773,17 +773,11 @@ class hook_callbacks {
         }
         $avataranim = ($avataranim === false || $avataranim === '') ? 1 : (int)(bool)$avataranim;
 
-        // Footer "explore courses" link + customizable feedback text. The courses
-        // link ships with a default; get_config() === false means "never saved"
-        // (use default), while '' means an admin cleared it (hide the link).
-        $coursestextcfg = get_config('local_ai_course_assistant', 'footer_courses_text');
-        $footercoursestext = $coursestextcfg === false
-            ? 'Explore open online courses at saylor.org'
-            : trim((string) $coursestextcfg);
-        $coursesurlcfg = get_config('local_ai_course_assistant', 'footer_courses_url');
-        $footercoursesurl = $coursesurlcfg === false
-            ? 'https://www.saylor.org'
-            : trim((string) $coursesurlcfg);
+        // Footer "explore courses" link + customizable feedback text. Since 8.4.1
+        // the link ships empty (hidden) on every site; an admin sets both pieces
+        // to show it. Saylor's own sites carry their link as a saved value.
+        $footercoursestext = trim((string) get_config('local_ai_course_assistant', 'footer_courses_text'));
+        $footercoursesurl = trim((string) get_config('local_ai_course_assistant', 'footer_courses_url'));
         // Hide the link if either piece is missing.
         if ($footercoursesurl === '') {
             $footercoursestext = '';
@@ -1248,6 +1242,55 @@ class hook_callbacks {
             'chat:quiz_score_good',
             'chat:quiz_score_practice',
             'chat:quiz_topic_adaptive',
+            // 8.4.1: learner text moved out of chat.js, voice.js, quiz.js and audio_player.js literals.
+            'chat:voice_err_record_unsupported',
+            'chat:voice_err_transcribe_failed',
+            'chat:voice_err_transcribe_unavailable',
+            'chat:voice_err_recognition_unsupported',
+            'chat:voice_err_mic_denied_settings',
+            'chat:voice_err_recognition',
+            'chat:voice_err_recognition_start',
+            'chat:voice_err_playback_unavailable',
+            'chat:voice_err_mic_denied_chat',
+            'chat:voice_err_mic_blocked',
+            'chat:voice_err_mic_missing',
+            'chat:voice_err_mic_busy',
+            'chat:voice_err_mic_unavailable',
+            'chat:voice_err_start_failed',
+            'chat:voice_err_connection_failed',
+            'chat:voice_err_mode_failed',
+            'chat:voice_live_fallback',
+            'chat:voice_err_speech_input',
+            'chat:voice_err_wait_response',
+            'chat:voice_err_not_enabled',
+            'chat:voice_err_secure_context',
+            'chat:voice_err_pron_not_enabled',
+            'chat:voice_err_pron_secure_context',
+            'chat:voicepanel_open_page',
+            'chat:voicepanel_open_generic',
+            'chat:voicepanel_start_page',
+            'chat:voicepanel_start_generic',
+            'chat:voicepanel_status_ready',
+            'chat:voicepanel_status_starting',
+            'chat:voicepanel_status_live',
+            'chat:voicepanel_status_https',
+            'chat:history_refresh_failed',
+            'chat:language_set',
+            'chat:language_locked',
+            'chat:survey_already_done',
+            'chat:usertesting_none',
+            'chat:usertesting_done',
+            'chat:usertesting_load_failed',
+            'chat:avatar_save_failed',
+            'chat:error_stream_cap',
+            'chat:error_stream_connection',
+            'chat:audio_play',
+            'chat:audio_pause',
+            'chat:quiz_difficulty',
+            'chat:quiz_difficulty_easy',
+            'chat:quiz_difficulty_medium',
+            'chat:quiz_difficulty_hard',
+            'chat:quiz_progress',
             // Mastery chips and popover (chat.js).
             'mastery:ask_about',
             'mastery:ask_template',

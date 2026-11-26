@@ -76,7 +76,29 @@ zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*/docs/superpowers/*" \
   -x "*/__pycache__/*" \
   -x "*.pyc" \
-  -x "*/scripts/*"
+  -x "*/scripts/*" \
+  -x "*-E" \
+  -x "*.orig" \
+  -x "*.rej" \
+  -x "*.bak" \
+  -x "*~" \
+  -x "*.swp"
+
+# Refuse to publish an editor or tool artifact (8.4.1). A BSD `sed -i -E` on
+# macOS (meant as GNU `sed -E -i`) takes -E as the backup suffix and writes
+# <file>-E, and one such file (README.md-E) was tracked and shipped in 8.4.0.
+# The exclusions above keep these names out whether or not git tracks them;
+# this check is the backstop if an exclusion is ever edited away, and
+# tests/package_artifacts_test.php fails the build when one is tracked.
+ARTIFACTS=$(unzip -Z1 ai_course_assistant.zip | grep -E -- '(-E|\.orig|\.rej|\.bak|~|\.swp|\.DS_Store)$')
+if [ -n "$ARTIFACTS" ]; then
+  echo "ABORTED: the zip contains editor or tool artifacts:" >&2
+  echo "$ARTIFACTS" | sed 's/^/  /' >&2
+  echo "" >&2
+  echo "git rm them and re-run." >&2
+  rm -f ai_course_assistant.zip
+  exit 1
+fi
 
 
 # Refuse to publish a file that git is not tracking.

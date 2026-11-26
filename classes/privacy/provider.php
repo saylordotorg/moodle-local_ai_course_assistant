@@ -334,8 +334,9 @@ class provider implements
             'privacy:metadata:model_switch'
         );
         // 8.4.0: the answer audit. Discovered through COURSE_USER_TABLES, exported by export_answer_audit(),
-        // and on erasure REDACTED rather than deleted: the question, answer and claim text go, the metadata,
-        // verdicts and hashes stay so the course's hash chain can still be checked.
+        // and on erasure REDACTED rather than deleted: the question, answer and claim text go, and (8.4.1) the row is
+        // unlinked: userid becomes 0, messageid and conversationid are cleared and linksalt is dropped, so linkhash no
+        // longer ties it to anyone. The verdicts and hashes stay so the course's hash chain can still be checked.
         $collection->add_database_table(
             'local_ai_course_assistant_answer_audit',
             [
@@ -352,6 +353,7 @@ class provider implements
                 'status' => 'privacy:metadata:answer_audit:status',
                 'claims' => 'privacy:metadata:answer_audit:claims',
                 'timecreated' => 'privacy:metadata:answer_audit:timecreated',
+                'linkhash' => 'privacy:metadata:answer_audit:linkhash',
             ],
             'privacy:metadata:answer_audit'
         );

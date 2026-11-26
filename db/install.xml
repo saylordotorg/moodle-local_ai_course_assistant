@@ -992,7 +992,7 @@
         <INDEX NAME="role_status" UNIQUE="false" FIELDS="role, status"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_ai_course_assistant_answer_audit" COMMENT="8.4.0 answer audit: one append-only row per assistant answer (kind answer) and one per background verdict (kind verdict, supersedes = the answer row). rowhash chains each course's rows; it covers texthash, never the text, so redaction (text nulled, redacted = 1) keeps the chain checkable. No key, system prompt or prompt text is ever stored.">
+    <TABLE NAME="local_ai_course_assistant_answer_audit" COMMENT="8.4.0 answer audit: one append-only row per assistant answer (kind answer) and one per background verdict (kind verdict, supersedes = the answer row). rowhash chains each course's rows; it covers texthash, never the text, and linkhash, never the raw learner, message or conversation id, so redaction (text nulled, ids cleared, redacted = 1) keeps the chain checkable. No key, system prompt or prompt text is ever stored.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="kind" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="answer" SEQUENCE="false" COMMENT="answer or verdict"/>
@@ -1023,6 +1023,8 @@
         <FIELD NAME="prevhash" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="rowhash of the previous row for the same course; empty for the first"/>
         <FIELD NAME="rowhash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="linksalt" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="8.4.1: random salt of linkhash; null once the row is unlinked (redacted)"/>
+        <FIELD NAME="linkhash" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="8.4.1: sha256(linksalt:userid:messageid:conversationid), covered by rowhash in place of the raw ids"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

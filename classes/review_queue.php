@@ -144,7 +144,7 @@ class review_queue {
                     'source'   => 'offtopic',
                     'sourceid' => (int) $c->sourceid,
                     'when'     => (int) $c->twhen,
-                    'summary'  => 'Off-topic count: ' . (int) $c->offtopic_count,
+                    'summary'  => get_string('instructor_dashboard:review_summary_offtopic', self::COMPONENT, (int) $c->offtopic_count),
                     'who'      => anonymizer::name((int) $c->userid),
                 ];
             }
@@ -179,7 +179,7 @@ class review_queue {
                     'source'   => 'integrity',
                     'sourceid' => (int) $a->sourceid,
                     'when'     => (int) $a->twhen,
-                    'summary'  => 'Integrity: ' . $kind,
+                    'summary'  => get_string('instructor_dashboard:review_summary_integrity', self::COMPONENT, $kind),
                     'who'      => anonymizer::name((int) $a->userid),
                 ];
             }
@@ -384,7 +384,7 @@ class review_queue {
             'sourceid' => (int) $a->id,
             'when' => (int) $v->vwhen,
             'summary' => self::summary($kind, $detail),
-            'who' => anonymizer::name((int) $a->userid),
+            'who' => answer_audit_report::learner($a),
             'priority' => $found['wellbeing'] ? 1 : 0,
             'detail' => $detail,
         ];
@@ -452,7 +452,7 @@ class review_queue {
             'sourceid' => (int) $a->id,
             'when' => (int) $a->timecreated,
             'summary' => self::summary(get_string('instructor_dashboard:review_kind_rule', self::COMPONENT), $detail),
-            'who' => anonymizer::name((int) $a->userid),
+            'who' => answer_audit_report::learner($a),
             'priority' => $wellbeing ? 1 : 0,
             'detail' => $detail,
         ];

@@ -2419,5 +2419,45 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026112302, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026112610) {
+        // 8.4.1: the answer audit's chain stops covering the raw learner, message and conversation ids. Each row
+        // gets a random linksalt and linkhash = sha256(salt:userid:messageid:conversationid), and rowhash covers
+        // linkhash instead, so a redaction (erasure included) can clear the ids and the salt and the chain still
+        // verifies. Rows written by 8.4.0 are re-sealed once, course by course: the old chain is checked first and
+        // the result is logged (answer_audit_resealed), then every rowhash is rewritten; rows already redacted are
+        // unlinked at the same time. See answer_audit::reseal_course().
+        $table = new xmldb_table('local_ai_course_assistant_answer_audit');
+        $field = new xmldb_field('linksalt', XMLDB_TYPE_CHAR, '64', null, null, null, null, 'timecreated');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('linkhash', XMLDB_TYPE_CHAR, '64', null, null, null, null, 'linksalt');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $courseids = $DB->get_fieldset_sql('SELECT DISTINCT courseid FROM {local_ai_course_assistant_answer_audit}');
+        foreach ($courseids as $courseid) {
+            $r = \local_ai_course_assistant\answer_audit::reseal_course((int) $courseid);
+            if ($r['rows'] > 0) {
+                mtrace("SOLA: answer audit chain re-sealed for course {$courseid} ({$r['rows']} rows, "
+                    . "{$r['unlinked']} unlinked; 8.4.0 chain " . ($r['legacy_ok'] ? 'verified' : 'BROKEN at row '
+                    . $r['legacy_brokenat']) . ' before the re-seal).');
+            }
+        }
+
+        // 8.4.1: Saylor's values are no longer anyone's defaults. On Saylor's own sites (saylor.org, sylr.org) a
+        // setting never set, or blank where blank used to mean the Saylor value, gets the old value written so
+        // nothing visibly changes; on other sites a setting still holding exactly the old Saylor default is
+        // replaced with the neutral one. See site_defaults::migrate().
+        $moved = \local_ai_course_assistant\site_defaults::migrate();
+        if ($moved) {
+            mtrace('SOLA: Saylor defaults ' . (\local_ai_course_assistant\site_defaults::is_saylor_host()
+                ? 'kept as saved values on this Saylor site' : 'replaced with neutral defaults')
+                . ': ' . implode(', ', array_keys($moved)) . '.');
+        }
+
+        upgrade_plugin_savepoint(true, 2026112610, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

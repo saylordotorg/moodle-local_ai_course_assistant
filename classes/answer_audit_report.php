@@ -228,7 +228,7 @@ class answer_audit_report {
         return [
             'id' => (int) $a->id,
             'time' => (int) $a->timecreated,
-            'learner' => anonymizer::name((int) $a->userid),
+            'learner' => self::learner($a),
             'activity' => self::activity($a, $cms),
             'mode' => (string) ($a->mode ?? ''),
             'source' => self::source($a),
@@ -487,7 +487,7 @@ class answer_audit_report {
             $rows[] = [
                 'id' => (int) $a->id,
                 'time' => userdate((int) $a->timecreated, get_string('strftimedatetimeshort', 'langconfig')),
-                'learner' => anonymizer::name((int) $a->userid),
+                'learner' => self::learner($a),
                 'activity' => self::activity($a, $cms),
                 'verdict' => self::status_label($v ? (string) $v->status : self::UNCHECKED),
                 'voice' => self::source($a) === self::SOURCE_VOICE,
@@ -709,7 +709,7 @@ class answer_audit_report {
         return [
             'id' => (int) $a->id,
             'time' => gmdate('Y-m-d\TH:i:s\Z', (int) $a->timecreated),
-            'learner' => anonymizer::name((int) $a->userid),
+            'learner' => self::learner($a),
             'activity' => self::activity($a, $cms),
             'mode' => (string) ($a->mode ?? ''),
             'source' => self::source($a),
@@ -726,6 +726,20 @@ class answer_audit_report {
             'answer' => $redacted ? '' : (string) ($a->answer ?? ''),
             'rowhash' => (string) $a->rowhash,
         ];
+    }
+
+    /**
+     * The learner shown for an answer row: the usual pseudonym, or a fixed label once the row is unlinked
+     * (redacted, 8.4.1), which no longer names anyone.
+     *
+     * @param \stdClass $a answer row
+     * @return string
+     */
+    public static function learner(\stdClass $a): string {
+        if ((int) $a->userid === 0) {
+            return get_string('answeraudit:learnerremoved', 'local_ai_course_assistant');
+        }
+        return anonymizer::name((int) $a->userid);
     }
 
     /**

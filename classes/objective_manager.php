@@ -926,7 +926,7 @@ class objective_manager {
                 'additionalProperties' => false,
             ],
         ];
-        $sys = "You are an instructional designer helping Saylor produce measurable, "
+        $sys = "You are an instructional designer helping " . branding::institution_name() . " produce measurable, "
             . "observable learning objectives for an online college course. Given the course "
             . "structure below, propose between 6 and 12 objectives covering the breadth of the "
             . "course. Each objective should start with a Bloom-style verb (Describe, Explain, "

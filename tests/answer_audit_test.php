@@ -295,10 +295,17 @@ final class answer_audit_test extends \advanced_testcase {
         $this->assertEquals(1, $ra->redacted);
         $this->assertGreaterThan(0, (int) $ra->timeredacted);
         // Metadata, sources, rules and hashes are kept.
-        foreach (['messageid', 'conversationid', 'userid', 'courseid', 'cmid', 'mode', 'model', 'provider',
-                'chunks', 'citations', 'categories', 'rules', 'validators', 'texthash', 'prevhash', 'rowhash'] as $f) {
+        foreach (['courseid', 'cmid', 'mode', 'model', 'provider', 'chunks', 'citations', 'categories', 'rules',
+                'validators', 'texthash', 'linkhash', 'prevhash', 'rowhash'] as $f) {
             $this->assertEquals($beforea->$f, $ra->$f, "field $f must survive redaction");
         }
+        // 8.4.1: the link to the learner, message and conversation does not.
+        $this->assertEquals(0, $ra->userid);
+        $this->assertNull($ra->messageid);
+        $this->assertNull($ra->conversationid);
+        $this->assertNull($ra->linksalt);
+        $this->assertEquals(0, $rva->userid);
+        $this->assertNull($rva->linksalt);
         // Claim text is dropped, the claim's verdict stays.
         $claims = json_decode($rva->claims, true);
         $this->assertArrayNotHasKey('text', $claims[0]);
@@ -474,6 +481,36 @@ final class answer_audit_test extends \advanced_testcase {
         $claims = json_decode($v->claims, true);
         $this->assertArrayNotHasKey('text', $claims[0]);
         $this->assertSame('contradicted', $claims[0]['status']);
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain(7));
+    }
+
+    public function test_a_redaction_before_the_lock_is_seen_inside_it_and_the_verdict_is_never_stored_linked(): void {
+        global $CFG, $DB;
+        $CFG->lock_factory = '\\' . answer_audit_test_lock_factory::class;
+        $a = answer_audit::record($this->row(7, ['conversationid' => 11, 'userid' => 5]));
+
+        // append_verdict() has read the answer (live) and is waiting for the course lock when the learner is
+        // erased. The in-lock re-read must see it, so the verdict is inserted already redacted and unlinked: no
+        // redaction of the verdict row by id is needed afterwards (that later pass is only the backstop for a
+        // redaction landing between the in-lock read and the insert).
+        $byid = [];
+        answer_audit::$beforeredact = function(string $select, array $params) use (&$byid): void {
+            if ($select === 'id = ?') {
+                $byid[] = $params[0];
+            }
+        };
+        answer_audit_test_lock_factory::$onlock = function() {
+            answer_audit::redact_for_user(5);
+        };
+        $vid = answer_audit::append_verdict($a, ['status' => 'warn', 'claims' => [['text' => 'Week 9 exam.',
+            'type' => 'date', 'status' => 'unsupported', 'evidence_ref' => 'chunk:7', 'severity' => 'medium']]]);
+        $this->assertNull(answer_audit_test_lock_factory::$onlock, 'the seam must have run');
+
+        $this->assertSame([], $byid, 'the verdict was inserted linked or with text and had to be redacted after');
+        $v = $DB->get_record(self::TABLE, ['id' => $vid]);
+        $this->assertEquals(1, $v->redacted);
+        $this->assertTrue(answer_audit::is_unlinked($v));
+        $this->assertStringNotContainsString('Week 9', $v->claims);
         $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain(7));
     }
 
@@ -754,6 +791,7 @@ final class answer_audit_test extends \advanced_testcase {
     }
 
     public function test_privacy_export_contains_audit_metadata_for_user(): void {
+        global $DB;
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         $other = $this->getDataGenerator()->create_user();
@@ -790,14 +828,10 @@ final class answer_audit_test extends \advanced_testcase {
         $this->assertSame('needs_review', $verdict->status);
         $this->assertSame('contradicted', $verdict->claims[0]['status']);
 
-        $tomb = $writer->get_data([$plugin, 'answer_audit', $gone]);
-        $this->assertNotEmpty($tomb, 'a redacted row is still exported as metadata');
-        $this->assertSame(1, $tomb->redacted);
-        $this->assertNull($tomb->question);
-        $this->assertNull($tomb->answer);
-        $this->assertNotEmpty($tomb->timeredacted);
-        $this->assertEquals([['id' => 'r1', 'action' => 'warn']], $tomb->rules);
-        $this->assertStringNotContainsString('Gone', json_encode($tomb));
+        // 8.4.1: a redacted row is unlinked from the learner, so it is no longer their data and is not exported.
+        $this->assertEmpty($writer->get_data([$plugin, 'answer_audit', $gone]),
+            'a redacted (unlinked) row is not in the learner\'s export');
+        $this->assertTrue(answer_audit::is_unlinked($DB->get_record(self::TABLE, ['id' => $gone])));
 
         $this->assertEmpty($writer->get_data([$plugin, 'answer_audit', $theirs['auditid']]),
             'another learner\'s row is not in this export');

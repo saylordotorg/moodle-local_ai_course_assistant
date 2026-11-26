@@ -34,9 +34,6 @@ class content_extractor {
     /** @var int Minimum characters required to keep a module's content. */
     private const MIN_CHARS = 80;
 
-    /** @var string Default transcript URL regex. */
-    private const DEFAULT_TRANSCRIPT_PATTERN = 'resources\.saylor\.org/transcripts/[^"\'\s>]+';
-
     /** @var string Default iframe host patterns (one per line; # comments supported). */
     private const DEFAULT_IFRAME_HOST_PATTERNS = <<<'TXT'
 share\.synthesia\.io/embeds/videos/
@@ -588,7 +585,7 @@ TXT;
         // Find all transcript URLs with positions.
         $transcriptpattern = self::get_transcript_pattern();
         $transcripts = [];
-        if (preg_match_all('#' . $transcriptpattern . '#i', $html, $tmatches, PREG_OFFSET_CAPTURE)) {
+        if ($transcriptpattern !== '' && preg_match_all('#' . $transcriptpattern . '#i', $html, $tmatches, PREG_OFFSET_CAPTURE)) {
             foreach ($tmatches[0] as $tmatch) {
                 $url = $tmatch[0];
                 $offset = $tmatch[1];
@@ -818,11 +815,10 @@ TXT;
      * @return string Regex pattern (without delimiters).
      */
     private static function get_transcript_pattern(): string {
+        // 8.4.1: blank means no transcript pairing, as the setting's help says. Until 8.4.0 blank fell back to
+        // Saylor's own transcript host; Saylor's sites now carry that pattern as a saved value.
         $raw = get_config('local_ai_course_assistant', 'rag_transcript_url_pattern');
-        if (!is_string($raw) || trim($raw) === '') {
-            return self::DEFAULT_TRANSCRIPT_PATTERN;
-        }
-        return trim($raw);
+        return is_string($raw) ? trim($raw) : '';
     }
 
     /**

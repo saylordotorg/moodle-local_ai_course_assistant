@@ -386,7 +386,6 @@ class cost_anomaly_detector {
         $body .= "  3. Provider misroute (e.g. failover chain sending chat to Claude Haiku instead of Gemini Flash).\n\n";
         $body .= "Adjust the multiplier or disable the detector at:\n";
         $body .= "  Site administration > Plugins > Local plugins > AI Course Assistant > Cost anomaly detector.\n";
-        $body .= "Unsubscribe (cost-alerts): https://help.saylor.org/sola/email-preferences\n";
 
         $sent = false;
         foreach (array_filter(array_map('trim', explode(',', $recipients))) as $email) {
@@ -409,7 +408,9 @@ class cost_anomaly_detector {
             $to->middlename = '';
             $to->alternatename = '';
             try {
-                if (\email_to_user($to, \core_user::get_noreply_user(), $subject, $body)) {
+                // 8.4.1: this site's own one-click unsubscribe link (it used to point at a Saylor help page).
+                $unsubscribe = "Unsubscribe (cost-alerts): " . email_optout::url($email, email_optout::TYPE_SPEND_ALERT) . "\n";
+                if (\email_to_user($to, \core_user::get_noreply_user(), $subject, $body . $unsubscribe)) {
                     $sent = true;
                 }
             } catch (\Throwable $e) {

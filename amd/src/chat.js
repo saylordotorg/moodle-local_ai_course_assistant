@@ -59,6 +59,106 @@ define([
         },
     };
 
+    /**
+     * Learner-facing notices and status lines (8.4.1: no English left in this file for them).
+     *
+     * Strings used where an async lookup would flash the wrong text (the voice panel) are loaded once at
+     * init into UI_STRINGS; everything else goes through uiText(), which reads that map when it can and
+     * asks core/str otherwise. All keys are listed in hook_callbacks::get_js_strings() for the CDN bundle.
+     */
+    const UI_COMPONENT = 'local_ai_course_assistant';
+    const UI_PRELOAD_KEYS = [
+        'chat:voicepanel_open_page', 'chat:voicepanel_open_generic',
+        'chat:voicepanel_start_page', 'chat:voicepanel_start_generic',
+        'chat:voicepanel_status_ready', 'chat:voicepanel_status_starting', 'chat:voicepanel_status_live',
+        'chat:voicepanel_status_https', 'chat:voice_err_not_enabled', 'chat:voice_err_playback_unavailable',
+        'chat:voice_err_speech_input',
+    ];
+    const UI_STRINGS = {};
+
+    /**
+     * Fill in {$a} (single value) or {$a->name} (object) placeholders. Moodle's string cache returns the
+     * raw placeholders, so this is done here rather than by Str.get_string's third argument.
+     *
+     * @param {string} text
+     * @param {string|number|Object|undefined} param
+     * @returns {string}
+     */
+    const fillPlaceholders = function(text, param) {
+        let out = String(text);
+        if (param === undefined || param === null) {
+            return out;
+        }
+        if (typeof param === 'object') {
+            Object.keys(param).forEach(function(k) {
+                out = out.split('{$a->' + k + '}').join(String(param[k]));
+            });
+            return out;
+        }
+        return out.split('{$a}').join(String(param));
+    };
+
+    /**
+     * Load the strings the voice panel needs synchronously.
+     *
+     * @returns {Promise}
+     */
+    const preloadUiStrings = function() {
+        return Str.get_strings(UI_PRELOAD_KEYS.map(function(key) {
+            return {key: key, component: UI_COMPONENT};
+        })).then(function(texts) {
+            texts.forEach(function(text, i) {
+                UI_STRINGS[UI_PRELOAD_KEYS[i]] = text;
+            });
+            return null;
+        }).catch(function() {
+            return null;
+        });
+    };
+
+    /**
+     * Synchronous read of a preloaded string. Returns '' while the map is not ready (never the raw key, which
+     * a learner would see); init re-draws the voice panel as soon as it is.
+     *
+     * @param {string} key
+     * @param {string|number|Object} [param]
+     * @returns {string}
+     */
+    const uiTextNow = function(key, param) {
+        return UI_STRINGS[key] === undefined ? '' : fillPlaceholders(UI_STRINGS[key], param);
+    };
+
+    /**
+     * Asynchronous lookup of any lang string of this plugin.
+     *
+     * @param {string} key
+     * @param {string|number|Object} [param]
+     * @returns {Promise<string>}
+     */
+    const uiText = function(key, param) {
+        if (UI_STRINGS[key] !== undefined) {
+            return Promise.resolve(fillPlaceholders(UI_STRINGS[key], param));
+        }
+        return Str.get_string(key, UI_COMPONENT).then(function(text) {
+            UI_STRINGS[key] = text;
+            return fillPlaceholders(text, param);
+        });
+    };
+
+    /**
+     * Show a localized notification.
+     *
+     * @param {string} key Lang string identifier.
+     * @param {string} type 'info', 'error' or 'success'.
+     * @param {string|number|Object} [param]
+     */
+    const notify = function(key, type, param) {
+        uiText(key, param).then(function(text) {
+            UI.showNotification(text, type);
+            return null;
+        }).catch(function() { /**/ });
+    };
+
     /** @type {Array} Quiz topics parsed from data attribute */
     let quizTopics = [];
     /** @type {Array} Learning objectives from course */
@@ -1247,7 +1347,9 @@ define([
      */
     const getRealtimeMicStream = function() {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            return Promise.reject(new Error('Microphone access is not available in this browser.'));
+            const unavailable = new Error('mic-unavailable');
+            unavailable.name = 'MicUnavailableError';
+            return Promise.reject(unavailable);
         }
         return navigator.mediaDevices.getUserMedia(getRealtimeMicConstraints());
     };
@@ -1256,23 +1358,24 @@ define([
      * Normalize browser getUserMedia failures into user-facing copy.
      *
      * @param {Error|DOMException|Object|string|null} err
-     * @returns {string}
+     * @returns {Promise<string>}
      */
     const formatRealtimeVoiceStartError = function(err) {
         const name = err && err.name ? err.name : '';
+        let key = 'chat:voice_err_start_failed';
         if (name === 'NotAllowedError' || name === 'PermissionDeniedError' || name === 'SecurityError') {
-            return 'Microphone access was blocked. Please allow microphone access and try again.';
+            key = 'chat:voice_err_mic_blocked';
+        } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+            key = 'chat:voice_err_mic_missing';
+        } else if (name === 'NotReadableError' || name === 'TrackStartError') {
+            key = 'chat:voice_err_mic_busy';
+        } else if (name === 'MicUnavailableError') {
+            key = 'chat:voice_err_mic_unavailable';
+        } else if (err && err.message) {
+            // A server refusal: Moodle already localized it.
+            return Promise.resolve(err.message);
         }
-        if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
-            return 'No microphone was found on this device.';
-        }
-        if (name === 'NotReadableError' || name === 'TrackStartError') {
-            return 'Your microphone is busy in another app. Close the other app and try again.';
-        }
-        if (err && err.message) {
-            return err.message;
-        }
-        return 'Could not start live voice chat.';
+        return uiText(key);
     };
 
     /**
@@ -1353,26 +1456,24 @@ define([
         }
         const available = isVoiceChatAvailable();
         const sessionActive = hasActiveVoiceSession();
-        const contextText = sessionActive
-            ? (currentPageTitle
-                ? 'Voice chat is open for "' + currentPageTitle + '". Keep speaking, type a follow-up, or end the session when you are done.'
-                : 'Voice chat is open for this page or another course topic. Keep speaking, type a follow-up, or end the session when you are done.')
-            : (currentPageTitle
-                ? 'Start a voice conversation about "' + currentPageTitle + '" or another course topic. Your transcript will still show up in chat.'
-                : 'Start a voice conversation about this page or another course topic. Your transcript will still show up in chat.');
-        let status = 'Ready when you are.';
+        let contextKey = currentPageTitle ? 'chat:voicepanel_start_page' : 'chat:voicepanel_start_generic';
+        if (sessionActive) {
+            contextKey = currentPageTitle ? 'chat:voicepanel_open_page' : 'chat:voicepanel_open_generic';
+        }
+        const contextText = uiTextNow(contextKey, currentPageTitle || undefined);
+        let status = uiTextNow('chat:voicepanel_status_ready');
         if (sessionActive && !Voice.isConnected() && !Live.isConnected()) {
-            status = 'Voice chat is starting. You can end the session at any time.';
+            status = uiTextNow('chat:voicepanel_status_starting');
         } else if (Voice.isConnected() || Live.isConnected()) {
-            status = 'Voice chat is live. Speak or type to continue.';
+            status = uiTextNow('chat:voicepanel_status_live');
         } else if (!isVoiceFeatureEnabled(root)) {
-            status = 'Voice chat is not enabled for this course yet.';
+            status = uiTextNow('chat:voice_err_not_enabled');
         } else if (!hasVoiceInputEnvironment()) {
-            status = 'Voice chat needs HTTPS and microphone access.';
+            status = uiTextNow('chat:voicepanel_status_https');
         } else if (!hasAudioPlaybackSupport()) {
-            status = 'Audio playback is not available in this browser.';
+            status = uiTextNow('chat:voice_err_playback_unavailable');
         } else if (!isRealtimeVoicePreferred(root) && !supportsLegacyVoiceFlow()) {
-            status = 'This browser does not support speech input.';
+            status = uiTextNow('chat:voice_err_speech_input');
         }
         UI.configureVoicePanel({
             text: contextText,
@@ -1445,7 +1546,7 @@ define([
         }).catch(function() {
             UI.renderHistoryPanel(conversationHistory);
             if (showError) {
-                UI.showNotification('Could not refresh history right now.', 'error');
+                notify('chat:history_refresh_failed', 'error');
             }
         }).then(function() {
             historyRefreshPending = false;
@@ -1620,6 +1721,7 @@ define([
         syncComposerLlmControls(root);
         initSpeech();
         syncVoicePanel();
+        preloadUiStrings().then(syncVoicePanel);
         UI.setModeButtonsEnabled(!quizLocked && !attemptLocked);
         // Both locks, not just attemptLocked. quizLocked is the per-quiz
         // assistance level `hidden`, and it is set on a quiz's VIEW page as well
@@ -2176,7 +2278,7 @@ define([
         if (langCode && langCode !== 'en') {
             var langInfo = Speech.getLangInfo(langCode);
             var langName = langInfo ? langInfo.name : langCode;
-            UI.showNotification('Language set to ' + langName + '. New messages will be in ' + langName + '.', 'info');
+            notify('chat:language_set', 'info', {language: langName});
         }
     };
 
@@ -2289,7 +2391,7 @@ define([
             els.langBtn.addEventListener('click', function() {
                 var lockRoot = document.getElementById('local-ai-course-assistant');
                 if (lockRoot && lockRoot.dataset.englishLock === '1') {
-                    UI.showNotification('Language is locked to English for this course.', 'info');
+                    notify('chat:language_locked', 'info');
                     return;
                 }
                 UI.showLangPicker(
@@ -2953,7 +3055,7 @@ define([
         Repo.getSurvey(courseId).then(function(data) {
             if (!data.has_survey || data.already_responded) {
                 if (data.already_responded) {
-                    UI.showNotification('You have already completed this survey. Thank you!', 'info');
+                    notify('chat:survey_already_done', 'info');
                 }
                 return;
             }
@@ -3054,11 +3156,11 @@ define([
         // Option B: in-widget testing panel.
         Repo.getUserTesting(courseId).then(function(data) {
             if (!data.has_taskset) {
-                UI.showNotification('No testing tasks are available right now.', 'info');
+                notify('chat:usertesting_none', 'info');
                 return;
             }
             if (data.completed_count >= data.total_tasks) {
-                UI.showNotification('You have completed all testing tasks. Thank you!', 'info');
+                notify('chat:usertesting_done', 'info');
                 return;
             }
 
@@ -3078,7 +3180,7 @@ define([
                 }
             );
         }).catch(function() {
-            UI.showNotification('Could not load testing tasks.', 'error');
+            notify('chat:usertesting_load_failed', 'error');
         });
     };
 
@@ -3134,7 +3236,7 @@ define([
                     onLangSelect: function(code, name) {
                         var lockRoot = document.getElementById('local-ai-course-assistant');
                         if (lockRoot && lockRoot.dataset.englishLock === '1') {
-                            UI.showNotification('Language is locked to English for this course.', 'info');
+                            notify('chat:language_locked', 'info');
                             return;
                         }
                         if (code) {
@@ -3157,7 +3259,7 @@ define([
                             // custom avatars were rejected server-side and the
                             // picker looked like it simply did not work.
                             window.console && console.warn('[SOLA avatar]', err);
-                            UI.showNotification('Could not save the avatar choice.', 'error');
+                            notify('chat:avatar_save_failed', 'error');
                         });
                     },
                     onVoiceSelect: function(voice) {
@@ -3568,7 +3670,7 @@ define([
         }
 
         if (!audioCtx) {
-            addAssistantMsg('Audio playback is not available in this browser.');
+            uiText('chat:voice_err_playback_unavailable').then(addAssistantMsg).catch(function() { /**/ });
             syncVoicePanel();
             return;
         }
@@ -3727,7 +3829,7 @@ define([
                                     }
                                 }
                                 if (!audioCtx) {
-                                    addAssistantMsg('Audio playback is not available in this browser.');
+                                    uiText('chat:voice_err_playback_unavailable').then(addAssistantMsg).catch(function() { /**/ });
                                     return;
                                 }
                                 resumingAfterSilence = true;
@@ -3787,7 +3889,12 @@ define([
                             }
                             UI.setVoiceState('disconnected');
                             teardownVoiceSessionUi();
-                            addAssistantMsg(msg || 'Voice connection failed.');
+                            if (msg && !isGemini) {
+                                addAssistantMsg(msg);
+                            } else {
+                                // Gemini's module messages are English developer text; show a localized line.
+                                uiText('chat:voice_err_connection_failed').then(addAssistantMsg).catch(function() { /**/ });
+                            }
                         },
                         onSuggestions: function(nextChips) {
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
@@ -3835,7 +3942,10 @@ define([
                 }
                 UI.setVoiceState('disconnected');
                 teardownVoiceSessionUi();
-                addAssistantMsg(formatRealtimeVoiceStartError(err));
+                formatRealtimeVoiceStartError(err).then(function(text) {
+                    addAssistantMsg(text);
+                    return null;
+                }).catch(function() { /**/ });
             });
         };
 
@@ -3860,8 +3970,11 @@ define([
             UI.stopMouthSync();
             UI.setVoiceState('disconnected');
             teardownVoiceSessionUi();
-            addAssistantMsg(message ||
-                'Live voice isn\'t available right now, so this conversation uses the regular voice mode.');
+            if (message) {
+                addAssistantMsg(message);
+            } else {
+                uiText('chat:voice_live_fallback').then(addAssistantMsg).catch(function() { /**/ });
+            }
             startLegacyPracticeSpeaking(root, selection);
         };
 
@@ -3909,7 +4022,7 @@ define([
      */
     const startLegacyPracticeSpeaking = function(root, selection) {
         if (!supportsLegacyVoiceFlow()) {
-            UI.showNotification('This browser does not support speech input.', 'error');
+            notify('chat:voice_err_speech_input', 'error');
             syncVoicePanel();
             return;
         }
@@ -3970,7 +4083,11 @@ define([
                         Voice.disconnect();
                         UI.setVoiceState('disconnected');
                         teardownVoiceSessionUi();
-                        addAssistantMsg(msg || 'Voice mode failed.');
+                        if (msg) {
+                            addAssistantMsg(msg);
+                        } else {
+                            uiText('chat:voice_err_mode_failed').then(addAssistantMsg).catch(function() { /**/ });
+                        }
                     },
                     onSuggestions: function(chips) {
                         if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
@@ -4020,16 +4137,16 @@ define([
      */
     const handlePracticeSpeaking = function() {
         if (sending || streamController) {
-            UI.showNotification('Please wait for the current response to finish before starting voice chat.', 'error');
+            notify('chat:voice_err_wait_response', 'error');
             return;
         }
         const root = document.getElementById('local-ai-course-assistant');
         if (!root || !isVoiceFeatureEnabled(root)) {
-            UI.showNotification('Voice chat is not enabled for this course yet.', 'error');
+            notify('chat:voice_err_not_enabled', 'error');
             return;
         }
         if (!hasVoiceInputEnvironment()) {
-            UI.showNotification('Voice chat needs a secure context (HTTPS or localhost) and microphone access. This page is served over plain HTTP from a LAN address, so the browser blocks the microphone.', 'error');
+            notify('chat:voice_err_secure_context', 'error');
             return;
         }
         setBottomMode('voice', {force: true});
@@ -4104,16 +4221,16 @@ define([
      */
     const handleELLPronunciation = function() {
         if (sending || streamController) {
-            UI.showNotification('Please wait for the current response to finish before starting voice chat.', 'error');
+            notify('chat:voice_err_wait_response', 'error');
             return;
         }
         const root = document.getElementById('local-ai-course-assistant');
         if (!root || !isRealtimeVoicePreferred(root)) {
-            UI.showNotification('Pronunciation Practice is not enabled for this course yet.', 'error');
+            notify('chat:voice_err_pron_not_enabled', 'error');
             return;
         }
         if (!hasVoiceInputEnvironment()) {
-            UI.showNotification('Pronunciation Practice needs a secure context (HTTPS or localhost) and microphone access. This page is served over plain HTTP from a LAN address, so the browser blocks the microphone.', 'error');
+            notify('chat:voice_err_pron_secure_context', 'error');
             return;
         }
         setBottomMode('voice', {force: true});
@@ -4265,7 +4382,7 @@ define([
                         UI.showNotification(msg, 'error');
                         return;
                     }).catch(function() {
-                        UI.showNotification('Microphone error: ' + errorCode, 'error');
+                        window.console && console.warn('[SOLA mic]', errorCode);
                     });
                 }
             }
@@ -4950,7 +5067,7 @@ define([
                             addAssistantMsg(msg);
                             return;
                         }).catch(function() {
-                            addAssistantMsg('Could not generate a quiz. Please try again.');
+                            window.console && console.warn('[SOLA quiz] could not load the quiz error string');
                         });
                         return;
                     }
@@ -5014,7 +5131,7 @@ define([
                         addAssistantMsg(msg);
                         return;
                     }).catch(function() {
-                        addAssistantMsg('Could not generate a quiz. Please try again.');
+                        window.console && console.warn('[SOLA quiz] could not load the quiz error string');
                     });
                 });
             },
@@ -5741,9 +5858,10 @@ define([
         }
         var rootEl = document.getElementById('local-ai-course-assistant');
         var shortName = (rootEl && rootEl.dataset.shortname) || 'SOLA';
-        var displayName = (rootEl && rootEl.dataset.displayname) || 'Saylor Online Learning Assistant';
-        var institutionName = (rootEl && rootEl.dataset.institution) || 'Saylor University';
-        // Build identity string: "SOLA (Saylor Online Learning Assistant)" or just the short name if they match.
+        // The server always sends the configured (or this site's neutral) names; these are last-resort fallbacks.
+        var displayName = (rootEl && rootEl.dataset.displayname) || shortName;
+        var institutionName = (rootEl && rootEl.dataset.institution) || '';
+        // Build identity string: "SOLA (Online Learning Assistant)" or just the short name if they match.
         var identity = shortName;
         if (displayName && displayName !== shortName) {
             identity = shortName + ' (' + displayName + ')';
@@ -6397,7 +6515,16 @@ define([
                 if (inputEl) { inputEl.setAttribute('aria-invalid', 'true'); }
                 // Show error as assistant message.
                 // Detect specific HTTP error patterns for categorised responses.
-                if (errorMsg.includes('401') || errorMsg.includes('auth')) {
+                // sse_client.js reports its own transport failures in English; never show those raw.
+                const transportKeys = {
+                    'Unknown error': 'chat:error',
+                    'Stream payload exceeded safety cap': 'chat:error_stream_cap',
+                    'Stream payload line exceeded safety cap': 'chat:error_stream_cap',
+                    'Stream connection failed': 'chat:error_stream_connection',
+                };
+                if (typeof errorMsg === 'string' && transportKeys[errorMsg.trim()]) {
+                    uiText(transportKeys[errorMsg.trim()]).then(addAssistantMsg).catch(function() { /**/ });
+                } else if (errorMsg.includes('401') || errorMsg.includes('auth')) {
                     Str.get_string('chat:error_auth', 'local_ai_course_assistant').then(function(msg) {
                         addAssistantMsg(msg);
                         return;
@@ -6500,13 +6627,13 @@ define([
             Str.get_string('chat:copied', 'local_ai_course_assistant').then(function(successMsg) {
                 UI.showNotification(successMsg, 'success');
             }).catch(function() {
-                UI.showNotification('Copied!', 'success');
+                window.console && console.warn('[SOLA copy] could not load the copied string');
             });
         }).catch(function() {
             Str.get_string('chat:copy_failed', 'local_ai_course_assistant').then(function(errorMsg) {
                 UI.showNotification(errorMsg, 'error');
             }).catch(function() {
-                UI.showNotification('Copy failed', 'error');
+                window.console && console.warn('[SOLA copy] could not load the copy-failed string');
             });
         });
     };

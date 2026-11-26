@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'AI Course Assistant';
+$string['branding:default_display_name'] = 'AI Learning Assistant';
 $string['error'] = '{$a}';
 // Cache definitions (db/caches.php). Required so the cache admin UI has a label per store.
 $string['cachedef_ratelimit'] = 'Per-user request rate limiting';
@@ -147,7 +148,7 @@ $string['settings:history_candidates_desc'] = 'In semantic history mode, only th
 $string['settings:avatar'] = 'Chat Avatar';
 $string['settings:avatar_desc'] = 'Select the avatar icon for the chat widget button.';
 $string['settings:institution_name'] = 'Institution Name';
-$string['settings:institution_name_desc'] = 'The name of the institution displayed in the system prompt, avatar labels, and demo content. Change this when rebranding.';
+$string['settings:institution_name_desc'] = 'The name of the institution displayed in the system prompt, avatar labels, and demo content. Leave empty to use the site name.';
 $string['settings:avatar_saylor'] = '{$a} Logo (Default)';
 $string['settings:avatar_numbered'] = 'Avatar {$a}';
 $string['settings:avatar_custom'] = 'Custom: {$a}';
@@ -984,11 +985,11 @@ $string['admin:vendor_dpa:dpa_unknown'] = 'Unknown';
 
 // White-label contact points (v3.9.15, contact_email added v4.1.9).
 $string['settings:contact_email'] = 'Contact email';
-$string['settings:contact_email_desc'] = 'General contact email shown on the learner facing privacy notice under "Contact". Defaults to contact@saylor.org. Leave empty to hide the line. Rebranded installs should point this at their own support address.';
+$string['settings:contact_email_desc'] = 'General contact email shown on the learner facing privacy notice under "Contact". Leave empty to use the site support email.';
 $string['settings:dpo_email'] = 'Data Protection Officer email';
 $string['settings:dpo_email_desc'] = 'Optional Data Protection Officer email. Retained for installs that want a dedicated DPO line in addition to the general contact email; the bundled privacy notice surfaces the contact email by default.';
 $string['settings:privacy_external_url'] = 'Institution privacy page URL';
-$string['settings:privacy_external_url_desc'] = 'Link to the institution level privacy page, shown on the learner facing privacy notice under "Contact". Leave empty to hide the line.';
+$string['settings:privacy_external_url_desc'] = 'Link to the institution level privacy page, shown on the learner facing privacy notice under "Contact". Leave empty to use the site policy page when the site has one, or to hide the line.';
 
 // Privacy notice admin override (v3.9.16).
 $string['settings:privacy_notice_override'] = 'Privacy notice override (HTML)';
@@ -2281,9 +2282,9 @@ $string['settings:quiz_model_desc'] = 'Model name for quiz generation, e.g. <cod
 $string['settings:branding_heading'] = 'Branding';
 $string['settings:branding_heading_desc'] = 'Customize the assistant name and appearance.';
 $string['settings:institution_short_name'] = 'Institution Short Name';
-$string['settings:institution_short_name_desc'] = 'Abbreviated institution name for compact UI elements (e.g. "State U").';
+$string['settings:institution_short_name_desc'] = 'Abbreviated institution name for compact UI elements (e.g. "State U"). Leave empty to use the site short name.';
 $string['settings:display_name'] = 'Assistant Display Name';
-$string['settings:display_name_desc'] = 'Full name of the AI assistant shown in greetings and the welcome screen (e.g. "Online Learning Assistant").';
+$string['settings:display_name_desc'] = 'Full name of the AI assistant shown in greetings and the welcome screen (e.g. "Online Learning Assistant"). Leave empty for a generic name.';
 $string['settings:short_name'] = 'Assistant Short Name';
 $string['settings:short_name_desc'] = 'Short name shown in the header bar and compact UI elements (e.g. "Assistant").';
 $string['settings:welcome_message'] = 'Welcome Screen Message';
@@ -3707,7 +3708,7 @@ $string['privacy:metadata:model_eval:createdby'] = 'The site administrator who a
 $string['privacy:metadata:model_switch'] = 'Model switches and rollbacks: which model a role moved from and to, and why. The only personal data is the identifier of the administrator who made or reversed the switch. These rows are site configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure.';
 $string['privacy:metadata:model_switch:createdby'] = 'The site administrator who made this switch. Empty when it was automatic.';
 $string['privacy:metadata:model_switch:rolledbackby'] = 'The site administrator who rolled this switch back. Empty when the watcher did, or it was not rolled back.';
-$string['privacy:metadata:answer_audit'] = 'A record of each answer the assistant gave: the sources it used, the rules that fired and any later check of its claims, so that answers can be reviewed. The question, answer and claim text are removed when the conversation is cleared or erasure is requested; the record of what was checked stays.';
+$string['privacy:metadata:answer_audit'] = 'A record of each answer the assistant gave: the sources it used, the rules that fired and any later check of its claims, so that answers can be reviewed. When the conversation is cleared or erasure is requested, the question, answer and claim text are removed and the record is no longer linked to the learner; the record of what was checked stays.';
 $string['privacy:metadata:answer_audit:userid'] = 'The learner who asked the question.';
 $string['privacy:metadata:answer_audit:courseid'] = 'The course the question was asked in.';
 $string['privacy:metadata:answer_audit:question'] = 'The learner\'s question.';
@@ -3721,6 +3722,7 @@ $string['privacy:metadata:answer_audit:rules'] = 'The guidance rules that fired 
 $string['privacy:metadata:answer_audit:status'] = 'The claim check\'s verdict on the answer.';
 $string['privacy:metadata:answer_audit:claims'] = 'The claims found in the answer and whether the course material supports them.';
 $string['privacy:metadata:answer_audit:timecreated'] = 'When the answer was recorded.';
+$string['privacy:metadata:answer_audit:linkhash'] = 'A one-way key made from the learner, message and conversation and a random salt. When the text is removed the learner, message and conversation are cleared and the salt is deleted, so the key no longer leads back to the learner.';
 // 8.4.0: answer safety settings and guidance rules.
 $string['settings:answer_safety_heading'] = 'Answer safety';
 $string['settings:answer_safety_heading_desc'] = 'Checks each answer for risky guidance (grades, deadlines, policy, wellbeing, personal medical, legal or financial advice, academic integrity and numbers the course material does not support) and keeps an audit record of every chat answer: in the course page chat and in the Moodle app. Meta AI answers are not covered. Questions on these topics are held and checked before the learner sees the answer.';
@@ -4027,6 +4029,7 @@ $string['answeraudit:rowcount'] = 'Answers shown: {$a}.';
 $string['answeraudit:truncated'] = 'Showing the newest {$a} answers. Narrow the filters or download the export to see more.';
 $string['answeraudit:text_removed'] = 'Text removed';
 $string['answeraudit:coursewide'] = 'Course-wide';
+$string['answeraudit:learnerremoved'] = 'Removed';
 $string['answeraudit:notfound'] = 'That answer is not in this course\'s audit.';
 $string['answeraudit:detail_heading'] = 'Answer {$a}';
 $string['answeraudit:back'] = 'Back to the list';
@@ -4126,3 +4129,104 @@ $string['instructor_dashboard:review_claim_meta'] = '{$a->status}, severity: {$a
 $string['instructor_dashboard:review_col_resolve'] = 'Resolve';
 $string['instructor_dashboard:review_audit_link'] = 'See every recorded answer in the answer audit';
 $string['instructor_dashboard:review_caption'] = 'Items waiting for review, most urgent first';
+
+// --- v8.4.1: learner and admin text moved out of JS, templates and PHP literals ---
+// instructor dashboard review queue summaries.
+$string['instructor_dashboard:review_summary_offtopic'] = 'Off-topic count: {$a}';
+$string['instructor_dashboard:review_summary_integrity'] = 'Integrity: {$a}';
+// inactivity reminder email.
+$string['reminder:inactivity_subject'] = 'We miss you in {$a}!';
+$string['reminder:inactivity_since_days'] = '{$a} days';
+$string['reminder:inactivity_since_awhile'] = 'a while';
+$string['reminder:inactivity_body'] = 'Hi {$a->firstname},
+
+It\'s been {$a->since} since you last visited {$a->coursename}. [[tutorname]] is ready to help you pick up where you left off.
+
+Even 10 minutes of review can make a difference. Log in and let\'s keep your momentum going!
+
+— [[tutorname]]';
+// voice.js and chat.js voice errors.
+$string['chat:voice_err_record_unsupported'] = 'Audio recording is not supported in this browser.';
+$string['chat:voice_err_transcribe_failed'] = 'Transcription failed. Please try again in a moment.';
+$string['chat:voice_err_transcribe_unavailable'] = 'Transcription is unavailable right now.';
+$string['chat:voice_err_recognition_unsupported'] = 'Speech recognition is not supported in this browser. Please try Chrome or Edge.';
+$string['chat:voice_err_mic_denied_settings'] = 'Microphone access denied. Please allow microphone access in your browser settings and try again.';
+$string['chat:voice_err_recognition'] = 'Speech recognition error: {$a}';
+$string['chat:voice_err_recognition_start'] = 'Could not start speech recognition. Please check microphone permissions.';
+$string['chat:voice_err_playback_unavailable'] = 'Audio playback is not available in this browser.';
+$string['chat:voice_err_mic_denied_chat'] = 'Microphone access denied. Please allow microphone access to use voice chat.';
+$string['chat:voice_err_mic_blocked'] = 'Microphone access was blocked. Please allow microphone access and try again.';
+$string['chat:voice_err_mic_missing'] = 'No microphone was found on this device.';
+$string['chat:voice_err_mic_busy'] = 'Your microphone is busy in another app. Close the other app and try again.';
+$string['chat:voice_err_mic_unavailable'] = 'Microphone access is not available in this browser.';
+$string['chat:voice_err_start_failed'] = 'Could not start live voice chat.';
+$string['chat:voice_err_connection_failed'] = 'Voice connection failed.';
+$string['chat:voice_err_mode_failed'] = 'Voice mode failed.';
+$string['chat:voice_live_fallback'] = 'Live voice isn\'t available right now, so this conversation uses the regular voice mode.';
+$string['chat:voice_err_speech_input'] = 'This browser does not support speech input.';
+$string['chat:voice_err_wait_response'] = 'Please wait for the current response to finish before starting voice chat.';
+$string['chat:voice_err_not_enabled'] = 'Voice chat is not enabled for this course yet.';
+$string['chat:voice_err_secure_context'] = 'Voice chat needs a secure context (HTTPS or localhost) and microphone access. This page is served over plain HTTP from a LAN address, so the browser blocks the microphone.';
+$string['chat:voice_err_pron_not_enabled'] = 'Pronunciation Practice is not enabled for this course yet.';
+$string['chat:voice_err_pron_secure_context'] = 'Pronunciation Practice needs a secure context (HTTPS or localhost) and microphone access. This page is served over plain HTTP from a LAN address, so the browser blocks the microphone.';
+// voice panel status text.
+$string['chat:voicepanel_open_page'] = 'Voice chat is open for "{$a}". Keep speaking, type a follow-up, or end the session when you are done.';
+$string['chat:voicepanel_open_generic'] = 'Voice chat is open for this page or another course topic. Keep speaking, type a follow-up, or end the session when you are done.';
+$string['chat:voicepanel_start_page'] = 'Start a voice conversation about "{$a}" or another course topic. Your transcript will still show up in chat.';
+$string['chat:voicepanel_start_generic'] = 'Start a voice conversation about this page or another course topic. Your transcript will still show up in chat.';
+$string['chat:voicepanel_status_ready'] = 'Ready when you are.';
+$string['chat:voicepanel_status_starting'] = 'Voice chat is starting. You can end the session at any time.';
+$string['chat:voicepanel_status_live'] = 'Voice chat is live. Speak or type to continue.';
+$string['chat:voicepanel_status_https'] = 'Voice chat needs HTTPS and microphone access.';
+// chat.js notifications.
+$string['chat:history_refresh_failed'] = 'Could not refresh history right now.';
+$string['chat:language_set'] = 'Language set to {$a->language}. New messages will be in {$a->language}.';
+$string['chat:language_locked'] = 'Language is locked to English for this course.';
+$string['chat:survey_already_done'] = 'You have already completed this survey. Thank you!';
+$string['chat:usertesting_none'] = 'No testing tasks are available right now.';
+$string['chat:usertesting_done'] = 'You have completed all testing tasks. Thank you!';
+$string['chat:usertesting_load_failed'] = 'Could not load testing tasks.';
+$string['chat:avatar_save_failed'] = 'Could not save the avatar choice.';
+$string['chat:error_stream_cap'] = 'The response was too large to display. Please try again.';
+$string['chat:error_stream_connection'] = 'The connection was interrupted. Please try again.';
+// audio player labels.
+$string['chat:audio_play'] = 'Play audio';
+$string['chat:audio_pause'] = 'Pause audio';
+// quiz setup and progress.
+$string['chat:quiz_difficulty'] = 'Difficulty';
+$string['chat:quiz_difficulty_easy'] = 'Easy';
+$string['chat:quiz_difficulty_medium'] = 'Medium';
+$string['chat:quiz_difficulty_hard'] = 'Hard';
+$string['chat:quiz_progress'] = 'Question {$a->current} of {$a->total}';
+// analytics tab templates.
+$string['analytics:msg_ratings'] = 'Message Ratings';
+$string['analytics:star_distribution'] = 'Star Rating Distribution';
+$string['analytics:recent_negative'] = 'Recent Negative Feedback';
+$string['analytics:msg_excerpt'] = 'Message Excerpt';
+$string['analytics:hallucination_q'] = 'Hallucination?';
+$string['analytics:daily_usage_trend'] = 'Daily Usage Trend';
+$string['analytics:hour_of_day'] = 'Hour of Day';
+$string['analytics:day_of_week'] = 'Day of Week';
+$string['analytics:keyword'] = 'Keyword';
+$string['analytics:category'] = 'Category';
+$string['analytics:usage_type'] = 'Type';
+$string['analytics:insights_failed'] = 'Failed to generate insights: {$a}';
+$string['analytics:unknown_error'] = 'Unknown error';
+// Learning Radar alerts and prompts.
+$string['radar:js_error_prefix'] = 'Error: {$a}';
+$string['radar:js_network_error'] = 'Network error';
+$string['radar:js_redash_created_confirm'] = 'Redash query created. Open in a new tab?';
+$string['radar:js_redash_push_error'] = 'Redash push error: {$a}';
+$string['radar:js_unknown_error'] = 'unknown error';
+$string['radar:js_email_prompt'] = 'Recipient email address:';
+$string['radar:js_slack_prompt'] = 'Slack incoming webhook URL:';
+$string['radar:js_teams_prompt'] = 'Teams incoming webhook URL:';
+$string['radar:js_sent'] = 'Sent.';
+$string['radar:js_send_error'] = 'Send error: {$a}';
+$string['radar:js_type_query_first'] = 'Type or run a query first.';
+$string['radar:js_share_copied'] = 'Share link copied to clipboard.';
+$string['radar:js_delete_schedule_confirm'] = 'Delete this schedule?';
+$string['radar:js_schedule_edit'] = 'Edit schedule';
+$string['radar:js_schedule_new'] = 'Schedule a Learning Radar query';
+$string['radar:js_placeholder_courseids'] = 'Course IDs (e.g. 2,5,12)';
+$string['radar:js_placeholder_provider'] = 'Provider (e.g. openai)';

@@ -39,8 +39,37 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
         sendFailed: 'Send failed: {$a}',
         scheduleLoadFailed: 'Could not load schedule: {$a}',
         saveFailed: 'Save failed: {$a}',
-        runFirst: 'Run a query first.'
+        runFirst: 'Run a query first.',
+        errorPrefix: '',
+        networkError: '',
+        redashCreatedConfirm: '',
+        redashPushError: '',
+        unknownError: '',
+        emailPrompt: '',
+        slackPrompt: '',
+        teamsPrompt: '',
+        sent: '',
+        sendError: '',
+        typeQueryFirst: '',
+        shareCopied: '',
+        deleteConfirm: '',
+        scheduleEdit: '',
+        scheduleNew: '',
+        placeholderCourseIds: '',
+        placeholderProvider: ''
     };
+
+    /**
+     * Alert text for a key of strs (the key itself only in the instant before init's prefetch resolves).
+     *
+     * @param {string} name Key of strs.
+     * @param {string} [value] Value for the {$a} placeholder.
+     * @return {string}
+     */
+    function msg(name, value) {
+        var text = strs[name] || name;
+        return value === undefined ? text : text.split('{$a}').join(String(value));
+    }
     var chatHistory = [];
     var lastQuery = '';
     var lastResponse = '';
@@ -73,7 +102,24 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
             {key: 'radar:js_send_failed', component: 'local_ai_course_assistant'},
             {key: 'radar:js_schedule_load_failed', component: 'local_ai_course_assistant'},
             {key: 'radar:js_save_failed', component: 'local_ai_course_assistant'},
-            {key: 'radar:js_run_first', component: 'local_ai_course_assistant'}
+            {key: 'radar:js_run_first', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_error_prefix', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_network_error', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_redash_created_confirm', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_redash_push_error', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_unknown_error', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_email_prompt', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_slack_prompt', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_teams_prompt', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_sent', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_send_error', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_type_query_first', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_share_copied', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_delete_schedule_confirm', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_schedule_edit', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_schedule_new', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_placeholder_courseids', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_placeholder_provider', component: 'local_ai_course_assistant'}
         ]).then(function(loaded) {
             strs.redashPushFailed = loaded[0];
             strs.redashSetupFailed = loaded[1];
@@ -81,6 +127,23 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
             strs.scheduleLoadFailed = loaded[3];
             strs.saveFailed = loaded[4];
             strs.runFirst = loaded[5];
+            strs.errorPrefix = loaded[6];
+            strs.networkError = loaded[7];
+            strs.redashCreatedConfirm = loaded[8];
+            strs.redashPushError = loaded[9];
+            strs.unknownError = loaded[10];
+            strs.emailPrompt = loaded[11];
+            strs.slackPrompt = loaded[12];
+            strs.teamsPrompt = loaded[13];
+            strs.sent = loaded[14];
+            strs.sendError = loaded[15];
+            strs.typeQueryFirst = loaded[16];
+            strs.shareCopied = loaded[17];
+            strs.deleteConfirm = loaded[18];
+            strs.scheduleEdit = loaded[19];
+            strs.scheduleNew = loaded[20];
+            strs.placeholderCourseIds = loaded[21];
+            strs.placeholderProvider = loaded[22];
             return null;
         }).catch(function() { /* Keep English fallbacks. */ });
         cfg = {
@@ -168,7 +231,7 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
             if (v === 'custom' || v === 'byprovider') {
                 detail.style.display = '';
                 if (value) {
-                    value.placeholder = v === 'custom' ? 'Course IDs (e.g. 2,5,12)' : 'Provider (e.g. openai)';
+                    value.placeholder = v === 'custom' ? msg('placeholderCourseIds') : msg('placeholderProvider');
                 }
             } else {
                 detail.style.display = 'none';
@@ -394,7 +457,7 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
                                 fullText += p.token;
                                 renderResponse(responseDiv, fullText);
                             } else if (p.message) {
-                                renderResponse(responseDiv, 'Error: ' + p.message);
+                                renderResponse(responseDiv, msg('errorPrefix', p.message));
                             } else if (p.full && !fullText) {
                                 fullText = p.full;
                                 renderResponse(responseDiv, fullText);
@@ -406,7 +469,7 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
             }
             return read();
         }).catch(function(err) {
-            renderResponse(responseDiv, 'Error: ' + (err.message || 'Network error'));
+            renderResponse(responseDiv, msg('errorPrefix', err.message || msg('networkError')));
             onDone('');
         });
     }
@@ -577,14 +640,14 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
             body: body.toString()
         }).then(function(r) { return r.json(); }).then(function(j) {
             if (j.ok && j.url) {
-                if (window.confirm('Redash query created. Open in a new tab?\n\n' + j.url)) {
+                if (window.confirm(msg('redashCreatedConfirm') + '\n\n' + j.url)) {
                     window.open(j.url, '_blank');
                 }
             } else {
-                alert(strs.redashPushFailed.replace('{$a}', j.error || 'unknown error'));
+                alert(strs.redashPushFailed.replace('{$a}', j.error || msg('unknownError')));
             }
         }).catch(function(err) {
-            alert('Redash push error: ' + err.message);
+            alert(msg('redashPushError', err.message));
         });
     }
 
@@ -663,7 +726,7 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
     }
 
     function downloadExport(format) {
-        if (!lastResponse) { alert('Run a query first.'); return; }
+        if (!lastResponse) { alert(msg('runFirst')); return; }
         var f = el('form', { method: 'POST', action: cfg.exportUrl, target: '_blank' });
         appendHidden(f, 'sesskey', cfg.sesskey);
         appendHidden(f, 'action', 'download');
@@ -683,15 +746,15 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
     }
 
     function openSendDialog(channel) {
-        if (!lastResponse) { alert('Run a query first.'); return; }
+        if (!lastResponse) { alert(msg('runFirst')); return; }
         var prompt1, prompt2;
         if (channel === 'email') {
-            prompt1 = 'Recipient email address:';
+            prompt1 = msg('emailPrompt');
             prompt2 = window.prompt(prompt1, '');
             if (!prompt2) { return; }
             postSend({ action: 'email', to: prompt2, format: 'text' });
         } else if (channel === 'slack' || channel === 'teams') {
-            prompt1 = (channel === 'slack' ? 'Slack' : 'Teams') + ' incoming webhook URL:';
+            prompt1 = channel === 'slack' ? msg('slackPrompt') : msg('teamsPrompt');
             prompt2 = window.prompt(prompt1, '');
             if (!prompt2) { return; }
             postSend({ action: channel, webhook: prompt2 });
@@ -712,12 +775,12 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
             body: body.toString()
         }).then(function(r) { return r.json(); }).then(function(j) {
             if (j.ok) {
-                alert('Sent.');
+                alert(msg('sent'));
             } else {
-                alert(strs.sendFailed.replace('{$a}', j.error || 'unknown error'));
+                alert(strs.sendFailed.replace('{$a}', j.error || msg('unknownError')));
             }
         }).catch(function(err) {
-            alert('Send error: ' + err.message);
+            alert(msg('sendError', err.message));
         });
     }
 
@@ -739,11 +802,11 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
         if (!btn) { return; }
         btn.addEventListener('click', function() {
             var q = $('ai-analysis-input').value.trim() || lastQuery;
-            if (!q) { alert('Type or run a query first.'); return; }
+            if (!q) { alert(msg('typeQueryFirst')); return; }
             var url = window.location.origin + window.location.pathname + window.location.search
                 + '#q=' + encodeURIComponent(q);
             copyToClipboard(url);
-            alert('Share link copied to clipboard.');
+            alert(msg('shareCopied'));
         });
     }
 
@@ -781,7 +844,7 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
         });
         document.querySelectorAll('.radar-sched-delete').forEach(function(b) {
             b.addEventListener('click', function() {
-                if (!confirm('Delete this schedule?')) { return; }
+                if (!confirm(msg('deleteConfirm'))) { return; }
                 Ajax.call([{
                     methodname: 'local_ai_course_assistant_delete_radar_schedule',
                     args: { id: parseInt(b.dataset.id, 10) }
@@ -837,7 +900,7 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
             class: 'card', style: 'max-width:560px;width:92%;max-height:90vh;overflow:auto'
         });
         var header = '<div class="card-header d-flex justify-content-between align-items-center">'
-            + '<h5 class="mb-0">' + (existing ? 'Edit schedule' : 'Schedule a Learning Radar query') + '</h5>'
+            + '<h5 class="mb-0">' + escapeHtml(existing ? msg('scheduleEdit') : msg('scheduleNew')) + '</h5>'
             + '<button class="btn btn-sm btn-link" id="radar-schedule-close">×</button></div>';
         var providerOptions = providers.map(function(p) {
             return '<option value="' + escapeHtml(p.id) + '">' + escapeHtml(p.label) + '</option>';

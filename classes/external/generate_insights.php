@@ -159,7 +159,7 @@ class generate_insights extends external_api {
         }
 
         // Build the AI prompt.
-        $institution = get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University';
+        $institution = \local_ai_course_assistant\branding::institution_name();
         $brand = \local_ai_course_assistant\branding::short_name();
         $systemprompt = "You are a product analyst for {$brand} ({$institution} Online Learning Assistant), "
             . "an AI-powered learning coach embedded in Moodle course pages. "

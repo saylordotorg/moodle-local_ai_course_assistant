@@ -56,7 +56,6 @@ class send_inactivity_reminders extends \core\task\scheduled_task {
         $rawthreshold = get_config('local_ai_course_assistant', 'inactivity_threshold_days');
         $threshold = ($rawthreshold === false || $rawthreshold === '') ? 7 : (int) $rawthreshold;
         $cutoff = time() - ($threshold * 86400);
-        $display_name = \local_ai_course_assistant\branding::display_name();
 
         // Find users with active email reminders who haven't accessed their course recently.
         $sql = "SELECT r.id, r.userid, r.courseid, r.destination, r.last_sent,
@@ -124,13 +123,14 @@ class send_inactivity_reminders extends \core\task\scheduled_task {
             }
 
             $days_since = $rec->lastaccess > 0 ? round((time() - $rec->lastaccess) / 86400) : 0;
-            $subject = "We miss you in {$rec->coursename}!";
-            $body = "Hi {$rec->firstname},\n\n"
-                . "It's been " . ($days_since > 0 ? "{$days_since} days" : "a while")
-                . " since you last visited {$rec->coursename}. "
-                . "{$display_name} is ready to help you pick up where you left off.\n\n"
-                . "Even 10 minutes of review can make a difference. Log in and let's keep your momentum going!\n\n"
-                . "— {$display_name}";
+            $subject = get_string('reminder:inactivity_subject', 'local_ai_course_assistant', $rec->coursename);
+            $body = \local_ai_course_assistant\branding::str('reminder:inactivity_body', (object) [
+                'firstname' => $rec->firstname,
+                'coursename' => $rec->coursename,
+                'since' => $days_since > 0
+                    ? get_string('reminder:inactivity_since_days', 'local_ai_course_assistant', $days_since)
+                    : get_string('reminder:inactivity_since_awhile', 'local_ai_course_assistant'),
+            ]);
 
             try {
                 // The driving query INNER JOINs {user}, so the pre-loaded map

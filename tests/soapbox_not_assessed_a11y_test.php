@@ -95,7 +95,7 @@ final class soapbox_not_assessed_a11y_test extends \basic_testcase {
      * accesshide is Moodle core's class, and this plugin already uses it.
      *
      * sr-only is Bootstrap 4 and was renamed visually-hidden in Bootstrap 5.
-     * version.php declares support for Moodle 4.5 through 5.2, which spans that
+     * version.php declares support for Moodle 4.5 through 5.3, which spans that
      * rename, so neither Bootstrap name is safe across the supported range.
      *
      * The badge used to be echoed twice by soapbox.php. CONTRIB-10574 #273 and
@@ -116,12 +116,12 @@ final class soapbox_not_assessed_a11y_test extends \basic_testcase {
         $this->assertDoesNotMatchRegularExpression(
             '/class\s*=\s*["\'][^"\']*\bsr-only\b/',
             $src,
-            "{$relpath}: sr-only is Bootstrap 4 only, and this plugin supports Moodle 4.5 through 5.2"
+            "{$relpath}: sr-only is Bootstrap 4 only, and this plugin supports Moodle 4.5 through 5.3"
         );
         $this->assertDoesNotMatchRegularExpression(
             '/class\s*=\s*["\'][^"\']*\bvisually-hidden\b/',
             $src,
-            "{$relpath}: visually-hidden is Bootstrap 5 only, and this plugin supports Moodle 4.5 through 5.2"
+            "{$relpath}: visually-hidden is Bootstrap 5 only, and this plugin supports Moodle 4.5 through 5.3"
         );
         $this->assertMatchesRegularExpression(
             '/class\s*=\s*["\'][^"\']*\baccesshide\b/',

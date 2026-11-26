@@ -932,8 +932,12 @@
                         content.innerHTML = '<div class="alert alert-danger">' + html + '</div>';
                     }
                 }).fail(function(err) {
-                    content.innerHTML = '<div class="alert alert-danger">Failed to generate insights: '
-                        + (err.message || 'Unknown error') + '</div>';
+                    var failure = document.createElement('div');
+                    failure.className = 'alert alert-danger';
+                    failure.textContent = {{#quote}}{{#str}}analytics:insights_failed, local_ai_course_assistant, __DETAIL__{{/str}}{{/quote}}
+                        .replace('__DETAIL__', err.message || {{#quote}}{{#str}}analytics:unknown_error, local_ai_course_assistant{{/str}}{{/quote}});
+                    content.innerHTML = '';
+                    content.appendChild(failure);
                     content.style.display = 'block';
                     spinner.style.display = 'none';
                     insightsBtn.disabled = false;
