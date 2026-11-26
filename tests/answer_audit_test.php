@@ -484,6 +484,36 @@ final class answer_audit_test extends \advanced_testcase {
         $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain(7));
     }
 
+    public function test_a_redaction_before_the_lock_is_seen_inside_it_and_the_verdict_is_never_stored_linked(): void {
+        global $CFG, $DB;
+        $CFG->lock_factory = '\\' . answer_audit_test_lock_factory::class;
+        $a = answer_audit::record($this->row(7, ['conversationid' => 11, 'userid' => 5]));
+
+        // append_verdict() has read the answer (live) and is waiting for the course lock when the learner is
+        // erased. The in-lock re-read must see it, so the verdict is inserted already redacted and unlinked: no
+        // redaction of the verdict row by id is needed afterwards (that later pass is only the backstop for a
+        // redaction landing between the in-lock read and the insert).
+        $byid = [];
+        answer_audit::$beforeredact = function(string $select, array $params) use (&$byid): void {
+            if ($select === 'id = ?') {
+                $byid[] = $params[0];
+            }
+        };
+        answer_audit_test_lock_factory::$onlock = function() {
+            answer_audit::redact_for_user(5);
+        };
+        $vid = answer_audit::append_verdict($a, ['status' => 'warn', 'claims' => [['text' => 'Week 9 exam.',
+            'type' => 'date', 'status' => 'unsupported', 'evidence_ref' => 'chunk:7', 'severity' => 'medium']]]);
+        $this->assertNull(answer_audit_test_lock_factory::$onlock, 'the seam must have run');
+
+        $this->assertSame([], $byid, 'the verdict was inserted linked or with text and had to be redacted after');
+        $v = $DB->get_record(self::TABLE, ['id' => $vid]);
+        $this->assertEquals(1, $v->redacted);
+        $this->assertTrue(answer_audit::is_unlinked($v));
+        $this->assertStringNotContainsString('Week 9', $v->claims);
+        $this->assertSame(['ok' => true, 'brokenat' => null], answer_audit::verify_chain(7));
+    }
+
     public function test_secret_names_are_refused_and_ordinary_names_are_not(): void {
         global $DB;
         // Names a validator, category or citation may well use.

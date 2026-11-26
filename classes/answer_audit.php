@@ -242,23 +242,34 @@ class answer_audit {
             'judge_cost' => isset($verdict['judge_cost']) ? round((float) $verdict['judge_cost'], 6) : null,
         ];
         // A redacted original stays redacted: its verdict is written with no claim text either, and unlinked like it.
-        if (!empty($original->redacted)) {
-            $rec->claims = self::strip_claim_text($rec->claims);
-            $rec->redacted = 1;
-            $rec->timeredacted = time();
-            $rec->userid = 0;
-            $rec->messageid = null;
-            $rec->conversationid = null;
-            $rec->linksalt = null;
-            $rec->linkhash = self::new_link(0, null, null)[1];
-        } else {
-            self::link($rec);
-        }
-        $id = self::insert_chained($rec);
+        // The original's state is read again INSIDE the course lock, right before the hash is computed and the row
+        // inserted, so a redaction that finished while the judge ran (or while this call waited for the lock) is
+        // always seen and the verdict is never stored with text or a link to the learner.
+        $originalid = (int) $original->id;
+        $id = self::insert_chained($rec, static function(\stdClass $rec) use ($originalid): void {
+            global $DB;
+            $now = $DB->get_record(self::TABLE, ['id' => $originalid],
+                'id, redacted, userid, messageid, conversationid', MUST_EXIST);
+            if (!empty($now->redacted)) {
+                $rec->claims = self::strip_claim_text($rec->claims);
+                $rec->redacted = 1;
+                $rec->timeredacted = time();
+                $rec->userid = 0;
+                $rec->messageid = null;
+                $rec->conversationid = null;
+                $rec->linksalt = null;
+                $rec->linkhash = self::new_link(0, null, null)[1];
+            } else {
+                $rec->userid = (int) $now->userid;
+                $rec->messageid = self::int_or_null($now->messageid);
+                $rec->conversationid = self::int_or_null($now->conversationid);
+                self::link($rec);
+            }
+        });
 
-        // The answer may have been redacted between the read above and the insert (the learner cleared the
-        // conversation while the judge ran). Check again now that the verdict exists: any redaction from here on
-        // finds the verdict through the identifiers it shares with its answer.
+        // Redaction does not take the course lock, so it can still land between the in-lock read and the insert,
+        // and its own query would not find a row that did not exist yet. Check again now that the verdict exists:
+        // any redaction from here on finds the verdict through the identifiers it shares with its answer.
         if (empty($rec->redacted) && !empty($DB->get_field(self::TABLE, 'redacted', ['id' => $original->id]))) {
             self::redact_where('id = ?', [$id]);
         }
@@ -728,14 +739,12 @@ class answer_audit {
      * Insert a row at the end of its course's chain, under the course lock.
      *
      * @param \stdClass $rec
+     * @param \Closure|null $underlock called with $rec once the lock is held, before the hashes are computed
+     *     (append_verdict() re-reads its answer row's redaction state there)
      * @return int
      */
-    private static function insert_chained(\stdClass $rec): int {
+    private static function insert_chained(\stdClass $rec, ?\Closure $underlock = null): int {
         global $DB;
-        $rec->texthash = self::compute_texthash($rec->question, $rec->answer, $rec->claims);
-        $rec->redacted = $rec->redacted ?? 0;
-        $rec->timeredacted = $rec->timeredacted ?? null;
-
         $factory = \core\lock\lock_config::get_lock_factory(self::LOCK_TYPE);
         // The lock factory and resource are fixed; only the wait is adjustable (tests shorten it).
         $lock = $factory->get_lock(self::lock_resource($rec->courseid), self::$locktimeout);
@@ -743,6 +752,12 @@ class answer_audit {
             throw new \moodle_exception('locktimeout');
         }
         try {
+            if ($underlock) {
+                $underlock($rec);
+            }
+            $rec->texthash = self::compute_texthash($rec->question, $rec->answer, $rec->claims);
+            $rec->redacted = $rec->redacted ?? 0;
+            $rec->timeredacted = $rec->timeredacted ?? null;
             $last = $DB->get_records(self::TABLE, ['courseid' => $rec->courseid], 'id DESC', 'id, rowhash', 0, 1);
             $rec->prevhash = $last ? (string) reset($last)->rowhash : '';
             $rec->timecreated = time();
@@ -828,7 +843,10 @@ class answer_audit {
      * redacted row is unlinked at once: its key is made from a salt that is thrown away), and rewrites every
      * prevhash and rowhash. Runs under the course lock. Writes one RESEALED_ACTION audit_logger row with the counts
      * and the legacy result (no text, no ids of learners). A course with no row lacking a link hash is left exactly
-     * as it is and logs nothing, so running it again never rewrites a chain.
+     * as it is and logs nothing, so running it again never rewrites a chain. A rerun after a crash is safe: the
+     * rewrite runs in one delegated transaction, so a crash part way (or an exception) rolls the course back to
+     * exactly what 8.4.0 wrote, the lock is released in a finally, no log row is written, and the upgrade step
+     * run again checks and re-seals the course from the start.
      *
      * @param int $courseid
      * @return array{rows: int, linked: int, unlinked: int, legacy_ok: bool, legacy_brokenat: ?int}
@@ -841,15 +859,14 @@ class answer_audit {
             throw new \moodle_exception('locktimeout');
         }
         $result = ['rows' => 0, 'linked' => 0, 'unlinked' => 0, 'legacy_ok' => true, 'legacy_brokenat' => null];
-        $legacy = $DB->count_records_select(self::TABLE, "courseid = ? AND (linkhash IS NULL OR linkhash = '')",
-            [$courseid]);
-        if ($legacy === 0) {
-            // Nothing written before 8.4.1: nothing to re-seal, and a chain is never rewritten without a reason
-            // (re-sealing a verified chain again would hide any change made since).
-            $lock->release();
-            return $result;
-        }
         try {
+            $legacy = $DB->count_records_select(self::TABLE, "courseid = ? AND (linkhash IS NULL OR linkhash = '')",
+                [$courseid]);
+            if ($legacy === 0) {
+                // Nothing written before 8.4.1: nothing to re-seal, and a chain is never rewritten without a reason
+                // (re-sealing a verified chain again would hide any change made since). The finally releases the lock.
+                return $result;
+            }
             $prev = '';
             $rs = $DB->get_recordset(self::TABLE, ['courseid' => $courseid], 'id ASC');
             try {
@@ -869,6 +886,8 @@ class answer_audit {
                 $rs->close();
             }
 
+            // One transaction for the rewrite: a crash leaves the course exactly as 8.4.0 wrote it.
+            $transaction = $DB->start_delegated_transaction();
             $prev = '';
             $unlinked = [];
             $rs = $DB->get_recordset(self::TABLE, ['courseid' => $courseid], 'id ASC');
@@ -905,6 +924,7 @@ class answer_audit {
                 $rs->close();
             }
             self::clear_review_notes($unlinked);
+            $transaction->allow_commit();
         } finally {
             $lock->release();
         }

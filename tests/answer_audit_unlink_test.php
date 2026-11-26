@@ -299,6 +299,24 @@ final class answer_audit_unlink_test extends \advanced_testcase {
         $this->assertTrue(answer_audit::verify_chain(7)['ok']);
     }
 
+    public function test_the_reseal_always_releases_the_course_lock(): void {
+        global $CFG;
+        // The database lock factory does not hand a held lock to a second caller in the same process.
+        $CFG->lock_factory = '\\core\\lock\\db_record_lock_factory';
+        answer_audit::$locktimeout = 1;
+        try {
+            // Nothing to re-seal (the early return), then a re-seal that rewrites: both must let go of the lock.
+            $this->assertSame(0, answer_audit::reseal_course(7)['rows']);
+            $this->assertGreaterThan(0, answer_audit::record($this->row(7, 5, 9701, 9071)));
+            $this->legacy_chain(9, [[5, 9702, 9072, false]]);
+            $this->assertSame(1, answer_audit::reseal_course(9)['rows']);
+            $this->assertGreaterThan(0, answer_audit::record($this->row(9, 5, 9703, 9072)));
+            $this->assertTrue(answer_audit::verify_chain(9)['ok']);
+        } finally {
+            answer_audit::$locktimeout = answer_audit::DEFAULT_LOCK_TIMEOUT;
+        }
+    }
+
     public function test_a_tampered_840_chain_is_reported_by_the_reseal(): void {
         global $DB;
         [, $b] = $this->legacy_chain(8, [[5, 9601, 9061, false], [5, 9602, 9061, false], [5, 9603, 9061, false]]);
