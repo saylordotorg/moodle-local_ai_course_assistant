@@ -8,6 +8,12 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 
 A 2:38 tour, recorded on version 8.0.0 on a Saylor test site in a demo course with no student data. It shows what SOLA does for learners (in student view): answers from the course, Quiz Me, Study Plan and 46 languages. Then it shows how an institution brands SOLA as its own with settings instead of a fork, the settings hub, and the Providers and keys table. Branding needs version 8.0.0 or later. Narration is AI-generated.
 
+## Walkthrough video
+
+[![SOLA, the AI Course Assistant for Moodle: Walkthrough (Version 8.4)](https://img.youtube.com/vi/lgXZc1vop6E/maxresdefault.jpg)](https://youtu.be/lgXZc1vop6E)
+
+A 4:57 chaptered tour of version 8.4 for admins, teachers and developers: what learners and teachers see, the settings hub, providers, keys and failover, spend caps and branding, the 8.4 answer safety features (guidance rules, claim check, answer audit, review outcomes), what is off by default and the known limits, then privacy and installation. Recorded on a Saylor test site in a test course with test accounts and no student data. Narration is AI-generated.
+
 ## Version 8.4.1
 
 **Release Date:** November 2026
